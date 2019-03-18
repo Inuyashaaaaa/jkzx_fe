@@ -1,10 +1,10 @@
 import {
   ASSET_CLASS_ZHCN_MAP,
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
+  INPUT_NUMBER_LOT_CONFIG,
   INPUT_NUMBER_PERCENTAGE_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
-  INPUT_NUMBER_LOT_CONFIG,
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
 } from '@/constants/common';
 import RangeNumberInput from '@/containers/RangeNumberInput';
 import Form from '@/design/components/Form';
