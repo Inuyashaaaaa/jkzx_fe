@@ -3,6 +3,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   INPUT_NUMBER_PERCENTAGE_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
+  INPUT_NUMBER_LOT_CONFIG,
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
 } from '@/constants/common';
 import RangeNumberInput from '@/containers/RangeNumberInput';
 import Form from '@/design/components/Form';
@@ -48,49 +50,49 @@ class Component extends PureComponent<
       instruments: [],
       tableColumnDefs: [
         {
-          headerName: '标的物价格 (¥)',
+          headerName: '标的物价格',
           field: 'underlyerPrice',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
-          headerName: '价格 (¥)',
+          headerName: '价格',
           field: 'price',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'DELTA',
           field: 'delta',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_LOT_CONFIG,
         },
         {
           headerName: 'DELTA CASH',
           field: 'deltaCash',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'GAMMA',
           field: 'gamma',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_DIGITAL_CONFIG,
         },
         {
           headerName: 'GAMMA CASH',
           field: 'gammaCash',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'VEGA',
           field: 'vega',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'THETA',
           field: 'theta',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'RHO_R',
           field: 'rhoR',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_DIGITAL_CONFIG,
         },
       ],
     };
