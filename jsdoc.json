@@ -1,0 +1,10 @@
+{
+  "opts": {
+    "destination": "docs"
+  },
+  "source": {
+    "include": "src",
+    "includePattern": ".(ts|tsx)$"
+  },
+  "plugins": ["plugins/markdown"]
+}

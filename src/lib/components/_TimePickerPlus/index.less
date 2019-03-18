@@ -1,0 +1,19 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/lib/utils/utils.less';
+@import '../style/themes.less';
+
+@time-plus: ~'@{tongyu-prefix}-time-plus';
+
+:global {
+  .@{time-plus} {
+    width: 100%;
+
+    &.no-border {
+      .ant-time-picker-input {
+        border: none;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+}

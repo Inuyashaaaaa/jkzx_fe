@@ -1,0 +1,671 @@
+---
+name: SourceTable
+path: /SourceTable
+menu: Table
+---
+
+import { Playground, PropsTable } from 'docz';
+import SourceTable from '../SourceTable';
+import ModalButton from '../../ModalButton';
+import Form from '../../Form';
+import { delay, mockData } from '../../../utils';
+import { Button, Row } from 'antd';
+import produce from 'immer';
+
+# SourceTable
+
+封装 `Table`，增加 `CRUD` 功能
+
+## 创建
+
+<Playground>
+{() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                columnDefs: [
+                    { headerName: 'Make', field: 'make', },
+                    { headerName: 'Model', field: 'model' },
+                    { headerName: 'Price', field: 'price', },
+                ],
+                dataSource: [],
+                createFormData: {}
+            };
+
+            this.onCreate = this.onCreate.bind(this)
+            this.onSearch = this.onSearch.bind(this)
+            this.onModalButtonClick = this.onModalButtonClick.bind(this)
+            this.onCreateFormValueChange = this.onCreateFormValueChange.bind(this)
+        }
+
+        componentDidMount() {
+            this.onSearch()
+        }
+
+        onCreate(params) {
+           this.$createForm.props.form.validateFieldsAndScroll((errors, values) => {
+               if (errors) return;
+                this.setState({
+                    dataSource: this.state.dataSource.concat({
+                        id: Math.random(),
+                        ...values,
+                    })
+                }, () => {
+                    this.setState({
+                        visible: false,
+                        createFormData: {}
+                    })
+                })
+           })
+        }
+
+        onSearch(params) {
+            this.setState({
+                loading: true,
+            })
+            return delay(1000, mockData({
+                    make: '@name',
+                    model: '@name',
+                    price: '@integer',
+                }, '20-30')).then(dataSource => {
+                this.setState({
+                    dataSource,
+                    loading: false,
+                })
+            })
+        }
+
+        onCreateFormValueChange(params) {
+            this.setState({
+                createFormData: params.values
+            })
+        }
+
+        onModalButtonClick() {
+            this.setState({
+                visible: true,
+            })
+        }
+
+        render () {
+            const { columnDefs, dataSource, loading, visible, createFormData } = this.state;
+            return <SourceTable
+                    loading={loading}
+                    rowKey="id"
+                    dataSource={dataSource}
+                    header={
+                        <Row style={{marginBottom: 10}}>
+                            <ModalButton visible={visible} onClick={this.onModalButtonClick} onConfirm={this.onCreate} key='create' type='primary' content={
+                            <Form
+                                wrappedComponentRef={ref => this.$createForm = ref}
+                                controlNumberOneRow={1}
+                                footer={false}
+                                onValueChange={this.onCreateFormValueChange}
+                                dataSource={createFormData}
+                                controls={[
+                                {
+                                    control: {
+                                        label: 'model'
+                                    },
+                                    name: 'model',
+                                    field: 'model',
+                                    input: {
+                                        type: 'input'
+                                    }
+                                },
+                                {
+                                    control: {
+                                        label: 'price'
+                                    },
+                                    name: 'price',
+                                    field: 'price',
+                                    input: {
+                                        type: 'number'
+                                    }
+                                }
+                            ]}></Form>
+                        }>创 建</ModalButton>
+                        </Row>
+                    }
+                    columnDefs={columnDefs}
+                    onSearchButtonClick={this.onSearch}
+                />
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 搜索
+
+<Playground>
+{() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                columnDefs: [
+                    { headerName: 'Make', field: 'make', },
+                    { headerName: 'Model', field: 'model' },
+                    { headerName: 'Price', field: 'price' },
+                ],
+                dataSource: [],
+                createFormData: {}
+            };
+
+            this.onSearch = this.onSearch.bind(this)
+        }
+
+        componentDidMount() {
+            this.onSearch()
+        }
+
+        onSearch(params) {
+            // 可以获取 searchFormData 发起请求
+            this.setState({
+                loading: true,
+            })
+            return delay(1000, mockData({
+                    make: '@name',
+                    model: '@name',
+                    price: '@integer',
+                }, '20-30')).then(dataSource => {
+                this.setState({
+                    dataSource,
+                    loading: false,
+                })
+            })
+        }
+
+        render () {
+            const { columnDefs, dataSource, loading, visible } = this.state;
+            return <SourceTable
+                    searchable
+                    loading={loading}
+                    rowKey="id"
+                    dataSource={dataSource}
+                    columnDefs={columnDefs}
+                    searchFormControls={[
+                        {
+                            control: {
+                                label: 'model'
+                            },
+                            name: 'model',
+                            field: 'model',
+                            input: {
+                                type: 'input'
+                            }
+                        },
+                        {
+                            control: {
+                                label: 'price'
+                            },
+                            name: 'price',
+                            field: 'price',
+                            input: {
+                                type: 'number'
+                            }
+                        }
+                    ]}
+                    onSearchButtonClick={this.onSearch}
+                />
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 删除
+
+<Playground>
+{() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                columnDefs: [
+                    { headerName: 'Make', field: 'make', },
+                    { headerName: 'Model', field: 'model' },
+                    { headerName: 'Price', field: 'price' },
+                ],
+                dataSource: [],
+                createFormData: {}
+            };
+
+            this.onSearch = this.onSearch.bind(this)
+            this.onRemove = this.onRemove.bind(this)
+        }
+
+        componentDidMount() {
+            this.onSearch()
+        }
+
+        onSearch(params) {
+            // 可以获取 searchFormData 发起请求
+            this.setState({
+                loading: true,
+            })
+            return delay(1000, mockData({
+                    make: '@name',
+                    model: '@name',
+                    price: '@integer',
+                }, '20-30')).then(dataSource => {
+                this.setState({
+                    dataSource,
+                    loading: false,
+                })
+            })
+        }
+
+        onRemove(params) {
+            return delay(1000, (rowActionComContext) => {
+                this.setState(produce(state => {
+                    state.dataSource.splice(params.rowIndex, 1)
+                }))
+            })
+        }
+
+        render () {
+            const { columnDefs, dataSource, loading, visible } = this.state;
+            return <SourceTable
+                    loading={loading}
+                    rowKey="id"
+                    dataSource={dataSource}
+                    columnDefs={columnDefs}
+                    rowActions={[
+                        <Button type='danger' onClick={this.onRemove}>删除</Button>
+                    ]}
+                />
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 行操作
+
+每个 `action` 的 `onClick` 接受一个返回 `Promise` 的函数，内部管理了 loading 状态，当 Promise 结束时候（resolved，reject）会设置 loading 为 false。如果要手动控制每行操作的内部状态，可以参考下面的自定义行操作 demo。
+
+`vertical` 模式下，暂时无法实现简单行操作
+
+<Playground>
+{() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                actionName: 'hey!',
+                columnDefs: [
+                    { headerName: 'Make', field: 'make', },
+                    { headerName: 'Model', field: 'model' },
+                    { headerName: 'Price', field: 'price' },
+                ],
+                dataSource: [],
+            };
+
+            this.onSearch = this.onSearch.bind(this)
+            this.getRowActions = this.getRowActions.bind(this)
+            this.onSwitch = this.onSwitch.bind(this)
+            this.onRemove = this.onRemove.bind(this)
+        }
+
+        componentDidMount() {
+            this.onSearch()
+        }
+
+        onSearch(params) {
+            // 可以获取 searchFormData 发起请求
+            this.setState({
+                loading: true,
+            })
+            return delay(1000, mockData({
+                    make: '@name',
+                    model: '@name',
+                    price: '@integer',
+                }, '20-30')).then(dataSource => {
+                this.setState({
+                    dataSource,
+                    loading: false,
+                })
+            })
+        }
+
+        onRemove(params) {
+            return delay(1000, (rowActionComContext) => {
+                this.setState(produce(state => {
+                    state.dataSource.splice(params.rowIndex, 1)
+                }))
+            })
+        }
+
+        getRowActions(params) {
+            if (params.rowIndex % 2) {
+                return [
+                    <Button key='操作A' type='primary' onClick={this.onRemove}>操作A({this.state.actionName})</Button>,
+                ]
+            } else {
+                return [
+                    <Button key='操作B' type='primary' onClick={this.onRemove}>操作B({this.state.actionName})</Button>
+                ]
+            }
+        }
+
+        onSwitch() {
+            this.setState({
+                actionName: this.state.actionName === 'ha!' ? 'hey!' : 'ha!',
+            }, () => {
+                this.$sourceTable && this.$sourceTable.refresh()
+            })
+        }
+
+        render () {
+            const { columnDefs, dataSource, loading, visible } = this.state;
+            return <>
+                <Button.Group style={{marginBottom: 10}}>
+                    <Button type='primary' onClick={this.onSwitch}>切换操作</Button>
+                </Button.Group>
+                <SourceTable
+                        ref={node => this.$sourceTable = node}
+                        loading={loading}
+                        rowKey="id"
+                        dataSource={dataSource}
+                        columnDefs={columnDefs}
+                        rowActions={this.getRowActions}
+                    />
+                </>
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+### 自定义行操作
+
+[自定义]((https://www.ag-grid.com/javascript-grid-cell-rendering/)) `CellRendering`，可以拿到当前行的所有[内容](https://www.ag-grid.com/javascript-grid-cell-rendering-components/)
+
+<Playground>
+{() => {
+
+    class CustomCellRenderer extends React.PureComponent {
+        constructor(props) {
+            super(props);
+            this.state = {
+                createFormData: {},
+            }
+            this.onCreateFormValueChange = this.onCreateFormValueChange.bind(this)
+        }
+
+        onCreateFormValueChange(params) {
+            this.setState({
+                createFormData: params.values
+            })
+        }
+
+        render() {
+            return <Row style={{height: this.props.context.rowHeight}} type='flex' align='middle'>
+                    <ModalButton size='small' type='primary' content={
+                                <Form
+                                    controlNumberOneRow={1}
+                                    footer={false}
+                                    onValueChange={this.onCreateFormValueChange}
+                                    dataSource={this.state.createFormData}
+                                    controls={[
+                                    {
+                                        control: {
+                                            label: 'model'
+                                        },
+                                        name: 'model',
+                                        field: 'model',
+                                        input: {
+                                            type: 'input'
+                                        }
+                                    },
+                                    {
+                                        control: {
+                                            label: 'price'
+                                        },
+                                        name: 'price',
+                                        field: 'price',
+                                        input: {
+                                            type: 'number'
+                                        }
+                                    }
+                                ]}></Form>
+                }>查看</ModalButton>
+            </Row>
+        }
+    }
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                actionName: 'hey!',
+                columnDefs: [
+                    { headerName: 'Make', field: 'make', },
+                    { headerName: 'Model', field: 'model' },
+                    { headerName: 'Price', field: 'price' },
+                    { headerName: 'actions', field: 'actions', cellRenderer: 'CustomCellRenderer' }
+                ],
+                dataSource: [],
+            };
+
+            this.onSearch = this.onSearch.bind(this)
+        }
+
+        componentDidMount() {
+            this.onSearch()
+        }
+
+        onSearch(params) {
+            // 可以获取 searchFormData 发起请求
+            this.setState({
+                loading: true,
+            })
+            return delay(1000, mockData({
+                    make: '@name',
+                    model: '@name',
+                    price: '@integer',
+                }, '20-30')).then(dataSource => {
+                this.setState({
+                    dataSource,
+                    loading: false,
+                })
+            })
+        }
+
+        render () {
+            const { columnDefs, dataSource, loading, visible } = this.state;
+            return  <SourceTable
+                        ref={node => this.$sourceTable = node}
+                        loading={loading}
+                        rowKey="id"
+                        dataSource={dataSource}
+                        columnDefs={columnDefs}
+                        frameworkComponents={{
+                            CustomCellRenderer
+                        }}
+                    />
+
+
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 计总行
+
+<Playground>
+{() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                dataSource: mockData({
+                    money: '@integer(10, 100)',
+                    money1: '@integer(10, 100)',
+                    money2: '@integer(10, 100)',
+                }, '3'),
+                columnDefs: [
+                    {
+                        headerName: 'money',
+                        field: 'money',
+                        editable: true,
+                        input: {
+                            type: 'number',
+                            precision: 2,
+                            format: '¥ 0,0.00',
+                        },
+                    },
+                    {
+                        headerName: 'money1',
+                        field: 'money1',
+                        editable: true,
+                        totalable: false,
+                        input: {
+                            type: 'number',
+                            precision: 2,
+                            format: '¥ 0,0.00',
+                        },
+                    },
+                    {
+                        headerName: 'money2',
+                        field: 'money2',
+                        editable: true,
+                        calculateTotalData({ totalData, record }) {
+                            return (totalData || 0) + record.money2 * 100;
+                        },
+                        input: {
+                            type: 'number',
+                            precision: 2,
+                            format: '¥ 0,0.00',
+                        },
+                    },
+                ],
+            };
+        }
+
+
+
+        render () {
+            const { columnDefs, rowData, dataSource } = this.state;
+            return <SourceTable
+                    totalable
+                    rowKey="id"
+                    columnDefs={columnDefs}
+                    dataSource={dataSource}
+                />
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+### 纵向表格
+
+<Playground>
+{() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+
+            this.state = {
+                dataSource: mockData({
+                    money: '@integer(10, 100)',
+                    money1: '@integer(10, 100)',
+                    money2: '@integer(10, 100)',
+                }, '3'),
+                columnDefs: [
+                    {
+                        headerName: 'money',
+                        field: 'money',
+                        editable: true,
+                        input: {
+                            type: 'number',
+                            precision: 2,
+                            format: '¥ 0,0.00',
+                        },
+                    },
+                    {
+                        headerName: 'money1',
+                        field: 'money1',
+                        editable: true,
+                        totalable: false,
+                        input: {
+                            type: 'number',
+                            precision: 2,
+                            format: '¥ 0,0.00',
+                        },
+                    },
+                    {
+                        headerName: 'money2',
+                        field: 'money2',
+                        editable: true,
+                        calculateTotalData({ totalData, record }) {
+                            return (totalData || 0) + record.money2 * 100;
+                        },
+                        input: {
+                            type: 'number',
+                            precision: 2,
+                            format: '¥ 0,0.00',
+                        },
+                    },
+                ],
+            };
+        }
+
+
+
+        render () {
+            const { columnDefs, rowData, dataSource } = this.state;
+            return <SourceTable
+                    vertical
+                    totalable
+                    rowKey="id"
+                    columnDefs={columnDefs}
+                    dataSource={dataSource}
+                />
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+# API
+
+<PropsTable of={SourceTable} />

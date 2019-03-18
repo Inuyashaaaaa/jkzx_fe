@@ -1,0 +1,404 @@
+---
+name: Form
+path: /Form
+menu: Form
+---
+
+import { Playground, PropsTable } from 'docz';
+import Form from '../Form';
+import Control from '../Control';
+
+# Form
+
+快速生成表单
+
+## 布局
+
+### horizontal
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        render () {
+            return <>
+               <Form
+                layout='horizontal'
+                controlNumberOneRow={2}
+                controls={[
+                    {
+                    control: {
+                        label: 'name',
+                    },
+                    field: 'name',
+                    input: {
+                        type: 'input',
+                    },
+                    decorator: {
+                        rules: [
+                        {
+                            required: true,
+                            message: 'name must be exsit',
+                        },
+                        ],
+                    },
+                    },
+                      {
+                    control: {
+                        label: 'name1',
+                    },
+                    field: 'name1',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name2',
+                    },
+                    field: 'name2',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name3',
+                    },
+                    field: 'name3',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name4',
+                    },
+                    field: 'name4',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                ]}
+                />
+            </>
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+### vertical
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        render () {
+            return <>
+               <Form
+                layout='vertical'
+                controlNumberOneRow={3}
+                controls={[
+                    {
+                    control: {
+                        label: 'name',
+                    },
+                    field: 'name',
+                    input: {
+                        type: 'input',
+                    },
+                    decorator: {
+                        rules: [
+                        {
+                            required: true,
+                            message: 'name must be exsit',
+                        },
+                        ],
+                    },
+                    },
+                      {
+                    control: {
+                        label: 'name1',
+                    },
+                    field: 'name1',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name2',
+                    },
+                    field: 'name2',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name3',
+                    },
+                    field: 'name3',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name4',
+                    },
+                    field: 'name4',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                ]}
+                />
+            </>
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+### inline
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        render () {
+            return <>
+               <Form
+                layout='inline'
+                controls={[
+                    {
+                    control: {
+                        label: 'name',
+                    },
+                    field: 'name',
+                    input: {
+                        type: 'input',
+                    },
+                    decorator: {
+                        rules: [
+                        {
+                            required: true,
+                            message: 'name must be exsit',
+                        },
+                        ],
+                    },
+                    },
+                      {
+                    control: {
+                        label: 'name1',
+                    },
+                    field: 'name1',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name2',
+                    },
+                    field: 'name2',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name3',
+                    },
+                    field: 'name3',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                     {
+                    control: {
+                        label: 'name4',
+                    },
+                    field: 'name4',
+                    input: {
+                        type: 'input',
+                    },
+                    },
+                ]}
+                />
+            </>
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 自定义 footer
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        render () {
+            return <>
+               <Form
+                footer={false}
+                controlNumberOneRow={3}
+                controls={[
+                    {
+                    control: {
+                        label: 'name',
+                    },
+                    field: 'name',
+                    input: {
+                        type: 'input',
+                    },
+                    decorator: {
+                        rules: [
+                        {
+                            required: true,
+                            message: 'name must be exsit',
+                        },
+                        ],
+                    },
+                    },
+                    {
+                    control: {
+                        label: 'age',
+                    },
+                    field: 'age',
+                    input: {
+                        type: 'number',
+                        precision: 2,
+                        format: '0,0.00',
+                    },
+                    },
+                    {
+                    control: {
+                        label: 'dell',
+                    },
+                    field: 'dell',
+                    input: {
+                        type: 'select',
+                        options: [
+                        {
+                            label: 'name1',
+                            value: 'name1',
+                        },
+                        ],
+                    },
+                    },
+                ]}
+                />
+            </>
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 受控状态
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props){
+            super(props)
+            this.state = {
+                dataSource: {}
+            }
+            this.onValueChange = this.onValueChange.bind(this)
+        }
+
+        onValueChange(params) {
+            this.setState({
+                dataSource: params.values
+            })
+        }
+
+        render () {
+            return <>
+               <Form
+                controlNumberOneRow={3}
+                controls={[
+                    {
+                    control: {
+                        label: 'name',
+                    },
+                    field: 'name',
+                    input: {
+                        type: 'input',
+                    },
+                    decorator: {
+                        rules: [
+                        {
+                            required: true,
+                            message: 'name must be exsit',
+                        },
+                        ],
+                    },
+                    },
+                    {
+                    control: {
+                        label: 'age',
+                    },
+                    field: 'age',
+                    input: {
+                        type: 'number',
+                        precision: 2,
+                        format: '0,0.00',
+                    },
+                    },
+                    {
+                    control: {
+                        label: 'dell',
+                    },
+                    field: 'dell',
+                    input: {
+                        type: 'select',
+                        decorator: [
+                        {
+                            label: 'name1',
+                            value: 'name1',
+                        },
+                        ],
+                    },
+                    },
+                ]}
+                dataSource={this.state.dataSource}
+                onValueChange={this.onValueChange}
+                />
+            </>
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+# API
+
+### Form
+
+<PropsTable of={Form} />
+
+### Control
+
+<PropsTable of={Control} />

@@ -1,0 +1,52 @@
+import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
+import {
+  DaysInYear,
+  Direction,
+  EffectiveDate,
+  ExpirationDate,
+  HighStrike,
+  InitialSpot,
+  LowStrike,
+  NotionalAmount,
+  NotionalAmountType,
+  OptionType,
+  ParticipationRate,
+  Premium,
+  PremiumType,
+  SettlementDate,
+  SpecifiedPrice,
+  StrikeType,
+  Term,
+  UnderlyerInstrumentId,
+  UnderlyerMultiplier,
+} from './common/common';
+import { pipeLeg } from './common/pipeLeg';
+
+export const AnnualizedVerticalSpreadOptionDTOEuropeanAnnual = pipeLeg({
+  name: '欧式价差 - 年化',
+  type: LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_ANNUAL,
+  assetClass: ASSET_CLASS_MAP.EQUITY,
+  isAnnualized: true,
+  columnDefs: [
+    Direction,
+    OptionType,
+    UnderlyerInstrumentId,
+    UnderlyerMultiplier,
+    InitialSpot,
+    StrikeType,
+    LowStrike,
+    HighStrike,
+    Term,
+    EffectiveDate,
+    ExpirationDate,
+    SpecifiedPrice,
+    DaysInYear,
+    // expirationTime
+    SettlementDate,
+    ParticipationRate,
+    NotionalAmountType,
+    NotionalAmount,
+    PremiumType,
+    Premium,
+  ],
+});

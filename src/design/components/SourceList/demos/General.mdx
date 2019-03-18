@@ -1,0 +1,483 @@
+---
+name: SourceList
+path: /SourceList
+menu: Table
+---
+
+import { Playground, PropsTable } from 'docz';
+import SourceList from '../SourceList';
+import { delay, mockData, remove } from '../../../utils';
+import { Button, Row, Col } from 'antd';
+import ModalButton from '../../ModalButton';
+import Form from '../../Form';
+
+# SourceList
+
+点击按钮，自动弹出模态框
+
+## 创建
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+            this.state = {
+                loading: false,
+            }
+            this.featch = this.featch.bind(this)
+            this.onCreate = this.onCreate.bind(this)
+            this.onConfirm = this.onConfirm.bind(this)
+            this.onClick = this.onClick.bind(this)
+        }
+
+        componentDidMount() {
+            return this.featch()
+        }
+
+        featch(params) {
+            this.setState({
+                loading: true,
+            })
+            delay(1000).then(() => {
+                this.setState({
+                loading: false,
+                    dataSource: mockData({
+                        'name': '@name'
+                    })
+                })
+            })
+
+        }
+
+        onCreate() {
+            return delay(1000, true)
+        }
+
+        onConfirm(params) {
+            this.setState({
+                visible: false,
+                dataSource: this.state.dataSource.concat(mockData({
+                        'name': this.$form.props.form.getFieldValue('name')
+                    }, '1'))
+            })
+        }
+
+        onClick() {
+            this.setState({
+                visible: true,
+            })
+        }
+
+        render () {
+            return <SourceList
+                        loading={this.state.loading}
+                        action={
+                            <ModalButton
+                                    type='primary'
+                                    visible={this.state.visible}
+                                    onConfirm={this.onConfirm}
+                                    onClick={this.onClick}
+                                    size='small'
+                                    content={
+                                <Form
+                                    wrappedComponentRef={node => this.$form = node}
+                                    controlNumberOneRow={1}
+                                    footer={false}
+
+                                    controls={[{
+                                    control: {
+                                        label: 'name',
+                                    },
+                                    field: 'name',
+                                    input: {
+                                        type: 'input',
+                                    },
+                                }]}/>
+                            }>创建</ModalButton>
+                        }
+                        rowKey='id'
+                        title='this is title'
+                        style={{ width: 300 }}
+                        renderItem={params => params.rowData.name}
+                        dataSource={this.state.dataSource}
+                    />;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 搜索
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+            this.state = {
+                loading: false,
+            }
+            this.featch = this.featch.bind(this)
+        }
+
+        componentDidMount() {
+            return this.featch()
+        }
+
+        featch(params) {
+            console.log(this.$form && this.$form.props.form.getFieldValue('name'))
+            this.setState({
+                loading: true,
+            })
+            delay(1000).then(() => {
+                this.setState({
+                loading: false,
+                    dataSource: mockData({
+                        'name': '@name'
+                    })
+                })
+            })
+
+        }
+
+        render () {
+            return <SourceList
+                        searchable={true}
+                        searchFormProps={{
+                            wrappedComponentRef: node => this.$form = node
+                        }}
+                        loading={this.state.loading}
+                        rowKey='id'
+                        title='this is title'
+                        style={{ width: 300 }}
+                        renderItem={params => params.rowData.name}
+                        searchFormControls={[
+                            {
+                                control: {
+                                    label: 'name',
+                                },
+                                field: 'name',
+                                input: {
+                                    type: 'input',
+                                },
+                            }
+                        ]}
+                        onSearchButtonClick={this.featch}
+                        dataSource={this.state.dataSource}
+                    />;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 删除
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+            this.state = {
+                loading: false,
+                removeLoadings: {}
+            }
+            this.featch = this.featch.bind(this)
+            this.onRemove = this.onRemove.bind(this)
+        }
+
+        componentDidMount() {
+            return this.featch()
+        }
+
+        featch(params) {
+            this.setState({
+                loading: true,
+            })
+            delay(1000).then(() => {
+                this.setState({
+                loading: false,
+                    dataSource: mockData({
+                        'name': '@name'
+                    })
+                })
+            })
+
+        }
+
+        onRemove(params) {
+            this.setState({
+                removeLoadings: {
+                    ...this.state.removeLoadings,
+                    [params.rowId]: true
+                }
+            })
+
+            delay(1000).then(() => {
+                this.setState({
+                    dataSource: remove(this.state.dataSource, item => item.id === params.rowId),
+                    removeLoadings: {
+                        ...this.state.removeLoadings,
+                        [params.rowId]: false
+                    }
+                })
+            })
+        }
+
+        bindOnRemove(params) {
+            return () => this.onRemove(params)
+        }
+
+        render () {
+            return <SourceList
+                        loading={this.state.loading}
+                        rowKey='id'
+                        title='this is title'
+                        style={{ width: 300 }}
+                        renderItem={params => {
+                            return <Row type='flex' justify='space-between'>
+                                <Col>{params.rowData.name}</Col>
+                                <Col><Button loading={this.state.removeLoadings[params.rowId]} size='small' type='danger' onClick={this.bindOnRemove(params)}>删除</Button></Col>
+                            </Row>
+                        }}
+                        dataSource={this.state.dataSource}
+                    />;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+
+## 选择
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+            this.state = {
+                loading: false,
+                removeLoadings: {},
+                signle: true,
+            }
+            this.featch = this.featch.bind(this)
+            this.onRemove = this.onRemove.bind(this)
+            this.switch = this.switch.bind(this)
+        }
+
+        componentDidMount() {
+            return this.featch()
+        }
+
+        featch(params) {
+            this.setState({
+                loading: true,
+            })
+            delay(1000).then(() => {
+                this.setState({
+                loading: false,
+                    dataSource: mockData({
+                        'name': '@name'
+                    })
+                })
+            })
+
+        }
+
+        onRemove(params) {
+            this.setState({
+                removeLoadings: {
+                    ...this.state.removeLoadings,
+                    [params.rowId]: true
+                }
+            })
+
+            delay(1000).then(() => {
+                this.setState({
+                    dataSource: remove(this.state.dataSource, item => item.id === params.rowId),
+                    removeLoadings: {
+                        ...this.state.removeLoadings,
+                        [params.rowId]: false
+                    }
+                })
+            })
+        }
+
+        bindOnRemove(params) {
+            return () => this.onRemove(params)
+        }
+
+        switch() {
+            this.setState({
+                signle: !this.state.signle
+            })
+        }
+
+        render () {
+            return <SourceList
+                        action={
+                            <Button size='small' onClick={this.switch}>切换单选/多选</Button>
+                        }
+                        rowSelection={this.state.signle ? 'single' : 'multiple'}
+                        selectable={true}
+                        loading={this.state.loading}
+                        rowKey='id'
+                        title='this is title'
+                        style={{ width: 300 }}
+                        renderItem={params => {
+                            return <Row type='flex' justify='space-between'>
+                                <Col>{params.rowData.name}</Col>
+                                <Col><Button loading={this.state.removeLoadings[params.rowId]} size='small' type='danger' onClick={this.bindOnRemove(params)}>删除</Button></Col>
+                            </Row>
+                        }}
+                        dataSource={this.state.dataSource}
+                    />;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+<!-- ## 多选
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+            this.onRemove = this.onRemove.bind(this)
+        }
+
+        onRemove(params) {
+            console.log(params)
+            return delay(1000, true)
+        }
+
+        onSearch() {
+            return delay(1000, {
+                dataSource: mockData({
+                    name: '@name',
+                })
+            })
+        }
+
+        onCreate() {
+            return delay(1000, true)
+        }
+
+        render () {
+            return <SourceList
+                        rowKey='id'
+                        title='this is title'
+                        style={{ width: 300 }}
+                        renderItem={params => params.rowData.name}
+                        rowSelection="multiple"
+                        createFormControls={[
+                             {
+                                control: {
+                                    label: 'name',
+                                },
+                                field: 'name',
+                                input: {
+                                    type: 'input',
+                                },
+                            },
+                        ]}
+                        onSearch={this.onSearch}
+                        onRemove={this.onRemove}
+                        onCreate={this.onCreate}
+                    />;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 完全受控
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props) {
+            super(props);
+            this.onRemove = this.onRemove.bind(this)
+            this.onSearch = this.onSearch.bind(this)
+            this.state = {
+                dataSource: []
+            }
+        }
+
+        componentDidMount() {
+            this.onSearch()
+        }
+
+        onRemove(params) {
+            this.state.dataSource.splice(params.rowIndex, 1)
+            this.forceUpdate()
+            // onRemove 一般为 async 函数
+            return Promise.reject()
+        }
+
+        onSearch() {
+            this.setState({
+                dataSource: mockData({
+                    name: '@name',
+                })
+            })
+        }
+
+        render () {
+            return <SourceList
+                        rowKey='id'
+                        title='this is title'
+                        style={{ width: 300 }}
+                        renderItem={params => params.rowData.name}
+                        createFormControls={[
+                             {
+                                control: {
+                                    label: 'name',
+                                },
+                                field: 'name',
+                                input: {
+                                    type: 'input',
+                                },
+                            },
+                        ]}
+                        onRemove={this.onRemove}
+                        dataSource={this.state.dataSource}
+                    />;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground> -->
+
+# API
+
+<PropsTable of={SourceList} />

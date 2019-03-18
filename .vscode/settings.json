@@ -1,0 +1,31 @@
+{
+  "workbench.iconTheme": "material-icon-theme",
+  "git.confirmSync": false,
+  "window.zoomLevel": 0,
+  "git.enableSmartCommit": true,
+  "files.associations": {
+    "*.wxss": "stylus",
+    "*.wxml": "jade",
+    "*.wpy": "vue",
+    "Jenkinsfile": "jenkins",
+    "*.styl": "stylus",
+    "*.css": "less",
+    "*.hbs": "javascript",
+    "*.js": "javascriptreact",
+    "*.ts": "typescriptreact"
+  },
+  "workbench.startupEditor": "newUntitledFile",
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmDelete": false,
+  "git.autofetch": true,
+  "emmet.triggerExpansionOnTab": true,
+  "workbench.statusBar.visible": true,
+  "editor.minimap.enabled": false,
+  "autoimport.showNotifications": true,
+  "editor.lineNumbers": "interval",
+  "editor.renderLineHighlight": "gutter",
+  "autoimport.filesToScan": "**/*.{ts,tsx}",
+  "workbench.colorTheme": "One Dark Pro",
+  "eslint.validate": ["javascript", "javascriptreact"],
+  "javascript.updateImportsOnFileMove.enabled": "always"
+}

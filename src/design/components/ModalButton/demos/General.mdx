@@ -1,0 +1,88 @@
+---
+name: ModalButton
+path: /ModalButton
+menu: Button
+---
+
+import { Playground, PropsTable } from 'docz';
+import ModalButton from '../index';
+import { delay } from '../../../utils';
+
+# ModalButton
+
+点击按钮，自动弹出模态框
+
+## 基础使用
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        render () {
+            return <ModalButton
+                        content={<div> i am inline boy! </div>}
+                    >Click me</ModalButton>;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+## 受控模式
+
+<Playground>
+  {() => {
+
+    class Demo extends React.PureComponent {
+        constructor(props){
+            super(props)
+            this.state = {
+                loading: false,
+                visible: false,
+            }
+            this.onClick = this.onClick.bind(this)
+            this.onCancel = this.onCancel.bind(this)
+        }
+
+        onClick() {
+            this.setState({
+                loading: true,
+            }, () => {
+                setTimeout(() => {
+                    this.setState({
+                        loading: false,
+                        visible: true,
+                    })
+                }, 1500)
+            })
+        }
+
+        onCancel() {
+            this.setState({
+                visible: false,
+            })
+        }
+
+        render () {
+            return <ModalButton
+                        visible={this.state.visible}
+                        loading={this.state.loading}
+                        content={<div> i am inline boy! </div>}
+                        onClick={this.onClick}
+                        onCancel={this.onCancel}
+                    >Click me</ModalButton>;
+        }
+    }
+
+    return <Demo />
+
+}}
+
+</Playground>
+
+# API
+
+<PropsTable of={ModalButton} />

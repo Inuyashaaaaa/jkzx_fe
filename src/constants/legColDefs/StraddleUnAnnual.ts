@@ -1,0 +1,55 @@
+import { ILegType } from '@/constants/legColDefs';
+import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
+import {
+  DaysInYear,
+  Direction,
+  EffectiveDate,
+  ExpirationDate,
+  FrontPremium,
+  HighParticipationRate,
+  HighStrike,
+  InitialSpot,
+  LowParticipationRate,
+  LowStrike,
+  MinimumPremium,
+  NotionalAmount,
+  NotionalAmountType,
+  Premium,
+  PremiumType,
+  SettlementDate,
+  SpecifiedPrice,
+  StrikeType,
+  Term,
+  UnderlyerInstrumentId,
+  UnderlyerMultiplier,
+} from './common/common';
+import { pipeLeg } from './common/pipeLeg';
+
+export const StraddleUnAnnual: ILegType = pipeLeg({
+  name: '跨式 - 非年化',
+  type: LEG_TYPE_MAP.STRADDLE_UNANNUAL,
+  assetClass: ASSET_CLASS_MAP.EQUITY,
+  isAnnualized: false,
+  columnDefs: [
+    Direction,
+    UnderlyerMultiplier,
+    UnderlyerInstrumentId,
+    InitialSpot,
+    SpecifiedPrice,
+    SettlementDate,
+    Term,
+    DaysInYear,
+    NotionalAmount,
+    NotionalAmountType,
+    EffectiveDate,
+    ExpirationDate,
+    PremiumType,
+    Premium,
+
+    StrikeType,
+    LowStrike,
+    HighStrike,
+    LowParticipationRate,
+    HighParticipationRate,
+  ],
+});

@@ -1,0 +1,41 @@
+@import '~antd/lib/style/themes/default.less';
+
+@table-margin-bottom: 8px;
+
+.standardTable {
+  :global {
+    .ant-table-pagination {
+      margin-top: 24px;
+    }
+  }
+
+  .tableAlert {
+    margin-bottom: 16px;
+  }
+}
+
+.tableListOperator {
+  margin-bottom: 16px;
+}
+
+.tableListForm {
+  margin-bottom: 24px;
+}
+
+.columnSelected {
+  background-color: #ddd !important;
+}
+
+:global {
+  .ant-table-tbody tr.antd-pro-components-_-standard-table-index-rowSelected > td {
+    background-color: #ddd;
+  }
+}
+
+.toes {
+  position: relative;
+  top: 8px;
+  &.moveUp {
+    top: -48px;
+  }
+}

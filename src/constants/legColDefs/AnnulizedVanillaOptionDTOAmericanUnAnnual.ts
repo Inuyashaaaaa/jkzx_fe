@@ -1,0 +1,47 @@
+import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
+import {
+  Direction,
+  EffectiveDate,
+  ExpirationDate,
+  FrontPremium,
+  InitialSpot,
+  MinimumPremium,
+  NotionalAmount,
+  NotionalAmountType,
+  OptionType,
+  ParticipationRate,
+  Premium,
+  PremiumType,
+  SettlementDate,
+  SpecifiedPrice,
+  Strike,
+  StrikeType,
+  UnderlyerInstrumentId,
+  UnderlyerMultiplier,
+} from './common/common';
+import { pipeLeg } from './common/pipeLeg';
+
+export const AnnulizedVanillaOptionDTOAmericanUnAnnual = pipeLeg({
+  name: '美式 - 非年化',
+  type: LEG_TYPE_MAP.VANILLA_AMERICAN_UNANNUAL,
+  assetClass: ASSET_CLASS_MAP.EQUITY,
+  isAnnualized: false,
+  columnDefs: [
+    Direction,
+    OptionType,
+    UnderlyerInstrumentId,
+    UnderlyerMultiplier,
+    InitialSpot,
+    StrikeType,
+    Strike,
+    SpecifiedPrice,
+    EffectiveDate,
+    ExpirationDate,
+    SettlementDate,
+    ParticipationRate,
+    NotionalAmountType,
+    NotionalAmount,
+    PremiumType,
+    Premium,
+  ],
+});

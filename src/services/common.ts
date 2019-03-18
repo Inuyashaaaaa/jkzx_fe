@@ -1,0 +1,24 @@
+import { TRNORS_OPTS } from '@/constants/model';
+
+export const getCanUsedTranors = usedTranors => {
+  return TRNORS_OPTS.filter(item => {
+    return !usedTranors.includes(item.name);
+  }).map(item => ({
+    label: item.name,
+    value: item.name,
+  }));
+};
+
+// 获取所有可用的期限下拉 options 选项
+export const getCanUsedTranorsOtions = (
+  tableDataSource: Array<{ tenor: any }>,
+  record: { tenor }
+) => {
+  return getCanUsedTranors(
+    tableDataSource.map(item => item.tenor).filter(item => item !== record.tenor)
+  );
+};
+
+export const getCanUsedTranorsOtionsNotIncludingSelf = (tableDataSource: Array<{ tenor: any }>) => {
+  return getCanUsedTranors(tableDataSource.map(item => item.tenor));
+};

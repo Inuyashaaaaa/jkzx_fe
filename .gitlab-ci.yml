@@ -1,0 +1,77 @@
+stages:
+  - install
+  - test
+  - build
+  - deploy
+
+cache:
+  key: ${CI_BUILD_REF_NAME}
+  paths:
+    - node_modules/
+    - dist/
+
+before_script:
+  - source ~/.bashrc
+  - tail ~/.bashrc
+  # - nvm -v
+  - whoami
+  # - echo $NVM_DIR
+  - export PATH=/home/gitlab-runner/.nvm/versions/node/v10.15.1/bin:$PATH
+  - yarn -v
+
+# 安装依赖
+Install:
+  stage: install
+  script:
+    - yarn install
+  only:
+    - master-staging
+    - master
+
+Lint:
+  stage: test
+  script:
+    - echo 'yarn run lint'
+  only:
+    - master-staging
+    - master
+
+Test:
+  stage: test
+  script:
+    - echo 'yarn run test'
+  only:
+    - master-staging
+    - master
+
+Build:
+  stage: build
+  script:
+    - yarn run build
+  only:
+    - master
+    - master-staging
+
+Deploy-Test:
+  stage: deploy
+  script:
+    - yarn run deploy:test
+  only:
+    - master-staging
+
+Deploy-Doc:
+  stage: deploy
+  script:
+    - yarn run deploy:doc
+  when: manual
+  only:
+    - master
+    - master-staging
+
+Deploy-Prod:
+  stage: deploy
+  script:
+    - yarn run deploy:prod
+  when: manual
+  only:
+    - master
