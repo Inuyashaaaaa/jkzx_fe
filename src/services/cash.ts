@@ -23,3 +23,33 @@ export const countRhoR = rhoR => {
     .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
     .toNumber();
 };
+
+export const countDelta = (delta, multiplier) => {
+  return new BigNumber(delta)
+    .dividedBy(multiplier)
+    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+    .toNumber();
+};
+
+export const countGamma = (gamma, multiplier, underlyerPrice) => {
+  return new BigNumber(gamma)
+    .dividedBy(multiplier)
+    .multipliedBy(underlyerPrice)
+    .dividedBy(100)
+    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+    .toNumber();
+};
+
+export const countVega = vega => {
+  return new BigNumber(vega)
+    .dividedBy(100)
+    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+    .toNumber();
+};
+
+export const countTheta = theta => {
+  return new BigNumber(theta)
+    .dividedBy(365)
+    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+    .toNumber();
+};
