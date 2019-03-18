@@ -38,42 +38,36 @@ class ExerciseModal extends PureComponent<
     exportVisible: false,
   };
   public show = (data = {}, tableFormData, currentUser, reload) => {
-    console.log(data);
     this.data = data;
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
 
     const direction = this.data.direction;
-
-    this.setState(
-      {
-        visible: true,
-        direction,
-        ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-          ? {
-              dataSource: this.computeLotDataSource({
-                [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-              }),
-            }
-          : {
-              dataSource: this.computeCnyDataSource({
-                [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-              }),
+    this.setState({
+      visible: true,
+      direction,
+      ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+        ? {
+            dataSource: this.computeLotDataSource({
+              [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
             }),
-      },
-      () => {
-        console.log(this.state.direction);
-      }
-    );
+          }
+        : {
+            dataSource: this.computeCnyDataSource({
+              [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+            }),
+          }),
+    });
   };
 
   public computeCnyDataSource = (value, changed = {}) => {
     return {
       ...value,
       [NOTIONAL_AMOUNT]: new BigNumber(value[NUM_OF_OPTIONS])
-        .multipliedBy(this.data[LEG_FIELD.INITIAL_NOTIONAL_AMOUNT])
-        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER]),
+        .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+        .toNumber(),
       [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
         ? changed[SETTLE_AMOUNT]
         : new BigNumber(value[NUM_OF_OPTIONS]).multipliedBy(value[UNDERLYER_PRICE]).toNumber(),
@@ -84,7 +78,7 @@ class ExerciseModal extends PureComponent<
     return {
       ...value,
       [NUM_OF_OPTIONS]: new BigNumber(value[NOTIONAL_AMOUNT])
-        .div(this.data[LEG_FIELD.INITIAL_NOTIONAL_AMOUNT])
+        .div(this.data[LEG_FIELD.INITIAL_SPOT])
         .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
         .toNumber(),
       [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
@@ -105,16 +99,17 @@ class ExerciseModal extends PureComponent<
 
   public onConfirm = async () => {
     const dataSource = this.state.dataSource;
+    this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
       userLoginId: this.currentUser.userName,
       eventDetail: {
-        underlyerPrice: dataSource[UNDERLYER_PRICE],
-        settleAmount: dataSource[SETTLE_AMOUNT],
-        numOfOptions: dataSource[NUM_OF_OPTIONS],
-        notionalAmount: dataSource[NOTIONAL_AMOUNT],
+        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+        settleAmount: String(dataSource[SETTLE_AMOUNT]),
+        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
     });
 
