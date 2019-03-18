@@ -5,6 +5,7 @@ import { AnnulizedVanillaOptionDTOAmericanAnnual } from './legColDefs/AnnulizedV
 import { AnnulizedVanillaOptionDTOAmericanUnAnnual } from './legColDefs/AnnulizedVanillaOptionDTOAmericanUnAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanAnnual } from './legColDefs/AnnulizedVanillaOptionDTOEuropeanAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanUnAnnual } from './legColDefs/AnnulizedVanillaOptionDTOEuropeanUnAnnual';
+import { AutoCallSnowAnnual } from './legColDefs/AutoCallSnowAnnual';
 import { BarrierAnnual } from './legColDefs/BarrierAnnual';
 import { BarrierUnAnnual } from './legColDefs/BarrierUnAnnual';
 import { ConcavaAnnual } from './legColDefs/ConcavaAnnual';
@@ -33,6 +34,7 @@ import { TripleDigitalAnnual } from './legColDefs/TripleDigitalAnnual';
 import { TripleDigitalUnAnnual } from './legColDefs/TripleDigitalUnAnnual';
 
 export const LEG_MAP = {
+  [LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL]: AutoCallSnowAnnual,
   // 现金
   // [LEG_TYPE_MAP.CASH]: 'CASH',
   // 其他单资产期权

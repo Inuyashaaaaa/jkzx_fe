@@ -7,6 +7,8 @@ export const TRADE_ID_FIELD = 'tradeId';
 
 export const LEG_TYPE_FIELD = '$legType';
 
+export const LEG_ID_FIELD = 'id';
+
 export const LEG_NAME_FIELD = '$legName';
 
 export const LEG_ANNUALIZED_FIELD = '$isAnnualized';
@@ -128,6 +130,26 @@ export const UNIT_ENUM_MAP = {
   USD: 'USD',
 };
 
+export const UNIT_ENUM_OPTIONS = Object.keys(UNIT_ENUM_MAP).map(key => ({
+  label: UNIT_ENUM_ZHCN_MAP[key],
+  value: UNIT_ENUM_MAP[key],
+}));
+
+export const UNIT_ENUM_ZHCN_MAP2 = {
+  CNY: '人民币',
+  PERCENT: '百分比',
+};
+
+export const UNIT_ENUM_MAP2 = {
+  CNY: 'CNY',
+  PERCENT: 'PERCENT',
+};
+
+export const UNIT_ENUM_OPTIONS2 = Object.keys(UNIT_ENUM_MAP2).map(key => ({
+  label: UNIT_ENUM_ZHCN_MAP2[key],
+  value: UNIT_ENUM_MAP2[key],
+}));
+
 export const KNOCK_DIRECTION_ZHCN_MAP = {
   UP: '向上',
   DOWN: '向下',
@@ -141,6 +163,21 @@ export const KNOCK_DIRECTION_MAP = {
 export const KNOCK_DIRECTION_OPTIONS = Object.keys(KNOCK_DIRECTION_MAP).map(key => ({
   label: KNOCK_DIRECTION_ZHCN_MAP[key],
   value: KNOCK_DIRECTION_MAP[key],
+}));
+
+export const UP_BARRIER_TYPE_MAP = {
+  CNY: 'CNY',
+  PERCENT: 'PERCENT',
+};
+
+export const UP_BARRIER_TYPE_ZHCN_MAP = {
+  CNY: '人民币',
+  PERCENT: '百分比',
+};
+
+export const UP_BARRIER_TYPE_OPTIONS = Object.keys(UP_BARRIER_TYPE_MAP).map(key => ({
+  label: UP_BARRIER_TYPE_ZHCN_MAP[key],
+  value: UP_BARRIER_TYPE_MAP[key],
 }));
 
 export const OPTION_TYPE_ZHCN_MAP = {
@@ -175,11 +212,6 @@ export const OBSERVATION_TYPE_MAP = {
 export const OBSERVATION_TYPE_OPTIONS = Object.keys(OBSERVATION_TYPE_MAP).map(key => ({
   label: OBSERVATION_TYPE_ZHCN_MAP[key],
   value: OBSERVATION_TYPE_MAP[key],
-}));
-
-export const UNIT_ENUM_OPTIONS = Object.keys(UNIT_ENUM_MAP).map(key => ({
-  label: UNIT_ENUM_ZHCN_MAP[key],
-  value: UNIT_ENUM_MAP[key],
 }));
 
 export const PAYMENT_TYPE_MAP = {
@@ -261,6 +293,19 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  * 多腿字段名
  */
 export const LEG_FIELD = {
+  AUTO_CALL_STRIKE: 'autoCallStrike',
+  AUTO_CALL_STRIKE_UNIT: 'autoCallStrikeUnit',
+  /* 收益/coupon(%) */
+  COUPON_PAYMENT: 'couponPayment',
+  /* 敲出/coupon观察日 */
+  EXPIRE_NO_BARRIEROBSERVE_DAY: 'observationDates',
+  /* 到期未敲出收益类型 */
+  EXPIRE_NOBARRIER_PREMIUM_TYPE: 'autoCallPaymentType',
+  /* 到期未敲出固定收益 */
+  EXPIRE_NOBARRIERPREMIUM: 'fixedPayment',
+  STEP: 'step',
+  UP_BARRIER: 'upBarrier',
+  UP_BARRIER_TYPE: 'upBarrierType',
   ALUNWIND_NOTIONAL_AMOUNT: 'historyValue',
   INITIAL_NOTIONAL_AMOUNT: 'initialValue',
   LCM_EVENT_TYPE: 'lcmEventType',
@@ -363,7 +408,12 @@ export const EXERCISETYPE_MAP = {
 
 export const EXTRA_FIELDS = ['positionId', 'quantity', 'lcmEventType', 'productType'];
 
-export const LEG_INJECT_FIELDS = [LEG_TYPE_FIELD, LEG_NAME_FIELD, LEG_ANNUALIZED_FIELD];
+export const LEG_INJECT_FIELDS = [
+  LEG_ID_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_NAME_FIELD,
+  LEG_ANNUALIZED_FIELD,
+];
 
 export const BIG_NUMBER_CONFIG = {
   DECIMAL_PLACES: 4,
@@ -374,6 +424,9 @@ export const BIG_NUMBER_CONFIG = {
  */
 export const LEG_TYPE_MAP = {
   CASH: 'CASH',
+  AUTO_CALL_SNOW: 'AUTOCALL',
+  AUTO_CALL_SNOW_ANNUAL: 'AUTO_CALL_SNOW_ANNUAL',
+  AUTO_CALL_SNOW_UNANNUAL: 'AUTO_CALL_SNOW_UNANNUAL',
   GENERIC_SINGLE_ASSET_OPTION: 'GENERIC_SINGLE_ASSET_OPTION',
   VANILLA_EUROPEAN: 'VANILLA_EUROPEAN',
   VANILLA_EUROPEAN_ANNUAL: 'VANILLA_EUROPEAN_ANNUAL',
@@ -437,6 +490,8 @@ export const PRODUCT_TYPE_MAP = {
 };
 
 export const PRODUCT_TYPE_ZHCN_MAP = {
+  AUTO_CALL_SNOW: 'AutoCall',
+  AUTO_CALL_SNOW_ANNUAL: 'AutoCall - 雪球式 - 年化',
   CASH: '现金',
   GENERIC_SINGLE_ASSET_OPTION: '其他单资产期权',
   VANILLA_EUROPEAN: '香草欧式',
