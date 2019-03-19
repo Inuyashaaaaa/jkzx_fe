@@ -120,13 +120,13 @@ class BasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname);
 
     if (!currRouterData) {
-      return 'Ant Design Pro';
+      return '同余场外衍生品交易系统';
     }
     const pageName = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     });
-    return `${pageName} - Ant Design Pro`;
+    return `${pageName} - 同余场外衍生品交易系统`;
   };
 
   getLayoutStyle = () => {
