@@ -163,9 +163,10 @@ export const BOOKING_TABLE_COLUMN_DEFS2: IColumnDef[] = [
   },
 ];
 
-export const BOOKING_TABLE_COLUMN_DEFS: (
-  bindCheckContract: any
-) => IColumnDef[] = bindCheckContract => [
+export const BOOKING_TABLE_COLUMN_DEFS: (bindCheckContract: any) => IColumnDef[] = (
+  bindCheckContract,
+  onSearch
+) => [
   ...BOOKING_TABLE_COLUMN_DEFS2,
   {
     headerName: '操作',
@@ -182,7 +183,7 @@ export const BOOKING_TABLE_COLUMN_DEFS: (
             查看合约
           </Button>
           <LifeModalTable key="checkLife" rowData={params.data} />
-          <PortfolioModalTable key="portfolio" rowData={params.data} />
+          <PortfolioModalTable key="portfolio" rowData={params.data} search={onSearch} />
         </Row>
       );
     },

@@ -6,6 +6,7 @@ import {
   trdTradePortfolioDelete,
 } from '@/services/trade-service';
 import { Button, Popconfirm, Typography } from 'antd';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 
@@ -18,7 +19,11 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
     dataSource: [],
   };
   public componentDidMount = () => {
+    if (!this.props.rowData.portfolioNames) {
+      return;
+    }
     const portfolioNames = this.props.rowData.portfolioNames;
+
     this.setState({
       dataSource: portfolioNames.map(item => {
         return {
@@ -36,9 +41,14 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
   };
 
   public handleCancel = () => {
-    this.setState({
-      modalVisible: false,
-    });
+    this.setState(
+      {
+        modalVisible: false,
+      },
+      () => {
+        this.props.search();
+      }
+    );
   };
 
   public handleOk = () => {
@@ -47,11 +57,16 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
     });
   };
 
-  public onRemove = async params => {
-    console.log(params);
+  public bindOnRemove = params => async () => {
     const { error, data } = await trdTradePortfolioDelete({
       tradeId: this.props.rowData.tradeId,
-      portfolioName: params.data,
+      portfolioName: params.data.portfolio,
+    });
+    if (error) return;
+    const datas = _.dropWhile(this.state.dataSource, ['portfolio', params.data.portfolio]);
+    console.log(datas);
+    this.setState({
+      dataSource: datas,
     });
   };
 
@@ -92,19 +107,29 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
           onClick={this.showModal}
           modalProps={modalProps}
           onCancel={this.handleCancel}
-          onConfirm={this.handleOk}
           content={
             <>
               <SourceTable
                 rowKey="uuid"
                 dataSource={this.state.dataSource}
-                columnDefs={[{ headerName: '投资组合', field: 'portfolio' }]}
-                rowActions={[
-                  <Popconfirm title="确认删除?" onConfirm={this.onRemove} key="pop">
-                    <Button type="danger" key="del">
-                      删除
-                    </Button>
-                  </Popconfirm>,
+                columnDefs={[
+                  { headerName: '投资组合', field: 'portfolio' },
+                  {
+                    headerName: '操作',
+                    render: params => {
+                      return (
+                        <Popconfirm
+                          title="确认删除?"
+                          onConfirm={this.bindOnRemove(params)}
+                          key="pop"
+                        >
+                          <Button type="danger" key="del" size="small">
+                            删除
+                          </Button>
+                        </Popconfirm>
+                      );
+                    },
+                  },
                 ]}
                 searchable={true}
                 onSearchButtonClick={this.handleCreate}
