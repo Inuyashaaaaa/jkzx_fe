@@ -67,6 +67,7 @@ const pagesCollection = [
   'help',
   'userGuide',
   'developmentGuide',
+  'approvalProcessManagement',
 ];
 
 function handlePages(data, result1, result2) {

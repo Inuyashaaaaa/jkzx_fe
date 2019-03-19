@@ -484,6 +484,26 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
         ],
       },
       {
+        headerName: '审核管理',
+        children: [
+          {
+            headerName: '流程管理',
+            field: 'approvalProcessManagement',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+        ],
+      },
+      {
         headerName: '系统设置',
         children: [
           {
