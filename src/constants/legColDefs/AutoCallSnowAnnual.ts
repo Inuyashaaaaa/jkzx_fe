@@ -40,9 +40,9 @@ import {
   UpBarrierType,
 } from './common/common';
 import { pipeLeg } from './common/pipeLeg';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from './index';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
 
-export const AutoCallSnowAnnual = pipeLeg({
+export const AutoCallSnowAnnual: ILegType = pipeLeg({
   name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL],
   type: LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -87,7 +87,7 @@ export const AutoCallSnowAnnual = pipeLeg({
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
     };
   },
-  getPosition: (nextPosition, dataSourceItem) => {
+  getPosition: (nextPosition, dataSourceItem, tableDataSource) => {
     nextPosition.productType = LEG_TYPE_MAP.AUTO_CALL_SNOW;
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
@@ -109,5 +109,10 @@ export const AutoCallSnowAnnual = pipeLeg({
     nextPosition.asset.annualized = true;
 
     return nextPosition;
+  },
+  getPageData: (nextDataSourceItem, position) => {
+    nextDataSourceItem[LEG_FIELD.UP_BARRIER] = position.asset.barrier;
+    nextDataSourceItem[LEG_FIELD.UP_BARRIER_TYPE] = position.asset.barrierType;
+    return nextDataSourceItem;
   },
 });

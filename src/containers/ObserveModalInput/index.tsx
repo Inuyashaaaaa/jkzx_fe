@@ -3,7 +3,9 @@ import Form from '@/design/components/Form';
 import { InputPolym } from '@/design/components/Form/Input/InputPolym';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
+import { remove } from '@/design/utils';
 import { Button, Row } from 'antd';
+import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 
@@ -92,6 +94,15 @@ class ObserveModalInput extends InputPolym<any> {
     });
   };
 
+  public bindRemove = params => () => {
+    this.setState({
+      dealDataSource: remove(
+        this.state.dealDataSource,
+        (item, index) => index === params.node.rowIndex
+      ),
+    });
+  };
+
   public renderEditing(props) {
     return (
       <Row
@@ -163,11 +174,16 @@ class ObserveModalInput extends InputPolym<any> {
                 },
                 {
                   headerName: '操作',
-                  render(params) {
-                    console.log(params);
+                  render: params => {
                     return (
-                      <Row type="flex" align="middle" style={{}}>
-                        <Button size="small" type="danger">
+                      <Row
+                        type="flex"
+                        align="middle"
+                        style={{
+                          height: params.context.rowHeight,
+                        }}
+                      >
+                        <Button size="small" type="danger" onClick={this.bindRemove(params)}>
                           删除
                         </Button>
                       </Row>

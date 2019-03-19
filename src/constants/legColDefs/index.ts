@@ -81,6 +81,7 @@ export interface ILegType {
   isAnnualized: boolean;
   getDefault?: any;
   getPosition?: any;
+  getPageData?: any;
 }
 
 export const allLegTypes: ILegType[] = [

@@ -19,7 +19,7 @@ import {
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
 import { AutoCallSnowAnnual } from '@/constants/legColDefs/AutoCallSnowAnnual';
-import { LEG_MAP } from '@/constants/legType';
+import { LEG_E2E_MAP, LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -116,6 +116,10 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
     [LEG_FIELD.SETTLEMENT_DATE]: expirationDate,
     ...dataSourceItem,
   };
+
+  if (leg.type === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+    return leg.getDefault(nextDataSourceItem, isPricing);
+  }
 
   if (
     leg.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
@@ -553,26 +557,31 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
         : undefined),
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
     };
-  } else if (leg.type === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
-    nextDataSourceItem = AutoCallSnowAnnual.getDefault(nextDataSourceItem, isPricing);
   }
 
   return nextDataSourceItem;
 };
 
-export const convertTradePositions = (tableDataSource, isPricing = false) => {
+export const convertTradePositions = (tableDataSource, tableFormData, isPricing = false) => {
   const positions: any[] = tableDataSource.map(dataSourceItem => {
     dataSourceItem = miniumlPercent(dataSourceItem);
 
     const productType = dataSourceItem[LEG_TYPE_FIELD];
 
-    let nextPosition: any = {
+    const nextPosition: any = {
       lcmEventType: 'OPEN',
       positionAccountCode: 'empty',
       positionAccountName: 'empty',
       counterPartyAccountCode: 'empty',
       counterPartyAccountName: 'empty',
+      counterPartyCode: tableFormData.counterPartyCode,
+      counterPartyName: tableFormData.counterPartyCode,
     };
+
+    if (productType === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+      const Leg = LEG_MAP[productType];
+      return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource);
+    }
 
     if (
       productType === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
@@ -984,10 +993,6 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
       nextPosition.asset.annualized = productType === LEG_TYPE_MAP.STRADDLE_ANNUAL ? true : false;
     }
 
-    if (productType === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
-      nextPosition = AutoCallSnowAnnual.getPosition(nextPosition, dataSourceItem);
-    }
-
     return nextPosition;
   });
 
@@ -995,14 +1000,7 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
 };
 
 export const convertTradePageData2ApiData = (tableDataSource, tableFormData, userName) => {
-  const positions: any[] = convertTradePositions(tableDataSource).map(item => {
-    return {
-      ...item,
-      counterPartyCode: tableFormData.counterPartyCode,
-      counterPartyName: tableFormData.counterPartyCode,
-    };
-  });
-
+  const positions: any[] = convertTradePositions(tableDataSource, tableFormData);
   const params: any = _.omit(tableFormData, ['counterPartyCode']);
 
   params.comment = 'empty';
@@ -1031,6 +1029,21 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
   tableFormData.tradeDate = apiData.tradeDate;
 
   const tableDataSource = positions.map(position => {
+    if (position.productType === LEG_TYPE_MAP.AUTO_CALL_SNOW) {
+      const productType = position.productType;
+      const Leg = LEG_MAP[LEG_E2E_MAP[productType]];
+
+      const nextPageDataItem: any = backConvertPercent({
+        ..._.omitBy(position.asset, _.isNull),
+        lcmEventType: position.lcmEventType,
+        ...createLegDataSourceItem(Leg),
+        id: position.positionId,
+        productType: Leg.type,
+      });
+
+      return Leg.getPageData(nextPageDataItem, position);
+    }
+
     const productType = position.productType;
 
     let nextPosition: any = {
