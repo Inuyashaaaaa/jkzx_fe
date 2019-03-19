@@ -1,4 +1,7 @@
-export const remove = (array: any[], index: number | ((item: any) => boolean)): any[] => {
+export const remove = (
+  array: any[],
+  index: number | ((item: any, index: number) => boolean)
+): any[] => {
   if (!Array.isArray(array)) {
     return array;
   }
@@ -12,7 +15,7 @@ export const remove = (array: any[], index: number | ((item: any) => boolean)): 
 
 export const insert = (
   array: any[],
-  index: number | ((item: any) => boolean),
+  index: number | ((item: any, index: number) => boolean),
   data: any
 ): any[] => {
   if (!Array.isArray(array)) {

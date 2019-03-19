@@ -312,6 +312,7 @@ class TradeManagementPricing extends PureComponent<any> {
 
     const positions = convertTradePositions(
       tableDataSource.map(item => _.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])),
+      {},
       true
     );
 
