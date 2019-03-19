@@ -53,3 +53,23 @@ export const countTheta = theta => {
     .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
     .toNumber();
 };
+
+export const countStdDelta = (delta, quantity) => {
+  return new BigNumber(delta)
+    .dividedBy(new BigNumber(quantity).abs())
+    .multipliedBy(100)
+    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+    .toNumber();
+};
+
+export const countPricePer = (price, actualNotionalAmount) => {
+  return new BigNumber(price)
+    .dividedBy(actualNotionalAmount)
+    .multipliedBy(100)
+    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+    .toNumber();
+};
+
+export const countPrice = price => {
+  return new BigNumber(price).decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES).toNumber();
+};
