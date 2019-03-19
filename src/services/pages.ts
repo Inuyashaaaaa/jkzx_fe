@@ -1,8 +1,8 @@
 import {
   EXERCISETYPE_MAP,
-  EXTRA_FIELDS,
   LEG_ANNUALIZED_FIELD,
   LEG_FIELD,
+  LEG_ID_FIELD,
   LEG_INJECT_FIELDS,
   LEG_NAME_FIELD,
   LEG_TYPE_FIELD,
@@ -18,7 +18,8 @@ import {
   UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
-import { LEG_MAP } from '@/constants/legType';
+import { AutoCallSnowAnnual } from '@/constants/legColDefs/AutoCallSnowAnnual';
+import { LEG_E2E_MAP, LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -29,7 +30,7 @@ import uuidv4 from 'uuid/v4';
 
 export const createLegDataSourceItem = (leg: ILegType) => {
   return {
-    id: uuidv4(),
+    [LEG_ID_FIELD]: uuidv4(),
     [LEG_TYPE_FIELD]: leg.type,
     [LEG_NAME_FIELD]: leg.name,
     [LEG_ANNUALIZED_FIELD]: leg.isAnnualized,
@@ -115,6 +116,10 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
     [LEG_FIELD.SETTLEMENT_DATE]: expirationDate,
     ...dataSourceItem,
   };
+
+  if (leg.type === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+    return leg.getDefault(nextDataSourceItem, isPricing);
+  }
 
   if (
     leg.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
@@ -557,11 +562,26 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
   return nextDataSourceItem;
 };
 
-export const convertTradePositions = (tableDataSource, isPricing = false) => {
-  const positions: any[] = tableDataSource.map(item => {
-    item = miniumlPercent(item);
+export const convertTradePositions = (tableDataSource, tableFormData, isPricing = false) => {
+  const positions: any[] = tableDataSource.map(dataSourceItem => {
+    dataSourceItem = miniumlPercent(dataSourceItem);
 
-    const productType = item[LEG_TYPE_FIELD];
+    const productType = dataSourceItem[LEG_TYPE_FIELD];
+
+    const nextPosition: any = {
+      lcmEventType: 'OPEN',
+      positionAccountCode: 'empty',
+      positionAccountName: 'empty',
+      counterPartyAccountCode: 'empty',
+      counterPartyAccountName: 'empty',
+      counterPartyCode: tableFormData.counterPartyCode,
+      counterPartyName: tableFormData.counterPartyCode,
+    };
+
+    if (productType === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+      const Leg = LEG_MAP[productType];
+      return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource);
+    }
 
     if (
       productType === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
@@ -569,9 +589,6 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
       productType === LEG_TYPE_MAP.VANILLA_EUROPEAN_ANNUAL ||
       productType === LEG_TYPE_MAP.VANILLA_AMERICAN_ANNUAL
     ) {
-      // 开始处理 position
-      const position = _.pick(item, EXTRA_FIELDS);
-
       const COMPUTED_FIELDS = [
         'numOfOptions',
         'strikePercent',
@@ -582,28 +599,17 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
         'premiumPercent',
       ];
 
-      position.productType = getVanillaLegType(productType);
+      nextPosition.productType = getVanillaLegType(productType);
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
 
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate &&
+        nextPosition.asset.effectiveDate.format('YYYY-MM-DDTHH:mm:ss');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.exerciseType = getVanillaExerciseType(productType);
 
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DDTHH:mm:ss');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.exerciseType = getVanillaExerciseType(productType);
-
-      position.asset.annualized = getVanillaAnnualized(productType);
-      return position;
+      nextPosition.asset.annualized = getVanillaAnnualized(productType);
 
       function getVanillaLegType(productType) {
         if (
@@ -660,9 +666,6 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
       productType === LEG_TYPE_MAP.DIGITAL_AMERICAN_ANNUAL ||
       productType === LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL
     ) {
-      // 开始处理 position
-      const position = _.pick(item, EXTRA_FIELDS);
-
       const COMPUTED_FIELDS = [
         'numOfOptions',
         'strikePercent',
@@ -673,27 +676,16 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
         'premiumPercent',
       ];
 
-      position.productType = LEG_TYPE_MAP.DIGITAL;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DDTHH:mm:ss');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.exerciseType = getDigitalExerciseType(productType);
+      nextPosition.productType = LEG_TYPE_MAP.DIGITAL;
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate &&
+        nextPosition.asset.effectiveDate.format('YYYY-MM-DDTHH:mm:ss');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.exerciseType = getDigitalExerciseType(productType);
 
-      position.asset.annualized = getDigitalAnnualized(productType);
-
-      return position;
+      nextPosition.asset.annualized = getDigitalAnnualized(productType);
 
       function getDigitalExerciseType(productType) {
         if (
@@ -732,9 +724,6 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
       productType === LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_UNANNUAL ||
       productType === LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_ANNUAL
     ) {
-      // 开始处理 position
-      const position = _.pick(item, EXTRA_FIELDS);
-
       const COMPUTED_FIELDS = [
         'numOfOptions',
         'strikePercent',
@@ -745,421 +734,273 @@ export const convertTradePositions = (tableDataSource, isPricing = false) => {
         'premiumPercent',
       ];
 
-      position.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DDTHH:mm:ss');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
+      nextPosition.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate &&
+        nextPosition.asset.effectiveDate.format('YYYY-MM-DDTHH:mm:ss');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
 
-      position.asset.annualized =
+      nextPosition.asset.annualized =
         productType === LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_ANNUAL ? true : false;
-      return position;
     }
 
     if (
       productType === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
       productType === LEG_TYPE_MAP.BARRIER_ANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.BARRIER;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.BARRIER;
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.BARRIER_ANNUAL ? true : false;
-      return position;
+      nextPosition.asset.annualized = productType === LEG_TYPE_MAP.BARRIER_ANNUAL ? true : false;
     }
 
     if (
       productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
       productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.DOUBLE_SHARK_FIN;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.DOUBLE_SHARK_FIN;
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized =
+      nextPosition.asset.annualized =
         productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ? true : false;
-      return position;
     }
 
     if (productType === LEG_TYPE_MAP.EAGLE_ANNUAL || productType === LEG_TYPE_MAP.EAGLE_UNANNUAL) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.EAGLE;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.EAGLE;
+      nextPosition.lcmEventType = 'OPEN';
+      nextPosition.positionAccountCode = 'empty';
+      nextPosition.positionAccountName = 'empty';
+      nextPosition.counterPartyAccountCode = 'empty';
+      nextPosition.counterPartyAccountName = 'empty';
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+      // nextPosition.asset.expirationTime = moment.isMoment(nextPosition.asset.expirationTime)
+      //   ? nextPosition.asset.expirationTime.format('HH:mm:ss')
+      //   : nextPosition.asset.expirationTime;
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.EAGLE_ANNUAL ? true : false;
-      return position;
+      nextPosition.asset.annualized = productType === LEG_TYPE_MAP.EAGLE_ANNUAL ? true : false;
     }
 
     if (
       productType === LEG_TYPE_MAP.DOUBLE_TOUCH_ANNUAL ||
       productType === LEG_TYPE_MAP.DOUBLE_TOUCH_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.DOUBLE_TOUCH;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.DOUBLE_TOUCH;
+      nextPosition.lcmEventType = 'OPEN';
+      nextPosition.positionAccountCode = 'empty';
+      nextPosition.positionAccountName = 'empty';
+      nextPosition.counterPartyAccountCode = 'empty';
+      nextPosition.counterPartyAccountName = 'empty';
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+      // nextPosition.asset.expirationTime = moment.isMoment(nextPosition.asset.expirationTime)
+      //   ? nextPosition.asset.expirationTime.format('HH:mm:ss')
+      //   : nextPosition.asset.expirationTime;
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.DOUBLE_TOUCH_ANNUAL ? true : false;
-      position.asset.touched = true;
-      return position;
+      nextPosition.asset.annualized =
+        productType === LEG_TYPE_MAP.DOUBLE_TOUCH_ANNUAL ? true : false;
+      nextPosition.asset.touched = true;
     }
 
     if (
       productType === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_ANNUAL ||
       productType === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.DOUBLE_NO_TOUCH;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.DOUBLE_NO_TOUCH;
+      nextPosition.lcmEventType = 'OPEN';
+      nextPosition.positionAccountCode = 'empty';
+      nextPosition.positionAccountName = 'empty';
+      nextPosition.counterPartyAccountCode = 'empty';
+      nextPosition.counterPartyAccountName = 'empty';
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized =
+      nextPosition.asset.annualized =
         productType === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_ANNUAL ? true : false;
-      position.asset.touched = false;
-      return position;
+      nextPosition.asset.touched = false;
     }
 
     if (
       productType === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
       productType === LEG_TYPE_MAP.CONCAVA_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.CONCAVA;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.CONCAVA;
+      nextPosition.lcmEventType = 'OPEN';
+      nextPosition.positionAccountCode = 'empty';
+      nextPosition.positionAccountName = 'empty';
+      nextPosition.counterPartyAccountCode = 'empty';
+      nextPosition.counterPartyAccountName = 'empty';
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.CONCAVA_ANNUAL ? true : false;
-      position.asset.concavaed = true;
-      return position;
+      nextPosition.asset.annualized = productType === LEG_TYPE_MAP.CONCAVA_ANNUAL ? true : false;
+      nextPosition.asset.concavaed = true;
     }
 
     if (
       productType === LEG_TYPE_MAP.CONVEX_ANNUAL ||
       productType === LEG_TYPE_MAP.CONVEX_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.CONVEX;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.CONVEX;
+      nextPosition.lcmEventType = 'OPEN';
+      nextPosition.positionAccountCode = 'empty';
+      nextPosition.positionAccountName = 'empty';
+      nextPosition.counterPartyAccountCode = 'empty';
+      nextPosition.counterPartyAccountName = 'empty';
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.CONVEX_ANNUAL ? true : false;
-      position.asset.concavaed = false;
-      return position;
+      nextPosition.asset.annualized = productType === LEG_TYPE_MAP.CONVEX_ANNUAL ? true : false;
+      nextPosition.asset.concavaed = false;
     }
 
     if (
       productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
       productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.DOUBLE_DIGITAL;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.DOUBLE_DIGITAL;
+      nextPosition.lcmEventType = 'OPEN';
+      nextPosition.positionAccountCode = 'empty';
+      nextPosition.positionAccountName = 'empty';
+      nextPosition.counterPartyAccountCode = 'empty';
+      nextPosition.counterPartyAccountName = 'empty';
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ? true : false;
-      return position;
+      nextPosition.asset.annualized =
+        productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ? true : false;
     }
 
     if (
       productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
       productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.TRIPLE_DIGITAL;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.TRIPLE_DIGITAL;
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ? true : false;
-      return position;
+      nextPosition.asset.annualized =
+        productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ? true : false;
     }
 
     if (
       productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
       productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ? true : false;
-      return position;
+      nextPosition.asset.annualized =
+        productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ? true : false;
     }
 
     if (
       productType === LEG_TYPE_MAP.STRADDLE_ANNUAL ||
       productType === LEG_TYPE_MAP.STRADDLE_UNANNUAL
     ) {
-      // 开始处理 position
-      const position: any = {};
       const COMPUTED_FIELDS = [];
 
-      position.productType = LEG_TYPE_MAP.STRADDLE;
-      position.lcmEventType = 'OPEN';
-      position.positionAccountCode = 'empty';
-      position.positionAccountName = 'empty';
-      position.counterPartyAccountCode = 'empty';
-      position.counterPartyAccountName = 'empty';
-      position.asset = _.omit(item, [
-        'id',
-        ...LEG_INJECT_FIELDS,
-        ...COMPUTED_FIELDS,
-        ...EXTRA_FIELDS,
-      ]);
-      position.asset.effectiveDate =
-        position.asset.effectiveDate && position.asset.effectiveDate.format('YYYY-MM-DD');
-      position.asset.expirationDate =
-        position.asset.expirationDate && position.asset.expirationDate.format('YYYY-MM-DD');
-      position.asset.settlementDate =
-        position.asset.settlementDate && position.asset.settlementDate.format('YYYY-MM-DD');
-      // position.asset.expirationTime = moment.isMoment(position.asset.expirationTime)
-      //   ? position.asset.expirationTime.format('HH:mm:ss')
-      //   : position.asset.expirationTime;
+      nextPosition.productType = LEG_TYPE_MAP.STRADDLE;
+      nextPosition.lcmEventType = 'OPEN';
+      nextPosition.positionAccountCode = 'empty';
+      nextPosition.positionAccountName = 'empty';
+      nextPosition.counterPartyAccountCode = 'empty';
+      nextPosition.counterPartyAccountName = 'empty';
+      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+      nextPosition.asset.effectiveDate =
+        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate =
+        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate =
+        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-      position.asset.annualized = productType === LEG_TYPE_MAP.STRADDLE_ANNUAL ? true : false;
-      return position;
+      nextPosition.asset.annualized = productType === LEG_TYPE_MAP.STRADDLE_ANNUAL ? true : false;
     }
 
-    return item;
+    return nextPosition;
   });
 
   return positions;
 };
 
 export const convertTradePageData2ApiData = (tableDataSource, tableFormData, userName) => {
-  const positions: any[] = convertTradePositions(tableDataSource).map(item => {
-    return {
-      ...item,
-      counterPartyCode: tableFormData.counterPartyCode,
-      counterPartyName: tableFormData.counterPartyCode,
-    };
-  });
-
+  const positions: any[] = convertTradePositions(tableDataSource, tableFormData);
   const params: any = _.omit(tableFormData, ['counterPartyCode']);
 
   params.comment = 'empty';
@@ -1188,9 +1029,24 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
   tableFormData.tradeDate = apiData.tradeDate;
 
   const tableDataSource = positions.map(position => {
+    if (position.productType === LEG_TYPE_MAP.AUTO_CALL_SNOW) {
+      const productType = position.productType;
+      const Leg = LEG_MAP[LEG_E2E_MAP[productType]];
+
+      const nextPageDataItem: any = backConvertPercent({
+        ..._.omitBy(position.asset, _.isNull),
+        lcmEventType: position.lcmEventType,
+        ...createLegDataSourceItem(Leg),
+        id: position.positionId,
+        productType: Leg.type,
+      });
+
+      return Leg.getPageData(nextPageDataItem, position);
+    }
+
     const productType = position.productType;
 
-    let nextPosition = {
+    let nextPosition: any = {
       ..._.omitBy(position.asset, _.isNull),
       lcmEventType: position.lcmEventType,
     };
@@ -1462,6 +1318,25 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
 
 function miniumlPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.UP_BARRIER] !== undefined) {
+      clone[LEG_FIELD.UP_BARRIER] = new BigNumber(clone[LEG_FIELD.UP_BARRIER])
+        .multipliedBy(0.01)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.COUPON_PAYMENT] !== undefined) {
+    clone[LEG_FIELD.COUPON_PAYMENT] = new BigNumber(clone[LEG_FIELD.COUPON_PAYMENT])
+      .multipliedBy(0.01)
+      .toNumber();
+  }
+
+  if (clone[LEG_FIELD.STEP] !== undefined) {
+    clone[LEG_FIELD.STEP] = new BigNumber(clone[LEG_FIELD.STEP]).multipliedBy(0.01).toNumber();
+  }
+
   if (clone[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.PERCENT) {
     if (clone[LEG_FIELD.STRIKE] !== undefined) {
       clone[LEG_FIELD.STRIKE] = new BigNumber(clone[LEG_FIELD.STRIKE])
@@ -1620,6 +1495,25 @@ function miniumlPercent(item) {
 
 function backConvertPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.UP_BARRIER] !== undefined) {
+      clone[LEG_FIELD.UP_BARRIER] = new BigNumber(clone[LEG_FIELD.UP_BARRIER])
+        .multipliedBy(100)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.COUPON_PAYMENT] !== undefined) {
+    clone[LEG_FIELD.COUPON_PAYMENT] = new BigNumber(clone[LEG_FIELD.COUPON_PAYMENT])
+      .multipliedBy(100)
+      .toNumber();
+  }
+
+  if (clone[LEG_FIELD.STEP] !== undefined) {
+    clone[LEG_FIELD.STEP] = new BigNumber(clone[LEG_FIELD.STEP]).multipliedBy(100).toNumber();
+  }
+
   if (clone[LEG_FIELD.PAYMENT_TYPE] === PAYMENT_TYPE_MAP.PERCENT) {
     if (clone[LEG_FIELD.PAYMENT] !== undefined) {
       clone[LEG_FIELD.PAYMENT] = new BigNumber(clone[LEG_FIELD.PAYMENT])

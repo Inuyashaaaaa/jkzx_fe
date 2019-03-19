@@ -1,10 +1,12 @@
 import { LEG_TYPE_MAP } from './common';
+import { ILegType } from './legColDefs';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanAnnual';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual';
 import { AnnulizedVanillaOptionDTOAmericanAnnual } from './legColDefs/AnnulizedVanillaOptionDTOAmericanAnnual';
 import { AnnulizedVanillaOptionDTOAmericanUnAnnual } from './legColDefs/AnnulizedVanillaOptionDTOAmericanUnAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanAnnual } from './legColDefs/AnnulizedVanillaOptionDTOEuropeanAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanUnAnnual } from './legColDefs/AnnulizedVanillaOptionDTOEuropeanUnAnnual';
+import { AutoCallSnowAnnual } from './legColDefs/AutoCallSnowAnnual';
 import { BarrierAnnual } from './legColDefs/BarrierAnnual';
 import { BarrierUnAnnual } from './legColDefs/BarrierUnAnnual';
 import { ConcavaAnnual } from './legColDefs/ConcavaAnnual';
@@ -32,7 +34,14 @@ import { StraddleUnAnnual } from './legColDefs/StraddleUnAnnual';
 import { TripleDigitalAnnual } from './legColDefs/TripleDigitalAnnual';
 import { TripleDigitalUnAnnual } from './legColDefs/TripleDigitalUnAnnual';
 
-export const LEG_MAP = {
+export const LEG_E2E_MAP = {
+  [LEG_TYPE_MAP.AUTO_CALL_SNOW]: LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL,
+};
+
+export const LEG_MAP: {
+  [key: string]: ILegType;
+} = {
+  [LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL]: AutoCallSnowAnnual,
   // 现金
   // [LEG_TYPE_MAP.CASH]: 'CASH',
   // 其他单资产期权

@@ -26,13 +26,14 @@ import {
   trdTradeLCMUnwindAmountGet,
 } from '@/services/trade-service';
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { message, notification } from 'antd';
+import { message } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import ExportModal from './ExportModal';
+import ExerciseModal from './modals/ExerciseModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
 
@@ -48,6 +49,8 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public activeRowData: any = {};
 
   public $unwindModal: UnwindModal;
+
+  public $exerciseModal: ExerciseModal;
 
   constructor(props) {
     super(props);
@@ -220,20 +223,20 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     this.setState(
       produce((state: any) => {
         if (this.cacheTyeps.indexOf(leg.type) !== -1) {
-          state.columnDefs = [
-            {
-              headerName: '状态',
-              field: LEG_FIELD.LCM_EVENT_TYPE,
-              oldEditable: false,
-              editable: false,
-              input: {
-                type: 'select',
-                options: LCM_EVENT_TYPE_OPTIONS,
-              },
-            },
-            ...orderLegColDefs(
-              _.unionBy<IColDef>(
-                state.columnDefs.concat(
+          state.columnDefs = orderLegColDefs(
+            _.unionBy<IColDef>(
+              [
+                {
+                  headerName: '状态',
+                  field: LEG_FIELD.LCM_EVENT_TYPE,
+                  oldEditable: false,
+                  editable: false,
+                  input: {
+                    type: 'select',
+                    options: LCM_EVENT_TYPE_OPTIONS,
+                  },
+                },
+                ...state.columnDefs.concat(
                   leg.columnDefs.map(col => {
                     return {
                       ...col,
@@ -247,18 +250,18 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
                     };
                   })
                 ),
-                item => item.field
-              )
-            ),
-            {
-              ...InitialNotionalAmount,
-              editable: false,
-            },
-            {
-              ...AlUnwindNotionalAmount,
-              editable: false,
-            },
-          ];
+                {
+                  ...InitialNotionalAmount,
+                  editable: false,
+                },
+                {
+                  ...AlUnwindNotionalAmount,
+                  editable: false,
+                },
+              ],
+              item => item.field
+            )
+          );
         }
         state.dataSource.push(rowData);
       })
@@ -295,17 +298,23 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     this.activeRowData = params.rowData;
 
     if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-      this.$modelButton.click({
-        formControls: modalFormControls({
-          info: 'underlyerPrice',
-          name: '标的物价格',
-          input: { type: 'input' },
-        }),
-        extra: {
-          ...params,
-          eventType,
-        },
-      });
+      // this.$modelButton.click({
+      //   formControls: modalFormControls({
+      //     info: 'underlyerPrice',
+      //     name: '标的物价格',
+      //     input: { type: 'input' },
+      //   }),
+      //   extra: {
+      //     ...params,
+      //     eventType,
+      //   },
+      // });
+      this.$exerciseModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
+      );
     }
     if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
       if (this.activeRowData[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
@@ -448,6 +457,11 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         />
         <ModalButton ref={node => (this.$modelButton = node)} onConfirm={this.onConfirm} />
         <UnwindModal ref={node => (this.$unwindModal = node)} />
+        <ExerciseModal
+          ref={node => {
+            this.$exerciseModal = node;
+          }}
+        />
         <ExportModal
           visible={this.state.visible}
           trade={this.state.tableFormData}

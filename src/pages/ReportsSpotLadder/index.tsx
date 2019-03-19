@@ -1,6 +1,8 @@
 import {
   ASSET_CLASS_ZHCN_MAP,
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
+  INPUT_NUMBER_LOT_CONFIG,
   INPUT_NUMBER_PERCENTAGE_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
@@ -9,7 +11,15 @@ import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { countDeltaCash, countGamaCash, countRhoR } from '@/services/cash';
+import {
+  countDelta,
+  countDeltaCash,
+  countGamaCash,
+  countGamma,
+  countRhoR,
+  countTheta,
+  countVega,
+} from '@/services/cash';
 import { mktInstrumentInfo } from '@/services/market-data-service';
 import { prcSpotScenarios } from '@/services/pricing-service';
 import { trdBookListBySimilarBookName, trdInstrumentListByBook } from '@/services/trade-service';
@@ -40,49 +50,49 @@ class Component extends PureComponent<
       instruments: [],
       tableColumnDefs: [
         {
-          headerName: '标的物价格 (¥)',
+          headerName: '标的物价格',
           field: 'underlyerPrice',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
-          headerName: '价格 (¥)',
+          headerName: '价格',
           field: 'price',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'DELTA',
           field: 'delta',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_LOT_CONFIG,
         },
         {
           headerName: 'DELTA CASH',
           field: 'deltaCash',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'GAMMA',
           field: 'gamma',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_DIGITAL_CONFIG,
         },
         {
           headerName: 'GAMMA CASH',
           field: 'gammaCash',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'VEGA',
           field: 'vega',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'THETA',
           field: 'theta',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'RHO_R',
           field: 'rhoR',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_DIGITAL_CONFIG,
         },
       ],
     };
@@ -95,31 +105,47 @@ class Component extends PureComponent<
     const { error, data } = await prcSpotScenarios(
       this.convertSearchFormData(this.state.searchFormData)
     );
-    this.setState({
-      loading: false,
-    });
+
     if (error) return;
 
     const instruments = this.convertInstruments(data);
 
-    this.setState({ instruments }, () => this.fetchAssets());
+    const nextInstruments = await this.fetchAssets(instruments);
+
+    this.setState({
+      loading: false,
+    });
+
+    this.setState({ instruments: nextInstruments });
   };
 
-  public fetchAssets = () => {
-    this.state.instruments.forEach((item, index) => {
-      mktInstrumentInfo({
-        instrumentId: item.underlyerInstrumentId,
-      }).then(result => {
-        const { error, data } = result;
-        if (error) return;
-        this.setState(
-          produce((state: any) => {
-            state.instruments[index].assetClass = ASSET_CLASS_ZHCN_MAP[data.assetClass];
-            state.instruments[index].instrumentType = INSTRUMENT_TYPE_ZHCN_MAP[data.instrumentType];
-          })
-        );
-      });
-    });
+  public fetchAssets = instruments => {
+    return Promise.all(
+      instruments.map((item, index) => {
+        return mktInstrumentInfo({
+          instrumentId: item.underlyerInstrumentId,
+        }).then(result => {
+          const { error, data } = result;
+          if (error) return item;
+          const multiplier = data.instrumentInfo.multiplier;
+          item.assetClass = ASSET_CLASS_ZHCN_MAP[data.assetClass];
+          item.instrumentType = INSTRUMENT_TYPE_ZHCN_MAP[data.instrumentType];
+          item.tableDataSource = item.tableDataSource.map((items, key) => {
+            return {
+              ...items,
+              delta: countDelta(items.delta, multiplier),
+              deltaCash: countDeltaCash(items.deltaCash, items.underlyerPrice),
+              gamma: countGamma(items.gamma, multiplier, items.underlyerPrice),
+              gammaCash: countGamaCash(items.gamma, items.underlyerPrice),
+              theta: countTheta(items.theta),
+              vega: countVega(items.vega),
+              rhoR: countRhoR(items.rhoR),
+            };
+          });
+          return item;
+        });
+      })
+    );
   };
 
   public convertSearchFormData = formData => {
@@ -172,6 +198,7 @@ class Component extends PureComponent<
           return dist;
         }, {});
       });
+
       const tableDataSource = _.values(groupObj);
 
       return {

@@ -1,3 +1,4 @@
+import ObserveModalInput from '@/containers/ObserveModalInput';
 import { IColDef } from '@/design/components/Table/types';
 import {
   mktInstrumentInfo,
@@ -34,7 +35,11 @@ import {
   SPECIFIED_PRICE_ZHCN_MAP,
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
+  UNIT_ENUM_MAP2,
   UNIT_ENUM_OPTIONS,
+  UNIT_ENUM_OPTIONS2,
+  UP_BARRIER_TYPE_MAP,
+  UP_BARRIER_TYPE_OPTIONS,
 } from '../../common';
 
 export const OptionType: IColDef = {
@@ -676,6 +681,124 @@ export const Barrier: IColDef = {
   rules: RULES_REQUIRED,
 };
 
+export const UpBarrierType: IColDef = {
+  editable: true,
+  headerName: '敲出障碍价类型',
+  field: LEG_FIELD.UP_BARRIER_TYPE,
+  input: {
+    type: 'select',
+    options: UP_BARRIER_TYPE_OPTIONS,
+  },
+};
+
+export const UpBarrier: IColDef = {
+  editable: true,
+  headerName: '敲出障碍价',
+  field: LEG_FIELD.UP_BARRIER,
+  input: record => {
+    if (record[LEG_FIELD.UP_BARRIER_TYPE] === UP_BARRIER_TYPE_MAP.CNY) {
+      return {
+        depends: [LEG_FIELD.UP_BARRIER_TYPE],
+        value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      };
+    }
+
+    // if (record[LEG_FIELD.UP_BARRIER_TYPE] === UP_BARRIER_TYPE_MAP.PERCENT) {
+    return {
+      depends: [LEG_FIELD.UP_BARRIER_TYPE],
+      value: INPUT_NUMBER_PERCENTAGE_CONFIG,
+    };
+    // }
+  },
+};
+
+export const CouponEarnings: IColDef = {
+  editable: true,
+  headerName: '收益/coupon(%)',
+  field: LEG_FIELD.COUPON_PAYMENT,
+  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+};
+
+export const Step: IColDef = {
+  editable: true,
+  headerName: '逐步调整步长(%)',
+  field: LEG_FIELD.STEP,
+  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+};
+
+export const ExpireNoBarrierPremiumType: IColDef = {
+  editable: true,
+  headerName: '到期未敲出收益类型',
+  field: LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE,
+  input: {
+    type: 'select',
+    options: [
+      {
+        label: '固定',
+        value: 'FIXED',
+      },
+      {
+        label: '看涨',
+        value: 'CALL',
+      },
+      {
+        label: '看跌',
+        value: 'PUT',
+      },
+    ],
+  },
+};
+
+export const AutoCallStrikeUnit: IColDef = {
+  editable: true,
+  headerName: '到期未敲出行权价格类型',
+  field: LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
+  input: {
+    type: 'select',
+    options: UNIT_ENUM_OPTIONS2,
+  },
+};
+
+export const AutoCallStrike: IColDef = {
+  editable: true,
+  headerName: '到期未敲出行权价格',
+  field: LEG_FIELD.AUTO_CALL_STRIKE,
+  input: record => {
+    if (record[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_MAP2.CNY) {
+      return {
+        depends: [LEG_FIELD.AUTO_CALL_STRIKE_UNIT],
+        value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      };
+    }
+
+    // if (record[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_OPTIONS2.PERCENT) {
+    return {
+      depends: [LEG_FIELD.AUTO_CALL_STRIKE_UNIT],
+      value: INPUT_NUMBER_PERCENTAGE_CONFIG,
+    };
+    // }
+  },
+};
+
+export const ExpireNoBarrierPremium: IColDef = {
+  editable: true,
+  headerName: '到期未敲出固定收益',
+  field: LEG_FIELD.EXPIRE_NOBARRIERPREMIUM,
+  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+};
+
+export const ExpireNoBarrierObserveDay: IColDef = {
+  editable: true,
+  headerName: '敲出/coupon观察日',
+  field: LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
+  input: record => {
+    return {
+      type: ObserveModalInput,
+      record,
+    };
+  },
+};
+
 export const LowBarrier: IColDef = {
   editable: true,
   headerName: '低障碍价',
@@ -1005,7 +1128,8 @@ export const SpecifiedPrice: IColDef = {
   input: record => {
     if (
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
+      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL
     ) {
       return {
         defaultOpen: true,
@@ -1109,7 +1233,12 @@ export const NotionalAmount: IColDef = {
 };
 
 export const NotionalAmountType: IColDef = {
-  editable: true,
+  editable: params => {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+      return false;
+    }
+    return true;
+  },
   headerName: '名义本金类型',
   field: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   input: {
@@ -1127,14 +1256,24 @@ export const NotionalAmountType: IColDef = {
     ],
   },
   rules: RULES_REQUIRED,
-  getValue: {
-    depends: [LEG_FIELD.PREMIUM_TYPE],
-    value(record) {
-      if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT) {
-        return NOTIONAL_AMOUNT_TYPE_MAP.CNY;
-      }
-      return NOTIONAL_AMOUNT_TYPE_MAP.LOT;
-    },
+  getValue: params => {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+      return {
+        depends: [],
+        value(data) {
+          return data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+        },
+      };
+    }
+    return {
+      depends: [LEG_FIELD.PREMIUM_TYPE],
+      value(record) {
+        if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT) {
+          return NOTIONAL_AMOUNT_TYPE_MAP.CNY;
+        }
+        return NOTIONAL_AMOUNT_TYPE_MAP.LOT;
+      },
+    };
   },
 };
 

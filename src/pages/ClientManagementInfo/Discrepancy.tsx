@@ -11,6 +11,7 @@ import {
   cliFundEventSave,
   refBankAccountSearch,
 } from '@/services/reference-data-service';
+import { createApprovalProcess } from '@/services/approval';
 import { Button, Col, message, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
@@ -294,8 +295,9 @@ class Discrepancy extends PureComponent<
     this.setState({
       modalConfirmLoading: true,
     });
-    const { error, data } = await cliFundEventSave({
-      ...formatValues,
+    const { error, data } = await createApprovalProcess({
+      processName: '资金录入经办复合流程',
+      processData: { ...formatValues },
     });
     this.setState({
       modalConfirmLoading: false,
@@ -310,7 +312,7 @@ class Discrepancy extends PureComponent<
         state.modalVisible = false;
       }),
       () => {
-        message.success('资金录入成功');
+        message.success('已进入流程');
       }
     );
   };
