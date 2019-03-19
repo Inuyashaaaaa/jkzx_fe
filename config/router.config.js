@@ -85,6 +85,11 @@ export default [
               name: 'onBoardTransaction',
               component: './TradeManagementOnBoardTransaction/index',
             },
+            {
+              path: '/trade-management/portfolio-management',
+              name: 'portfolioManagement',
+              component: './TradeManagementPortfolioManagement/index',
+            },
           ],
         },
         {

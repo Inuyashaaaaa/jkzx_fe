@@ -184,6 +184,15 @@ class Form2Base extends PureComponent<Form2BaseProps, any> {
       style,
       className,
       controlNumberOneRow,
+      resetable,
+      submitable,
+      resetText,
+      submitText,
+      onFieldChange,
+      dataSource,
+      onValueChange,
+      footer,
+      form,
       ...formProps
     } = this.props;
     const rowContainers = this.getRowContainer();

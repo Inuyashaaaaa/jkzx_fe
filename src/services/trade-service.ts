@@ -90,3 +90,43 @@ export async function trdTradeLCMUnwindAmountGet(params = {}) {
     },
   });
 }
+
+export async function trdPortfolioSearch(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioSearch',
+      params,
+    },
+  });
+}
+
+export async function trdPortfolioDelete(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioDelete',
+      params,
+    },
+  });
+}
+
+export async function trdPortfolioCreate(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioCreate',
+      params,
+    },
+  });
+}
+
+export async function trdPortfolioUpdate(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioUpdate',
+      params,
+    },
+  });
+}

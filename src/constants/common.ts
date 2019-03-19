@@ -70,6 +70,23 @@ export const INPUT_NUMBER_LOT_CONFIG: AllInputProps = {
   format: '0.0000 ss',
 };
 
+export const EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP = {
+  FIXED: 'FIXED',
+  CALL: 'CALL',
+  PUT: 'PUT',
+};
+
+export const EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP = {
+  FIXED: '固定',
+  CALL: '看涨',
+  PUT: '看跌',
+};
+
+export const EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS = convertOptions(
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP
+);
+
 // 事件通知类型
 export const EVENT_TYPE_MAP = {
   EXPIRATION: 'EXPIRATION',

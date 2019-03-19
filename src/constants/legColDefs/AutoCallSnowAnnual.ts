@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXTRA_FIELDS,
   LEG_FIELD,
   LEG_INJECT_FIELDS,
@@ -90,6 +91,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
+      [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource) => {
@@ -102,6 +104,16 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       LEG_FIELD.UP_BARRIER,
       LEG_FIELD.UP_BARRIER_TYPE,
     ]);
+
+    if (
+      nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+      EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+    ) {
+      nextPosition.asset[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] = undefined;
+      nextPosition.asset[LEG_FIELD.AUTO_CALL_STRIKE] = undefined;
+    } else {
+      nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
+    }
 
     nextPosition.asset.barrier = dataSourceItem[LEG_FIELD.UP_BARRIER];
     nextPosition.asset.barrierType = dataSourceItem[LEG_FIELD.UP_BARRIER_TYPE];

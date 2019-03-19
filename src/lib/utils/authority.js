@@ -33,6 +33,7 @@ export function setPermissions(permissions) {
     JSON.stringify({
       ...permissions,
       customReport: true,
+      portfolioManagement: true,
     })
   );
 }

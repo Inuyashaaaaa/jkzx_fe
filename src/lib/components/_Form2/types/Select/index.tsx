@@ -87,7 +87,7 @@ class Select2 extends InputCommonClass<
     if (typeof value === 'object' && value !== null) {
       return value.label;
     }
-    const findItem = this.getOptions().find(item => item.value === value);
+    const findItem = (this.getOptions() || []).find(item => item.value === value);
 
     if (findItem && React.isValidElement(findItem.label)) {
       throw new Error('Select2: format label type cannot be Element.');
