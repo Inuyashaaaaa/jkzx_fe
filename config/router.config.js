@@ -85,6 +85,11 @@ export default [
               name: 'onBoardTransaction',
               component: './TradeManagementOnBoardTransaction/index',
             },
+            {
+              path: '/trade-management/portfolio-management',
+              name: 'portfolioManagement',
+              component: './TradeManagementPortfolioManagement/index',
+            },
           ],
         },
         {
@@ -243,6 +248,18 @@ export default [
             //   name: 'intradayExpiringPositionReport',
             //   component: './RiskManagerIntradayExpiringPositionReport/index',
             // },
+          ],
+        },
+        {
+          path: '/approval-process',
+          name: 'approvalProcess',
+          icon: 'interation',
+          routes: [
+            {
+              path: '/approval-process/process-manangement',
+              name: 'approvalProcessManagement',
+              component: './ApprovalProcessManagement/index',
+            },
           ],
         },
         {

@@ -223,20 +223,20 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     this.setState(
       produce((state: any) => {
         if (this.cacheTyeps.indexOf(leg.type) !== -1) {
-          state.columnDefs = [
-            {
-              headerName: '状态',
-              field: LEG_FIELD.LCM_EVENT_TYPE,
-              oldEditable: false,
-              editable: false,
-              input: {
-                type: 'select',
-                options: LCM_EVENT_TYPE_OPTIONS,
-              },
-            },
-            ...orderLegColDefs(
-              _.unionBy<IColDef>(
-                state.columnDefs.concat(
+          state.columnDefs = orderLegColDefs(
+            _.unionBy<IColDef>(
+              [
+                {
+                  headerName: '状态',
+                  field: LEG_FIELD.LCM_EVENT_TYPE,
+                  oldEditable: false,
+                  editable: false,
+                  input: {
+                    type: 'select',
+                    options: LCM_EVENT_TYPE_OPTIONS,
+                  },
+                },
+                ...state.columnDefs.concat(
                   leg.columnDefs.map(col => {
                     return {
                       ...col,
@@ -250,18 +250,18 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
                     };
                   })
                 ),
-                item => item.field
-              )
-            ),
-            {
-              ...InitialNotionalAmount,
-              editable: false,
-            },
-            {
-              ...AlUnwindNotionalAmount,
-              editable: false,
-            },
-          ];
+                {
+                  ...InitialNotionalAmount,
+                  editable: false,
+                },
+                {
+                  ...AlUnwindNotionalAmount,
+                  editable: false,
+                },
+              ],
+              item => item.field
+            )
+          );
         }
         state.dataSource.push(rowData);
       })

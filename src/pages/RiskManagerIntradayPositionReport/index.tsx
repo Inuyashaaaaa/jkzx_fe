@@ -74,7 +74,7 @@ class RiskManagerIntradayPositionReport extends PureComponent {
     return (
       <PageHeaderWrapper title="持仓明细">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <ReloadGreekButton fetchTable={this.fetchTable} id="refPartySave" />
+          <ReloadGreekButton fetchTable={this.fetchTable} id="real_time_dag" />
         </Row>
         <SourceTable
           loading={this.state.loading}

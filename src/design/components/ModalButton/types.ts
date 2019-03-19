@@ -24,4 +24,4 @@ export interface ModalButtonState {
 
 export type IModalButtonCancelHandle = () => any;
 
-export type IModalButtonClickHandle = () => any;
+export type IModalButtonClickHandle = () => Promise<any>;

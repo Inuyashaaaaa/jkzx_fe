@@ -36,7 +36,19 @@ class ModalButton extends StationalComponent<ModalButtonProps, ModalButtonState>
         visible: false,
       });
     }
-    return this.props.onConfirm();
+    this.setState({
+      confirmLoading: true,
+    });
+    const result = this.props.onConfirm();
+    result.then(cb => {
+      this.setState(
+        {
+          confirmLoading: false,
+          visible: false,
+        },
+        () => cb && cb(this)
+      );
+    });
   };
 
   public render() {
