@@ -246,6 +246,18 @@ export default [
           ],
         },
         {
+          path: '/approval-process',
+          name: 'approvalProcess',
+          icon: 'interation',
+          routes: [
+            {
+              path: '/approval-process/process-manangement',
+              name: 'approvalProcessManagement',
+              component: './ApprovalProcessManagement/index',
+            },
+          ],
+        },
+        {
           path: '/system-settings',
           name: 'systemSettings',
           icon: 'tool',

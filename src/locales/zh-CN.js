@@ -56,6 +56,8 @@ export default {
   'menu.workflowManagement': '审核',
   'menu.workflowManagement.workflowSettings': '审核配置',
   'menu.workflowManagement.processManagement': '任务管理',
+  'menu.approvalProcess': '审核管理',
+  'menu.approvalProcess.approvalProcessManagement': '流程管理',
   'menu.reports': '报告',
   'menu.reports.spotLadder': '标的物情景分析',
   'menu.reports.pnlAttribution': '盈亏归因',
