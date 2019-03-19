@@ -9,6 +9,8 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   PRODUCT_TYPE_ZHCN_MAP,
+  SPECIFIED_PRICE_MAP,
+  UP_BARRIER_TYPE_MAP,
 } from '../common';
 import {
   AutoCallStrike,
@@ -85,6 +87,9 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
+      [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
+      [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource) => {

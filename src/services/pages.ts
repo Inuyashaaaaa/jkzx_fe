@@ -1318,6 +1318,25 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
 
 function miniumlPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.UP_BARRIER] !== undefined) {
+      clone[LEG_FIELD.UP_BARRIER] = new BigNumber(clone[LEG_FIELD.UP_BARRIER])
+        .multipliedBy(0.01)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.COUPON_PAYMENT] !== undefined) {
+    clone[LEG_FIELD.COUPON_PAYMENT] = new BigNumber(clone[LEG_FIELD.COUPON_PAYMENT])
+      .multipliedBy(0.01)
+      .toNumber();
+  }
+
+  if (clone[LEG_FIELD.STEP] !== undefined) {
+    clone[LEG_FIELD.STEP] = new BigNumber(clone[LEG_FIELD.STEP]).multipliedBy(0.01).toNumber();
+  }
+
   if (clone[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.PERCENT) {
     if (clone[LEG_FIELD.STRIKE] !== undefined) {
       clone[LEG_FIELD.STRIKE] = new BigNumber(clone[LEG_FIELD.STRIKE])
@@ -1476,6 +1495,25 @@ function miniumlPercent(item) {
 
 function backConvertPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.UP_BARRIER] !== undefined) {
+      clone[LEG_FIELD.UP_BARRIER] = new BigNumber(clone[LEG_FIELD.UP_BARRIER])
+        .multipliedBy(100)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.COUPON_PAYMENT] !== undefined) {
+    clone[LEG_FIELD.COUPON_PAYMENT] = new BigNumber(clone[LEG_FIELD.COUPON_PAYMENT])
+      .multipliedBy(100)
+      .toNumber();
+  }
+
+  if (clone[LEG_FIELD.STEP] !== undefined) {
+    clone[LEG_FIELD.STEP] = new BigNumber(clone[LEG_FIELD.STEP]).multipliedBy(100).toNumber();
+  }
+
   if (clone[LEG_FIELD.PAYMENT_TYPE] === PAYMENT_TYPE_MAP.PERCENT) {
     if (clone[LEG_FIELD.PAYMENT] !== undefined) {
       clone[LEG_FIELD.PAYMENT] = new BigNumber(clone[LEG_FIELD.PAYMENT])

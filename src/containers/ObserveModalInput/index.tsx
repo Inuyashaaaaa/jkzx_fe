@@ -1,11 +1,15 @@
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, LEG_FIELD } from '@/constants/common';
+import {
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  LEG_FIELD,
+  UP_BARRIER_TYPE_MAP,
+} from '@/constants/common';
 import Form from '@/design/components/Form';
 import { InputPolym } from '@/design/components/Form/Input/InputPolym';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { remove } from '@/design/utils';
-import { Button, Row } from 'antd';
-import _ from 'lodash';
+import { Button, message, Row } from 'antd';
+import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
 
@@ -30,17 +34,31 @@ class ObserveModalInput extends InputPolym<any> {
   public computeDataSource = dataSource => {
     const { record } = this.props;
     const upBarrier = record[LEG_FIELD.UP_BARRIER];
+    const upBarrierType = record[LEG_FIELD.UP_BARRIER_TYPE];
     const step = record[LEG_FIELD.STEP];
     const initialSpot = record[LEG_FIELD.INITIAL_SPOT];
+
+    const barrierVal =
+      upBarrierType === UP_BARRIER_TYPE_MAP.PERCENT
+        ? new BigNumber(initialSpot).multipliedBy(new BigNumber(upBarrier).div(100)).toNumber()
+        : upBarrier;
+
     return dataSource
+      .sort((a, b) => a.obDay.valueOf() - b.obDay.valueOf())
       .map((item, index) => {
         return {
           ...item,
-          price: upBarrier + (index + 1 - 1) * step * initialSpot,
+          price: new BigNumber(barrierVal)
+            .plus(
+              new BigNumber(index + 1)
+                .multipliedBy(new BigNumber(step).div(100))
+                .multipliedBy(initialSpot)
+            )
+            .decimalPlaces(4)
+            .toNumber(),
           id: index,
         };
-      })
-      .sort((a, b) => a.obDay.valueOf() - b.obDay.valueOf());
+      });
   };
 
   public formatValue = (value): string => {
@@ -83,6 +101,9 @@ class ObserveModalInput extends InputPolym<any> {
 
   public onSubmitButtonClick = params => {
     const { dataSource } = params;
+    if (this.state.dealDataSource.find(item => item.obDay.isSame(dataSource.day))) {
+      return message.warn('不可以出现相同日期');
+    }
     this.setState({
       dealDataSource: this.computeDataSource([
         ...this.state.dealDataSource,
