@@ -209,6 +209,7 @@ class TradeManagementContractManagement extends PureComponent {
         <SourceTable
           searchable={true}
           resetable={true}
+          context={this.onSearch}
           loading={this.state.loading}
           pagination={this.state.pagination}
           onPaginationChange={this.onTablePaginationChange}

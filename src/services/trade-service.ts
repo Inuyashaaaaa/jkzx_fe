@@ -90,3 +90,33 @@ export async function trdTradeLCMUnwindAmountGet(params = {}) {
     },
   });
 }
+
+export async function trdPortfolioListBySimilarPortfolioName(params) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioListBySimilarPortfolioName',
+      params,
+    },
+  });
+}
+
+export async function trdTradePortfolioCreateBatch(params) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradePortfolioCreateBatch',
+      params,
+    },
+  });
+}
+
+export async function trdTradePortfolioDelete(params) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradePortfolioDelete',
+      params,
+    },
+  });
+}
