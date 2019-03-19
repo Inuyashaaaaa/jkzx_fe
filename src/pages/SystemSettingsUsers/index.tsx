@@ -440,7 +440,7 @@ class SystemSettingsUsers extends PureComponent {
       <Button key="user" type="primary" onClick={this.updateUser}>
         修改用户
       </Button>,
-      <Button key="resource" type="primary" onClick={() => this.showResources(rowData)}>
+      <Button key="resource" type="primary" onClick={async () => this.showResources(rowData)}>
         资源权限
       </Button>,
     ];

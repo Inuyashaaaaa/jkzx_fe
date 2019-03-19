@@ -73,7 +73,7 @@ export const normalizeExsitable = (data: any, colDef): ILinkageMetaExsitable => 
   }
   if (typeof exsitable === 'function') {
     const result = exsitable({ data, colDef });
-    if (typeof result === 'boolean') {
+    if (typeof result === 'boolean' || result === undefined) {
       return {
         depends: [],
         value: result,

@@ -9,6 +9,8 @@ import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
 import {
   BIG_NUMBER_CONFIG,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_CURRENCY_USD_CONFIG,
   INPUT_NUMBER_DAYS_CONFIG,
@@ -732,25 +734,22 @@ export const ExpireNoBarrierPremiumType: IColDef = {
   field: LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE,
   input: {
     type: 'select',
-    options: [
-      {
-        label: '固定',
-        value: 'FIXED',
-      },
-      {
-        label: '看涨',
-        value: 'CALL',
-      },
-      {
-        label: '看跌',
-        value: 'PUT',
-      },
-    ],
+    options: EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
   },
 };
 
 export const AutoCallStrikeUnit: IColDef = {
   editable: true,
+  exsitable: params => {
+    return {
+      depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+      value:
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.CALL ||
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT,
+    };
+  },
   headerName: '到期未敲出行权价格类型',
   field: LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
   input: {
@@ -761,6 +760,16 @@ export const AutoCallStrikeUnit: IColDef = {
 
 export const AutoCallStrike: IColDef = {
   editable: true,
+  exsitable: params => {
+    return {
+      depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+      value:
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.CALL ||
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT,
+    };
+  },
   headerName: '到期未敲出行权价格',
   field: LEG_FIELD.AUTO_CALL_STRIKE,
   input: record => {
@@ -782,6 +791,14 @@ export const AutoCallStrike: IColDef = {
 
 export const ExpireNoBarrierPremium: IColDef = {
   editable: true,
+  exsitable: params => {
+    return {
+      depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+      value:
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+        EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
+    };
+  },
   headerName: '到期未敲出固定收益',
   field: LEG_FIELD.EXPIRE_NOBARRIERPREMIUM,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
