@@ -310,7 +310,7 @@ class Discrepancy extends PureComponent<
         state.modalVisible = false;
       }),
       () => {
-        message.success('资金录入成功');
+        message.success('已进入流程');
       }
     );
   };
