@@ -138,7 +138,7 @@ export async function completeTaskProcess(params = {}) {
   });
 }
 
-//查询流程图
+// 查询流程图
 export async function queryProcessDiagram(params) {
   return fetch(`${HOST_TEST}workflow-service/${params.processInstanceId}/image`, {
     method: `GET`,

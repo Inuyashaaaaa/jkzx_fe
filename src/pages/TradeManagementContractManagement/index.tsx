@@ -209,6 +209,7 @@ class TradeManagementContractManagement extends PureComponent {
         <SourceTable
           searchable={true}
           resetable={true}
+          context={this.onSearch}
           loading={this.state.loading}
           pagination={this.state.pagination}
           onPaginationChange={this.onTablePaginationChange}
@@ -222,7 +223,7 @@ class TradeManagementContractManagement extends PureComponent {
           searchFormData={this.state.searchFormData}
           autoSizeColumnsToFit={true}
           searchFormControls={bookingSearchFormControls(this.state.bookList, this.state.bookIdList)}
-          columnDefs={BOOKING_TABLE_COLUMN_DEFS(this.bindCheckContract)}
+          columnDefs={BOOKING_TABLE_COLUMN_DEFS(this.bindCheckContract, this.onSearch)}
           paginationProps={{
             backend: true,
           }}

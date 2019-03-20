@@ -53,7 +53,7 @@ class ApprovalForm extends PureComponent {
           modifyBtn: '',
           rejectReason: '',
           passComment: '',
-          modifyComment: ''
+          modifyComment: '',
         },
         () => {
           this.fetchData(formData, status);
@@ -236,7 +236,7 @@ class ApprovalForm extends PureComponent {
       obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
       obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
       const { formData } = this.props;
-      const {modifyComment} = this.state;
+      const { modifyComment } = this.state;
       const params = {
         taskId: formData.taskId,
         ctlProcessData: {
@@ -415,12 +415,15 @@ class ApprovalForm extends PureComponent {
                 )}
                 {!isCheckBtn && (
                   <div style={{ marginLeft: 10 }}>
-                    <Popconfirm title={
+                    <Popconfirm
+                      title={
                         <div>
                           <p>确认将此次修改提交复核吗？</p>
                           <TextArea onChange={this.setModifyComment} value={modifyComment} />
                         </div>
-                      } onConfirm={this.confirmModify}>
+                      }
+                      onConfirm={this.confirmModify}
+                    >
                       <Button
                         type="primary"
                         disabled={modifying && modifyBtn === 'modify'}

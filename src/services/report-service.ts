@@ -130,11 +130,11 @@ export async function rptValuationReportList(params) {
   });
 }
 
-export async function rptValuationReportSend(params) {
+export async function emlSendValuationReport(params) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'rptValuationReportSend',
+      method: 'emlSendValuationReport',
       params,
     },
   });

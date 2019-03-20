@@ -1,9 +1,9 @@
 import ModalButton from '@/design/components/ModalButton';
-import { rptValuationReportSend } from '@/services/report-service';
+import { DOWN_LOAD_VALUATION_URL } from '@/services/document';
+import { emlSendValuationReport } from '@/services/report-service';
 import { Button, Col, message, Row } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-
 class ValuationCellRenderer extends PureComponent {
   constructor(props) {
     super(props);
@@ -12,10 +12,8 @@ class ValuationCellRenderer extends PureComponent {
     };
   }
 
-  public componentDidMount = () => {};
-
   public onClick = () => {
-    this.rowData = this.props.node.data;
+    this.rowData = this.props.params.data;
     this.setState({
       visible: true,
     });
@@ -25,12 +23,21 @@ class ValuationCellRenderer extends PureComponent {
     this.setState({
       visible: false,
     });
-    const reportData = _.pick(this.rowData, ['legalName', 'valuationDate', 'tradeEmail']);
-    const { error, data } = await rptValuationReportSend({
-      valuationReports: [reportData],
+    message.loading('正在发送');
+    const reportData = _.mapKeys(_.pick(this.rowData, ['uuid', 'tradeEmail']), (value, key) => {
+      if (key === 'tradeEmail') {
+        return 'tos';
+      }
+      if (key === 'uuid') {
+        return 'valuationReportId';
+      }
+    });
+    const { error, data } = await emlSendValuationReport({
+      params: [reportData],
     });
     if (error) {
       message.error('发送失败');
+      return;
     }
     message.success('发送成功');
     return;
@@ -44,25 +51,23 @@ class ValuationCellRenderer extends PureComponent {
 
   public render() {
     return (
-      <Row style={{ height: this.props.context.rowHeight }} type="flex" align="middle">
+      <Row style={{ height: this.props.params.context.rowHeight }} type="flex" align="middle">
         <Col>
-          <Button size="small">
+          <Button size="default">
             <a
-              href={`/document-service/bct/download/valuationReport?valuationReportId=${
-                this.props.node.data.uuid
-              }`}
+              href={`${DOWN_LOAD_VALUATION_URL}${this.props.params.data.uuid}`}
               download="template.t"
             >
               查看
             </a>
           </Button>
         </Col>
-        {/* <ModalButton
-          size="small"
+        <ModalButton
+          size="default"
           type="primary"
           content={
             <div>
-              是否确认向&nbsp;&nbsp;{this.props.node.data.legalName}&nbsp;&nbsp;邮箱发送估值报告?
+              是否确认向&nbsp;&nbsp;{this.props.params.data.legalName}&nbsp;&nbsp;邮箱发送估值报告?
             </div>
           }
           visible={this.state.visible}
@@ -71,7 +76,7 @@ class ValuationCellRenderer extends PureComponent {
           onCancel={this.onCancel}
         >
           发送报告
-        </ModalButton> */}
+        </ModalButton>
       </Row>
     );
   }
