@@ -1,9 +1,9 @@
 import ModalButton from '@/design/components/ModalButton';
+import { DOWN_LOAD_VALUATION_URL } from '@/services/document';
 import { emlSendValuationReport } from '@/services/report-service';
 import { Button, Col, message, Row } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-
 class ValuationCellRenderer extends PureComponent {
   constructor(props) {
     super(props);
@@ -55,9 +55,7 @@ class ValuationCellRenderer extends PureComponent {
         <Col>
           <Button size="default">
             <a
-              href={`/document-service/bct/download/valuationReport?valuationReportId=${
-                this.props.params.data.uuid
-              }`}
+              href={`${DOWN_LOAD_VALUATION_URL}${this.props.params.data.uuid}`}
               download="template.t"
             >
               查看
