@@ -5,12 +5,11 @@ import {
   trdTradePortfolioCreateBatch,
   trdTradePortfolioDelete,
 } from '@/services/trade-service';
-import { Button, Popconfirm, Typography } from 'antd';
+import { message } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
-
-const { Title } = Typography;
+import ActionCol from './ActionCol';
 
 class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
   public state = {
@@ -57,16 +56,12 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
     });
   };
 
-  public bindOnRemove = params => async () => {
-    const { error, data } = await trdTradePortfolioDelete({
-      tradeId: this.props.rowData.tradeId,
-      portfolioName: params.data.portfolio,
-    });
-    if (error) return;
-    const datas = _.dropWhile(this.state.dataSource, ['portfolio', params.data.portfolio]);
-    console.log(datas);
+  public onRemove = params => {
+    const clone = [...this.state.dataSource];
+    const index = this.state.dataSource.findIndex(item => item.portfolio === params.data.portfolio);
+    clone.splice(index, 1);
     this.setState({
-      dataSource: datas,
+      dataSource: clone,
     });
   };
 
@@ -82,6 +77,7 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
         portfolio: item,
       };
     });
+    message.success('添加成功');
     this.setState({
       dataSource: [...this.state.dataSource, ...datas],
     });
@@ -111,6 +107,7 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
             <>
               <SourceTable
                 rowKey="uuid"
+                title="已关联投资组合"
                 dataSource={this.state.dataSource}
                 columnDefs={[
                   { headerName: '投资组合', field: 'portfolio' },
@@ -118,15 +115,11 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
                     headerName: '操作',
                     render: params => {
                       return (
-                        <Popconfirm
-                          title="确认删除?"
-                          onConfirm={this.bindOnRemove(params)}
-                          key="pop"
-                        >
-                          <Button type="danger" key="del" size="small">
-                            删除
-                          </Button>
-                        </Popconfirm>
+                        <ActionCol
+                          params={params}
+                          rowData={this.props.rowData}
+                          onRemove={this.onRemove.bind(this)}
+                        />
                       );
                     },
                   },
@@ -146,6 +139,7 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
                       mode: 'multiple',
                       placeholder: '请输入内容搜索',
                       showSearch: true,
+                      allowClear: true,
                       options: async (value: string = '') => {
                         const { data, error } = await trdPortfolioListBySimilarPortfolioName({
                           similarPortfolioName: value,
