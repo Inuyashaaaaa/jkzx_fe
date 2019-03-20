@@ -11,14 +11,14 @@ import { allTryPricingLegTypes } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import {
-  ComputedColDefs,
-  COMPUTED_LEG_FIELDS,
   COMPUTED_LEG_FIELD_MAP,
+  COMPUTED_LEG_FIELDS,
+  ComputedColDefs,
 } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import {
+  TRADESCOL_FIELDS,
   TradesColDefs,
   TRADESCOLDEFS_LEG_FIELD_MAP,
-  TRADESCOL_FIELDS,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
@@ -168,7 +168,12 @@ class TradeManagementPricing extends PureComponent<any> {
                         }
                       : false,
                     exsitable: params => {
-                      return this.handleJudge(params);
+                      const legExsitable = this.handleJudge(params);
+                      if (!legExsitable) return false;
+                      if (typeof col.exsitable === 'function') {
+                        return col.exsitable(params);
+                      }
+                      return col.exsitable === undefined ? true : col.exsitable;
                     },
                   };
                 })

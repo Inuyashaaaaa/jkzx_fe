@@ -1,3 +1,4 @@
+import AsiaObserveModalInput from '@/containers/AsiaObserveModalInput';
 import ObserveModalInput from '@/containers/ObserveModalInput';
 import { IColDef } from '@/design/components/Table/types';
 import {
@@ -7,10 +8,12 @@ import {
 } from '@/services/market-data-service';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
+import moment from 'moment';
 import {
   BIG_NUMBER_CONFIG,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
+  FREQUENCY_TYPE_OPTIONS,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_CURRENCY_USD_CONFIG,
   INPUT_NUMBER_DAYS_CONFIG,
@@ -19,6 +22,7 @@ import {
   INPUT_NUMBER_PERCENTAGE_CONFIG,
   KNOCK_DIRECTION_MAP,
   KNOCK_DIRECTION_OPTIONS,
+  LEG_ANNUALIZED_FIELD,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
@@ -914,37 +918,36 @@ export const RebateLow: IColDef = {
 
 export const Frequency: IColDef = {
   headerName: '观察频率',
-  field: 'frequency',
+  field: LEG_FIELD.OBSERVATION_DAY_STEP,
   editable: true,
   input: {
     type: 'select',
     defaultOpen: true,
-    options: [
-      {
-        label: '1D',
-        value: '1D',
-      },
-      {
-        label: '1W',
-        value: '1W',
-      },
-      {
-        label: '1M',
-        value: '1M',
-      },
-      {
-        label: '3M',
-        value: '3M',
-      },
-      {
-        label: '6M',
-        value: '6M',
-      },
-      {
-        label: '1Y',
-        value: '1Y',
-      },
-    ],
+    options: FREQUENCY_TYPE_OPTIONS,
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const ObserveStartDay: IColDef = {
+  headerName: '观察起始日',
+  field: LEG_FIELD.OBSERVE_START_DAY,
+  editable: true,
+  input: {
+    type: 'date',
+    defaultOpen: true,
+    range: 'day',
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const ObserveEndDay: IColDef = {
+  headerName: '观察终止日',
+  field: LEG_FIELD.OBSERVE_END_DAY,
+  editable: true,
+  input: {
+    type: 'date',
+    defaultOpen: true,
+    range: 'day',
   },
   rules: RULES_REQUIRED,
 };
@@ -988,21 +991,11 @@ export const Holidays: IColDef = {
 export const ObservationDates: IColDef = {
   headerName: '观察日',
   editable: true,
-  field: 'observationDates',
-  input: {
-    type: 'select',
-    defaultOpen: true,
-    options: [
-      {
-        label: '2018-08-10',
-        value: '2018-08-10',
-      },
-      {
-        label: '2018-08-11',
-        value: '2018-08-11',
-      },
-    ],
-  },
+  field: LEG_FIELD.OBSERVATION_DATES,
+  input: record => ({
+    type: AsiaObserveModalInput,
+    record,
+  }),
   rules: RULES_REQUIRED,
 };
 
@@ -1720,4 +1713,56 @@ export const HighRebate: IColDef = {
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
+};
+
+export const PricingTerm = {
+  ...Term,
+  editable: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return true;
+    }
+    return false;
+  },
+  getValue: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return {
+        depends: [],
+        value(record) {
+          return record[Term.field];
+        },
+      };
+    }
+    return {
+      depends: [LEG_FIELD.EXPIRATION_DATE],
+      value(record) {
+        return moment(record[LEG_FIELD.EXPIRATION_DATE]).diff(moment(), 'days') + 1;
+      },
+    };
+  },
+};
+
+export const PricingExpirationDate = {
+  ...ExpirationDate,
+  editable: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return false;
+    }
+    return true;
+  },
+  getValue: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return {
+        depends: [LEG_FIELD.TERM],
+        value(record) {
+          return moment().add(record[LEG_FIELD[LEG_FIELD.TERM]], 'days');
+        },
+      };
+    }
+    return {
+      depends: [],
+      value(record) {
+        return record[LEG_FIELD.EXPIRATION_DATE];
+      },
+    };
+  },
 };

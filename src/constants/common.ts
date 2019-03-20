@@ -133,6 +133,41 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   UNWIND_PARTIAL: '部分平仓',
 };
 
+export const FREQUENCY_TYPE_MAP = {
+  // '1D': '1D',
+  // '1W': '1W',
+  // '1M': '1M',
+  // '3M': '3M',
+  // '6M': '6M',
+  // '1Y': '1Y',
+  '1D': 1,
+  '1W': 7,
+  '1M': 30,
+  '3M': 90,
+  '6M': 180,
+  '1Y': 365,
+};
+
+export const FREQUENCY_TYPE_ZHCN_MAP = {
+  '1D': '1天',
+  '1W': '1周',
+  '1M': '1月',
+  '3M': '3月',
+  '6M': '6月',
+  '1Y': '1年',
+};
+
+export const FREQUENCY_TYPE_NUM_MAP = {
+  '1D': 1,
+  '1W': 7,
+  '1M': 30,
+  '3M': 90,
+  '6M': 180,
+  '1Y': 365,
+};
+
+export const FREQUENCY_TYPE_OPTIONS = convertOptions(FREQUENCY_TYPE_MAP, FREQUENCY_TYPE_ZHCN_MAP);
+
 export const LCM_EVENT_TYPE_OPTIONS = convertOptions(LCM_EVENT_TYPE_MAP, LCM_EVENT_TYPE_ZHCN_MAP);
 
 export const UNIT_ENUM_ZHCN_MAP = {
@@ -310,6 +345,12 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  * 多腿字段名
  */
 export const LEG_FIELD = {
+  /* 观察日 */
+  OBSERVATION_DATES: 'OBSERVATION_DATES',
+  /* 观察频率 */
+  OBSERVATION_DAY_STEP: 'observationDayStep',
+  OBSERVE_START_DAY: 'OBSERVE_START_DAY',
+  OBSERVE_END_DAY: 'OBSERVE_END_DAY',
   AUTO_CALL_STRIKE: 'autoCallStrike',
   AUTO_CALL_STRIKE_UNIT: 'autoCallStrikeUnit',
   /* 收益/coupon(%) */
@@ -440,7 +481,9 @@ export const BIG_NUMBER_CONFIG = {
  * 多腿类型
  */
 export const LEG_TYPE_MAP = {
-  CASH: 'CASH',
+  ASIAN: 'ASIAN',
+  ASIAN_ANNUAL: 'ASIAN_ANNUAL',
+  ASIAN_UNANNUAL: 'ASIAN_UNANNUAL',
   AUTO_CALL_SNOW: 'AUTOCALL',
   AUTO_CALL_SNOW_ANNUAL: 'AUTO_CALL_SNOW_ANNUAL',
   AUTO_CALL_SNOW_UNANNUAL: 'AUTO_CALL_SNOW_UNANNUAL',
@@ -453,7 +496,6 @@ export const LEG_TYPE_MAP = {
   VANILLA_AMERICAN_UNANNUAL: 'VANILLA_AMERICAN_UNANNUAL',
   CALL_SPREAD: 'CALL_SPREAD',
   CALL_SPREAD_COMBO: 'CALL_SPREAD_COMBO',
-  AUTOCALL: 'AUTOCALL',
   BASKET: 'BASKET',
   CASH_PRODUCT: 'CASH_PRODUCT',
   FUTURE: 'FUTURE',
@@ -507,6 +549,9 @@ export const PRODUCT_TYPE_MAP = {
 };
 
 export const PRODUCT_TYPE_ZHCN_MAP = {
+  ASIA: '亚式',
+  [LEG_TYPE_MAP.ASIAN_ANNUAL]: '亚式 - 年化',
+  [LEG_TYPE_MAP.ASIAN_UNANNUAL]: '亚式 - 非年化',
   AUTO_CALL_SNOW: 'AutoCall',
   AUTO_CALL_SNOW_ANNUAL: 'AutoCall - 雪球式 - 年化',
   CASH: '现金',

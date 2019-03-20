@@ -1,5 +1,6 @@
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
   LEG_FIELD,
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
@@ -8,12 +9,13 @@ import { InputPolym } from '@/design/components/Form/Input/InputPolym';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { remove } from '@/design/utils';
+import { qlDateScheduleCreate } from '@/services/quant-service';
 import { Button, message, Row } from 'antd';
 import BigNumber from 'bignumber.js';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 import React from 'react';
 
-class ObserveModalInput extends InputPolym<any> {
+class AsiaObserveModalInput extends InputPolym<any> {
   public state = {
     visible: false,
     dealDataSource: [],
@@ -25,11 +27,38 @@ class ObserveModalInput extends InputPolym<any> {
       (props.value || []).map((item, index) => {
         return {
           obDay: moment(item),
-          payDay: moment(item),
         };
       })
     );
   }
+
+  public componentDidMount = () => {
+    // if (!this.props.record[LEG_FIELD.OBSERVATION_DATES]) {
+    //   this.inital();
+    // }
+  };
+
+  public inital = async () => {
+    const { record } = this.props;
+    const start = isMoment(record[LEG_FIELD.OBSERVE_START_DAY])
+      ? record[LEG_FIELD.OBSERVE_START_DAY].format('YYYY-MM-DD')
+      : record[LEG_FIELD.OBSERVE_START_DAY];
+    const end = isMoment(record[LEG_FIELD.OBSERVE_END_DAY])
+      ? record[LEG_FIELD.OBSERVE_END_DAY].format('YYYY-MM-DD')
+      : record[LEG_FIELD.OBSERVE_END_DAY];
+    const freq = record[LEG_FIELD.OBSERVATION_DAY_STEP];
+
+    const { error, data } = await qlDateScheduleCreate({
+      start,
+      end,
+      freq,
+      roll: 'backward',
+      adj: 'modified_following',
+      holidays: ['DEFAULT_CALENDAR'],
+    });
+
+    if (error) return;
+  };
 
   public computeDataSource = dataSource => {
     const { record } = this.props;
@@ -48,12 +77,8 @@ class ObserveModalInput extends InputPolym<any> {
       .map((item, index) => {
         return {
           ...item,
-          price: new BigNumber(barrierVal)
-            .plus(
-              new BigNumber(index + 1)
-                .multipliedBy(new BigNumber(step).div(100))
-                .multipliedBy(initialSpot)
-            )
+          weight: new BigNumber(1)
+            .div(index + 1)
             .decimalPlaces(4)
             .toNumber(),
           id: index,
@@ -62,7 +87,7 @@ class ObserveModalInput extends InputPolym<any> {
   };
 
   public formatValue = (value): string => {
-    return value ? [value[0], value[value.length - 1]].join(' ~ ') : '';
+    return value && value.length ? [value[0].day, value[value.length - 1].day].join(' ~ ') : '';
   };
 
   public formatChangeEvent = event => {
@@ -88,7 +113,14 @@ class ObserveModalInput extends InputPolym<any> {
         visible: !this.state.visible,
       },
       () => {
-        this._onChange(this.state.dealDataSource.map(item => item.obDay.format('YYYY-MM-DD')));
+        this._onChange(
+          this.state.dealDataSource.map(item => {
+            return {
+              ...item,
+              day: item.obDay.format('YYYY-MM-DD'),
+            };
+          })
+        );
       }
     );
   };
@@ -109,7 +141,6 @@ class ObserveModalInput extends InputPolym<any> {
         ...this.state.dealDataSource,
         {
           obDay: dataSource.day,
-          payDay: dataSource.day,
         },
       ]),
     });
@@ -123,6 +154,8 @@ class ObserveModalInput extends InputPolym<any> {
       ),
     });
   };
+
+  public onGenerate = () => {};
 
   public renderEditing(props) {
     return (
@@ -140,12 +173,21 @@ class ObserveModalInput extends InputPolym<any> {
             onOk: this.onOk,
             onCancel: this.onCancel,
             destroyOnClose: true,
+            width: 700,
           }}
           onClick={this.onOpen}
           visible={this.state.visible}
           style={{ width: '100%', display: 'block' }}
           content={
             <SourceTable
+              // footer={
+              //   <Row type="flex" justify="start" align="middle" style={{ marginTop: 10 }}>
+              //     <Icon type="reload" />
+              //     <a href="javascript:;" style={{ paddingLeft: 5 }} onClick={this.onGenerate}>
+              //       重新生成观察日
+              //     </a>
+              //   </Row>
+              // }
               dataSource={this.state.dealDataSource}
               pagination={false}
               rowKey="id"
@@ -154,7 +196,6 @@ class ObserveModalInput extends InputPolym<any> {
                   <Form
                     onSubmitButtonClick={this.onSubmitButtonClick}
                     layout="inline"
-                    resetable={false}
                     controls={[
                       {
                         field: 'day',
@@ -175,6 +216,9 @@ class ObserveModalInput extends InputPolym<any> {
                       },
                     ]}
                     submitText={'添加'}
+                    resetText={'批量生成观察日'}
+                    resetable={false}
+                    onResetButtonClick={this.onGenerate}
                   />
                 </Row>
               }
@@ -188,16 +232,14 @@ class ObserveModalInput extends InputPolym<any> {
                   },
                 },
                 {
-                  headerName: '支付日',
-                  field: 'payDay',
-                  input: {
-                    type: 'date',
-                    ranger: 'day',
-                  },
+                  headerName: '权重',
+                  field: 'weight',
+                  input: INPUT_NUMBER_DIGITAL_CONFIG,
                 },
                 {
-                  headerName: '障碍价格',
+                  headerName: '已观察到价格(可编辑)',
                   field: 'price',
+                  editable: true,
                   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
                 },
                 {
@@ -229,4 +271,4 @@ class ObserveModalInput extends InputPolym<any> {
   }
 }
 
-export default ObserveModalInput;
+export default AsiaObserveModalInput;

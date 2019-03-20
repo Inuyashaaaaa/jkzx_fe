@@ -18,8 +18,7 @@ import {
   UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
-import { AutoCallSnowAnnual } from '@/constants/legColDefs/AutoCallSnowAnnual';
-import { LEG_E2E_MAP, LEG_MAP } from '@/constants/legType';
+import { LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -117,7 +116,11 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
     ...dataSourceItem,
   };
 
-  if (leg.type === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+  if (
+    leg.type === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
+  ) {
     return leg.getDefault(nextDataSourceItem, isPricing);
   }
 
@@ -578,7 +581,11 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
       counterPartyName: tableFormData.counterPartyCode,
     };
 
-    if (productType === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+    if (
+      productType === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL ||
+      productType === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+      productType === LEG_TYPE_MAP.ASIAN_UNANNUAL
+    ) {
       const Leg = LEG_MAP[productType];
       return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource);
     }
@@ -1029,10 +1036,12 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
   tableFormData.tradeDate = apiData.tradeDate;
 
   const tableDataSource = positions.map(position => {
-    if (position.productType === LEG_TYPE_MAP.AUTO_CALL_SNOW) {
-      const productType = position.productType;
-      const Leg = LEG_MAP[LEG_E2E_MAP[productType]];
-
+    if (
+      position.productType === LEG_TYPE_MAP.AUTO_CALL_SNOW ||
+      position.productType === LEG_TYPE_MAP.ASIAN
+    ) {
+      const isAnnualized = position.asset.annualized;
+      const Leg = LEG_MAP[`${position.productType}_${isAnnualized ? 'ANNUAL' : 'UNANNUAL'}`];
       const nextPageDataItem: any = backConvertPercent({
         ..._.omitBy(position.asset, _.isNull),
         lcmEventType: position.lcmEventType,
