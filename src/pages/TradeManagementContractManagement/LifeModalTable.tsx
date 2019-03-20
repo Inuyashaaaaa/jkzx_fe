@@ -72,6 +72,7 @@ class LifeModalTable extends PureComponent<
       title: '生命周期事件概览',
       footer: false,
       closable: true,
+      onOk: this.handleOk,
     };
 
     return (
@@ -83,7 +84,6 @@ class LifeModalTable extends PureComponent<
         visible={this.state.modalVisiable}
         modalProps={modalProps}
         onCancel={this.handleCancel}
-        onConfirm={this.handleOk}
         content={
           <SourceTable
             rowKey={'uuid'}

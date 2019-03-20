@@ -33,7 +33,7 @@ const createEventBus = () => {
         this._listeners[type].splice(index, 1);
       }
     },
-    listen(type, cb, scope) {
+    listen(type, cb, scope?) {
       const index = this._listen(type, cb, scope);
       const unListen = () => {
         this._listeners[type].splice(index, 1);
@@ -47,7 +47,7 @@ const createEventBus = () => {
         return;
       }
       listeners.forEach(listen => {
-        listen.cb.call(listen.scope, payload);
+        listen.cb.call(listen.scope, payload, type);
       });
     },
     _listen(type, cb, scope) {

@@ -19,9 +19,10 @@ export default {
           ie: 11,
         },
         locale: {
+          antd: true,
           enable: true, // default false
           default: 'zh-CN', // default zh-CN
-          baseNavigator: true, // default true, when it is true, will use `navigator.language` overwrite default
+          baseNavigator: false, // default true, when it is true, will use `navigator.language` overwrite default
         },
         dynamicImport: {
           loadingComponent: '/lib/components/_Loading',

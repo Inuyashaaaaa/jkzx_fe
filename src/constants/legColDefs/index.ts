@@ -7,6 +7,7 @@ import { AnnulizedVanillaOptionDTOAmericanAnnual } from './AnnulizedVanillaOptio
 import { AnnulizedVanillaOptionDTOAmericanUnAnnual } from './AnnulizedVanillaOptionDTOAmericanUnAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanAnnual } from './AnnulizedVanillaOptionDTOEuropeanAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanUnAnnual } from './AnnulizedVanillaOptionDTOEuropeanUnAnnual';
+import { AutoCallSnowAnnual } from './AutoCallSnowAnnual';
 import { BarrierAnnual } from './BarrierAnnual';
 import { BarrierUnAnnual } from './BarrierUnAnnual';
 import {
@@ -78,6 +79,9 @@ export interface ILegType {
   assetClass: string;
   columnDefs: IColDef[];
   isAnnualized: boolean;
+  getDefault?: any;
+  getPosition?: any;
+  getPageData?: any;
 }
 
 export const allLegTypes: ILegType[] = [
@@ -113,6 +117,7 @@ export const allLegTypes: ILegType[] = [
   RangeAccrualsUnAnnual,
   StraddleAnnual,
   StraddleUnAnnual,
+  AutoCallSnowAnnual,
 ];
 
 const PricingInitialSpot = InitialSpot;

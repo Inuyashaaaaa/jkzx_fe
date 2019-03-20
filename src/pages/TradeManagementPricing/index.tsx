@@ -24,7 +24,18 @@ import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { countDeltaCash, countGamaCash, countRhoR } from '@/services/cash';
+import {
+  countDelta,
+  countDeltaCash,
+  countGamaCash,
+  countGamma,
+  countPrice,
+  countPricePer,
+  countRhoR,
+  countStdDelta,
+  countTheta,
+  countVega,
+} from '@/services/cash';
 import { trdBookList } from '@/services/general-service';
 import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service';
 import { convertTradePositions, createLegDataSourceItem, getAddLegItem } from '@/services/pages';
@@ -301,6 +312,7 @@ class TradeManagementPricing extends PureComponent<any> {
 
     const positions = convertTradePositions(
       tableDataSource.map(item => _.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])),
+      {},
       true
     );
 
@@ -366,39 +378,25 @@ class TradeManagementPricing extends PureComponent<any> {
                 }
                 return val ? new BigNumber(val).multipliedBy(100).toNumber() : val;
               }),
-              [COMPUTED_LEG_FIELD_MAP.PRICE]: new BigNumber(item.price)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber(),
-              [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: new BigNumber(item.price)
-                .dividedBy(this.getActualNotionAmountBigNumber(cur))
-                .multipliedBy(100)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber(),
-              [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: new BigNumber(item.delta)
-                .dividedBy(new BigNumber(item.quantity).abs())
-                .multipliedBy(100)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber(),
-              [COMPUTED_LEG_FIELD_MAP.DELTA]: new BigNumber(item.delta)
-                .dividedBy(cur[LEG_FIELD.UNDERLYER_MULTIPLIER])
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber(),
+              [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
+              [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
+                item.price,
+                this.getActualNotionAmountBigNumber(cur)
+              ),
+              [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
+              [COMPUTED_LEG_FIELD_MAP.DELTA]: countDelta(
+                item.delta,
+                cur[LEG_FIELD.UNDERLYER_MULTIPLIER]
+              ),
               [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(item.delta, item.underlyerPrice),
-              [COMPUTED_LEG_FIELD_MAP.GAMMA]: new BigNumber(item.gamma)
-                .dividedBy(cur[LEG_FIELD.UNDERLYER_MULTIPLIER])
-                .multipliedBy(item.underlyerPrice)
-                .dividedBy(100)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber(),
+              [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
+                item.gamma,
+                cur[LEG_FIELD.UNDERLYER_MULTIPLIER],
+                item.underlyerPrice
+              ),
               [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),
-              [COMPUTED_LEG_FIELD_MAP.VEGA]: new BigNumber(item.vega)
-                .dividedBy(100)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber(),
-              [COMPUTED_LEG_FIELD_MAP.THETA]: new BigNumber(item.theta)
-                .dividedBy(365)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber(),
+              [COMPUTED_LEG_FIELD_MAP.VEGA]: countVega(item.vega),
+              [COMPUTED_LEG_FIELD_MAP.THETA]: countTheta(item.theta),
               [COMPUTED_LEG_FIELD_MAP.RHO_R]: countRhoR(item.rhoR),
               // [COMPUTED_LEG_FIELD_MAP.RHO]: new BigNumber(item.rho)
               // .multipliedBy(100)

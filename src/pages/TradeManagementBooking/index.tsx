@@ -150,7 +150,12 @@ class BookCreate extends PureComponent<any> {
                         }
                       : false,
                     exsitable: params => {
-                      return this.handleJudge(params);
+                      const legExsitable = this.handleJudge(params);
+                      if (!legExsitable) return false;
+                      if (typeof col.exsitable === 'function') {
+                        return col.exsitable(params);
+                      }
+                      return col.exsitable === undefined ? true : col.exsitable;
                     },
                   };
                 })
