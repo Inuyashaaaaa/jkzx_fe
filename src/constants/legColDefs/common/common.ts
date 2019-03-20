@@ -8,7 +8,7 @@ import {
 } from '@/services/market-data-service';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 import {
   BIG_NUMBER_CONFIG,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
@@ -528,6 +528,19 @@ export const ExpirationDate: IColDef = {
     defaultOpen: true,
   },
   rules: RULES_REQUIRED,
+  getValue: {
+    depends: [LEG_FIELD.TERM, LEG_FIELD.EFFECTIVE_DATE],
+    value: record => {
+      const effectiveDate = record[LEG_FIELD.EFFECTIVE_DATE];
+      const term = record[LEG_FIELD.TERM];
+      if (record[LEG_FIELD.TERM] !== undefined && effectiveDate !== undefined) {
+        return (isMoment(effectiveDate) ? effectiveDate : moment(effectiveDate))
+          .add(term, 'days')
+          .clone();
+      }
+      return record[LEG_FIELD.EXPIRATION_DATE];
+    },
+  },
 };
 
 export const ExpirationTime: IColDef = {
