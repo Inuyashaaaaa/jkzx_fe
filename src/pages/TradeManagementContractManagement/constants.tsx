@@ -3,10 +3,14 @@ import { IFormControl } from '@/design/components/Form/types';
 import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
-import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import {
+  trdBookListBySimilarBookName,
+  trdPortfolioListBySimilarPortfolioName,
+} from '@/services/trade-service';
 import { Button, Row } from 'antd';
 import React from 'react';
 import LifeModalTable from './LifeModalTable';
+import PortfolioModalTable from './PortfolioModalTable';
 
 export const ROW_KEY = 'tradeId';
 
@@ -35,6 +39,29 @@ export const bookingSearchFormControls: (bookList, bookIdList) => IFormControl[]
       },
     },
     field: BOOK_NAME_FIELD,
+  },
+  {
+    control: {
+      label: '投资组合',
+    },
+    input: {
+      type: 'select',
+      showSearch: true,
+      placeholder: '请输入内容搜索',
+      mode: 'multiple',
+      allowClear: true,
+      options: async (value: string = '') => {
+        const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+          similarPortfolioName: value,
+        });
+        if (error) return [];
+        return data.map(item => ({
+          label: item,
+          value: item,
+        }));
+      },
+    },
+    field: 'portfolioNames',
   },
   {
     control: {
@@ -129,15 +156,21 @@ export const BOOKING_TABLE_COLUMN_DEFS2: IColumnDef[] = [
     field: 'salesName',
     width: 230,
   },
+  {
+    headerName: '所属投资组合',
+    field: 'portfolioNames',
+    width: 300,
+  },
 ];
 
-export const BOOKING_TABLE_COLUMN_DEFS: (
-  bindCheckContract: any
-) => IColumnDef[] = bindCheckContract => [
+export const BOOKING_TABLE_COLUMN_DEFS: (bindCheckContract: any) => IColumnDef[] = (
+  bindCheckContract,
+  onSearch
+) => [
   ...BOOKING_TABLE_COLUMN_DEFS2,
   {
     headerName: '操作',
-    width: 320,
+    width: 480,
     render(params) {
       return (
         <Row type="flex" align="middle" style={{ height: params.context.rowHeight }}>
@@ -150,6 +183,7 @@ export const BOOKING_TABLE_COLUMN_DEFS: (
             查看合约
           </Button>
           <LifeModalTable key="checkLife" rowData={params.data} />
+          <PortfolioModalTable key="portfolio" rowData={params.data} search={onSearch} />
         </Row>
       );
     },
