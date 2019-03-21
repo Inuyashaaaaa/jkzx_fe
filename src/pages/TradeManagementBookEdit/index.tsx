@@ -5,6 +5,7 @@ import {
   LEG_FIELD,
   LEG_NAME_FIELD,
   LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
@@ -14,6 +15,7 @@ import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import ModalButton from '@/lib/components/_ModalButton2';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { convertObservetions } from '@/services/common';
 import { trdBookList, trdTradeGet } from '@/services/general-service';
 import {
   bookingTableFormControls,
@@ -33,6 +35,7 @@ import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import ExportModal from './ExportModal';
+import AsianExerciseModal from './modals/AsianExerciseModal';
 import ExerciseModal from './modals/ExerciseModal';
 import FixingModal from './modals/FixingModal';
 import UnwindModal from './modals/UnwindModal';
@@ -54,6 +57,8 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public $exerciseModal: ExerciseModal;
 
   public $fixingModal: FixingModal;
+
+  public $asianExerciseModal: AsianExerciseModal;
 
   constructor(props) {
     super(props);
@@ -297,10 +302,12 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public bindEventAction = (eventType, params) => () => {
+    const legType = params.rowData[LEG_TYPE_FIELD];
+
     // 每次操作后及时更新，并保证数据一致性
     this.activeRowData = params.rowData;
 
-    if (eventType === LCM_EVENT_TYPE_MAP.FIXING) {
+    if (eventType === LCM_EVENT_TYPE_MAP.OBSERVE) {
       return this.$fixingModal.show(
         this.activeRowData,
         this.state.tableFormData,
@@ -310,6 +317,19 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     }
 
     if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
+      if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
+        if (convertObservetions(params.rowData).some(item => !item.price)) {
+          return message.warn('请先完善观察日价格')
+        }
+
+        return this.$asianExerciseModal.show(
+          this.activeRowData,
+          this.state.tableFormData,
+          this.props.currentUser,
+          () => this.loadData(true)
+        );
+      }
+
       return this.$exerciseModal.show(
         this.activeRowData,
         this.state.tableFormData,
@@ -473,6 +493,11 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         <FixingModal
           ref={node => {
             this.$fixingModal = node;
+          }}
+        />
+        <AsianExerciseModal
+          ref={node => {
+            this.$asianExerciseModal = node;
           }}
         />
       </PageHeaderWrapper>

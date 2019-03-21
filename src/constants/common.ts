@@ -128,7 +128,7 @@ export const LCM_EVENT_TYPE_MAP = {
   ROLL: 'ROLL',
   CLOSED: 'CLOSED',
   UNWIND_PARTIAL: 'UNWIND_PARTIAL',
-  FIXING: 'FIXING',
+  OBSERVE: 'OBSERVE',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
@@ -144,22 +144,16 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   ROLL: '展期',
   CLOSED: '结束',
   UNWIND_PARTIAL: '部分平仓',
-  FIXING: '观察',
+  OBSERVE: '观察',
 };
 
 export const FREQUENCY_TYPE_MAP = {
-  '1D': 1,
-  '1W': 7,
-  '1M': 30,
-  '3M': 90,
-  '6M': 180,
-  '1Y': 365,
-  // '1D': '1D',
-  // '1W': '1W',
-  // '1M': '1M',
-  // '3M': '3M',
-  // '6M': '6M',
-  // '1Y': '1Y',
+  '1D': '1D',
+  '1W': '1W',
+  '1M': '1M',
+  '3M': '3M',
+  '6M': '6M',
+  '1Y': '1Y',
 };
 
 export const FREQUENCY_TYPE_ZHCN_MAP = {
@@ -349,8 +343,8 @@ export const LEG_FIELD = {
   /* 观察日 */
   OBSERVATION_DATES: 'OBSERVATION_DATES',
   /* 观察频率 */
-  OBSERVATION_STEP: 'observationDayStep',
-  // OBSERVATION_STEP: 'observationStep',
+  // OBSERVATION_STEP: 'observationDayStep',
+  OBSERVATION_STEP: 'observationStep',
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',
   AUTO_CALL_STRIKE: 'autoCallStrike',
@@ -375,7 +369,7 @@ export const LEG_FIELD = {
   PREMIUM: 'premium',
   DAYS_IN_YEAR: 'daysInYear',
   SETTLEMENT_DATE: 'settlementDate',
-  EXPIRATION_DATE: 'expirationDate',
+  EXPIRATION_DATE: 'expirationDate', // 到期日
   EFFECTIVE_DATE: 'effectiveDate',
   INITIAL_SPOT: 'initialSpot',
   DIRECTION: 'direction',

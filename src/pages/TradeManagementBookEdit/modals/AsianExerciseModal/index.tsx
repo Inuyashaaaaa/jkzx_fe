@@ -10,16 +10,21 @@ import {
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
+import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { isSameDay, wrapMoment } from '@/utils';
+import { wrapMoment } from '@/utils';
 import { Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { countAvg } from '../../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 const OPTIONS_NUMBER = 'optionsNumber';
+
+const SUBJECT_MATTER_AVG = 'SUBJECT_MATTER_AVG';
+
+const SETTLEA_MOUNT = 'SETTLEA_MOUNT';
 
 class AsianExerciseModal extends PureComponent<
   {
@@ -38,12 +43,15 @@ class AsianExerciseModal extends PureComponent<
 
   public reload: any;
 
+  public subjectMatterAvg: any;
+
+  public $form: Form;
+
   public state = {
     visible: false,
     direction: 'BUYER',
     modalConfirmLoading: false,
     dataSource: {},
-    exportVisible: false,
     formData: {},
   };
 
@@ -65,8 +73,22 @@ class AsianExerciseModal extends PureComponent<
         this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY
           ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
           : this.getDefaultNotionalAmount(),
-      [OPTIONS_NUMBER]: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY,
+      [OPTIONS_NUMBER]:
+        this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.LOT
+          ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
+          : this.getDefaultOptionsNumber(),
+      [SUBJECT_MATTER_AVG]: countAvg(convertObservetions(this.data)),
+      [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.STRIKE],
     };
+  };
+
+  public getDefaultOptionsNumber = () => {
+    // 名义本金 / 期初价格 / 合约乘数
+    return new BigNumber(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
+      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber();
   };
 
   public getDefaultNotionalAmount = () => {
@@ -101,52 +123,6 @@ class AsianExerciseModal extends PureComponent<
     });
   };
 
-  public onConfirm = async () => {
-    const dataSource = this.state.dataSource;
-    this.switchConfirmLoading();
-    const { error, data } = await trdTradeLCMEventProcess({
-      positionId: this.data.id,
-      tradeId: this.tableFormData.tradeId,
-      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
-      userLoginId: this.currentUser.userName,
-      eventDetail: {
-        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
-        settleAmount: String(dataSource[SETTLE_AMOUNT]),
-        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
-        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
-      },
-    });
-
-    this.switchConfirmLoading();
-    if (error) return;
-    message.success('行权成功');
-    this.setState({
-      visible: false,
-      exportVisible: true,
-    });
-  };
-
-  public convertVisible = () => {
-    this.setState({
-      exportVisible: false,
-    });
-  };
-
-  public isCanExercise = () => {
-    const now = moment();
-    // 今天是最后一个观察日
-    const last = _.last(this.state.tableData).day || {};
-    if (last && isSameDay(now, last)) {
-      return true;
-    }
-
-    if (isSameDay(this.data[LEG_FIELD.EXPIRATION_DATE], now)) {
-      return true;
-    }
-
-    return false;
-  };
-
   public filterObDays = tableData => {
     return tableData.filter(item => {
       return wrapMoment(item).valueOf() <= moment().valueOf();
@@ -157,7 +133,37 @@ class AsianExerciseModal extends PureComponent<
     return this.data[LEG_FIELD.DIRECTION] === DIRECTION_TYPE_MAP.BUYER ? '我方行权' : '对方行权';
   };
 
-  public onConfirm = async () => {};
+  public onConfirm = async () => {
+    const rsp = await this.$form.validate();
+    if (rsp.error) return;
+    const { error } = await trdTradeLCMEventProcess({
+      positionId: this.data.id,
+      tradeId: this.tableFormData.tradeId,
+      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+      userLoginId: this.currentUser.userName,
+      eventDetail: {
+        underlyerPrice: String(this.state.formData[SUBJECT_MATTER_AVG]),
+        settleAmount: String(this.state.formData[SETTLEA_MOUNT]),
+      },
+    });
+
+    if (error) return;
+    message.success('行权成功');
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.reload();
+      }
+    );
+  };
+
+  public onValueChange = params => {
+    this.setState({
+      formData: params.values,
+    });
+  };
 
   public render() {
     const { visible } = this.state;
@@ -188,8 +194,10 @@ class AsianExerciseModal extends PureComponent<
           title={this.getTitle()}
         >
           <Form
+            ref={node => (this.$form = node)}
             footer={false}
             dataSource={this.state.formData}
+            onValueChange={this.onValueChange}
             controls={[
               {
                 field: OPTIONS_NUMBER,
@@ -212,7 +220,7 @@ class AsianExerciseModal extends PureComponent<
                 },
               },
               {
-                field: 'subjectmatterAvg',
+                field: SUBJECT_MATTER_AVG,
                 control: {
                   label: '标的物均价（¥）',
                 },
@@ -232,7 +240,7 @@ class AsianExerciseModal extends PureComponent<
                 },
               },
               {
-                field: 'settlementPrice',
+                field: SETTLEA_MOUNT,
                 control: {
                   label: '结算金额',
                 },

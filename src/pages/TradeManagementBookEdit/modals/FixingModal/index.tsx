@@ -15,6 +15,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { countAvg } from '../../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
@@ -44,6 +45,7 @@ class FixingModal extends PureComponent<
     dataSource: {},
     exportVisible: false,
     tableData: [],
+    avg: 0,
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -52,10 +54,17 @@ class FixingModal extends PureComponent<
     this.currentUser = currentUser;
     this.reload = reload;
 
-    this.setState({
-      tableData: this.filterObDays(convertObservetions(data)),
-      visible: true,
-    });
+    this.setState(
+      {
+        tableData: this.filterObDays(convertObservetions(data)),
+        visible: true,
+      },
+      () => {
+        this.setState({
+          avg: this.countAvg(),
+        });
+      }
+    );
   };
 
   public computeCnyDataSource = (value, changed = {}) => {
@@ -109,11 +118,11 @@ class FixingModal extends PureComponent<
     const now = moment();
     // 今天是最后一个观察日
     const last = (_.last(this.state.tableData) || {}).day;
-    if (last && isSameDay(now, last)) {
+    if ((last && isSameDay(now, last)) || isSameDay(this.data[LEG_FIELD.EXPIRATION_DATE], now)) {
       return true;
     }
 
-    if (isSameDay(this.data[LEG_FIELD.EXPIRATION_DATE], now)) {
+    if (this.state.tableData.every(item => !!item.price)) {
       return true;
     }
 
@@ -126,15 +135,39 @@ class FixingModal extends PureComponent<
     });
   };
 
+  public countAvg = () => {
+    return countAvg(this.state.tableData);
+  };
+
+  public onCellValueChanged = params => {
+    if (params.colDef.field === 'price' && params.newValue !== params.oldValue) {
+      this.startOb(params.data);
+      this.setState({
+        avg: this.countAvg(),
+      });
+    }
+  };
+
+  public startOb = async data => {
+    const { error } = await trdTradeLCMEventProcess({
+      positionId: this.data.id,
+      tradeId: this.tableFormData.tradeId,
+      eventType: LCM_EVENT_TYPE_MAP.OBSERVE,
+      userLoginId: this.currentUser.userName,
+      eventDetail: {
+        observationDate: data.day,
+        observationPrice: String(data.price),
+      },
+    });
+    if (error) return;
+    message.success('行权成功');
+    this.reload();
+  };
+
   public render() {
     const { visible } = this.state;
     return (
       <>
-        <AsianExerciseModal
-          ref={node => {
-            this.$asianExerciseModal = node;
-          }}
-        />
         <Modal
           closable={false}
           destroyOnClose={true}
@@ -142,17 +175,17 @@ class FixingModal extends PureComponent<
           title={'Fixing'}
           footer={
             <Row type="flex" justify="space-between">
-              <Col>平均价: {123123}</Col>
+              <Col>平均价: {this.state.avg}</Col>
               <Col>
                 <Button onClick={this.switchModal}>取消</Button>
                 <Button
-                  disabled={this.isCanExercise()}
+                  disabled={!this.isCanExercise()}
                   style={{ marginLeft: VERTICAL_GUTTER }}
                   onClick={this.onConfirm}
                   type="primary"
                   loading={this.state.modalConfirmLoading}
                 >
-                  行权
+                  确定
                 </Button>
               </Col>
             </Row>
@@ -161,7 +194,8 @@ class FixingModal extends PureComponent<
           <SourceTable
             pagination={false}
             dataSource={this.state.tableData}
-            rowKey="uuid"
+            rowKey="day"
+            onCellValueChanged={this.onCellValueChanged}
             columnDefs={[
               {
                 headerName: '观察日',
