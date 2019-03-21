@@ -158,6 +158,7 @@ class ExerciseModal extends PureComponent<
         numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
         notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
+      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
     });
     if (error) return;
     this.setState({
@@ -195,11 +196,8 @@ class ExerciseModal extends PureComponent<
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={EXERCISE_FORM_CONTROLS}
+            controls={EXERCISE_FORM_CONTROLS(this.handleSettleAmount)}
           />
-          <Button key="upload" type="primary" onClick={this.handleSettleAmount}>
-            结算
-          </Button>
         </Modal>
       </>
     );
