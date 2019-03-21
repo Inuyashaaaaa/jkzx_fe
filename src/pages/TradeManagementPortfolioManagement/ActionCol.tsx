@@ -63,7 +63,12 @@ class ActionCol extends PureComponent<any, any> {
           >
             修改
           </ModalButton>
-          <PopconfirmButton title="确认删除?" type="danger" size="small" onConfirm={this.onRemove}>
+          <PopconfirmButton
+            confirmTitle="确认删除?"
+            type="danger"
+            size="small"
+            onConfirm={this.onRemove}
+          >
             删除
           </PopconfirmButton>
         </Button.Group>

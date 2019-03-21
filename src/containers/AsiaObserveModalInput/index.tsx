@@ -1,3 +1,4 @@
+import PopconfirmButton from '@/components/PopconfirmButton';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
@@ -10,15 +11,18 @@ import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { remove } from '@/design/utils';
 import { qlDateScheduleCreate } from '@/services/quant-service';
-import { Button, message, Row } from 'antd';
+import { Button, Col, message, Row } from 'antd';
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React from 'react';
 
 class AsiaObserveModalInput extends InputPolym<any> {
   public state = {
     visible: false,
+    popconfirmVisible: false,
     dealDataSource: [],
+    generateLoading: false,
   };
 
   constructor(props) {
@@ -32,46 +36,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
     );
   }
 
-  public componentDidMount = () => {
-    // if (!this.props.record[LEG_FIELD.OBSERVATION_DATES]) {
-    //   this.inital();
-    // }
-  };
-
-  public inital = async () => {
-    const { record } = this.props;
-    const start = isMoment(record[LEG_FIELD.OBSERVE_START_DAY])
-      ? record[LEG_FIELD.OBSERVE_START_DAY].format('YYYY-MM-DD')
-      : record[LEG_FIELD.OBSERVE_START_DAY];
-    const end = isMoment(record[LEG_FIELD.OBSERVE_END_DAY])
-      ? record[LEG_FIELD.OBSERVE_END_DAY].format('YYYY-MM-DD')
-      : record[LEG_FIELD.OBSERVE_END_DAY];
-    const freq = record[LEG_FIELD.OBSERVATION_STEP];
-
-    const { error, data } = await qlDateScheduleCreate({
-      start,
-      end,
-      freq,
-      roll: 'backward',
-      adj: 'modified_following',
-      holidays: ['DEFAULT_CALENDAR'],
-    });
-
-    if (error) return;
-  };
-
   public computeDataSource = dataSource => {
-    const { record } = this.props;
-    const upBarrier = record[LEG_FIELD.UP_BARRIER];
-    const upBarrierType = record[LEG_FIELD.UP_BARRIER_TYPE];
-    const step = record[LEG_FIELD.STEP];
-    const initialSpot = record[LEG_FIELD.INITIAL_SPOT];
-
-    const barrierVal =
-      upBarrierType === UP_BARRIER_TYPE_MAP.PERCENT
-        ? new BigNumber(initialSpot).multipliedBy(new BigNumber(upBarrier).div(100)).toNumber()
-        : upBarrier;
-
     return dataSource
       .sort((a, b) => a.obDay.valueOf() - b.obDay.valueOf())
       .map((item, index) => {
@@ -155,7 +120,63 @@ class AsiaObserveModalInput extends InputPolym<any> {
     });
   };
 
-  public onGenerate = () => {};
+  public onPopcomfirmButtonConfirm = () => {
+    this.setState(
+      {
+        popconfirmVisible: false,
+      },
+      () => {
+        this.onGenerate();
+      }
+    );
+  };
+
+  public onGenerate = async () => {
+    const { record } = this.props;
+    const start = isMoment(record[LEG_FIELD.OBSERVE_START_DAY])
+      ? record[LEG_FIELD.OBSERVE_START_DAY].format('YYYY-MM-DD')
+      : record[LEG_FIELD.OBSERVE_START_DAY];
+    const end = isMoment(record[LEG_FIELD.OBSERVE_END_DAY])
+      ? record[LEG_FIELD.OBSERVE_END_DAY].format('YYYY-MM-DD')
+      : record[LEG_FIELD.OBSERVE_END_DAY];
+    const freq = record[LEG_FIELD.OBSERVATION_STEP];
+    this.setState({ generateLoading: true });
+    const { error, data } = await qlDateScheduleCreate({
+      start,
+      end,
+      freq,
+      roll: 'backward',
+      adj: 'modified_following',
+      holidays: ['DEFAULT_CALENDAR'],
+    });
+    this.setState({ generateLoading: false });
+
+    if (error) return;
+    this.setState({
+      dealDataSource: this.computeDataSource(
+        data.map(item => {
+          return {
+            obDay: moment(item),
+          };
+        })
+      ),
+    });
+  };
+
+  public onPopconfirmClick = () => {
+    if (_.isEmpty(this.state.dealDataSource) === false) {
+      return this.setState({
+        popconfirmVisible: true,
+      });
+    }
+    this.onGenerate();
+  };
+
+  public onHidePopconfirm = () => {
+    this.setState({
+      popconfirmVisible: false,
+    });
+  };
 
   public renderEditing(props) {
     return (
@@ -180,46 +201,54 @@ class AsiaObserveModalInput extends InputPolym<any> {
           style={{ width: '100%', display: 'block' }}
           content={
             <SourceTable
-              // footer={
-              //   <Row type="flex" justify="start" align="middle" style={{ marginTop: 10 }}>
-              //     <Icon type="reload" />
-              //     <a href="javascript:;" style={{ paddingLeft: 5 }} onClick={this.onGenerate}>
-              //       重新生成观察日
-              //     </a>
-              //   </Row>
-              // }
               dataSource={this.state.dealDataSource}
               pagination={false}
               rowKey="id"
               header={
-                <Row style={{ marginBottom: 10 }}>
-                  <Form
-                    onSubmitButtonClick={this.onSubmitButtonClick}
-                    layout="inline"
-                    controls={[
-                      {
-                        field: 'day',
-                        control: {
-                          label: '观察日',
+                <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
+                  <Col>
+                    <Form
+                      onSubmitButtonClick={this.onSubmitButtonClick}
+                      layout="inline"
+                      controls={[
+                        {
+                          field: 'day',
+                          control: {
+                            label: '观察日',
+                          },
+                          input: {
+                            type: 'date',
+                            range: 'day',
+                          },
+                          decorator: {
+                            rules: [
+                              {
+                                required: true,
+                              },
+                            ],
+                          },
                         },
-                        input: {
-                          type: 'date',
-                          range: 'day',
-                        },
-                        decorator: {
-                          rules: [
-                            {
-                              required: true,
-                            },
-                          ],
-                        },
-                      },
-                    ]}
-                    submitText={'添加'}
-                    resetText={'批量生成观察日'}
-                    resetable={false}
-                    onResetButtonClick={this.onGenerate}
-                  />
+                      ]}
+                      submitText={'添加'}
+                      resetText={'批量生成观察日'}
+                      resetable={false}
+                    />
+                  </Col>
+                  <Col>
+                    <PopconfirmButton
+                      type="primary"
+                      loading={this.state.generateLoading}
+                      onClick={this.onPopconfirmClick}
+                      onConfirm={this.onPopcomfirmButtonConfirm}
+                      popconfirmProps={{
+                        title: '生成将覆盖当前表格内容',
+                        visible: this.state.popconfirmVisible,
+                        onCancel: this.onHidePopconfirm,
+                      }}
+                    >
+                      批量生成观察日
+                    </PopconfirmButton>
+                  </Col>
                 </Row>
               }
               columnDefs={[

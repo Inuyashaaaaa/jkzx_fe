@@ -1,12 +1,16 @@
+import StationalComponent from '@/design/components/StationalComponent';
 import { Popconfirm } from 'antd';
 import Button, { ButtonProps } from 'antd/lib/button';
-import React, { PureComponent } from 'react';
+import { PopconfirmProps } from 'antd/lib/popconfirm';
+import React from 'react';
 
 export type PopconfirmButtonProps = ButtonProps & {
   onConfirm?: (params) => any | Promise<any>;
+  popconfirmProps?: PopconfirmProps;
+  confirmTitle?: string;
 };
 
-class PopconfirmButton extends PureComponent<PopconfirmButtonProps> {
+class PopconfirmButton extends StationalComponent<PopconfirmButtonProps, any> {
   public state = {
     loading: false,
   };
@@ -15,24 +19,31 @@ class PopconfirmButton extends PureComponent<PopconfirmButtonProps> {
     if (!this.props.onConfirm) {
       return;
     }
-    this.setState({
+    this.$setState({
       loading: true,
     });
     const result = this.props.onConfirm(params);
-    result.then(cb => {
-      this.setState(
-        {
-          loading: false,
-        },
-        () => cb && cb(this)
-      );
-    });
+
+    if (result instanceof Promise) {
+      result.then(this.handleResult);
+    } else {
+      this.handleResult(result);
+    }
+  };
+
+  public handleResult = cb => {
+    this.$setState(
+      {
+        loading: false,
+      },
+      () => cb && cb(this)
+    );
   };
 
   public render() {
-    const { title, onConfirm, ...buttonProps } = this.props;
+    const { confirmTitle, onConfirm, popconfirmProps, ...buttonProps } = this.props;
     return (
-      <Popconfirm title="确认删除?" {...this.props} onConfirm={this.onConfirm}>
+      <Popconfirm title={confirmTitle} onConfirm={this.onConfirm} {...popconfirmProps}>
         <Button loading={this.state.loading} {...buttonProps} />
       </Popconfirm>
     );

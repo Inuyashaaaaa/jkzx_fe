@@ -22,7 +22,12 @@ class ActionCol extends PureComponent<any> {
 
   public render() {
     return (
-      <PopconfirmButton title="确认删除?" type="danger" size="small" onConfirm={this.onRemove}>
+      <PopconfirmButton
+        confirmTitle="确认删除?"
+        type="danger"
+        size="small"
+        onConfirm={this.onRemove}
+      >
         删除
       </PopconfirmButton>
     );
