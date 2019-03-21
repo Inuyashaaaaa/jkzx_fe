@@ -48,8 +48,8 @@ import { pipeLeg } from './common/pipeLeg';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
 
 export const AutoCallSnowAnnual: ILegType = pipeLeg({
-  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL],
-  type: LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL,
+  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.AUTOCALL_ANNUAL],
+  type: LEG_TYPE_MAP.AUTOCALL_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
   pricingColumnDefs: [
@@ -118,7 +118,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource) => {
-    nextPosition.productType = LEG_TYPE_MAP.AUTO_CALL_SNOW;
+    nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     nextPosition.asset = _.omit(dataSourceItem, [

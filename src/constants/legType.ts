@@ -42,7 +42,8 @@ export const LEG_MAP: {
   [LEG_TYPE_MAP.ASIAN_ANNUAL]: AsiaAnnual,
   [LEG_TYPE_MAP.ASIAN_UNANNUAL]: AsiaUnAnnual,
 
-  [LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL]: AutoCallSnowAnnual,
+  [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: AutoCallSnowAnnual,
+
   // 现金
   // [LEG_TYPE_MAP.CASH]: 'CASH',
   // 其他单资产期权
