@@ -46,7 +46,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
     const end = isMoment(record[LEG_FIELD.OBSERVE_END_DAY])
       ? record[LEG_FIELD.OBSERVE_END_DAY].format('YYYY-MM-DD')
       : record[LEG_FIELD.OBSERVE_END_DAY];
-    const freq = record[LEG_FIELD.OBSERVATION_DAY_STEP];
+    const freq = record[LEG_FIELD.OBSERVATION_STEP];
 
     const { error, data } = await qlDateScheduleCreate({
       start,

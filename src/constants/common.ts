@@ -134,18 +134,12 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
 };
 
 export const FREQUENCY_TYPE_MAP = {
-  // '1D': '1D',
-  // '1W': '1W',
-  // '1M': '1M',
-  // '3M': '3M',
-  // '6M': '6M',
-  // '1Y': '1Y',
-  '1D': 1,
-  '1W': 7,
-  '1M': 30,
-  '3M': 90,
-  '6M': 180,
-  '1Y': 365,
+  '1D': '1D',
+  '1W': '1W',
+  '1M': '1M',
+  '3M': '3M',
+  '6M': '6M',
+  '1Y': '1Y',
 };
 
 export const FREQUENCY_TYPE_ZHCN_MAP = {
@@ -348,7 +342,7 @@ export const LEG_FIELD = {
   /* 观察日 */
   OBSERVATION_DATES: 'OBSERVATION_DATES',
   /* 观察频率 */
-  OBSERVATION_DAY_STEP: 'observationDayStep',
+  OBSERVATION_STEP: 'observationStep',
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',
   AUTO_CALL_STRIKE: 'autoCallStrike',

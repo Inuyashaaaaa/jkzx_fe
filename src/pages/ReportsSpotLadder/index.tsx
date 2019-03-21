@@ -110,7 +110,26 @@ class Component extends PureComponent<
 
     const instruments = this.convertInstruments(data);
 
-    const nextInstruments = await this.fetchAssets(instruments);
+    let nextInstruments: any[] = await this.fetchAssets(instruments);
+
+    nextInstruments = nextInstruments.map(item => {
+      const multiplier = item.multiplier;
+      return {
+        ...item,
+        tableDataSource: item.tableDataSource.map((dataItem, key) => {
+          return {
+            ...dataItem,
+            delta: countDelta(dataItem.delta, multiplier),
+            deltaCash: countDeltaCash(dataItem.delta, dataItem.underlyerPrice),
+            gamma: countGamma(dataItem.gamma, multiplier, dataItem.underlyerPrice),
+            gammaCash: countGamaCash(dataItem.gamma, dataItem.underlyerPrice),
+            theta: countTheta(dataItem.theta),
+            vega: countVega(dataItem.vega),
+            rhoR: countRhoR(dataItem.rhoR),
+          };
+        }),
+      };
+    });
 
     this.setState({
       loading: false,
@@ -127,22 +146,12 @@ class Component extends PureComponent<
         }).then(result => {
           const { error, data } = result;
           if (error) return item;
-          const multiplier = data.instrumentInfo.multiplier;
-          item.assetClass = ASSET_CLASS_ZHCN_MAP[data.assetClass];
-          item.instrumentType = INSTRUMENT_TYPE_ZHCN_MAP[data.instrumentType];
-          item.tableDataSource = item.tableDataSource.map((items, key) => {
-            return {
-              ...items,
-              delta: countDelta(items.delta, multiplier),
-              deltaCash: countDeltaCash(items.deltaCash, items.underlyerPrice),
-              gamma: countGamma(items.gamma, multiplier, items.underlyerPrice),
-              gammaCash: countGamaCash(items.gamma, items.underlyerPrice),
-              theta: countTheta(items.theta),
-              vega: countVega(items.vega),
-              rhoR: countRhoR(items.rhoR),
-            };
-          });
-          return item;
+          return {
+            ...item,
+            assetClass: ASSET_CLASS_ZHCN_MAP[data.assetClass],
+            instrumentType: INSTRUMENT_TYPE_ZHCN_MAP[data.instrumentType],
+            multiplier: data.instrumentInfo.multiplier,
+          };
         });
       })
     );
@@ -176,34 +185,57 @@ class Component extends PureComponent<
     return unionUnderlyerInstruments.map(array => {
       const item = array[0];
 
-      const dataSource = array
-        .map(item => {
-          return {
-            ...item,
-            gammaCash: countGamaCash(item.gamma, item.underlyerPrice),
-            deltaCash: countDeltaCash(item.delta, item.underlyerPrice),
-            rhoR: countRhoR(item.rhoR),
-          };
-        })
-        .map(item => _.omitBy(item, _.isNull));
+      const dataSource = array;
+
       const groups = _.groupBy(dataSource, 'scenarioId');
       const groupObj = _.mapValues(groups, (group, scenarioId) => {
         return group.reduce((dist, next) => {
           Object.keys(next).forEach(key => {
             const value = next[key];
-            dist[key] = _.isNumber(value)
-              ? new BigNumber(value).plus(dist[key] || 0).toNumber()
-              : value;
+            // 'delta',
+            // 'deltaCash',
+            // 'gamma',
+            // 'gammaCash',
+            // 'positionId',
+            // 'price',
+            // 'q',
+            // 'quantity',
+            // 'r',
+            // 'rhoQ',
+            // 'rhoR',
+            // 'scenarioId',
+            // 'scenarioResult',
+            // 'theta',
+            // 'underlyerForward',
+            // 'underlyerInstrumentId',
+            // 'underlyerPrice',
+            // 'vega',
+            // 'vol',
+            dist[key] =
+              [
+                'delta',
+                'deltaCash',
+                'gamma',
+                'gammaCash',
+                'q',
+                'r',
+                'rhoQ',
+                'rhoR',
+                'theta',
+                'vega',
+                'vol',
+                'price',
+              ].indexOf(key) > -1
+                ? new BigNumber(value).plus(dist[key] || 0).toNumber()
+                : value;
           });
           return dist;
         }, {});
       });
 
-      const tableDataSource = _.values(groupObj);
+      const tableDataSource = _.values(groupObj).map(item => _.omitBy(item, _.isNull));
 
       return {
-        assetClass: '...',
-        instrumentType: '...',
         underlyerInstrumentId: item.underlyerInstrumentId,
         tableDataSource,
       };
