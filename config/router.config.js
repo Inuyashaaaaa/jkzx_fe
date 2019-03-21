@@ -211,6 +211,21 @@ export default [
               name: 'eodHistoricalPnlByUnderlyer',
               component: './ReportsEodHistoricalPnlByUnderlyer/index',
             },
+            {
+              path: '/reports/trading-statements',
+              name: 'tradingStatements',
+              component: './ReportsTradingStatements/index',
+            },
+            {
+              path: '/reports/funds-detailed-statements',
+              name: 'fundsDetailedStatements',
+              component: './ReportsFundsDetailedStatements/index',
+            },
+            {
+              path: '/reports/customer-funds-summary-statements',
+              name: 'customerFundsSummaryStatements',
+              component: './ReportsCustomerFundsSummaryStatements/index',
+            },
           ],
         },
         {
