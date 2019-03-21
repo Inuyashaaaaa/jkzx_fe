@@ -1,7 +1,7 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { message, Modal } from 'antd';
+import { Button, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
 import ExportModal from '../../ExportModal';
@@ -52,43 +52,43 @@ class ExerciseModal extends PureComponent<
         ? {
             dataSource: this.computeLotDataSource({
               [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-              [UNDERLYER_PRICE]: this.data[LEG_FIELD.INITIAL_SPOT],
             }),
           }
         : {
             dataSource: this.computeCnyDataSource({
               [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-              [UNDERLYER_PRICE]: this.data[LEG_FIELD.INITIAL_SPOT],
             }),
           }),
     });
   };
 
-  public getSettleAmount = async value => {
-    const { error, data } = await tradeExercisePreSettle({
-      positionId: this.data.id,
-      eventDetail: {
-        underlyerPrice: String(value[UNDERLYER_PRICE]),
-        numOfOptions: String(value[NUM_OF_OPTIONS]),
-        notionalAmount: String(value[NOTIONAL_AMOUNT]),
-      },
-    });
-    if (error) return;
-    this.setState({
-      dataSource: {
-        ...value,
-        [SETTLE_AMOUNT]: data,
-      },
-    });
-  };
+  // public getSettleAmount = async value => {
+  //   const { error, data } = await tradeExercisePreSettle({
+  //     positionId: this.data.id,
+  //     eventDetail: {
+  //       underlyerPrice: String(value[UNDERLYER_PRICE]),
+  //       numOfOptions: String(value[NUM_OF_OPTIONS]),
+  //       notionalAmount: String(value[NOTIONAL_AMOUNT]),
+  //     },
+  //   });
+  //   if (error) return;
+  //   this.setState({
+  //     dataSource: {
+  //       ...value,
+  //       [SETTLE_AMOUNT]: data,
+  //     },
+  //   });
+  // };
 
   public computeCnyDataSource = value => {
     const notionalAmount = new BigNumber(value[NUM_OF_OPTIONS])
       .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
       .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
       .toNumber();
-    const newValue = { ...value, [NOTIONAL_AMOUNT]: notionalAmount };
-    this.getSettleAmount(newValue);
+    return {
+      ...value,
+      [NOTIONAL_AMOUNT]: notionalAmount,
+    };
   };
 
   public computeLotDataSource = value => {
@@ -96,8 +96,10 @@ class ExerciseModal extends PureComponent<
       .div(this.data[LEG_FIELD.INITIAL_SPOT])
       .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
       .toNumber();
-    const newValue = { ...value, [NUM_OF_OPTIONS]: numOfOptions };
-    this.getSettleAmount(newValue);
+    return {
+      ...value,
+      [NUM_OF_OPTIONS]: numOfOptions,
+    };
   };
 
   public switchConfirmLoading = () => {
@@ -147,6 +149,25 @@ class ExerciseModal extends PureComponent<
     });
   };
 
+  public handleSettleAmount = async () => {
+    const dataSource = this.state.dataSource;
+    const { error, data } = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventDetail: {
+        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+      },
+    });
+    if (error) return;
+    this.setState({
+      dataSource: {
+        ...dataSource,
+        [SETTLE_AMOUNT]: data,
+      },
+    });
+  };
+
   public render() {
     const { direction, visible } = this.state;
     return (
@@ -176,6 +197,9 @@ class ExerciseModal extends PureComponent<
             footer={false}
             controls={EXERCISE_FORM_CONTROLS}
           />
+          <Button key="upload" type="primary" onClick={this.handleSettleAmount}>
+            结算
+          </Button>
         </Modal>
       </>
     );
