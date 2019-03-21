@@ -1,7 +1,7 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
 import Form from '@/design/components/Form';
-import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { message, Modal } from 'antd';
+import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
+import { Button, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
 import ExportModal from '../../ExportModal';
@@ -37,6 +37,7 @@ class ExerciseModal extends PureComponent<
     dataSource: {},
     exportVisible: false,
   };
+
   public show = (data = {}, tableFormData, currentUser, reload) => {
     this.data = data;
     this.tableFormData = tableFormData;
@@ -61,29 +62,43 @@ class ExerciseModal extends PureComponent<
     });
   };
 
-  public computeCnyDataSource = (value, changed = {}) => {
+  // public getSettleAmount = async value => {
+  //   const { error, data } = await tradeExercisePreSettle({
+  //     positionId: this.data.id,
+  //     eventDetail: {
+  //       underlyerPrice: String(value[UNDERLYER_PRICE]),
+  //       numOfOptions: String(value[NUM_OF_OPTIONS]),
+  //       notionalAmount: String(value[NOTIONAL_AMOUNT]),
+  //     },
+  //   });
+  //   if (error) return;
+  //   this.setState({
+  //     dataSource: {
+  //       ...value,
+  //       [SETTLE_AMOUNT]: data,
+  //     },
+  //   });
+  // };
+
+  public computeCnyDataSource = value => {
+    const notionalAmount = new BigNumber(value[NUM_OF_OPTIONS])
+      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .toNumber();
     return {
       ...value,
-      [NOTIONAL_AMOUNT]: new BigNumber(value[NUM_OF_OPTIONS])
-        .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .toNumber(),
-      [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
-        ? changed[SETTLE_AMOUNT]
-        : new BigNumber(value[NUM_OF_OPTIONS]).multipliedBy(value[UNDERLYER_PRICE]).toNumber(),
+      [NOTIONAL_AMOUNT]: notionalAmount,
     };
   };
 
-  public computeLotDataSource = (value, changed = {}) => {
+  public computeLotDataSource = value => {
+    const numOfOptions = new BigNumber(value[NOTIONAL_AMOUNT])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .toNumber();
     return {
       ...value,
-      [NUM_OF_OPTIONS]: new BigNumber(value[NOTIONAL_AMOUNT])
-        .div(this.data[LEG_FIELD.INITIAL_SPOT])
-        .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .toNumber(),
-      [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
-        ? changed[SETTLE_AMOUNT]
-        : new BigNumber(value[NUM_OF_OPTIONS]).multipliedBy(value[UNDERLYER_PRICE]).toNumber(),
+      [NUM_OF_OPTIONS]: numOfOptions,
     };
   };
 
@@ -124,25 +139,32 @@ class ExerciseModal extends PureComponent<
 
   public onValueChange = params => {
     this.setState({
-      ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        ? {
-            dataSource: this.computeLotDataSource(
-              params.values,
-              params.changedValues.SETTLE_AMOUNT ? params.changedValues : {}
-            ),
-          }
-        : {
-            dataSource: this.computeCnyDataSource(
-              params.values,
-              params.changedValues.SETTLE_AMOUNT ? params.changedValues : {}
-            ),
-          }),
+      dataSource: params.values,
     });
   };
 
   public convertVisible = () => {
     this.setState({
       exportVisible: false,
+    });
+  };
+
+  public handleSettleAmount = async () => {
+    const dataSource = this.state.dataSource;
+    const { error, data } = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventDetail: {
+        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+      },
+    });
+    if (error) return;
+    this.setState({
+      dataSource: {
+        ...dataSource,
+        [SETTLE_AMOUNT]: data,
+      },
     });
   };
 
@@ -175,6 +197,9 @@ class ExerciseModal extends PureComponent<
             footer={false}
             controls={EXERCISE_FORM_CONTROLS}
           />
+          <Button key="upload" type="primary" onClick={this.handleSettleAmount}>
+            结算
+          </Button>
         </Modal>
       </>
     );
