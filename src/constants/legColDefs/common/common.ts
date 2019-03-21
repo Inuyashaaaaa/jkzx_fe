@@ -1,3 +1,5 @@
+import AsiaObserveModalInput from '@/containers/AsiaObserveModalInput';
+import ObserveModalInput from '@/containers/ObserveModalInput';
 import { IColDef } from '@/design/components/Table/types';
 import {
   mktInstrumentInfo,
@@ -6,8 +8,12 @@ import {
 } from '@/services/market-data-service';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
+import moment, { isMoment } from 'moment';
 import {
   BIG_NUMBER_CONFIG,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
+  FREQUENCY_TYPE_OPTIONS,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_CURRENCY_USD_CONFIG,
   INPUT_NUMBER_DAYS_CONFIG,
@@ -16,6 +22,7 @@ import {
   INPUT_NUMBER_PERCENTAGE_CONFIG,
   KNOCK_DIRECTION_MAP,
   KNOCK_DIRECTION_OPTIONS,
+  LEG_ANNUALIZED_FIELD,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
@@ -34,7 +41,11 @@ import {
   SPECIFIED_PRICE_ZHCN_MAP,
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
+  UNIT_ENUM_MAP2,
   UNIT_ENUM_OPTIONS,
+  UNIT_ENUM_OPTIONS2,
+  UP_BARRIER_TYPE_MAP,
+  UP_BARRIER_TYPE_OPTIONS,
 } from '../../common';
 
 export const OptionType: IColDef = {
@@ -517,6 +528,19 @@ export const ExpirationDate: IColDef = {
     defaultOpen: true,
   },
   rules: RULES_REQUIRED,
+  getValue: {
+    depends: [LEG_FIELD.TERM, LEG_FIELD.EFFECTIVE_DATE],
+    value: record => {
+      const effectiveDate = record[LEG_FIELD.EFFECTIVE_DATE];
+      const term = record[LEG_FIELD.TERM];
+      if (record[LEG_FIELD.TERM] !== undefined && effectiveDate !== undefined) {
+        return (isMoment(effectiveDate) ? effectiveDate : moment(effectiveDate))
+          .add(term, 'days')
+          .clone();
+      }
+      return record[LEG_FIELD.EXPIRATION_DATE];
+    },
+  },
 };
 
 export const ExpirationTime: IColDef = {
@@ -676,6 +700,139 @@ export const Barrier: IColDef = {
   rules: RULES_REQUIRED,
 };
 
+export const UpBarrierType: IColDef = {
+  editable: true,
+  headerName: '敲出障碍价类型',
+  field: LEG_FIELD.UP_BARRIER_TYPE,
+  input: {
+    type: 'select',
+    options: UP_BARRIER_TYPE_OPTIONS,
+  },
+};
+
+export const UpBarrier: IColDef = {
+  editable: true,
+  headerName: '敲出障碍价',
+  field: LEG_FIELD.UP_BARRIER,
+  input: record => {
+    if (record[LEG_FIELD.UP_BARRIER_TYPE] === UP_BARRIER_TYPE_MAP.CNY) {
+      return {
+        depends: [LEG_FIELD.UP_BARRIER_TYPE],
+        value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      };
+    }
+
+    // if (record[LEG_FIELD.UP_BARRIER_TYPE] === UP_BARRIER_TYPE_MAP.PERCENT) {
+    return {
+      depends: [LEG_FIELD.UP_BARRIER_TYPE],
+      value: INPUT_NUMBER_PERCENTAGE_CONFIG,
+    };
+    // }
+  },
+};
+
+export const CouponEarnings: IColDef = {
+  editable: true,
+  headerName: '收益/coupon(%)',
+  field: LEG_FIELD.COUPON_PAYMENT,
+  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+};
+
+export const Step: IColDef = {
+  editable: true,
+  headerName: '逐步调整步长(%)',
+  field: LEG_FIELD.STEP,
+  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+};
+
+export const ExpireNoBarrierPremiumType: IColDef = {
+  editable: true,
+  headerName: '到期未敲出收益类型',
+  field: LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE,
+  input: {
+    type: 'select',
+    options: EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
+  },
+};
+
+export const AutoCallStrikeUnit: IColDef = {
+  editable: true,
+  exsitable: params => {
+    return {
+      depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+      value:
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.CALL ||
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT,
+    };
+  },
+  headerName: '到期未敲出行权价格类型',
+  field: LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
+  input: {
+    type: 'select',
+    options: UNIT_ENUM_OPTIONS2,
+  },
+};
+
+export const AutoCallStrike: IColDef = {
+  editable: true,
+  exsitable: params => {
+    return {
+      depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+      value:
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.CALL ||
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+          EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT,
+    };
+  },
+  headerName: '到期未敲出行权价格',
+  field: LEG_FIELD.AUTO_CALL_STRIKE,
+  input: record => {
+    if (record[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_MAP2.CNY) {
+      return {
+        depends: [LEG_FIELD.AUTO_CALL_STRIKE_UNIT],
+        value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      };
+    }
+
+    // if (record[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_OPTIONS2.PERCENT) {
+    return {
+      depends: [LEG_FIELD.AUTO_CALL_STRIKE_UNIT],
+      value: INPUT_NUMBER_PERCENTAGE_CONFIG,
+    };
+    // }
+  },
+};
+
+export const ExpireNoBarrierPremium: IColDef = {
+  editable: true,
+  exsitable: params => {
+    return {
+      depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+      value:
+        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+        EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
+    };
+  },
+  headerName: '到期未敲出固定收益',
+  field: LEG_FIELD.EXPIRE_NOBARRIERPREMIUM,
+  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+};
+
+export const ExpireNoBarrierObserveDay: IColDef = {
+  editable: true,
+  headerName: '敲出/coupon观察日',
+  field: LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
+  input: record => {
+    return {
+      type: ObserveModalInput,
+      record,
+    };
+  },
+};
+
 export const LowBarrier: IColDef = {
   editable: true,
   headerName: '低障碍价',
@@ -774,37 +931,36 @@ export const RebateLow: IColDef = {
 
 export const Frequency: IColDef = {
   headerName: '观察频率',
-  field: 'frequency',
+  field: LEG_FIELD.OBSERVATION_STEP,
   editable: true,
   input: {
     type: 'select',
     defaultOpen: true,
-    options: [
-      {
-        label: '1D',
-        value: '1D',
-      },
-      {
-        label: '1W',
-        value: '1W',
-      },
-      {
-        label: '1M',
-        value: '1M',
-      },
-      {
-        label: '3M',
-        value: '3M',
-      },
-      {
-        label: '6M',
-        value: '6M',
-      },
-      {
-        label: '1Y',
-        value: '1Y',
-      },
-    ],
+    options: FREQUENCY_TYPE_OPTIONS,
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const ObserveStartDay: IColDef = {
+  headerName: '观察起始日',
+  field: LEG_FIELD.OBSERVE_START_DAY,
+  editable: true,
+  input: {
+    type: 'date',
+    defaultOpen: true,
+    range: 'day',
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const ObserveEndDay: IColDef = {
+  headerName: '观察终止日',
+  field: LEG_FIELD.OBSERVE_END_DAY,
+  editable: true,
+  input: {
+    type: 'date',
+    defaultOpen: true,
+    range: 'day',
   },
   rules: RULES_REQUIRED,
 };
@@ -848,21 +1004,11 @@ export const Holidays: IColDef = {
 export const ObservationDates: IColDef = {
   headerName: '观察日',
   editable: true,
-  field: 'observationDates',
-  input: {
-    type: 'select',
-    defaultOpen: true,
-    options: [
-      {
-        label: '2018-08-10',
-        value: '2018-08-10',
-      },
-      {
-        label: '2018-08-11',
-        value: '2018-08-11',
-      },
-    ],
-  },
+  field: LEG_FIELD.OBSERVATION_DATES,
+  input: record => ({
+    type: AsiaObserveModalInput,
+    record,
+  }),
   rules: RULES_REQUIRED,
 };
 
@@ -1005,7 +1151,8 @@ export const SpecifiedPrice: IColDef = {
   input: record => {
     if (
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
+      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL
     ) {
       return {
         defaultOpen: true,
@@ -1109,7 +1256,12 @@ export const NotionalAmount: IColDef = {
 };
 
 export const NotionalAmountType: IColDef = {
-  editable: true,
+  editable: params => {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+      return false;
+    }
+    return true;
+  },
   headerName: '名义本金类型',
   field: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   input: {
@@ -1127,14 +1279,24 @@ export const NotionalAmountType: IColDef = {
     ],
   },
   rules: RULES_REQUIRED,
-  getValue: {
-    depends: [LEG_FIELD.PREMIUM_TYPE],
-    value(record) {
-      if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT) {
-        return NOTIONAL_AMOUNT_TYPE_MAP.CNY;
-      }
-      return NOTIONAL_AMOUNT_TYPE_MAP.LOT;
-    },
+  getValue: params => {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+      return {
+        depends: [],
+        value(data) {
+          return data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+        },
+      };
+    }
+    return {
+      depends: [LEG_FIELD.PREMIUM_TYPE],
+      value(record) {
+        if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT) {
+          return NOTIONAL_AMOUNT_TYPE_MAP.CNY;
+        }
+        return NOTIONAL_AMOUNT_TYPE_MAP.LOT;
+      },
+    };
   },
 };
 
@@ -1564,4 +1726,56 @@ export const HighRebate: IColDef = {
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
+};
+
+export const PricingTerm = {
+  ...Term,
+  editable: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return true;
+    }
+    return false;
+  },
+  getValue: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return {
+        depends: [],
+        value(record) {
+          return record[Term.field];
+        },
+      };
+    }
+    return {
+      depends: [LEG_FIELD.EXPIRATION_DATE],
+      value(record) {
+        return moment(record[LEG_FIELD.EXPIRATION_DATE]).diff(moment(), 'days') + 1;
+      },
+    };
+  },
+};
+
+export const PricingExpirationDate = {
+  ...ExpirationDate,
+  editable: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return false;
+    }
+    return true;
+  },
+  getValue: params => {
+    if (params.data[LEG_ANNUALIZED_FIELD]) {
+      return {
+        depends: [LEG_FIELD.TERM],
+        value(record) {
+          return moment().add(record[LEG_FIELD.TERM], 'days');
+        },
+      };
+    }
+    return {
+      depends: [],
+      value(record) {
+        return record[LEG_FIELD.EXPIRATION_DATE];
+      },
+    };
+  },
 };

@@ -13,7 +13,7 @@ numeral.register('format', 'de', {
     unformat: /(de)/,
   },
   format: (value, format, roundingFunction) => {
-    const space = numeral._.includes(format, ' de') ? ' ' : '';
+    // const space = numeral._.includes(format, ' de') ? ' ' : '';
 
     format = format.replace(/\s?de/, '');
 
@@ -26,7 +26,9 @@ numeral.register('format', 'de', {
       value = isnan ? 0 : val;
     }
 
-    return `${numeral._.numberToFormat(value, format, roundingFunction)}${space}`;
+    console.log(`${numeral._.numberToFormat(value, format, roundingFunction)}`);
+
+    return `${numeral._.numberToFormat(value, format, roundingFunction)}`;
   },
   unformat: str => {
     return numeral._.stringToNumber(str);

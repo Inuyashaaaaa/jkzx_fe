@@ -161,11 +161,17 @@ export default function request(url, options = {}, passError = false) {
           const failAction = { error };
 
           if (code === 401) {
-            // @HACK
-            /* eslint-disable no-underscore-dangle */
-            window.g_app._store.dispatch({
-              type: 'login/logout',
+            notification.error({
+              message: '3秒后自动跳转登录页',
             });
+            setTimeout(() => {
+              // @HACK
+              /* eslint-disable no-underscore-dangle */
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+              });
+            }, 3000);
+
             return failAction;
           }
 

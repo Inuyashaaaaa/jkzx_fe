@@ -6,6 +6,7 @@ import { IFormControl } from '@/design/components/Form/types';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColumnDef } from '@/design/components/Table/types';
+import { createApprovalProcess } from '@/services/approval';
 import {
   cliFundEventListByClientIds,
   cliFundEventSave,
@@ -294,8 +295,9 @@ class Discrepancy extends PureComponent<
     this.setState({
       modalConfirmLoading: true,
     });
-    const { error, data } = await cliFundEventSave({
-      ...formatValues,
+    const { error, data } = await createApprovalProcess({
+      processName: '资金录入经办复合流程',
+      processData: { ...formatValues },
     });
     this.setState({
       modalConfirmLoading: false,
@@ -310,7 +312,7 @@ class Discrepancy extends PureComponent<
         state.modalVisible = false;
       }),
       () => {
-        message.success('资金录入成功');
+        message.success('已进入流程');
       }
     );
   };

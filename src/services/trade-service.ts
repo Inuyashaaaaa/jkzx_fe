@@ -90,3 +90,83 @@ export async function trdTradeLCMUnwindAmountGet(params = {}) {
     },
   });
 }
+
+export async function trdPortfolioListBySimilarPortfolioName(params) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioListBySimilarPortfolioName',
+      params,
+    },
+  });
+}
+
+export async function trdPortfolioSearch(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioSearch',
+      params,
+    },
+  });
+}
+
+export async function trdTradePortfolioCreateBatch(params) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradePortfolioCreateBatch',
+      params,
+    },
+  });
+}
+
+export async function trdPortfolioDelete(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioDelete',
+      params,
+    },
+  });
+}
+
+export async function trdTradePortfolioDelete(params) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradePortfolioDelete',
+      params,
+    },
+  });
+}
+
+export async function trdPortfolioCreate(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioCreate',
+      params,
+    },
+  });
+}
+
+export async function trdPortfolioUpdate(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdPortfolioUpdate',
+      params,
+    },
+  });
+}
+
+export async function tradeExercisePreSettle(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'tradeExercisePreSettle',
+      params,
+    },
+  });
+}

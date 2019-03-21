@@ -1,0 +1,91 @@
+const processNum = {
+  field: 'processSequenceNum',
+  headerName: '审批单号',
+};
+
+const processName = {
+  field: 'processName',
+  headerName: '审批类型',
+};
+
+const initiatorName = {
+  field: 'initiatorName',
+  headerName: '发起人',
+};
+
+const operatorName = {
+  field: 'operatorName',
+  headerName: '操作人',
+};
+
+const subject = {
+  field: 'subject',
+  headerName: '标题',
+};
+
+const startTime = {
+  field: 'startTime',
+  headerName: '发起时间',
+};
+const taskName = {
+  title: '流程节点',
+  dataIndex: 'taskName',
+  key: 'taskName',
+};
+
+const person = {
+  title: '经办/复核人',
+  dataIndex: 'userName',
+  key: 'userName',
+};
+
+const operation = {
+  title: '操作',
+  dataIndex: 'operation',
+  key: 'operation',
+};
+
+const operateTime = {
+  title: '经办时间',
+  dataIndex: 'operateTime',
+  key: 'operateTime',
+};
+
+const comment = {
+  title: '经办/复核人意见',
+  dataIndex: 'comment',
+  key: 'comment',
+};
+
+export function generateColumns(type, tag) {
+  if (type === 'start') {
+    return [processNum, processName, initiatorName, subject, startTime];
+  }
+
+  if (type === 'complete') {
+    return [processNum, processName, operatorName, subject, startTime];
+  }
+
+  if (type === 'approval') {
+    const columns =
+      tag === 'initiator'
+        ? [processNum, processName, initiatorName, subject, startTime]
+        : [processNum, processName, operatorName, subject, startTime];
+
+    return columns.map(item => {
+      const obj = {
+        title: item.headerName,
+        key: item.field,
+        dataIndex: item.field,
+      };
+      if (item.field === 'processSequenceNum') {
+        obj.width = 120;
+      }
+      return obj;
+    });
+  }
+
+  if (type === 'process') {
+    return [taskName, person, operation, operateTime, comment];
+  }
+}

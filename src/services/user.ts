@@ -71,13 +71,6 @@ export const permissions = {
  * }
  */
 export async function login(params) {
-  // return delay(2000, {
-  //   data: {
-  //     token: 'xxxxxxx',
-  //     roles: ['admin'],
-  //     permissions,
-  //   },
-  // });
   return request(`${HOST_TEST}auth-service/users/login`, {
     method: `POST`,
     body: params,
@@ -105,12 +98,6 @@ export async function logout() {
       token: 'xxxx',
     },
   };
-  // return delay(3000, {
-  //   error: false,
-  //   data: {
-  //     token: 'xxxx',
-  //   },
-  // });
 }
 
 export async function queryCaptcha(params) {

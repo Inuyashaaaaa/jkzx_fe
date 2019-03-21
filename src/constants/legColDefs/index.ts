@@ -7,6 +7,9 @@ import { AnnulizedVanillaOptionDTOAmericanAnnual } from './AnnulizedVanillaOptio
 import { AnnulizedVanillaOptionDTOAmericanUnAnnual } from './AnnulizedVanillaOptionDTOAmericanUnAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanAnnual } from './AnnulizedVanillaOptionDTOEuropeanAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanUnAnnual } from './AnnulizedVanillaOptionDTOEuropeanUnAnnual';
+import { AsiaAnnual } from './AsiaAnnual';
+import { AsiaUnAnnual } from './AsiaUnAnnual';
+import { AutoCallSnowAnnual } from './AutoCallSnowAnnual';
 import { BarrierAnnual } from './BarrierAnnual';
 import { BarrierUnAnnual } from './BarrierUnAnnual';
 import {
@@ -32,6 +35,8 @@ import {
   ParticipationRate2,
   Payment,
   PaymentType,
+  PricingExpirationDate,
+  PricingTerm,
   Rebate,
   Strike,
   Strike1,
@@ -78,6 +83,10 @@ export interface ILegType {
   assetClass: string;
   columnDefs: IColDef[];
   isAnnualized: boolean;
+  getDefault?: any;
+  getPosition?: any;
+  getPageData?: any;
+  pricingColumnDefs?: any[];
 }
 
 export const allLegTypes: ILegType[] = [
@@ -113,63 +122,10 @@ export const allLegTypes: ILegType[] = [
   RangeAccrualsUnAnnual,
   StraddleAnnual,
   StraddleUnAnnual,
+  AutoCallSnowAnnual,
+  AsiaAnnual,
+  AsiaUnAnnual,
 ];
-
-const PricingInitialSpot = InitialSpot;
-
-const PricingUnderlyerInstrumentId = UnderlyerInstrumentId;
-
-const PricingTerm = {
-  ...Term,
-  editable: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return true;
-    }
-    return false;
-  },
-  getValue: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return {
-        depends: [],
-        value(record) {
-          return record[Term.field];
-        },
-      };
-    }
-    return {
-      depends: [LEG_FIELD.EXPIRATION_DATE],
-      value(record) {
-        return moment(record[LEG_FIELD.EXPIRATION_DATE]).diff(moment(), 'days') + 1;
-      },
-    };
-  },
-};
-
-const PricingExpirationDate = {
-  ...ExpirationDate,
-  editable: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return false;
-    }
-    return true;
-  },
-  getValue: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return {
-        depends: [LEG_FIELD.TERM],
-        value(record) {
-          return moment().add(record[LEG_FIELD[LEG_FIELD.TERM]], 'days');
-        },
-      };
-    }
-    return {
-      depends: [],
-      value(record) {
-        return record[LEG_FIELD.EXPIRATION_DATE];
-      },
-    };
-  },
-};
 
 export const allTryPricingLegTypes: ILegType[] = [
   [
@@ -177,9 +133,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       StrikeType,
       Strike,
@@ -194,9 +150,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       StrikeType,
       Strike,
@@ -211,9 +167,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       StrikeType,
       Strike,
@@ -229,9 +185,9 @@ export const allTryPricingLegTypes: ILegType[] = [
       Direction,
       NotionalAmountType,
       StrikeType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       Strike,
       PricingTerm,
@@ -246,9 +202,9 @@ export const allTryPricingLegTypes: ILegType[] = [
       StrikeType,
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       Strike,
       PricingTerm,
@@ -265,9 +221,9 @@ export const allTryPricingLegTypes: ILegType[] = [
       Direction,
       NotionalAmountType,
       StrikeType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       Strike,
       PricingTerm,
@@ -284,9 +240,9 @@ export const allTryPricingLegTypes: ILegType[] = [
       Direction,
       NotionalAmountType,
       StrikeType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       Strike,
       PricingTerm,
@@ -302,10 +258,10 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       StrikeType,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       Strike,
       PricingTerm,
@@ -321,9 +277,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       LowStrike,
       StrikeType,
@@ -340,9 +296,9 @@ export const allTryPricingLegTypes: ILegType[] = [
       Direction,
       NotionalAmountType,
       StrikeType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       LowStrike,
       HighStrike,
@@ -357,10 +313,10 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       StrikeType,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       Strike,
       Barrier,
@@ -379,10 +335,10 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       StrikeType,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       Strike,
       Barrier,
@@ -401,10 +357,10 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       StrikeType,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       LowStrike,
       LowBarrier,
@@ -424,10 +380,10 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       StrikeType,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       OptionType,
       LowStrike,
       LowBarrier,
@@ -447,9 +403,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       Strike1,
       Strike2,
       StrikeType,
@@ -467,10 +423,10 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
       StrikeType,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       Strike1,
       Strike2,
       Strike3,
@@ -487,9 +443,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       LowBarrier,
       HighBarrier,
       Payment,
@@ -504,9 +460,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       LowBarrier,
       HighBarrier,
       Payment,
@@ -521,9 +477,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       LowBarrier,
       HighBarrier,
       Payment,
@@ -538,9 +494,9 @@ export const allTryPricingLegTypes: ILegType[] = [
     [
       Direction,
       NotionalAmountType,
-      PricingInitialSpot,
+      InitialSpot,
       UnderlyerMultiplier,
-      PricingUnderlyerInstrumentId,
+      UnderlyerInstrumentId,
       LowBarrier,
       HighBarrier,
       Payment,
@@ -550,14 +506,15 @@ export const allTryPricingLegTypes: ILegType[] = [
       NotionalAmount,
     ],
   ],
+  [AutoCallSnowAnnual, AutoCallSnowAnnual.pricingColumnDefs],
   // [
   //   ConcavaAnnual,
   //   [
   //     Direction,
   //     NotionalAmountType,
-  //     PricingInitialSpot,
+  //     InitialSpot,
   //     UnderlyerMultiplier,
-  //     PricingUnderlyerInstrumentId,
+  //     UnderlyerInstrumentId,
   //     LowBarrier,
   //     HighBarrier,
   //     PayOff,
@@ -571,9 +528,9 @@ export const allTryPricingLegTypes: ILegType[] = [
   //   [
   //     Direction,
   //     NotionalAmountType,
-  //     PricingInitialSpot,
+  //     InitialSpot,
   //     UnderlyerMultiplier,
-  //     PricingUnderlyerInstrumentId,
+  //     UnderlyerInstrumentId,
   //     LowBarrier,
   //     HighBarrier,
   //     PayOff,

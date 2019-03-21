@@ -27,12 +27,12 @@ const TABLE_COL_DEFS: IColumnDef[] = [
   },
   {
     headerName: '可用资金',
-    field: 'counterPartyFund',
+    field: 'cash',
     input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   },
   {
     headerName: '剩余授信额度',
-    field: 'counterPartyCreditBalance',
+    field: 'credit',
     input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   },
   {

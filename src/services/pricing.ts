@@ -68,7 +68,10 @@ export async function prcTrialPositionsService(params = {}) {
     method: `POST`,
     body: {
       method: 'prcTrialPositions',
-      params,
+      params: {
+        ...params,
+        pricingEnvironmentId: 'DEFAULT_CLOSE',
+      },
     },
   });
 }

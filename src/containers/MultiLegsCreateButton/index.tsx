@@ -18,22 +18,25 @@ export default class MultilLegCreateButton extends PureComponent<{
     const usedLegs = this.props.isPricing
       ? allLegTypes.filter(
           item =>
-            !(
-              item.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
-              item.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
-              item.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-              item.type === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.STRADDLE_ANNUAL ||
-              item.type === LEG_TYPE_MAP.STRADDLE_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
-              item.type === LEG_TYPE_MAP.CONCAVA_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.CONVEX_ANNUAL ||
-              item.type === LEG_TYPE_MAP.CONVEX_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
-              item.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL
-            )
+            item.type === LEG_TYPE_MAP.VANILLA_AMERICAN_ANNUAL ||
+            item.type === LEG_TYPE_MAP.VANILLA_AMERICAN_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_ANNUAL ||
+            item.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.DIGITAL_AMERICAN_ANNUAL ||
+            item.type === LEG_TYPE_MAP.DIGITAL_AMERICAN_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL ||
+            item.type === LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_ANNUAL ||
+            item.type === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+            item.type === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.EAGLE_ANNUAL ||
+            item.type === LEG_TYPE_MAP.EAGLE_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.DOUBLE_TOUCH_ANNUAL ||
+            item.type === LEG_TYPE_MAP.DOUBLE_TOUCH_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_ANNUAL ||
+            item.type === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL
         )
       : allLegTypes;
     return [

@@ -22,3 +22,15 @@ export const getCanUsedTranorsOtions = (
 export const getCanUsedTranorsOtionsNotIncludingSelf = (tableDataSource: Array<{ tenor: any }>) => {
   return getCanUsedTranors(tableDataSource.map(item => item.tenor));
 };
+
+export function convertObservetions(nextDataSourceItem) {
+  const days = Object.keys(nextDataSourceItem.fixingWeights);
+  if (!days.length) return [];
+  return days.map(day => {
+    return {
+      day,
+      weight: nextDataSourceItem.fixingWeights[day],
+      price: nextDataSourceItem.fixingObservations[day],
+    };
+  });
+}

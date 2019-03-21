@@ -59,7 +59,9 @@ export const bookingTableFormControls = (
           onClick={onSwtichModal}
           disabled={!formData.counterPartyCode}
           onCancel={onClearCounterPartyCodeButtonClick}
-          onConfirm={onSwtichModal}
+          modalProps={{
+            onOk: onSwtichModal,
+          }}
           modalProps={{
             title: `${formData.counterPartyCode} 的基本信息`,
             width: 800,

@@ -1,10 +1,12 @@
 import Section from '@/components/Section';
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColumnDef } from '@/lib/components/_Table2';
 import { refPartyGetByLegalName } from '@/services/reference-data-service';
-import { rptValuationReportList, rptValuationReportSend } from '@/services/report-service';
-import { message } from 'antd';
+import { emlSendValuationReport, rptValuationReportList } from '@/services/report-service';
+import { message, Row } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import ValuationCellRenderer from './ValuationCellRenderer';
@@ -38,10 +40,16 @@ const VALUATION_COL_DEFS: IColumnDef[] = [
       type: 'email',
     },
   },
+  // {
+  //   headerName: '操作',
+  //   field: 'actions',
+  //   cellRenderer: 'ValuationCellRenderer',
+  // },
   {
     headerName: '操作',
-    field: 'actions',
-    cellRenderer: 'ValuationCellRenderer',
+    render: params => {
+      return <ValuationCellRenderer params={params} />;
+    },
   },
 ];
 
@@ -105,15 +113,27 @@ class Valuation extends PureComponent<ValuationProps> {
   public onConfirm = async () => {
     this.setState({
       visible: false,
+      loading: true,
     });
     const reportData = this.state.dataSource.map(item => {
-      return _.pick(item, ['legalName', 'valuationDate', 'tradeEmail']);
+      return _.mapKeys(_.pick(item, ['uuid', 'tradeEmail']), (value, key) => {
+        if (key === 'tradeEmail') {
+          return 'tos';
+        }
+        if (key === 'uuid') {
+          return 'valuationReportId';
+        }
+      });
     });
-    const { error, data } = await rptValuationReportSend({
-      valuationReports: reportData,
+    const { error, data } = await emlSendValuationReport({
+      params: reportData,
+    });
+    this.setState({
+      loading: false,
     });
     if (error) {
       message.error('批量发送失败');
+      return;
     }
     message.success('批量发送成功');
     return;
@@ -141,23 +161,24 @@ class Valuation extends PureComponent<ValuationProps> {
           loading={this.state.loading}
           columnDefs={VALUATION_COL_DEFS}
           dataSource={this.state.dataSource}
-          frameworkComponents={{
-            ValuationCellRenderer,
-          }}
-          // header={
-          //   <Row style={{ marginBottom: VERTICAL_GUTTER }}>
-          //     <ModalButton
-          //       key="sends"
-          //       type="primary"
-          //       visible={this.state.visible}
-          //       onClick={this.onClickBatch}
-          //       content={<div>是否确认向所有已选中的客户邮箱发送估值报告?</div>}
-          //       onConfirm={this.onConfirm}
-          //     >
-          //       批量发送报告
-          //     </ModalButton>
-          //   </Row>
-          // }
+          // frameworkComponents={{
+          //   ValuationCellRenderer,
+          // }}
+          header={
+            <Row style={{ marginBottom: VERTICAL_GUTTER }}>
+              <ModalButton
+                key="sends"
+                type="primary"
+                visible={this.state.visible}
+                onClick={this.onClickBatch}
+                content={<div>是否确认向所有已选中的客户邮箱发送估值报告?</div>}
+                onConfirm={this.onConfirm}
+                onCancel={this.onCancelBatch}
+              >
+                批量发送报告
+              </ModalButton>
+            </Row>
+          }
         />
       </>
     );
