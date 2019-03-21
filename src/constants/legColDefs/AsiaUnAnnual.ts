@@ -103,10 +103,6 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
       return val;
     });
 
-    nextPosition.asset.settlementDate = isPricing
-      ? nextPosition.asset.expirationDate
-      : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate;
-
     nextPosition.asset = _.omit(dataSourceItem, [
       ...LEG_INJECT_FIELDS,
       LEG_FIELD.OBSERVE_START_DAY,
@@ -129,6 +125,10 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
       },
       {}
     );
+
+    nextPosition.asset.settlementDate = isPricing
+      ? nextPosition.asset.expirationDate
+      : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate;
 
     nextPosition.asset.annualized = false;
 

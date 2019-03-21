@@ -146,6 +146,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
       nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+
     nextPosition.asset.settlementDate = isPricing
       ? nextPosition.asset.expirationDate
       : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
