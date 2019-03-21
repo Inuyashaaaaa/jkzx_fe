@@ -179,3 +179,33 @@ export async function rptIntradayReportPaged(params = {}) {
     },
   });
 }
+
+export async function rptOtcTradeReportPagedByNameAndDate(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptOtcTradeReportPagedByNameAndDate',
+      params,
+    },
+  });
+}
+
+export async function rptFinancialOtcFundDetailReportPagedByNameAndDate(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptFinancialOtcFundDetailReportPagedByNameAndDate',
+      params,
+    },
+  });
+}
+
+export async function rptFinanicalOtcClientFundReportPagedByNameAndDate(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptFinanicalOtcClientFundReportPagedByNameAndDate',
+      params,
+    },
+  });
+}

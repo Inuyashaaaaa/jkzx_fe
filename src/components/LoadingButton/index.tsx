@@ -1,11 +1,12 @@
+import StationalComponent from '@/design/components/StationalComponent';
 import Button, { ButtonProps } from 'antd/lib/button';
-import React, { PureComponent } from 'react';
+import React from 'react';
 
 export type LoadingButtonProps = ButtonProps & {
   onClick?: (params) => any | Promise<any>;
 };
 
-class LoadingButton extends PureComponent<LoadingButtonProps> {
+class LoadingButton extends StationalComponent<LoadingButtonProps, any> {
   public state = {
     loading: false,
   };
@@ -14,18 +15,24 @@ class LoadingButton extends PureComponent<LoadingButtonProps> {
     if (!this.props.onClick) {
       return;
     }
-    this.setState({
+    this.$setState({
       loading: true,
     });
     const result = this.props.onClick(params);
-    result.then(cb => {
-      this.setState(
-        {
-          loading: false,
-        },
-        () => cb && cb(this)
-      );
-    });
+    if (result instanceof Promise) {
+      result.then(this.handleResult);
+    } else {
+      this.handleResult(result);
+    }
+  };
+
+  public handleResult = cb => {
+    this.$setState(
+      {
+        loading: false,
+      },
+      () => cb && cb(this)
+    );
   };
 
   public render() {

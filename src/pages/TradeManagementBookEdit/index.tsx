@@ -1,10 +1,11 @@
 import {
   LCM_EVENT_TYPE_MAP,
   LCM_EVENT_TYPE_OPTIONS,
-  LCM_EVENT_ZHCN_TYPES,
+  LCM_EVENT_TYPE_ZHCN_MAP,
   LEG_FIELD,
   LEG_NAME_FIELD,
   LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
@@ -14,6 +15,7 @@ import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import ModalButton from '@/lib/components/_ModalButton2';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { convertObservetions } from '@/services/common';
 import { trdBookList, trdTradeGet } from '@/services/general-service';
 import {
   bookingTableFormControls,
@@ -33,7 +35,9 @@ import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import ExportModal from './ExportModal';
+import AsianExerciseModal from './modals/AsianExerciseModal';
 import ExerciseModal from './modals/ExerciseModal';
+import FixingModal from './modals/FixingModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
 
@@ -51,6 +55,10 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public $unwindModal: UnwindModal;
 
   public $exerciseModal: ExerciseModal;
+
+  public $fixingModal: FixingModal;
+
+  public $asianExerciseModal: AsianExerciseModal;
 
   constructor(props) {
     super(props);
@@ -282,7 +290,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
           .filter(item => item !== LCM_EVENT_TYPE_MAP.EXPIRATION)
           .map(eventType => {
             return {
-              name: LCM_EVENT_ZHCN_TYPES[eventType],
+              name: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
               action: this.bindEventAction(eventType, params),
             };
           })),
@@ -294,32 +302,46 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public bindEventAction = (eventType, params) => () => {
+    const legType = params.rowData[LEG_TYPE_FIELD];
+
     // 每次操作后及时更新，并保证数据一致性
     this.activeRowData = params.rowData;
 
-    if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-      // this.$modelButton.click({
-      //   formControls: modalFormControls({
-      //     info: 'underlyerPrice',
-      //     name: '标的物价格',
-      //     input: { type: 'input' },
-      //   }),
-      //   extra: {
-      //     ...params,
-      //     eventType,
-      //   },
-      // });
-      this.$exerciseModal.show(
+    if (eventType === LCM_EVENT_TYPE_MAP.OBSERVE) {
+      return this.$fixingModal.show(
         this.activeRowData,
         this.state.tableFormData,
         this.props.currentUser,
         () => this.loadData(true)
       );
     }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
+      if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
+        if (convertObservetions(params.rowData).some(item => !item.price)) {
+          return message.warn('请先完善观察日价格');
+        }
+
+        return this.$asianExerciseModal.show(
+          this.activeRowData,
+          this.state.tableFormData,
+          this.props.currentUser,
+          () => this.loadData(true)
+        );
+      }
+
+      return this.$exerciseModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
+      );
+    }
+
     if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
       if (this.activeRowData[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
         return message.warn(
-          `${LCM_EVENT_ZHCN_TYPES.UNWIND}状态下无法继续${LCM_EVENT_ZHCN_TYPES.UNWIND}`
+          `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
         );
       }
 
@@ -467,6 +489,16 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
           trade={this.state.tableFormData}
           convertVisible={this.convertVisible}
           loadData={this.loadData}
+        />
+        <FixingModal
+          ref={node => {
+            this.$fixingModal = node;
+          }}
+        />
+        <AsianExerciseModal
+          ref={node => {
+            this.$asianExerciseModal = node;
+          }}
         />
       </PageHeaderWrapper>
     );
