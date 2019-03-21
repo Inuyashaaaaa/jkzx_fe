@@ -33,9 +33,6 @@ export function setPermissions(permissions) {
     JSON.stringify({
       ...permissions,
       customReport: true,
-      tradingStatements: true,
-      fundsDetailedStatements: true,
-      customerFundsSummaryStatements: true,
     })
   );
 }

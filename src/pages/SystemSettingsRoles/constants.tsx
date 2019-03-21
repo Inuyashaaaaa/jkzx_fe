@@ -416,6 +416,51 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+          {
+            headerName: '场外期权业务交易报表',
+            field: 'tradingStatements',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '场外期权业务资金明细报表',
+            field: 'fundsDetailedStatements',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '场外期权业务客户资金汇总报表',
+            field: 'customerFundsSummaryStatements',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
         ],
       },
       {
