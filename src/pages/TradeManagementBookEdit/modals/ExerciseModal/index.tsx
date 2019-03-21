@@ -1,6 +1,6 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
 import Form from '@/design/components/Form';
-import { trdTradeLCMEventProcess } from '@/services/trade-service';
+import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
@@ -37,6 +37,7 @@ class ExerciseModal extends PureComponent<
     dataSource: {},
     exportVisible: false,
   };
+
   public show = (data = {}, tableFormData, currentUser, reload) => {
     this.data = data;
     this.tableFormData = tableFormData;
@@ -51,40 +52,52 @@ class ExerciseModal extends PureComponent<
         ? {
             dataSource: this.computeLotDataSource({
               [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+              [UNDERLYER_PRICE]: this.data[LEG_FIELD.INITIAL_SPOT],
             }),
           }
         : {
             dataSource: this.computeCnyDataSource({
               [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+              [UNDERLYER_PRICE]: this.data[LEG_FIELD.INITIAL_SPOT],
             }),
           }),
     });
   };
 
-  public computeCnyDataSource = (value, changed = {}) => {
-    return {
-      ...value,
-      [NOTIONAL_AMOUNT]: new BigNumber(value[NUM_OF_OPTIONS])
-        .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .toNumber(),
-      [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
-        ? changed[SETTLE_AMOUNT]
-        : new BigNumber(value[NUM_OF_OPTIONS]).multipliedBy(value[UNDERLYER_PRICE]).toNumber(),
-    };
+  public getSettleAmount = async value => {
+    const { error, data } = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventDetail: {
+        underlyerPrice: String(value[UNDERLYER_PRICE]),
+        numOfOptions: String(value[NUM_OF_OPTIONS]),
+        notionalAmount: String(value[NOTIONAL_AMOUNT]),
+      },
+    });
+    if (error) return;
+    this.setState({
+      dataSource: {
+        ...value,
+        [SETTLE_AMOUNT]: data,
+      },
+    });
   };
 
-  public computeLotDataSource = (value, changed = {}) => {
-    return {
-      ...value,
-      [NUM_OF_OPTIONS]: new BigNumber(value[NOTIONAL_AMOUNT])
-        .div(this.data[LEG_FIELD.INITIAL_SPOT])
-        .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .toNumber(),
-      [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
-        ? changed[SETTLE_AMOUNT]
-        : new BigNumber(value[NUM_OF_OPTIONS]).multipliedBy(value[UNDERLYER_PRICE]).toNumber(),
-    };
+  public computeCnyDataSource = value => {
+    const notionalAmount = new BigNumber(value[NUM_OF_OPTIONS])
+      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .toNumber();
+    const newValue = { ...value, [NOTIONAL_AMOUNT]: notionalAmount };
+    this.getSettleAmount(newValue);
+  };
+
+  public computeLotDataSource = value => {
+    const numOfOptions = new BigNumber(value[NOTIONAL_AMOUNT])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .toNumber();
+    const newValue = { ...value, [NUM_OF_OPTIONS]: numOfOptions };
+    this.getSettleAmount(newValue);
   };
 
   public switchConfirmLoading = () => {
@@ -124,19 +137,7 @@ class ExerciseModal extends PureComponent<
 
   public onValueChange = params => {
     this.setState({
-      ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        ? {
-            dataSource: this.computeLotDataSource(
-              params.values,
-              params.changedValues.SETTLE_AMOUNT ? params.changedValues : {}
-            ),
-          }
-        : {
-            dataSource: this.computeCnyDataSource(
-              params.values,
-              params.changedValues.SETTLE_AMOUNT ? params.changedValues : {}
-            ),
-          }),
+      dataSource: params.values,
     });
   };
 
