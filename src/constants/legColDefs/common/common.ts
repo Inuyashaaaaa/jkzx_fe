@@ -1152,7 +1152,7 @@ export const SpecifiedPrice: IColDef = {
     if (
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL
+      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL
     ) {
       return {
         defaultOpen: true,
@@ -1257,7 +1257,7 @@ export const NotionalAmount: IColDef = {
 
 export const NotionalAmountType: IColDef = {
   editable: params => {
-    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
       return false;
     }
     return true;
@@ -1280,7 +1280,7 @@ export const NotionalAmountType: IColDef = {
   },
   rules: RULES_REQUIRED,
   getValue: params => {
-    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
       return {
         depends: [],
         value(data) {
