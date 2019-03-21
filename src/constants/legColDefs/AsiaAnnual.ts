@@ -90,9 +90,11 @@ export const AsiaAnnual: ILegType = pipeLeg({
       [ObserveStartDay.field]: now,
       [ObserveEndDay.field]: now.add(DEFAULT_TERM, 'day'),
       [Frequency.field]: FREQUENCY_TYPE_MAP['1D'],
+      [LEG_FIELD.EXPIRATION_DATE]: now,
+      [LEG_FIELD.SETTLEMENT_DATE]: now,
     };
   },
-  getPosition: (nextPosition, dataSourceItem, tableDataSource) => {
+  getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
     nextPosition.productType = LEG_TYPE_MAP.ASIAN;
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
@@ -110,6 +112,10 @@ export const AsiaAnnual: ILegType = pipeLeg({
       }
       return val;
     });
+
+    nextPosition.asset.settlementDate = isPricing
+      ? nextPosition.asset.expirationDate
+      : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate;
 
     nextPosition.asset = _.omit(dataSourceItem, [
       ...LEG_INJECT_FIELDS,
