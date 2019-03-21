@@ -236,11 +236,11 @@ class ExpirationModal extends PureComponent<
                 onValueChange={this.onCallValueChange}
                 controlNumberOneRow={1}
                 footer={false}
-                controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(this.state.premiumType)}
+                controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
+                  this.state.premiumType,
+                  this.handleSettleAmount
+                )}
               />
-              <Button key="upload" type="primary" onClick={this.handleSettleAmount}>
-                结算
-              </Button>
             </>
           )}
         </Modal>

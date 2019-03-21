@@ -1,11 +1,12 @@
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
-  INPUT_NUMBER_PERCENTAGE_CONFIG,
   INPUT_NUMBER_PERCENTAGE_DECIMAL_CONFIG,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
+import { Button } from 'antd';
+import React from 'react';
 
 export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
   {
@@ -70,7 +71,10 @@ export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
   },
 ];
 
-export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (premiumType) => IFormControl[] = premiumType => [
+export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
+  premiumType,
+  handleSettleAmount
+) => IFormControl[] = (premiumType, handleSettleAmount) => [
   {
     field: 'EXPIRE_NO_BARRIER_PREMIUM_TYPE',
     control: {
@@ -136,7 +140,14 @@ export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (premiumType) => IFormControl[] 
     control: {
       label: '结算金额',
     },
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+    input: {
+      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      after: (
+        <Button key="upload" type="primary" onClick={handleSettleAmount}>
+          结算
+        </Button>
+      ),
+    },
     decorator: {
       rules: [
         {

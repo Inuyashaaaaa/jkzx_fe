@@ -146,11 +146,8 @@ class ExerciseModal extends PureComponent<
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={KNOCKOUT_FORM_CONTROLS}
+            controls={KNOCKOUT_FORM_CONTROLS(this.handleSettleAmount)}
           />
-          <Button key="upload" type="primary" onClick={this.handleSettleAmount}>
-            结算
-          </Button>
         </Modal>
       </>
     );
