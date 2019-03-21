@@ -1,3 +1,4 @@
+import { convertObservetions } from '@/services/common';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -90,9 +91,11 @@ export const AsiaAnnual: ILegType = pipeLeg({
       [ObserveStartDay.field]: now,
       [ObserveEndDay.field]: now.add(DEFAULT_TERM, 'day'),
       [Frequency.field]: FREQUENCY_TYPE_MAP['1D'],
+      [LEG_FIELD.EXPIRATION_DATE]: now,
+      [LEG_FIELD.SETTLEMENT_DATE]: now,
     };
   },
-  getPosition: (nextPosition, dataSourceItem, tableDataSource) => {
+  getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
     nextPosition.productType = LEG_TYPE_MAP.ASIAN;
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
@@ -134,6 +137,10 @@ export const AsiaAnnual: ILegType = pipeLeg({
       {}
     );
 
+    nextPosition.asset.settlementDate = isPricing
+      ? nextPosition.asset.expirationDate
+      : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate;
+
     nextPosition.asset.annualized = true;
 
     return nextPosition;
@@ -143,13 +150,7 @@ export const AsiaAnnual: ILegType = pipeLeg({
     if (!days.length) return nextDataSourceItem;
     nextDataSourceItem[LEG_FIELD.OBSERVE_START_DAY] = moment(days[0]);
     nextDataSourceItem[LEG_FIELD.OBSERVE_END_DAY] = moment(days[days.length - 1]);
-    nextDataSourceItem[LEG_FIELD.OBSERVATION_DATES] = days.map(day => {
-      return {
-        day,
-        weight: nextDataSourceItem.fixingWeights[day],
-        price: nextDataSourceItem.fixingObservations[day],
-      };
-    });
+    nextDataSourceItem[LEG_FIELD.OBSERVATION_DATES] = convertObservetions(nextDataSourceItem);
 
     return nextDataSourceItem;
   },

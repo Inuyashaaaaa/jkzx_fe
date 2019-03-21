@@ -109,20 +109,20 @@ export const bookingTableFormControls: () => IFormControl[] = () => [
 ];
 
 export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = false) => {
+  if (
+    leg.type === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
+  ) {
+    return leg.getDefault(dataSourceItem, isPricing);
+  }
+
   const expirationDate = moment().add(DEFAULT_TERM, 'days');
   let nextDataSourceItem = {
     [LEG_FIELD.EXPIRATION_DATE]: expirationDate,
     [LEG_FIELD.SETTLEMENT_DATE]: expirationDate,
     ...dataSourceItem,
   };
-
-  if (
-    leg.type === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
-  ) {
-    return leg.getDefault(nextDataSourceItem, isPricing);
-  }
 
   if (
     leg.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
@@ -587,7 +587,7 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
       productType === LEG_TYPE_MAP.ASIAN_UNANNUAL
     ) {
       const Leg = LEG_MAP[productType];
-      return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource);
+      return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource, isPricing);
     }
 
     if (

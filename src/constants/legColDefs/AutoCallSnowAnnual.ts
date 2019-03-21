@@ -103,10 +103,10 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
     ExpireNoBarrierObserveDay,
   ],
   getDefault: (nextDataSourceItem, isPricing) => {
+    const nextDay = moment().add(DEFAULT_TERM, 'days');
     return {
       ...nextDataSourceItem,
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
@@ -115,9 +115,11 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
+      [LEG_FIELD.EXPIRATION_DATE]: nextDay,
+      [LEG_FIELD.SETTLEMENT_DATE]: nextDay,
     };
   },
-  getPosition: (nextPosition, dataSourceItem, tableDataSource) => {
+  getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
@@ -144,8 +146,11 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
       nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-    nextPosition.asset.settlementDate =
-      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+
+    nextPosition.asset.settlementDate = isPricing
+      ? nextPosition.asset.expirationDate
+      : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+
     nextPosition.asset.annualized = true;
 
     return nextPosition;

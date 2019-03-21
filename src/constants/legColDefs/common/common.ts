@@ -931,7 +931,7 @@ export const RebateLow: IColDef = {
 
 export const Frequency: IColDef = {
   headerName: '观察频率',
-  field: LEG_FIELD.OBSERVATION_DAY_STEP,
+  field: LEG_FIELD.OBSERVATION_STEP,
   editable: true,
   input: {
     type: 'select',
@@ -1767,7 +1767,7 @@ export const PricingExpirationDate = {
       return {
         depends: [LEG_FIELD.TERM],
         value(record) {
-          return moment().add(record[LEG_FIELD[LEG_FIELD.TERM]], 'days');
+          return moment().add(record[LEG_FIELD.TERM], 'days');
         },
       };
     }
