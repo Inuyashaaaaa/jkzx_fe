@@ -37,7 +37,9 @@ import uuidv4 from 'uuid/v4';
 import ExportModal from './ExportModal';
 import AsianExerciseModal from './modals/AsianExerciseModal';
 import ExerciseModal from './modals/ExerciseModal';
+import ExpirationModal from './modals/ExpirationModal';
 import FixingModal from './modals/FixingModal';
+import KnockOutModal from './modals/KnockOutModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
 
@@ -55,6 +57,10 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public $unwindModal: UnwindModal;
 
   public $exerciseModal: ExerciseModal;
+
+  public $expirationModal: ExpirationModal;
+
+  public $knockOutModal: KnockOutModal;
 
   public $fixingModal: FixingModal;
 
@@ -189,7 +195,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
           },
         });
       });
-
       this.addLegData(leg, this.makeData(leg, item));
     });
 
@@ -284,16 +289,27 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public getContextMenuItems = (params): Array<MenuItemDef | string> => {
+    // console.log(this.state.eventTypes);
+    // console.log(params);
+    // console.log((this.state.eventTypes[params.rowData.id] &&
+    //     this.state.eventTypes[params.rowData.id]
+    //       .filter(item => item !== LCM_EVENT_TYPE_MAP.EXPIRATION)
+    //       .map(eventType => {
+    //         return {
+    //           name: LCM_EVENT_ZHCN_TYPES[eventType],
+    //           action: this.bindEventAction(eventType, params),
+    //         };
+    //       })),
+    // );
+    // debugger;
     return [
       ...(this.state.eventTypes[params.rowData.id] &&
-        this.state.eventTypes[params.rowData.id]
-          .filter(item => item !== LCM_EVENT_TYPE_MAP.EXPIRATION)
-          .map(eventType => {
-            return {
-              name: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
-              action: this.bindEventAction(eventType, params),
-            };
-          })),
+        this.state.eventTypes[params.rowData.id].map(eventType => {
+          return {
+            name: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
+            action: this.bindEventAction(eventType, params),
+          };
+        })),
       'separator',
       'copy',
       'paste',
@@ -364,6 +380,24 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
           eventType,
         },
       });
+    }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
+      this.$expirationModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
+      );
+    }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_OUT) {
+      this.$knockOutModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
+      );
     }
   };
 
@@ -484,6 +518,8 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
             this.$exerciseModal = node;
           }}
         />
+        <ExpirationModal ref={node => (this.$expirationModal = node)} />
+        <KnockOutModal ref={node => (this.$knockOutModal = node)} />
         <ExportModal
           visible={this.state.visible}
           trade={this.state.tableFormData}
