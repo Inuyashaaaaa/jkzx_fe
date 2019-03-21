@@ -87,6 +87,18 @@ export const EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS = convertOptions(
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP
 );
 
+export const DIRECTION_TYPE_MAP = {
+  BUYER: 'BUYER',
+  SELLER: 'SELLER',
+};
+
+export const DIRECTION_TYPE_ZHCN_MAP = {
+  BUYER: '买',
+  SELLER: '卖',
+};
+
+export const DIRECTION_TYPE_OPTIONS = convertOptions(DIRECTION_TYPE_MAP, DIRECTION_TYPE_ZHCN_MAP);
+
 // 事件通知类型
 export const EVENT_TYPE_MAP = {
   EXPIRATION: 'EXPIRATION',
@@ -116,6 +128,7 @@ export const LCM_EVENT_TYPE_MAP = {
   ROLL: 'ROLL',
   CLOSED: 'CLOSED',
   UNWIND_PARTIAL: 'UNWIND_PARTIAL',
+  OBSERVE: 'OBSERVE',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
@@ -131,21 +144,16 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   ROLL: '展期',
   CLOSED: '结束',
   UNWIND_PARTIAL: '部分平仓',
+  OBSERVE: '观察',
 };
 
 export const FREQUENCY_TYPE_MAP = {
-  '1D': 1,
-  '1W': 7,
-  '1M': 30,
-  '3M': 90,
-  '6M': 180,
-  '1Y': 365,
-  // '1D': '1D',
-  // '1W': '1W',
-  // '1M': '1M',
-  // '3M': '3M',
-  // '6M': '6M',
-  // '1Y': '1Y',
+  '1D': '1D',
+  '1W': '1W',
+  '1M': '1M',
+  '3M': '3M',
+  '6M': '6M',
+  '1Y': '1Y',
 };
 
 export const FREQUENCY_TYPE_ZHCN_MAP = {
@@ -307,19 +315,6 @@ export const SPECIFIED_PRICE_ZHCN_MAP = {
   DERIVATIVES_CLOSE: '标的收盘价',
 };
 
-// 行权类型映射
-export const LCM_EVENT_ZHCN_TYPES = {
-  OPEN: '开仓',
-  UNWIND: '平仓',
-  EXPIRATION: '到期',
-  EXERCISE: '行权',
-  KNOCK_OUT: '敲出',
-  KNOCK_IN: '敲入',
-  DIVIDEND: '分红',
-  PAYMENT: '支付',
-  ROLL: '展期',
-};
-
 export const REBATETYPE_TYPE_MAP = {
   PAY_NONE: 'PAY_NONE',
   PAY_WHEN_HIT: 'PAY_WHEN_HIT',
@@ -348,8 +343,8 @@ export const LEG_FIELD = {
   /* 观察日 */
   OBSERVATION_DATES: 'OBSERVATION_DATES',
   /* 观察频率 */
-  OBSERVATION_STEP: 'observationDayStep',
-  // OBSERVATION_STEP: 'observationStep',
+  // OBSERVATION_STEP: 'observationDayStep',
+  OBSERVATION_STEP: 'observationStep',
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',
   AUTO_CALL_STRIKE: 'autoCallStrike',
@@ -374,7 +369,7 @@ export const LEG_FIELD = {
   PREMIUM: 'premium',
   DAYS_IN_YEAR: 'daysInYear',
   SETTLEMENT_DATE: 'settlementDate',
-  EXPIRATION_DATE: 'expirationDate',
+  EXPIRATION_DATE: 'expirationDate', // 到期日
   EFFECTIVE_DATE: 'effectiveDate',
   INITIAL_SPOT: 'initialSpot',
   DIRECTION: 'direction',
@@ -385,7 +380,7 @@ export const LEG_FIELD = {
   NOTIONAL_AMOUNT_TYPE: 'notionalAmountType',
   PREMIUM_TYPE: 'premiumType',
   SPECIFIED_PRICE: 'specifiedPrice',
-  UNDERLYER_MULTIPLIER: 'underlyerMultiplier',
+  UNDERLYER_MULTIPLIER: 'underlyerMultiplier', // 合约乘数
   PAYMENT_TYPE: 'paymentType',
   STRIKE: 'strike',
   STRIKE1: 'strike1',
