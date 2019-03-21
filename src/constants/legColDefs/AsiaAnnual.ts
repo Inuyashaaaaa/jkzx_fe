@@ -1,3 +1,4 @@
+import { convertObservetions } from '@/services/common';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -149,13 +150,7 @@ export const AsiaAnnual: ILegType = pipeLeg({
     if (!days.length) return nextDataSourceItem;
     nextDataSourceItem[LEG_FIELD.OBSERVE_START_DAY] = moment(days[0]);
     nextDataSourceItem[LEG_FIELD.OBSERVE_END_DAY] = moment(days[days.length - 1]);
-    nextDataSourceItem[LEG_FIELD.OBSERVATION_DATES] = days.map(day => {
-      return {
-        day,
-        weight: nextDataSourceItem.fixingWeights[day],
-        price: nextDataSourceItem.fixingObservations[day],
-      };
-    });
+    nextDataSourceItem[LEG_FIELD.OBSERVATION_DATES] = convertObservetions(nextDataSourceItem);
 
     return nextDataSourceItem;
   },

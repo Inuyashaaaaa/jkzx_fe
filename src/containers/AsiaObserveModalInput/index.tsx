@@ -239,11 +239,11 @@ class AsiaObserveModalInput extends InputPolym<any> {
                       type="primary"
                       loading={this.state.generateLoading}
                       onClick={this.onPopconfirmClick}
-                      onConfirm={this.onPopcomfirmButtonConfirm}
                       popconfirmProps={{
                         title: '生成将覆盖当前表格内容',
                         visible: this.state.popconfirmVisible,
                         onCancel: this.onHidePopconfirm,
+                        onConfirm: this.onPopcomfirmButtonConfirm,
                       }}
                     >
                       批量生成观察日

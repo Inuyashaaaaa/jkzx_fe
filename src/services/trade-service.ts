@@ -18,6 +18,11 @@ export async function trdPositionLCMEventTypes(params) {
       method: 'trdPositionLCMEventTypes',
       params,
     },
+  }).then(() => {
+    return {
+      error: false,
+      data: ['FIXING'],
+    };
   });
 }
 
