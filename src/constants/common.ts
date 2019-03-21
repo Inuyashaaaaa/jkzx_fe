@@ -215,6 +215,18 @@ export const KNOCK_DIRECTION_ZHCN_MAP = {
   DOWN: '向下',
 };
 
+export const DIRECTION_MAP = {
+  BUY: 'BUYER',
+  SELL: 'SELLER',
+};
+
+export const DIRECTION_ZHCN_MAP = {
+  BUY: '买',
+  SELL: '卖',
+};
+
+export const DIRECTION_OPTIONS = convertOptions(DIRECTION_MAP, DIRECTION_ZHCN_MAP);
+
 export const KNOCK_DIRECTION_MAP = {
   UP: 'UP',
   DOWN: 'DOWN',
@@ -454,6 +466,35 @@ export const INSTRUMENT_TYPE_ZHCN_MAP = {
   SPOT: '现货',
   FUTURES: '期货',
 };
+
+export const ASSET_TYPE_MAP = {
+  STOCK: 'STOCK',
+  COMMODITY: 'COMMODITY',
+};
+
+export const ASSET_TYPE_ZHCN_MAP = {
+  STOCK: '股票',
+  COMMODITY: '商品',
+};
+
+export const ASSET_TYPE_OPTIONS = convertOptions(ASSET_TYPE_MAP, ASSET_TYPE_ZHCN_MAP);
+
+// export const SURVIVAL_STATUS_MAP = {
+//   LIVE: 'LIVE',
+//   MATURED: 'MATURED',
+//   CLOSED: 'CLOSED',
+// };
+
+// export const SURVIVAL_STATUS_ZHCN_MAP = {
+//   LIVE: '股票',
+//   MATURED: '商品',
+//   CLOSED: '',
+// };
+
+// export const SURVIVAL_STATUS_OPTIONS = convertOptions(
+//   SURVIVAL_STATUS_MAP,
+//   SURVIVAL_STATUS_ZHCN_MAP
+// );
 
 export const EXERCISETYPE_MAP = {
   EUROPEAN: 'EUROPEAN',

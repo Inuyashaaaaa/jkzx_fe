@@ -319,7 +319,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
       if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
         if (convertObservetions(params.rowData).some(item => !item.price)) {
-          return message.warn('请先完善观察日价格')
+          return message.warn('请先完善观察日价格');
         }
 
         return this.$asianExerciseModal.show(
