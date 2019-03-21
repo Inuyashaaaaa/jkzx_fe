@@ -13,7 +13,7 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
   },
   {
     headerName: '交易确认书编码',
-    field: 'reportName',
+    field: 'optionName',
   },
   {
     headerName: '客户名称',
