@@ -129,6 +129,7 @@ export const LCM_EVENT_TYPE_MAP = {
   CLOSED: 'CLOSED',
   UNWIND_PARTIAL: 'UNWIND_PARTIAL',
   OBSERVE: 'OBSERVE',
+  SNOW_BALL_EXERCISE: 'SNOW_BALL_EXERCISE',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
@@ -145,6 +146,7 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   CLOSED: '结束',
   UNWIND_PARTIAL: '部分平仓',
   OBSERVE: '观察',
+  SNOW_BALL_EXERCISE: '雪球到期行权',
 };
 
 export const FREQUENCY_TYPE_MAP = {
@@ -352,22 +354,16 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  * 多腿字段名
  */
 export const LEG_FIELD = {
-  /* 观察日 */
-  OBSERVATION_DATES: 'OBSERVATION_DATES',
-  /* 观察频率 */
-  OBSERVATION_STEP: 'observationStep',
+  OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日
+  OBSERVATION_STEP: 'observationStep', // 观察频率
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',
   AUTO_CALL_STRIKE: 'autoCallStrike',
   AUTO_CALL_STRIKE_UNIT: 'autoCallStrikeUnit',
-  /* 收益/coupon(%) */
-  COUPON_PAYMENT: 'couponPayment',
-  /* 敲出/coupon观察日 */
-  EXPIRE_NO_BARRIEROBSERVE_DAY: 'observationDates',
-  /* 到期未敲出收益类型 */
-  EXPIRE_NOBARRIER_PREMIUM_TYPE: 'autoCallPaymentType',
-  /* 到期未敲出固定收益 */
-  EXPIRE_NOBARRIERPREMIUM: 'fixedPayment',
+  COUPON_PAYMENT: 'couponPayment', // 收益/coupon(%)
+  EXPIRE_NO_BARRIEROBSERVE_DAY: 'observationDates', // 敲出/coupon观察日
+  EXPIRE_NOBARRIER_PREMIUM_TYPE: 'autoCallPaymentType', // 到期未敲出收益类型
+  EXPIRE_NOBARRIERPREMIUM: 'fixedPayment', // 到期未敲出固定收益
   STEP: 'step',
   UP_BARRIER: 'upBarrier',
   UP_BARRIER_TYPE: 'upBarrierType',
@@ -379,9 +375,9 @@ export const LEG_FIELD = {
   FRONT_PREMIUM: 'frontPremium',
   PREMIUM: 'premium',
   DAYS_IN_YEAR: 'daysInYear',
-  SETTLEMENT_DATE: 'settlementDate',
+  SETTLEMENT_DATE: 'settlementDate', // 结算日
   EXPIRATION_DATE: 'expirationDate', // 到期日
-  EFFECTIVE_DATE: 'effectiveDate',
+  EFFECTIVE_DATE: 'effectiveDate', // 起始日
   INITIAL_SPOT: 'initialSpot',
   DIRECTION: 'direction',
   PAY_OFF_TYPE: 'payOffType',

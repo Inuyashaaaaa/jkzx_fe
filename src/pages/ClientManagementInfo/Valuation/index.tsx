@@ -11,7 +11,7 @@ import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import ValuationCellRenderer from './ValuationCellRenderer';
 
-const VALUATION_COL_DEFS: IColumnDef[] = [
+const VALUATION_COL_DEFS: (uploading, unUploading) => IColumnDef[] = (uploading, unUploading) => [
   {
     headerName: '交易对手',
     field: 'legalName',
@@ -48,7 +48,9 @@ const VALUATION_COL_DEFS: IColumnDef[] = [
   {
     headerName: '操作',
     render: params => {
-      return <ValuationCellRenderer params={params} />;
+      return (
+        <ValuationCellRenderer params={params} uploading={uploading} unUploading={unUploading} />
+      );
     },
   },
 ];
@@ -67,9 +69,7 @@ class Valuation extends PureComponent<ValuationProps> {
   };
 
   public componentDidMount = () => {
-    this.setState({
-      loading: true,
-    });
+    this.uploading();
     this.fetchTable();
   };
 
@@ -128,11 +128,24 @@ class Valuation extends PureComponent<ValuationProps> {
     const { error, data } = await emlSendValuationReport({
       params: reportData,
     });
-    this.setState({
-      loading: false,
-    });
+    this.unUploading();
     if (error) {
       message.error('批量发送失败');
+      return;
+    }
+    if (data.ERROR) {
+      data.ERROR.map(item => {
+        if (item.error.includes('501 Bad address')) {
+          message.error(`邮箱为${item.email}的用户文档发送失败,请确认邮箱是否正确`);
+          return;
+        } else if (item.error.includes('UUID string')) {
+          message.error(`邮箱为${item.email}的用户文档发送失败,文档不可用`);
+          return;
+        } else {
+          message.error(`邮箱为${item.email}的用户文档发送失败`);
+          return;
+        }
+      });
       return;
     }
     message.success('批量发送成功');
@@ -151,6 +164,18 @@ class Valuation extends PureComponent<ValuationProps> {
     });
   };
 
+  public uploading = () => {
+    this.setState({
+      loading: true,
+    });
+  };
+
+  public unUploading = () => {
+    this.setState({
+      loading: false,
+    });
+  };
+
   public render() {
     return (
       <>
@@ -159,7 +184,7 @@ class Valuation extends PureComponent<ValuationProps> {
           ref={node => (this.$sourceTable = node)}
           rowKey="uuid"
           loading={this.state.loading}
-          columnDefs={VALUATION_COL_DEFS}
+          columnDefs={VALUATION_COL_DEFS(this.uploading, this.unUploading)}
           dataSource={this.state.dataSource}
           // frameworkComponents={{
           //   ValuationCellRenderer,

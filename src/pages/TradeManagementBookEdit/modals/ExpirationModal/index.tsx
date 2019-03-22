@@ -130,7 +130,7 @@ class ExpirationModal extends PureComponent<
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
-      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+      eventType: LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
       userLoginId: this.currentUser.userName,
       eventDetail: {
         ...(dataSource[UNDERLYER_PRICE]
@@ -175,7 +175,7 @@ class ExpirationModal extends PureComponent<
         underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
         notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
-      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+      eventType: LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
     });
     if (error) return;
     this.setState({

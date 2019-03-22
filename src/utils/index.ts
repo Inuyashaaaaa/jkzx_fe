@@ -7,8 +7,8 @@ export const convertOptions = (maps, zhcn) => {
   }));
 };
 
-export const wrapMoment = val => {
-  return isMoment(val) ? val : moment(val);
+export const wrapMoment = (val, clone = true) => {
+  return isMoment(val) ? (clone ? val.clone() : val) : moment(val);
 };
 
 export const isSameDay = (a, b, format = 'YYYY-MM-DD') => {

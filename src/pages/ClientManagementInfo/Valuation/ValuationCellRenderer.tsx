@@ -23,7 +23,7 @@ class ValuationCellRenderer extends PureComponent {
     this.setState({
       visible: false,
     });
-    message.loading('正在发送');
+    this.props.uploading();
     const reportData = _.mapKeys(_.pick(this.rowData, ['uuid', 'tradeEmail']), (value, key) => {
       if (key === 'tradeEmail') {
         return 'tos';
@@ -35,9 +35,22 @@ class ValuationCellRenderer extends PureComponent {
     const { error, data } = await emlSendValuationReport({
       params: [reportData],
     });
+    this.props.unUploading();
     if (error) {
       message.error('发送失败');
       return;
+    }
+    if (data.ERROR) {
+      if (data.ERROR[0].error.includes('501 Bad address')) {
+        message.error('发送失败,请确认邮箱是否正确');
+        return;
+      } else if (data.ERROR[0].error.includes('UUID string')) {
+        message.error('发送失败,文档不可用');
+        return;
+      } else {
+        message.error('发送失败');
+        return;
+      }
     }
     message.success('发送成功');
     return;

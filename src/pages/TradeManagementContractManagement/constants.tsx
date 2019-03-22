@@ -42,29 +42,6 @@ export const bookingSearchFormControls: (bookList, bookIdList) => IFormControl[]
   },
   {
     control: {
-      label: '投资组合',
-    },
-    input: {
-      type: 'select',
-      showSearch: true,
-      placeholder: '请输入内容搜索',
-      mode: 'multiple',
-      allowClear: true,
-      options: async (value: string = '') => {
-        const { data, error } = await trdPortfolioListBySimilarPortfolioName({
-          similarPortfolioName: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
-      },
-    },
-    field: 'portfolioNames',
-  },
-  {
-    control: {
       label: '交易ID',
     },
     input: {
@@ -128,6 +105,29 @@ export const bookingSearchFormControls: (bookList, bookIdList) => IFormControl[]
     },
     field: 'tradeDate',
   },
+  {
+    control: {
+      label: '投资组合',
+    },
+    input: {
+      type: 'select',
+      showSearch: true,
+      placeholder: '请输入内容搜索',
+      mode: 'multiple',
+      allowClear: true,
+      options: async (value: string = '') => {
+        const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+          similarPortfolioName: value,
+        });
+        if (error) return [];
+        return data.map(item => ({
+          label: item,
+          value: item,
+        }));
+      },
+    },
+    field: 'portfolioNames',
+  },
 ];
 
 export const BOOKING_TABLE_COLUMN_DEFS2: IColumnDef[] = [
@@ -163,7 +163,7 @@ export const BOOKING_TABLE_COLUMN_DEFS2: IColumnDef[] = [
   },
 ];
 
-export const BOOKING_TABLE_COLUMN_DEFS: (bindCheckContract: any) => IColumnDef[] = (
+export const BOOKING_TABLE_COLUMN_DEFS: (bindCheckContract, onSearch) => IColumnDef[] = (
   bindCheckContract,
   onSearch
 ) => [

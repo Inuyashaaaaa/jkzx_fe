@@ -26,8 +26,6 @@ numeral.register('format', 'de', {
       value = isnan ? 0 : val;
     }
 
-    console.log(`${numeral._.numberToFormat(value, format, roundingFunction)}`);
-
     return `${numeral._.numberToFormat(value, format, roundingFunction)}`;
   },
   unformat: str => {

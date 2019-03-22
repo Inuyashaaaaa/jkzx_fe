@@ -292,7 +292,6 @@ class RendererCellRenderer extends React.PureComponent<IInputCellRendererParams,
     const data = this.getRowData();
     const { value } = this.props;
     const { value: getValue, depends } = this.normalizeGetValue();
-
     if (!getValue || !depends.length) return;
 
     const exsitable = this.getExsitable();
