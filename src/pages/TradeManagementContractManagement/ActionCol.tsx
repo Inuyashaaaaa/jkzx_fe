@@ -16,14 +16,19 @@ class ActionCol extends PureComponent<any> {
       portfolioName: params.data.portfolio,
     });
     if (error) return;
-    message.success('删除成功');
+    message.success('移除成功');
     this.props.onRemove(params);
   };
 
   public render() {
     return (
-      <PopconfirmButton title="确认删除?" type="danger" size="small" onConfirm={this.onRemove}>
-        删除
+      <PopconfirmButton
+        title="确定要将合约移出该投资组合吗?"
+        type="danger"
+        size="small"
+        onConfirm={this.onRemove}
+      >
+        移除关联
       </PopconfirmButton>
     );
   }
