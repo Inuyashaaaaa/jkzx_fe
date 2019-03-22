@@ -45,6 +45,7 @@ export const permissions = {
   department: true,
   resources: true,
   tradeBooks: true,
+  documentManagement: true,
 };
 
 /**
