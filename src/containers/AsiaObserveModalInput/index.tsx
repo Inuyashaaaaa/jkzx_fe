@@ -17,6 +17,8 @@ import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React from 'react';
 
+const OB_DAY_FIELD = 'obDay';
+
 class AsiaObserveModalInput extends InputPolym<any> {
   public state = {
     visible: false,
@@ -30,7 +32,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
     this.state.dealDataSource = this.computeDataSource(
       (props.value || []).map((item, index) => {
         return {
-          obDay: moment(item),
+          [OB_DAY_FIELD]: moment(item),
         };
       })
     );
@@ -38,7 +40,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
 
   public computeDataSource = dataSource => {
     return dataSource
-      .sort((a, b) => a.obDay.valueOf() - b.obDay.valueOf())
+      .sort((a, b) => a[OB_DAY_FIELD].valueOf() - b[OB_DAY_FIELD].valueOf())
       .map((item, index) => {
         return {
           ...item,
@@ -46,7 +48,6 @@ class AsiaObserveModalInput extends InputPolym<any> {
             .div(index + 1)
             .decimalPlaces(4)
             .toNumber(),
-          id: index,
         };
       });
   };
@@ -82,7 +83,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
           this.state.dealDataSource.map(item => {
             return {
               ...item,
-              day: item.obDay.format('YYYY-MM-DD'),
+              day: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
             };
           })
         );
@@ -98,7 +99,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
 
   public onSubmitButtonClick = params => {
     const { dataSource } = params;
-    if (this.state.dealDataSource.find(item => item.obDay.isSame(dataSource.day))) {
+    if (this.state.dealDataSource.find(item => item[OB_DAY_FIELD].isSame(dataSource.day))) {
       return message.warn('不可以出现相同日期');
     }
     this.setState({
@@ -113,9 +114,8 @@ class AsiaObserveModalInput extends InputPolym<any> {
 
   public bindRemove = params => () => {
     this.setState({
-      dealDataSource: remove(
-        this.state.dealDataSource,
-        (item, index) => index === params.node.rowIndex
+      dealDataSource: this.computeDataSource(
+        remove(this.state.dealDataSource, (item, index) => index === params.node.rowIndex)
       ),
     });
   };
@@ -203,7 +203,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
             <SourceTable
               dataSource={this.state.dealDataSource}
               pagination={false}
-              rowKey="id"
+              rowKey={OB_DAY_FIELD}
               header={
                 <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
                   <Col>
@@ -254,7 +254,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
               columnDefs={[
                 {
                   headerName: '观察日',
-                  field: 'obDay',
+                  field: OB_DAY_FIELD,
                   input: {
                     type: 'date',
                     ranger: 'day',
