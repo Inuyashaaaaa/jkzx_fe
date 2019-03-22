@@ -13,6 +13,8 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
 
+const OB_DAY_FIELD = 'obDay';
+
 class ObserveModalInput extends InputPolym<any> {
   public state = {
     visible: false,
@@ -24,7 +26,7 @@ class ObserveModalInput extends InputPolym<any> {
     this.state.dealDataSource = this.computeDataSource(
       (props.value || []).map((item, index) => {
         return {
-          obDay: moment(item),
+          [OB_DAY_FIELD]: moment(item),
           payDay: moment(item),
         };
       })
@@ -44,7 +46,7 @@ class ObserveModalInput extends InputPolym<any> {
         : upBarrier;
 
     return dataSource
-      .sort((a, b) => a.obDay.valueOf() - b.obDay.valueOf())
+      .sort((a, b) => a[OB_DAY_FIELD].valueOf() - b[OB_DAY_FIELD].valueOf())
       .map((item, index) => {
         return {
           ...item,
@@ -88,7 +90,9 @@ class ObserveModalInput extends InputPolym<any> {
         visible: !this.state.visible,
       },
       () => {
-        this._onChange(this.state.dealDataSource.map(item => item.obDay.format('YYYY-MM-DD')));
+        this._onChange(
+          this.state.dealDataSource.map(item => item[OB_DAY_FIELD].format('YYYY-MM-DD'))
+        );
       }
     );
   };
@@ -101,14 +105,14 @@ class ObserveModalInput extends InputPolym<any> {
 
   public onSubmitButtonClick = params => {
     const { dataSource } = params;
-    if (this.state.dealDataSource.find(item => item.obDay.isSame(dataSource.day))) {
+    if (this.state.dealDataSource.find(item => item[OB_DAY_FIELD].isSame(dataSource.day))) {
       return message.warn('不可以出现相同日期');
     }
     this.setState({
       dealDataSource: this.computeDataSource([
         ...this.state.dealDataSource,
         {
-          obDay: dataSource.day,
+          [OB_DAY_FIELD]: dataSource.day,
           payDay: dataSource.day,
         },
       ]),
@@ -147,7 +151,7 @@ class ObserveModalInput extends InputPolym<any> {
             <SourceTable
               dataSource={this.state.dealDataSource}
               pagination={false}
-              rowKey="day"
+              rowKey={OB_DAY_FIELD}
               header={
                 <Row style={{ marginBottom: 10 }}>
                   <Form
@@ -180,7 +184,7 @@ class ObserveModalInput extends InputPolym<any> {
               columnDefs={[
                 {
                   headerName: '观察日',
-                  field: 'obDay',
+                  field: OB_DAY_FIELD,
                   input: {
                     type: 'date',
                     ranger: 'day',
