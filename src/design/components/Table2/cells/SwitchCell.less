@@ -1,0 +1,18 @@
+@import '~antd/lib/style/themes/default.less';
+
+.row {
+  &:hover {
+    .cell {
+      &.editable {
+        transition: all 0.3s, outline 0s, outline-offset 0s;
+        &.rendering {
+          outline: 2px dashed @primary-3;
+          outline-offset: -2px;
+          cursor: pointer;
+        }
+        // &.editing {
+        // }
+      }
+    }
+  }
+}

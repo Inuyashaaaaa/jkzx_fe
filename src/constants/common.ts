@@ -381,9 +381,9 @@ export const LEG_FIELD = {
   FRONT_PREMIUM: 'frontPremium',
   PREMIUM: 'premium',
   DAYS_IN_YEAR: 'daysInYear',
-  SETTLEMENT_DATE: 'settlementDate',
+  SETTLEMENT_DATE: 'settlementDate', // 结算日
   EXPIRATION_DATE: 'expirationDate', // 到期日
-  EFFECTIVE_DATE: 'effectiveDate',
+  EFFECTIVE_DATE: 'effectiveDate', // 起始日
   INITIAL_SPOT: 'initialSpot',
   DIRECTION: 'direction',
   PAY_OFF_TYPE: 'payOffType',
