@@ -9,8 +9,8 @@ import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { isSameDay, wrapMoment } from '@/utils';
-import { Button, Col, message, Modal, Row } from 'antd';
+import { getMoment } from '@/utils';
+import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
@@ -118,7 +118,10 @@ class FixingModal extends PureComponent<
     const now = moment();
     // 今天是最后一个观察日
     const last = (_.last(this.state.tableData) || {}).day;
-    if ((last && isSameDay(now, last)) || isSameDay(this.data[LEG_FIELD.EXPIRATION_DATE], now)) {
+    if (
+      (last && now.isSame(last, 'day')) ||
+      now.isSame(this.data[LEG_FIELD.EXPIRATION_DATE], 'day')
+    ) {
       return true;
     }
 
@@ -131,7 +134,7 @@ class FixingModal extends PureComponent<
 
   public filterObDays = tableData => {
     return tableData.filter(item => {
-      return wrapMoment(item.day).valueOf() <= moment().valueOf();
+      return getMoment(item.day).valueOf() <= moment().valueOf();
     });
   };
 
@@ -168,25 +171,26 @@ class FixingModal extends PureComponent<
     const { visible } = this.state;
     return (
       <>
+        <AsianExerciseModal ref={node => (this.$asianExerciseModal = node)} />
         <Modal
-          closable={false}
+          onCancel={this.switchModal}
           destroyOnClose={true}
           visible={visible}
           title={'Fixing'}
           footer={
-            <Row type="flex" justify="space-between">
-              <Col>平均价: {this.state.avg}</Col>
+            <Row type="flex" justify="space-between" align="middle">
               <Col>
-                <Button onClick={this.switchModal}>取消</Button>
                 <Button
                   disabled={!this.isCanExercise()}
                   style={{ marginLeft: VERTICAL_GUTTER }}
                   onClick={this.onConfirm}
-                  type="primary"
                   loading={this.state.modalConfirmLoading}
                 >
-                  确定
+                  行权
                 </Button>
+              </Col>
+              <Col>
+                <Tag style={{ marginLeft: VERTICAL_GUTTER }}>平均价: {this.state.avg}</Tag>
               </Col>
             </Row>
           }

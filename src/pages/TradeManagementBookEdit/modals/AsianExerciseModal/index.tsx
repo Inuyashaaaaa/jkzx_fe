@@ -12,7 +12,7 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
 import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { wrapMoment } from '@/utils';
+import { getMoment } from '@/utils';
 import { Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
@@ -125,7 +125,7 @@ class AsianExerciseModal extends PureComponent<
 
   public filterObDays = tableData => {
     return tableData.filter(item => {
-      return wrapMoment(item).valueOf() <= moment().valueOf();
+      return getMoment(item).valueOf() <= moment().valueOf();
     });
   };
 

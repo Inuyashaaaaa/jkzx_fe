@@ -6,7 +6,7 @@ import {
   mktInstrumentSearch,
   mktQuotesListPaged,
 } from '@/services/market-data-service';
-import { wrapMoment } from '@/utils';
+import { getMoment } from '@/utils';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
 import moment, { isMoment } from 'moment';
@@ -195,7 +195,7 @@ export const SettlementDate: IColDef = {
   getValue: {
     depends: [LEG_FIELD.EXPIRATION_DATE],
     value: record => {
-      return wrapMoment(record[LEG_FIELD.EXPIRATION_DATE]);
+      return getMoment(record[LEG_FIELD.EXPIRATION_DATE], true);
     },
   },
 };
@@ -535,7 +535,7 @@ export const ExpirationDate: IColDef = {
       const effectiveDate = record[LEG_FIELD.EFFECTIVE_DATE];
       const term = record[LEG_FIELD.TERM];
       if (record[LEG_FIELD.TERM] !== undefined && effectiveDate !== undefined) {
-        return wrapMoment(effectiveDate).add(term, 'days');
+        return getMoment(effectiveDate, true).add(term, 'days');
       }
       return record[LEG_FIELD.EXPIRATION_DATE];
     },
@@ -959,7 +959,7 @@ export const ObserveStartDay: IColDef = {
       ) {
         const expirationDate = record[LEG_FIELD.EXPIRATION_DATE];
         if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
-          return wrapMoment(expirationDate);
+          return getMoment(expirationDate, true);
         }
         return record[LEG_FIELD.OBSERVE_START_DAY];
       }
@@ -993,7 +993,7 @@ export const ObserveEndDay: IColDef = {
       ) {
         const settlemenetDate = record[LEG_FIELD.SETTLEMENT_DATE];
         if (record[LEG_FIELD.SETTLEMENT_DATE] !== undefined) {
-          return wrapMoment(settlemenetDate);
+          return getMoment(settlemenetDate, true);
         }
         return record[LEG_FIELD.OBSERVE_END_DAY];
       }

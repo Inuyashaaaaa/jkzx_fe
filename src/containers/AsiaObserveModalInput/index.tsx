@@ -38,14 +38,14 @@ class AsiaObserveModalInput extends InputPolym<any> {
     );
   }
 
-  public computeDataSource = dataSource => {
+  public computeDataSource = (dataSource = []) => {
     return dataSource
       .sort((a, b) => a[OB_DAY_FIELD].valueOf() - b[OB_DAY_FIELD].valueOf())
       .map((item, index) => {
         return {
           ...item,
           weight: new BigNumber(1)
-            .div(index + 1)
+            .div(dataSource.length)
             .decimalPlaces(4)
             .toNumber(),
         };
