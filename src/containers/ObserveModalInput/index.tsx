@@ -117,9 +117,8 @@ class ObserveModalInput extends InputPolym<any> {
 
   public bindRemove = params => () => {
     this.setState({
-      dealDataSource: remove(
-        this.state.dealDataSource,
-        (item, index) => index === params.node.rowIndex
+      dealDataSource: this.computeDataSource(
+        remove(this.state.dealDataSource, (item, index) => index === params.node.rowIndex)
       ),
     });
   };
@@ -148,7 +147,7 @@ class ObserveModalInput extends InputPolym<any> {
             <SourceTable
               dataSource={this.state.dealDataSource}
               pagination={false}
-              rowKey="id"
+              rowKey="day"
               header={
                 <Row style={{ marginBottom: 10 }}>
                   <Form
