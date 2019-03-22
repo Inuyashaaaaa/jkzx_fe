@@ -107,7 +107,7 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
             <>
               <SourceTable
                 rowKey="uuid"
-                title="已关联投资组合"
+                title="已加入的投资组合"
                 dataSource={this.state.dataSource}
                 columnDefs={[
                   { headerName: '投资组合', field: 'portfolio' },
@@ -127,12 +127,12 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
                 searchable={true}
                 onSearchButtonClick={this.handleCreate}
                 searchButtonProps={{ icon: null }}
-                searchText={'新增'}
+                searchText={'加入'}
                 searchFormControls={[
                   {
                     field: 'create',
                     control: {
-                      label: '新增关联投资组合',
+                      label: '请选择投资组合',
                     },
                     input: {
                       type: 'select',
