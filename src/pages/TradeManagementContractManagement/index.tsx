@@ -169,12 +169,12 @@ class TradeManagementContractManagement extends PureComponent {
     if (_.isEmpty(data)) return;
 
     // @todo
-    const commonCounterPartyName = data.page[0] && data.page[0].positions[0].counterPartyName;
+    // const commonCounterPartyName = data.page[0] && data.page[0].positions[0].counterPartyName;
 
     const tableDataSource = data.page.map(item => {
       return {
         ...item,
-        commonCounterPartyName,
+        commonCounterPartyName: item.positions[0].counterPartyName,
       };
     });
 
