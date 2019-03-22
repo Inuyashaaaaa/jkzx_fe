@@ -382,7 +382,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       });
     }
 
-    if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
+    if (eventType === LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE) {
       this.$expirationModal.show(
         this.activeRowData,
         this.state.tableFormData,
