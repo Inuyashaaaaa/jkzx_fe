@@ -129,6 +129,7 @@ export const LCM_EVENT_TYPE_MAP = {
   CLOSED: 'CLOSED',
   UNWIND_PARTIAL: 'UNWIND_PARTIAL',
   OBSERVE: 'OBSERVE',
+  SNOW_BALL_EXERCISE: 'SNOW_BALL_EXERCISE',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
@@ -145,6 +146,7 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   CLOSED: '结束',
   UNWIND_PARTIAL: '部分平仓',
   OBSERVE: '观察',
+  SNOW_BALL_EXERCISE: '雪球到期行权',
 };
 
 export const FREQUENCY_TYPE_MAP = {
