@@ -930,7 +930,7 @@ export const RebateLow: IColDef = {
   rules: RULES_REQUIRED,
 };
 
-export const Frequency: IColDef = {
+export const ObservationStep: IColDef = {
   headerName: '观察频率',
   field: LEG_FIELD.OBSERVATION_STEP,
   editable: true,

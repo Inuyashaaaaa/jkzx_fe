@@ -507,6 +507,8 @@ export const allTryPricingLegTypes: ILegType[] = [
     ],
   ],
   [AutoCallSnowAnnual, AutoCallSnowAnnual.pricingColumnDefs],
+  [AsiaAnnual, AsiaAnnual.pricingColumnDefs],
+  [AsiaUnAnnual, AsiaUnAnnual.pricingColumnDefs],
   // [
   //   ConcavaAnnual,
   //   [
