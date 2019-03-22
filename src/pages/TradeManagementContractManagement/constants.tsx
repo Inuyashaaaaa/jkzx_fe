@@ -163,7 +163,7 @@ export const BOOKING_TABLE_COLUMN_DEFS2: IColumnDef[] = [
   },
 ];
 
-export const BOOKING_TABLE_COLUMN_DEFS: (bindCheckContract: any) => IColumnDef[] = (
+export const BOOKING_TABLE_COLUMN_DEFS: (bindCheckContract, onSearch) => IColumnDef[] = (
   bindCheckContract,
   onSearch
 ) => [

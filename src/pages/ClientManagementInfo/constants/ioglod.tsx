@@ -1,4 +1,8 @@
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import {
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
+  LCM_EVENT_TYPE_OPTIONS,
+} from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { IColumnDef } from '@/lib/components/_Table2';
 
@@ -473,30 +477,8 @@ export const UNCREATE_TABLE_COL_DEFS: IColumnDef[] = [
     headerName: '生命周期事件',
     field: 'lcmEventType',
     input: {
-      formatValue: value => {
-        switch (value) {
-          case 'OPEN':
-            return '开仓';
-          case 'UNWIND':
-            return '平仓';
-          case 'EXPIRATION':
-            return '到期';
-          case 'EXERCISE':
-            return '行权';
-          case 'KNOCK_OUT':
-            return '敲入';
-          case 'KNOCK_IN':
-            return '敲出';
-          case 'DIVIDEND':
-            return '分红';
-          case 'PAYMENT':
-            return '支付';
-          case 'UNWIND_PARTIAL':
-            return '部分平仓';
-          default:
-            break;
-        }
-      },
+      type: 'select',
+      options: LCM_EVENT_TYPE_OPTIONS,
     },
   },
   {

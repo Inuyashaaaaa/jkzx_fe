@@ -160,7 +160,7 @@ class FixingModal extends PureComponent<
       },
     });
     if (error) return;
-    message.success('行权成功');
+    message.success('观察价格更新成功');
     this.reload();
   };
 
