@@ -256,21 +256,6 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
-          {
-            headerName: '文档管理',
-            field: 'documentManagement',
-            editable: true,
-            input: {
-              type: 'checkbox',
-              formatValue(value) {
-                if (value) {
-                  return <Icon type="check" />;
-                }
-                return <Icon type="close" />;
-              },
-            },
-            width: 150,
-          },
         ],
       },
       {
@@ -417,7 +402,7 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             width: 150,
           },
           {
-            headerName: '场外期权业务交易报表',
+            headerName: '交易报表',
             field: 'tradingStatements',
             editable: true,
             input: {
@@ -432,7 +417,7 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             width: 150,
           },
           {
-            headerName: '场外期权业务资金明细报表',
+            headerName: '资金明细报表',
             field: 'fundsDetailedStatements',
             editable: true,
             input: {
@@ -447,7 +432,7 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             width: 150,
           },
           {
-            headerName: '场外期权业务客户资金汇总报表',
+            headerName: '客户资金汇总报表',
             field: 'customerFundsSummaryStatements',
             editable: true,
             input: {
@@ -674,6 +659,21 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
           {
             headerName: '交易簿管理',
             field: 'tradeBooks',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '文档模板管理',
+            field: 'documentManagement',
             editable: true,
             input: {
               type: 'checkbox',

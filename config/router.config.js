@@ -135,11 +135,6 @@ export default [
               name: 'clientInfo',
               component: './ClientManagementInfo/index',
             },
-            {
-              path: '/client-management/document-management',
-              name: 'documentManagement',
-              component: './ClientManagementDocument/index',
-            },
           ],
         },
         {
@@ -321,6 +316,11 @@ export default [
               path: '/system-settings/riskSettings',
               name: 'riskSettings',
               component: './SystemSettingsRiskSettings/index',
+            },
+            {
+              path: '/system-settings/document-management',
+              name: 'documentManagement',
+              component: './SystemSettingsDocumentManagement/index',
             },
           ],
         },
