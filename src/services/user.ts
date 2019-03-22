@@ -3,46 +3,49 @@ import { delay } from '@/lib/utils';
 import request from '@/lib/utils/request';
 import fetch from 'dva/fetch';
 
-// export const permissions = {
-//   notifications: false,
-//   pricing: true,
-//   pricingEnvironment: false,
-//   clientManagement: true,
-//   spotLadder: false,
-//   pnlAttribution: false,
-//   roles: true,
-//   userGuide: false,
-//   developmentGuide: false,
-//   intradayGreeks: true,
-//   intradayPnl: true,
-//   bookEdit: true,
-//   subjectStore: true,
-//   marketManagement: true,
-//   bankAccount: true,
-//   customSalesManage: true,
-//   userInfo: true,
-//   users: true,
-//   booking: true,
-//   contractManagement: true,
-//   volSurface: true,
-//   riskFreeCurve: true,
-//   dividendCurve: true,
-//   baseContractManagement: true,
-//   workflowSettings: true,
-//   processManagement: true,
-//   risk: true,
-//   eodPosition: true,
-//   eodRiskByUnderlyer: true,
-//   eodDailyPnlByUnderlyer: true,
-//   eodHistoricalPnlByUnderlyer: true,
-//   calendars: true,
-//   riskSettings: true,
-//   permissions: true,
-//   dashboard: true,
-//   department: true,
-//   resources: true,
-//   tradeBooks: true,
-// };
+export const permissions = {
+  notifications: false,
+  pricing: true,
+  pricingEnvironment: false,
+  clientManagement: true,
+  spotLadder: false,
+  pnlAttribution: false,
+  roles: true,
+  userGuide: false,
+  developmentGuide: false,
+  intradayGreeks: true,
+  intradayPnl: true,
+  bookEdit: true,
+  subjectStore: true,
+  marketManagement: true,
+  bankAccount: true,
+  customSalesManage: true,
+  userInfo: true,
+  users: true,
+  booking: true,
+  contractManagement: true,
+  volSurface: true,
+  riskFreeCurve: true,
+  dividendCurve: true,
+  baseContractManagement: true,
+  workflowSettings: true,
+  processManagement: true,
+  risk: true,
+  eodPosition: true,
+  eodRiskByUnderlyer: true,
+  eodDailyPnlByUnderlyer: true,
+  eodHistoricalPnlByUnderlyer: true,
+  tradingStatements: true,
+  fundsDetailedStatements: true,
+  customerFundsSummaryStatements: true,
+  calendars: true,
+  riskSettings: true,
+  permissions: true,
+  dashboard: true,
+  department: true,
+  resources: true,
+  tradeBooks: true,
+};
 
 /**
  * 登录
@@ -68,13 +71,6 @@ import fetch from 'dva/fetch';
  * }
  */
 export async function login(params) {
-  // return delay(2000, {
-  //   data: {
-  //     token: 'xxxxxxx',
-  //     roles: ['admin'],
-  //     permissions,
-  //   },
-  // });
   return request(`${HOST_TEST}auth-service/users/login`, {
     method: `POST`,
     body: params,
@@ -102,12 +98,6 @@ export async function logout() {
       token: 'xxxx',
     },
   };
-  // return delay(3000, {
-  //   error: false,
-  //   data: {
-  //     token: 'xxxx',
-  //   },
-  // });
 }
 
 export async function queryCaptcha(params) {

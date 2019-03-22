@@ -109,20 +109,20 @@ export const bookingTableFormControls: () => IFormControl[] = () => [
 ];
 
 export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = false) => {
+  if (
+    leg.type === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
+  ) {
+    return leg.getDefault(dataSourceItem, isPricing);
+  }
+
   const expirationDate = moment().add(DEFAULT_TERM, 'days');
   let nextDataSourceItem = {
     [LEG_FIELD.EXPIRATION_DATE]: expirationDate,
     [LEG_FIELD.SETTLEMENT_DATE]: expirationDate,
     ...dataSourceItem,
   };
-
-  if (
-    leg.type === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
-  ) {
-    return leg.getDefault(nextDataSourceItem, isPricing);
-  }
 
   if (
     leg.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
@@ -582,12 +582,12 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
     };
 
     if (
-      productType === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL ||
+      productType === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
       productType === LEG_TYPE_MAP.ASIAN_ANNUAL ||
       productType === LEG_TYPE_MAP.ASIAN_UNANNUAL
     ) {
       const Leg = LEG_MAP[productType];
-      return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource);
+      return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource, isPricing);
     }
 
     if (
@@ -1037,7 +1037,7 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
 
   const tableDataSource = positions.map(position => {
     if (
-      position.productType === LEG_TYPE_MAP.AUTO_CALL_SNOW ||
+      position.productType === LEG_TYPE_MAP.AUTOCALL ||
       position.productType === LEG_TYPE_MAP.ASIAN
     ) {
       const isAnnualized = position.asset.annualized;

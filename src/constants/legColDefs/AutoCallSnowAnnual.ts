@@ -48,8 +48,8 @@ import { pipeLeg } from './common/pipeLeg';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
 
 export const AutoCallSnowAnnual: ILegType = pipeLeg({
-  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL],
-  type: LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL,
+  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.AUTOCALL_ANNUAL],
+  type: LEG_TYPE_MAP.AUTOCALL_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
   pricingColumnDefs: [
@@ -107,7 +107,6 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       ...nextDataSourceItem,
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
@@ -115,10 +114,12 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
+      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
     };
   },
-  getPosition: (nextPosition, dataSourceItem, tableDataSource) => {
-    nextPosition.productType = LEG_TYPE_MAP.AUTO_CALL_SNOW;
+  getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
+    nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     nextPosition.asset = _.omit(dataSourceItem, [
@@ -144,8 +145,11 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
       nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-    nextPosition.asset.settlementDate =
-      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+
+    nextPosition.asset.settlementDate = isPricing
+      ? nextPosition.asset.expirationDate
+      : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+
     nextPosition.asset.annualized = true;
 
     return nextPosition;

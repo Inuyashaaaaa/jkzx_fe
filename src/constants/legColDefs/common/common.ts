@@ -6,6 +6,7 @@ import {
   mktInstrumentSearch,
   mktQuotesListPaged,
 } from '@/services/market-data-service';
+import { wrapMoment } from '@/utils';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
 import moment, { isMoment } from 'moment';
@@ -931,7 +932,7 @@ export const RebateLow: IColDef = {
 
 export const Frequency: IColDef = {
   headerName: '观察频率',
-  field: LEG_FIELD.OBSERVATION_DAY_STEP,
+  field: LEG_FIELD.OBSERVATION_STEP,
   editable: true,
   input: {
     type: 'select',
@@ -951,6 +952,28 @@ export const ObserveStartDay: IColDef = {
     range: 'day',
   },
   rules: RULES_REQUIRED,
+  // getValue: {
+  //   depends: [LEG_FIELD.EXPIRATION_DATE],
+  //   value: record => {
+  //     if (
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
+  //     ) {
+  //       const expirationDate = record[LEG_FIELD.EXPIRATION_DATE];
+  //       if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
+  //         return wrapMoment(expirationDate);
+  //       }
+  //       return record[LEG_FIELD.OBSERVE_START_DAY];
+  //     }
+
+  //     return {
+  //       depends: [],
+  //       value(data) {
+  //         return data[LEG_FIELD.OBSERVE_START_DAY];
+  //       },
+  //     };
+  //   },
+  // },
 };
 
 export const ObserveEndDay: IColDef = {
@@ -963,6 +986,28 @@ export const ObserveEndDay: IColDef = {
     range: 'day',
   },
   rules: RULES_REQUIRED,
+  // getValue: {
+  //   depends: [LEG_FIELD.SETTLEMENT_DATE],
+  //   value: record => {
+  //     if (
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
+  //     ) {
+  //       const settlemenetDate = record[LEG_FIELD.SETTLEMENT_DATE];
+  //       if (record[LEG_FIELD.SETTLEMENT_DATE] !== undefined) {
+  //         return wrapMoment(settlemenetDate);
+  //       }
+  //       return record[LEG_FIELD.OBSERVE_END_DAY];
+  //     }
+
+  //     return {
+  //       depends: [],
+  //       value(data) {
+  //         return data[LEG_FIELD.OBSERVE_END_DAY];
+  //       },
+  //     };
+  //   },
+  // },
 };
 
 export const Holidays: IColDef = {
@@ -1152,7 +1197,7 @@ export const SpecifiedPrice: IColDef = {
     if (
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL
+      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL
     ) {
       return {
         defaultOpen: true,
@@ -1257,7 +1302,7 @@ export const NotionalAmount: IColDef = {
 
 export const NotionalAmountType: IColDef = {
   editable: params => {
-    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
       return false;
     }
     return true;
@@ -1280,7 +1325,7 @@ export const NotionalAmountType: IColDef = {
   },
   rules: RULES_REQUIRED,
   getValue: params => {
-    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTO_CALL_SNOW_ANNUAL) {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
       return {
         depends: [],
         value(data) {
@@ -1767,7 +1812,7 @@ export const PricingExpirationDate = {
       return {
         depends: [LEG_FIELD.TERM],
         value(record) {
-          return moment().add(record[LEG_FIELD[LEG_FIELD.TERM]], 'days');
+          return moment().add(record[LEG_FIELD.TERM], 'days');
         },
       };
     }

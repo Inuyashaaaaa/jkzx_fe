@@ -160,3 +160,13 @@ export async function trdPortfolioUpdate(params = {}) {
     },
   });
 }
+
+export async function tradeExercisePreSettle(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'tradeExercisePreSettle',
+      params,
+    },
+  });
+}

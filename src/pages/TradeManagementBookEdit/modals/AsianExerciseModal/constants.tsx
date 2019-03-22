@@ -1,11 +1,7 @@
 import { INPUT_NUMBER_CURRENCY_CNY_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
-import { Button } from 'antd';
-import React from 'react';
 
-export const EXERCISE_FORM_CONTROLS: (
-  handleSettleAmount
-) => IFormControl[] = handleSettleAmount => [
+export const EXERCISE_FORM_CONTROLS: IFormControl[] = [
   {
     field: 'NUM_OF_OPTIONS',
     control: {
@@ -31,7 +27,7 @@ export const EXERCISE_FORM_CONTROLS: (
       rules: [
         {
           required: true,
-          message: '名义金额为必填项',
+          message: '期权数量 (手)为必填项',
         },
       ],
     },
@@ -46,7 +42,7 @@ export const EXERCISE_FORM_CONTROLS: (
       rules: [
         {
           required: true,
-          message: '标的物结算价格为必填项',
+          message: '期权数量 (手)为必填项',
         },
       ],
     },
@@ -56,19 +52,12 @@ export const EXERCISE_FORM_CONTROLS: (
     control: {
       label: '结算金额',
     },
-    input: {
-      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-      after: (
-        <Button key="upload" type="primary" onClick={handleSettleAmount}>
-          结算
-        </Button>
-      ),
-    },
+    input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG },
     decorator: {
       rules: [
         {
           required: true,
-          message: '结算金额为必填项',
+          message: '期权数量 (手)为必填项',
         },
       ],
     },
