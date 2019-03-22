@@ -103,7 +103,6 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
     ExpireNoBarrierObserveDay,
   ],
   getDefault: (nextDataSourceItem, isPricing) => {
-    const nextDay = moment().add(DEFAULT_TERM, 'days');
     return {
       ...nextDataSourceItem,
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
@@ -115,8 +114,8 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
-      [LEG_FIELD.EXPIRATION_DATE]: nextDay,
-      [LEG_FIELD.SETTLEMENT_DATE]: nextDay,
+      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {

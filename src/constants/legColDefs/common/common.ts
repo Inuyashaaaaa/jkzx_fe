@@ -6,6 +6,7 @@ import {
   mktInstrumentSearch,
   mktQuotesListPaged,
 } from '@/services/market-data-service';
+import { wrapMoment } from '@/utils';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
 import moment, { isMoment } from 'moment';
@@ -951,6 +952,28 @@ export const ObserveStartDay: IColDef = {
     range: 'day',
   },
   rules: RULES_REQUIRED,
+  // getValue: {
+  //   depends: [LEG_FIELD.EXPIRATION_DATE],
+  //   value: record => {
+  //     if (
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
+  //     ) {
+  //       const expirationDate = record[LEG_FIELD.EXPIRATION_DATE];
+  //       if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
+  //         return wrapMoment(expirationDate);
+  //       }
+  //       return record[LEG_FIELD.OBSERVE_START_DAY];
+  //     }
+
+  //     return {
+  //       depends: [],
+  //       value(data) {
+  //         return data[LEG_FIELD.OBSERVE_START_DAY];
+  //       },
+  //     };
+  //   },
+  // },
 };
 
 export const ObserveEndDay: IColDef = {
@@ -963,6 +986,28 @@ export const ObserveEndDay: IColDef = {
     range: 'day',
   },
   rules: RULES_REQUIRED,
+  // getValue: {
+  //   depends: [LEG_FIELD.SETTLEMENT_DATE],
+  //   value: record => {
+  //     if (
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+  //       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
+  //     ) {
+  //       const settlemenetDate = record[LEG_FIELD.SETTLEMENT_DATE];
+  //       if (record[LEG_FIELD.SETTLEMENT_DATE] !== undefined) {
+  //         return wrapMoment(settlemenetDate);
+  //       }
+  //       return record[LEG_FIELD.OBSERVE_END_DAY];
+  //     }
+
+  //     return {
+  //       depends: [],
+  //       value(data) {
+  //         return data[LEG_FIELD.OBSERVE_END_DAY];
+  //       },
+  //     };
+  //   },
+  // },
 };
 
 export const Holidays: IColDef = {
