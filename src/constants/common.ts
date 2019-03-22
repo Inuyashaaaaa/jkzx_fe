@@ -354,22 +354,16 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  * 多腿字段名
  */
 export const LEG_FIELD = {
-  /* 观察日 */
-  OBSERVATION_DATES: 'OBSERVATION_DATES',
-  /* 观察频率 */
-  OBSERVATION_STEP: 'observationStep',
+  OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日
+  OBSERVATION_STEP: 'observationStep', // 观察频率
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',
   AUTO_CALL_STRIKE: 'autoCallStrike',
   AUTO_CALL_STRIKE_UNIT: 'autoCallStrikeUnit',
-  /* 收益/coupon(%) */
-  COUPON_PAYMENT: 'couponPayment',
-  /* 敲出/coupon观察日 */
-  EXPIRE_NO_BARRIEROBSERVE_DAY: 'observationDates',
-  /* 到期未敲出收益类型 */
-  EXPIRE_NOBARRIER_PREMIUM_TYPE: 'autoCallPaymentType',
-  /* 到期未敲出固定收益 */
-  EXPIRE_NOBARRIERPREMIUM: 'fixedPayment',
+  COUPON_PAYMENT: 'couponPayment', // 收益/coupon(%)
+  EXPIRE_NO_BARRIEROBSERVE_DAY: 'observationDates', // 敲出/coupon观察日
+  EXPIRE_NOBARRIER_PREMIUM_TYPE: 'autoCallPaymentType', // 到期未敲出收益类型
+  EXPIRE_NOBARRIERPREMIUM: 'fixedPayment', // 到期未敲出固定收益
   STEP: 'step',
   UP_BARRIER: 'upBarrier',
   UP_BARRIER_TYPE: 'upBarrierType',
