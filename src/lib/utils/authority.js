@@ -32,7 +32,6 @@ export function setPermissions(permissions) {
     PERMISSIONS_LOCAL_FIELD,
     JSON.stringify({
       ...permissions,
-      portfolioManagement: true,
     })
   );
 }

@@ -31,6 +31,7 @@ import {
   SpecifiedPrice,
   Strike,
   StrikeType,
+  Term,
   UnderlyerInstrumentId,
   UnderlyerMultiplier,
 } from './common/common';
@@ -70,6 +71,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
       [ParticipationRate.field]: 100,
       [StrikeType.field]: STRIKE_TYPES_MAP.PERCENT,
       [Strike.field]: 100,
+      [Term.field]: DEFAULT_TERM,
       [SpecifiedPrice.field]: SPECIFIED_PRICE_MAP.CLOSE,
       [EffectiveDate.field]: moment(),
       [ExpirationDate.field]: moment(),
