@@ -71,6 +71,8 @@ const pagesCollection = [
   'userGuide',
   'developmentGuide',
   'approvalProcessManagement',
+  'customReport',
+  'portfolioManagement',
 ];
 
 function handlePages(data, result1, result2) {

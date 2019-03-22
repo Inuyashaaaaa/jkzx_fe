@@ -156,6 +156,21 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+          {
+            headerName: '投资组合管理',
+            field: 'portfolioManagement',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
         ],
       },
       {
@@ -499,6 +514,21 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
           {
             headerName: '到期合约',
             field: 'intradayExpiringPositionReport',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '定制化报告',
+            field: 'customReport',
             editable: true,
             input: {
               type: 'checkbox',
