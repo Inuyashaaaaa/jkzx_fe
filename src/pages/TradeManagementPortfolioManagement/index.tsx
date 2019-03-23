@@ -47,8 +47,6 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
       loading: true,
     });
     const { error, data } = await trdPortfolioSearch({
-      //   page: (paramsPagination || this.state.pagination).current - 1,
-      //   pageSize: (paramsPagination || this.state.pagination).pageSize,
       portfolioName: this.state.searchFormData.portfolioName
         ? this.state.searchFormData.portfolioName
         : '',
