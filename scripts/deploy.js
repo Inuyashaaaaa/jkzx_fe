@@ -3,9 +3,9 @@ const shell = require('shelljs');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 
-const TEST_CONTAINER = 'zz-FE-test';
-const PROD_CONTAINER = 'zz-FE-release';
-const DOC_CONTAINER = 'zz-FE-doc';
+const TEST_CONTAINER = 'FE-test';
+const PROD_CONTAINER = 'FE-release';
+const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 
 const exists = (src, dst) => {
