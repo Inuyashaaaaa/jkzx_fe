@@ -148,7 +148,7 @@ numeral.register('format', 'ss', {
 });
 
 if (window) {
-  window.$version = '0.0.1';
+  window.$version = '2019年03月23日';
 }
 
 // // Notify user if offline now
