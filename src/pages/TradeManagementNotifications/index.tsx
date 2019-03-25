@@ -134,7 +134,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
             resetable={true}
             onSearchButtonClick={this.onFetch}
             onResetButtonClick={this.onReset}
-            rowKey="uuid"
+            rowKey="notificationUUID"
             ref={node => (this.$sourceTable = node)}
             searchFormData={this.state.searchFormData}
             onSearchFormChange={this.onSearchFormChange}
