@@ -104,14 +104,14 @@ export const EVENT_TYPE_MAP = {
   EXPIRATION: 'EXPIRATION',
   KNOCK_OUT: 'KNOCK_OUT',
   PAYMENT: 'PAYMENT',
-  OBSERVATION: 'OBSERVATION',
+  OBSERVE: 'OBSERVE',
 };
 
 export const EVENT_TYPE_ZHCN_MAP = {
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
   PAYMENT: '支付',
-  OBSERVATION: '观察',
+  OBSERVE: '观察',
 };
 
 export const EVENT_TYPE_OPTIONS = convertOptions(EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP);
