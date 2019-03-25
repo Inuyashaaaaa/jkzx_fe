@@ -3,6 +3,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
@@ -208,11 +210,16 @@ class FixingModal extends PureComponent<
                   type: 'date',
                 },
               },
-              {
-                headerName: '权重',
-                field: 'weight',
-                input: INPUT_NUMBER_DIGITAL_CONFIG,
-              },
+              ...(this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+              this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+                ? []
+                : [
+                    {
+                      headerName: '权重',
+                      field: 'weight',
+                      input: INPUT_NUMBER_DIGITAL_CONFIG,
+                    },
+                  ]),
               {
                 headerName: '已观察到价格(可编辑)',
                 field: 'price',

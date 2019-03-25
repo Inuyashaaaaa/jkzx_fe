@@ -112,7 +112,9 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
   if (
     leg.type === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
     leg.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
+    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
   ) {
     return leg.getDefault(dataSourceItem, isPricing);
   }
@@ -505,34 +507,6 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
     };
   } else if (
-    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
-  ) {
-    nextDataSourceItem = {
-      ...nextDataSourceItem,
-      // expirationTime: '15:00:00',
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: leg.isAnnualized
-        ? NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(leg.isAnnualized
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-            [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-          }
-        : undefined),
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
-      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-    };
-  } else if (
     leg.type === LEG_TYPE_MAP.STRADDLE_ANNUAL ||
     leg.type === LEG_TYPE_MAP.STRADDLE_UNANNUAL
   ) {
@@ -584,7 +558,9 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
     if (
       productType === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
       productType === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-      productType === LEG_TYPE_MAP.ASIAN_UNANNUAL
+      productType === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
     ) {
       const Leg = LEG_MAP[productType];
       return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource, isPricing);
@@ -959,25 +935,6 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
     }
 
     if (
-      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
-    ) {
-      const COMPUTED_FIELDS = [];
-
-      nextPosition.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;
-      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
-      nextPosition.asset.effectiveDate =
-        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
-      nextPosition.asset.expirationDate =
-        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-      nextPosition.asset.settlementDate =
-        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
-
-      nextPosition.asset.annualized =
-        productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ? true : false;
-    }
-
-    if (
       productType === LEG_TYPE_MAP.STRADDLE_ANNUAL ||
       productType === LEG_TYPE_MAP.STRADDLE_UNANNUAL
     ) {
@@ -1038,7 +995,8 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
   const tableDataSource = positions.map(position => {
     if (
       position.productType === LEG_TYPE_MAP.AUTOCALL ||
-      position.productType === LEG_TYPE_MAP.ASIAN
+      position.productType === LEG_TYPE_MAP.ASIAN ||
+      position.productType === LEG_TYPE_MAP.RANGE_ACCRUALS
     ) {
       const isAnnualized = position.asset.annualized;
       const Leg = LEG_MAP[`${position.productType}_${isAnnualized ? 'ANNUAL' : 'UNANNUAL'}`];
@@ -1276,21 +1234,6 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
           return LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL;
         } else {
           return LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL;
-        }
-      }
-    } else if (productType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
-      nextPosition = {
-        ...nextPosition,
-        productType: getNoTouchTypeByAnnualized(position.asset.annualized),
-      };
-
-      nextPosition = backConvertPercent(nextPosition);
-
-      function getNoTouchTypeByAnnualized(isAnnualized) {
-        if (isAnnualized) {
-          return LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL;
-        } else {
-          return LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL;
         }
       }
     } else if (productType === LEG_TYPE_MAP.STRADDLE) {

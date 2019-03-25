@@ -24,13 +24,13 @@ export const getCanUsedTranorsOtionsNotIncludingSelf = (tableDataSource: Array<{
 };
 
 export function convertObservetions(nextDataSourceItem) {
-  const days = Object.keys(nextDataSourceItem.fixingWeights);
+  const days = Object.keys(nextDataSourceItem.fixingObservations);
   if (!days.length) return [];
   return days.map(day => {
     return {
       day,
-      weight: nextDataSourceItem.fixingWeights[day],
-      price: nextDataSourceItem.fixingObservations[day],
+      weight: nextDataSourceItem.fixingWeights && nextDataSourceItem.fixingWeights[day],
+      price: nextDataSourceItem.fixingObservations && nextDataSourceItem.fixingObservations[day],
     };
   });
 }

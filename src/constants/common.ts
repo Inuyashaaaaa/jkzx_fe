@@ -580,13 +580,12 @@ export const PRODUCT_TYPE_MAP = {
   ...LEG_TYPE_MAP,
 };
 
-export const PRODUCT_TYPE_ZHCN_MAP = {
+export const LEG_TYPE_ZHCH_MAP = {
   ASIA: '亚式',
   [LEG_TYPE_MAP.ASIAN_ANNUAL]: '亚式 - 年化',
   [LEG_TYPE_MAP.ASIAN_UNANNUAL]: '亚式 - 非年化',
   [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
   [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: 'AutoCall - 雪球式 - 年化',
-  CASH: '现金',
   GENERIC_SINGLE_ASSET_OPTION: '其他单资产期权',
   VANILLA_EUROPEAN: '香草欧式',
   VANILLA_EUROPEAN_ANNUAL: '欧式年化',
@@ -637,12 +636,12 @@ export const PRODUCT_TYPE_ZHCN_MAP = {
   TRIPLE_DIGITAL: '四层阶梯',
   TRIPLE_DIGITAL_ANNUAL: '四层阶梯年化',
   TRIPLE_DIGITAL_UNANNUAL: '四层阶梯非年化',
-  RANGE_ACCRUALS: '区间积累',
-  RANGE_ACCRUALS_ANNUAL: '区间积累年化',
-  RANGE_ACCRUALS_UNANNUAL: '区间积累非年化',
+  [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间积累',
+  [LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL]: '区间积累 - 年化',
+  [LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL]: '区间积累 - 非年化',
   STRADDLE: '跨式',
   STRADDLE_ANNUAL: '跨式年化',
   STRADDLE_UNANNUAL: '跨式非年化',
 };
 
-export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, PRODUCT_TYPE_ZHCN_MAP);
+export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, LEG_TYPE_ZHCH_MAP);
