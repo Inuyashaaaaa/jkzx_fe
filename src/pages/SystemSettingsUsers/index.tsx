@@ -441,7 +441,7 @@ class SystemSettingsUsers extends PureComponent {
         修改用户
       </Button>,
       <Button key="resource" type="primary" onClick={async () => this.showResources(rowData)}>
-        资源权限
+        数据权限
       </Button>,
     ];
   };
@@ -518,7 +518,7 @@ class SystemSettingsUsers extends PureComponent {
               }}
             >
               <h2>
-                用户：<span style={{ color: '#08c' }}>{choosedUser.username}</span> 资源权限列表
+                用户：<span style={{ color: '#08c' }}>{choosedUser.username}</span> 数据权限列表
               </h2>
               <Button type="primary" onClick={this.hideResource}>
                 返回用户列表

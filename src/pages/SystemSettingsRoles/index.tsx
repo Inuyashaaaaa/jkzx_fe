@@ -179,7 +179,7 @@ class SystemSettingsPermissions extends PureComponent {
     const { rowData } = event;
     return [
       <Button key="resource" type="primary" onClick={() => this.showResources(rowData)}>
-        资源权限
+        数据权限
       </Button>,
     ];
   };
@@ -256,7 +256,7 @@ class SystemSettingsPermissions extends PureComponent {
               }}
             >
               <h2>
-                角色：<span style={{ color: '#08c' }}>{choosedRole.roleName}</span> 资源权限列表
+                角色：<span style={{ color: '#08c' }}>{choosedRole.roleName}</span> 数据权限列表
               </h2>
               <Button type="primary" onClick={this.hideResource}>
                 返回角色列表
