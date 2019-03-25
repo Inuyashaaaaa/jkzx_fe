@@ -15,7 +15,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { countAvg } from '../../utils';
+import { countAvg, filterObDays } from '../../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
@@ -56,7 +56,7 @@ class FixingModal extends PureComponent<
 
     this.setState(
       {
-        tableData: this.filterObDays(convertObservetions(data)),
+        tableData: filterObDays(convertObservetions(data)),
         visible: true,
       },
       () => {
@@ -130,12 +130,6 @@ class FixingModal extends PureComponent<
     }
 
     return false;
-  };
-
-  public filterObDays = tableData => {
-    return tableData.filter(item => {
-      return getMoment(item.day).valueOf() <= moment().valueOf();
-    });
   };
 
   public countAvg = () => {
