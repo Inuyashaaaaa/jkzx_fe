@@ -7,10 +7,10 @@ import {
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
+  LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
-  PRODUCT_TYPE_ZHCN_MAP,
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
   UP_BARRIER_TYPE_MAP,
@@ -50,7 +50,7 @@ import { pipeLeg } from './common/pipeLeg';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
 
 export const AutoCallSnowAnnual: ILegType = pipeLeg({
-  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.AUTOCALL_ANNUAL],
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_ANNUAL],
   type: LEG_TYPE_MAP.AUTOCALL_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
