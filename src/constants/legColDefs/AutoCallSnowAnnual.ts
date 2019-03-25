@@ -8,9 +8,11 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   PRODUCT_TYPE_ZHCN_MAP,
   SPECIFIED_PRICE_MAP,
+  STRIKE_TYPES_MAP,
   UP_BARRIER_TYPE_MAP,
 } from '../common';
 import {
@@ -116,6 +118,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
