@@ -24,7 +24,11 @@ export default class CommmonTree extends PureComponent {
     if (titleAddtionalFunc) {
       const additionalTitle = titleAddtionalFunc(data);
       if (additionalTitle) {
-        displayPropertyName = `${displayPropertyName} (${additionalTitle})`;
+        if (additionalTitle === '资源组') {
+          displayPropertyName = `${displayPropertyName}`;
+        } else {
+          displayPropertyName = `${displayPropertyName} (${additionalTitle})`;
+        }
       }
     }
     // backgroundColor: '#C6E2FF'
