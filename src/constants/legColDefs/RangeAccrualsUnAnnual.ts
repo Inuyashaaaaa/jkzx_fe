@@ -9,6 +9,7 @@ import {
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  OB_DAY_FIELD,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
@@ -31,6 +32,8 @@ import {
   PaymentType,
   Premium,
   PremiumType,
+  PricingExpirationDate,
+  PricingTerm,
   SettlementDate,
   SpecifiedPrice,
   Term,
@@ -44,7 +47,26 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
   type: LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: false,
-  pricingColumnDefs: [],
+  pricingColumnDefs: [
+    Direction,
+    UnderlyerMultiplier,
+    UnderlyerInstrumentId,
+    InitialSpot,
+    PricingTerm,
+    DaysInYear,
+    ParticipationRate,
+    NotionalAmount,
+    NotionalAmountType,
+    EffectiveDate,
+    PricingExpirationDate,
+    PaymentType,
+    PremiumType,
+    Payment,
+    BarrierType,
+    HighBarrier,
+    LowBarrier,
+    ObservationDates,
+  ],
   columnDefs: [
     Direction,
     UnderlyerMultiplier,
@@ -78,12 +100,11 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
       [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
+      [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
+      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      ...(isPricing ? {} : {}),
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
@@ -99,7 +120,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item.day] = item.price || null;
+        result[item[OB_DAY_FIELD]] = item.price || null;
         return result;
       },
       {}

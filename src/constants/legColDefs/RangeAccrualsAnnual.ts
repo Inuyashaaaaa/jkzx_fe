@@ -9,6 +9,7 @@ import {
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  OB_DAY_FIELD,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
@@ -33,6 +34,8 @@ import {
   PaymentType,
   Premium,
   PremiumType,
+  PricingExpirationDate,
+  PricingTerm,
   SettlementDate,
   SpecifiedPrice,
   Term,
@@ -46,7 +49,26 @@ export const RangeAccrualsAnnual: ILegType = pipeLeg({
   type: LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
-  pricingColumnDefs: [],
+  pricingColumnDefs: [
+    Direction,
+    UnderlyerMultiplier,
+    UnderlyerInstrumentId,
+    InitialSpot,
+    PricingTerm,
+    DaysInYear,
+    ParticipationRate,
+    NotionalAmount,
+    NotionalAmountType,
+    EffectiveDate,
+    PricingExpirationDate,
+    PaymentType,
+    PremiumType,
+    Payment,
+    BarrierType,
+    HighBarrier,
+    LowBarrier,
+    ObservationDates,
+  ],
   columnDefs: [
     Direction,
     UnderlyerMultiplier,
@@ -75,6 +97,9 @@ export const RangeAccrualsAnnual: ILegType = pipeLeg({
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
       ...nextDataSourceItem,
+      // expirationTime: '15:00:00',
+      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
@@ -103,7 +128,7 @@ export const RangeAccrualsAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item.day] = item.price || null;
+        result[item[OB_DAY_FIELD]] = item.price || null;
         return result;
       },
       {}

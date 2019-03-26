@@ -5,7 +5,7 @@ import {
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  UP_BARRIER_TYPE_MAP,
+  OB_DAY_FIELD,
 } from '@/constants/common';
 import Form from '@/design/components/Form';
 import { InputPolym } from '@/design/components/Form/Input/InputPolym';
@@ -19,8 +19,6 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React from 'react';
-
-const OB_DAY_FIELD = 'obDay';
 
 class AsiaObserveModalInput extends InputPolym<any> {
   public state = {
@@ -38,7 +36,8 @@ class AsiaObserveModalInput extends InputPolym<any> {
     this.state.dealDataSource = this.computeDataSource(
       (props.value || []).map((item, index) => {
         return {
-          [OB_DAY_FIELD]: moment(item),
+          ...item,
+          [OB_DAY_FIELD]: moment(item[OB_DAY_FIELD]),
         };
       })
     );
@@ -59,7 +58,9 @@ class AsiaObserveModalInput extends InputPolym<any> {
   };
 
   public formatValue = (value): string => {
-    return value && value.length ? [value[0].day, value[value.length - 1].day].join(' ~ ') : '';
+    return value && value.length
+      ? [value[0][OB_DAY_FIELD], value[value.length - 1][OB_DAY_FIELD]].join(' ~ ')
+      : '';
   };
 
   public formatChangeEvent = event => {
@@ -89,7 +90,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
           this.state.dealDataSource.map(item => {
             return {
               ...item,
-              day: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
+              [OB_DAY_FIELD]: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
             };
           })
         );

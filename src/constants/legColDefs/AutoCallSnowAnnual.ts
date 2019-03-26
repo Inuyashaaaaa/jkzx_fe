@@ -12,7 +12,6 @@ import {
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
-  STRIKE_TYPES_MAP,
   UP_BARRIER_TYPE_MAP,
 } from '../common';
 import {

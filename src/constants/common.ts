@@ -1,6 +1,8 @@
 import { AllInputProps } from '@/lib/components/_Form2/Input';
 import { convertOptions } from '@/utils';
 
+export const OB_DAY_FIELD = 'obDay';
+
 export const BOOK_NAME_FIELD = 'bookName';
 
 export const TRADE_ID_FIELD = 'tradeId';
@@ -612,9 +614,9 @@ export const LEG_TYPE_ZHCH_MAP = {
   BARRIER: '单鲨',
   BARRIER_ANNUAL: '单鲨年化',
   BARRIER_UNANNUAL: '单鲨非年化',
-  DOUBLE_SHARK_FIN: '双鲨',
-  DOUBLE_SHARK_FIN_ANNUAL: '双鲨年化',
-  DOUBLE_SHARK_FIN_UNANNUAL: '双鲨非年化',
+  [LEG_TYPE_MAP.DOUBLE_SHARK_FIN]: '双鲨',
+  [LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL]: '双鲨 - 年化',
+  [LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL]: '双鲨 - 非年化',
   EAGLE: '鹰式',
   EAGLE_ANNUAL: '鹰式年化',
   EAGLE_UNANNUAL: '鹰式非年化',
@@ -624,18 +626,18 @@ export const LEG_TYPE_ZHCH_MAP = {
   DOUBLE_NO_TOUCH: '美式双不触碰',
   DOUBLE_NO_TOUCH_ANNUAL: '美式双不触碰年化',
   DOUBLE_NO_TOUCH_UNANNUAL: '美式双不触碰非年化',
-  CONCAVA: '二元凹式',
-  CONCAVA_ANNUAL: '二元凹式年化',
-  CONCAVA_UNANNUAL: '二元凹式非年化',
-  CONVEX: '二元凸式',
-  CONVEX_ANNUAL: '二元凸式年化',
-  CONVEX_UNANNUAL: '二元凸式非年化',
-  DOUBLE_DIGITAL: '三层阶梯',
-  DOUBLE_DIGITAL_ANNUAL: '三层阶梯年化',
-  DOUBLE_DIGITAL_UNANNUAL: '三层阶梯非年化',
-  TRIPLE_DIGITAL: '四层阶梯',
-  TRIPLE_DIGITAL_ANNUAL: '四层阶梯年化',
-  TRIPLE_DIGITAL_UNANNUAL: '四层阶梯非年化',
+  [LEG_TYPE_MAP.CONCAVA]: '二元凹式',
+  [LEG_TYPE_MAP.CONCAVA_ANNUAL]: '二元凹式 - 年化',
+  [LEG_TYPE_MAP.CONCAVA_UNANNUAL]: '二元凹式 - 非年化',
+  [LEG_TYPE_MAP.CONVEX]: '二元凸式',
+  [LEG_TYPE_MAP.CONVEX_ANNUAL]: '二元凸式 - 年化',
+  [LEG_TYPE_MAP.CONVEX_UNANNUAL]: '二元凸式 - 非年化',
+  [LEG_TYPE_MAP.DOUBLE_DIGITAL]: '三层阶梯',
+  [LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL]: '三层阶梯 - 年化',
+  [LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL]: '三层阶梯 - 非年化',
+  [LEG_TYPE_MAP.TRIPLE_DIGITAL]: '四层阶梯',
+  [LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL]: '四层阶梯 - 年化',
+  [LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL]: '四层阶梯 - 非年化',
   [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间积累',
   [LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL]: '区间积累 - 年化',
   [LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL]: '区间积累 - 非年化',

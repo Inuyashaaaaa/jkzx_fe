@@ -38,7 +38,20 @@ export default class MultilLegCreateButton extends PureComponent<{
             item.type === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_UNANNUAL ||
             item.type === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
             item.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-            item.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
+            item.type === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+            // ---
+            item.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
+            item.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
+            item.type === LEG_TYPE_MAP.CONCAVA_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.CONVEX_ANNUAL ||
+            item.type === LEG_TYPE_MAP.CONVEX_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
+            item.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
+            item.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL ||
+            item.type === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+            item.type === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
         )
       : allLegTypes;
     return [
