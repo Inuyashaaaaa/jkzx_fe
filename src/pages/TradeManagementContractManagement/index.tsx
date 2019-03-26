@@ -149,7 +149,6 @@ class TradeManagementContractManagement extends PureComponent {
 
   public onTradeTableSearch = async (paramsPagination?) => {
     const { searchFormData, pagination } = this.state;
-
     const formatValues = _.mapValues(searchFormData, (val, key) => {
       if (isMoment(val)) {
         return val.format('YYYY-MM-DD');

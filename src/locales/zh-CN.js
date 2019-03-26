@@ -54,6 +54,7 @@ export default {
   'menu.tradeManagement.subjectStore': '标的物管理',
   'menu.tradeManagement.onBoardTransaction': '场内交易管理',
   'menu.tradeManagement.portfolioManagement': '投资组合管理',
+  'menu.tradeManagement.tradeDocuments': '交易文档',
   'menu.workflowManagement': '审核',
   'menu.workflowManagement.workflowSettings': '审核配置',
   'menu.workflowManagement.processManagement': '任务管理',
