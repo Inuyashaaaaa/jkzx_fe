@@ -1,12 +1,12 @@
 import { BOOK_NAME_FIELD } from '@/constants/common';
 import SourceTable from '@/design/components/SourceTable';
-import { trdTradeListByBook, trdTradeSearchPaged, trdBookList } from '@/services/general-service';
+import { trdBookList, trdTradeListByBook, trdTradeSearchPaged } from '@/services/general-service';
 import { refSalesGetByLegalName } from '@/services/reference-data-service';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
-import { bookingSearchFormControls, BOOKING_TABLE_COLUMN_DEFS } from '../constants';
+import { BOOKING_TABLE_COLUMN_DEFS, bookingSearchFormControls } from '../constants';
 
 const ROW_KEY = 'tradeId';
 
@@ -157,7 +157,7 @@ class CommonModel extends PureComponent {
     });
   };
 
-  render() {
+  public render() {
     return (
       <SourceTable
         searchable={true}
