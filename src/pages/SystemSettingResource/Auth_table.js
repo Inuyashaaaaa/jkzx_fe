@@ -164,7 +164,7 @@ export default class AuthTable extends Component {
     const typeNames = ['资源组', '资源组', '投资组合', '交易簿'];
     let typeDescription = '';
     const index = types.indexOf(data.resourceType.toUpperCase());
-    if (index > -1) {
+    if (index > 1) {
       typeDescription = ` （${typeNames[index]}）`;
     }
     const { currentLogin, changed, authorities, loading } = this.state;

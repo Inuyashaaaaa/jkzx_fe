@@ -253,11 +253,11 @@ export default [
               name: 'customReport',
               component: './RiskManagerCustomReport/index',
             },
-            // {
-            //   path: '/risk-manager/intraday-expiring-position-report',
-            //   name: 'intradayExpiringPositionReport',
-            //   component: './RiskManagerIntradayExpiringPositionReport/index',
-            // },
+            {
+              path: '/risk-manager/intraday-expiring-position-report',
+              name: 'intradayExpiringPositionReport',
+              component: './RiskManagerIntradayExpiringPositionReport/index',
+            },
           ],
         },
         {

@@ -20,7 +20,7 @@ export default {
   'menu.systemSettings.roles': '角色管理',
   'menu.systemSettings.users': '用户管理',
   'menu.systemSettings.department': '部门管理',
-  'menu.systemSettings.resources': '资源管理',
+  'menu.systemSettings.resources': '数据权限管理',
   'menu.systemSettings.tradeBooks': '交易簿管理',
   'menu.systemSettings.volatilityCalendar': '波动率日历管理',
   'menu.systemSettings.documentManagement': '文档模板管理',

@@ -1,6 +1,8 @@
 import { AllInputProps } from '@/lib/components/_Form2/Input';
 import { convertOptions } from '@/utils';
 
+export const OB_DAY_FIELD = 'obDay';
+
 export const BOOK_NAME_FIELD = 'bookName';
 
 export const TRADE_ID_FIELD = 'tradeId';
@@ -104,14 +106,14 @@ export const EVENT_TYPE_MAP = {
   EXPIRATION: 'EXPIRATION',
   KNOCK_OUT: 'KNOCK_OUT',
   PAYMENT: 'PAYMENT',
-  OBSERVATION: 'OBSERVATION',
+  OBSERVE: 'OBSERVE',
 };
 
 export const EVENT_TYPE_ZHCN_MAP = {
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
   PAYMENT: '支付',
-  OBSERVATION: '观察',
+  OBSERVE: '观察',
 };
 
 export const EVENT_TYPE_OPTIONS = convertOptions(EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP);
@@ -580,13 +582,12 @@ export const PRODUCT_TYPE_MAP = {
   ...LEG_TYPE_MAP,
 };
 
-export const PRODUCT_TYPE_ZHCN_MAP = {
+export const LEG_TYPE_ZHCH_MAP = {
   ASIA: '亚式',
   [LEG_TYPE_MAP.ASIAN_ANNUAL]: '亚式 - 年化',
   [LEG_TYPE_MAP.ASIAN_UNANNUAL]: '亚式 - 非年化',
   [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
   [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: 'AutoCall - 雪球式 - 年化',
-  CASH: '现金',
   GENERIC_SINGLE_ASSET_OPTION: '其他单资产期权',
   VANILLA_EUROPEAN: '香草欧式',
   VANILLA_EUROPEAN_ANNUAL: '欧式年化',
@@ -645,4 +646,4 @@ export const PRODUCT_TYPE_ZHCN_MAP = {
   STRADDLE_UNANNUAL: '跨式非年化',
 };
 
-export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, PRODUCT_TYPE_ZHCN_MAP);
+export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, LEG_TYPE_ZHCH_MAP);

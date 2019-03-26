@@ -463,6 +463,7 @@ export const allTryPricingLegTypes: ILegType[] = [
   [ConvexUnAnnual, ConvexUnAnnual.pricingColumnDefs],
   [DoubleDigitalAnnual, DoubleDigitalAnnual.pricingColumnDefs],
   [DoubleDigitalUnAnnual, DoubleDigitalUnAnnual.pricingColumnDefs],
+  [TripleDigitalAnnual, TripleDigitalAnnual.pricingColumnDefs],
   [TripleDigitalUnAnnual, TripleDigitalUnAnnual.pricingColumnDefs],
   [RangeAccrualsAnnual, RangeAccrualsAnnual.pricingColumnDefs],
   [RangeAccrualsUnAnnual, RangeAccrualsUnAnnual.pricingColumnDefs],

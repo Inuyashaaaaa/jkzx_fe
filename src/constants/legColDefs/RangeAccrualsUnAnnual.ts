@@ -1,4 +1,5 @@
 import { DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
+import { convertObservetions } from '@/services/common';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -6,10 +7,11 @@ import {
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
+  LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  OB_DAY_FIELD,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
-  PRODUCT_TYPE_ZHCN_MAP,
   SPECIFIED_PRICE_MAP,
   UNIT_ENUM_MAP,
 } from '../common';
@@ -24,6 +26,7 @@ import {
   LowBarrier,
   NotionalAmount,
   NotionalAmountType,
+  ObservationDates,
   ParticipationRate,
   Payment,
   PaymentType,
@@ -40,7 +43,7 @@ import {
 import { pipeLeg } from './common/pipeLeg';
 
 export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
-  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL],
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL],
   type: LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: false,
@@ -62,6 +65,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
     BarrierType,
     HighBarrier,
     LowBarrier,
+    ObservationDates,
   ],
   columnDefs: [
     Direction,
@@ -84,6 +88,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
     BarrierType,
     HighBarrier,
     LowBarrier,
+    ObservationDates,
   ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -106,7 +111,21 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
     const COMPUTED_FIELDS = [];
 
     nextPosition.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;
-    nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+
+    nextPosition.asset = _.omit(dataSourceItem, [
+      ...LEG_INJECT_FIELDS,
+      ...COMPUTED_FIELDS,
+      LEG_FIELD.OBSERVATION_DATES,
+    ]);
+
+    nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
+      (result, item) => {
+        result[item[OB_DAY_FIELD]] = item.price || null;
+        return result;
+      },
+      {}
+    );
+
     nextPosition.asset.effectiveDate =
       nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
@@ -118,7 +137,11 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
 
     return nextPosition;
   },
-  getPageData: (nextDataSourceItem, position) => {
-    return nextDataSourceItem;
+  getPageData: (nextPageDataItem, position) => {
+    const days = Object.keys(nextPageDataItem.fixingObservations);
+    if (!days.length) return nextPageDataItem;
+    nextPageDataItem[LEG_FIELD.OBSERVATION_DATES] = convertObservetions(nextPageDataItem);
+
+    return nextPageDataItem;
   },
 });

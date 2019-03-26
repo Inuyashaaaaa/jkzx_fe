@@ -3,12 +3,15 @@ import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
   LEG_FIELD,
-  UP_BARRIER_TYPE_MAP,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
+  OB_DAY_FIELD,
 } from '@/constants/common';
 import Form from '@/design/components/Form';
 import { InputPolym } from '@/design/components/Form/Input/InputPolym';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
+import { IColumnDef } from '@/design/components/Table/types';
 import { remove } from '@/design/utils';
 import { qlDateScheduleCreate } from '@/services/quant-service';
 import { Button, Col, message, Row } from 'antd';
@@ -16,8 +19,6 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React from 'react';
-
-const OB_DAY_FIELD = 'obDay';
 
 class AsiaObserveModalInput extends InputPolym<any> {
   public state = {
@@ -27,12 +28,16 @@ class AsiaObserveModalInput extends InputPolym<any> {
     generateLoading: false,
   };
 
+  public productType: string;
+
   constructor(props) {
     super(props);
+    this.productType = props.record[LEG_TYPE_FIELD];
     this.state.dealDataSource = this.computeDataSource(
       (props.value || []).map((item, index) => {
         return {
-          [OB_DAY_FIELD]: moment(item),
+          ...item,
+          [OB_DAY_FIELD]: moment(item[OB_DAY_FIELD]),
         };
       })
     );
@@ -53,7 +58,9 @@ class AsiaObserveModalInput extends InputPolym<any> {
   };
 
   public formatValue = (value): string => {
-    return value && value.length ? [value[0].day, value[value.length - 1].day].join(' ~ ') : '';
+    return value && value.length
+      ? [value[0][OB_DAY_FIELD], value[value.length - 1][OB_DAY_FIELD]].join(' ~ ')
+      : '';
   };
 
   public formatChangeEvent = event => {
@@ -83,7 +90,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
           this.state.dealDataSource.map(item => {
             return {
               ...item,
-              day: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
+              [OB_DAY_FIELD]: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
             };
           })
         );
@@ -178,6 +185,59 @@ class AsiaObserveModalInput extends InputPolym<any> {
     });
   };
 
+  public isAccruals = () => {
+    return (
+      this.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+      this.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+    );
+  };
+
+  public getColumnDefs = (): IColumnDef[] => {
+    return [
+      {
+        headerName: '观察日',
+        field: OB_DAY_FIELD,
+        input: {
+          type: 'date',
+          ranger: 'day',
+        },
+      },
+      ...(this.isAccruals()
+        ? []
+        : [
+            {
+              headerName: '权重',
+              field: 'weight',
+              input: INPUT_NUMBER_DIGITAL_CONFIG,
+            },
+          ]),
+      {
+        headerName: '已观察到价格(可编辑)',
+        field: 'price',
+        editable: true,
+        input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      },
+      {
+        headerName: '操作',
+        render: params => {
+          return (
+            <Row
+              type="flex"
+              align="middle"
+              style={{
+                height: params.context.rowHeight,
+              }}
+            >
+              <Button size="small" type="danger" onClick={this.bindRemove(params)}>
+                删除
+              </Button>
+            </Row>
+          );
+        },
+      },
+    ];
+  };
+
   public renderEditing(props) {
     return (
       <Row
@@ -235,61 +295,25 @@ class AsiaObserveModalInput extends InputPolym<any> {
                     />
                   </Col>
                   <Col>
-                    <PopconfirmButton
-                      type="primary"
-                      loading={this.state.generateLoading}
-                      onClick={this.onPopconfirmClick}
-                      popconfirmProps={{
-                        title: '生成将覆盖当前表格内容',
-                        visible: this.state.popconfirmVisible,
-                        onCancel: this.onHidePopconfirm,
-                        onConfirm: this.onPopcomfirmButtonConfirm,
-                      }}
-                    >
-                      批量生成观察日
-                    </PopconfirmButton>
+                    {this.isAccruals() ? null : (
+                      <PopconfirmButton
+                        type="primary"
+                        loading={this.state.generateLoading}
+                        onClick={this.onPopconfirmClick}
+                        popconfirmProps={{
+                          title: '生成将覆盖当前表格内容',
+                          visible: this.state.popconfirmVisible,
+                          onCancel: this.onHidePopconfirm,
+                          onConfirm: this.onPopcomfirmButtonConfirm,
+                        }}
+                      >
+                        批量生成观察日
+                      </PopconfirmButton>
+                    )}
                   </Col>
                 </Row>
               }
-              columnDefs={[
-                {
-                  headerName: '观察日',
-                  field: OB_DAY_FIELD,
-                  input: {
-                    type: 'date',
-                    ranger: 'day',
-                  },
-                },
-                {
-                  headerName: '权重',
-                  field: 'weight',
-                  input: INPUT_NUMBER_DIGITAL_CONFIG,
-                },
-                {
-                  headerName: '已观察到价格(可编辑)',
-                  field: 'price',
-                  editable: true,
-                  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                },
-                {
-                  headerName: '操作',
-                  render: params => {
-                    return (
-                      <Row
-                        type="flex"
-                        align="middle"
-                        style={{
-                          height: params.context.rowHeight,
-                        }}
-                      >
-                        <Button size="small" type="danger" onClick={this.bindRemove(params)}>
-                          删除
-                        </Button>
-                      </Row>
-                    );
-                  },
-                },
-              ]}
+              columnDefs={this.getColumnDefs()}
             />
           }
         >

@@ -42,6 +42,7 @@ import FixingModal from './modals/FixingModal';
 import KnockOutModal from './modals/KnockOutModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
+import { filterObDays } from './utils';
 
 class TradeManagementBookEdit extends PureComponent<any, any> {
   public rowKey: string = 'id';
@@ -334,7 +335,8 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
 
     if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
       if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
-        if (convertObservetions(params.rowData).some(item => !item.price)) {
+        const convertedData = filterObDays(convertObservetions(params.rowData));
+        if (convertedData.some(item => !item.price)) {
           return message.warn('请先完善观察日价格');
         }
 

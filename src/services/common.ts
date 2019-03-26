@@ -1,3 +1,4 @@
+import { OB_DAY_FIELD } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 
 export const getCanUsedTranors = usedTranors => {
@@ -24,13 +25,13 @@ export const getCanUsedTranorsOtionsNotIncludingSelf = (tableDataSource: Array<{
 };
 
 export function convertObservetions(nextDataSourceItem) {
-  const days = Object.keys(nextDataSourceItem.fixingWeights);
+  const days = Object.keys(nextDataSourceItem.fixingObservations);
   if (!days.length) return [];
   return days.map(day => {
     return {
-      day,
-      weight: nextDataSourceItem.fixingWeights[day],
-      price: nextDataSourceItem.fixingObservations[day],
+      [OB_DAY_FIELD]: day,
+      weight: nextDataSourceItem.fixingWeights && nextDataSourceItem.fixingWeights[day],
+      price: nextDataSourceItem.fixingObservations && nextDataSourceItem.fixingObservations[day],
     };
   });
 }

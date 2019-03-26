@@ -1,4 +1,4 @@
-import { EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP, PRODUCT_TYPE_ZHCN_MAP } from '@/constants/common';
+import { EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
 import { toggleItem } from '@/design/utils';
 import { Badge, Calendar, Col, Popover, Row } from 'antd';
 import _ from 'lodash';
@@ -60,7 +60,7 @@ class Calendars extends PureComponent<any, any> {
                   <ul className={styles.events}>
                     <li>交易ID: {item.tradeId}</li>
                     <li>持仓ID: {item.positionId}</li>
-                    <li>期权类型: {PRODUCT_TYPE_ZHCN_MAP[item.productType]}</li>
+                    <li>期权类型: {LEG_TYPE_ZHCH_MAP[item.productType]}</li>
                     <li>标的物: {item.underlyerInstrumentId}</li>
                     <li>当前价格: {item.underlyerPrice}</li>
                   </ul>

@@ -7,9 +7,10 @@ import {
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
+  LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  OB_DAY_FIELD,
   PREMIUM_TYPE_MAP,
-  PRODUCT_TYPE_ZHCN_MAP,
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '../common';
@@ -45,7 +46,7 @@ import { pipeLeg } from './common/pipeLeg';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
 
 export const AsiaAnnual: ILegType = pipeLeg({
-  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.ASIAN_ANNUAL],
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.ASIAN_ANNUAL],
   type: LEG_TYPE_MAP.ASIAN_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
@@ -142,7 +143,7 @@ export const AsiaAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingWeights = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item.day] = item.weight;
+        result[item[OB_DAY_FIELD]] = item.weight;
         return result;
       },
       {}
@@ -150,7 +151,7 @@ export const AsiaAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item.day] = item.price || null;
+        result[item[OB_DAY_FIELD]] = item.price || null;
         return result;
       },
       {}

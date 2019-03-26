@@ -4,28 +4,22 @@ import SourceTable from '@/lib/components/_SourceTable';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
   exeTradeRecordSave,
-  queryPositions,
+  queryDetail,
   queryTradeRecord,
   uploadUrl,
+  querySummary,
 } from '@/services/onBoardTransaction';
-import {
-  Button,
-  message,
-  Modal,
-  //  Radio,
-  Tabs,
-} from 'antd';
+import { Button, message, Modal, Radio, Tabs } from 'antd';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-// import moment from 'moment';
 import RowForm from './components/RowForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
 
 const { TabPane } = Tabs;
-// const RadioButton = Radio.Button;
-// const RadioGroup = Radio.Group;
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 
 const reg = /^[+-]?\d+\.?\d*$/;
 
@@ -46,10 +40,9 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       loading: false,
       flowData: [],
       positionData: [],
-      // summaryData: [],
       formItems: [],
       instrumentIds: [],
-      // positionMode: 'detail',
+      positionMode: 'detail',
       createFormVisible: false,
       createModalDataSource: {
         dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
@@ -83,20 +76,33 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     this.fetchData(params, 'flow');
   };
 
-  queryPositions = async data => {
-    const params = {
-      dealDate: data.date.format('YYYY-MM-DD'),
-    };
-    this.fetchData(params, 'position');
+  queryDetail = async () => {
+    // const params = {
+    //   dealDate: data.date.format('YYYY-MM-DD'),
+    // };
+    const params = {};
+    this.fetchData(params, 'position', 'detail');
   };
 
-  fetchData = async (params, type) => {
+  querySummary = async () => {
+    // const params = {
+    //   dealDate: data.date.format('YYYY-MM-DD'),
+    // };
+    const params = {};
+    this.fetchData(params, 'position', 'summary');
+  };
+
+  fetchData = async (params, type, positionMode) => {
     const isFlow = type === 'flow';
 
     this.setState({
       loading: true,
     });
-    const executeMethod = isFlow ? queryTradeRecord : queryPositions;
+    const executeMethod = isFlow
+      ? queryTradeRecord
+      : positionMode === 'detail'
+      ? queryDetail
+      : querySummary;
     const list = await executeMethod({
       ...params,
     });
@@ -124,12 +130,16 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       handleObjNumber(obj);
       return obj;
     });
-    let summaryData = [];
-    if (!isFlow) {
-      summaryData = this.generateSummary(data);
-    }
-    finalData.sort((a, b) => a.bookId.localeCompare(b.bookId));
-    const nextState = isFlow ? { flowData: finalData } : { positionData: finalData, summaryData };
+    // let summaryData = [];
+    // if (!isFlow) {
+    //   summaryData = this.generateSummary(data);
+    // }
+    finalData.sort((a, b) => {
+      const aStr = a.bookId + a.instrumentId;
+      const bStr = b.bookId + b.instrumentId;
+      return aStr.localeCompare(bStr);
+    });
+    const nextState = isFlow ? { flowData: finalData } : { positionData: finalData };
     if (isFlow) {
       this.originFlowData = data;
     } else {
@@ -219,22 +229,23 @@ class TradeManagementOnBoardTansaction extends PureComponent {
 
   changeTab = tab => {
     const type = tab === '1' ? 'flow' : 'position';
-    const { positionData } = this.state;
-    if (type === 'position' && positionData.length === 0) {
-      const today = new Date();
-      const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-      this.queryPositions({
-        date: moment(yesterday),
-      });
+    const { positionMode } = this.state;
+    if (type === 'position') {
+      if (positionMode === 'detail') {
+        this.queryDetail();
+      } else {
+        this.querySummary();
+      }
     }
   };
 
-  // changePosition = e => {
-  //   const { value } = e.target;
-  //   this.setState({
-  //     positionMode: value === 'a' ? 'detail' : 'summary',
-  //   });
-  // };
+  changePosition = e => {
+    const { value } = e.target;
+    this.setState({
+      positionMode: value === 'a' ? 'detail' : 'summary',
+    });
+    value === 'a' ? this.queryDetail() : this.querySummary();
+  };
 
   handleFormData = action => {
     if (action === 'uploading') {
@@ -322,17 +333,16 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       formItems,
       modalLoading,
       flowData,
-      // positionData,
-      // summaryData,
+      positionData,
       loading,
       instrumentIds,
-      // positionMode,
+      positionMode,
       createFormVisible,
       createModalDataSource,
     } = this.state;
     const flowColumns = generateColumns('flow');
-    // const detailColumns = generateColumns('detail');
-    // const summaryColumns = generateColumns('summary');
+    const detailColumns = generateColumns('detail');
+    const summaryColumns = generateColumns('summary');
     return (
       <PageHeaderWrapper>
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
@@ -359,8 +369,8 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               }}
             />
           </TabPane>
-          {/* <TabPane tab="场内持仓统计" key="2">
-            <RowForm mode="position" handleQuery={this.queryPositions} />
+          <TabPane tab="场内持仓统计" key="2">
+            {/* <RowForm mode="position" handleQuery={this.queryPositions} /> */}
             <RadioGroup onChange={this.changePosition} defaultValue="a">
               <RadioButton value="a">按明细统计</RadioButton>
               <RadioButton value="b">按合约代码统计</RadioButton>
@@ -371,7 +381,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 searchable={false}
                 removeable={false}
                 saveDisabled
-                rowKey="id"
+                rowKey="uuid"
                 dataSource={positionData}
                 tableColumnDefs={detailColumns}
                 tableProps={{
@@ -385,15 +395,15 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 searchable={false}
                 removeable={false}
                 saveDisabled
-                rowKey="id"
-                dataSource={summaryData}
+                rowKey="uuid"
+                dataSource={positionData}
                 tableColumnDefs={summaryColumns}
                 tableProps={{
                   autoSizeColumnsToFit: true,
                 }}
               />
             )}
-          </TabPane> */}
+          </TabPane>
         </Tabs>
         <Modal
           title={modalTitle}

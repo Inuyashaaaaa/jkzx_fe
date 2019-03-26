@@ -6,10 +6,10 @@ import {
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
+  LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
-  PRODUCT_TYPE_ZHCN_MAP,
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '../common';
@@ -47,7 +47,7 @@ import {
 import { pipeLeg } from './common/pipeLeg';
 
 export const TripleDigitalAnnual: ILegType = pipeLeg({
-  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL],
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL],
   type: LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
@@ -58,7 +58,6 @@ export const TripleDigitalAnnual: ILegType = pipeLeg({
     UnderlyerMultiplier,
     UnderlyerInstrumentId,
     OptionType,
-    Strike,
     PricingTerm,
     PricingExpirationDate,
     ParticipationRate,

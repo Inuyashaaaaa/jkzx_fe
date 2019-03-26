@@ -3,6 +3,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
@@ -15,7 +17,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { countAvg } from '../../utils';
+import { countAvg, filterObDays } from '../../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
@@ -56,7 +58,7 @@ class FixingModal extends PureComponent<
 
     this.setState(
       {
-        tableData: this.filterObDays(convertObservetions(data)),
+        tableData: filterObDays(convertObservetions(data)),
         visible: true,
       },
       () => {
@@ -132,12 +134,6 @@ class FixingModal extends PureComponent<
     return false;
   };
 
-  public filterObDays = tableData => {
-    return tableData.filter(item => {
-      return getMoment(item.day).valueOf() <= moment().valueOf();
-    });
-  };
-
   public countAvg = () => {
     return countAvg(this.state.tableData);
   };
@@ -208,11 +204,16 @@ class FixingModal extends PureComponent<
                   type: 'date',
                 },
               },
-              {
-                headerName: '权重',
-                field: 'weight',
-                input: INPUT_NUMBER_DIGITAL_CONFIG,
-              },
+              ...(this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+              this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+                ? []
+                : [
+                    {
+                      headerName: '权重',
+                      field: 'weight',
+                      input: INPUT_NUMBER_DIGITAL_CONFIG,
+                    },
+                  ]),
               {
                 headerName: '已观察到价格(可编辑)',
                 field: 'price',

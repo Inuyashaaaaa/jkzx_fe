@@ -6,10 +6,10 @@ import {
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
+  LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
-  PRODUCT_TYPE_ZHCN_MAP,
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '../common';
@@ -43,7 +43,7 @@ import {
 import { pipeLeg } from './common/pipeLeg';
 
 export const DoubleDigitalUnAnnual: ILegType = pipeLeg({
-  name: PRODUCT_TYPE_ZHCN_MAP[LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL],
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL],
   type: LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: false,
