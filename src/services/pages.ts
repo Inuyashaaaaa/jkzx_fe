@@ -112,7 +112,19 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
   if (
     leg.type === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
     leg.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
+    leg.type === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+    leg.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL ||
+    leg.type === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.CONCAVA_UNANNUAL ||
+    leg.type === LEG_TYPE_MAP.CONVEX_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.CONVEX_UNANNUAL ||
+    leg.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL ||
+    leg.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL ||
+    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
   ) {
     return leg.getDefault(dataSourceItem, isPricing);
   }
@@ -285,37 +297,6 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
         : undefined),
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
     };
-  } else if (
-    leg.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL
-  ) {
-    nextDataSourceItem = {
-      ...nextDataSourceItem,
-      // expirationTime: '15:00:00',
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
-      [LEG_FIELD.LOW_PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.HIGH_PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: leg.isAnnualized
-        ? NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
-      [LEG_FIELD.REBATE_UNIT]: REBATETYPE_UNIT_MAP.PERCENT,
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
-      ...(leg.isAnnualized
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-            [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-          }
-        : undefined),
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
-      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-    };
   } else if (leg.type === LEG_TYPE_MAP.EAGLE_ANNUAL || leg.type === LEG_TYPE_MAP.EAGLE_UNANNUAL) {
     nextDataSourceItem = {
       ...nextDataSourceItem,
@@ -398,141 +379,6 @@ export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = fa
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
     };
   } else if (
-    leg.type === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.CONCAVA_UNANNUAL
-  ) {
-    nextDataSourceItem = {
-      ...nextDataSourceItem,
-      // expirationTime: '15:00:00',
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: leg.isAnnualized
-        ? NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(leg.isAnnualized
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-            [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-          }
-        : undefined),
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
-      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-    };
-  } else if (leg.type === LEG_TYPE_MAP.CONVEX_ANNUAL || leg.type === LEG_TYPE_MAP.CONVEX_UNANNUAL) {
-    nextDataSourceItem = {
-      ...nextDataSourceItem,
-      // expirationTime: '15:00:00',
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: leg.isAnnualized
-        ? NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(leg.isAnnualized
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-            [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-          }
-        : undefined),
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
-      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-    };
-  } else if (
-    leg.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL
-  ) {
-    nextDataSourceItem = {
-      ...nextDataSourceItem,
-      // expirationTime: '15:00:00',
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: leg.isAnnualized
-        ? NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(leg.isAnnualized
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-            [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-          }
-        : undefined),
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
-      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-    };
-  } else if (
-    leg.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL
-  ) {
-    nextDataSourceItem = {
-      ...nextDataSourceItem,
-      // expirationTime: '15:00:00',
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: leg.isAnnualized
-        ? NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(leg.isAnnualized
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-            [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-          }
-        : undefined),
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
-      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-    };
-  } else if (
-    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-    leg.type === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
-  ) {
-    nextDataSourceItem = {
-      ...nextDataSourceItem,
-      // expirationTime: '15:00:00',
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
-      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: leg.isAnnualized
-        ? NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(leg.isAnnualized
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-            [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-          }
-        : undefined),
-      ...(isPricing
-        ? {
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : undefined),
-      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-    };
-  } else if (
     leg.type === LEG_TYPE_MAP.STRADDLE_ANNUAL ||
     leg.type === LEG_TYPE_MAP.STRADDLE_UNANNUAL
   ) {
@@ -584,7 +430,19 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
     if (
       productType === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
       productType === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-      productType === LEG_TYPE_MAP.ASIAN_UNANNUAL
+      productType === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+      productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
+      productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL ||
+      productType === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
+      productType === LEG_TYPE_MAP.CONCAVA_UNANNUAL ||
+      productType === LEG_TYPE_MAP.CONVEX_ANNUAL ||
+      productType === LEG_TYPE_MAP.CONVEX_UNANNUAL ||
+      productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
+      productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL ||
+      productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
+      productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL ||
+      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
     ) {
       const Leg = LEG_MAP[productType];
       return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource, isPricing);
@@ -772,25 +630,6 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
       nextPosition.asset.annualized = productType === LEG_TYPE_MAP.BARRIER_ANNUAL ? true : false;
     }
 
-    if (
-      productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
-      productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL
-    ) {
-      const COMPUTED_FIELDS = [];
-
-      nextPosition.productType = LEG_TYPE_MAP.DOUBLE_SHARK_FIN;
-      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
-      nextPosition.asset.effectiveDate =
-        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
-      nextPosition.asset.expirationDate =
-        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-      nextPosition.asset.settlementDate =
-        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
-
-      nextPosition.asset.annualized =
-        productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ? true : false;
-    }
-
     if (productType === LEG_TYPE_MAP.EAGLE_ANNUAL || productType === LEG_TYPE_MAP.EAGLE_UNANNUAL) {
       const COMPUTED_FIELDS = [];
 
@@ -868,116 +707,6 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
     }
 
     if (
-      productType === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
-      productType === LEG_TYPE_MAP.CONCAVA_UNANNUAL
-    ) {
-      const COMPUTED_FIELDS = [];
-
-      nextPosition.productType = LEG_TYPE_MAP.CONCAVA;
-      nextPosition.lcmEventType = 'OPEN';
-      nextPosition.positionAccountCode = 'empty';
-      nextPosition.positionAccountName = 'empty';
-      nextPosition.counterPartyAccountCode = 'empty';
-      nextPosition.counterPartyAccountName = 'empty';
-      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
-      nextPosition.asset.effectiveDate =
-        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
-      nextPosition.asset.expirationDate =
-        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-      nextPosition.asset.settlementDate =
-        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
-
-      nextPosition.asset.annualized = productType === LEG_TYPE_MAP.CONCAVA_ANNUAL ? true : false;
-      nextPosition.asset.concavaed = true;
-    }
-
-    if (
-      productType === LEG_TYPE_MAP.CONVEX_ANNUAL ||
-      productType === LEG_TYPE_MAP.CONVEX_UNANNUAL
-    ) {
-      const COMPUTED_FIELDS = [];
-
-      nextPosition.productType = LEG_TYPE_MAP.CONVEX;
-      nextPosition.lcmEventType = 'OPEN';
-      nextPosition.positionAccountCode = 'empty';
-      nextPosition.positionAccountName = 'empty';
-      nextPosition.counterPartyAccountCode = 'empty';
-      nextPosition.counterPartyAccountName = 'empty';
-      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
-      nextPosition.asset.effectiveDate =
-        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
-      nextPosition.asset.expirationDate =
-        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-      nextPosition.asset.settlementDate =
-        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
-
-      nextPosition.asset.annualized = productType === LEG_TYPE_MAP.CONVEX_ANNUAL ? true : false;
-      nextPosition.asset.concavaed = false;
-    }
-
-    if (
-      productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
-      productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL
-    ) {
-      const COMPUTED_FIELDS = [];
-
-      nextPosition.productType = LEG_TYPE_MAP.DOUBLE_DIGITAL;
-      nextPosition.lcmEventType = 'OPEN';
-      nextPosition.positionAccountCode = 'empty';
-      nextPosition.positionAccountName = 'empty';
-      nextPosition.counterPartyAccountCode = 'empty';
-      nextPosition.counterPartyAccountName = 'empty';
-      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
-      nextPosition.asset.effectiveDate =
-        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
-      nextPosition.asset.expirationDate =
-        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-      nextPosition.asset.settlementDate =
-        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
-
-      nextPosition.asset.annualized =
-        productType === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ? true : false;
-    }
-
-    if (
-      productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
-      productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL
-    ) {
-      const COMPUTED_FIELDS = [];
-
-      nextPosition.productType = LEG_TYPE_MAP.TRIPLE_DIGITAL;
-      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
-      nextPosition.asset.effectiveDate =
-        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
-      nextPosition.asset.expirationDate =
-        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-      nextPosition.asset.settlementDate =
-        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
-
-      nextPosition.asset.annualized =
-        productType === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ? true : false;
-    }
-
-    if (
-      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-      productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
-    ) {
-      const COMPUTED_FIELDS = [];
-
-      nextPosition.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;
-      nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
-      nextPosition.asset.effectiveDate =
-        nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
-      nextPosition.asset.expirationDate =
-        nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
-      nextPosition.asset.settlementDate =
-        nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
-
-      nextPosition.asset.annualized =
-        productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ? true : false;
-    }
-
-    if (
       productType === LEG_TYPE_MAP.STRADDLE_ANNUAL ||
       productType === LEG_TYPE_MAP.STRADDLE_UNANNUAL
     ) {
@@ -1038,7 +767,13 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
   const tableDataSource = positions.map(position => {
     if (
       position.productType === LEG_TYPE_MAP.AUTOCALL ||
-      position.productType === LEG_TYPE_MAP.ASIAN
+      position.productType === LEG_TYPE_MAP.ASIAN ||
+      position.productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN ||
+      position.productType === LEG_TYPE_MAP.CONCAVA ||
+      position.productType === LEG_TYPE_MAP.CONVEX ||
+      position.productType === LEG_TYPE_MAP.DOUBLE_DIGITAL ||
+      position.productType === LEG_TYPE_MAP.TRIPLE_DIGITAL ||
+      position.productType === LEG_TYPE_MAP.RANGE_ACCRUALS
     ) {
       const isAnnualized = position.asset.annualized;
       const Leg = LEG_MAP[`${position.productType}_${isAnnualized ? 'ANNUAL' : 'UNANNUAL'}`];
@@ -1158,21 +893,6 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
           return LEG_TYPE_MAP.BARRIER_UNANNUAL;
         }
       }
-    } else if (productType === LEG_TYPE_MAP.DOUBLE_SHARK_FIN) {
-      nextPosition = {
-        ...nextPosition,
-        productType: getSharkTypeByAnnualized(position.asset.annualized),
-      };
-
-      nextPosition = backConvertPercent(nextPosition);
-
-      function getSharkTypeByAnnualized(isAnnualized) {
-        if (isAnnualized) {
-          return LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL;
-        } else {
-          return LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL;
-        }
-      }
     } else if (productType === LEG_TYPE_MAP.EAGLE) {
       nextPosition = {
         ...nextPosition,
@@ -1216,81 +936,6 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
           return LEG_TYPE_MAP.DOUBLE_NO_TOUCH_ANNUAL;
         } else {
           return LEG_TYPE_MAP.DOUBLE_NO_TOUCH_UNANNUAL;
-        }
-      }
-    } else if (productType === LEG_TYPE_MAP.CONCAVA) {
-      nextPosition = {
-        ...nextPosition,
-        productType: getNoTouchTypeByAnnualized(position.asset.annualized),
-      };
-
-      nextPosition = backConvertPercent(nextPosition);
-
-      function getNoTouchTypeByAnnualized(isAnnualized) {
-        if (isAnnualized) {
-          return LEG_TYPE_MAP.CONCAVA_ANNUAL;
-        } else {
-          return LEG_TYPE_MAP.CONCAVA_UNANNUAL;
-        }
-      }
-    } else if (productType === LEG_TYPE_MAP.CONVEX) {
-      nextPosition = {
-        ...nextPosition,
-        productType: getNoTouchTypeByAnnualized(position.asset.annualized),
-      };
-
-      nextPosition = backConvertPercent(nextPosition);
-
-      function getNoTouchTypeByAnnualized(isAnnualized) {
-        if (isAnnualized) {
-          return LEG_TYPE_MAP.CONVEX_ANNUAL;
-        } else {
-          return LEG_TYPE_MAP.CONVEX_UNANNUAL;
-        }
-      }
-    } else if (productType === LEG_TYPE_MAP.DOUBLE_DIGITAL) {
-      nextPosition = {
-        ...nextPosition,
-        productType: getNoTouchTypeByAnnualized(position.asset.annualized),
-      };
-
-      nextPosition = backConvertPercent(nextPosition);
-
-      function getNoTouchTypeByAnnualized(isAnnualized) {
-        if (isAnnualized) {
-          return LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL;
-        } else {
-          return LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL;
-        }
-      }
-    } else if (productType === LEG_TYPE_MAP.TRIPLE_DIGITAL) {
-      nextPosition = {
-        ...nextPosition,
-        productType: getNoTouchTypeByAnnualized(position.asset.annualized),
-      };
-
-      nextPosition = backConvertPercent(nextPosition);
-
-      function getNoTouchTypeByAnnualized(isAnnualized) {
-        if (isAnnualized) {
-          return LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL;
-        } else {
-          return LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL;
-        }
-      }
-    } else if (productType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
-      nextPosition = {
-        ...nextPosition,
-        productType: getNoTouchTypeByAnnualized(position.asset.annualized),
-      };
-
-      nextPosition = backConvertPercent(nextPosition);
-
-      function getNoTouchTypeByAnnualized(isAnnualized) {
-        if (isAnnualized) {
-          return LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL;
-        } else {
-          return LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL;
         }
       }
     } else if (productType === LEG_TYPE_MAP.STRADDLE) {

@@ -12,7 +12,6 @@ import {
   PREMIUM_TYPE_MAP,
   PRODUCT_TYPE_ZHCN_MAP,
   SPECIFIED_PRICE_MAP,
-  STRIKE_TYPES_MAP,
   UP_BARRIER_TYPE_MAP,
 } from '../common';
 import {
