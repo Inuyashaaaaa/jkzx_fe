@@ -1,3 +1,4 @@
+import { OB_DAY_FIELD } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 
 export const getCanUsedTranors = usedTranors => {
@@ -28,7 +29,7 @@ export function convertObservetions(nextDataSourceItem) {
   if (!days.length) return [];
   return days.map(day => {
     return {
-      day,
+      [OB_DAY_FIELD]: day,
       weight: nextDataSourceItem.fixingWeights && nextDataSourceItem.fixingWeights[day],
       price: nextDataSourceItem.fixingObservations && nextDataSourceItem.fixingObservations[day],
     };
