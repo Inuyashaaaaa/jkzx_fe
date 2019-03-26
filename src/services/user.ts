@@ -11,8 +11,6 @@ export const permissions = {
   spotLadder: false,
   pnlAttribution: false,
   roles: true,
-  userGuide: false,
-  developmentGuide: false,
   intradayGreeks: true,
   intradayPnl: true,
   bookEdit: true,

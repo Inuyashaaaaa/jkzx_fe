@@ -718,41 +718,6 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
           },
         ],
       },
-      {
-        headerName: '帮助',
-        children: [
-          {
-            headerName: '使用手册',
-            field: 'userGuide',
-            editable: true,
-            input: {
-              type: 'checkbox',
-              formatValue(value) {
-                if (value) {
-                  return <Icon type="check" />;
-                }
-                return <Icon type="close" />;
-              },
-            },
-            width: 150,
-          },
-          {
-            headerName: '开发指南',
-            field: 'developmentGuide',
-            editable: true,
-            input: {
-              type: 'checkbox',
-              formatValue(value) {
-                if (value) {
-                  return <Icon type="check" />;
-                }
-                return <Icon type="close" />;
-              },
-            },
-            width: 150,
-          },
-        ],
-      },
     ],
   },
 ];

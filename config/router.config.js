@@ -33,12 +33,6 @@ export default [
           component: './Dashboard',
         },
         {
-          path: '/user-info',
-          name: 'userInfo',
-          hideInMenu: true,
-          component: './UserInfo',
-        },
-        {
           path: '/trade-management',
           name: 'tradeManagement',
           icon: 'form',
@@ -321,23 +315,6 @@ export default [
               path: '/system-settings/document-management',
               name: 'documentManagement',
               component: './SystemSettingsDocumentManagement/index',
-            },
-          ],
-        },
-        {
-          path: '/help',
-          name: 'help',
-          icon: 'compass',
-          routes: [
-            {
-              path: '/help/user-guide',
-              name: 'userGuide',
-              component: './HelpUserGuide/index',
-            },
-            {
-              path: '/help/development-guide',
-              name: 'developmentGuide',
-              component: './HelpDevelopmentGuide/index',
             },
           ],
         },

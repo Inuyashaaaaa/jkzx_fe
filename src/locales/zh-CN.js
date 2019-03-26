@@ -70,9 +70,6 @@ export default {
   'menu.reports.tradingStatements': '交易报表',
   'menu.reports.fundsDetailedStatements': '资金明细报表',
   'menu.reports.customerFundsSummaryStatements': '客户资金汇总报表',
-  'menu.help': '帮助',
-  'menu.help.userGuide': '使用手册',
-  'menu.help.developmentGuide': '开发指南',
   'menu.userInfo': '个人中心',
   // pro lang
   'navBar.lang': '语言',
