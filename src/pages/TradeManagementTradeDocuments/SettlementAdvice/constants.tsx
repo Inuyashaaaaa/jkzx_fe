@@ -134,7 +134,7 @@ export const SEARCH_FORM_CONTROLS_SETTLE: (bookIdList, positionIdList) => IFormC
   },
 ];
 
-export const SETTLE_COLUMN_DEFS: IColumnDef[] = [
+export const SETTLE_COLUMN_DEFS: (onFetch) => IColumnDef[] = onFetch => [
   {
     field: 'positionId',
     headerName: '持仓ID',
@@ -160,14 +160,13 @@ export const SETTLE_COLUMN_DEFS: IColumnDef[] = [
     headerName: '到期日',
   },
   {
-    field: 'docProcessStatus',
+    field: 'status',
     headerName: '结算通知书处理状态',
   },
   {
     headerName: '操作',
     render: params => {
-      console.log(params);
-      return <SettlementModal data={params.data} />;
+      return <SettlementModal data={params.data} onFetch={onFetch} />;
     },
   },
 ];

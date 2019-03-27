@@ -1,7 +1,12 @@
 import Form from '@/design/components/Form';
 import ModalButton from '@/design/components/ModalButton';
-import { DOWN_LOAD_SETTLEMENT_URL, DOWN_LOAD_TRADE_URL } from '@/services/document';
-import { Button, Col, Row } from 'antd';
+import {
+  DOWN_LOAD_SETTLEMENT_URL,
+  DOWN_LOAD_TRADE_URL,
+  emlSendSupplementaryAgreementReport,
+} from '@/services/document';
+import { Button, Col, message, Row } from 'antd';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 
 class TradeModal extends PureComponent {
@@ -33,15 +38,26 @@ class TradeModal extends PureComponent {
     this.setState({
       visible: false,
     });
+    this.props.onFetch({ current: 1, pageSize: 10 });
   };
 
   public onConfirm = async () => {
-    this.setState({
-      visible: false,
+    const { error } = await emlSendSupplementaryAgreementReport({
+      tos: this.props.data.tradeEmail,
+      tradeId: this.props.data.tradeId,
+      description7: this.state.modalData.marketDisruption,
+      description8: this.state.modalData.tradeOption,
     });
+    if (error) {
+      message.error('发送失败');
+      return;
+    }
+    message.success('发送成功');
+    return;
   };
 
   public render() {
+    const { data } = this.props;
     return (
       <>
         <ModalButton
@@ -49,13 +65,11 @@ class TradeModal extends PureComponent {
           modalProps={{
             title: '生成交易确认书',
             width: 700,
-            okText: '发送至客户邮箱',
-            cancelText: '下载',
             footer: null,
+            closable: true,
           }}
-          onConfirm={this.onConfirm}
-          onCancel={this.onCancel}
           onClick={this.onClick}
+          onCancel={this.onCancel}
           size="small"
           type="primary"
           content={
@@ -118,6 +132,19 @@ class TradeModal extends PureComponent {
                     发送至客户邮箱
                   </Button>
                 </Col>
+              </Row>
+              <Row type="flex" justify="end" align="middle" gutter={8}>
+                <p style={{ lineHeight: '40px' }}>
+                  {data.docProcessStatus === 'UN_PROCESSED'
+                    ? `${data.partyName}未处理过交易确认书`
+                    : data.docProcessStatus === 'DOWNLOADED'
+                    ? `${data.partyName} 于 ${moment(data.updateAt).format(
+                        'YYYY-MM-DD HH:mm'
+                      )}下载过交易确认书`
+                    : `${data.partyName} 于 ${moment(data.updateAt).format(
+                        'YYYY-MM-DD HH:mm'
+                      )}发送过交易确认书`}
+                </p>
               </Row>
             </>
           }

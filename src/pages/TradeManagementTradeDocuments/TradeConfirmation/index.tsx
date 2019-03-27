@@ -1,4 +1,5 @@
 import SourceTable from '@/design/components/SourceTable';
+import { delay, mockData } from '@/lib/utils';
 import { trdTradeListByBook } from '@/services/general-service';
 import { tradeDocSearch } from '@/services/trade-service';
 import _ from 'lodash';
@@ -27,7 +28,8 @@ class TradeConfirmation extends PureComponent {
     // delay(
     //   1000,
     //   mockData({
-    //     tradeId: 'OPT20190320',
+    //     tradeId: '555555',
+    //     tradeEmail: 'zhangjiaan@tongyu.tech',
     //   })
     // ).then(result => {
     //   this.setState({
@@ -55,15 +57,25 @@ class TradeConfirmation extends PureComponent {
       loading: false,
     });
     if (error) return;
+    const dataSource = data.page.map(item => {
+      return {
+        ...item,
+        status:
+          item.docProcessStatus === 'UN_PROCESSED'
+            ? '未处理'
+            : item.docProcessStatus === 'DOWNLOADED'
+            ? `下载 于 ${moment(item.updateAt).format('YYYY-MM-DD HH:mm')}`
+            : `发送 于 ${moment(item.updateAt).format('YYYY-MM-DD HH:mm')}`,
+      };
+    });
     this.setState({
-      dataSource: data.page,
+      dataSource,
       pagination: {
         ...pagination,
         ...paramsPagination,
         total: data.totalCount,
       },
     });
-    console.log(formValues);
   };
 
   public onReset = () => {
@@ -116,9 +128,9 @@ class TradeConfirmation extends PureComponent {
     return (
       <>
         <SourceTable
-          rowKey="id"
+          rowKey="uuid"
           ref={node => (this.$sourceTable = node)}
-          columnDefs={TRADE_COLUMN_DEFS}
+          columnDefs={TRADE_COLUMN_DEFS(this.onFetch)}
           searchFormControls={SEARCH_FORM_CONTROLS_TRADE(this.state.bookIdList)}
           searchable={true}
           resetable={true}
