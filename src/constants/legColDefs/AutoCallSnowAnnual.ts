@@ -118,6 +118,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
+      [Step.field]: 0,
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
