@@ -84,6 +84,11 @@ export default [
               name: 'portfolioManagement',
               component: './TradeManagementPortfolioManagement/index',
             },
+            {
+              path: '/trade-management/trade-documents',
+              name: 'tradeDocuments',
+              component: './TradeManagementTradeDocuments/index',
+            },
           ],
         },
         {
