@@ -6,6 +6,7 @@ import {
   rptReportNameList,
 } from '@/services/report-service';
 import { message } from 'antd';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
@@ -22,7 +23,9 @@ class ReportsFundsDetailedStatements extends PureComponent {
     },
     loading: false,
     info: true,
-    searchFormData: {},
+    searchFormData: {
+      valuationDate: moment().subtract(1, 'days'),
+    },
   };
 
   constructor(props) {

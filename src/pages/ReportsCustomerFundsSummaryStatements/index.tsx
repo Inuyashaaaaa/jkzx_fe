@@ -9,6 +9,7 @@ import { message } from 'antd';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
+import moment from 'moment';
 
 class ReportsCustomerFundsSummaryStatements extends PureComponent {
   public $sourceTable: SourceTable = null;
@@ -22,7 +23,9 @@ class ReportsCustomerFundsSummaryStatements extends PureComponent {
     },
     loading: false,
     info: true,
-    searchFormData: {},
+    searchFormData: {
+      valuationDate: moment().subtract(1, 'days'),
+    },
   };
 
   constructor(props) {
