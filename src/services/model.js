@@ -179,7 +179,6 @@ export async function queryModelVolSurface(params, passError) {
       body: {
         method: 'mdlModelDataGet',
         params: {
-          instance: 'intraday',
           modelType: 'vol_surface',
           ...params,
         },
