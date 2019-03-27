@@ -89,9 +89,9 @@ export const LEG_MAP: {
   // 价差
   // [LEG_TYPE_MAP.VERTICAL_SPREAD]: 'VERTICAL_SPREAD',
   // 价差欧式非年化
-  [LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_UNANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual,
+  [LEG_TYPE_MAP.VERTICAL_SPREAD_UNANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual,
   // 价差欧式年化
-  [LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_ANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanAnnual,
+  [LEG_TYPE_MAP.VERTICAL_SPREAD_ANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanAnnual,
   // 单鲨
   // [LEG_TYPE_MAP.BARRIER]: 'BARRIER',
   // 单鲨年化

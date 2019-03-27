@@ -1,7 +1,11 @@
-import { LEG_NAME_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
+import { LEG_NAME_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
+import { COMPUTED_LEG_FIELDS } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
+import { TRADESCOL_FIELDS } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
+import { LEG_MAP } from '@/constants/legType';
+import { PRICING_FROM_TAG } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
@@ -79,14 +83,50 @@ class BookCreate extends PureComponent<any> {
   }
 
   public componentDidMount = () => {
+    this.loadBookList();
+    this.loadInstrumentIds();
+    this.initialFromPricingPage();
+  };
+
+  public initialFromPricingPage = () => {
+    const { location } = this.props;
+    const { query } = location;
+    const { from } = query;
+    if (from === PRICING_FROM_TAG) {
+      const dataSource = this.props.pricingData.dataSource.map(item => {
+        const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
+        return {
+          ...leg.getDefault({}, false),
+          ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
+        };
+      });
+      this.setState({
+        dataSource,
+        columnDefs: orderLegColDefs(
+          _.unionBy(
+            _.reject(
+              this.props.pricingData.columnDefs,
+              item => [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS].indexOf(item.field) !== -1
+            ).concat(
+              dataSource.reduce((container, item) => {
+                const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
+                return container.concat(leg.columnDefs);
+              }, [])
+            ),
+            item => item.field
+          )
+        ),
+      });
+    }
+  };
+
+  public loadBookList = () => {
     trdBookList().then(rsp => {
       if (rsp.error) return;
       this.setState({
         bookList: rsp.data,
       });
     });
-
-    this.loadInstrumentIds();
   };
 
   public loadInstrumentIds = () => {
@@ -737,4 +777,5 @@ class BookCreate extends PureComponent<any> {
 
 export default connect(state => ({
   currentUser: (state.user as any).currentUser,
+  pricingData: state.pricingData,
 }))(BookCreate);
