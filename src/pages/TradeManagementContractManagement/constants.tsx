@@ -49,16 +49,23 @@ export const bookingSearchFormControls: (bookList, bookIdList) => IFormControl[]
       showSearch: true,
       allowClear: true,
       placeholder: '请输入内容搜索',
-      options: async (value: string = '') => {
-        const { data, error } = await trdTradeListBySimilarTradeId({
-          similarTradeId: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
-      },
+      options: bookIdList.length
+        ? bookIdList.map(item => {
+            return {
+              label: item,
+              value: item,
+            };
+          })
+        : async (value: string = '') => {
+            const { data, error } = await trdTradeListBySimilarTradeId({
+              similarTradeId: value,
+            });
+            if (error) return [];
+            return data.map(item => ({
+              label: item,
+              value: item,
+            }));
+          },
     },
     field: 'tradeId',
   },

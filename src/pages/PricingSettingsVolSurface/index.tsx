@@ -354,7 +354,10 @@ class PricingSettingVolSurface extends PureComponent {
               onRemove={this.onRemove}
               ref={node => (this.$sourceTable = node)}
               loading={this.state.tableLoading}
-              searchFormControls={SEARCH_FORM_CONTROLS(this.state.groups, this.state.searchFormData)}
+              searchFormControls={SEARCH_FORM_CONTROLS(
+                this.state.groups,
+                this.state.searchFormData
+              )}
               searchFormProps={{
                 controlNumberOneRow: 3,
               }}
