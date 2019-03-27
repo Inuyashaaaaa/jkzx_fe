@@ -6,10 +6,10 @@ import {
   rptReportNameList,
 } from '@/services/report-service';
 import { message } from 'antd';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
-import moment from 'moment';
 
 class ReportsCustomerFundsSummaryStatements extends PureComponent {
   public $sourceTable: SourceTable = null;
