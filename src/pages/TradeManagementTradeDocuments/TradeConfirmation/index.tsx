@@ -1,5 +1,5 @@
 import SourceTable from '@/design/components/SourceTable';
-import { delay, mockData } from '@/lib/utils';
+import { trdTradeListByBook } from '@/services/general-service';
 import { tradeDocSearch } from '@/services/trade-service';
 import _ from 'lodash';
 import moment from 'moment';
@@ -19,20 +19,21 @@ class TradeConfirmation extends PureComponent {
       current: 1,
       pageSize: 10,
     },
+    bookIdList: [],
   };
 
   public componentDidMount = () => {
-    // this.onFetch();
-    delay(
-      1000,
-      mockData({
-        tradeId: 'OPT20190326',
-      })
-    ).then(result => {
-      this.setState({
-        dataSource: result,
-      });
-    });
+    this.onFetch();
+    // delay(
+    //   1000,
+    //   mockData({
+    //     tradeId: 'OPT20190320',
+    //   })
+    // ).then(result => {
+    //   this.setState({
+    //     dataSource: result,
+    //   });
+    // });
   };
 
   public onFetch = async (paramsPagination?) => {
@@ -78,8 +79,20 @@ class TradeConfirmation extends PureComponent {
     );
   };
 
-  public onSearchFormChange = params => {
+  public onSearchFormChange = async params => {
+    if (Object.keys(params.changedValues)[0] === 'bookName' && params.changedValues.bookName) {
+      const { error, data } = await trdTradeListByBook({
+        bookName: params.changedValues.bookName,
+      });
+      if (error) return;
+      this.setState({
+        bookIdList: data,
+        searchFormData: params.values,
+      });
+      return;
+    }
     this.setState({
+      bookIdList: [],
       searchFormData: params.values,
     });
   };
@@ -106,7 +119,7 @@ class TradeConfirmation extends PureComponent {
           rowKey="id"
           ref={node => (this.$sourceTable = node)}
           columnDefs={TRADE_COLUMN_DEFS}
-          searchFormControls={SEARCH_FORM_CONTROLS_TRADE}
+          searchFormControls={SEARCH_FORM_CONTROLS_TRADE(this.state.bookIdList)}
           searchable={true}
           resetable={true}
           loading={this.state.loading}

@@ -6,7 +6,7 @@ import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import React from 'react';
 import TradeModal from './TradeModal';
 
-export const SEARCH_FORM_CONTROLS_TRADE: IFormControl[] = [
+export const SEARCH_FORM_CONTROLS_TRADE: (bookIdList) => IFormControl[] = bookIdList => [
   {
     field: 'tradeDate',
     control: {
@@ -73,16 +73,23 @@ export const SEARCH_FORM_CONTROLS_TRADE: IFormControl[] = [
       showSearch: true,
       allowClear: true,
       placeholder: '请输入内容搜索',
-      options: async (value: string = '') => {
-        const { data, error } = await trdTradeListBySimilarTradeId({
-          similarTradeId: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
-      },
+      options: bookIdList.length
+        ? bookIdList.map(item => {
+            return {
+              label: item,
+              value: item,
+            };
+          })
+        : async (value: string = '') => {
+            const { data, error } = await trdTradeListBySimilarTradeId({
+              similarTradeId: value,
+            });
+            if (error) return [];
+            return data.map(item => ({
+              label: item,
+              value: item,
+            }));
+          },
     },
   },
   {

@@ -6,7 +6,10 @@ import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import React from 'react';
 import SettlementModal from './SettlementModal';
 
-export const SEARCH_FORM_CONTROLS_SETTLE: IFormControl[] = [
+export const SEARCH_FORM_CONTROLS_SETTLE: (bookIdList, positionIdList) => IFormControl[] = (
+  bookIdList,
+  positionIdList
+) => [
   {
     field: 'expirationDate',
     control: {
@@ -73,16 +76,20 @@ export const SEARCH_FORM_CONTROLS_SETTLE: IFormControl[] = [
       showSearch: true,
       allowClear: true,
       placeholder: '请输入内容搜索',
-      options: async (value: string = '') => {
-        const { data, error } = await trdTradeListBySimilarTradeId({
-          similarTradeId: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
-      },
+      options: bookIdList.length
+        ? bookIdList.map(item => {
+            return { label: item, value: item };
+          })
+        : async (value: string = '') => {
+            const { data, error } = await trdTradeListBySimilarTradeId({
+              similarTradeId: value,
+            });
+            if (error) return [];
+            return data.map(item => ({
+              label: item,
+              value: item,
+            }));
+          },
     },
   },
   {
@@ -95,16 +102,12 @@ export const SEARCH_FORM_CONTROLS_SETTLE: IFormControl[] = [
       showSearch: true,
       allowClear: true,
       placeholder: '请输入内容搜索',
-      options: async (value: string = '') => {
-        const { data, error } = await trdTradeListBySimilarTradeId({
-          similarTradeId: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
+      options: positionIdList.map(item => {
+        return {
           label: item,
           value: item,
-        }));
-      },
+        };
+      }),
     },
   },
   {

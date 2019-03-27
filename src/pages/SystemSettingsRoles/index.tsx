@@ -73,6 +73,7 @@ const pagesCollection = [
   'approvalProcessManagement',
   'customReport',
   'portfolioManagement',
+  'tradeDocuments',
 ];
 
 function handlePages(data, result1, result2) {

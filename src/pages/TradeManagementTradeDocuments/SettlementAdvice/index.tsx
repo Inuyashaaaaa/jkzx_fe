@@ -1,5 +1,5 @@
 import SourceTable from '@/design/components/SourceTable';
-import { delay, mockData } from '@/lib/utils';
+import { positionDocPositionIdListByTradeId, trdTradeListByBook } from '@/services/general-service';
 import { positionDocSearch } from '@/services/trade-service';
 import _ from 'lodash';
 import moment from 'moment';
@@ -19,20 +19,22 @@ class SettlementAdvice extends PureComponent {
       current: 1,
       pageSize: 10,
     },
+    bookIdList: [],
+    positionIdList: [],
   };
 
   public componentDidMount = () => {
-    // this.onFetch();
-    delay(
-      1000,
-      mockData({
-        tradeId: 'OPT20190326',
-      })
-    ).then(result => {
-      this.setState({
-        dataSource: result,
-      });
-    });
+    this.onFetch();
+    // delay(
+    //   1000,
+    //   mockData({
+    //     tradeId: 'OPT20190320',
+    //   })
+    // ).then(result => {
+    //   this.setState({
+    //     dataSource: result,
+    //   });
+    // });
   };
 
   public onFetch = async (paramsPagination?) => {
@@ -78,9 +80,33 @@ class SettlementAdvice extends PureComponent {
     );
   };
 
-  public onSearchFormChange = params => {
+  public onSearchFormChange = async params => {
     console.log(params.changedValues);
+    if (Object.keys(params.changedValues)[0] === 'bookName' && params.changedValues.bookName) {
+      const { error, data } = await trdTradeListByBook({
+        bookName: params.changedValues.bookName,
+      });
+      if (error) return;
+      this.setState({
+        bookIdList: data,
+        searchFormData: params.values,
+      });
+      return;
+    }
+    if (Object.keys(params.changedValues)[0] === 'tradeId' && params.changedValues.tradeId) {
+      const { error, data } = await positionDocPositionIdListByTradeId({
+        tradeId: params.changedValues.tradeId,
+      });
+      if (error) return;
+      this.setState({
+        positionIdList: data,
+        searchFormData: params.values,
+      });
+      return;
+    }
     this.setState({
+      bookIdList: [],
+      positionIdList: [],
       searchFormData: params.values,
     });
   };
@@ -107,7 +133,10 @@ class SettlementAdvice extends PureComponent {
           rowKey="uuid"
           ref={node => (this.$sourceTable = node)}
           columnDefs={SETTLE_COLUMN_DEFS}
-          searchFormControls={SEARCH_FORM_CONTROLS_SETTLE}
+          searchFormControls={SEARCH_FORM_CONTROLS_SETTLE(
+            this.state.bookIdList,
+            this.state.positionIdList
+          )}
           searchable={true}
           resetable={true}
           loading={this.state.loading}

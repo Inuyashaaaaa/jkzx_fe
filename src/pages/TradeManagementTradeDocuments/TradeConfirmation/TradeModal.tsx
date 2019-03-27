@@ -102,11 +102,11 @@ class TradeModal extends PureComponent {
                 <Col>
                   <Button type="default">
                     <a
-                      href={`${DOWN_LOAD_TRADE_URL}tradeId=${
-                        this.props.data.tradeId
-                      }&description7=${this.state.modalData.marketDisruption}&description8=${
-                        this.state.modalData.marketDisruption
-                      }`}
+                      href={encodeURI(
+                        `${DOWN_LOAD_TRADE_URL}tradeId=${this.props.data.tradeId}&description7=${
+                          this.state.modalData.marketDisruption
+                        }&description8=${this.state.modalData.tradeOption}`
+                      )}
                       download="template.t"
                     >
                       下载

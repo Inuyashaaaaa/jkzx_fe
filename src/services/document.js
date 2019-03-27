@@ -63,6 +63,6 @@ export const DOWN_LOAD_FIEL_URL = `${HOST_TEST}document-service/bct/download/bct
 
 export const DOWN_LOAD_VALUATION_URL = `${HOST_TEST}document-service/bct/download/valuationReport?valuationReportId=`;
 
-export const DOWN_LOAD_TRADE_URL = `${HOST_TEST}bct/download/supplementary_agreement?`;
+export const DOWN_LOAD_TRADE_URL = `${HOST_TEST}document-service/bct/download/supplementary_agreement?`;
 
-export const DOWN_LOAD_SETTLEMENT_URL = `${HOST_TEST}bct/download/settlement?tradeId=`;
+export const DOWN_LOAD_SETTLEMENT_URL = `${HOST_TEST}document-service/bct/download/settlement?`;

@@ -56,7 +56,9 @@ class TradeModal extends PureComponent {
                 <Col>
                   <Button type="default">
                     <a
-                      href={`${DOWN_LOAD_SETTLEMENT_URL}${this.props.data.tradeId}`}
+                      href={`${DOWN_LOAD_SETTLEMENT_URL}tradeId=${
+                        this.props.data.tradeId
+                      }&positionId=${this.props.data.positionId}`}
                       download="template.t"
                     >
                       下载
