@@ -170,3 +170,23 @@ export async function tradeExercisePreSettle(params = {}) {
     },
   });
 }
+
+export async function positionDocSearch(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'positionDocSearch',
+      params,
+    },
+  });
+}
+
+export async function tradeDocSearch(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'tradeDocSearch',
+      params,
+    },
+  });
+}

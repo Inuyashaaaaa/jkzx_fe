@@ -67,12 +67,10 @@ const pagesCollection = [
   'volatilityCalendar',
   'calendars',
   'riskSettings',
-  'help',
-  'userGuide',
-  'developmentGuide',
   'approvalProcessManagement',
   'customReport',
   'portfolioManagement',
+  'tradeDocuments',
 ];
 
 function handlePages(data, result1, result2) {

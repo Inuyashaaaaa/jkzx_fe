@@ -3,6 +3,7 @@ import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptPositionReportPagedByNameAndDate, rptReportNameList } from '@/services/report-service';
 import { message } from 'antd';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
@@ -19,7 +20,9 @@ class ReportsEodPosition extends PureComponent {
     },
     loading: false,
     info: true,
-    searchFormData: {},
+    searchFormData: {
+      valuationDate: moment().subtract(1, 'days'),
+    },
   };
 
   constructor(props) {
@@ -79,13 +82,6 @@ class ReportsEodPosition extends PureComponent {
     });
     return;
   };
-
-  // public onCellValueChanged = async event => {
-  //   const { error, data } = await rptRiskReportUpdate({ riskReport: event.data });
-  //   if (error) return message.error('更新错误');
-  //   message.success('更新成功');
-  //   return true;
-  // };
 
   public onPaginationChange = ({ pagination }) => {
     this.setState(

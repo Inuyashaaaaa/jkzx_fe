@@ -1,4 +1,4 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
+import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 import MarketSourceTable from '@/containers/MarketSourceTable';
 import { IFormControl } from '@/lib/components/_Form2';
@@ -11,19 +11,20 @@ import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
-import {
-  queryAllModelNameVol,
-  queryModelName,
-  queryModelVolSurface,
-  saveModelVolSurface,
-} from '@/services/model';
+import { queryAllModelNameVol, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
 // import { queryModelName, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
 import { Col, message, notification, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
-import { GROUP_KEY, MARKET_KEY, SEARCH_FORM_CONTROLS, TABLE_COLUMN_DEFS } from './constants';
+import {
+  GROUP_KEY,
+  INSTANCE_KEY,
+  MARKET_KEY,
+  SEARCH_FORM_CONTROLS,
+  TABLE_COLUMN_DEFS,
+} from './constants';
 
 class PricingSettingVolSurface extends PureComponent {
   public lastFetchedDataSource = null;
@@ -38,7 +39,9 @@ class PricingSettingVolSurface extends PureComponent {
 
   public state = {
     tableFormData: {},
-    searchFormData: {},
+    searchFormData: {
+      [INSTANCE_KEY]: 'INTRADAY',
+    },
     tableLoading: false,
     tableDataSource: [],
     tableColumnDefs: [],
@@ -109,6 +112,7 @@ class PricingSettingVolSurface extends PureComponent {
       {
         underlyer: searchFormData[MARKET_KEY],
         modelName: searchFormData[GROUP_KEY],
+        instance: searchFormData[INSTANCE_KEY],
       },
       true
     );
@@ -350,11 +354,12 @@ class PricingSettingVolSurface extends PureComponent {
               onRemove={this.onRemove}
               ref={node => (this.$sourceTable = node)}
               loading={this.state.tableLoading}
-              searchFormControls={SEARCH_FORM_CONTROLS(this.state.groups)}
+              searchFormControls={SEARCH_FORM_CONTROLS(
+                this.state.groups,
+                this.state.searchFormData
+              )}
               searchFormProps={{
-                wrapperSpace: 14,
-                labelSpace: 4,
-                controlNumberOneRow: 2,
+                controlNumberOneRow: 3,
               }}
               searchFormData={this.state.searchFormData}
               onSearchFormChange={this.onSearchFormChange}

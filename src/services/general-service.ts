@@ -55,6 +55,16 @@ export async function trdTradeListByBook(params = {}) {
   });
 }
 
+export async function positionDocPositionIdListByTradeId(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'positionDocPositionIdListByTradeId',
+      params,
+    },
+  });
+}
+
 export async function trdTradeLCMEventList(params = {}) {
   return request(`${HOST_TEST}trade-service/api/rpc`, {
     method: `POST`,

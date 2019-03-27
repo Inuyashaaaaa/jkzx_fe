@@ -171,6 +171,21 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+          {
+            headerName: '交易文档',
+            field: 'tradeDocuments',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
         ],
       },
       {
@@ -704,41 +719,6 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
           {
             headerName: '文档模板管理',
             field: 'documentManagement',
-            editable: true,
-            input: {
-              type: 'checkbox',
-              formatValue(value) {
-                if (value) {
-                  return <Icon type="check" />;
-                }
-                return <Icon type="close" />;
-              },
-            },
-            width: 150,
-          },
-        ],
-      },
-      {
-        headerName: '帮助',
-        children: [
-          {
-            headerName: '使用手册',
-            field: 'userGuide',
-            editable: true,
-            input: {
-              type: 'checkbox',
-              formatValue(value) {
-                if (value) {
-                  return <Icon type="check" />;
-                }
-                return <Icon type="close" />;
-              },
-            },
-            width: 150,
-          },
-          {
-            headerName: '开发指南',
-            field: 'developmentGuide',
             editable: true,
             input: {
               type: 'checkbox',

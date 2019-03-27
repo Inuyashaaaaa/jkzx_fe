@@ -1,9 +1,6 @@
-import { LEG_TYPE_MAP } from '@/constants/common';
 import { allLegTypes } from '@/constants/legColDefs';
-import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import { Button, Dropdown, Menu } from 'antd';
 import { ClickParam } from 'antd/lib/menu';
-import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
 export default class MultilLegCreateButton extends PureComponent<{
@@ -15,32 +12,7 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const usedLegs = this.props.isPricing
-      ? allLegTypes.filter(
-          item =>
-            item.type === LEG_TYPE_MAP.VANILLA_AMERICAN_ANNUAL ||
-            item.type === LEG_TYPE_MAP.VANILLA_AMERICAN_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_ANNUAL ||
-            item.type === LEG_TYPE_MAP.VANILLA_EUROPEAN_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.DIGITAL_AMERICAN_ANNUAL ||
-            item.type === LEG_TYPE_MAP.DIGITAL_AMERICAN_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL ||
-            item.type === LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_ANNUAL ||
-            item.type === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-            item.type === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.EAGLE_ANNUAL ||
-            item.type === LEG_TYPE_MAP.EAGLE_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.DOUBLE_TOUCH_ANNUAL ||
-            item.type === LEG_TYPE_MAP.DOUBLE_TOUCH_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_ANNUAL ||
-            item.type === LEG_TYPE_MAP.DOUBLE_NO_TOUCH_UNANNUAL ||
-            item.type === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
-            item.type === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-            item.type === LEG_TYPE_MAP.ASIAN_UNANNUAL
-        )
-      : allLegTypes;
+    const usedLegs = allLegTypes;
     return [
       {
         name: '年化',

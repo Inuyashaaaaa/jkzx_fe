@@ -54,6 +54,7 @@ export default {
   'menu.tradeManagement.subjectStore': '标的物管理',
   'menu.tradeManagement.onBoardTransaction': '场内交易管理',
   'menu.tradeManagement.portfolioManagement': '投资组合管理',
+  'menu.tradeManagement.tradeDocuments': '交易文档',
   'menu.workflowManagement': '审核',
   'menu.workflowManagement.workflowSettings': '审核配置',
   'menu.workflowManagement.processManagement': '任务管理',
@@ -70,9 +71,6 @@ export default {
   'menu.reports.tradingStatements': '交易报表',
   'menu.reports.fundsDetailedStatements': '资金明细报表',
   'menu.reports.customerFundsSummaryStatements': '客户资金汇总报表',
-  'menu.help': '帮助',
-  'menu.help.userGuide': '使用手册',
-  'menu.help.developmentGuide': '开发指南',
   'menu.userInfo': '个人中心',
   // pro lang
   'navBar.lang': '语言',
