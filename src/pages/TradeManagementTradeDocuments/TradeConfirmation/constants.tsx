@@ -116,7 +116,7 @@ export const SEARCH_FORM_CONTROLS_TRADE: (bookIdList) => IFormControl[] = bookId
   },
 ];
 
-export const TRADE_COLUMN_DEFS: IColumnDef[] = [
+export const TRADE_COLUMN_DEFS: (onFetch) => IColumnDef[] = onFetch => [
   {
     field: 'tradeId',
     headerName: '交易ID',
@@ -142,14 +142,13 @@ export const TRADE_COLUMN_DEFS: IColumnDef[] = [
     headerName: '交易邮箱',
   },
   {
-    field: 'docProcessStatus',
+    field: 'status',
     headerName: '交易确认书处理状态',
   },
   {
     headerName: '操作',
     render: params => {
-      console.log(params);
-      return <TradeModal data={params.data} />;
+      return <TradeModal data={params.data} onFetch={onFetch} />;
     },
   },
 ];

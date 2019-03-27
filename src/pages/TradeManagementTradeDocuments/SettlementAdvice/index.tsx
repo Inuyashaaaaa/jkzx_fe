@@ -5,6 +5,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { SEARCH_FORM_CONTROLS_SETTLE, SETTLE_COLUMN_DEFS } from './constants';
+import { delay, mockData } from '@/lib/utils';
 
 class SettlementAdvice extends PureComponent {
   public $sourceTable: SourceTable = null;
@@ -29,6 +30,8 @@ class SettlementAdvice extends PureComponent {
     //   1000,
     //   mockData({
     //     tradeId: 'OPT20190320',
+    //     tradeEmail: 'zhangjiaan@tongyu.tech',
+    //     positionId: '3452',
     //   })
     // ).then(result => {
     //   this.setState({
@@ -56,15 +59,25 @@ class SettlementAdvice extends PureComponent {
       loading: false,
     });
     if (error) return;
+    const dataSource = data.page.map(item => {
+      return {
+        ...item,
+        status:
+          item.docProcessStatus === 'UN_PROCESSED'
+            ? '未处理'
+            : item.docProcessStatus === 'DOWNLOADED'
+            ? `下载 于 ${moment(item.updateAt).format('YYYY-MM-DD HH:mm')}`
+            : `发送 于 ${moment(item.updateAt).format('YYYY-MM-DD HH:mm')}`,
+      };
+    });
     this.setState({
-      dataSource: data.page,
+      dataSource,
       pagination: {
         ...pagination,
         ...paramsPagination,
         total: data.totalCount,
       },
     });
-    console.log(formValues);
   };
 
   public onReset = () => {
@@ -81,7 +94,6 @@ class SettlementAdvice extends PureComponent {
   };
 
   public onSearchFormChange = async params => {
-    console.log(params.changedValues);
     if (Object.keys(params.changedValues)[0] === 'bookName' && params.changedValues.bookName) {
       const { error, data } = await trdTradeListByBook({
         bookName: params.changedValues.bookName,
@@ -132,7 +144,7 @@ class SettlementAdvice extends PureComponent {
         <SourceTable
           rowKey="uuid"
           ref={node => (this.$sourceTable = node)}
-          columnDefs={SETTLE_COLUMN_DEFS}
+          columnDefs={SETTLE_COLUMN_DEFS(this.onFetch)}
           searchFormControls={SEARCH_FORM_CONTROLS_SETTLE(
             this.state.bookIdList,
             this.state.positionIdList

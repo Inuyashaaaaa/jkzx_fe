@@ -55,6 +55,28 @@ export async function getPartyDoc(params) {
   });
 }
 
+// 发送交易确认书
+export async function emlSendSupplementaryAgreementReport(params) {
+  return request(`${HOST_TEST}document-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'emlSendSupplementaryAgreementReport',
+      params,
+    },
+  });
+}
+
+// 发送结算通知书
+export async function emlSendSettleReport(params) {
+  return request(`${HOST_TEST}document-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'emlSendSettleReport',
+      params,
+    },
+  });
+}
+
 export const UPLOAD_URL = `${HOST_TEST}document-service/api/upload/rpc`;
 
 export const HREF_UPLOAD_URL = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;
