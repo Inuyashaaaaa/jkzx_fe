@@ -120,7 +120,9 @@ class CommonModel extends PureComponent {
       if (error) return;
       this.setState({
         bookIdList: data,
+        searchFormData: params.values,
       });
+      return;
     }
 
     let refSalesGetByLegalNameRsp;
@@ -137,6 +139,7 @@ class CommonModel extends PureComponent {
       });
     }
     this.setState({
+      bookIdList: [],
       searchFormData: params.values,
     });
   };
