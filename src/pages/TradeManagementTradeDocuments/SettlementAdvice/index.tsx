@@ -1,11 +1,11 @@
 import SourceTable from '@/design/components/SourceTable';
+import { delay, mockData } from '@/lib/utils';
 import { positionDocPositionIdListByTradeId, trdTradeListByBook } from '@/services/general-service';
 import { positionDocSearch } from '@/services/trade-service';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { SEARCH_FORM_CONTROLS_SETTLE, SETTLE_COLUMN_DEFS } from './constants';
-import { delay, mockData } from '@/lib/utils';
 
 class SettlementAdvice extends PureComponent {
   public $sourceTable: SourceTable = null;

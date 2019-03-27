@@ -4,9 +4,9 @@ import {
   DOWN_LOAD_TRADE_URL,
   emlSendSettleReport,
 } from '@/services/document';
-import { Button, Col, Row, message } from 'antd';
-import React, { PureComponent } from 'react';
+import { Button, Col, message, Row } from 'antd';
 import moment from 'moment';
+import React, { PureComponent } from 'react';
 
 class TradeModal extends PureComponent {
   public state = {
