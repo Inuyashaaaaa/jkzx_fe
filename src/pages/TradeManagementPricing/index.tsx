@@ -1,17 +1,8 @@
-import {
-  BIG_NUMBER_CONFIG,
-  LEG_ANNUALIZED_FIELD,
-  LEG_FIELD,
-  LEG_NAME_FIELD,
-  LEG_TYPE_FIELD,
-  NOTIONAL_AMOUNT_TYPE_MAP,
-} from '@/constants/common';
+import { LEG_NAME_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { allTryPricingLegTypes } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
-import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import {
-  COMPUTED_LEG_FIELD_MAP,
   COMPUTED_LEG_FIELDS,
   ComputedColDefs,
 } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
@@ -20,22 +11,11 @@ import {
   TradesColDefs,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
+import { PRICING_FROM_TAG } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import {
-  countDelta,
-  countDeltaCash,
-  countGamaCash,
-  countGamma,
-  countPrice,
-  countPricePer,
-  countRhoR,
-  countStdDelta,
-  countTheta,
-  countVega,
-} from '@/services/cash';
 import { trdBookList } from '@/services/general-service';
 import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service';
 import { convertTradePositions, createLegDataSourceItem, getAddLegItem } from '@/services/pages';
@@ -44,9 +24,9 @@ import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
 import { Button, message, notification, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
-import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import router from 'umi/router';
 import uuidv4 from 'uuid/v4';
 
 class TradeManagementPricing extends PureComponent<any> {
@@ -145,51 +125,16 @@ class TradeManagementPricing extends PureComponent<any> {
   };
 
   public addLegData = (leg, rowData) => {
-    this.setState(
-      produce((state: any) => {
-        if (this.cacheTyeps.indexOf(leg.type) !== -1) {
-          state.columnDefs = orderLegColDefs(
-            _.unionBy<IColDef>(
-              state.columnDefs.concat(
-                leg.columnDefs.map(col => {
-                  return {
-                    ...col,
-                    suppressMenu: true,
-                    editable: col.editable
-                      ? params => {
-                          if (typeof col.editable === 'function') {
-                            if (col.editable(params)) {
-                              return this.handleJudge(params);
-                            } else {
-                              return false;
-                            }
-                          }
-                          return this.handleJudge(params);
-                        }
-                      : false,
-                    exsitable: params => {
-                      const legExsitable = this.handleJudge(params);
-                      if (!legExsitable) return false;
-                      if (typeof col.exsitable === 'function') {
-                        return col.exsitable(params);
-                      }
-                      return col.exsitable === undefined ? true : col.exsitable;
-                    },
-                  };
-                })
-              ),
-              item => item.field
-            )
-          );
-        }
-        state.columnDefs = _.unionBy<IColDef>(state.columnDefs, item => item.field);
-        _.remove(state.columnDefs, (item: any) =>
-          [...this.nextTradesColDefs, ...ComputedColDefs].find(iitem => iitem.field === item.field)
-        );
-        state.columnDefs = state.columnDefs.concat(this.nextTradesColDefs).concat(ComputedColDefs);
-        state.dataSource.push(rowData);
-      })
-    );
+    this.props.dispatch({
+      type: 'pricingData/addLegData',
+      payload: {
+        cacheTyeps: this.cacheTyeps,
+        leg,
+        computedAllLegTypes: this.computedAllLegTypes,
+        nextTradesColDefs: this.nextTradesColDefs,
+        rowData,
+      },
+    });
   };
 
   public getHorizontalrColumnDef = ({ rowData }) => {
@@ -220,16 +165,10 @@ class TradeManagementPricing extends PureComponent<any> {
     if (!params.column) return;
 
     const id = params.column.getColDef().field;
-    this.setState(
-      produce((state: any) => {
-        const index = state.dataSource.findIndex(item => item[this.rowKey] === id);
-        state.dataSource.splice(index, 1);
-
-        if (state.dataSource.length === 0) {
-          state.columnDefs = [];
-        }
-      })
-    );
+    this.props.dispatch({
+      type: 'pricingData/removeLegData',
+      payload: { id, rowKey: this.rowKey },
+    });
   };
 
   public copyLegData = (params: GetContextMenuItemsParams) => {
@@ -256,7 +195,7 @@ class TradeManagementPricing extends PureComponent<any> {
   };
 
   public getDataItemByColField = colField => {
-    return this.state.dataSource.find(item => item.id === colField);
+    return this.props.pricingData.dataSource.find(item => item.id === colField);
   };
 
   public switchLoading = loading => {
@@ -265,40 +204,8 @@ class TradeManagementPricing extends PureComponent<any> {
     });
   };
 
-  public getActualNotionAmountBigNumber = legData => {
-    const isAnnualized = legData[LEG_ANNUALIZED_FIELD];
-
-    if (isAnnualized) {
-      if (legData[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
-        return new BigNumber(legData[LEG_FIELD.NOTIONAL_AMOUNT])
-          .multipliedBy(legData[LEG_FIELD.TERM])
-          .dividedBy(365);
-      }
-      if (legData[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.LOT) {
-        return new BigNumber(legData[LEG_FIELD.NOTIONAL_AMOUNT])
-          .multipliedBy(legData[LEG_FIELD.UNDERLYER_MULTIPLIER])
-          .multipliedBy(legData[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE])
-          .multipliedBy(legData[LEG_FIELD.TERM])
-          .dividedBy(365);
-      }
-    }
-
-    if (!isAnnualized) {
-      if (legData[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
-        return new BigNumber(legData[LEG_FIELD.NOTIONAL_AMOUNT]);
-      }
-      if (legData[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.LOT) {
-        return new BigNumber(legData[LEG_FIELD.NOTIONAL_AMOUNT])
-          .multipliedBy(legData[LEG_FIELD.UNDERLYER_MULTIPLIER])
-          .multipliedBy(legData[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE]);
-      }
-    }
-
-    throw new Error('getActualNotionAmountBigNumber not match!');
-  };
-
   public onSave = async params => {
-    const { dataSource: tableDataSource } = this.state;
+    const tableDataSource = this.props.pricingData.dataSource;
 
     if (_.isEmpty(tableDataSource)) {
       message.warn('请添加期权结构');
@@ -365,52 +272,10 @@ class TradeManagementPricing extends PureComponent<any> {
 
     if (rsps.some(rsp => rsp.error) || rsps.some(rsp => _.isEmpty(rsp.data))) return;
 
-    this.setState(
-      produce((state: any) => {
-        state.dataSource = rsps
-          .reduce((pre, next) => {
-            return pre.concat(next.data);
-          }, [])
-          .map((item, index) => {
-            const cur = state.dataSource[index];
-
-            return {
-              ...cur,
-              ..._.mapValues(_.pick(item, TRADESCOL_FIELDS), (val, key) => {
-                val = new BigNumber(val).decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES).toNumber();
-                if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
-                  return val;
-                }
-                return val ? new BigNumber(val).multipliedBy(100).toNumber() : val;
-              }),
-              [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
-              [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
-                item.price,
-                this.getActualNotionAmountBigNumber(cur)
-              ),
-              [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
-              [COMPUTED_LEG_FIELD_MAP.DELTA]: countDelta(
-                item.delta,
-                cur[LEG_FIELD.UNDERLYER_MULTIPLIER]
-              ),
-              [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(item.delta, item.underlyerPrice),
-              [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
-                item.gamma,
-                cur[LEG_FIELD.UNDERLYER_MULTIPLIER],
-                item.underlyerPrice
-              ),
-              [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),
-              [COMPUTED_LEG_FIELD_MAP.VEGA]: countVega(item.vega),
-              [COMPUTED_LEG_FIELD_MAP.THETA]: countTheta(item.theta),
-              [COMPUTED_LEG_FIELD_MAP.RHO_R]: countRhoR(item.rhoR),
-              // [COMPUTED_LEG_FIELD_MAP.RHO]: new BigNumber(item.rho)
-              // .multipliedBy(100)
-              // .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-              // .toNumber(),
-            };
-          });
-      })
-    );
+    this.props.dispatch({
+      type: 'pricingData/pricingLegData',
+      payload: { rsps },
+    });
   };
 
   public getDepends = (getValue, data, colDef) => {
@@ -424,16 +289,16 @@ class TradeManagementPricing extends PureComponent<any> {
 
   public computeCellValues = () => {
     const dependeds = _.flatten(
-      this.state.dataSource.map(dataSourceItem => {
+      this.props.pricingData.dataSource.map(dataSourceItem => {
         return _.union<string>(
-          this.state.columnDefs.reduce((arr, item) => {
+          this.props.pricingData.columnDefs.reduce((arr, item) => {
             return arr.concat(this.getDepends(item.getValue, dataSourceItem, item));
           }, [])
         );
       })
     );
 
-    this.state.dataSource.forEach(rowData => {
+    this.props.pricingData.dataSource.forEach(rowData => {
       const rowId = rowData[this.rowKey];
       dependeds.forEach(colField => {
         const value = rowData[colField];
@@ -458,27 +323,22 @@ class TradeManagementPricing extends PureComponent<any> {
     this.$sourceTable = node;
   };
 
-  public onCellValueChanged = params => {
-    const { colDef } = params;
-    if (
-      TradesColDefs.find(item => item.field === colDef.field) ||
-      colDef.field === LEG_FIELD.UNDERLYER_INSTRUMENT_ID ||
-      colDef.field === LEG_FIELD.UNDERLYER_MULTIPLIER ||
-      colDef.field === LEG_FIELD.INITIAL_SPOT
-    ) {
-      this.setState(
-        produce((state: any) => {
-          state.dataSource.forEach(item => {
-            item[colDef.field] = params.value;
-          });
-        })
-      );
-    }
+  public convertBooking = () => {
+    router.push({
+      pathname: '/trade-management/booking',
+      query: {
+        from: PRICING_FROM_TAG,
+      },
+    });
   };
 
   public render() {
     const getAction = (top = true) => (
-      <Row style={{ [top ? 'marginBottom' : 'marginTop']: VERTICAL_GUTTER }}>
+      <Row
+        type="flex"
+        justify="space-between"
+        style={{ [top ? 'marginBottom' : 'marginTop']: VERTICAL_GUTTER }}
+      >
         <Button.Group>
           <MultilLegCreateButton isPricing={true} key="create" handleAddLeg={this.handleAddLeg} />
           <Button
@@ -490,6 +350,9 @@ class TradeManagementPricing extends PureComponent<any> {
             试定价
           </Button>
         </Button.Group>
+        <Button key="转换簿记" type="primary" onClick={this.convertBooking}>
+          转换簿记
+        </Button>
       </Row>
     );
     return (
@@ -500,7 +363,9 @@ class TradeManagementPricing extends PureComponent<any> {
           ref={this.getRef}
           header={getAction()}
           footer={
-            this.state.dataSource && this.state.dataSource.length > 0 ? getAction(false) : undefined
+            this.props.pricingData.dataSource && this.props.pricingData.dataSource.length > 0
+              ? getAction(false)
+              : undefined
           }
           // extraActions={[<Button key="生成交易确认书">生成交易确认书</Button>]}
           rowKey={this.rowKey}
@@ -509,8 +374,8 @@ class TradeManagementPricing extends PureComponent<any> {
           enableSorting={false}
           getHorizontalrColumnDef={this.getHorizontalrColumnDef}
           getContextMenuItems={this.getContextMenuItems}
-          dataSource={this.state.dataSource}
-          columnDefs={this.state.columnDefs}
+          dataSource={this.props.pricingData.dataSource}
+          columnDefs={this.props.pricingData.columnDefs}
           pagination={false}
         />
       </PageHeaderWrapper>
@@ -520,4 +385,5 @@ class TradeManagementPricing extends PureComponent<any> {
 
 export default connect(state => ({
   currentUser: (state.user as any).currentUser,
+  pricingData: state.pricingData,
 }))(TradeManagementPricing);
