@@ -1,12 +1,13 @@
 import { BIG_NUMBER_CONFIG, LEG_FIELD } from '@/constants/common';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import {
-  COMPUTED_LEG_FIELD_MAP,
   ComputedColDefs,
+  COMPUTED_LEG_FIELDS,
+  COMPUTED_LEG_FIELD_MAP,
 } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import {
-  TRADESCOL_FIELDS,
   TRADESCOLDEFS_LEG_FIELD_MAP,
+  TRADESCOL_FIELDS,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { IColDef } from '@/design/components/Table/types';
 import {
@@ -100,6 +101,53 @@ export default {
             // .toNumber(),
           };
         });
+    },
+
+    setPricingDefault(state, action) {
+      const {
+        payload: { data, rowId },
+      } = action;
+
+      state.dataSource.forEach(item => {
+        if (item.id === rowId) {
+          Object.assign(
+            item,
+            _.mapValues(
+              _.pick(
+                data,
+                TRADESCOL_FIELDS.filter(
+                  item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE
+                )
+              ),
+              val => {
+                if (val) {
+                  return new BigNumber(val)
+                    .multipliedBy(100)
+                    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                    .toNumber();
+                }
+                return val;
+              }
+            )
+          );
+        }
+      });
+    },
+
+    clearPricingDefault(state, action) {
+      state.dataSource.forEach(item => {
+        Object.assign(
+          item,
+          _.fromPairs(
+            [
+              ...TRADESCOL_FIELDS.filter(
+                item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE
+              ),
+              ...COMPUTED_LEG_FIELDS,
+            ].map(item => [item, undefined])
+          )
+        );
+      });
     },
 
     addLegData(state, action) {
