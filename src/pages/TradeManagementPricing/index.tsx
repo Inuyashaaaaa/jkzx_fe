@@ -1,6 +1,6 @@
-import { LEG_NAME_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
+import { LEG_NAME_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { allTryPricingLegTypes } from '@/constants/legColDefs';
+import { allTryPricingLegTypes, ILegType } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -11,6 +11,7 @@ import {
   TradesColDefs,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
+import { LEG_MAP } from '@/constants/legType';
 import { PRICING_FROM_TAG } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
@@ -20,8 +21,11 @@ import { trdBookList } from '@/services/general-service';
 import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service';
 import { convertTradePositions, createLegDataSourceItem, getAddLegItem } from '@/services/pages';
 import { prcTrialPositionsService } from '@/services/pricing';
+import { prcPricingEnvironmentsList } from '@/services/pricing-service';
+import { convertOptions } from '@/utils';
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { Button, message, notification, Row } from 'antd';
+import { Button, Col, Input, message, notification, Row, Select } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -44,8 +48,10 @@ class TradeManagementPricing extends PureComponent<any> {
     columnDefs: [],
     dataSource: [],
     bookList: [],
+    pricingEnvironmentsList: [],
     mktInstrumentIds: [],
     createTradeLoading: false,
+    curPricingEnv: null,
   };
 
   constructor(props) {
@@ -78,6 +84,16 @@ class TradeManagementPricing extends PureComponent<any> {
     });
 
     this.loadInstrumentIds();
+    this.loadPricingEnv();
+  };
+
+  public loadPricingEnv = async () => {
+    const { error, data } = await prcPricingEnvironmentsList();
+    if (error) return;
+    this.setState({
+      pricingEnvironmentsList: data,
+      curPricingEnv: data[0],
+    });
   };
 
   public loadInstrumentIds = () => {
@@ -111,12 +127,7 @@ class TradeManagementPricing extends PureComponent<any> {
 
     const legData = getAddLegItem(leg, createLegDataSourceItem(leg), true);
 
-    this.addLegData(leg, {
-      ...legData,
-      [TRADESCOLDEFS_LEG_FIELD_MAP.VOL]: 20,
-      [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
-      [TRADESCOLDEFS_LEG_FIELD_MAP.R]: 5,
-    });
+    this.addLegData(leg, legData);
   };
 
   public handleJudge = params => {
@@ -228,13 +239,6 @@ class TradeManagementPricing extends PureComponent<any> {
       true
     );
 
-    const tableDataSourceItem = tableDataSource[0];
-
-    if (!tableDataSourceItem) {
-      this.switchLoading(false);
-      throw new Error('tableDataSourceItem is undefined');
-    }
-
     const rsps = await Promise.all(
       positions.map((item, index) => {
         return prcTrialPositionsService({
@@ -250,6 +254,7 @@ class TradeManagementPricing extends PureComponent<any> {
             }
             return val ? new BigNumber(val).multipliedBy(0.01).toNumber() : val;
           }),
+          pricingEnvironmentId: this.state.curPricingEnv,
         });
       })
     );
@@ -332,6 +337,70 @@ class TradeManagementPricing extends PureComponent<any> {
     });
   };
 
+  public onCellValueChanged = params => {
+    this.fetchDefaultPricingEnvData(params.data);
+  };
+
+  public fetchDefaultPricingEnvData = async legData => {
+    // 交易要素都不为空
+    const validateTableRsp: any = await this.$sourceTable.validateTable({
+      rowId: legData[this.rowKey],
+      showError: false,
+    });
+
+    if (validateTableRsp.error) {
+      console.warn('validateTable: has error');
+      return;
+    }
+
+    // val，q 等都为空，视为默认
+    if (
+      _.some(
+        _.pick(
+          legData,
+          TRADESCOL_FIELDS.filter(item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE)
+        ),
+        item => item != null
+      )
+    ) {
+      console.warn('val，q 等都为空，视为默认');
+      return;
+    }
+
+    const { error, data = [] } = await prcTrialPositionsService({
+      positions: convertTradePositions(
+        [_.omit(legData, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])],
+        {},
+        true
+      ),
+      pricingEnvironmentId: this.state.curPricingEnv,
+    });
+
+    if (error) return;
+
+    this.props.dispatch({
+      type: 'pricingData/setPricingDefault',
+      payload: { data: _.first(data), rowId: legData[this.rowKey] },
+    });
+  };
+
+  public onPricingEnvSelectChange = val => {
+    this.setState(
+      {
+        curPricingEnv: val,
+      },
+      () => {
+        this.props.dispatch({
+          type: 'pricingData/clearPricingDefault',
+        });
+        // clearPricingDefault push state queue
+        setTimeout(() => {
+          this.props.pricingData.dataSource.forEach(item => this.fetchDefaultPricingEnvData(item));
+        });
+      }
+    );
+  };
+
   public render() {
     const getAction = (top = true) => (
       <Row
@@ -339,17 +408,37 @@ class TradeManagementPricing extends PureComponent<any> {
         justify="space-between"
         style={{ [top ? 'marginBottom' : 'marginTop']: VERTICAL_GUTTER }}
       >
-        <Button.Group>
-          <MultilLegCreateButton isPricing={true} key="create" handleAddLeg={this.handleAddLeg} />
-          <Button
-            loading={this.state.createTradeLoading}
-            key="试定价"
-            type="primary"
-            onClick={this.onSave}
-          >
-            试定价
-          </Button>
-        </Button.Group>
+        <Row type="flex" align="middle">
+          <Col>
+            <MultilLegCreateButton isPricing={true} key="create" handleAddLeg={this.handleAddLeg} />
+          </Col>
+          <Col style={{ marginLeft: 15 }}>定价环境:</Col>
+          <Col style={{ marginLeft: 10, width: 400 }}>
+            <Input.Group compact={true}>
+              <Select
+                onChange={this.onPricingEnvSelectChange}
+                value={this.state.curPricingEnv}
+                style={{ width: 200 }}
+              >
+                {this.state.pricingEnvironmentsList.map(item => {
+                  return (
+                    <Select.Option key={item} value={item}>
+                      {item}
+                    </Select.Option>
+                  );
+                })}
+              </Select>
+              <Button
+                loading={this.state.createTradeLoading}
+                key="试定价"
+                type="primary"
+                onClick={this.onSave}
+              >
+                试定价
+              </Button>
+            </Input.Group>
+          </Col>
+        </Row>
         <Button key="转换簿记" type="primary" onClick={this.convertBooking}>
           转换簿记
         </Button>
@@ -377,6 +466,7 @@ class TradeManagementPricing extends PureComponent<any> {
           dataSource={this.props.pricingData.dataSource}
           columnDefs={this.props.pricingData.columnDefs}
           pagination={false}
+          onCellValueChanged={this.onCellValueChanged}
         />
       </PageHeaderWrapper>
     );
