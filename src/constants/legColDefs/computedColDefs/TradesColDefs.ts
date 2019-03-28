@@ -27,11 +27,6 @@ export const TradesColDefs: IColDef[] = [
     field: TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE,
     input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
     cellStyle: CELL_STYLE,
-    rules: [
-      {
-        required: true,
-      },
-    ],
     getValue: {
       depends: [LEG_FIELD.INITIAL_SPOT],
       value(record) {
@@ -45,11 +40,6 @@ export const TradesColDefs: IColDef[] = [
     field: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
     input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     cellStyle: CELL_STYLE,
-    rules: [
-      {
-        required: true,
-      },
-    ],
   },
   {
     editable: true,
@@ -57,11 +47,6 @@ export const TradesColDefs: IColDef[] = [
     field: TRADESCOLDEFS_LEG_FIELD_MAP.R,
     input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     cellStyle: CELL_STYLE,
-    rules: [
-      {
-        required: true,
-      },
-    ],
   },
   {
     editable: true,
@@ -69,10 +54,5 @@ export const TradesColDefs: IColDef[] = [
     field: TRADESCOLDEFS_LEG_FIELD_MAP.Q,
     input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     cellStyle: CELL_STYLE,
-    rules: [
-      {
-        required: true,
-      },
-    ],
   },
 ];
