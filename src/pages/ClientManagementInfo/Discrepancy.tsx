@@ -241,6 +241,7 @@ class Discrepancy extends PureComponent<
       {
         discrepancyCreateData: {
           paymentDate: moment(),
+          accountDirection: 'PARTY',
         },
       },
       () => this.onFetch()
