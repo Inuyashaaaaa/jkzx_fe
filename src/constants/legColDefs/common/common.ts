@@ -132,7 +132,7 @@ export const ParticipationRate: IColDef = {
 };
 
 export const LowParticipationRate: IColDef = {
-  headerName: '高参与率',
+  headerName: '低参与率',
   field: LEG_FIELD.LOW_PARTICIPATION_RATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -140,7 +140,7 @@ export const LowParticipationRate: IColDef = {
 };
 
 export const HighParticipationRate: IColDef = {
-  headerName: '低参与率',
+  headerName: '高参与率',
   field: LEG_FIELD.HIGH_PARTICIPATION_RATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
