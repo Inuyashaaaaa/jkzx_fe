@@ -73,7 +73,12 @@ export default {
               if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
                 return val;
               }
-              return val ? new BigNumber(val).multipliedBy(100).toNumber() : val;
+              return val
+                ? new BigNumber(val)
+                    .multipliedBy(100)
+                    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                    .toNumber()
+                : val;
             }),
             [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
             [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(

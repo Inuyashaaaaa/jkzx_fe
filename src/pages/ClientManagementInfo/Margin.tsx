@@ -367,6 +367,7 @@ class Margin extends PureComponent<MarginProps> {
     this.modalFormData = event.rowData;
     const IOGlodDataSource = {
       cashFlow: 0,
+      legalName: event.rowData.legalName,
     };
     this.setState({
       ioGlodVisible: true,

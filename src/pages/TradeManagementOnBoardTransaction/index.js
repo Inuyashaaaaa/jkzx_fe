@@ -428,6 +428,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
           visible={createFormVisible}
           onCancel={this.hideCreateForm}
           onOk={this.handleCreateForm}
+          title="新建场内流水"
         >
           <Form
             controlNumberOneRow={1}

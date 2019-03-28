@@ -296,7 +296,8 @@ class TableBase extends React.Component<TableBaseProps, TableState> {
     return rowNode;
   };
 
-  public validateTableCells = () => {
+  public validateTableCells = (options: any = {}) => {
+    const { rowId, showError } = options;
     this.gridApi.stopEditing();
     const renders: any[] = this.gridApi.getCellRendererInstances();
     return Promise.all(
@@ -304,9 +305,10 @@ class TableBase extends React.Component<TableBaseProps, TableState> {
         .map(item => item.componentInstance)
         .filter(item => {
           if (!item.getEditable) return false;
+          if (rowId && (item.getRowData() || {})[this.props.rowKey] !== rowId) return false;
           return item.getEditable();
         })
-        .map(item => item.validateCell())
+        .map(item => item.validateCell(showError))
     );
   };
 
@@ -329,7 +331,7 @@ class TableBase extends React.Component<TableBaseProps, TableState> {
     this.TableEventBus.emit(EVENT_CELL_VALUE_CHANGED, event);
     if (this.props.onCellValueChanged) {
       const data = this.props.vertical
-        ? this.getVerticalTableRowDataByColField(event.colDef)
+        ? this.getVerticalTableRowDataByColField(event.colDef.field)
         : event.data;
       const colDef = this.props.vertical
         ? this.getVerticalTableColDefByRowIndex(event.node.rowIndex)

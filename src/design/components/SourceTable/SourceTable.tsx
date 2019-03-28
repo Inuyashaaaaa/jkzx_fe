@@ -52,8 +52,8 @@ class SourceTable extends StationalComponent<SourceTableProps, SourceTableState>
     });
   };
 
-  public validateTable = async () => {
-    return this.$baseSourceTable.$table.$baseTable.validateTableCells().then(results => {
+  public validateTable = async (options?) => {
+    return this.$baseSourceTable.$table.$baseTable.validateTableCells(options).then(results => {
       if (results.some(item => item.error)) {
         return {
           error: true,
