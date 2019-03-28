@@ -1,13 +1,13 @@
 import { BIG_NUMBER_CONFIG, LEG_FIELD } from '@/constants/common';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import {
-  ComputedColDefs,
-  COMPUTED_LEG_FIELDS,
   COMPUTED_LEG_FIELD_MAP,
+  COMPUTED_LEG_FIELDS,
+  ComputedColDefs,
 } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import {
-  TRADESCOLDEFS_LEG_FIELD_MAP,
   TRADESCOL_FIELDS,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { IColDef } from '@/design/components/Table/types';
 import {
