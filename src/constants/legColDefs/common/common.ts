@@ -9,9 +9,10 @@ import {
 import { getMoment } from '@/utils';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
-import moment, { isMoment } from 'moment';
+import moment from 'moment';
 import {
   BIG_NUMBER_CONFIG,
+  DOWN_OBSERVATION_OPTIONS,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
   FREQUENCY_TYPE_OPTIONS,
@@ -709,6 +710,56 @@ export const UpBarrierType: IColDef = {
   },
 };
 
+export const DownBarrierType: IColDef = {
+  editable: true,
+  headerName: '敲入障碍价类型',
+  field: LEG_FIELD.DOWN_BARRIER_TYPE,
+  input: {
+    type: 'select',
+    options: UNIT_ENUM_OPTIONS2,
+  },
+};
+
+export const DownBarrierOptionsStrikeType: IColDef = {
+  editable: true,
+  headerName: '敲入期权行权价类型',
+  field: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE,
+  input: {
+    type: 'select',
+    options: UNIT_ENUM_OPTIONS2,
+  },
+};
+
+export const DownBarrierOptionsStrike: IColDef = {
+  editable: true,
+  headerName: '敲入期权行权价',
+  field: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE,
+  input: record => {
+    if (record[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_OPTIONS2.CNY) {
+      return {
+        depends: [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE],
+        value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      };
+    }
+
+    return {
+      depends: [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE],
+      value: INPUT_NUMBER_PERCENTAGE_CONFIG,
+    };
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const DownBarrierOptionsType: IColDef = {
+  editable: true,
+  headerName: '敲入期权类型',
+  field: LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE,
+  input: {
+    type: 'select',
+    options: OPTION_TYPE_OPTIONS,
+  },
+};
+
 export const UpBarrier: IColDef = {
   editable: true,
   headerName: '敲出障碍价',
@@ -730,6 +781,25 @@ export const UpBarrier: IColDef = {
   },
 };
 
+export const DownBarrier: IColDef = {
+  editable: true,
+  headerName: '敲入障碍价',
+  field: LEG_FIELD.DOWN_BARRIER,
+  input: record => {
+    if (record[LEG_FIELD.DOWN_BARRIER_TYPE] === UNIT_ENUM_MAP2.CNY) {
+      return {
+        depends: [LEG_FIELD.DOWN_BARRIER_TYPE],
+        value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+      };
+    }
+
+    return {
+      depends: [LEG_FIELD.DOWN_BARRIER_TYPE],
+      value: INPUT_NUMBER_PERCENTAGE_CONFIG,
+    };
+  },
+};
+
 export const CouponEarnings: IColDef = {
   editable: true,
   headerName: '收益/coupon(%)',
@@ -740,6 +810,13 @@ export const CouponEarnings: IColDef = {
 export const Step: IColDef = {
   editable: true,
   headerName: '逐步调整步长(%)',
+  field: LEG_FIELD.STEP,
+  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+};
+
+export const Coupon: IColDef = {
+  editable: true,
+  headerName: 'coupon障碍',
   field: LEG_FIELD.STEP,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
 };
@@ -936,6 +1013,50 @@ export const ObservationStep: IColDef = {
     type: 'select',
     defaultOpen: true,
     options: FREQUENCY_TYPE_OPTIONS,
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const UpObservationStep: IColDef = {
+  headerName: '敲出观察频率',
+  field: LEG_FIELD.UP_OBSERVATION_STEP,
+  editable: true,
+  input: {
+    type: 'select',
+    defaultOpen: true,
+    options: FREQUENCY_TYPE_OPTIONS,
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const DownObservationStep: IColDef = {
+  headerName: '敲入观察频率',
+  field: LEG_FIELD.DOWN_OBSERVATION_STEP,
+  editable: true,
+  input: {
+    type: 'select',
+    defaultOpen: true,
+    options: DOWN_OBSERVATION_OPTIONS,
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const AlreadyBarrier: IColDef = {
+  headerName: '敲入观察频率',
+  field: LEG_FIELD.ALREADY_BARRIER,
+  editable: true,
+  input: {
+    type: 'checkbox',
+  },
+  rules: RULES_REQUIRED,
+};
+
+export const DownBarrierDate: IColDef = {
+  headerName: '敲入日期',
+  field: LEG_FIELD.DOWN_BARRIER_DATE,
+  editable: true,
+  input: {
+    type: 'date',
   },
   rules: RULES_REQUIRED,
 };
