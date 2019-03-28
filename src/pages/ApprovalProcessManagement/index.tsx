@@ -63,7 +63,7 @@ class ApprovalProcessManagement extends PureComponent {
         });
         break;
       case 'checked':
-        res = await queryProcessToDoList({
+        res = await queryProcessList({
           processInstanceUserPerspective: 'EXECUTED_BY_ME',
           keyword: '',
         });

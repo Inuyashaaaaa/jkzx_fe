@@ -1,7 +1,10 @@
 import { INPUT_NUMBER_CURRENCY_CNY_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { IColumnDef } from '@/lib/components/_Table2';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
+import {
+  refMasterAgreementSearch,
+  refSimilarLegalNameList,
+} from '@/services/reference-data-service';
 import { CascaderOptionType } from 'antd/lib/cascader';
 import { ADDRESS_CASCADER } from '.';
 export * from './INSITUTIONS';
@@ -53,6 +56,19 @@ export const SEARCH_FORM_CONTROLS: (
     field: 'masterAgreementId',
     input: {
       allowClear: true,
+      type: 'select',
+      showSearch: true,
+      placeholder: '请输入内容搜索',
+      options: async (value: string = '') => {
+        const { data, error } = await refMasterAgreementSearch({
+          masterAgreementId: value,
+        });
+        if (error) return [];
+        return data.map(item => ({
+          label: item,
+          value: item,
+        }));
+      },
     },
   },
   {
