@@ -1,4 +1,8 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_LOT_CONFIG } from '@/constants/common';
+import {
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
+  INPUT_NUMBER_LOT_CONFIG,
+} from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -57,10 +61,12 @@ const historyBuyAmount = {
   field: 'historyBuyAmount',
   headerName: '总买金额',
 };
+
 const historySellAmount = {
   field: 'historySellAmount',
   headerName: '总卖金额',
 };
+
 const longPosition = {
   field: 'longPosition',
   headerName: '总买量',
@@ -81,11 +87,11 @@ const totalPnl = {
   headerName: '总盈亏',
 };
 
-// const t = {
-//   field: '',
-//   headerName: '',
-//   key: '',
-// };
+const marketValue = {
+  field: 'marketValue',
+  headerName: '市值',
+  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+};
 
 export function generateColumns(type) {
   if (type === 'flow') {
@@ -111,6 +117,7 @@ export function generateColumns(type) {
       historyBuyAmount,
       shortPosition,
       historySellAmount,
+      marketValue,
       totalPnl,
     ];
   }
@@ -123,6 +130,7 @@ export function generateColumns(type) {
       historyBuyAmount,
       shortPosition,
       historySellAmount,
+      marketValue,
       totalPnl,
     ];
   }
