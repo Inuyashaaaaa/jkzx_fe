@@ -257,6 +257,11 @@ export default [
               name: 'intradayExpiringPositionReport',
               component: './RiskManagerIntradayExpiringPositionReport/index',
             },
+            {
+              path: '/risk-manager/portfolio-risk',
+              name: 'portfolioRisk',
+              component: './RiskManagerPortfolioRisk/index',
+            },
           ],
         },
         {
