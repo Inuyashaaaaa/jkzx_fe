@@ -1,7 +1,7 @@
 import Form from '@/design/components/Form';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import SourceTable from '@/lib/components/_SourceTable';
-import { mktInstrumentSearch } from '@/services/market-data-service';
+import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
 import {
   exeTradeRecordSave,
   queryDetail,
@@ -16,6 +16,8 @@ import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import RowForm from './components/RowForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
+import BigNumber from 'bignumber.js';
+import { BIG_NUMBER_CONFIG } from '@/constants/common';
 
 const { TabPane } = Tabs;
 const RadioButton = Radio.Button;
@@ -111,7 +113,10 @@ class TradeManagementOnBoardTansaction extends PureComponent {
         loading: false,
       });
     }
-    const data = (list && list.data) || [];
+    let data = (list && list.data) || [];
+
+    data = await this.injectMarketValue(data);
+
     const finalData = data.map(d => {
       const obj = Object.assign({}, d);
       if (isFlow) {
@@ -130,15 +135,13 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       handleObjNumber(obj);
       return obj;
     });
-    // let summaryData = [];
-    // if (!isFlow) {
-    //   summaryData = this.generateSummary(data);
-    // }
+
     finalData.sort((a, b) => {
       const aStr = a.bookId + a.instrumentId;
       const bStr = b.bookId + b.instrumentId;
       return aStr.localeCompare(bStr);
     });
+
     const nextState = isFlow ? { flowData: finalData } : { positionData: finalData };
     if (isFlow) {
       this.originFlowData = data;
@@ -148,6 +151,33 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     this.setState({
       loading: false,
       ...nextState,
+    });
+  };
+
+  injectMarketValue = async finalData => {
+    const { data = {}, error } = await mktQuotesListPaged({
+      instrumentIds: finalData.map(item => item.instrumentId),
+    });
+
+    if (error) return finalData;
+
+    const { page = [] } = data;
+
+    return finalData.map(item => {
+      const findItem = page.find(iitem => iitem.instrumentId === item.instrumentId);
+      if (findItem) {
+        const { longPosition = 0, shortPosition = 0 } = item;
+        const { last = 0, multiplier = 1 } = findItem;
+        return {
+          ...item,
+          marketValue: new BigNumber(new BigNumber(longPosition).minus(shortPosition))
+            .multipliedBy(last)
+            .multipliedBy(multiplier)
+            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+            .toNumber(),
+        };
+      }
+      return item;
     });
   };
 
