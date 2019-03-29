@@ -240,6 +240,10 @@ export const treeData = [
             title: '定制化报告',
             key: 'customReport',
           },
+          {
+            title: '投资组合风险',
+            key: 'portfolioRisk',
+          },
         ],
       },
       {
