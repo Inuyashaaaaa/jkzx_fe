@@ -281,10 +281,15 @@ export default [
               name: 'users',
               component: './SystemSettingsUsers/index',
             },
+            // {
+            //   path: '/system-settings/roles',
+            //   name: 'roles',
+            //   component: './SystemSettingsRoles/index',
+            // },
             {
-              path: '/system-settings/roles',
-              name: 'roles',
-              component: './SystemSettingsRoles/index',
+              path: '/system-settings/role-management',
+              name: 'roleManagement',
+              component: './SystemSettingsRoleManagement/index',
             },
             {
               path: '/system-settings/department',
