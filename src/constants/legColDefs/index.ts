@@ -7,39 +7,10 @@ import { AnnulizedVanillaOptionDTOEuropeanAnnual } from './AnnulizedVanillaOptio
 import { AnnulizedVanillaOptionDTOEuropeanUnAnnual } from './AnnulizedVanillaOptionDTOEuropeanUnAnnual';
 import { AsiaAnnual } from './AsiaAnnual';
 import { AsiaUnAnnual } from './AsiaUnAnnual';
+import { AutoCallPhoenixAnnual } from './AutoCallPhoenixAnnual';
 import { AutoCallSnowAnnual } from './AutoCallSnowAnnual';
 import { BarrierAnnual } from './BarrierAnnual';
 import { BarrierUnAnnual } from './BarrierUnAnnual';
-import {
-  Barrier,
-  Direction,
-  HighBarrier,
-  HighStrike,
-  InitialSpot,
-  KnockDirection,
-  LowBarrier,
-  LowStrike,
-  NotionalAmount,
-  NotionalAmountType,
-  ObservationType,
-  OptionType,
-  ParticipationRate,
-  ParticipationRate1,
-  ParticipationRate2,
-  Payment,
-  PaymentType,
-  PricingExpirationDate,
-  PricingTerm,
-  Rebate,
-  Strike,
-  Strike1,
-  Strike2,
-  Strike3,
-  Strike4,
-  StrikeType,
-  UnderlyerInstrumentId,
-  UnderlyerMultiplier,
-} from './common/common';
 import { ConcavaAnnual } from './ConcavaAnnual';
 import { ConcavaUnAnnual } from './ConcavaUnAnnual';
 import { ConvexAnnual } from './ConvexAnnual';
@@ -117,6 +88,7 @@ export const allLegTypes: ILegType[] = [
   AutoCallSnowAnnual,
   AsiaAnnual,
   AsiaUnAnnual,
+  AutoCallPhoenixAnnual
 ];
 
 export const allTryPricingLegTypes: ILegType[] = [
@@ -173,6 +145,7 @@ export const allTryPricingLegTypes: ILegType[] = [
   [RangeAccrualsUnAnnual, RangeAccrualsUnAnnual.pricingColumnDefs],
   [StraddleAnnual, StraddleAnnual.pricingColumnDefs],
   [StraddleUnAnnual, StraddleUnAnnual.pricingColumnDefs],
+  [AutoCallPhoenixAnnual, AutoCallPhoenixAnnual.pricingColumnDefs],
 ].map(([leg, colDefs]) => pickColumns(leg, colDefs));
 
 function pickColumns(leg, colDefs) {

@@ -2,10 +2,12 @@ import PopconfirmButton from '@/components/PopconfirmButton';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
+  KNOCK_DIRECTION_MAP,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
+  UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import Form from '@/design/components/Form';
 import { InputPolym } from '@/design/components/Form/Input/InputPolym';
@@ -30,9 +32,12 @@ class AsiaObserveModalInput extends InputPolym<any> {
 
   public productType: string;
 
+  public record: any;
+
   constructor(props) {
     super(props);
     this.productType = props.record[LEG_TYPE_FIELD];
+    this.record = props.record;
     this.state.dealDataSource = this.computeDataSource(
       (props.value || []).map((item, index) => {
         return {
@@ -44,7 +49,7 @@ class AsiaObserveModalInput extends InputPolym<any> {
   }
 
   public computeDataSource = (dataSource = []) => {
-    return dataSource
+    dataSource = dataSource
       .sort((a, b) => a[OB_DAY_FIELD].valueOf() - b[OB_DAY_FIELD].valueOf())
       .map((item, index) => {
         return {
@@ -55,9 +60,47 @@ class AsiaObserveModalInput extends InputPolym<any> {
             .toNumber(),
         };
       });
+
+    if (this.isAutoCallPhoenix() || this.isAutoCallSnow()) {
+      const { record } = this.props;
+      const upBarrier = record[LEG_FIELD.UP_BARRIER];
+      const upBarrierType = record[LEG_FIELD.UP_BARRIER_TYPE];
+      const step = record[LEG_FIELD.STEP];
+      const initialSpot = record[LEG_FIELD.INITIAL_SPOT];
+
+      const barrierVal =
+        upBarrierType === UP_BARRIER_TYPE_MAP.PERCENT
+          ? new BigNumber(initialSpot).multipliedBy(new BigNumber(upBarrier).div(100)).toNumber()
+          : upBarrier;
+
+      return dataSource.map((item, index) => {
+        return {
+          ...item,
+          payDay: item[OB_DAY_FIELD],
+          ...(this.isIn()
+            ? {
+                price: new BigNumber(barrierVal)
+                  .plus(
+                    new BigNumber(index + 1)
+                      .multipliedBy(new BigNumber(step).div(100))
+                      .multipliedBy(initialSpot)
+                  )
+                  .decimalPlaces(4)
+                  .toNumber(),
+              }
+            : null),
+        };
+      });
+    }
+
+    return dataSource;
   };
 
   public formatValue = (value): string => {
+    if (this.isAutoCallPhoenix() && this.isAutoCallSnow()) {
+      return value && value.length ? [value[0], value[value.length - 1]].join(' ~ ') : '';
+    }
+
     return value && value.length
       ? [value[0][OB_DAY_FIELD], value[value.length - 1][OB_DAY_FIELD]].join(' ~ ')
       : '';
@@ -192,7 +235,80 @@ class AsiaObserveModalInput extends InputPolym<any> {
     );
   };
 
+  public isAutoCallSnow = () => {
+    return (
+      this.productType === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
+      this.productType === LEG_TYPE_MAP.AUTOCALL_UNANNUAL
+    );
+  };
+
+  public isAutoCallPhoenix = () => {
+    return (
+      this.productType === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||
+      this.productType === LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL
+    );
+  };
+
+  public isIn = () => {
+    return this.props.direction === KNOCK_DIRECTION_MAP.DOWN;
+  };
+
+  public isUp = () => {
+    return this.props.direction === KNOCK_DIRECTION_MAP.UP;
+  };
+
   public getColumnDefs = (): IColumnDef[] => {
+    if (this.isAutoCallSnow() || this.isAutoCallPhoenix()) {
+      return [
+        {
+          headerName: '观察日',
+          field: OB_DAY_FIELD,
+          input: {
+            type: 'date',
+            ranger: 'day',
+          },
+        },
+        {
+          headerName: '支付日',
+          field: 'payDay',
+          input: {
+            type: 'date',
+            ranger: 'day',
+          },
+        },
+        this.isIn()
+          ? {
+              headerName: '障碍价格',
+              field: 'price',
+              input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+            }
+          : {
+              headerName: '已观察到价格(可编辑)',
+              field: 'price',
+              editable: true,
+              input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+            },
+        {
+          headerName: '操作',
+          render: params => {
+            return (
+              <Row
+                type="flex"
+                align="middle"
+                style={{
+                  height: params.context.rowHeight,
+                }}
+              >
+                <Button size="small" type="danger" onClick={this.bindRemove(params)}>
+                  删除
+                </Button>
+              </Row>
+            );
+          },
+        },
+      ];
+    }
+
     return [
       {
         headerName: '观察日',
@@ -290,12 +406,13 @@ class AsiaObserveModalInput extends InputPolym<any> {
                         },
                       ]}
                       submitText={'添加'}
-                      resetText={'批量生成观察日'}
                       resetable={false}
                     />
                   </Col>
                   <Col>
-                    {this.isAccruals() ? null : (
+                    {this.isAccruals() ||
+                    this.isAutoCallPhoenix() ||
+                    this.isAutoCallSnow() ? null : (
                       <PopconfirmButton
                         type="primary"
                         loading={this.state.generateLoading}

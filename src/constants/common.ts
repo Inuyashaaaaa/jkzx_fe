@@ -180,6 +180,23 @@ export const FREQUENCY_TYPE_NUM_MAP = {
 
 export const FREQUENCY_TYPE_OPTIONS = convertOptions(FREQUENCY_TYPE_MAP, FREQUENCY_TYPE_ZHCN_MAP);
 
+export const DOWN_OBSERVATION_ZHCN_MAP = {
+  '1D': '每交易日',
+  '1M': '  每月',
+  '3W': ' 每季度',
+};
+
+export const DOWN_OBSERVATION_NUM_MAP = {
+  '1D': '1D',
+  '1M': '1M',
+  '3W': '3W',
+};
+
+export const DOWN_OBSERVATION_OPTIONS = convertOptions(
+  DOWN_OBSERVATION_NUM_MAP,
+  DOWN_OBSERVATION_ZHCN_MAP
+);
+
 export const LCM_EVENT_TYPE_OPTIONS = convertOptions(LCM_EVENT_TYPE_MAP, LCM_EVENT_TYPE_ZHCN_MAP);
 
 export const UNIT_ENUM_ZHCN_MAP = {
@@ -356,19 +373,29 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  * 多腿字段名
  */
 export const LEG_FIELD = {
+  IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
+  DOWN_BARRIER_DATE: 'DownBarrierDate', // 敲入日期
+  ALREADY_BARRIER: 'AlreadyBarrier', // 已经敲入
+  COUPON_BARRIER: 'couponBarrier', // coupon障碍
   OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日
   OBSERVATION_STEP: 'observationStep', // 观察频率
+  UP_OBSERVATION_STEP: 'UP_OBSERVATION_STEP', // 观察频率
+  DOWN_OBSERVATION_STEP: 'knockInObservationStep', // 观察频率
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',
   AUTO_CALL_STRIKE: 'autoCallStrike',
   AUTO_CALL_STRIKE_UNIT: 'autoCallStrikeUnit',
   COUPON_PAYMENT: 'couponPayment', // 收益/coupon(%)
-  EXPIRE_NO_BARRIEROBSERVE_DAY: 'observationDates', // 敲出/coupon观察日
+  EXPIRE_NO_BARRIEROBSERVE_DAY: 'fixingObservations', // 敲出/coupon观察日
   EXPIRE_NOBARRIER_PREMIUM_TYPE: 'autoCallPaymentType', // 到期未敲出收益类型
   EXPIRE_NOBARRIERPREMIUM: 'fixedPayment', // 到期未敲出固定收益
   STEP: 'step',
   UP_BARRIER: 'upBarrier',
+  DOWN_BARRIER: 'knockInBarrier',
   UP_BARRIER_TYPE: 'upBarrierType',
+  DOWN_BARRIER_TYPE: 'knockInBarrierType',
+  DOWN_BARRIER_OPTIONS_STRIKE_TYPE: 'knockInStrikeType',
+  DOWN_BARRIER_OPTIONS_TYPE: 'knockInOptionType',
   ALUNWIND_NOTIONAL_AMOUNT: 'historyValue',
   INITIAL_NOTIONAL_AMOUNT: 'initialValue',
   LCM_EVENT_TYPE: 'lcmEventType',
@@ -422,6 +449,7 @@ export const LEG_FIELD = {
   NOTIONAL_AMOUNT: 'notionalAmount',
   LOW_STRIKE: 'lowStrike',
   HIGH_STRIKE: 'highStrike',
+  DOWN_BARRIER_OPTIONS_STRIKE: 'knockInStrike',
   BARRIER: 'barrier',
   LOW_BARRIER: 'lowBarrier',
   HIGH_BARRIER: 'highBarrier',
@@ -522,6 +550,9 @@ export const LEG_TYPE_MAP = {
   AUTOCALL: 'AUTOCALL',
   AUTOCALL_ANNUAL: 'AUTOCALL_ANNUAL',
   AUTOCALL_UNANNUAL: 'AUTOCALL_UNANNUAL',
+  AUTOCALL_PHOENIX: 'AUTOCALL_PHOENIX',
+  AUTOCALL_PHOENIX_ANNUAL: 'AUTOCALL_PHOENIX_ANNUAL',
+  AUTOCALL_PHOENIX_UNANNUAL: 'AUTOCALL_PHOENIX_UNANNUAL',
   GENERIC_SINGLE_ASSET_OPTION: 'GENERIC_SINGLE_ASSET_OPTION',
   VANILLA_EUROPEAN: 'VANILLA_EUROPEAN',
   VANILLA_EUROPEAN_ANNUAL: 'VANILLA_EUROPEAN_ANNUAL',
@@ -580,8 +611,13 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.ASIAN]: '亚式',
   [LEG_TYPE_MAP.ASIAN_ANNUAL]: '亚式 - 年化',
   [LEG_TYPE_MAP.ASIAN_UNANNUAL]: '亚式 - 非年化',
+  [LEG_TYPE_MAP.AUTOCALL_PHOENIX]: 'AutoCall - 凤凰式',
+  [LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL]: 'AutoCall - 凤凰式 - 年化',
+  [LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL]: 'AutoCall - 雪球式 - 非年化',
+  [LEG_TYPE_MAP.AUTOCALL_UNANNUAL]: 'AutoCall - 凤凰式 - 年化',
   [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
   [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: 'AutoCall - 雪球式 - 年化',
+  [LEG_TYPE_MAP.AUTOCALL_UNANNUAL]: 'AutoCall - 凤凰式 - 年化',
   [LEG_TYPE_MAP.GENERIC_SINGLE_ASSET_OPTION]: '其他单资产期权',
   [LEG_TYPE_MAP.VANILLA_EUROPEAN]: '欧式',
   [LEG_TYPE_MAP.VANILLA_EUROPEAN_ANNUAL]: '欧式 - 年化',
