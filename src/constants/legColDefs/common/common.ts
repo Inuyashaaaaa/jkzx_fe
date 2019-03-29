@@ -9,6 +9,7 @@ import {
 import { getMoment } from '@/utils';
 import { ValidationRule } from 'antd/lib/form';
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 import moment from 'moment';
 import {
   BIG_NUMBER_CONFIG,
@@ -817,7 +818,7 @@ export const Step: IColDef = {
 export const Coupon: IColDef = {
   editable: true,
   headerName: 'coupon障碍',
-  field: LEG_FIELD.STEP,
+  field: LEG_FIELD.COUPON_BARRIER,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
 };
 
@@ -903,8 +904,22 @@ export const ExpireNoBarrierObserveDay: IColDef = {
   field: LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
   input: record => {
     return {
-      type: ObserveModalInput,
+      type: AsiaObserveModalInput,
       record,
+      direction: KNOCK_DIRECTION_MAP.UP,
+    };
+  },
+};
+
+export const InExpireNoBarrierObserveDay: IColDef = {
+  editable: true,
+  headerName: '敲入/coupon观察日',
+  field: LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY,
+  input: record => {
+    return {
+      type: AsiaObserveModalInput,
+      record,
+      direction: KNOCK_DIRECTION_MAP.DOWN,
     };
   },
 };
@@ -1024,7 +1039,7 @@ export const UpObservationStep: IColDef = {
   input: {
     type: 'select',
     defaultOpen: true,
-    options: FREQUENCY_TYPE_OPTIONS,
+    options: _.reject(FREQUENCY_TYPE_OPTIONS, item => item.value === '1D'),
   },
   rules: RULES_REQUIRED,
 };
@@ -1042,7 +1057,7 @@ export const DownObservationStep: IColDef = {
 };
 
 export const AlreadyBarrier: IColDef = {
-  headerName: '敲入观察频率',
+  headerName: '已经敲入',
   field: LEG_FIELD.ALREADY_BARRIER,
   editable: true,
   input: {
@@ -1055,10 +1070,15 @@ export const DownBarrierDate: IColDef = {
   headerName: '敲入日期',
   field: LEG_FIELD.DOWN_BARRIER_DATE,
   editable: true,
+  exsitable: params => {
+    return {
+      depends: [LEG_FIELD.ALREADY_BARRIER],
+      value: !!params.data[LEG_FIELD.ALREADY_BARRIER],
+    };
+  },
   input: {
     type: 'date',
   },
-  rules: RULES_REQUIRED,
 };
 
 export const ObserveStartDay: IColDef = {

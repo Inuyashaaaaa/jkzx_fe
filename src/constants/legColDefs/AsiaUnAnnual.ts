@@ -8,6 +8,7 @@ import {
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  OB_DAY_FIELD,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
@@ -141,7 +142,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item.day] = item.price || null;
+        result[item[OB_DAY_FIELD]] = item.price || null;
         return result;
       },
       {}

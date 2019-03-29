@@ -2,14 +2,13 @@ import _ from 'lodash';
 import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
-  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXTRA_FIELDS,
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
-  PAYMENT_TYPE_MAP,
+  OB_DAY_FIELD,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
   UP_BARRIER_TYPE_MAP,
@@ -20,6 +19,7 @@ import {
   CouponEarnings,
   DaysInYear,
   Direction,
+  DownBarrier,
   DownBarrierDate,
   DownBarrierOptionsStrike,
   DownBarrierOptionsStrikeType,
@@ -29,14 +29,13 @@ import {
   EffectiveDate,
   ExpirationDate,
   ExpireNoBarrierObserveDay,
-  ExpireNoBarrierPremium,
   FrontPremium,
+  InExpireNoBarrierObserveDay,
   InitialSpot,
   KnockDirection,
   MinimumPremium,
   NotionalAmount,
   NotionalAmountType,
-  ObservationStep,
   ParticipationRate,
   Premium,
   PremiumType,
@@ -56,8 +55,8 @@ import { pipeLeg } from './common/pipeLeg';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
 
 export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_UNANNUAL],
-  type: LEG_TYPE_MAP.AUTOCALL_UNANNUAL,
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL],
+  type: LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
   pricingColumnDefs: [
@@ -75,7 +74,6 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
     UpBarrier,
     Step,
     CouponEarnings,
-    ExpireNoBarrierPremium,
     ExpireNoBarrierObserveDay,
   ],
   columnDefs: [
@@ -101,7 +99,6 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
     UpBarrierType,
     UpBarrier,
     CouponEarnings,
-    ExpireNoBarrierPremium,
     ExpireNoBarrierObserveDay,
     DownBarrierType,
     DownBarrierOptionsStrikeType,
@@ -111,6 +108,9 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
     DownObservationStep,
     AlreadyBarrier,
     DownBarrierDate,
+    DownBarrier,
+    InExpireNoBarrierObserveDay,
+    DownBarrierOptionsStrike,
   ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -123,15 +123,13 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
-      [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
-      [Step.field]: 0,
+      [LEG_FIELD.ALREADY_BARRIER]: false,
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
-    nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
+    nextPosition.productType = LEG_TYPE_MAP.AUTOCALL_PHOENIX;
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     nextPosition.asset = _.omit(dataSourceItem, [
@@ -139,16 +137,12 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
       ...EXTRA_FIELDS,
       LEG_FIELD.UP_BARRIER,
       LEG_FIELD.UP_BARRIER_TYPE,
+      AlreadyBarrier.field,
+      UpObservationStep.field,
     ]);
 
-    if (
-      nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
-      EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
-    ) {
-      nextPosition.asset[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] = undefined;
-      nextPosition.asset[LEG_FIELD.AUTO_CALL_STRIKE] = undefined;
-    } else {
-      nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
+    if (dataSourceItem[AlreadyBarrier.field]) {
+      nextPosition.asset[DownBarrierDate.field] = undefined;
     }
 
     nextPosition.asset.barrier = dataSourceItem[LEG_FIELD.UP_BARRIER];
@@ -158,17 +152,50 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
     nextPosition.asset.expirationDate =
       nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
 
+    nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE] =
+      nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE] &&
+      nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE].format('YYYY-MM-DD');
+
     nextPosition.asset.settlementDate = isPricing
       ? nextPosition.asset.expirationDate
       : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
     nextPosition.asset.annualized = true;
 
+    nextPosition.asset.fixingObservations = dataSourceItem[
+      LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY
+    ].reduce((result, item) => {
+      result[item[OB_DAY_FIELD]] = item.price !== undefined ? String(item.price) : null;
+      return result;
+    }, {});
+
+    nextPosition.asset.knockInObservationDates = dataSourceItem[
+      LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY
+    ].map(item => item[OB_DAY_FIELD]);
+
     return nextPosition;
   },
   getPageData: (nextDataSourceItem, position) => {
     nextDataSourceItem[LEG_FIELD.UP_BARRIER] = position.asset.barrier;
     nextDataSourceItem[LEG_FIELD.UP_BARRIER_TYPE] = position.asset.barrierType;
+
+    const data = position.asset.fixingObservations || [];
+
+    nextDataSourceItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] = Object.keys(data).map(key => {
+      return {
+        [OB_DAY_FIELD]: key,
+        price: data[key],
+      };
+    });
+
+    const data2 = position.asset.knockInObservationDates || [];
+
+    nextDataSourceItem[LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY] = data2.map(key => {
+      return {
+        [OB_DAY_FIELD]: key,
+      };
+    });
+
     return nextDataSourceItem;
   },
 });

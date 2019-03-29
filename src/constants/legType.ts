@@ -8,6 +8,7 @@ import { AnnulizedVanillaOptionDTOEuropeanAnnual } from './legColDefs/AnnulizedV
 import { AnnulizedVanillaOptionDTOEuropeanUnAnnual } from './legColDefs/AnnulizedVanillaOptionDTOEuropeanUnAnnual';
 import { AsiaAnnual } from './legColDefs/AsiaAnnual';
 import { AsiaUnAnnual } from './legColDefs/AsiaUnAnnual';
+import { AutoCallPhoenixAnnual } from './legColDefs/AutoCallPhoenixAnnual';
 import { AutoCallSnowAnnual } from './legColDefs/AutoCallSnowAnnual';
 import { BarrierAnnual } from './legColDefs/BarrierAnnual';
 import { BarrierUnAnnual } from './legColDefs/BarrierUnAnnual';
@@ -43,6 +44,7 @@ export const LEG_MAP: {
   [LEG_TYPE_MAP.ASIAN_UNANNUAL]: AsiaUnAnnual,
 
   [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: AutoCallSnowAnnual,
+  [LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL]: AutoCallPhoenixAnnual,
 
   // 现金
   // [LEG_TYPE_MAP.CASH]: 'CASH',

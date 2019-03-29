@@ -9,6 +9,7 @@ import {
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  OB_DAY_FIELD,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
@@ -44,6 +45,7 @@ import {
   UnderlyerMultiplier,
   UpBarrier,
   UpBarrierType,
+  UpObservationStep,
 } from './common/common';
 import { pipeLeg } from './common/pipeLeg';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
@@ -73,6 +75,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
     AutoCallStrikeUnit,
     AutoCallStrike,
     ExpireNoBarrierObserveDay,
+    UpObservationStep,
   ],
   columnDefs: [
     SpecifiedPrice,
@@ -102,6 +105,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
     AutoCallStrikeUnit,
     AutoCallStrike,
     ExpireNoBarrierObserveDay,
+    UpObservationStep,
   ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -130,6 +134,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       ...EXTRA_FIELDS,
       LEG_FIELD.UP_BARRIER,
       LEG_FIELD.UP_BARRIER_TYPE,
+      UpObservationStep.field,
     ]);
 
     if (
@@ -141,6 +146,10 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
     } else {
       nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
     }
+
+    nextPosition.asset[ExpireNoBarrierObserveDay.field] = nextPosition.asset[
+      ExpireNoBarrierObserveDay.field
+    ].map(item => item[OB_DAY_FIELD]);
 
     nextPosition.asset.barrier = dataSourceItem[LEG_FIELD.UP_BARRIER];
     nextPosition.asset.barrierType = dataSourceItem[LEG_FIELD.UP_BARRIER_TYPE];
