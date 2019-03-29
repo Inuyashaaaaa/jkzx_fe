@@ -71,6 +71,16 @@ export async function updateRolePagePermissions(params) {
   });
 }
 
+export async function authPagePermissionGetByRoleId(params) {
+  return request(`${HOST_TEST}auth-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'authPagePermissionGetByRoleId',
+      params,
+    },
+  });
+}
+
 export async function initPagePermissions() {
   return Promise.all([
     queryRolePagePermissions({}),
