@@ -39,6 +39,7 @@ export default {
   'menu.riskManager.intradayDailyPnlByUnderlyerReport': '标的盈亏',
   'menu.riskManager.customReport': '定制化报告',
   'menu.riskManager.intradayExpiringPositionReport': '到期合约',
+  'menu.riskManager.portfolioRisk': '投资组合风险',
   'menu.clientManagement': '客户管理',
   'menu.clientManagement.clientInfo': '客户信息管理',
   'menu.customSalesManage': '销售管理',
