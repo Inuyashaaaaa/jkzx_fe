@@ -1,12 +1,7 @@
-import { WrappedFormUtils } from 'antd/lib/form/Form';
 import { PureComponent } from 'react';
-import { ITableCellProps } from '../../type';
+import { IFormCellProps } from 'src/components/type';
 
-class EditingCell extends PureComponent<ITableCellProps, any> {
-  public $input: HTMLInputElement;
-
-  public form: WrappedFormUtils;
-
+class EditingCell extends PureComponent<IFormCellProps, any> {
   public getValue = async () => {
     const dataIndex = this.getDataIndex();
     const value = this.props.form.getFieldValue(dataIndex);
@@ -31,15 +26,23 @@ class EditingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public render() {
-    const { colDef, record, rowIndex, children, $$render } = this.props;
-    const { dataIndex } = colDef;
+    const {
+      form,
+      record,
+      colDef: { dataIndex, render },
+      cellApi,
+    } = this.props;
     const value = record[dataIndex];
-    return $$render
-      ? $$render(value, record, rowIndex, {
-          form: this.props.form,
+    if (render) {
+      return cellApi.renderElement(
+        render(value, record, 0, {
+          form,
           editing: true,
         })
-      : children;
+      );
+    }
+
+    return value;
   }
 }
 

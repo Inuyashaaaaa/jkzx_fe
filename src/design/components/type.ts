@@ -1,38 +1,55 @@
 import { ButtonProps } from 'antd/lib/button';
 import { FormItemProps } from 'antd/lib/form';
-import { FormComponentProps, FormProps, GetFieldDecoratorOptions } from 'antd/lib/form/Form';
+import { FormComponentProps, FormProps, WrappedFormUtils } from 'antd/lib/form/Form';
 import { ColumnProps, TableProps } from 'antd/lib/table';
-import React, { ComponentClass, CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 import { Omit } from './common/types';
+import FormSwitchCell from './Form2/cells/SwitchCell';
+import FormBase from './Form2/FormBase';
 import InputManager from './Input/register';
-import { ILinkageExsitable } from './Table/types';
 import TableManager from './Table2/api';
+import TableSwitchCell from './Table2/cells/SwitchCell';
 
 export interface IColDef {
-  dataIndex: string;
-  field?: any;
-  decorator?: any;
-  input?: any;
+  dataIndex?: string;
+  render?: any;
 }
 
-export interface IFormColDef<IInput = any> extends IColDef {
-  dataIndex: string;
-  field?: FormItemProps;
-  decorator?: GetFieldDecoratorOptions;
-  input?: IInput;
-  render?: (value: any, record: any) => React.ReactNode;
+export interface IRenderOptions<T = any> {
+  form?: WrappedFormUtils;
+  editing?: boolean;
+}
+
+export interface IFormColDef<T = any> extends IColDef {
+  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactElement;
   /* 作用和 field 中的 label 一样，方便直接使用 table.columns 的数据 */
   title?: string;
+  editable?: boolean;
+  getValue?:
+    | ((record: T, params: IFormTriggerCellValueChangedParams) => any)
+    | ([(record: T, params: IFormTriggerCellValueChangedParams) => any, ...string[]]);
 }
 
-export interface ITableColDef<IInput = any, T = any> extends IColDef, ColumnProps<T> {
-  dataIndex: string;
-  field?: Omit<FormItemProps, 'label' | 'labelCol' | 'wrapperCol' | 'extra' | 'colon'>;
-  decorator?: GetFieldDecoratorOptions;
-  input?: IInput;
-  totalable?: boolean | ((params: { totalData: number; record: object }) => number);
-  exsitable?: ILinkageExsitable;
+export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render'> {
+  // totalable?: boolean | ((params: { totalData: number; record: object }) => number);
+  title?: string;
   editable?: boolean;
+  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactElement;
+  getValue?:
+    | ((record: T, params: ITableTriggerCellValueChangedParams) => any)
+    | ([(record: T, params: ITableTriggerCellValueChangedParams) => any, ...string[]]);
+}
+
+export interface IFormCellProps<T = any> {
+  colDef: IFormColDef<T>;
+  record: T;
+  api: FormBase;
+  cellApi?: FormSwitchCell;
+  form?: WrappedFormUtils;
+  getValue?: {
+    depends: string[];
+    value: (record: T, params: IFormTriggerCellValueChangedParams) => any;
+  };
 }
 
 export interface ITableCellProps<T = any> {
@@ -42,6 +59,15 @@ export interface ITableCellProps<T = any> {
   api: ITableApi;
   context: ITableContext;
   getRowKey: () => string;
+  className?: string;
+  style?: CSSRuleList;
+  $$render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
+  getValue?: {
+    depends: string[];
+    value: (record: T, params: ITableTriggerCellValueChangedParams) => any;
+  };
+  cellApi?: TableSwitchCell;
+  form?: WrappedFormUtils;
 }
 
 export interface ITableRowProps<T = any> extends FormComponentProps {
@@ -53,25 +79,44 @@ export interface ITableRowProps<T = any> extends FormComponentProps {
 }
 
 export interface ITableTriggerCellValueChangedParams<T = any> {
-  eventName: string;
   record: T;
   rowIndex: number;
   dataIndex: string;
   oldValue: any;
+  rowId?: string;
+  linkage?: boolean;
 }
 
-export interface ITableProps<T = any> extends TableProps<T> {
-  onCellValueChanged?: (
-    params: {
-      record: T;
-      rowIndex: number;
-      dataIndex: string;
-      value: any;
-      oldValue: any;
-    }
-  ) => void;
+export interface ITableTriggerCellValueChangeParams<T = any> {
+  record?: T;
+  rowIndex?: number;
+  value?: any;
+  changedValues?: any;
+  allValues?: any;
+  rowId?: string;
+}
+
+export interface IFormTriggerCellValueChangeParams<T = any> {
+  record?: T;
+  value?: any;
+  changedValues?: any;
+  allValues?: any;
+}
+
+export interface IFormTriggerCellValueChangedParams<T = any> {
+  record: T;
+  dataIndex: string;
+  oldValue: any;
+  linkage?: boolean;
+  value: any;
+}
+
+export interface ITableProps<T = any> extends Omit<TableProps<T>, 'columns'> {
+  onCellValueChanged?: (params: ITableTriggerCellValueChangedParams) => void;
+  onCellValueChange?: (params: ITableTriggerCellValueChangeParams) => void;
   columns?: ITableColDef[];
   inputManager?: InputManager;
+  vertical?: boolean;
 }
 
 export type ITableContext = any;
@@ -82,7 +127,9 @@ export interface ITableApi {
   eventBus: any;
 }
 
-export interface IFormProps extends FormProps {
+export interface IFormBaseProps<T = any> extends FormProps {
+  onValueChanged?: IFormValueChangedHandle<T>;
+  onValueChange?: IFormValueChangeHandle<T>;
   inputManager?: InputManager;
   actionFieldProps?: FormItemProps;
   submitable?: boolean;
@@ -90,7 +137,7 @@ export interface IFormProps extends FormProps {
   submitText?: string;
   className?: string;
   style?: CSSProperties;
-  fieldNumberOneRow?: number;
+  columnNumberOneRow?: number;
   dataSource?: object;
   columns?: IFormColDef[];
   footer?: boolean | JSX.Element;
@@ -110,7 +157,13 @@ export interface IFormProps extends FormProps {
   resetButtonProps?: ButtonProps;
 }
 
-export type IWrappedForm = ComponentClass<IFormProps>;
+export interface IFormProps<T = any> extends IFormBaseProps {
+  eventBus?: any;
+}
+
+export type IFormValueChangedHandle<T = any> = (params: IFormTriggerCellValueChangedParams) => void;
+
+export type IFormValueChangeHandle<T = any> = (params: IFormTriggerCellValueChangeParams) => void;
 
 export abstract class InputBase<P = any, S = any> extends React.PureComponent<
   P & {

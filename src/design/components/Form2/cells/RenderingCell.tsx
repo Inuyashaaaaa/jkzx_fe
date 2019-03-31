@@ -1,24 +1,26 @@
-import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
+import { IFormCellProps, IFormTriggerCellValueChangedParams } from 'src/components/type';
 import { delay } from '../../../utils';
-import {
-  ITableCellProps,
-  ITableTriggerCellValueChangedParams,
-  ITableTriggerCellValueChangeParams,
-} from '../../type';
-import { TABLE_CELL_VALUE_CHANGED } from '../constants/EVENT';
+import { FORM_CELL_VALUE_CHANGED } from '../constants';
 
-class RenderingCell extends PureComponent<ITableCellProps, any> {
-  public $input: HTMLInputElement;
+class RenderingCell extends PureComponent<IFormCellProps> {
+  public componentDidMount = () => {
+    if (!this.props.form.isFieldTouched(this.getDataIndex())) {
+      this.props.form.validateFields();
+    }
+    this.props.api.eventBus.listen(FORM_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
+  };
 
-  public form: WrappedFormUtils;
+  public componentWillUnmount = () => {
+    this.props.api.eventBus.unListen(FORM_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
+  };
 
-  public linkage = (params: ITableTriggerCellValueChangedParams) => {
-    const { rowId } = params;
+  public onTableCellValueChanged = (params: IFormTriggerCellValueChangedParams) => {
+    this.linkage(params);
+  };
 
-    if (rowId !== this.getRowId()) return;
-
+  public linkage = (params: IFormTriggerCellValueChangedParams) => {
     const dataIndex = this.getDataIndex();
 
     if (params.dataIndex === dataIndex) return;
@@ -36,7 +38,7 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
     this.linkageValue(params);
   };
 
-  public linkageValue = (params: ITableTriggerCellValueChangedParams) => {
+  public linkageValue = (params: IFormTriggerCellValueChangedParams) => {
     const { record, getValue } = this.props;
     if (!getValue.value) return;
     const changedFields = [params.dataIndex];
@@ -81,54 +83,29 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
     });
   };
 
-  public componentDidMount = () => {
-    if (!this.props.form.isFieldTouched(this.getDataIndex())) {
-      this.props.form.validateFields();
-    }
-    this.props.api.eventBus.listen(TABLE_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
-  };
-
-  public componentWillUnmount = () => {
-    this.props.api.eventBus.unListen(TABLE_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
-  };
-
-  public onTableCellValueChanged = (params: ITableTriggerCellValueChangedParams) => {
-    this.linkage(params);
-  };
-
-  public getRowId = () => {
-    const { record, getRowKey } = this.props;
-    return record[getRowKey()];
-  };
-
   public getDataIndex = () => {
     const { colDef } = this.props;
     const { dataIndex } = colDef;
     return dataIndex;
   };
 
-  public getInputRef = node => {
-    this.$input = node;
-  };
-
-  public getValue = () => {
-    const { colDef, record } = this.props;
-    const { dataIndex } = colDef;
-    return record[dataIndex];
-  };
-
   public render() {
-    const value = this.getValue();
-    const { record, rowIndex, children, $$render } = this.props;
-    return [
-      ...React.Children.toArray(children).slice(0, -1),
-      $$render
-        ? $$render(value, record, rowIndex, {
-            form: this.props.form,
-            editing: false,
-          })
-        : value,
-    ];
+    const {
+      form,
+      record,
+      colDef: { dataIndex, render },
+      cellApi,
+    } = this.props;
+    const value = record[dataIndex];
+    if (render) {
+      return cellApi.renderElement(
+        render(value, record, 0, {
+          form,
+          editing: false,
+        })
+      );
+    }
+    return value;
   }
 }
 

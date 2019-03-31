@@ -31,7 +31,7 @@ class Input extends InputBase<IInputProps> {
 
   public renderRendering() {
     const { value } = this.props;
-    return <span>{value}</span>;
+    return <span style={{ display: 'inline-block', width: '100%' }}>{value}</span>;
   }
 }
 

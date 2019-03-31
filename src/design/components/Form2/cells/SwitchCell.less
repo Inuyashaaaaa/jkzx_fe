@@ -1,20 +1,21 @@
 @import '~antd/lib/style/themes/default.less';
 
-.row {
-  &:hover {
-    .cell {
-      &.editable {
-        cursor: pointer;
-        &.rendering {
+.cell {
+  &.editable {
+    cursor: pointer;
+    &.rendering {
+      :global {
+        .ant-form-item-control-wrapper {
+          padding-left: @input-padding-horizontal;
           &:hover {
             -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             z-index: 999;
           }
         }
-        // &.editing {
-        // }
       }
     }
+    // &.editing {
+    // }
   }
 }
