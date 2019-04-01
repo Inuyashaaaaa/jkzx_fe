@@ -140,9 +140,9 @@ export const LEG_MAP: {
   [LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL]: TripleDigitalAnnual,
   // 四层积累非年化
   [LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL]: TripleDigitalUnAnnual,
-  // 区间积累年化
+  // 区间累积年化
   [LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL]: RangeAccrualsAnnual,
-  // 区间积累非年化
+  // 区间累积非年化
   [LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL]: RangeAccrualsUnAnnual,
   // 跨式年化
   [LEG_TYPE_MAP.STRADDLE_ANNUAL]: StraddleAnnual,
