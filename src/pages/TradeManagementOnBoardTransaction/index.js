@@ -78,19 +78,19 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     this.fetchData(params, 'flow');
   };
 
-  queryDetail = async () => {
-    // const params = {
-    //   dealDate: data.date.format('YYYY-MM-DD'),
-    // };
-    const params = {};
+  queryDetail = async data => {
+    const params = {
+      searchDate: data.date.format('YYYY-MM-DD'),
+    };
+    // const params = {};
     this.fetchData(params, 'position', 'detail');
   };
 
-  querySummary = async () => {
-    // const params = {
-    //   dealDate: data.date.format('YYYY-MM-DD'),
-    // };
-    const params = {};
+  querySummary = async data => {
+    const params = {
+      searchDate: data.date.format('YYYY-MM-DD'),
+    };
+    // const params = {};
     this.fetchData(params, 'position', 'summary');
   };
 
@@ -262,9 +262,13 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     const { positionMode } = this.state;
     if (type === 'position') {
       if (positionMode === 'detail') {
-        this.queryDetail();
+        this.queryDetail({
+          date: moment().subtract(1, 'days'),
+        });
       } else {
-        this.querySummary();
+        this.querySummary({
+          date: moment().subtract(1, 'days'),
+        });
       }
     }
   };
@@ -274,7 +278,13 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     this.setState({
       positionMode: value === 'a' ? 'detail' : 'summary',
     });
-    value === 'a' ? this.queryDetail() : this.querySummary();
+    value === 'a'
+      ? this.queryDetail({
+          date: moment().subtract(1, 'days'),
+        })
+      : this.querySummary({
+          date: moment().subtract(1, 'days'),
+        });
   };
 
   handleFormData = action => {
@@ -400,7 +410,10 @@ class TradeManagementOnBoardTansaction extends PureComponent {
             />
           </TabPane>
           <TabPane tab="场内持仓统计" key="2">
-            {/* <RowForm mode="position" handleQuery={this.queryPositions} /> */}
+            <RowForm
+              mode="position"
+              handleQuery={positionMode === 'detail' ? this.queryDetail : this.querySummary}
+            />
             <RadioGroup onChange={this.changePosition} defaultValue="a">
               <RadioButton value="a">按明细统计</RadioButton>
               <RadioButton value="b">按合约代码统计</RadioButton>
