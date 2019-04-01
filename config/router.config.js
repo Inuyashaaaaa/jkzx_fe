@@ -1,6 +1,10 @@
 import mapTree from '../src/lib/utils/mapTree';
 
 export default [
+  {
+    path: '/socket-test-page',
+    component: './SocketTestPage/index',
+  },
   // user
   {
     path: '/user',

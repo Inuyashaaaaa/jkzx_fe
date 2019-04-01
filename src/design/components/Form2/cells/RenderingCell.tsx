@@ -105,7 +105,7 @@ class RenderingCell extends PureComponent<IFormCellProps> {
         })
       );
     }
-    return value;
+    return value || null;
   }
 }
 
