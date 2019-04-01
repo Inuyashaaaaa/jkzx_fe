@@ -49,7 +49,10 @@ export default class MultilLegCreateButton extends PureComponent<{
         // disabled={this.state.dataSource.length >= 1}
         key="add"
         overlay={
-          <Menu onClick={this.props.handleAddLeg}>
+          <Menu
+            onClick={this.props.handleAddLeg}
+            style={{ display: 'flex', justifyContent: 'start' }}
+          >
             {this.getLegMenuNodes(this.normalLegMenus())}
           </Menu>
         }
