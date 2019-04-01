@@ -17,7 +17,7 @@ export async function queryDetail(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'excPositionSnapshotListAll',
+      method: 'excPositionRecordSearch',
       params,
     },
   });
@@ -28,7 +28,7 @@ export async function querySummary(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'excPositionSnapshotListAllGroupByInstrumentId',
+      method: 'excPositionRecordSearchGroupByInstrumentId',
       params,
     },
   });
