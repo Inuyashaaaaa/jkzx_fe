@@ -58,64 +58,8 @@ const TABLE_COL_DEFS: IColumnDef[] = [
   },
 ];
 
-const OUR_CREATE_FORM_CONTROLS: IFormControl[] = [
-  {
-    options: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '客户名称',
-    },
-    dataIndex: 'legalName',
-  },
-  {
-    options: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '资金类型',
-    },
-    input: {
-      showSearch: true,
-      type: 'select',
-      options: [
-        {
-          label: '期权费扣除',
-          value: '期权费扣除',
-        },
-        {
-          label: '期权费收入',
-          value: '期权费收入',
-        },
-        {
-          label: '授信扣除',
-          value: '授信扣除',
-        },
-        {
-          label: '授信恢复',
-          value: '授信恢复',
-        },
-        {
-          label: '保证金冻结',
-          value: '保证金冻结',
-        },
-        {
-          label: '保证金释放',
-          value: '保证金释放',
-        },
-      ],
-    },
-    dataIndex: 'cashType',
-  },
-  {
+export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMargin => {
+  const tradeId = {
     options: {
       rules: [
         {
@@ -127,21 +71,79 @@ const OUR_CREATE_FORM_CONTROLS: IFormControl[] = [
       label: '交易ID',
     },
     dataIndex: 'tradeId',
-  },
-  {
-    options: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
+  };
+  return ([
+    {
+      options: {
+        rules: [
+          {
+            required: true,
+          },
+        ],
+      },
+      control: {
+        label: '客户名称',
+      },
+      dataIndex: 'legalName',
     },
-    control: {
-      label: '金额',
+    {
+      options: {
+        rules: [
+          {
+            required: true,
+          },
+        ],
+      },
+      control: {
+        label: '资金类型',
+      },
+      input: {
+        showSearch: true,
+        type: 'select',
+        options: [
+          {
+            label: '期权费扣除',
+            value: '期权费扣除',
+          },
+          {
+            label: '期权费收入',
+            value: '期权费收入',
+          },
+          {
+            label: '授信扣除',
+            value: '授信扣除',
+          },
+          {
+            label: '授信恢复',
+            value: '授信恢复',
+          },
+          {
+            label: '保证金冻结',
+            value: '保证金冻结',
+          },
+          {
+            label: '保证金释放',
+            value: '保证金释放',
+          },
+        ],
+      },
+      dataIndex: 'cashType',
     },
-    dataIndex: 'cashFlow',
-  },
-];
+    {
+      options: {
+        rules: [
+          {
+            required: true,
+          },
+        ],
+      },
+      control: {
+        label: '金额',
+      },
+      dataIndex: 'cashFlow',
+    },
+  ] as IFormControl[]).concat(entryMargin ? tradeId : []);
+};
 
 const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
   {
@@ -241,6 +243,7 @@ class ExportModal extends PureComponent<any, any> {
       activeKey: 'our',
       ourDataSource: [],
       toOurDataSource: [],
+      entryMargin: true,
     };
   }
 
@@ -457,8 +460,20 @@ class ExportModal extends PureComponent<any, any> {
   };
 
   public handleChangeValueOur = values => {
+    if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
+      this.setState({
+        entryMargin: false,
+        ourDataSource: values,
+      });
+      return;
+    }
+
     this.setState({
-      ourDataSource: values,
+      entryMargin: true,
+      ourDataSource: {
+        ...values,
+        tradeId: this.modalFormData.tradeId,
+      },
     });
   };
 
@@ -539,7 +554,7 @@ class ExportModal extends PureComponent<any, any> {
                   return;
                 }}
                 dataSource={this.state.ourDataSource}
-                controls={OUR_CREATE_FORM_CONTROLS}
+                controls={OUR_CREATE_FORM_CONTROLS(this.state.entryMargin)}
                 onChangeValue={this.handleChangeValueOur}
                 controlNumberOneRow={1}
                 footer={false}
