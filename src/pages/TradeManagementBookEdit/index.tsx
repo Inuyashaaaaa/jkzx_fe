@@ -36,6 +36,7 @@ import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import ExportModal from './ExportModal';
 import AsianExerciseModal from './modals/AsianExerciseModal';
+import BarrierIn from './modals/BarrierIn';
 import ExerciseModal from './modals/ExerciseModal';
 import ExpirationModal from './modals/ExpirationModal';
 import FixingModal from './modals/FixingModal';
@@ -66,6 +67,8 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public $fixingModal: FixingModal;
 
   public $asianExerciseModal: AsianExerciseModal;
+
+  public $barrierIn: BarrierIn;
 
   constructor(props) {
     super(props);
@@ -290,19 +293,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public getContextMenuItems = (params): Array<MenuItemDef | string> => {
-    // console.log(this.state.eventTypes);
-    // console.log(params);
-    // console.log((this.state.eventTypes[params.rowData.id] &&
-    //     this.state.eventTypes[params.rowData.id]
-    //       .filter(item => item !== LCM_EVENT_TYPE_MAP.EXPIRATION)
-    //       .map(eventType => {
-    //         return {
-    //           name: LCM_EVENT_ZHCN_TYPES[eventType],
-    //           action: this.bindEventAction(eventType, params),
-    //         };
-    //       })),
-    // );
-    // debugger;
     return [
       ...(this.state.eventTypes[params.rowData.id] &&
         this.state.eventTypes[params.rowData.id].map(eventType => {
@@ -323,6 +313,24 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
 
     // 每次操作后及时更新，并保证数据一致性
     this.activeRowData = params.rowData;
+
+    if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
+      return this.$expirationModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
+      );
+    }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_IN) {
+      return this.$barrierIn.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
+      );
+    }
 
     if (eventType === LCM_EVENT_TYPE_MAP.OBSERVE) {
       return this.$fixingModal.show(
@@ -370,6 +378,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         () => this.loadData(true)
       );
     }
+
     if (eventType === LCM_EVENT_TYPE_MAP.ROLL) {
       this.$modelButton.click({
         formControls: modalFormControls({
@@ -536,6 +545,11 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         <AsianExerciseModal
           ref={node => {
             this.$asianExerciseModal = node;
+          }}
+        />
+        <BarrierIn
+          ref={node => {
+            this.$barrierIn = node;
           }}
         />
       </PageHeaderWrapper>

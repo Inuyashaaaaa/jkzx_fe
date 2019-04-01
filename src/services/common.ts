@@ -1,5 +1,8 @@
 import { OB_DAY_FIELD } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
+import { OB_PRICE_FIELD } from '@/pages/TradeManagementBookEdit/constants';
+import { isAutocallPhoenix } from '@/tools';
+import _ from 'lodash';
 
 export const getCanUsedTranors = usedTranors => {
   return TRNORS_OPTS.filter(item => {
@@ -24,14 +27,25 @@ export const getCanUsedTranorsOtionsNotIncludingSelf = (tableDataSource: Array<{
   return getCanUsedTranors(tableDataSource.map(item => item.tenor));
 };
 
+// 将观察日接口数据转换成字段数据
 export function convertObservetions(nextDataSourceItem) {
+  if (isAutocallPhoenix(nextDataSourceItem)) {
+    return _.toPairs(nextDataSourceItem.fixingObservations).map(([price, day]) => {
+      return {
+        [OB_DAY_FIELD]: day,
+        [OB_PRICE_FIELD]: price,
+      };
+    });
+  }
+
   const days = Object.keys(nextDataSourceItem.fixingObservations);
   if (!days.length) return [];
   return days.map(day => {
     return {
       [OB_DAY_FIELD]: day,
       weight: nextDataSourceItem.fixingWeights && nextDataSourceItem.fixingWeights[day],
-      price: nextDataSourceItem.fixingObservations && nextDataSourceItem.fixingObservations[day],
+      [OB_PRICE_FIELD]:
+        nextDataSourceItem.fixingObservations && nextDataSourceItem.fixingObservations[day],
     };
   });
 }

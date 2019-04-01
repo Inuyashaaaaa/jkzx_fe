@@ -1,7 +1,12 @@
-import { LCM_EVENT_TYPE_MAP, LEG_FIELD } from '@/constants/common';
+import {
+  LCM_EVENT_TYPE_MAP,
+  LEG_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_ZHCH_MAP,
+} from '@/constants/common';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { Button, message, Modal } from 'antd';
+import { message, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import ExportModal from '../../ExportModal';
@@ -22,7 +27,7 @@ class ExerciseModal extends PureComponent<
 > {
   public $knockOutModal: Form;
 
-  public data: any;
+  public data: any = {};
 
   public tableFormData: any;
 
@@ -136,7 +141,7 @@ class ExerciseModal extends PureComponent<
           destroyOnClose={true}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={'敲出 (雪球式)'}
+          title={`敲出 (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
         >
           <Form
             wrappedComponentRef={node => {

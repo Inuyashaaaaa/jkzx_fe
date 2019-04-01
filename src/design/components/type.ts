@@ -155,6 +155,7 @@ export interface IFormBaseProps<T = any> extends FormProps {
   onResetButtonClick?: (params: { dataSource: any; domEvent: MouseEvent }) => void;
   submitButtonProps?: ButtonProps;
   resetButtonProps?: ButtonProps;
+  eventBus?: any;
 }
 
 export interface IFormProps<T = any> extends IFormBaseProps {
@@ -171,10 +172,14 @@ export abstract class InputBase<P = any, S = any> extends React.PureComponent<
     value?: any;
     onChange?: (...args: any[]) => any;
     onValueChange?: (...args: any[]) => any;
-    status: 'editing' | 'rendering';
+    status?: 'editing' | 'rendering';
   },
   S
 > {
+  public static defaultProps = {
+    status: 'editing',
+  };
+
   public abstract renderEditing(): any;
   public abstract renderRendering(): any;
 
