@@ -276,68 +276,11 @@ export const IOGLOD_COL_DEFS: IColumnDef[] = [
   },
 ];
 
-export const OUR_CREATE_FORM_CONTROLS: (salesNameList) => IFormControl[] = salesNameList => [
-  {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '客户名称',
-    },
-    field: 'legalName',
-    input: {
-      type: 'select',
-      options: salesNameList,
-    },
-  },
-  {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '资金类型',
-    },
-    input: {
-      showSearch: true,
-      type: 'select',
-      options: [
-        {
-          label: '期权费扣除',
-          value: '期权费扣除',
-        },
-        {
-          label: '期权费收入',
-          value: '期权费收入',
-        },
-        {
-          label: '授信扣除',
-          value: '授信扣除',
-        },
-        {
-          label: '授信恢复',
-          value: '授信恢复',
-        },
-        {
-          label: '保证金冻结',
-          value: '保证金冻结',
-        },
-        {
-          label: '保证金释放',
-          value: '保证金释放',
-        },
-      ],
-    },
-    field: 'cashType',
-  },
-  {
+export const OUR_CREATE_FORM_CONTROLS: (salesNameList, margin) => IFormControl[] = (
+  salesNameList,
+  margin
+) => {
+  const tradeId = {
     decorator: {
       rules: [
         {
@@ -349,22 +292,84 @@ export const OUR_CREATE_FORM_CONTROLS: (salesNameList) => IFormControl[] = sales
       label: '交易ID',
     },
     field: 'tradeId',
-  },
-  {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
+  };
+  return ([
+    {
+      decorator: {
+        rules: [
+          {
+            required: true,
+          },
+        ],
+      },
+      control: {
+        label: '客户名称',
+      },
+      field: 'legalName',
+      input: {
+        type: 'select',
+        options: salesNameList,
+      },
     },
-    control: {
-      label: '金额',
+    {
+      decorator: {
+        rules: [
+          {
+            required: true,
+          },
+        ],
+      },
+      control: {
+        label: '资金类型',
+      },
+      input: {
+        showSearch: true,
+        type: 'select',
+        options: [
+          {
+            label: '期权费扣除',
+            value: '期权费扣除',
+          },
+          {
+            label: '期权费收入',
+            value: '期权费收入',
+          },
+          {
+            label: '授信扣除',
+            value: '授信扣除',
+          },
+          {
+            label: '授信恢复',
+            value: '授信恢复',
+          },
+          {
+            label: '保证金冻结',
+            value: '保证金冻结',
+          },
+          {
+            label: '保证金释放',
+            value: '保证金释放',
+          },
+        ],
+      },
+      field: 'cashType',
     },
-    field: 'cashFlow',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-];
+    {
+      decorator: {
+        rules: [
+          {
+            required: true,
+          },
+        ],
+      },
+      control: {
+        label: '金额',
+      },
+      field: 'cashFlow',
+      input: INPUT_NUMBER_DIGITAL_CONFIG,
+    },
+  ] as IFormControl[]).concat(margin ? tradeId : []);
+};
 
 export const TOOUR_CREATE_FORM_CONTROLS: (salesNameList) => IFormControl[] = salesNameList => [
   {

@@ -56,6 +56,8 @@ class IOGlod extends PureComponent<IOGlodProps> {
     toOurDataSource2: {},
     IOGlodSourceTableLoading: false,
     accountId: '',
+    margin: true,
+    entryMargin: true,
   };
 
   public componentDidMount = () => {
@@ -452,13 +454,18 @@ class IOGlod extends PureComponent<IOGlodProps> {
     if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
       this.setState({
         item: false,
+        entryMargin: false,
         ourDataSource: values,
       });
       return;
     }
 
     this.setState({
-      ourDataSource: values,
+      entryMargin: true,
+      ourDataSource: {
+        ...values,
+        tradeId: this.modalFormData.tradeId,
+      },
     });
   };
 
@@ -474,6 +481,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
     if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
       this.setState({
         item: false,
+        margin: false,
         ourDataSource2: values,
       });
       return;
@@ -490,6 +498,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
       });
     }
     this.setState({
+      margin: true,
       ourDataSource2: values,
     });
   };
@@ -639,7 +648,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
                     return;
                   }}
                   dataSource={this.state.ourDataSource2}
-                  controls={OUR_CREATE_FORM_CONTROLS(this.state.legalNamesList)}
+                  controls={OUR_CREATE_FORM_CONTROLS(this.state.legalNamesList, this.state.margin)}
                   onValueChange={this.handleChangeValueOur2}
                   controlNumberOneRow={1}
                   footer={false}
@@ -688,7 +697,10 @@ class IOGlod extends PureComponent<IOGlodProps> {
                   return;
                 }}
                 dataSource={this.state.ourDataSource}
-                controls={OUR_CREATE_FORM_CONTROLS(this.state.legalNamesList)}
+                controls={OUR_CREATE_FORM_CONTROLS(
+                  this.state.legalNamesList,
+                  this.state.entryMargin
+                )}
                 onValueChange={this.handleChangeValueOur}
                 controlNumberOneRow={1}
                 footer={false}
