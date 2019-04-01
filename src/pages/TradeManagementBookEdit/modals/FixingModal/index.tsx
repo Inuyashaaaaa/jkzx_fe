@@ -1,24 +1,31 @@
 import {
+  BIG_NUMBER_CONFIG,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
+  INPUT_NUMBER_PERCENTAGE_CONFIG,
+  KNOCK_DIRECTION_MAP,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
+  OB_DAY_FIELD,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
-import { convertObservetions } from '@/services/common';
+import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
+import { isAutocallPhoenix } from '@/tools';
 import { getMoment } from '@/utils';
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../../constants';
 import { countAvg, filterObDays } from '../../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
+import ExpirationModal from '../ExpirationModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 class FixingModal extends PureComponent<
@@ -40,6 +47,8 @@ class FixingModal extends PureComponent<
 
   public reload: any;
 
+  public $expirationModal: ExpirationModal;
+
   public state = {
     visible: false,
     direction: 'BUYER',
@@ -58,7 +67,7 @@ class FixingModal extends PureComponent<
 
     this.setState(
       {
-        tableData: filterObDays(convertObservetions(data)),
+        tableData: filterObDays(this.getObservertionFieldData(data)),
         visible: true,
       },
       () => {
@@ -67,6 +76,78 @@ class FixingModal extends PureComponent<
         });
       }
     );
+  };
+
+  public getObLifePayment = (
+    alObPrice,
+    cuponBarrier,
+    curObdays,
+    preObdays,
+    daysInYear,
+    cuponPayment,
+    notionalAmount,
+    knockDirection
+  ) => {
+    if (knockDirection === KNOCK_DIRECTION_MAP.UP) {
+      if (alObPrice > cuponBarrier) {
+        return new BigNumber(curObdays - preObdays)
+          .div(daysInYear)
+          .multipliedBy(cuponPayment)
+          .multipliedBy(notionalAmount)
+          .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+          .toNumber();
+      }
+    }
+
+    if (alObPrice < cuponBarrier) {
+      return new BigNumber(curObdays - preObdays)
+        .div(daysInYear)
+        .multipliedBy(cuponPayment)
+        .multipliedBy(notionalAmount)
+        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+        .toNumber();
+    }
+
+    return 0;
+  };
+
+  public getObservertionFieldData = data => {
+    if (this.isAutocallPhoenix()) {
+      return data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].map((item, index) => {
+        // 已观察到价格
+        const alObPrice = item[OB_PRICE_FIELD];
+        const cuponBarrier = data[LEG_FIELD.COUPON_BARRIER];
+        const curObdays = getMoment(item[OB_DAY_FIELD]).days();
+        const preObdays =
+          index === 0
+            ? 0
+            : curObdays -
+              getMoment(
+                data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY][index - 1][OB_DAY_FIELD]
+              ).days();
+        const daysInYear = data[LEG_FIELD.DAYS_IN_YEAR];
+        const cuponPayment = data[LEG_FIELD.COUPON_PAYMENT];
+        const notionalAmount = data[LEG_FIELD.NOTIONAL_AMOUNT];
+        const knockDirection = data[LEG_FIELD.KNOCK_DIRECTION];
+
+        return {
+          ...item,
+          [LEG_FIELD.UP_BARRIER]: data[LEG_FIELD.UP_BARRIER],
+          [LEG_FIELD.COUPON_BARRIER]: data[LEG_FIELD.COUPON_BARRIER],
+          [OB_LIFE_PAYMENT]: this.getObLifePayment(
+            alObPrice,
+            cuponBarrier,
+            curObdays,
+            preObdays,
+            daysInYear,
+            cuponPayment,
+            notionalAmount,
+            knockDirection
+          ),
+        };
+      });
+    }
+    return data[LEG_FIELD.OBSERVATION_DATES];
   };
 
   public computeCnyDataSource = (value, changed = {}) => {
@@ -93,17 +174,18 @@ class FixingModal extends PureComponent<
   };
 
   public onConfirm = async () => {
-    if (this.$asianExerciseModal) {
+    if (this.$expirationModal) {
       this.setState(
         {
           visible: false,
         },
         () => {
-          this.$asianExerciseModal.show(
+          this.$expirationModal.show(
             this.data,
             this.tableFormData,
             this.currentUser,
-            this.reload
+            this.reload,
+            this.state.tableData
           );
         }
       );
@@ -127,7 +209,7 @@ class FixingModal extends PureComponent<
       return true;
     }
 
-    if (this.state.tableData.every(item => !!item.price)) {
+    if (this.state.tableData.every(item => !!item[OB_PRICE_FIELD])) {
       return true;
     }
 
@@ -139,7 +221,7 @@ class FixingModal extends PureComponent<
   };
 
   public onCellValueChanged = params => {
-    if (params.colDef.field === 'price' && params.newValue !== params.oldValue) {
+    if (params.colDef.field === OB_PRICE_FIELD && params.newValue !== params.oldValue) {
       this.startOb(params.data);
       this.setState({
         avg: this.countAvg(),
@@ -155,7 +237,7 @@ class FixingModal extends PureComponent<
       userLoginId: this.currentUser.userName,
       eventDetail: {
         observationDate: data.day,
-        observationPrice: String(data.price),
+        observationPrice: String(data[OB_PRICE_FIELD]),
       },
     });
     if (error) return;
@@ -163,75 +245,195 @@ class FixingModal extends PureComponent<
     this.reload();
   };
 
+  public isAutocallPhoenix = () => {
+    return (
+      this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||
+      this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL
+    );
+  };
+
+  public getColumnDefs = (): IColumnDef[] => {
+    if (this.isAutocallPhoenix()) {
+      return [
+        {
+          headerName: '观察日',
+          field: OB_DAY_FIELD,
+          input: {
+            type: 'date',
+          },
+        },
+        {
+          headerName: '敲出障碍价',
+          field: LEG_FIELD.UP_BARRIER,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+        },
+        {
+          headerName: 'Coupon障碍',
+          field: LEG_FIELD.COUPON_BARRIER,
+          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+        },
+        {
+          headerName: '已观察到价格(可编辑)',
+          field: OB_PRICE_FIELD,
+          editable: true,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+          rules: [
+            {
+              message: '数值不能低于0',
+              validator: (rule, value, callback) => {
+                if (value < 0) {
+                  return callback(true);
+                }
+                callback();
+              },
+            },
+          ],
+        },
+        {
+          headerName: '观察周期收益',
+          field: OB_LIFE_PAYMENT,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+        },
+      ];
+    }
+
+    return [
+      {
+        headerName: '观察日',
+        field: 'day',
+        input: {
+          type: 'date',
+        },
+      },
+      ...(this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+      this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+        ? []
+        : [
+            {
+              headerName: '权重',
+              field: 'weight',
+              input: INPUT_NUMBER_DIGITAL_CONFIG,
+            },
+          ]),
+      {
+        headerName: '已观察到价格(可编辑)',
+        field: OB_PRICE_FIELD,
+        editable: true,
+        input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+        rules: [
+          {
+            message: '数值不能低于0',
+            validator: (rule, value, callback) => {
+              if (value < 0) {
+                return callback(true);
+              }
+              callback();
+            },
+          },
+        ],
+      },
+    ];
+  };
+
+  public canBarrier = () => {
+    return this.state.tableData.some(record => {
+      const alObPrice = record[OB_PRICE_FIELD];
+      const upBarrier = record[LEG_FIELD.UP_BARRIER];
+      const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
+      if (direction === KNOCK_DIRECTION_MAP.UP) {
+        return alObPrice > upBarrier;
+      }
+
+      if (direction === KNOCK_DIRECTION_MAP.DOWN) {
+        return alObPrice < upBarrier;
+      }
+
+      return false;
+    });
+  };
+
+  // 未发生敲出
+  public notBarrierHappen = () => {
+    const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
+    return this.state.tableData.every(record => {
+      const upBarrier = record[LEG_FIELD.UP_BARRIER];
+      const alObPrice = record[OB_PRICE_FIELD];
+      if (direction === KNOCK_DIRECTION_MAP.UP) {
+        return alObPrice <= upBarrier;
+      }
+      if (direction === KNOCK_DIRECTION_MAP.DOWN) {
+        return alObPrice >= upBarrier;
+      }
+      return false;
+    });
+  };
+
+  public getModalFooter = () => {
+    if (this.isAutocallPhoenix()) {
+      return (
+        <Row type="flex" justify="start" align="middle">
+          <Col>
+            <Button
+              disabled={!this.canBarrier()}
+              style={{ marginLeft: VERTICAL_GUTTER }}
+              onClick={this.onConfirm}
+              loading={this.state.modalConfirmLoading}
+            >
+              敲出
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              disabled={!(this.isCanExercise() || this.notBarrierHappen())}
+              style={{ marginLeft: VERTICAL_GUTTER }}
+              onClick={this.onConfirm}
+              loading={this.state.modalConfirmLoading}
+            >
+              到期
+            </Button>
+          </Col>
+        </Row>
+      );
+    }
+    return (
+      <Row type="flex" justify="space-between" align="middle">
+        <Col>
+          <Button
+            disabled={!this.isCanExercise()}
+            style={{ marginLeft: VERTICAL_GUTTER }}
+            onClick={this.onConfirm}
+            loading={this.state.modalConfirmLoading}
+          >
+            行权
+          </Button>
+        </Col>
+        <Col>
+          <Tag style={{ marginLeft: VERTICAL_GUTTER }}>平均价: {this.state.avg}</Tag>
+        </Col>
+      </Row>
+    );
+  };
+
   public render() {
     const { visible } = this.state;
     return (
       <>
+        <ExpirationModal ref={node => (this.$expirationModal = node)} />
         <AsianExerciseModal ref={node => (this.$asianExerciseModal = node)} />
         <Modal
           onCancel={this.switchModal}
           destroyOnClose={true}
           visible={visible}
           title={'Fixing'}
-          footer={
-            <Row type="flex" justify="space-between" align="middle">
-              <Col>
-                <Button
-                  disabled={!this.isCanExercise()}
-                  style={{ marginLeft: VERTICAL_GUTTER }}
-                  onClick={this.onConfirm}
-                  loading={this.state.modalConfirmLoading}
-                >
-                  行权
-                </Button>
-              </Col>
-              <Col>
-                <Tag style={{ marginLeft: VERTICAL_GUTTER }}>平均价: {this.state.avg}</Tag>
-              </Col>
-            </Row>
-          }
+          footer={this.getModalFooter()}
+          width={900}
         >
           <SourceTable
             pagination={false}
             dataSource={this.state.tableData}
-            rowKey="day"
+            rowKey={OB_DAY_FIELD}
             onCellValueChanged={this.onCellValueChanged}
-            columnDefs={[
-              {
-                headerName: '观察日',
-                field: 'day',
-                input: {
-                  type: 'date',
-                },
-              },
-              ...(this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-              this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
-                ? []
-                : [
-                    {
-                      headerName: '权重',
-                      field: 'weight',
-                      input: INPUT_NUMBER_DIGITAL_CONFIG,
-                    },
-                  ]),
-              {
-                headerName: '已观察到价格(可编辑)',
-                field: 'price',
-                editable: true,
-                input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                rules: [
-                  {
-                    message: '数值不能低于0',
-                    validator: (rule, value, callback) => {
-                      if (value < 0) {
-                        return callback(true);
-                      }
-                      callback();
-                    },
-                  },
-                ],
-              },
-            ]}
+            columnDefs={this.getColumnDefs()}
           />
         </Modal>
       </>

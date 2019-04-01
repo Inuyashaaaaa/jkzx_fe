@@ -415,7 +415,8 @@ export const LEG_FIELD = {
   STRIKE_TYPE: 'strikeType',
   NOTIONAL_AMOUNT_TYPE: 'notionalAmountType',
   PREMIUM_TYPE: 'premiumType',
-  SPECIFIED_PRICE: 'specifiedPrice',
+  SPECIFIED_PRICE: 'specifiedPrice', // 结算方式
+  SPECIFIED_PRICE2: 'SPECIFIED_PRICE2', // 结算金额
   UNDERLYER_MULTIPLIER: 'underlyerMultiplier', // 合约乘数
   PAYMENT_TYPE: 'paymentType',
   STRIKE: 'strike',
@@ -453,6 +454,7 @@ export const LEG_FIELD = {
   BARRIER: 'barrier',
   LOW_BARRIER: 'lowBarrier',
   HIGH_BARRIER: 'highBarrier',
+  UNDERLYER_INSTRUMENT_PRICE: 'UNDERLYER_INSTRUMENT_PRICE',
 };
 
 /**

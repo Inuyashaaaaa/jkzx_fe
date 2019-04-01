@@ -1,14 +1,18 @@
 import { Form2, Input } from '@/design/components';
+import { getToken } from '@/lib/utils/authority';
 import { message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import produce from 'immer';
 import React, { PureComponent } from 'react';
 import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
 
 class SocketTestPage extends PureComponent {
   public form: Form2;
 
   public sock: any;
+
+  public stomp: Stomp;
 
   public state = {
     contents: [],
@@ -24,37 +28,53 @@ class SocketTestPage extends PureComponent {
         {
           linked: false,
         },
-        () => this.sock.close()
+        () => this.stomp.disconnect()
       );
     }
 
     const values = this.form.decoratorForm.getFieldsValue();
-    const { address, token } = values;
+    const { address, channel, sendChannel } = values;
     if (!address) return message.error('address not exist.');
-    if (!token) return message.error('token not exist.');
+    if (!channel) return message.error('channel not exist.');
+    if (!sendChannel) return message.error('sendChannel not exist.');
 
     return this.setState(
       {
         linked: true,
       },
-      () => this.createSocket(address, token)
+      () => this.createSocket(address, channel, sendChannel)
     );
   };
 
-  public createSocket = (address, token) => {
-    const sock = (this.sock = new SockJS(address + '?' + token));
+  public createSocket = (address, channel, sendChannel) => {
+    const sock = (this.sock = new SockJS(address));
+    const stomp = (this.stomp = Stomp.over(sock));
+    // sock.onopen = () => {
+    //   this.print('sock:open');
+    // };
 
-    sock.onopen = () => {
-      this.print('open');
-    };
+    // sock.onmessage = e => {
+    //   this.print('sock:message: ' + JSON.stringify(e.data));
+    // };
 
-    sock.onmessage = e => {
-      this.print('message: ' + e.data);
-    };
+    // sock.onclose = e => {
+    //   this.print('sock:close');
+    // };
 
-    sock.onclose = e => {
-      this.print('close');
-    };
+    stomp.sendChannel = sendChannel;
+    stomp.channel = channel;
+    stomp.connect(
+      'admin',
+      '12345',
+      frame => {
+        stomp.subscribe(channel, message => {
+          this.print('stomp:message: ' + JSON.stringify(message));
+        });
+      },
+      error => {
+        console.error(error);
+      }
+    );
   };
 
   public print = (message: string) => {
@@ -72,8 +92,8 @@ class SocketTestPage extends PureComponent {
     if (!message) return message.warn('消息内容不能是空');
     if (!this.sock) return message.warn('请先建立 socket 连接');
 
-    this.print('send: ' + message);
-    this.sock.send(message);
+    this.print('stomp:send: ' + JSON.stringify(message));
+    this.stomp.send(this.stomp.sendChannel, {}, JSON.stringify(message));
   };
 
   public getRef = node => (this.form = node);
@@ -91,21 +111,34 @@ class SocketTestPage extends PureComponent {
                 return (
                   <FormItem hasFeedback={true}>
                     {form.getFieldDecorator('address', {
-                      initialValue: value,
+                      initialValue: 'http://10.1.100.219:16000/wsReport',
                     })(<Input />)}
                   </FormItem>
                 );
               },
             },
             {
-              title: 'query',
-              dataIndex: 'token',
+              title: 'channel',
+              dataIndex: 'channel',
               render: (value, record, index, { form, editing }) => {
                 return (
                   <FormItem hasFeedback={true}>
-                    {form.getFieldDecorator('token', {
-                      initialValue: value,
-                    })(<Input placeholder="形式为 auth=xxxx" />)}
+                    {form.getFieldDecorator('channel', {
+                      initialValue: '/topic/notice',
+                    })(<Input />)}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: 'send:channel',
+              dataIndex: 'sendChannel',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem hasFeedback={true}>
+                    {form.getFieldDecorator('sendChannel', {
+                      initialValue: '/topic/message',
+                    })(<Input />)}
                   </FormItem>
                 );
               },
