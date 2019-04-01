@@ -123,20 +123,4 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
     field: 'underlyerPrice',
     input: INPUT_NUMBER_DIGITAL_CONFIG,
   },
-  {
-    headerName: '无风险利率',
-    field: 'r',
-  },
-  {
-    headerName: '隐含波动率',
-    field: 'vol',
-  },
-  {
-    headerName: '年化分红率',
-    field: 'q',
-  },
-  {
-    headerName: '年日数',
-    field: 'daysInYear',
-  },
 ];

@@ -34,12 +34,27 @@ class ReportsEodHistoricalPnlByUnderlyer extends PureComponent {
       reportType: 'PNL_HST',
     });
     if (error) return;
-    this.setState({
-      markets: data.map(item => ({
-        label: item,
-        value: item,
-      })),
-    });
+    this.setState(
+      {
+        markets: data.map(item => ({
+          label: item,
+          value: item,
+        })),
+      },
+      () => {
+        this.setState(
+          {
+            searchFormData: {
+              ...(this.state.markets.length ? { reportName: this.state.markets[0].value } : null),
+              valuationDate: moment().subtract(1, 'days'),
+            },
+          },
+          () => {
+            this.fetchTable();
+          }
+        );
+      }
+    );
   };
 
   public fetchTable = async () => {

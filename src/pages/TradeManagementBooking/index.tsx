@@ -74,6 +74,7 @@ class BookCreate extends PureComponent<any> {
     tradeTableData: [],
     tadeInfo: {},
     modalVisible: false,
+    entryMargin: true,
   };
 
   public modalFormData: any;
@@ -556,8 +557,20 @@ class BookCreate extends PureComponent<any> {
   };
 
   public handleChangeValueOur = values => {
+    if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
+      this.setState({
+        entryMargin: false,
+        ourDataSource: values,
+      });
+      return;
+    }
+
     this.setState({
-      ourDataSource: values,
+      entryMargin: true,
+      ourDataSource: {
+        ...values,
+        tradeId: this.modalFormData.tradeId,
+      },
     });
   };
 
@@ -747,7 +760,7 @@ class BookCreate extends PureComponent<any> {
                   return;
                 }}
                 dataSource={this.state.ourDataSource}
-                controls={OUR_CREATE_FORM_CONTROLS}
+                controls={OUR_CREATE_FORM_CONTROLS(this.state.entryMargin)}
                 onChangeValue={this.handleChangeValueOur}
                 controlNumberOneRow={1}
                 footer={false}
