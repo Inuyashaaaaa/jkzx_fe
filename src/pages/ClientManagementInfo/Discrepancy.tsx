@@ -306,7 +306,7 @@ class Discrepancy extends PureComponent<
     if (error) return;
     this.setState(
       produce((state: any) => {
-        state.tableDataSource = state.tableDataSource.concat(data);
+        // state.tableDataSource = state.tableDataSource.concat(data);
         state.discrepancyCreateData = {
           paymentDate: moment(),
         };
@@ -333,7 +333,10 @@ class Discrepancy extends PureComponent<
       });
       this.setState({
         bankAccountList,
-        discrepancyCreateData: values,
+        discrepancyCreateData: {
+          ...values,
+          bankAccount: '',
+        },
       });
       return;
     }
