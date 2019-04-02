@@ -1,23 +1,23 @@
+import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import Form from '@/design/components/Form';
+import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import SourceTable from '@/lib/components/_SourceTable';
 import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
 import {
   exeTradeRecordSave,
   queryDetail,
+  querySummary,
   queryTradeRecord,
   uploadUrl,
-  querySummary,
 } from '@/services/onBoardTransaction';
 import { Button, message, Modal, Radio, Tabs } from 'antd';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import RowForm from './components/RowForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
-import BigNumber from 'bignumber.js';
-import { BIG_NUMBER_CONFIG } from '@/constants/common';
 
 const { TabPane } = Tabs;
 const RadioButton = Radio.Button;
@@ -397,7 +397,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
           <TabPane tab="场内流水" key="1">
             <RowForm mode="flow" codeOptions={instrumentIds} handleQuery={this.queryRecords} />
-            <div>
+            <div style={{ marginBottom: '20px' }}>
               <Button onClick={this.showModal} type="primary" style={{ marginTop: 10 }}>
                 导入场内流水
               </Button>
@@ -409,13 +409,11 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               loading={loading}
               searchable={false}
               removeable={false}
-              saveDisabled
+              // saveDisabled
               rowKey="uuid"
               dataSource={flowData}
-              tableColumnDefs={flowColumns}
-              tableProps={{
-                autoSizeColumnsToFit: true,
-              }}
+              columnDefs={flowColumns}
+              autoSizeColumnsToFit={true}
             />
           </TabPane>
           <TabPane tab="场内持仓统计" key="2">
@@ -423,7 +421,11 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               mode="position"
               handleQuery={positionMode === 'detail' ? this.queryDetail : this.querySummary}
             />
-            <RadioGroup onChange={this.changePosition} defaultValue="a">
+            <RadioGroup
+              onChange={this.changePosition}
+              defaultValue="a"
+              style={{ marginBottom: '20px' }}
+            >
               <RadioButton value="a">按明细统计</RadioButton>
               <RadioButton value="b">按合约代码统计</RadioButton>
             </RadioGroup>
@@ -432,13 +434,11 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 loading={loading}
                 searchable={false}
                 removeable={false}
-                saveDisabled
+                // saveDisabled
                 rowKey="uuid"
                 dataSource={positionData}
-                tableColumnDefs={detailColumns}
-                tableProps={{
-                  autoSizeColumnsToFit: true,
-                }}
+                columnDefs={detailColumns}
+                autoSizeColumnsToFit={true}
               />
             )}
             {positionMode === 'summary' && (
@@ -446,13 +446,11 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 loading={loading}
                 searchable={false}
                 removeable={false}
-                saveDisabled
+                // saveDisabled
                 rowKey="uuid"
                 dataSource={positionData}
-                tableColumnDefs={summaryColumns}
-                tableProps={{
-                  autoSizeColumnsToFit: true,
-                }}
+                columnDefs={summaryColumns}
+                autoSizeColumnsToFit={true}
               />
             )}
           </TabPane>
