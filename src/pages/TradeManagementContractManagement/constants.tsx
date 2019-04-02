@@ -32,10 +32,14 @@ export const bookingSearchFormControls: (bookList, bookIdList) => IFormControl[]
           similarBookName: value,
         });
         if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
+        return data
+          .sort((a, b) => {
+            return a.localeCompare(b);
+          })
+          .map(item => ({
+            label: item,
+            value: item,
+          }));
       },
     },
     field: BOOK_NAME_FIELD,

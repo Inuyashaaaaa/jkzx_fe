@@ -22,7 +22,12 @@ export const SEARCH_FORM_DEFS: IFormControl[] = [
       type: 'date',
       range: 'range',
       disabledDate(startValue) {
-        return startValue.valueOf() < moment().valueOf();
+        return (
+          startValue.valueOf() <
+          moment()
+            .subtract(1, 'days')
+            .valueOf()
+        );
       },
     },
   },
