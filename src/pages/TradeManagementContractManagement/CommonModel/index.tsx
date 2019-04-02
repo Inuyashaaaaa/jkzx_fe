@@ -53,7 +53,6 @@ class CommonModel extends PureComponent {
     });
 
     this.setState({ loading: true });
-    console.log(this.status);
     const { error, data } = await trdTradeSearchPaged({
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
@@ -72,22 +71,18 @@ class CommonModel extends PureComponent {
       };
     });
 
-    this.setState(
-      {
-        tableDataSource,
-        pagination: {
-          ...pagination,
-          ...paramsPagination,
-          total: data.totalCount,
-        },
+    this.setState({
+      tableDataSource,
+      pagination: {
+        ...pagination,
+        ...paramsPagination,
+        total: data.totalCount,
       },
-      () => {
-        console.log(tableDataSource);
-      }
-    );
+    });
   };
 
   public onTablePaginationChange = ({ pagination }) => {
+    console.log(pagination);
     this.setState(
       {
         pagination,

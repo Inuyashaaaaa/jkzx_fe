@@ -30,12 +30,12 @@ export default [
       path: '/',
       component: '../layouts/BasicLayout',
       routes: [
-        {
-          path: '/dashboard',
-          name: 'dashboard',
-          icon: 'dashboard',
-          component: './Dashboard',
-        },
+        // {
+        //   path: '/dashboard',
+        //   name: 'dashboard',
+        //   icon: 'dashboard',
+        //   component: './Dashboard',
+        // },
         {
           path: '/trade-management',
           name: 'tradeManagement',

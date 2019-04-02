@@ -6,6 +6,7 @@ import memo from 'memoize-one';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import styles from './index.less';
+import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 
 class Calendars extends PureComponent<any, any> {
   public static defaultProps = {
@@ -15,6 +16,19 @@ class Calendars extends PureComponent<any, any> {
   public state = {
     mode: 'month',
     disabledTypes: [],
+    dataSource: [],
+  };
+
+  public componentDidMount = () => {
+    this.onFetch(
+      moment()
+        .startOf('month')
+        .format('YYYY-MM-DD'),
+      moment()
+        .endOf('month')
+        .format('YYYY-MM-DD'),
+      this.state.mode
+    );
   };
 
   public getSameDataSourceByDate = memo((dataSource: any[] = [], format) => {
@@ -37,7 +51,7 @@ class Calendars extends PureComponent<any, any> {
 
   public getListData = value => {
     const format = this.getCompareDateFormat();
-    const sameDataSourceByDate = this.getSameDataSourceByDate(this.props.dataSource, format);
+    const sameDataSourceByDate = this.getSameDataSourceByDate(this.state.dataSource, format);
     console.log(sameDataSourceByDate);
     return sameDataSourceByDate[value.format(format)];
   };
@@ -67,7 +81,9 @@ class Calendars extends PureComponent<any, any> {
                 }
                 title={EVENT_TYPE_ZHCN_MAP[item.notificationEventType]}
               >
-                <li key={item.content}>{this.getBadge(item.notificationEventType)}</li>
+                <li key={item.content}>
+                  {this.getBadge(item.notificationEventType, item.tradeId)}
+                </li>
               </Popover>
             );
           })}
@@ -75,8 +91,13 @@ class Calendars extends PureComponent<any, any> {
     );
   };
 
-  public getBadge = notificationEventType => {
-    return <Badge status="processing" text={EVENT_TYPE_ZHCN_MAP[notificationEventType]} />;
+  public getBadge = (notificationEventType, tradeId) => {
+    return (
+      <Badge
+        status="processing"
+        text={`${tradeId}:${EVENT_TYPE_ZHCN_MAP[notificationEventType]}`}
+      />
+    );
   };
 
   public getBadgeInteraction = notificationEventType => {
@@ -102,7 +123,34 @@ class Calendars extends PureComponent<any, any> {
   };
 
   public onPanelChange = (date, mode: string) => {
-    this.setState({ mode });
+    let startDate;
+    let endDate;
+    if (mode === 'month') {
+      startDate = moment(date)
+        .startOf('month')
+        .format('YYYY-MM-DD');
+      endDate = moment(date)
+        .endOf('month')
+        .format('YYYY-MM-DD');
+    } else {
+      startDate = moment(date)
+        .startOf('year')
+        .format('YYYY-MM-DD');
+      endDate = moment(date)
+        .endOf('year')
+        .format('YYYY-MM-DD');
+    }
+    this.onFetch(startDate, endDate, mode);
+  };
+
+  public onFetch = async (startDate, endDate, mode) => {
+    const { error, data } = await traTradeLCMNotificationSearch({
+      after: startDate,
+      before: endDate,
+    });
+    if (error) return;
+
+    this.setState({ mode, dataSource: data });
   };
 
   public bindTagButtonClick = notificationEventType => () => {
