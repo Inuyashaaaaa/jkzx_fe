@@ -135,6 +135,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       LEG_FIELD.UP_BARRIER,
       LEG_FIELD.UP_BARRIER_TYPE,
       UpObservationStep.field,
+      ExpireNoBarrierObserveDay.field,
     ]);
 
     if (
@@ -147,9 +148,9 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
     }
 
-    nextPosition.asset[ExpireNoBarrierObserveDay.field] = nextPosition.asset[
-      ExpireNoBarrierObserveDay.field
-    ].map(item => item[OB_DAY_FIELD]);
+    nextPosition.asset.observationDates = dataSourceItem[ExpireNoBarrierObserveDay.field].map(
+      item => item[OB_DAY_FIELD]
+    );
 
     nextPosition.asset.barrier = dataSourceItem[LEG_FIELD.UP_BARRIER];
     nextPosition.asset.barrierType = dataSourceItem[LEG_FIELD.UP_BARRIER_TYPE];

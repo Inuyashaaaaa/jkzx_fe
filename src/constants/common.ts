@@ -132,6 +132,7 @@ export const LCM_EVENT_TYPE_MAP = {
   UNWIND_PARTIAL: 'UNWIND_PARTIAL',
   OBSERVE: 'OBSERVE',
   SNOW_BALL_EXERCISE: 'SNOW_BALL_EXERCISE',
+  PHOENIX_EXERCISE: 'PHOENIX_EXERCISE',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
@@ -148,7 +149,8 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   CLOSED: '结束',
   UNWIND_PARTIAL: '部分平仓',
   OBSERVE: '观察',
-  SNOW_BALL_EXERCISE: '雪球到期行权',
+  SNOW_BALL_EXERCISE: '雪球式到期行权',
+  PHOENIX_EXERCISE: '凤凰式到期行权',
 };
 
 export const FREQUENCY_TYPE_MAP = {
@@ -374,7 +376,7 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  */
 export const LEG_FIELD = {
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
-  DOWN_BARRIER_DATE: 'DownBarrierDate', // 敲入日期
+  DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
   ALREADY_BARRIER: 'AlreadyBarrier', // 已经敲入
   COUPON_BARRIER: 'couponBarrier', // coupon障碍
   OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日

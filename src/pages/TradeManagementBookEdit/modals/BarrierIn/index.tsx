@@ -30,6 +30,8 @@ class BarrierIn extends PureComponent<
 
   public fixingTableData: any = [];
 
+  public modal: any;
+
   public state = {
     visible: true,
     autoCallPaymentType: null,
@@ -68,31 +70,18 @@ class BarrierIn extends PureComponent<
   };
 
   public onConfirm = async () => {
-    const dataSource =
-      this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
-      EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
-        ? this.state.fixedDataSource
-        : this.state.callPutDataSource;
     this.switchConfirmLoading();
-    const { error, data } = await trdTradeLCMEventProcess({
+    const { error } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.KNOCK_IN,
       userLoginId: this.currentUser.userName,
-      eventDetail: {
-        ...(dataSource[UNDERLYER_PRICE]
-          ? { underlyerProce: String(dataSource[UNDERLYER_PRICE]) }
-          : null),
-        settleAmount: String(dataSource[SETTLE_AMOUNT]),
-      },
+      eventDetail: {},
     });
-
     this.switchConfirmLoading();
     if (error) return;
     message.success('敲入成功');
-    this.setState({
-      visible: false,
-    });
+    this.setState({ visible: false });
   };
 
   public render() {
