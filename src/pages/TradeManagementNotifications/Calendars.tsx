@@ -1,12 +1,12 @@
 import { EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
 import { toggleItem } from '@/design/utils';
+import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 import { Badge, Calendar, Col, Popover, Row } from 'antd';
 import _ from 'lodash';
 import memo from 'memoize-one';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import styles from './index.less';
-import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 
 class Calendars extends PureComponent<any, any> {
   public static defaultProps = {
@@ -17,18 +17,6 @@ class Calendars extends PureComponent<any, any> {
     mode: 'month',
     disabledTypes: [],
     dataSource: [],
-  };
-
-  public componentDidMount = () => {
-    this.onFetch(
-      moment()
-        .startOf('month')
-        .format('YYYY-MM-DD'),
-      moment()
-        .endOf('month')
-        .format('YYYY-MM-DD'),
-      this.state.mode
-    );
   };
 
   public getSameDataSourceByDate = memo((dataSource: any[] = [], format) => {
@@ -44,6 +32,18 @@ class Calendars extends PureComponent<any, any> {
     }, {});
     return sameDataSourceByDate;
   });
+
+  public componentDidMount = () => {
+    this.onFetch(
+      moment()
+        .startOf('month')
+        .format('YYYY-MM-DD'),
+      moment()
+        .endOf('month')
+        .format('YYYY-MM-DD'),
+      this.state.mode
+    );
+  };
 
   public getCompareDateFormat = () => {
     return this.state.mode === 'month' ? 'YYYY-MM-DD' : 'YYYY-MM';
