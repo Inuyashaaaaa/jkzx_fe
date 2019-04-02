@@ -150,11 +150,11 @@ export const IOGLOD_COL_DEFS: IColumnDef[] = [
     // checkboxSelection: true,
     pinned: 'left',
   },
-  {
-    headerName: '账户编号',
-    field: 'accountId',
-    width: 150,
-  },
+  // {
+  //   headerName: '账户编号',
+  //   field: 'accountId',
+  //   width: 150,
+  // },
   {
     headerName: '交易编号',
     field: 'tradeId',
@@ -470,10 +470,10 @@ export const UNCREATE_TABLE_COL_DEFS: IColumnDef[] = [
     headerName: '交易编号',
     field: 'tradeId',
   },
-  {
-    headerName: '账户编号',
-    field: 'accountId',
-  },
+  // {
+  //   headerName: '账户编号',
+  //   field: 'accountId',
+  // },
   {
     headerName: '现金流',
     field: 'cashFlow',
