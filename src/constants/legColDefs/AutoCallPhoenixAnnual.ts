@@ -11,6 +11,7 @@ import {
   OB_DAY_FIELD,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
+  UNIT_ENUM_MAP2,
   UP_BARRIER_TYPE_MAP,
 } from '../common';
 import {
@@ -43,7 +44,6 @@ import {
   PricingTerm,
   SettlementDate,
   SpecifiedPrice,
-  Step,
   Term,
   UnderlyerInstrumentId,
   UnderlyerMultiplier,
@@ -60,21 +60,31 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: true,
   pricingColumnDefs: [
+    SpecifiedPrice,
     Direction,
     UnderlyerInstrumentId,
     UnderlyerMultiplier,
     InitialSpot,
     ParticipationRate,
-    PricingTerm,
-    PricingExpirationDate,
+    Coupon,
     NotionalAmountType,
     NotionalAmount,
     KnockDirection,
     UpBarrierType,
     UpBarrier,
-    Step,
     CouponEarnings,
     ExpireNoBarrierObserveDay,
+    DownBarrierType,
+    DownBarrierOptionsStrikeType,
+    DownBarrierOptionsStrike,
+    DownBarrierOptionsType,
+    UpObservationStep,
+    DownObservationStep,
+    DownBarrier,
+    InExpireNoBarrierObserveDay,
+    DownBarrierOptionsStrike,
+    PricingTerm,
+    PricingExpirationDate,
   ],
   columnDefs: [
     SpecifiedPrice,
@@ -126,6 +136,14 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.ALREADY_BARRIER]: false,
+      [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE]: UNIT_ENUM_MAP2.PERCENT,
+      [DownBarrierType.field]: UNIT_ENUM_MAP2.PERCENT,
+      ...(isPricing
+        ? {
+            autoCallPaymentType: null,
+            knockInDate: null,
+          }
+        : {}),
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
@@ -165,7 +183,7 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
     nextPosition.asset.fixingObservations = dataSourceItem[
       LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY
     ].reduce((result, item) => {
-      result[item[OB_DAY_FIELD]] = item.price !== undefined ? String(item.price) : null;
+      result[item[OB_DAY_FIELD]] = item.price !== undefined ? item.price : null;
       return result;
     }, {});
 

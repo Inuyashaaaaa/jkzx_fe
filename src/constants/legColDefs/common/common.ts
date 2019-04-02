@@ -1,4 +1,3 @@
-import AsiaObserveModalInput from '@/containers/AsiaObserveModalInput';
 import ObserveModalInput from '@/containers/ObserveModalInput';
 import { IColDef } from '@/design/components/Table/types';
 import {
@@ -240,11 +239,15 @@ export const InitialSpot: IColDef = {
         instrumentIds: [record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID]],
       }).then(rsp => {
         if (rsp.error) return undefined;
-        return rsp.data.page[0]
-          ? new BigNumber(rsp.data.page[0].last)
-              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-              .toNumber()
-          : 1;
+        return new BigNumber(
+          _.chain(rsp)
+            .get('data.page[0]')
+            .omitBy(_.isNull)
+            .get('last', 1)
+            .value()
+        )
+          .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+          .toNumber();
       });
     },
   },
@@ -718,6 +721,7 @@ export const DownBarrierType: IColDef = {
   input: {
     type: 'select',
     options: UNIT_ENUM_OPTIONS2,
+    defaultOpen: true,
   },
 };
 
@@ -728,6 +732,7 @@ export const DownBarrierOptionsStrikeType: IColDef = {
   input: {
     type: 'select',
     options: UNIT_ENUM_OPTIONS2,
+    defaultOpen: true,
   },
 };
 
@@ -736,7 +741,7 @@ export const DownBarrierOptionsStrike: IColDef = {
   headerName: '敲入期权行权价',
   field: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE,
   input: record => {
-    if (record[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_OPTIONS2.CNY) {
+    if (record[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_MAP2.CNY) {
       return {
         depends: [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -758,6 +763,7 @@ export const DownBarrierOptionsType: IColDef = {
   input: {
     type: 'select',
     options: OPTION_TYPE_OPTIONS,
+    defaultOpen: true,
   },
 };
 
@@ -844,7 +850,7 @@ export const AutoCallStrikeUnit: IColDef = {
           EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT,
     };
   },
-  headerName: '到期未敲出行权价格类型',
+  headerName: '到期未敲出行权价类型',
   field: LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
   input: {
     type: 'select',
@@ -904,7 +910,7 @@ export const ExpireNoBarrierObserveDay: IColDef = {
   field: LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
   input: record => {
     return {
-      type: AsiaObserveModalInput,
+      type: ObserveModalInput,
       record,
       direction: KNOCK_DIRECTION_MAP.UP,
     };
@@ -913,11 +919,11 @@ export const ExpireNoBarrierObserveDay: IColDef = {
 
 export const InExpireNoBarrierObserveDay: IColDef = {
   editable: true,
-  headerName: '敲入/coupon观察日',
+  headerName: '敲入观察日',
   field: LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY,
   input: record => {
     return {
-      type: AsiaObserveModalInput,
+      type: ObserveModalInput,
       record,
       direction: KNOCK_DIRECTION_MAP.DOWN,
     };
@@ -1190,7 +1196,7 @@ export const ObservationDates: IColDef = {
   editable: true,
   field: LEG_FIELD.OBSERVATION_DATES,
   input: record => ({
-    type: AsiaObserveModalInput,
+    type: ObserveModalInput,
     record,
   }),
   rules: RULES_REQUIRED,

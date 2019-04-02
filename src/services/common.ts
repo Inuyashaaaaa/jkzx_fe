@@ -27,6 +27,7 @@ export const getCanUsedTranorsOtionsNotIncludingSelf = (tableDataSource: Array<{
   return getCanUsedTranors(tableDataSource.map(item => item.tenor));
 };
 
+// @todo remove and replace for leg selef pageData convertion
 // 将观察日接口数据转换成字段数据
 export function convertObservetions(nextDataSourceItem) {
   if (isAutocallPhoenix(nextDataSourceItem)) {

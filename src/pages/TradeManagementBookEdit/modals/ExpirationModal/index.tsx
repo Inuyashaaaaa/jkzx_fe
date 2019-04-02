@@ -1,6 +1,5 @@
 import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
-  EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   LCM_EVENT_TYPE_MAP,
@@ -12,13 +11,15 @@ import {
 } from '@/constants/common';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { getMinRule, getRequiredRule, isAutocallPhoenix } from '@/tools';
-import { message, Modal } from 'antd';
+import { getMinRule, getRequiredRule, isAutocallPhoenix, isKnockIn } from '@/tools';
+import { Button, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { OB_LIFE_PAYMENT } from '../../constants';
 import ExportModal from '../../ExportModal';
+import { getObservertionFieldData } from '../../tools';
 import {
   EXERCISE_PRICE,
   EXPIRATION_CALL_PUT_FORM_CONTROLS,
@@ -79,8 +80,25 @@ class ExpirationModal extends PureComponent<
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.STRIKE],
       [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
-      [LEG_FIELD.COUPON_PAYMENT]: this.data[LEG_FIELD.COUPON_PAYMENT],
+      [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
+      [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
     };
+  };
+
+  /**
+   * coupnon部分：
+   * 如果由fixing中进入到期，则coupon部分收益=观察事件表格中观察周期收益的总和
+   * 如果由菜单进入：获得所有观察价格，按照fixing事件中的方法进行计算
+   */
+  public getCouponPaymentTotal = () => {
+    if (!!this.fixingTableData) {
+      return this.fixingTableData.reduce((total, next) => total + (next[OB_LIFE_PAYMENT] || 0), 0);
+    }
+
+    return getObservertionFieldData(this.data).reduce(
+      (total, next) => total + (next[OB_LIFE_PAYMENT] || 0),
+      0
+    );
   };
 
   public show = (data = {}, tableFormData, currentUser, reload, fixingTableData = []) => {
@@ -157,24 +175,45 @@ class ExpirationModal extends PureComponent<
     });
   };
 
-  public onConfirm = async () => {
-    const dataSource =
-      this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+  public getUsedFormData = () => {
+    if (isAutocallPhoenix(this.data)) {
+      return this.state.formData;
+    }
+
+    return this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
       EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
-        ? this.state.fixedDataSource
-        : this.state.callPutDataSource;
+      ? this.state.fixedDataSource
+      : this.state.callPutDataSource;
+  };
+
+  public getEventDetail = formData => {
+    if (isAutocallPhoenix(this.data)) {
+      return {
+        settleAmount: String(formData[LEG_FIELD.SPECIFIED_PRICE2]),
+        underlyerPrice:
+          formData[LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE] === undefined
+            ? null
+            : String(formData[LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]),
+      };
+    }
+
+    return {
+      ...(formData[UNDERLYER_PRICE] ? { underlyerProce: String(formData[UNDERLYER_PRICE]) } : null),
+      settleAmount: String(formData[SETTLE_AMOUNT]),
+    };
+  };
+
+  public onConfirm = async () => {
+    const usedFormData = this.getUsedFormData();
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
-      eventType: LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
+      eventType: isAutocallPhoenix(this.data)
+        ? LCM_EVENT_TYPE_MAP.EXPIRATION
+        : LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
       userLoginId: this.currentUser.userName,
-      eventDetail: {
-        ...(dataSource[UNDERLYER_PRICE]
-          ? { underlyerProce: String(dataSource[UNDERLYER_PRICE]) }
-          : null),
-        settleAmount: String(dataSource[SETTLE_AMOUNT]),
-      },
+      eventDetail: this.getEventDetail(usedFormData),
     });
 
     this.switchConfirmLoading();
@@ -205,7 +244,7 @@ class ExpirationModal extends PureComponent<
   };
 
   public handleSettleAmount = async () => {
-    const dataSource = this.state.callPutDataSource;
+    const dataSource = this.state.formData;
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -229,6 +268,28 @@ class ExpirationModal extends PureComponent<
     });
   };
 
+  // 不要删除，可能后期会使用到
+  // 凤凰到期的 标的物结算金额 暂时不去计算
+  public countAutocalPhoenixSettleAmount = async () => {
+    const dataSource = this.state.formData;
+    const { error, data } = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventDetail: isKnockIn(this.data)
+        ? {
+            underlyerPrice: String(dataSource[LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]),
+          }
+        : { underlyerPrice: null },
+      eventType: LCM_EVENT_TYPE_MAP.EXPIRATION,
+    });
+    if (error) return;
+    this.setState({
+      formData: {
+        ...dataSource,
+        [LEG_FIELD.SPECIFIED_PRICE2]: data,
+      },
+    });
+  };
+
   public getForm = () => {
     if (isAutocallPhoenix(this.data)) {
       return (
@@ -243,7 +304,7 @@ class ExpirationModal extends PureComponent<
               control: {
                 label: '名义金额',
               },
-              input: { disabled: true },
+              input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
               decorator: {
                 rules: [getRequiredRule(), getMinRule()],
               },
@@ -253,7 +314,7 @@ class ExpirationModal extends PureComponent<
               control: {
                 label: 'Coupon收益',
               },
-              input: { disabled: true },
+              input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
               decorator: {
                 rules: [getRequiredRule()],
               },
@@ -272,7 +333,7 @@ class ExpirationModal extends PureComponent<
                 rules: [getRequiredRule()],
               },
             },
-            ...(this.data[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.KNOCK_IN
+            ...(isKnockIn(this.data)
               ? [
                   {
                     field: LEG_FIELD.STRIKE,
@@ -303,7 +364,18 @@ class ExpirationModal extends PureComponent<
               control: {
                 label: '结算金额',
               },
-              input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+              input: {
+                ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                after: (
+                  <Button
+                    key="upload"
+                    type="primary"
+                    onClick={this.countAutocalPhoenixSettleAmount}
+                  >
+                    结算
+                  </Button>
+                ),
+              },
               decorator: {
                 rules: [getRequiredRule()],
               },
@@ -341,14 +413,6 @@ class ExpirationModal extends PureComponent<
         />
       </>
     );
-  };
-
-  public getModalFooter = () => {
-    if (isAutocallPhoenix(this)) {
-      return;
-    }
-
-    return;
   };
 
   public render() {

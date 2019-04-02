@@ -149,7 +149,6 @@ export const RangeAccrualsAnnual: ILegType = pipeLeg({
     const days = Object.keys(nextPageDataItem.fixingObservations);
     if (!days.length) return nextPageDataItem;
     nextPageDataItem[LEG_FIELD.OBSERVATION_DATES] = convertObservetions(nextPageDataItem);
-
     return nextPageDataItem;
   },
 });

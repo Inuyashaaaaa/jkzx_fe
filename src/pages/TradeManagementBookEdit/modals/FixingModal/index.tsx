@@ -15,7 +15,7 @@ import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { isAutocallPhoenix } from '@/tools';
+import { isRangeAccruals } from '@/tools';
 import { getMoment } from '@/utils';
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import BigNumber from 'bignumber.js';
@@ -23,6 +23,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../../constants';
+import { getObservertionFieldData } from '../../tools';
 import { countAvg, filterObDays } from '../../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
 import ExpirationModal from '../ExpirationModal';
@@ -64,10 +65,10 @@ class FixingModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-
+    const tableData = filterObDays(getObservertionFieldData(data));
     this.setState(
       {
-        tableData: filterObDays(this.getObservertionFieldData(data)),
+        tableData,
         visible: true,
       },
       () => {
@@ -76,78 +77,6 @@ class FixingModal extends PureComponent<
         });
       }
     );
-  };
-
-  public getObLifePayment = (
-    alObPrice,
-    cuponBarrier,
-    curObdays,
-    preObdays,
-    daysInYear,
-    cuponPayment,
-    notionalAmount,
-    knockDirection
-  ) => {
-    if (knockDirection === KNOCK_DIRECTION_MAP.UP) {
-      if (alObPrice > cuponBarrier) {
-        return new BigNumber(curObdays - preObdays)
-          .div(daysInYear)
-          .multipliedBy(cuponPayment)
-          .multipliedBy(notionalAmount)
-          .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-          .toNumber();
-      }
-    }
-
-    if (alObPrice < cuponBarrier) {
-      return new BigNumber(curObdays - preObdays)
-        .div(daysInYear)
-        .multipliedBy(cuponPayment)
-        .multipliedBy(notionalAmount)
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber();
-    }
-
-    return 0;
-  };
-
-  public getObservertionFieldData = data => {
-    if (this.isAutocallPhoenix()) {
-      return data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].map((item, index) => {
-        // 已观察到价格
-        const alObPrice = item[OB_PRICE_FIELD];
-        const cuponBarrier = data[LEG_FIELD.COUPON_BARRIER];
-        const curObdays = getMoment(item[OB_DAY_FIELD]).days();
-        const preObdays =
-          index === 0
-            ? 0
-            : curObdays -
-              getMoment(
-                data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY][index - 1][OB_DAY_FIELD]
-              ).days();
-        const daysInYear = data[LEG_FIELD.DAYS_IN_YEAR];
-        const cuponPayment = data[LEG_FIELD.COUPON_PAYMENT];
-        const notionalAmount = data[LEG_FIELD.NOTIONAL_AMOUNT];
-        const knockDirection = data[LEG_FIELD.KNOCK_DIRECTION];
-
-        return {
-          ...item,
-          [LEG_FIELD.UP_BARRIER]: data[LEG_FIELD.UP_BARRIER],
-          [LEG_FIELD.COUPON_BARRIER]: data[LEG_FIELD.COUPON_BARRIER],
-          [OB_LIFE_PAYMENT]: this.getObLifePayment(
-            alObPrice,
-            cuponBarrier,
-            curObdays,
-            preObdays,
-            daysInYear,
-            cuponPayment,
-            notionalAmount,
-            knockDirection
-          ),
-        };
-      });
-    }
-    return data[LEG_FIELD.OBSERVATION_DATES];
   };
 
   public computeCnyDataSource = (value, changed = {}) => {
@@ -300,7 +229,7 @@ class FixingModal extends PureComponent<
     return [
       {
         headerName: '观察日',
-        field: 'day',
+        field: OB_DAY_FIELD,
         input: {
           type: 'date',
         },
@@ -397,16 +326,18 @@ class FixingModal extends PureComponent<
     }
     return (
       <Row type="flex" justify="space-between" align="middle">
-        <Col>
-          <Button
-            disabled={!this.isCanExercise()}
-            style={{ marginLeft: VERTICAL_GUTTER }}
-            onClick={this.onConfirm}
-            loading={this.state.modalConfirmLoading}
-          >
-            行权
-          </Button>
-        </Col>
+        {!isRangeAccruals(this.data) && (
+          <Col>
+            <Button
+              disabled={!this.isCanExercise()}
+              style={{ marginLeft: VERTICAL_GUTTER }}
+              onClick={this.onConfirm}
+              loading={this.state.modalConfirmLoading}
+            >
+              行权
+            </Button>
+          </Col>
+        )}
         <Col>
           <Tag style={{ marginLeft: VERTICAL_GUTTER }}>平均价: {this.state.avg}</Tag>
         </Col>

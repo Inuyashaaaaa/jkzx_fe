@@ -2,26 +2,21 @@ import {
   LEG_ANNUALIZED_FIELD,
   LEG_FIELD,
   LEG_ID_FIELD,
-  LEG_INJECT_FIELDS,
   LEG_NAME_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  NOTIONAL_AMOUNT_TYPE_MAP,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
-  REBATETYPE_TYPE_MAP,
-  SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
+import { ILegType } from '@/constants/legColDefs';
 import { LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 
 export const createLegDataSourceItem = (leg: ILegType) => {
@@ -193,6 +188,30 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
 
 function miniumlPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.DOWN_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.DOWN_BARRIER] !== undefined) {
+      clone[LEG_FIELD.DOWN_BARRIER] = new BigNumber(clone[LEG_FIELD.DOWN_BARRIER])
+        .multipliedBy(0.01)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
+      clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
+        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE]
+      )
+        .multipliedBy(0.01)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.COUPON_BARRIER] !== undefined) {
+    clone[LEG_FIELD.COUPON_BARRIER] = new BigNumber(clone[LEG_FIELD.COUPON_BARRIER])
+      .multipliedBy(0.01)
+      .toNumber();
+  }
 
   if (clone[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.UP_BARRIER] !== undefined) {
@@ -383,16 +402,6 @@ function miniumlPercent(item) {
     }
   }
 
-  if (clone[LEG_FIELD.DOWN_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
-    if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] !== undefined) {
-      clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] = new BigNumber(
-        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE]
-      )
-        .multipliedBy(0.01)
-        .toNumber();
-    }
-  }
-
   if (clone[LEG_FIELD.DOWN_BARRIER] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
       clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
@@ -409,11 +418,25 @@ function miniumlPercent(item) {
 function backConvertPercent(item) {
   const clone = { ...item };
 
-  if (clone[LEG_FIELD.DOWN_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
-    if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] !== undefined) {
-      clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] = new BigNumber(
-        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE]
+  if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
+      clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
+        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE]
       )
+        .multipliedBy(100)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.COUPON_BARRIER] !== undefined) {
+    clone[LEG_FIELD.COUPON_BARRIER] = new BigNumber(clone[LEG_FIELD.COUPON_BARRIER])
+      .multipliedBy(100)
+      .toNumber();
+  }
+
+  if (clone[LEG_FIELD.DOWN_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.DOWN_BARRIER] !== undefined) {
+      clone[LEG_FIELD.DOWN_BARRIER] = new BigNumber(clone[LEG_FIELD.DOWN_BARRIER])
         .multipliedBy(100)
         .toNumber();
     }
