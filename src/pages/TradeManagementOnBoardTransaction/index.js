@@ -413,7 +413,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               rowKey="uuid"
               dataSource={flowData}
               columnDefs={flowColumns}
-              autoSizeColumnsToFit={true}
+              autoSizeColumnsToFit
             />
           </TabPane>
           <TabPane tab="场内持仓统计" key="2">
@@ -438,7 +438,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 rowKey="uuid"
                 dataSource={positionData}
                 columnDefs={detailColumns}
-                autoSizeColumnsToFit={true}
+                autoSizeColumnsToFit
               />
             )}
             {positionMode === 'summary' && (
@@ -450,7 +450,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 rowKey="uuid"
                 dataSource={positionData}
                 columnDefs={summaryColumns}
-                autoSizeColumnsToFit={true}
+                autoSizeColumnsToFit
               />
             )}
           </TabPane>
