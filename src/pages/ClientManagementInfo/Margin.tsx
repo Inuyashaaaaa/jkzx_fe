@@ -21,10 +21,10 @@ const TABLE_COL_DEFS: IColumnDef[] = [
     headerName: '客户名称',
     field: 'legalName',
   },
-  {
-    headerName: '交易编号',
-    field: 'accountId',
-  },
+  // {
+  //   headerName: '交易编号',
+  //   field: 'accountId',
+  // },
   {
     headerName: '可用资金',
     field: 'cash',
