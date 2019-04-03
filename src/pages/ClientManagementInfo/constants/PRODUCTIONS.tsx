@@ -22,7 +22,7 @@ const uploadData = {
     }
   },
   onRemove: async file => {
-    if (!file.response.result) return;
+    if (!file.response) return;
     const { error } = await partyDocDelete({
       uuid: file.response.result.uuid,
     });
