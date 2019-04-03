@@ -353,7 +353,7 @@ export const PRODUCTIONS: (
         },
         {
           label: '金融机构专业投资者',
-          value: 'FINANIAL_INSTITUTIONAL_INVESTOR',
+          value: 'FINANCIAL_INSTITUTIONAL_INVESTOR',
         },
         {
           label: '金融产品',
