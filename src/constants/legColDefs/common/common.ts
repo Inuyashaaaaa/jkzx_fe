@@ -712,6 +712,7 @@ export const UpBarrierType: IColDef = {
     type: 'select',
     options: UP_BARRIER_TYPE_OPTIONS,
   },
+  rules: RULES_REQUIRED,
 };
 
 export const DownBarrierType: IColDef = {
@@ -723,6 +724,7 @@ export const DownBarrierType: IColDef = {
     options: UNIT_ENUM_OPTIONS2,
     defaultOpen: true,
   },
+  rules: RULES_REQUIRED,
 };
 
 export const DownBarrierOptionsStrikeType: IColDef = {
@@ -805,6 +807,7 @@ export const DownBarrier: IColDef = {
       value: INPUT_NUMBER_PERCENTAGE_CONFIG,
     };
   },
+  rules: RULES_REQUIRED,
 };
 
 export const CouponEarnings: IColDef = {
@@ -812,6 +815,7 @@ export const CouponEarnings: IColDef = {
   headerName: '收益/coupon(%)',
   field: LEG_FIELD.COUPON_PAYMENT,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+  rules: RULES_REQUIRED,
 };
 
 export const Step: IColDef = {
@@ -915,6 +919,7 @@ export const ExpireNoBarrierObserveDay: IColDef = {
       direction: KNOCK_DIRECTION_MAP.UP,
     };
   },
+  rules: RULES_REQUIRED,
 };
 
 export const InExpireNoBarrierObserveDay: IColDef = {
@@ -928,6 +933,7 @@ export const InExpireNoBarrierObserveDay: IColDef = {
       direction: KNOCK_DIRECTION_MAP.DOWN,
     };
   },
+  rules: RULES_REQUIRED,
 };
 
 export const LowBarrier: IColDef = {

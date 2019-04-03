@@ -3,6 +3,7 @@ import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
   EXTRA_FIELDS,
+  FREQUENCY_TYPE_MAP,
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
@@ -31,7 +32,6 @@ import {
   ExpirationDate,
   ExpireNoBarrierObserveDay,
   FrontPremium,
-  InExpireNoBarrierObserveDay,
   InitialSpot,
   KnockDirection,
   MinimumPremium,
@@ -81,7 +81,6 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
     UpObservationStep,
     DownObservationStep,
     DownBarrier,
-    InExpireNoBarrierObserveDay,
     DownBarrierOptionsStrike,
     PricingTerm,
     PricingExpirationDate,
@@ -119,7 +118,6 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
     AlreadyBarrier,
     DownBarrierDate,
     DownBarrier,
-    InExpireNoBarrierObserveDay,
     DownBarrierOptionsStrike,
   ],
   getDefault: (nextDataSourceItem, isPricing) => {
@@ -138,6 +136,7 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
       [LEG_FIELD.ALREADY_BARRIER]: false,
       [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE]: UNIT_ENUM_MAP2.PERCENT,
       [DownBarrierType.field]: UNIT_ENUM_MAP2.PERCENT,
+      [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],
       ...(isPricing
         ? {
             autoCallPaymentType: null,
@@ -187,9 +186,7 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
       return result;
     }, {});
 
-    nextPosition.asset.knockInObservationDates = dataSourceItem[
-      LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY
-    ].map(item => item[OB_DAY_FIELD]);
+    nextPosition.asset.knockInObservationDates = null;
 
     return nextPosition;
   },

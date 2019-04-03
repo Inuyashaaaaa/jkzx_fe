@@ -163,12 +163,12 @@ export const FREQUENCY_TYPE_MAP = {
 };
 
 export const FREQUENCY_TYPE_ZHCN_MAP = {
-  '1D': '1天',
-  '1W': '1周',
-  '1M': '1月',
-  '3M': '3月',
-  '6M': '6月',
-  '1Y': '1年',
+  '1D': '每交易日',
+  '1W': '每周',
+  '1M': '每月',
+  '3M': '每季度',
+  '6M': '每半年',
+  '1Y': '每年',
 };
 
 export const FREQUENCY_TYPE_NUM_MAP = {

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
+  FREQUENCY_TYPE_MAP,
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
@@ -27,6 +28,7 @@ import {
   NotionalAmount,
   NotionalAmountType,
   ObservationDates,
+  ObservationStep,
   ParticipationRate,
   Payment,
   PaymentType,
@@ -66,6 +68,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
     HighBarrier,
     LowBarrier,
     ObservationDates,
+    ObservationStep,
   ],
   columnDefs: [
     Direction,
@@ -89,6 +92,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
     HighBarrier,
     LowBarrier,
     ObservationDates,
+    ObservationStep,
   ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -104,6 +108,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [ObservationStep.field]: FREQUENCY_TYPE_MAP['1D'],
       ...(isPricing ? {} : {}),
     };
   },
@@ -116,6 +121,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
       ...LEG_INJECT_FIELDS,
       ...COMPUTED_FIELDS,
       LEG_FIELD.OBSERVATION_DATES,
+      ObservationStep.field,
     ]);
 
     nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
