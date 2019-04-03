@@ -1,11 +1,11 @@
 // import { Modal, message } from 'antd';
 // import { formatMessage } from 'umi/locale';
+import { SOCKET_EVENT_TYPE } from '@/constants/socket';
+import { connectSocket, disconnectSocket, socketEventBus } from '@/services/socket';
 import 'animate.css';
 import BigNumber from 'bignumber.js';
 import { setAutoFreeze } from 'immer';
 import numeral from 'numeral';
-import { SOCKET_EVENT_TYPE } from './constants/socket';
-import { connectSocket, disconnectSocket, socketEventBus } from './services/socket';
 
 numeral.register('format', 'de', {
   regexps: {
@@ -153,15 +153,11 @@ const startSocket = () => {
   }`;
 
   connectSocket({
-    address: `${socketHost}:16000/ws-report`,
+    address: `${socketHost}:16000/ws-end-point`,
     notificationChannel: '/topic-report/notify',
   });
   window.addEventListener('beforeunload', () => {
     disconnectSocket();
-  });
-
-  socketEventBus.listen(SOCKET_EVENT_TYPE, a => {
-    console.log(a);
   });
 };
 

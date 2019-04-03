@@ -9,7 +9,7 @@ let sock = null;
 
 export const socketEventBus = createEventBus();
 
-export const connectSocket = ({ address, sendChannel, notificationChannel }) => {
+export const connectSocket = ({ address, sendChannel = '', notificationChannel }) => {
   sock = new SockJS(address);
   stomp = Stomp.over(sock);
   // sock.onopen = () => {
@@ -33,7 +33,7 @@ export const connectSocket = ({ address, sendChannel, notificationChannel }) => 
     frame => {
       stomp.subscribe(notificationChannel, message => {
         socketEventBus.emit(SOCKET_EVENT_TYPE, {
-          data: JSON.parse(message),
+          data: message.body ? JSON.parse(message.body) : {},
         });
       });
     },
