@@ -1,11 +1,11 @@
 // import { Modal, message } from 'antd';
 // import { formatMessage } from 'umi/locale';
-import { setAutoFreeze } from 'immer';
+import { SOCKET_EVENT_TYPE } from '@/constants/socket';
+import { connectSocket, disconnectSocket, socketEventBus } from '@/services/socket';
 import 'animate.css';
-import numeral from 'numeral';
 import BigNumber from 'bignumber.js';
-
-setAutoFreeze(false);
+import { setAutoFreeze } from 'immer';
+import numeral from 'numeral';
 
 numeral.register('format', 'de', {
   regexps: {
@@ -147,10 +147,26 @@ numeral.register('format', 'ss', {
   },
 });
 
-if (window) {
-  window.$version = '2019年03月23日';
-}
+const startSocket = () => {
+  const socketHost = `${window.location.protocol}//${
+    process.env.NODE_ENV === 'development' ? '10.1.100.219' : window.location.hostname
+  }`;
 
+  connectSocket({
+    address: `${socketHost}:16000/ws-end-point`,
+    notificationChannel: '/topic-report/notify',
+  });
+  window.addEventListener('beforeunload', () => {
+    disconnectSocket();
+  });
+};
+
+const start = () => {
+  setAutoFreeze(false);
+  startSocket();
+};
+
+start();
 // // Notify user if offline now
 // window.addEventListener('sw.offline', () => {
 //   message.warning(formatMessage({ id: 'app.pwa.offline' }));

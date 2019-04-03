@@ -1,5 +1,4 @@
 import { Form2, Input } from '@/design/components';
-import { getToken } from '@/lib/utils/authority';
 import { message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import produce from 'immer';
@@ -64,8 +63,8 @@ class SocketTestPage extends PureComponent {
     stomp.sendChannel = sendChannel;
     stomp.channel = channel;
     stomp.connect(
-      'admin',
-      '12345',
+      'guset',
+      'guset',
       frame => {
         stomp.subscribe(channel, message => {
           this.print('stomp:message: ' + JSON.stringify(message));
@@ -111,7 +110,7 @@ class SocketTestPage extends PureComponent {
                 return (
                   <FormItem hasFeedback={true}>
                     {form.getFieldDecorator('address', {
-                      initialValue: 'http://10.1.100.219:16000/wsReport',
+                      initialValue: 'http://10.1.100.219:16000/ws-report',
                     })(<Input />)}
                   </FormItem>
                 );
@@ -124,7 +123,7 @@ class SocketTestPage extends PureComponent {
                 return (
                   <FormItem hasFeedback={true}>
                     {form.getFieldDecorator('channel', {
-                      initialValue: '/topic/notice',
+                      initialValue: '/topic-report/notice',
                     })(<Input />)}
                   </FormItem>
                 );
