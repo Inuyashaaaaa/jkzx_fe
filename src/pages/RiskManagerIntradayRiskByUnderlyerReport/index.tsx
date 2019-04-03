@@ -4,11 +4,13 @@ import SourceTable from '@/design/components/SourceTable';
 import { unionId } from '@/design/utils/unionId';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptIntradayRiskReportPaged } from '@/services/report-service';
+import { socketHOC } from '@/tools/socketHOC';
+import { ISourceTable } from '@/types';
 import { Row } from 'antd';
 import React, { PureComponent } from 'react';
 import { PAGE_TABLE_COL_DEFS } from './constants';
 
-class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent {
+class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent implements ISourceTable {
   public $sourceTable: SourceTable = null;
 
   public state = {
@@ -23,7 +25,7 @@ class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent {
     },
   };
 
-  public fetchTable = async (paramsPagination?) => {
+  public fetch = async (paramsPagination?) => {
     this.setState({
       loading: true,
     });
@@ -53,7 +55,7 @@ class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent {
   };
 
   public componentDidMount = () => {
-    this.fetchTable();
+    this.fetch();
   };
 
   public onPaginationChange = ({ pagination }) => {
@@ -65,7 +67,7 @@ class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent {
         },
       },
       () => {
-        this.fetchTable();
+        this.fetch();
       }
     );
   };
@@ -74,7 +76,7 @@ class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent {
     return (
       <PageHeaderWrapper title="标的风险">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <ReloadGreekButton fetchTable={this.fetchTable} id="real_time_dag" />
+          <ReloadGreekButton fetchTable={this.fetch} id="real_time_dag" />
         </Row>
         <SourceTable
           loading={this.state.loading}
@@ -107,4 +109,4 @@ class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent {
   }
 }
 
-export default RiskManagerIntradayRiskByUnderlyerReport;
+export default socketHOC(RiskManagerIntradayRiskByUnderlyerReport);

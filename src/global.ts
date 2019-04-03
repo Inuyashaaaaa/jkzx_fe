@@ -4,8 +4,8 @@ import 'animate.css';
 import BigNumber from 'bignumber.js';
 import { setAutoFreeze } from 'immer';
 import numeral from 'numeral';
-import { SOCKET_EVENT_TYPE } from '@/constants/socket';
-import { connectSocket, disconnectSocket, socketEventBus } from '@/services/socket';
+import { SOCKET_EVENT_TYPE } from './constants/socket';
+import { connectSocket, disconnectSocket, socketEventBus } from './services/socket';
 
 numeral.register('format', 'de', {
   regexps: {
