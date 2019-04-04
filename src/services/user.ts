@@ -45,6 +45,7 @@ export const permissions = {
   tradeBooks: true,
   documentManagement: true,
   roleManagement: true,
+  auditingManagement: true,
 };
 
 /**

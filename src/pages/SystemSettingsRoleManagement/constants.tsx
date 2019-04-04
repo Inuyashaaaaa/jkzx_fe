@@ -251,6 +251,10 @@ export const treeData = [
         key: 'approvalProcess',
         children: [
           {
+            title: '审批组管理',
+            key: 'approvalAuditingManagement',
+          },
+          {
             title: '流程管理',
             key: 'approvalProcessManagement',
           },
