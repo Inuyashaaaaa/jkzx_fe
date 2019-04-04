@@ -1,18 +1,18 @@
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
+  authPagePermissionGetByRoleId,
   authRolesList,
   createRole,
   queryAllPagePermissions,
   updateRole,
-  authPagePermissionGetByRoleId,
   updateRolePagePermissions,
 } from '@/services/role';
-import { Button, message, Row, Drawer, Col, Icon, Popconfirm, Table } from 'antd';
+import { Button, Col, Drawer, Icon, message, Popconfirm, Row, Table } from 'antd';
 import React, { PureComponent } from 'react';
-import DrawerContarner from './DrawerContarner';
-import AuditingList from './auditLists';
 import styles from './auditing.less';
+import AuditingList from './auditLists';
+import DrawerContarner from './DrawerContarner';
 
 const columns = [
   {
@@ -224,11 +224,11 @@ class SystemSettingsRoleManagement extends PureComponent {
       <>
         <div className={styles.auditingWrapper}>
           <PageHeaderWrapper>
-            <div style={{ width: '300px' }}>
+            <div style={{ width: '300px', background: '#FFF', padding: '30px' }}>
               <p>审批组列表</p>
               <AuditingList />
             </div>
-            <div style={{ marginLeft: '20px' }}>
+            <div style={{ marginLeft: '20px', background: '#FFF', padding: '30px' }}>
               <Row style={{ marginBottom: '10px', textAlign: 'right', maxHeight: '28px' }}>
                 <span style={{ float: 'left' }}>审批组成员</span>
                 <Button size="default" type="primary" onClick={this.handleDrawer}>

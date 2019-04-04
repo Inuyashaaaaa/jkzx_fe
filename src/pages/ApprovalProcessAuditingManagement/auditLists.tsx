@@ -2,11 +2,11 @@ import Form from '@/design/components/Form';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { Button, message, Row, Drawer, Col, Icon, Popconfirm, Input } from 'antd';
+import { Button, Col, Drawer, Icon, Input, message, Popconfirm, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
-import Operation from './Operation';
 import styles from './auditing.less';
+import Operation from './Operation';
 
 class AuditLists extends PureComponent {
   public $sourceTable: SourceTable = null;
@@ -51,8 +51,8 @@ class AuditLists extends PureComponent {
     });
   };
 
-  confirm = param => () => {
-    let newList = [];
+  public confirm = param => () => {
+    const newList = [];
     const auditingList = this.state.auditingList.forEach(item => {
       if (item.id !== param.id) {
         newList.push(item);
@@ -63,7 +63,7 @@ class AuditLists extends PureComponent {
     });
   };
 
-  onEdit = param => () => {
+  public onEdit = param => () => {
     const auditingList = this.state.auditingList.map(item => {
       if (item.id === param.id) {
         item.editable = !param.editable;
@@ -75,7 +75,7 @@ class AuditLists extends PureComponent {
     });
   };
 
-  onAdd = () => {
+  public onAdd = () => {
     const newItem = [
       {
         name: '',
@@ -91,7 +91,7 @@ class AuditLists extends PureComponent {
     });
   };
 
-  onBlur = (e, param) => {
+  public onBlur = (e, param) => {
     const auditingList = this.state.auditingList.map(item => {
       if (item.id === param.id) {
         item.name = e.target.value;

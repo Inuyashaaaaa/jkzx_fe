@@ -1,10 +1,10 @@
+import SourceTable from '@/design/components/SourceTable';
 import {
   authPagePermissionGetByRoleId,
   deleteRole,
   updateRolePagePermissions,
 } from '@/services/role';
-import SourceTable from '@/design/components/SourceTable';
-import { Button, Col, Drawer, message, Row, Form, Input, Select, Table } from 'antd';
+import { Button, Col, Drawer, Form, Input, message, Row, Select, Table } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import styles from './auditing.less';
@@ -60,27 +60,27 @@ class Operation extends PureComponent {
     });
   };
 
-  onUserName = e => {
+  public onUserName = e => {
     this.setState({
       userName: e.target.value,
     });
   };
 
-  onRole = e => {
+  public onRole = e => {
     this.setState({
       role: e,
     });
   };
 
-  onSearch = () => {
+  public onSearch = () => {
     // 筛选条件
   };
 
-  onAdd = () => {
+  public onAdd = () => {
     console.log(1);
   };
 
-  onSelectChange = selectedRowKeys => {
+  public onSelectChange = selectedRowKeys => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     this.setState({ selectedRowKeys });
   };
