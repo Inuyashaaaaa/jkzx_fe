@@ -1,3 +1,4 @@
+import { getMoment } from '@/utils';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -134,7 +135,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingWeights = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item.day] = item.weight;
+        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
         return result;
       },
       {}
@@ -142,7 +143,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item[OB_DAY_FIELD]] = item.price || null;
+        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
         return result;
       },
       {}
