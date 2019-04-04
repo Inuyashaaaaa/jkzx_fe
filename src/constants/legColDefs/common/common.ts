@@ -1104,25 +1104,13 @@ export const ObserveStartDay: IColDef = {
   },
   rules: RULES_REQUIRED,
   getValue: {
-    depends: [LEG_FIELD.EXPIRATION_DATE],
+    depends: [LEG_FIELD.EFFECTIVE_DATE],
     value: record => {
-      if (
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
-      ) {
-        const expirationDate = record[LEG_FIELD.EXPIRATION_DATE];
-        if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
-          return getMoment(expirationDate, true);
-        }
-        return record[LEG_FIELD.OBSERVE_START_DAY];
+      if (record[LEG_FIELD.EFFECTIVE_DATE] !== undefined) {
+        return record[LEG_FIELD.EFFECTIVE_DATE];
       }
 
-      return {
-        depends: [],
-        value(data) {
-          return data[LEG_FIELD.OBSERVE_START_DAY];
-        },
-      };
+      return record[LEG_FIELD.OBSERVE_START_DAY];
     },
   },
 };
@@ -1138,25 +1126,13 @@ export const ObserveEndDay: IColDef = {
   },
   rules: RULES_REQUIRED,
   getValue: {
-    depends: [LEG_FIELD.SETTLEMENT_DATE],
+    depends: [LEG_FIELD.EXPIRATION_DATE],
     value: record => {
-      if (
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
-      ) {
-        const settlemenetDate = record[LEG_FIELD.SETTLEMENT_DATE];
-        if (record[LEG_FIELD.SETTLEMENT_DATE] !== undefined) {
-          return getMoment(settlemenetDate, true);
-        }
-        return record[LEG_FIELD.OBSERVE_END_DAY];
+      if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
+        return record[LEG_FIELD.EXPIRATION_DATE];
       }
 
-      return {
-        depends: [],
-        value(data) {
-          return data[LEG_FIELD.OBSERVE_END_DAY];
-        },
-      };
+      return record[LEG_FIELD.OBSERVE_END_DAY];
     },
   },
 };

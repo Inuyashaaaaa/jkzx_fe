@@ -98,7 +98,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
       [ExpirationDate.field]: moment(),
       [SettlementDate.field]: moment().add(DEFAULT_TERM, 'day'),
       [PremiumType.field]: PREMIUM_TYPE_MAP.PERCENT,
-      [NotionalAmountType.field]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
+      [NotionalAmountType.field]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [ObserveStartDay.field]: moment(),
       [ObserveEndDay.field]: moment().add(DEFAULT_TERM, 'day'),
       [ObservationStep.field]: FREQUENCY_TYPE_MAP['1D'],
