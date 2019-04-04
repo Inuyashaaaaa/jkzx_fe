@@ -1,6 +1,11 @@
 import { ButtonProps } from 'antd/lib/button';
 import { FormItemProps } from 'antd/lib/form';
-import { FormComponentProps, FormProps, WrappedFormUtils } from 'antd/lib/form/Form';
+import {
+  FormComponentProps,
+  FormProps,
+  GetFieldDecoratorOptions,
+  WrappedFormUtils,
+} from 'antd/lib/form/Form';
 import { ColumnProps, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
 import { Omit } from './common/types';
@@ -16,7 +21,15 @@ export interface IColDef {
 }
 
 export interface IRenderOptions<T = any> {
-  form?: WrappedFormUtils;
+  form?: Omit<WrappedFormUtils, 'getFieldDecorator'> & {
+    getFieldDecorator<T extends object>(
+      id: keyof T,
+      options?: GetFieldDecoratorOptions
+    ): (node: React.ReactNode) => React.ReactNode;
+    getFieldDecorator(
+      options?: GetFieldDecoratorOptions
+    ): (node: React.ReactNode) => React.ReactNode;
+  };
   editing?: boolean;
 }
 

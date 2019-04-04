@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { omit } from 'lodash';
 import React, { PureComponent } from 'react';
 import { IFormCellProps, IFormTriggerCellValueChangeParams } from 'src/components/type';
+import { wrapFormGetDecorator } from '../../utils';
 import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from '../constants';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
@@ -78,20 +79,21 @@ class SwitchCell extends PureComponent<
 
   public getInlineCell = () => {
     const { colDef, form } = this.props;
-    const { editable } = colDef;
+    const { editable, dataIndex } = colDef;
     const { editing } = this.state;
+    const wrapedForm = wrapFormGetDecorator(dataIndex, form);
     if (editable && editing) {
       return React.createElement(EditingCell, {
         ...this.props,
         cellApi: this,
-        form,
+        form: wrapedForm,
         ref: this.getEditingCellRef,
       });
     } else {
       return React.createElement(RenderingCell, {
         ...this.props,
         cellApi: this,
-        form,
+        form: wrapedForm,
         ref: this.getRenderingCellRef,
       });
     }
