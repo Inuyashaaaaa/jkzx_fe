@@ -1,4 +1,4 @@
-import { LEG_NAME_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import { LEG_NAME_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
@@ -32,6 +32,7 @@ import { refPartyGetByLegalName, trdTradeCreate } from '@/services/trade-service
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
 import { Button, message, Modal, Row, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
@@ -429,15 +430,15 @@ class BookCreate extends PureComponent<any> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
           case '保证金释放':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
             return this.handleC(uuidList, values, resolve);
           default:

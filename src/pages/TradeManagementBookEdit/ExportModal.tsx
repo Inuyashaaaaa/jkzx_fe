@@ -12,6 +12,7 @@ import {
 } from '@/services/reference-data-service';
 import { Button, message, Modal, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
@@ -367,15 +368,15 @@ class ExportModal extends PureComponent<any, any> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
           case '保证金释放':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
             return this.handleC(uuidList, values, resolve);
           default:
