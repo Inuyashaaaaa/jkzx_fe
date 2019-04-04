@@ -184,14 +184,14 @@ export const FREQUENCY_TYPE_OPTIONS = convertOptions(FREQUENCY_TYPE_MAP, FREQUEN
 
 export const DOWN_OBSERVATION_ZHCN_MAP = {
   '1D': '每交易日',
-  '1M': '  每月',
-  '3W': ' 每季度',
+  '1M': '每月',
+  '3M': '每季度',
 };
 
 export const DOWN_OBSERVATION_NUM_MAP = {
   '1D': '1D',
   '1M': '1M',
-  '3W': '3W',
+  '3M': '3M',
 };
 
 export const DOWN_OBSERVATION_OPTIONS = convertOptions(
