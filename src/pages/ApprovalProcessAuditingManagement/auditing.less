@@ -1,0 +1,41 @@
+@import '~antd/lib/style/themes/default.less';
+
+.listItem {
+  .icon {
+    // visibility: hidden;
+    margin-left: 6px;
+    i {
+      padding: 0 4px;
+      font-size: 14px;
+    }
+  }
+  &:hover .icon {
+    visibility: visible;
+  }
+  .value {
+    width: 160px;
+    margin: 3px 0;
+    display: inline-block;
+  }
+  button {
+    border: none;
+    padding: 3px !important;
+  }
+}
+.label {
+  display: inline-block;
+  span {
+    width: 80px;
+  }
+}
+.menberTable {
+  float: left;
+}
+.auditingWrapper {
+  :global {
+    .ant-card-body {
+      display: flex;
+      min-height: 720px;
+    }
+  }
+}

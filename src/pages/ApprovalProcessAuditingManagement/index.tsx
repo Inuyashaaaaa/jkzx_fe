@@ -1,272 +1,287 @@
-import SourceTable from '@/lib/components/_SourceTable';
+import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
-  queryProcessDiagram,
-  queryProcessHistoryList,
-  queryProcessList,
-  queryProcessToDoList,
-} from '@/services/approval';
-import { Button, Input, Modal, Tabs } from 'antd';
-import { async } from 'q';
+  authRolesList,
+  createRole,
+  queryAllPagePermissions,
+  updateRole,
+  authPagePermissionGetByRoleId,
+  updateRolePagePermissions,
+} from '@/services/role';
+import { Button, message, Row, Drawer, Col, Icon, Popconfirm, Table } from 'antd';
 import React, { PureComponent } from 'react';
-import ApprovalForm from './ApprovalForm';
-// import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { generateColumns } from './constants';
+import DrawerContarner from './DrawerContarner';
+import AuditingList from './auditLists';
+import styles from './auditing.less';
 
-const { TabPane } = Tabs;
-const { Search } = Input;
+const columns = [
+  {
+    title: '用户名',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '昵称',
+    dataIndex: 'alias',
+    key: 'alias',
+  },
+  {
+    title: '部门',
+    dataIndex: 'address',
+    key: 'address',
+  },
+  {
+    title: '操作',
+    key: 'operation',
+    dataIndex: 'operation',
+    render: () => <a style={{ color: 'red' }}>移出</a>,
+  },
+];
+class SystemSettingsRoleManagement extends PureComponent {
+  public $sourceTable: SourceTable = null;
 
-const PROCESS_ITEMS = ['待我处理', '待他人审批', '我已审批', '已完成'];
+  public $form: Form = null;
 
-const PROCESS_STATE = ['queued', 'started', 'checked', 'completed'];
+  public state = {
+    dataSource: [],
+    loading: false,
+    visible: false,
+    formData: {},
+    displayResources: false,
+    choosedRole: {},
+    auditingList: [],
+    hover: false,
+  };
 
-function parseTime(time) {
-  const temp = time.replace(/[\D]/g, '');
-  return parseInt(temp, 10);
-}
-
-class ApprovalProcessAuditingManagement extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      loading: false,
-      startedData: [],
-      checkedData: [],
-      completedData: [],
-      queuedData: [],
-      showDiagram: false,
-      showForm: false,
-      formData: [],
-      status: 'queued',
-      modalVisible: false,
-      flowDiagram: '',
-    };
   }
 
-  public componentDidMount() {
-    this.fetchData(PROCESS_STATE[0]);
+  public componentDidMount = () => {
+    this.fetchTable();
+    this.fetchList();
+  };
+
+  public handlePages(data, result1, result2) {
+    const { pageName, id, children } = data;
+    result1[pageName] = id;
+    if (children) {
+      children.forEach(child => this.handlePages(child, result1, result2));
+    } else {
+      result2[pageName] = id;
+    }
   }
 
-  public fetchData = async status => {
+  public fetchList = async () => {
     this.setState({
       loading: true,
     });
-    let res = '';
-    switch (status) {
-      case 'queued':
-        res = await queryProcessToDoList();
-        break;
-      case 'started':
-        res = await queryProcessList({
-          processInstanceUserPerspective: 'STARTED_BY_ME',
-          keyword: '',
-        });
-        break;
-      case 'checked':
-        res = await queryProcessList({
-          processInstanceUserPerspective: 'EXECUTED_BY_ME',
-          keyword: '',
-        });
-        break;
-      case 'completed':
-        res = await queryProcessHistoryList();
-        break;
-      default:
-        break;
-    }
 
-    if (!res || res.error) {
-      this.setState({
-        loading: false,
-      });
-      return;
-    }
-    const data = (res && res.data) || [];
-    const result = data.map(item => {
-      const obj = { ...item };
-      if (obj.processInstance) {
-        Object.assign(obj, obj.processInstance);
-      }
-      obj.initiatorName = (obj.initiator && obj.initiator.userName) || '';
-      obj.operatorName = (obj.operator && obj.operator.userName) || '';
-      // obj.startTime = moment(obj.startTime).format('YYYY-MM-DD hh:mm:ss');
-      return obj;
-    });
-    result.sort((a, b) => {
-      return parseTime(b.startTime) - parseTime(a.startTime);
-    });
-    const nextState = Object.create(null);
-    nextState[`${status}Data`] = result;
-    this[`${status}Data`] = [...result];
+    // const auditingList = [
+    //   {
+    //     name: '风控审批组',
+    //     id: 1,
+    //   },
+    //   {
+    //     name: '客户审批组',
+    //     id: 2,
+    //   },
+    //   {
+    //     name: '交易审批组',
+    //     id: 3,
+    //   }
+    // ];
+    const auditingList = [];
+
     this.setState({
+      auditingList,
       loading: false,
-      status,
-      ...nextState,
     });
   };
 
-  public hideModal = () => {
-    this.editDate = {};
+  public fetchTable = async () => {
+    // this.setState({
+    //   loading: true,
+    // });
+    // const requests = () => Promise.all([authRolesList(), queryAllPagePermissions({})]);
+    // const [roles, allPagesPermissions] = await requests();
+    // const roles = [];
+    // if (roles.error || allPagesPermissions.error) {
+    //   this.setState({
+    //     loading: false,
+    //   });
+    //   return false;
+    // }
+
+    // const pageMap = {};
+    // const entityPageMap = {};
+    // // this.handlePages(allPagesPermissions.data, pageMap, entityPageMap);
+    // const newPageMap = pageMap;
+    // const newEntityPageMap = entityPageMap;
+
+    // const dataSource = roles.data.map(item => {
+    //   return {
+    //     ...item,
+    //     newPageMap,
+    //   };
+    // });
+    // this.setState({
+    //   loading: false,
+    //   dataSource: dataSource.sort((role1, role2) => role1.roleName.localeCompare(role2.roleName)),
+    // });
     this.setState({
-      modalVisible: false,
+      // loading: false,
+      dataSource: [{ roleName: 1 }],
     });
+    return;
   };
 
-  public showModal = (type, data, image) => {
-    const isForm = type === 'form';
+  public handleDrawer = () => {
     this.setState({
-      modalVisible: true,
-      showDiagram: !isForm,
-      showForm: isForm,
-      modalTitle: isForm ? '审计详情' : '流程图',
-      formData: data,
-      flowDiagram: image ? image : '',
+      visible: true,
     });
   };
 
-  public queryDiagram = async (type, data) => {
-    const image = await queryProcessDiagram(data);
-    this.showModal(type, data, image);
+  // public handleDrawer = async () => {
+  //   const { error, data } = await authPagePermissionGetByRoleId({
+  //     roleId: this.props.data.id,
+  //   });
+  //   if (error) {
+  //     message.error('页面权限获取失败');
+  //     return;
+  //   }
+  //   const checkedKey = data.map(item => {
+  //     return _.toPairs(this.props.data.newPageMap).filter(items => items[1] === item)[0][0];
+  //   });
+  //   const checkedKeys = checkedKey.filter(item => {
+  //     return !fatherTreeNode.find(items => item === items);
+  //   });
+  //   this.setState({
+  //     visible: true,
+  //     checkedKeys,
+  //   });
+  // };
+
+  public onClose = () => {
+    this.setState({
+      visible: false,
+    });
   };
 
-  public changeTab = tab => {
-    const index = parseInt(tab, 10) - 1;
-    this.index = index;
-    const { startedData, checkedData, completedData, queuedData } = this.state;
-    const stateContainer = [queuedData, startedData, checkedData, completedData];
-    const targetData = stateContainer[index];
-    this.fetchData(PROCESS_STATE[index]);
-  };
-
-  public checkApprovalForm = () => {
-    // console.log(data);
-  };
-
-  public handleSearch = (e, index) => {
-    if (!e) {
+  public handleSave = async () => {
+    const { newPageMap } = this.props.data;
+    const checkKeys = this.state.checkedKeys;
+    const permissions = _.values(_.pick(newPageMap, checkKeys));
+    const params = {
+      permissions: [
+        {
+          roleId: this.props.data.id,
+          pageComponentId: permissions,
+        },
+      ],
+    };
+    const res = await updateRolePagePermissions(params);
+    if (res.error) {
+      message.error('权限配置失败');
       return;
     }
-    const property = `${PROCESS_STATE[index]}Data`;
-    const originData = this[property] || [];
-    const result = originData.filter(
-      data => data.processNum.includes(e) || data.subject.includes(e)
-    );
-    const nextState = Object.create(null);
-    nextState[property] = result;
+    message.success('权限配置成功');
     this.setState({
-      ...nextState,
+      visible: false,
+    });
+    this.fetchTable();
+  };
+
+  public handleFormChange = params => {
+    this.setState({
+      formData: params.values,
     });
   };
 
-  public handleSearchChange = (e, index) => {
-    const { value } = e.target;
-    console.log(value);
-    if (!value) {
-      const property = `${PROCESS_STATE[index]}Data`;
-      const originData = this[property] || [];
-      const nextState = Object.create(null);
-      nextState[property] = [...originData];
-      this.setState({
-        ...nextState,
-      });
-    }
-  };
-
-  public handleFormChange = () => {
+  public hideResource = () => {
     this.setState({
-      modalVisible: false,
+      displayResources: false,
     });
-    this.fetchData(PROCESS_STATE[this.index || 0]);
   };
 
-  public getRowActions = event => {
-    const { rowData } = event;
-    return [
-      <Button key="approval" type="primary" onClick={() => this.showModal('form', rowData)}>
-        查看审批单
-      </Button>,
-      <Button key="diagram" type="primary" onClick={() => this.queryDiagram('diagram', rowData)}>
-        流程图
-      </Button>,
-    ];
+  public showResource = data => {
+    this.setState({
+      displayResources: true,
+      choosedRole: data,
+    });
+  };
+
+  public onCellValueChanged = async event => {
+    const { error, data } = await updateRole({
+      ...event.data,
+      roleId: event.data.id,
+    });
+    if (error) return;
   };
 
   public render() {
-    const {
-      modalTitle,
-      modalVisible,
-      startedData,
-      checkedData,
-      completedData,
-      queuedData,
-      loading,
-      showDiagram,
-      showForm,
-      formData,
-      status,
-      flowDiagram,
-    } = this.state;
-    const stateContainer = [queuedData, startedData, checkedData, completedData];
-    const processColumns = generateColumns('start');
-    const processCompleteColumns = generateColumns('complete');
     return (
-      <PageHeaderWrapper>
-        <Tabs defaultActiveKey="1" onChange={this.changeTab}>
-          {PROCESS_ITEMS.map((item, index) => {
-            // const data = this.state[`${PROCESS_STATE[index]}Data`];
-            const data = stateContainer[index];
-            return (
-              <TabPane tab={item} key={index + 1}>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <Search
-                    style={{ width: 250 }}
-                    placeholder="输入审批单号或者标题搜索"
-                    onSearch={value => this.handleSearch(value, index)}
-                    onChange={value => this.handleSearchChange(value, index)}
-                  />
-                </div>
-                <SourceTable
-                  loading={loading}
-                  searchable={false}
-                  removeable={false}
-                  saveDisabled={true}
-                  rowKey="processInstanceId"
-                  dataSource={data}
-                  tableColumnDefs={index === 3 ? processCompleteColumns : processColumns}
-                  rowActions={this.getRowActions}
-                  tableProps={{
-                    autoSizeColumnsToFit: true,
-                  }}
-                  actionColDef={{
-                    width: 250,
-                  }}
-                />
-              </TabPane>
-            );
-          })}
-        </Tabs>
-        <Modal
-          title={modalTitle}
-          visible={modalVisible}
-          onCancel={this.hideModal}
-          onOk={this.hideModal}
-          footer={null}
-          width={720}
-        >
-          {showDiagram && (
-            <img src={flowDiagram} style={{ width: 650 }} alt="图片加载出错，请重试" />
-          )}
-          {showForm && (
-            <ApprovalForm
-              formData={formData}
-              status={status}
-              handleFormChange={this.handleFormChange}
-            />
-          )}
-        </Modal>
-      </PageHeaderWrapper>
+      <>
+        <div className={styles.auditingWrapper}>
+          <PageHeaderWrapper>
+            <div style={{ width: '300px' }}>
+              <p>审批组列表</p>
+              <AuditingList />
+            </div>
+            <div style={{ marginLeft: '20px' }}>
+              <Row style={{ marginBottom: '10px', textAlign: 'right', maxHeight: '28px' }}>
+                <span style={{ float: 'left' }}>审批组成员</span>
+                <Button size="default" type="primary" onClick={this.handleDrawer}>
+                  增加成员
+                </Button>
+              </Row>
+              <Table
+                className={styles.menberTable}
+                columns={columns}
+                dataSource={this.state.dataSource}
+              />
+            </div>
+            {/* {!this.state.displayResources && (
+              <SourceTable
+                style={{marginLeft: '320px'}}
+                ref={node => (this.$sourceTable = node)}
+                rowKey={'id'}
+                dataSource={this.state.dataSource}
+                loading={this.state.loading}
+                columnDefs={TABLE_COL_DEF(this.fetchTable, this.showResource)}
+                onCellValueChanged={this.onCellValueChanged}
+                header={
+                  <Row style={{ marginBottom: '10px', textAlign: 'right', maxHeight: '28px'}}>
+                    <span style={{float: 'left'}}>审批组成员</span>
+                    <Button
+                      size="default"
+                      type="primary"
+                      onClick={this.handleDrawer}
+                    >
+                      增加成员
+                    </Button>
+                  </Row>
+                }
+              />
+            )} */}
+            <Drawer
+              placement="right"
+              onClose={this.onClose}
+              visible={this.state.visible}
+              width={500}
+              title={
+                <Row type="flex" justify="start" gutter={24}>
+                  <p>增加成员</p>
+                </Row>
+              }
+            >
+              <DrawerContarner />
+            </Drawer>
+          </PageHeaderWrapper>
+        </div>
+      </>
     );
   }
 }
 
-export default ApprovalProcessAuditingManagement;
+export default SystemSettingsRoleManagement;
