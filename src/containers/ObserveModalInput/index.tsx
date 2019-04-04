@@ -16,11 +16,12 @@ import SourceTable from '@/design/components/SourceTable';
 import { IColumnDef } from '@/design/components/Table/types';
 import { remove } from '@/design/utils';
 import { qlDateScheduleCreate } from '@/services/quant-service';
+import { isAsian, isAutocallPhoenix, isAutocallSnow, isKnockIn, isRangeAccruals } from '@/tools';
 import { getMoment } from '@/utils';
 import { Button, Col, message, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import moment, { isMoment } from 'moment';
+import moment from 'moment';
 import React from 'react';
 
 class ObserveModalInput extends InputPolym<any> {
@@ -50,9 +51,10 @@ class ObserveModalInput extends InputPolym<any> {
   }
 
   public computeDataSource = (dataSource = []) => {
-    dataSource = dataSource
-      .sort((a, b) => a[OB_DAY_FIELD].valueOf() - b[OB_DAY_FIELD].valueOf())
-      .map((item, index) => {
+    dataSource = dataSource.sort((a, b) => a[OB_DAY_FIELD].valueOf() - b[OB_DAY_FIELD].valueOf());
+
+    if (isAsian(this.record)) {
+      dataSource = dataSource.map((item, index) => {
         return {
           ...item,
           weight: new BigNumber(1)
@@ -61,6 +63,7 @@ class ObserveModalInput extends InputPolym<any> {
             .toNumber(),
         };
       });
+    }
 
     if (this.isAutoCallPhoenix() || this.isAutoCallSnow()) {
       const { record } = this.props;
@@ -74,11 +77,11 @@ class ObserveModalInput extends InputPolym<any> {
           ? new BigNumber(initialSpot).multipliedBy(new BigNumber(upBarrier).div(100)).toNumber()
           : upBarrier;
 
-      return dataSource.map((item, index) => {
+      dataSource = dataSource.map((item, index) => {
         return {
           ...item,
           payDay: item[OB_DAY_FIELD],
-          ...(this.isIn()
+          ...(isKnockIn(this.record)
             ? {
                 price: new BigNumber(barrierVal)
                   .plus(
@@ -186,15 +189,34 @@ class ObserveModalInput extends InputPolym<any> {
     );
   };
 
-  public onGenerate = async () => {
+  public getAutoGenerateParams = () => {
     const { record } = this.props;
-    const start = isMoment(record[LEG_FIELD.OBSERVE_START_DAY])
-      ? record[LEG_FIELD.OBSERVE_START_DAY].format('YYYY-MM-DD')
-      : record[LEG_FIELD.OBSERVE_START_DAY];
-    const end = isMoment(record[LEG_FIELD.OBSERVE_END_DAY])
-      ? record[LEG_FIELD.OBSERVE_END_DAY].format('YYYY-MM-DD')
-      : record[LEG_FIELD.OBSERVE_END_DAY];
-    const freq = record[LEG_FIELD.OBSERVATION_STEP];
+    if (isAsian(record)) {
+      const start = getMoment(record[LEG_FIELD.OBSERVE_START_DAY]).format('YYYY-MM-DD');
+      const end = getMoment(record[LEG_FIELD.OBSERVE_END_DAY]).format('YYYY-MM-DD');
+      const freq = record[LEG_FIELD.OBSERVATION_STEP];
+      return { start, end, freq };
+    }
+
+    if (isAutocallSnow(record) || isAutocallPhoenix(record)) {
+      const start = getMoment(record[LEG_FIELD.EFFECTIVE_DATE]).format('YYYY-MM-DD');
+      const end = getMoment(record[LEG_FIELD.EXPIRATION_DATE]).format('YYYY-MM-DD');
+      const freq = record[LEG_FIELD.UP_OBSERVATION_STEP];
+      return { start, end, freq };
+    }
+
+    if (isRangeAccruals(record)) {
+      const start = getMoment(record[LEG_FIELD.EFFECTIVE_DATE]).format('YYYY-MM-DD');
+      const end = getMoment(record[LEG_FIELD.EXPIRATION_DATE]).format('YYYY-MM-DD');
+      const freq = record[LEG_FIELD.OBSERVATION_STEP];
+      return { start, end, freq };
+    }
+
+    throw new Error('getAutoGenerateParams: not match!');
+  };
+
+  public onGenerate = async () => {
+    const { start, end, freq } = this.getAutoGenerateParams();
     this.setState({ generateLoading: true });
     const { error, data } = await qlDateScheduleCreate({
       start,
@@ -211,7 +233,7 @@ class ObserveModalInput extends InputPolym<any> {
       dealDataSource: this.computeDataSource(
         data.map(item => {
           return {
-            obDay: moment(item),
+            [OB_DAY_FIELD]: moment(item),
           };
         })
       ),
@@ -359,6 +381,24 @@ class ObserveModalInput extends InputPolym<any> {
     ];
   };
 
+  public getAutoGenerateButton = () => {
+    return (
+      <PopconfirmButton
+        type="primary"
+        loading={this.state.generateLoading}
+        onClick={this.onPopconfirmClick}
+        popconfirmProps={{
+          title: '生成将覆盖当前表格内容',
+          visible: this.state.popconfirmVisible,
+          onCancel: this.onHidePopconfirm,
+          onConfirm: this.onPopcomfirmButtonConfirm,
+        }}
+      >
+        批量生成观察日
+      </PopconfirmButton>
+    );
+  };
+
   public renderEditing(props) {
     return (
       <Row
@@ -414,25 +454,7 @@ class ObserveModalInput extends InputPolym<any> {
                       resetable={false}
                     />
                   </Col>
-                  <Col>
-                    {this.isAccruals() ||
-                    this.isAutoCallPhoenix() ||
-                    this.isAutoCallSnow() ? null : (
-                      <PopconfirmButton
-                        type="primary"
-                        loading={this.state.generateLoading}
-                        onClick={this.onPopconfirmClick}
-                        popconfirmProps={{
-                          title: '生成将覆盖当前表格内容',
-                          visible: this.state.popconfirmVisible,
-                          onCancel: this.onHidePopconfirm,
-                          onConfirm: this.onPopcomfirmButtonConfirm,
-                        }}
-                      >
-                        批量生成观察日
-                      </PopconfirmButton>
-                    )}
-                  </Col>
+                  <Col>{this.getAutoGenerateButton()}</Col>
                 </Row>
               }
               columnDefs={this.getColumnDefs()}

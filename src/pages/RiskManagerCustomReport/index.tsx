@@ -2,10 +2,12 @@ import SourceTable from '@/design/components/SourceTable';
 import { unionId } from '@/design/utils/unionId';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptIntradayReportNamesList, rptIntradayReportPaged } from '@/services/report-service';
+import { socketHOC } from '@/tools/socketHOC';
+import { ISourceTable } from '@/types';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
-class RiskManagerCustomReport extends PureComponent {
+class RiskManagerCustomReport extends PureComponent implements ISourceTable {
   public $sourceTable: SourceTable = null;
 
   public state = {
@@ -24,7 +26,7 @@ class RiskManagerCustomReport extends PureComponent {
 
   public reportName: string;
 
-  public fetchTable = async (paramsPagination?) => {
+  public fetch = async (paramsPagination?) => {
     this.setState({
       loading: true,
     });
@@ -74,7 +76,7 @@ class RiskManagerCustomReport extends PureComponent {
         },
       },
       () => {
-        this.fetchTable();
+        this.fetch();
       }
     );
   };
@@ -86,7 +88,7 @@ class RiskManagerCustomReport extends PureComponent {
   };
 
   public onSearchButtonClick = () => {
-    this.fetchTable();
+    this.fetch();
   };
 
   public render() {
@@ -149,4 +151,4 @@ class RiskManagerCustomReport extends PureComponent {
   }
 }
 
-export default RiskManagerCustomReport;
+export default socketHOC(RiskManagerCustomReport);

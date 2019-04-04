@@ -4,6 +4,7 @@ import {
   ASSET_CLASS_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXTRA_FIELDS,
+  FREQUENCY_TYPE_MAP,
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
@@ -122,6 +123,7 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
+      [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],
       [Step.field]: 0,
     };
   },

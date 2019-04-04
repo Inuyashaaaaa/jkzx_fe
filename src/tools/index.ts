@@ -3,14 +3,32 @@ import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/c
 export const isAutocallPhoenix = data => {
   return (
     data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX
+  );
+};
+
+export const isAutocallSnow = data => {
+  return (
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_UNANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL
+  );
+};
+
+export const isAsian = data => {
+  return (
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN
   );
 };
 
 export const isRangeAccruals = data => {
   return (
     data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS
   );
 };
 

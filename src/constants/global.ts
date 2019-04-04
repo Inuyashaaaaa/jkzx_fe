@@ -19,3 +19,11 @@ export const HOST_TEST = process.env.NODE_ENV === 'development' ? '/api/' : '/';
 
 // 生产环境
 export const HOST_PRO = process.env.NODE_ENV === 'development' ? '/api/' : '/';
+
+export const SOCKET_MAP = {
+  ALL: 'ALL',
+  PNL: 'PNL',
+  RISK: 'RISK',
+  POSITION: 'POSITION',
+  VALUATION: 'VALUATION',
+};
