@@ -54,8 +54,8 @@ class DatePicker2 extends InputPolym<AllDatePicker2Props> {
 
   public formatChangeEvent = event => {
     return {
-      origin: event,
-      normal: event,
+      origin: event || undefined,
+      normal: event || undefined,
     };
   };
 
