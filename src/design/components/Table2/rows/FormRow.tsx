@@ -14,6 +14,14 @@ class EditableRow extends PureComponent<ITableRowProps> {
     this.props.api.tableManager.registeRow(record[getRowKey()], this);
   };
 
+  public validate = async (options = {}, fieldNames = []) => {
+    return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
+      return this.props.form.validateFields(fieldNames, options, (error, values) => {
+        resolve({ error, values });
+      });
+    });
+  };
+
   public render() {
     const { form } = this.props;
     return (

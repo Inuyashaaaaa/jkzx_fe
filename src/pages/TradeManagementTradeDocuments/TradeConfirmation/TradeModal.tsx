@@ -61,15 +61,15 @@ class TradeModal extends PureComponent {
     return (
       <>
         <ModalButton
-          visible={this.state.visible}
           modalProps={{
             title: '生成交易确认书',
             width: 700,
             footer: null,
             closable: true,
+            visible: this.state.visible,
+            onCancel: this.onCancel,
           }}
           onClick={this.onClick}
-          onCancel={this.onCancel}
           size="small"
           type="primary"
           content={

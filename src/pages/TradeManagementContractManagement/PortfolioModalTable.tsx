@@ -91,6 +91,8 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
       title: '关联投资组合',
       footer: false,
       closable: true,
+      onCancel: this.handleCancel,
+      visible: modalVisible,
     };
 
     return (
@@ -99,10 +101,8 @@ class PortfolioModalTable extends PureComponent<{ rowData: any }, any> {
           size="small"
           key="portfolio"
           type="primary"
-          visible={modalVisible}
           onClick={this.showModal}
           modalProps={modalProps}
-          onCancel={this.handleCancel}
           content={
             <>
               <SourceTable

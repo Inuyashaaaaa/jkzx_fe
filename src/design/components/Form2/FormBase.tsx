@@ -9,6 +9,7 @@ import { IFormBaseProps, IFormColDef } from '../type';
 import SwitchCell from './cells/SwitchCell';
 import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from './constants';
 import FormManager from './formManager';
+import './index.less';
 
 class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
   public static defaultProps = {
@@ -66,11 +67,12 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     return rules;
   };
 
-  public getControlElement = (colDef: IFormColDef = {}) => {
+  public getControlElement = (colDef: IFormColDef = {}, key) => {
     const { form, dataSource } = this.props;
     const { getValue } = colDef;
     return (
       <SwitchCell
+        key={key}
         getValue={this.normalizeGetValue(getValue)}
         colDef={colDef}
         form={form}
@@ -223,19 +225,20 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
           'resetButtonProps',
           'inputManager',
           'getValue',
+          'eventBus',
         ])}
-        className={classNames(`tongyu-form`, className)}
+        className={classNames(`tongyu-form2`, className)}
         layout={layout}
         onSubmit={this.onSubmit}
       >
         {layout === 'inline'
-          ? columns.map(item => this.getControlElement(item))
+          ? columns.map((item, index) => this.getControlElement(item, index))
           : rowContainers.map((cols, key) => {
               this.maxRowControlNumber =
                 cols.length > this.maxRowControlNumber ? cols.length : this.maxRowControlNumber;
 
               return (
-                <Row gutter={12} key={key} {...(rowProps ? rowProps({ index: key }) : undefined)}>
+                <Row gutter={24} key={key} {...(rowProps ? rowProps({ index: key }) : undefined)}>
                   {cols.map((item, index) => {
                     const { dataIndex } = item;
                     return (
@@ -254,7 +257,7 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
         {layout === 'inline' ? (
           this.getFooter()
         ) : (
-          <Row gutter={12}>
+          <Row>
             <Col span={24 / this.maxRowControlNumber}>{this.getFooter()}</Col>
           </Row>
         )}

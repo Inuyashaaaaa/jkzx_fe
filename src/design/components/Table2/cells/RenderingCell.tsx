@@ -34,6 +34,9 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
     }
 
     this.linkageValue(params);
+
+    // 当前行 form 只要有非自身 field 发生 value changed 就会触发更新
+    this.forceUpdate();
   };
 
   public linkageValue = (params: ITableTriggerCellValueChangedParams) => {
@@ -82,9 +85,6 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public componentDidMount = () => {
-    if (!this.props.form.isFieldTouched(this.getDataIndex())) {
-      this.props.form.validateFields();
-    }
     this.props.api.eventBus.listen(TABLE_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
   };
 
@@ -120,15 +120,17 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
   public render() {
     const value = this.getValue();
     const { record, rowIndex, children, $$render } = this.props;
-    return [
-      ...React.Children.toArray(children).slice(0, -1),
-      $$render
-        ? $$render(value, record, rowIndex, {
-            form: this.props.form,
-            editing: false,
-          })
-        : value,
-    ];
+    return React.Children.toArray(children)
+      .slice(0, -1)
+      .concat(
+        $$render
+          ? $$render(value, record, rowIndex, {
+              form: this.props.form,
+              editing: false,
+              key: 'last',
+            })
+          : value
+      );
   }
 }
 

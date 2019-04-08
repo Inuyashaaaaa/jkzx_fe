@@ -1,9 +1,12 @@
-import React from 'react';
-import StationalComponent from '../StationalComponent';
+import React, { PureComponent } from 'react';
 import ModalButtonBase from './ModalButtonBase';
 import { ModalButtonProps, ModalButtonState } from './types';
 
-class ModalButton extends StationalComponent<ModalButtonProps, ModalButtonState> {
+class ModalButton extends PureComponent<ModalButtonProps, ModalButtonState> {
+  public static defaultProps = {
+    modalProps: {},
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -13,52 +16,78 @@ class ModalButton extends StationalComponent<ModalButtonProps, ModalButtonState>
   }
 
   public onClick = event => {
-    if (!this.props.onClick) {
-      return this.$setState({
-        visible: true,
+    this.switchVisible();
+    if (this.props.onClick) {
+      return (this.props as any).onClick(event);
+    }
+  };
+
+  public switchVisible = () => {
+    if (this.props.modalProps.visible == null) {
+      this.setState({
+        visible: !this.state.visible,
       });
     }
-    return (this.props as any).onClick(event);
+  };
+
+  public switchConfirmLoading = (callback?) => {
+    if (this.props.modalProps.confirmLoading == null) {
+      this.setState(
+        {
+          confirmLoading: !this.state.confirmLoading,
+        },
+        callback
+      );
+    } else {
+      callback();
+    }
   };
 
   public onCancel = () => {
-    if (!this.props.onCancel) {
-      return this.$setState({
-        visible: false,
-      });
+    this.switchVisible();
+    if (typeof this.props.modalProps.onCancel === 'function') {
+      return this.props.modalProps.onCancel();
     }
-    return this.props.onCancel();
   };
 
   public onConfirm = () => {
-    if (!this.props.onConfirm) {
-      return this.$setState({
-        visible: false,
-      });
+    if (typeof this.props.modalProps.onOk !== 'function') {
+      return this.switchVisible();
     }
-    this.setState({
-      confirmLoading: true,
-    });
-    const result = this.props.onConfirm();
-    result.then(cb => {
-      this.setState(
-        {
-          confirmLoading: false,
-          visible: false,
-        },
-        () => cb && cb(this)
-      );
-    });
+    const result = this.props.modalProps.onOk();
+    if (result instanceof Promise) {
+      this.switchConfirmLoading(() => {
+        result.then(
+          callback => {
+            this.switchConfirmLoading(() => {
+              this.switchVisible();
+              if (typeof callback === 'function') {
+                callback(this);
+              }
+            });
+          },
+          () => {
+            this.switchConfirmLoading(() => this.switchVisible());
+          }
+        );
+      });
+    } else {
+      this.switchVisible();
+    }
   };
 
   public render() {
     return (
       <ModalButtonBase
         {...this.props}
-        {...this.getUsedState()}
         onClick={this.onClick}
-        onConfirm={this.onConfirm}
-        onCancel={this.onCancel}
+        modalProps={{
+          confirmLoading: this.state.confirmLoading,
+          visible: this.state.visible,
+          ...this.props.modalProps,
+          onOk: this.onConfirm,
+          onCancel: this.onCancel,
+        }}
       />
     );
   }

@@ -26,7 +26,7 @@ class InputNumber extends InputBase<IInputNumberProps> {
   public renderEditing() {
     return (
       <AntdInputNumber
-        {...omit(this.props, ['autoSelect'])}
+        {...omit(this.props, ['autoSelect', 'onValueChange', 'editing'])}
         onChange={this.onChange}
         ref={this.getRef}
       />

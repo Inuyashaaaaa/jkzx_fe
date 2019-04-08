@@ -38,6 +38,18 @@ class Table2 extends PureComponent<ITableProps> {
     this.context = this.getContext();
   }
 
+  public getFieldNames = () => {
+    return this.props.columns.map(item => item.dataIndex);
+  };
+
+  public validate = (options = {}, fieldNames = this.getFieldNames(), rowIds?) => {
+    return this.api.tableManager.rowNodes
+      .filter(item => rowIds == null || rowIds.findIndex(id => id === item.id))
+      .forEach(item => {
+        return item.node.validate(options, fieldNames);
+      });
+  };
+
   public getContext = (): ITableContext => {
     return {
       ...this.context,

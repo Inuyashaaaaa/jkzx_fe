@@ -1,10 +1,23 @@
 @import '~antd/lib/style/themes/default.less';
 
-.cell {
-  &.editable {
-    cursor: pointer;
-    &.rendering {
-      :global {
+@prefix: form2-switch;
+
+:global {
+  .ant-form-inline {
+    .@{prefix}-cell {
+      display: inline-block;
+
+      .ant-spin-container,
+      .ant-spin-nested-loading {
+        display: inline-block;
+      }
+    }
+  }
+
+  .@{prefix}-cell {
+    &.editable {
+      cursor: pointer;
+      &.rendering {
         .ant-form-item-control-wrapper {
           padding-left: @input-padding-horizontal;
           &:hover {
@@ -14,8 +27,8 @@
           }
         }
       }
+      // &.editing {
+      // }
     }
-    // &.editing {
-    // }
   }
 }

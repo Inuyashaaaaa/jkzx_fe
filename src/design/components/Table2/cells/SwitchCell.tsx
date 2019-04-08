@@ -2,7 +2,7 @@ import { Spin } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import classNames from 'classnames';
 import { omit } from 'lodash';
-import React, { PureComponent } from 'react';
+import React, { KeyboardEvent, PureComponent } from 'react';
 import { ITableCellProps, ITableTriggerCellValueChangeParams } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
 import { TABLE_CELL_VALUE_CHANGE, TABLE_CELL_VALUE_CHANGED } from '../constants/EVENT';
@@ -87,14 +87,6 @@ class SwitchCell extends PureComponent<
     }
   };
 
-  public validateRowForm = async (options = {}) => {
-    return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      return this.form.validateFields(options, (error, values) => {
-        resolve({ error, values });
-      });
-    });
-  };
-
   public saveCell = async (callback?) => {
     if (!this.getEditable()) return;
     if (!this.state.editing) return;
@@ -106,12 +98,16 @@ class SwitchCell extends PureComponent<
       return this.setState({ editing: false }, callback);
     }
 
-    const { error } = await this.validateRowForm();
-    if (error) return;
+    const errorMsgs = await this.form.getFieldError(dataIndex);
+    if (errorMsgs) return;
     if (this.$editingCell) {
       const value = await this.$editingCell.getValue();
       this.mutableChangeRecordValue(value, false);
-      this.setState({ editing: false }, callback);
+      this.setState({ editing: false }, () => {
+        if (callback) {
+          callback();
+        }
+      });
     }
   };
 
@@ -176,7 +172,7 @@ class SwitchCell extends PureComponent<
     }
   };
 
-  public onKeyDown = (e: KeyboardEvent) => {
+  public onKeyDown = (e: KeyboardEvent<HTMLTableDataCellElement>) => {
     if (!this.getEditable()) return;
 
     // Enter
@@ -221,7 +217,7 @@ class SwitchCell extends PureComponent<
     return !!this.state.editing;
   };
 
-  public onCellBlur = (e: FocusEvent) => {
+  public onCellBlur = () => {
     if (!this.getEditable()) return;
     if (this.state.editing) {
       this.saveCell();
@@ -240,32 +236,6 @@ class SwitchCell extends PureComponent<
     return style;
   };
 
-  public onTableCellValueChange = (params: ITableTriggerCellValueChangeParams) => {
-    const { rowId } = params;
-    if (rowId !== this.getRowId()) return;
-
-    const dataIndex = this.getDataIndex();
-    if (Object.keys(params.changedValues).indexOf(dataIndex) !== -1) return;
-
-    // validate after rendered
-    setTimeout(() => {
-      this.validateRowForm({ force: true });
-    }, 0);
-  };
-
-  public componentDidMount = () => {
-    this.registeCell();
-
-    if (!this.form.isFieldTouched(this.getDataIndex())) {
-      this.form.validateFields();
-    }
-    this.props.api.eventBus.listen(TABLE_CELL_VALUE_CHANGE, this.onTableCellValueChange);
-  };
-
-  public componentWillUnmount = () => {
-    this.props.api.eventBus.unListen(TABLE_CELL_VALUE_CHANGE, this.onTableCellValueChange);
-  };
-
   public render() {
     return (
       <td
@@ -279,6 +249,7 @@ class SwitchCell extends PureComponent<
           'context',
           'getRowKey',
           '$$render',
+          'getValue',
         ])}
         onClick={this.onCellClick}
         onBlur={this.onCellBlur}

@@ -59,14 +59,15 @@ class ActionCol extends PureComponent<any, any> {
                 onValueChange={this.onValueChange}
               />
             }
-            onConfirm={this.onChange}
+            modalProps={{
+              onOk: this.onChange,
+            }}
           >
             修改
           </ModalButton>
           <PopconfirmButton
             type="danger"
             size="small"
-            onConfirm={this.onRemove}
             popconfirmProps={{
               onConfirm: this.onRemove,
               title: '确认删除?',
