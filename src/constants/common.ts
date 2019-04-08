@@ -105,14 +105,14 @@ export const DIRECTION_TYPE_OPTIONS = convertOptions(DIRECTION_TYPE_MAP, DIRECTI
 export const EVENT_TYPE_MAP = {
   EXPIRATION: 'EXPIRATION',
   KNOCK_OUT: 'KNOCK_OUT',
-  PAYMENT: 'PAYMENT',
+  // PAYMENT: 'PAYMENT',
   OBSERVE: 'OBSERVE',
 };
 
 export const EVENT_TYPE_ZHCN_MAP = {
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
-  PAYMENT: '支付',
+  // PAYMENT: '支付',
   OBSERVE: '观察',
 };
 
