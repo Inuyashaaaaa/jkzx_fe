@@ -231,7 +231,6 @@ class BookCreate extends PureComponent<any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 

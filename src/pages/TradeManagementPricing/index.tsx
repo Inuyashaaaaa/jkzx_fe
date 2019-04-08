@@ -168,7 +168,6 @@ class TradeManagementPricing extends PureComponent<any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 
