@@ -226,6 +226,8 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
           'inputManager',
           'getValue',
           'eventBus',
+          'onValueChange',
+          'onValueChanged',
         ])}
         className={classNames(`tongyu-form2`, className)}
         layout={layout}

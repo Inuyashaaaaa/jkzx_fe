@@ -1,4 +1,5 @@
 export const BASE_FORM_FIELDS = {
+  TRADER_TYPE: 'traderType',
   LEGALNAME: 'legalName',
   LEGALREPRESENTATIVE: 'legalRepresentative',
   ADDRESS: 'address',
@@ -25,4 +26,9 @@ export const BASE_FORM_FIELDS = {
   PRODUCTFOUNDDATE: 'productFoundDate',
   PRODUCTEXPIRINGDATE: 'productExpiringDate',
   FUNDMANAGER: 'fundManager',
+};
+
+export const TRADER_TYPE = {
+  PRODUCT: 'product',
+  ENTERPRISE: 'enterprise',
 };
