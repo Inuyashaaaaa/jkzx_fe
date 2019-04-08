@@ -170,6 +170,12 @@ export const AutoCallSnowAnnual: ILegType = pipeLeg({
     return nextPosition;
   },
   getPageData: (nextDataSourceItem, position) => {
+    nextDataSourceItem[ExpireNoBarrierObserveDay.field] = (
+      position.asset.observationDates || []
+    ).map(item => ({
+      [OB_DAY_FIELD]: item,
+    }));
+
     nextDataSourceItem[LEG_FIELD.UP_BARRIER] = position.asset.barrier;
     nextDataSourceItem[LEG_FIELD.UP_BARRIER_TYPE] = position.asset.barrierType;
     return nextDataSourceItem;
