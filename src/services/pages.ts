@@ -19,12 +19,13 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 
-export const createLegDataSourceItem = (leg: ILegType) => {
+export const createLegDataSourceItem = (leg: ILegType, extra?) => {
   return {
     [LEG_ID_FIELD]: uuidv4(),
     [LEG_TYPE_FIELD]: leg.type,
     [LEG_NAME_FIELD]: leg.name,
     [LEG_ANNUALIZED_FIELD]: leg.isAnnualized,
+    ...extra,
   };
 };
 
