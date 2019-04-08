@@ -124,18 +124,14 @@ class FixingModal extends PureComponent<
   public isCanExercise = () => {
     const now = moment();
     // 今天是最后一个观察日
-    const last = (_.last(this.state.tableData) || {}).day;
+    const last = _.get(_.last(this.state.tableData) || {}, [OB_DAY_FIELD]);
     if (
-      (last && now.isSame(last, 'day')) ||
-      now.isSame(this.data[LEG_FIELD.EXPIRATION_DATE], 'day')
+      ((last && now.isSame(last, 'day')) ||
+        now.isSame(this.data[LEG_FIELD.EXPIRATION_DATE], 'day')) &&
+      this.state.tableData.every(item => item[OB_PRICE_FIELD] != null)
     ) {
       return true;
     }
-
-    if (this.state.tableData.every(item => !!item[OB_PRICE_FIELD])) {
-      return true;
-    }
-
     return false;
   };
 
