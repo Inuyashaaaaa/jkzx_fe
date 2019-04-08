@@ -25,6 +25,8 @@ import moment from 'moment';
 import React from 'react';
 
 class ObserveModalInput extends InputPolym<any> {
+  public $sourceTable: SourceTable = null;
+
   public state = {
     visible: false,
     popconfirmVisible: false,
@@ -128,6 +130,10 @@ class ObserveModalInput extends InputPolym<any> {
   };
 
   public onOk = async () => {
+    const validateTableRsp: any = await this.$sourceTable.validateTable();
+
+    if (validateTableRsp.error) return;
+
     this.setState(
       {
         visible: !this.state.visible,
@@ -425,6 +431,9 @@ class ObserveModalInput extends InputPolym<any> {
               dataSource={this.state.dealDataSource}
               pagination={false}
               rowKey={OB_DAY_FIELD}
+              ref={node => {
+                this.$sourceTable = node;
+              }}
               header={
                 <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
                   <Col>
