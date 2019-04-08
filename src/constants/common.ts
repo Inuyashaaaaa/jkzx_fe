@@ -15,6 +15,8 @@ export const LEG_NAME_FIELD = '$legName';
 
 export const LEG_ANNUALIZED_FIELD = '$isAnnualized';
 
+export const LEG_PRICING_FIELD = '$isPricing';
+
 export const RULES_REQUIRED = [
   {
     required: true,
@@ -537,6 +539,7 @@ export const LEG_INJECT_FIELDS = [
   LEG_TYPE_FIELD,
   LEG_NAME_FIELD,
   LEG_ANNUALIZED_FIELD,
+  LEG_PRICING_FIELD,
 ];
 
 export const BIG_NUMBER_CONFIG = {

@@ -1,4 +1,4 @@
-import { LEG_NAME_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
+import { LEG_NAME_FIELD, LEG_PRICING_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
@@ -100,6 +100,7 @@ class BookCreate extends PureComponent<any> {
         return {
           ...leg.getDefault({}, false),
           ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
+          [LEG_PRICING_FIELD]: false,
         };
       });
       this.setState({
