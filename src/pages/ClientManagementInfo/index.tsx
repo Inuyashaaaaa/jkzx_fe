@@ -447,7 +447,7 @@ class ClientManagement extends PureStateComponent {
                               }
                               return;
                             }}
-                            controls={INSITUTIONS(this.state.branchSalesList)}
+                            controls={INSITUTIONS(this.state.branchSalesList, 'create')}
                             dataSource={this.state.dataSourceInst}
                             onValueChange={this.handleChangeInstValue}
                             controlNumberOneRow={2}
@@ -462,7 +462,7 @@ class ClientManagement extends PureStateComponent {
                               }
                               return;
                             }}
-                            controls={PRODUCTIONS(this.state.branchSalesList)}
+                            controls={PRODUCTIONS(this.state.branchSalesList, 'create')}
                             dataSource={this.state.dataSourceProd}
                             onValueChange={this.handleChangeProdValue}
                             controlNumberOneRow={2}
