@@ -164,7 +164,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
     nextDataSourceItem[LEG_FIELD.OBSERVE_END_DAY] = moment(days[days.length - 1]);
     nextDataSourceItem[LEG_FIELD.OBSERVATION_DATES] = days.map(day => {
       return {
-        day,
+        [OB_DAY_FIELD]: day,
         weight: nextDataSourceItem.fixingWeights[day],
         price: nextDataSourceItem.fixingObservations[day],
       };
