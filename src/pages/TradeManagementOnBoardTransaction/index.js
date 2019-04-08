@@ -59,7 +59,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
   componentDidMount() {
     this.queryInstrumentId();
     this.queryRecords({
-      startDate: moment(1, 'days'),
+      startDate: moment().subtract(1, 'days'),
       endDate: moment(),
     });
   }
@@ -280,7 +280,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       }
     } else {
       this.queryRecords({
-        startDate: moment(1, 'days'),
+        startDate: moment().subtract(1, 'days'),
         endDate: moment(),
       });
     }
