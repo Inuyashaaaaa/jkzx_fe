@@ -240,7 +240,7 @@ class ClientManagement extends PureStateComponent {
     });
   };
 
-  public onCreate = () => {
+  public onCreate = async () => {
     if (this.state.activeKey === INSTITUTION) {
       return this.createInstitution();
     } else {

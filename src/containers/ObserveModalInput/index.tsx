@@ -127,7 +127,7 @@ class ObserveModalInput extends InputPolym<any> {
     });
   };
 
-  public onOk = () => {
+  public onOk = async () => {
     this.setState(
       {
         visible: !this.state.visible,
@@ -416,9 +416,9 @@ class ObserveModalInput extends InputPolym<any> {
             onCancel: this.onCancel,
             destroyOnClose: true,
             width: 700,
+            visible: this.state.visible,
           }}
           onClick={this.onOpen}
-          visible={this.state.visible}
           style={{ width: '100%', display: 'block' }}
           content={
             <SourceTable

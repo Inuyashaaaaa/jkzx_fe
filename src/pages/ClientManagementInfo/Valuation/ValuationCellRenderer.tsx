@@ -83,10 +83,12 @@ class ValuationCellRenderer extends PureComponent {
               是否确认向&nbsp;&nbsp;{this.props.params.data.legalName}&nbsp;&nbsp;邮箱发送估值报告?
             </div>
           }
-          visible={this.state.visible}
           onClick={this.onClick}
-          onConfirm={this.onConfirm}
-          onCancel={this.onCancel}
+          modalProps={{
+            visible: this.state.visible,
+            onOk: this.onConfirm,
+            onCancel: this.onCancel,
+          }}
         >
           发送报告
         </ModalButton>

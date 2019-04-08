@@ -1,6 +1,11 @@
 import { ButtonProps } from 'antd/lib/button';
 import { FormItemProps } from 'antd/lib/form';
-import { FormComponentProps, FormProps, WrappedFormUtils } from 'antd/lib/form/Form';
+import {
+  FormComponentProps,
+  FormProps,
+  GetFieldDecoratorOptions,
+  WrappedFormUtils,
+} from 'antd/lib/form/Form';
 import { ColumnProps, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
 import { Omit } from './common/types';
@@ -16,14 +21,22 @@ export interface IColDef {
 }
 
 export interface IRenderOptions<T = any> {
-  form?: WrappedFormUtils;
+  form?: Omit<WrappedFormUtils, 'getFieldDecorator'> & {
+    getFieldDecorator<T extends object>(
+      id: keyof T,
+      options?: GetFieldDecoratorOptions
+    ): (node: React.ReactNode) => React.ReactNode;
+    getFieldDecorator(
+      options?: GetFieldDecoratorOptions
+    ): (node: React.ReactNode) => React.ReactNode;
+  };
   editing?: boolean;
 }
 
 export interface IFormColDef<T = any> extends IColDef {
-  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactElement;
+  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
   /* 作用和 field 中的 label 一样，方便直接使用 table.columns 的数据 */
-  title?: string;
+  title?: React.ReactNode;
   editable?: boolean;
   getValue?:
     | ((record: T, params: IFormTriggerCellValueChangedParams) => any)
@@ -32,9 +45,9 @@ export interface IFormColDef<T = any> extends IColDef {
 
 export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render'> {
   // totalable?: boolean | ((params: { totalData: number; record: object }) => number);
-  title?: string;
+  title?: React.ReactNode;
   editable?: boolean;
-  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactElement;
+  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
   getValue?:
     | ((record: T, params: ITableTriggerCellValueChangedParams) => any)
     | ([(record: T, params: ITableTriggerCellValueChangedParams) => any, ...string[]]);
@@ -60,7 +73,7 @@ export interface ITableCellProps<T = any> {
   context: ITableContext;
   getRowKey: () => string;
   className?: string;
-  style?: CSSRuleList;
+  style?: CSSProperties;
   $$render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
   getValue?: {
     depends: string[];
@@ -172,24 +185,18 @@ export abstract class InputBase<P = any, S = any> extends React.PureComponent<
     value?: any;
     onChange?: (...args: any[]) => any;
     onValueChange?: (...args: any[]) => any;
-    status?: 'editing' | 'rendering';
+    editing?: boolean;
   },
   S
 > {
-  public static defaultProps = {
-    status: 'editing',
-  };
-
   public abstract renderEditing(): any;
   public abstract renderRendering(): any;
 
   public render() {
-    if (this.props.status === 'rendering') {
+    if (this.props.editing === undefined ? true : this.props.editing) {
+      return this.renderEditing();
+    } else {
       return this.renderRendering();
     }
-    if (this.props.status === 'editing') {
-      return this.renderEditing();
-    }
-    throw new Error(`InputBase: status(${this.props.status}) is must be exsit.`);
   }
 }

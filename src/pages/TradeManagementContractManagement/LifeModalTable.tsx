@@ -43,7 +43,7 @@ class LifeModalTable extends PureComponent<
     );
   };
 
-  public handleOk = () => {
+  public handleOk = async () => {
     this.setState({
       modalVisiable: false,
     });
@@ -73,6 +73,8 @@ class LifeModalTable extends PureComponent<
       footer: false,
       closable: true,
       onOk: this.handleOk,
+      visible: this.state.modalVisiable,
+      onCancel: this.handleCancel,
     };
 
     return (
@@ -81,9 +83,7 @@ class LifeModalTable extends PureComponent<
         key="check"
         type="primary"
         onClick={this.showModal}
-        visible={this.state.modalVisiable}
         modalProps={modalProps}
-        onCancel={this.handleCancel}
         content={
           <SourceTable
             rowKey={'uuid'}

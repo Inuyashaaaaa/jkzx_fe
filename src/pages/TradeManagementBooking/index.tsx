@@ -647,7 +647,7 @@ class BookCreate extends PureComponent<any> {
     }
   };
 
-  public onSwtichModal = () => {
+  public onSwtichModal = async () => {
     this.setState({
       modalVisible: !this.state.modalVisible,
     });

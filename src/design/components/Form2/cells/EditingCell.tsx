@@ -1,5 +1,5 @@
 import { PureComponent } from 'react';
-import { IFormCellProps } from 'src/components/type';
+import { IFormCellProps } from '../../../type';
 
 class EditingCell extends PureComponent<IFormCellProps, any> {
   public getValue = async () => {

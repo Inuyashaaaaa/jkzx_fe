@@ -1,9 +1,4 @@
-import Input from './Input';
-import InputNumber from './InputNumber';
-import InputManager from './register';
-
-const defaultInputManager = new InputManager();
-defaultInputManager.registe('input', Input);
-defaultInputManager.registe('inputNumber', InputNumber);
-
-export { Input, InputNumber, InputManager, defaultInputManager };
+export { default as Input } from './Input';
+export { default as InputNumber } from './InputNumber';
+export { default as Select } from './Select';
+export { default as Cascader } from './Cascader';
