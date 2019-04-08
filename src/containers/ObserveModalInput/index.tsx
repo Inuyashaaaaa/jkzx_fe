@@ -81,7 +81,7 @@ class ObserveModalInput extends InputPolym<any> {
         return {
           ...item,
           payDay: item[OB_DAY_FIELD],
-          ...(isKnockIn(this.record)
+          ...(this.isAutoCallSnow()
             ? {
                 price: new BigNumber(barrierVal)
                   .plus(
@@ -303,7 +303,7 @@ class ObserveModalInput extends InputPolym<any> {
             ranger: 'day',
           },
         },
-        this.isIn()
+        this.isAutoCallSnow()
           ? {
               headerName: '障碍价格',
               field: 'price',
