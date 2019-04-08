@@ -883,7 +883,14 @@ const CreateModalButton = memo<any>(props => {
             return;
           }
 
-          if (currenStep === 0) {
+          if (
+            currenStep === 0 &&
+            baseFormData[BASE_FORM_FIELDS.TRADER_TYPE] === TRADER_TYPE.ENTERPRISE
+          ) {
+            return setCurrentStep(currenStep + 2);
+          }
+
+          if ([0, 1, 2, 5].find(item => item === currenStep)) {
             const { error } = await formRef.current.validate();
             if (error) return;
           }
