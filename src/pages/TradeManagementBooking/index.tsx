@@ -102,7 +102,7 @@ class BookCreate extends PureComponent<any> {
 
   // http://10.1.2.16:8080/browse/OTMS-2659
   public getConvertPremium = (leg: ILegType, defaultData, pricingData) => {
-    if (!!leg.columnDefs.find(item => item.field === LEG_FIELD.PREMIUM) === false) {
+    if (!!leg.getColumnDefs().find(item => item.field === LEG_FIELD.PREMIUM) === false) {
       return {};
     }
     return {
@@ -140,7 +140,7 @@ class BookCreate extends PureComponent<any> {
             ).concat(
               dataSource.reduce((container, item) => {
                 const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
-                return container.concat(leg.columnDefs);
+                return container.concat(leg.getColumnDefs());
               }, [])
             ),
             item => item.field
@@ -176,7 +176,7 @@ class BookCreate extends PureComponent<any> {
 
     if (!legType) return false;
 
-    return !!legType.columnDefs.find(item => item.field === colDef.field);
+    return !!legType.getColumnDefs(false, false).find(item => item.field === colDef.field);
   };
 
   public handleAddLeg = event => {
@@ -203,7 +203,7 @@ class BookCreate extends PureComponent<any> {
           state.columnDefs = orderLegColDefs(
             _.unionBy<IColDef>(
               state.columnDefs.concat(
-                leg.columnDefs.map(col => {
+                leg.getColumnDefs().map(col => {
                   return {
                     ...col,
                     suppressMenu: true,

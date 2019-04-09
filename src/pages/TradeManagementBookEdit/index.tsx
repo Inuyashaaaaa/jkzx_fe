@@ -220,7 +220,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
 
     if (!legType) return false;
 
-    return !!legType.columnDefs.find(item => item.field === colDef.field);
+    return !!legType.getColumnDefs('editing').find(item => item.field === colDef.field);
   };
 
   public handleAddLeg = event => {
@@ -254,7 +254,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
                   },
                 },
                 ...state.columnDefs.concat(
-                  leg.columnDefs.map(col => {
+                  leg.getColumnDefs('editing').map(col => {
                     return {
                       ...col,
                       oldEditable: col.editable,
