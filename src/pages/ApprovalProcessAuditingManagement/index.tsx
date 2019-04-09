@@ -7,8 +7,6 @@ import styles from './Auditing.less';
 import DrawerContarner from './DrawerContarner';
 
 class SystemSettingsRoleManagement extends PureComponent {
-  // public $drawer: DrawerContarner = null;
-
   public state = {
     columns: [
       {
