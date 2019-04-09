@@ -1,56 +1,58 @@
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import {
-  authPagePermissionGetByRoleId,
-  authRolesList,
-  createRole,
-  queryAllPagePermissions,
-  updateRole,
-  updateRolePagePermissions,
-} from '@/services/role';
-import { Button, Col, Drawer, Icon, message, Popconfirm, Row, Table } from 'antd';
+import { wkApproveGroupList, wkApproveGroupModify } from '@/services/auditing';
+import { deleteRole, updateRolePagePermissions } from '@/services/role';
+import { authUserList } from '@/services/user';
+import { Button, Col, Drawer, Icon, message, notification, Popconfirm, Row, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './auditing.less';
 import AuditingList from './auditLists';
 import DrawerContarner from './DrawerContarner';
 
-const columns = [
-  {
-    title: '用户名',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: '昵称',
-    dataIndex: 'alias',
-    key: 'alias',
-  },
-  {
-    title: '部门',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: '操作',
-    key: 'operation',
-    dataIndex: 'operation',
-    render: () => <a style={{ color: 'red' }}>移出</a>,
-  },
-];
 class SystemSettingsRoleManagement extends PureComponent {
   public $sourceTable: SourceTable = null;
 
-  public $form: Form = null;
-
   public state = {
-    dataSource: [],
+    columns: [
+      {
+        title: '用户名',
+        dataIndex: 'username',
+        key: 'username',
+      },
+      {
+        title: '昵称',
+        dataIndex: 'alias',
+        key: 'alias',
+      },
+      {
+        title: '部门',
+        dataIndex: 'address',
+        key: 'address',
+      },
+      {
+        title: '操作',
+        key: 'operation',
+        dataIndex: 'operation',
+        render: (text, record) =>
+          this.state.userList.length >= 1 ? (
+            <Popconfirm
+              title="确认移出?"
+              onConfirm={() => this.handleDelete(record.userApproveGroupId)}
+            >
+              <a style={{ color: 'red' }}>移出</a>
+            </Popconfirm>
+          ) : null,
+      },
+    ],
+    userList: null,
     loading: false,
     visible: false,
     formData: {},
     displayResources: false,
     choosedRole: {},
-    auditingList: [],
+    approveGroupList: [],
     hover: false,
+    currentGroup: null,
   };
 
   constructor(props) {
@@ -60,6 +62,31 @@ class SystemSettingsRoleManagement extends PureComponent {
   public componentDidMount = () => {
     this.fetchTable();
     this.fetchList();
+  };
+
+  public handleDelete = async key => {
+    // 审批组成员移出
+    const { currentGroup } = this.state;
+    let userList = [...this.state.userList];
+    userList = userList.filter(item => item.userApproveGroupId !== key);
+    currentGroup.userList = userList;
+    const { data, error } = await wkApproveGroupModify(currentGroup);
+    const { message } = error;
+    if (error) {
+      return notification.error({
+        message: `移出失败`,
+        description: message,
+      });
+    } else {
+      notification.success({
+        message: `移出成功`,
+        description: message,
+      });
+      this.setState({
+        visible: false,
+      });
+    }
+    this.setState({ userList });
   };
 
   public handlePages(data, result1, result2) {
@@ -77,24 +104,11 @@ class SystemSettingsRoleManagement extends PureComponent {
       loading: true,
     });
 
-    // const auditingList = [
-    //   {
-    //     name: '风控审批组',
-    //     id: 1,
-    //   },
-    //   {
-    //     name: '客户审批组',
-    //     id: 2,
-    //   },
-    //   {
-    //     name: '交易审批组',
-    //     id: 3,
-    //   }
-    // ];
-    const auditingList = [];
-
+    const { data, error, raw } = await wkApproveGroupList();
+    if (error) return;
     this.setState({
-      auditingList,
+      approveGroupList: data,
+      userList: data.userList,
       loading: false,
     });
   };
@@ -112,7 +126,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     //   });
     //   return false;
     // }
-
+    //
     // const pageMap = {};
     // const entityPageMap = {};
     // // this.handlePages(allPagesPermissions.data, pageMap, entityPageMap);
@@ -131,7 +145,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     // });
     this.setState({
       // loading: false,
-      dataSource: [{ roleName: 1 }],
+      userList: [],
     });
     return;
   };
@@ -141,26 +155,6 @@ class SystemSettingsRoleManagement extends PureComponent {
       visible: true,
     });
   };
-
-  // public handleDrawer = async () => {
-  //   const { error, data } = await authPagePermissionGetByRoleId({
-  //     roleId: this.props.data.id,
-  //   });
-  //   if (error) {
-  //     message.error('页面权限获取失败');
-  //     return;
-  //   }
-  //   const checkedKey = data.map(item => {
-  //     return _.toPairs(this.props.data.newPageMap).filter(items => items[1] === item)[0][0];
-  //   });
-  //   const checkedKeys = checkedKey.filter(item => {
-  //     return !fatherTreeNode.find(items => item === items);
-  //   });
-  //   this.setState({
-  //     visible: true,
-  //     checkedKeys,
-  //   });
-  // };
 
   public onClose = () => {
     this.setState({
@@ -219,51 +213,99 @@ class SystemSettingsRoleManagement extends PureComponent {
     if (error) return;
   };
 
+  public onEdit = async param => {
+    console.log(param);
+    this.setState({
+      userList: param.userList,
+    });
+  };
+
+  public handleMenber = async param => {
+    // 切换审批组成员
+    if (!param) return;
+    this.setState({
+      userList: param.userList,
+      currentGroup: param,
+    });
+  };
+
+  public onBatchAdd = async param => {
+    // 批量加入
+    const { currentGroup } = this.state;
+    currentGroup.userList = currentGroup.userList.concat(param);
+    const { data, error } = await wkApproveGroupModify(currentGroup);
+    const { message } = error;
+    if (error) {
+      return notification.error({
+        message: `加入失败`,
+        description: message,
+      });
+    } else {
+      notification.success({
+        message: `加入成功`,
+        description: message,
+      });
+      this.setState({
+        visible: false,
+      });
+    }
+
+    currentGroup.userList = data.userList;
+
+    const approveGroupList = this.state.approveGroupList.map(item => {
+      if (item.approveGroupId === currentGroup.approveGroupId) {
+        item = data;
+      }
+      return item;
+    });
+    this.setState({
+      approveGroupList,
+      visible: false,
+      currentGroup,
+      userList: data.userList,
+    });
+  };
+
   public render() {
     return (
       <>
         <div className={styles.auditingWrapper}>
           <PageHeaderWrapper>
-            <div style={{ width: '300px', background: '#FFF', padding: '30px' }}>
+            <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
               <p>审批组列表</p>
-              <AuditingList />
+              <AuditingList
+                approveGroupList={this.state.approveGroupList}
+                handleEdit={param => this.onEdit(param)}
+                handleMenber={this.handleMenber}
+              />
             </div>
-            <div style={{ marginLeft: '20px', background: '#FFF', padding: '30px' }}>
+            <div
+              style={{
+                marginLeft: '20px',
+                background: '#FFF',
+                padding: '30px',
+                width: '100%',
+                position: 'relative',
+              }}
+            >
               <Row style={{ marginBottom: '10px', textAlign: 'right', maxHeight: '28px' }}>
                 <span style={{ float: 'left' }}>审批组成员</span>
-                <Button size="default" type="primary" onClick={this.handleDrawer}>
-                  增加成员
-                </Button>
+                {this.state.userList && this.state.userList.length ? (
+                  <Button size="default" type="primary" onClick={this.handleDrawer}>
+                    增加成员
+                  </Button>
+                ) : null}
               </Row>
-              <Table
-                className={styles.menberTable}
-                columns={columns}
-                dataSource={this.state.dataSource}
-              />
+              {this.state.userList && this.state.userList.length ? (
+                <Table
+                  className={styles.menberTable}
+                  columns={this.state.columns}
+                  dataSource={this.state.userList}
+                />
+              ) : (
+                <span className={styles.center}>请先选中一个审批组</span>
+              )}
             </div>
-            {/* {!this.state.displayResources && (
-              <SourceTable
-                style={{marginLeft: '320px'}}
-                ref={node => (this.$sourceTable = node)}
-                rowKey={'id'}
-                dataSource={this.state.dataSource}
-                loading={this.state.loading}
-                columnDefs={TABLE_COL_DEF(this.fetchTable, this.showResource)}
-                onCellValueChanged={this.onCellValueChanged}
-                header={
-                  <Row style={{ marginBottom: '10px', textAlign: 'right', maxHeight: '28px'}}>
-                    <span style={{float: 'left'}}>审批组成员</span>
-                    <Button
-                      size="default"
-                      type="primary"
-                      onClick={this.handleDrawer}
-                    >
-                      增加成员
-                    </Button>
-                  </Row>
-                }
-              />
-            )} */}
             <Drawer
               placement="right"
               onClose={this.onClose}
@@ -275,7 +317,10 @@ class SystemSettingsRoleManagement extends PureComponent {
                 </Row>
               }
             >
-              <DrawerContarner />
+              <DrawerContarner
+                onBatchAdd={param => this.onBatchAdd(param)}
+                currentGroup={this.state.currentGroup}
+              />
             </Drawer>
           </PageHeaderWrapper>
         </div>
