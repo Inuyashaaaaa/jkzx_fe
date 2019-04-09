@@ -1,5 +1,6 @@
-import { IFormControl } from '@/lib/components/_Form2';
-import { IColumnDef } from '@/lib/components/_Table2';
+import { IFormControl } from '@/design/components/Form/types';
+import { IColumnDef } from '@/design/components/Table/types';
+
 export const TABLE_COL_DEFS: IColumnDef[] = [
   {
     headerName: '交易对手',
@@ -38,7 +39,7 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
 
 export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMargin => {
   const tradeId = {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -48,11 +49,11 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
     control: {
       label: '交易ID',
     },
-    dataIndex: 'tradeId',
+    field: 'tradeId',
   };
   return ([
     {
-      options: {
+      decorator: {
         rules: [
           {
             required: true,
@@ -62,10 +63,10 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
       control: {
         label: '客户名称',
       },
-      dataIndex: 'legalName',
+      field: 'legalName',
     },
     {
-      options: {
+      decorator: {
         rules: [
           {
             required: true,
@@ -105,10 +106,10 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
           },
         ],
       },
-      dataIndex: 'cashType',
+      field: 'cashType',
     },
     {
-      options: {
+      decorator: {
         rules: [
           {
             required: true,
@@ -118,14 +119,14 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
       control: {
         label: '金额',
       },
-      dataIndex: 'cashFlow',
+      field: 'cashFlow',
     },
   ] as IFormControl[]).concat(entryMargin ? tradeId : []);
 };
 
 export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -135,10 +136,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '客户名称',
     },
-    dataIndex: 'legalName',
+    field: 'legalName',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -148,10 +149,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '交易ID',
     },
-    dataIndex: 'tradeId',
+    field: 'tradeId',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -161,10 +162,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '可用资金变化',
     },
-    dataIndex: 'counterPartyFundChange',
+    field: 'counterPartyFundChange',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -174,10 +175,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '剩余授信总额变化',
     },
-    dataIndex: 'counterPartyCreditBalanceChange',
+    field: 'counterPartyCreditBalanceChange',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -187,10 +188,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '授信总额变化',
     },
-    dataIndex: 'counterPartyCreditChange',
+    field: 'counterPartyCreditChange',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -200,6 +201,6 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '冻结保证金变化',
     },
-    dataIndex: 'counterPartyMarginChange',
+    field: 'counterPartyMarginChange',
   },
 ];
