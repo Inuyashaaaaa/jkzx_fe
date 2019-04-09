@@ -1,8 +1,17 @@
-import { LEG_NAME_FIELD, LEG_PRICING_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
+import {
+  LEG_FIELD,
+  LEG_NAME_FIELD,
+  LEG_PRICING_FIELD,
+  LEG_TYPE_FIELD,
+  PREMIUM_TYPE_MAP,
+} from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { allLegTypes } from '@/constants/legColDefs';
+import { allLegTypes, ILegType } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
-import { COMPUTED_LEG_FIELDS } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
+import {
+  COMPUTED_LEG_FIELD_MAP,
+  COMPUTED_LEG_FIELDS,
+} from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import { TRADESCOL_FIELDS } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { LEG_MAP } from '@/constants/legType';
 import { PRICING_FROM_TAG } from '@/constants/trade';
@@ -38,6 +47,7 @@ import produce from 'immer';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
+import router from 'umi/router';
 import uuidv4 from 'uuid/v4';
 import { OUR_CREATE_FORM_CONTROLS, TABLE_COL_DEFS, TOOUR_CREATE_FORM_CONTROLS } from './constants';
 import { bookingTableFormControls } from './services';
@@ -90,6 +100,19 @@ class BookCreate extends PureComponent<any> {
     this.initialFromPricingPage();
   };
 
+  // http://10.1.2.16:8080/browse/OTMS-2659
+  public getConvertPremium = (leg: ILegType, defaultData, pricingData) => {
+    if (!!leg.columnDefs.find(item => item.field === LEG_FIELD.PREMIUM) === false) {
+      return {};
+    }
+    return {
+      [LEG_FIELD.PREMIUM]:
+        defaultData[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT
+          ? pricingData[COMPUTED_LEG_FIELD_MAP.PRICE_PER]
+          : pricingData[COMPUTED_LEG_FIELD_MAP.PRICE],
+    };
+  };
+
   public initialFromPricingPage = () => {
     const { location } = this.props;
     const { query } = location;
@@ -97,9 +120,12 @@ class BookCreate extends PureComponent<any> {
     if (from === PRICING_FROM_TAG) {
       const dataSource = this.props.pricingData.dataSource.map(item => {
         const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
+        const defaultData = leg.getDefault({}, false);
+
         return {
-          ...leg.getDefault({}, false),
+          ...defaultData,
           ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
+          ...this.getConvertPremium(leg, defaultData, item),
           [LEG_PRICING_FIELD]: false,
         };
       });
@@ -109,7 +135,8 @@ class BookCreate extends PureComponent<any> {
           _.unionBy(
             _.reject(
               this.props.pricingData.columnDefs,
-              item => [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS].indexOf(item.field) !== -1
+              item =>
+                !![...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS].find(key => item.field === key)
             ).concat(
               dataSource.reduce((container, item) => {
                 const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
@@ -675,7 +702,7 @@ class BookCreate extends PureComponent<any> {
       <PageHeaderWrapper>
         <SourceTable
           header={
-            <Row style={{ marginBottom: VERTICAL_GUTTER }}>
+            <Row type="flex" justify="space-between" style={{ marginBottom: VERTICAL_GUTTER }}>
               <ButtonGroup>
                 <MultilLegCreateButton
                   isPricing={false}
@@ -691,6 +718,16 @@ class BookCreate extends PureComponent<any> {
                   完成簿记
                 </Button>
               </ButtonGroup>
+
+              {_.get(this.props.location, 'query.from', false) && (
+                <Button
+                  onClick={() => {
+                    router.push('/trade-management/pricing');
+                  }}
+                >
+                  返回定价
+                </Button>
+              )}
             </Row>
           }
           tableFormData={this.state.bookTableFormData}
