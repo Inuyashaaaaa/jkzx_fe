@@ -74,9 +74,9 @@ class Calendars extends PureComponent<any, any> {
                   <ul className={styles.events}>
                     <li>交易ID: {item.tradeId}</li>
                     <li>持仓ID: {item.positionId}</li>
-                    <li>期权类型: {LEG_TYPE_ZHCH_MAP[item.productType]}</li>
-                    <li>标的物: {item.underlyerInstrumentId}</li>
-                    <li>当前价格: {item.underlyerPrice}</li>
+                    <li>期权类型: {LEG_TYPE_ZHCH_MAP[item.eventInfo.productType]}</li>
+                    <li>标的物: {item.eventInfo.underlyerInstrumentId}</li>
+                    <li>当前价格: {item.eventInfo.underlyerPrice}</li>
                   </ul>
                 }
                 title={EVENT_TYPE_ZHCN_MAP[item.notificationEventType]}
