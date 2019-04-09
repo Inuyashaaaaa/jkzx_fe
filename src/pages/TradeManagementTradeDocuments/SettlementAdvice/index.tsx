@@ -26,18 +26,6 @@ class SettlementAdvice extends PureComponent {
 
   public componentDidMount = () => {
     this.onFetch();
-    // delay(
-    //   1000,
-    //   mockData({
-    //     tradeId: 'OPT20190320',
-    //     tradeEmail: 'zhangjiaan@tongyu.tech',
-    //     positionId: '3452',
-    //   })
-    // ).then(result => {
-    //   this.setState({
-    //     dataSource: result,
-    //   });
-    // });
   };
 
   public onFetch = async (paramsPagination?) => {

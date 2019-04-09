@@ -3,6 +3,7 @@ import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import { Row } from 'antd';
 import React from 'react';
 import SettlementModal from './SettlementModal';
 
@@ -166,7 +167,11 @@ export const SETTLE_COLUMN_DEFS: (onFetch) => IColumnDef[] = onFetch => [
   {
     headerName: '操作',
     render: params => {
-      return <SettlementModal data={params.data} onFetch={onFetch} />;
+      return (
+        <Row type="flex" align="middle" style={{ height: params.node.rowHeight }}>
+          <SettlementModal data={params.data} onFetch={onFetch} />
+        </Row>
+      );
     },
   },
 ];
