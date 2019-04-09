@@ -54,6 +54,7 @@ export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 're
 }
 
 export interface IFormCellProps<T = any> {
+  prefix?: string;
   colDef: IFormColDef<T>;
   record: T;
   api: FormBase;

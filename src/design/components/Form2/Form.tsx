@@ -32,15 +32,17 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     super(props);
     this.DecoratorForm = AntdForm.create<IFormBaseProps>({
       ..._.pick(props, Form.createOptionsFields),
-      onValuesChange: this.onValuesChange,
+      onFieldsChange: this.onFieldsChange,
     })(FormBase);
   }
 
-  public onValuesChange = (
+  public onFieldsChange = (
     props: IFormProps & FormCreateOption<IFormProps>,
-    changedValues,
-    allValues
+    changedFields,
+    allFields
   ) => {
+    const changedValues = _.mapValues(changedFields, val => val.value);
+    const allValues = _.mapValues(allFields, val => val.value);
     const { dataSource: record } = props;
     const event: IFormTriggerCellValueChangeParams = {
       changedValues,
@@ -50,9 +52,12 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     this.eventBus.emit(FORM_CELL_VALUE_CHANGE, event);
   };
 
-  public validate = async (options = {}) => {
+  public validate = async (
+    options = {},
+    fieldNames = this.props.columns.map(item => item.dataIndex)
+  ) => {
     return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      this.decoratorForm.validateFields(options, (error, values) => {
+      this.decoratorForm.validateFieldsAndScroll(fieldNames, options, (error, values) => {
         resolve({ error, values });
       });
     });

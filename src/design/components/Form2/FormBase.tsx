@@ -67,7 +67,7 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     return rules;
   };
 
-  public getControlElement = (colDef: IFormColDef = {}, key) => {
+  public getControlElement = (colDef: IFormColDef = {}, key?) => {
     const { form, dataSource } = this.props;
     const { getValue } = colDef;
     return (

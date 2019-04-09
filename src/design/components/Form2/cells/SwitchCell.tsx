@@ -4,9 +4,9 @@ import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import { omit } from 'lodash';
 import React, { FocusEvent, KeyboardEvent, PureComponent } from 'react';
-import { IFormCellProps, IFormTriggerCellValueChangeParams } from 'src/components/type';
+import { IFormCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
-import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from '../constants';
+import { FORM_CELL_VALUE_CHANGED } from '../constants';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
 import './SwitchCell.less';
@@ -32,6 +32,17 @@ class SwitchCell extends PureComponent<
   public $editingCell: EditingCell;
 
   public $renderingCell: RenderingCell;
+
+  public cacheInitialValue: any;
+
+  constructor(props) {
+    super(props);
+    const {
+      record,
+      colDef: { dataIndex },
+    } = props;
+    this.cacheInitialValue = record[dataIndex];
+  }
 
   public componentDidMount = () => {
     this.registeCell();
@@ -66,7 +77,7 @@ class SwitchCell extends PureComponent<
     const { colDef, form } = this.props;
     const { editable, dataIndex } = colDef;
     const { editing } = this.state;
-    const wrapedForm = wrapFormGetDecorator(dataIndex, form);
+    const wrapedForm = wrapFormGetDecorator(dataIndex, form, this.cacheInitialValue);
     if (editable && editing) {
       return React.createElement(EditingCell, {
         ...this.props,

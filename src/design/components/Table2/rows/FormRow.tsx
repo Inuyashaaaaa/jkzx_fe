@@ -1,6 +1,6 @@
 import { Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
-import { omit } from 'lodash';
+import _, { omit } from 'lodash';
 import React, { PureComponent } from 'react';
 import { ITableRowProps, ITableTriggerCellValueChangeParams } from '../../type';
 import styles from '../cells/SwitchCell.less';
@@ -44,7 +44,9 @@ class EditableRow extends PureComponent<ITableRowProps> {
 }
 
 const FormRow = Form.create({
-  onValuesChange(props: ITableRowProps, changedValues, allValues) {
+  onFieldsChange(props: ITableRowProps, changedFields: any, allFields) {
+    const changedValues = _.mapValues(changedFields, val => val.value);
+    const allValues = _.mapValues(allFields, val => val.value);
     const { record, rowIndex, api, getRowKey } = props;
     const event: ITableTriggerCellValueChangeParams = {
       changedValues,

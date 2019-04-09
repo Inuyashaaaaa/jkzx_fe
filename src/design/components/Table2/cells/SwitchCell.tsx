@@ -3,9 +3,9 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import classNames from 'classnames';
 import { omit } from 'lodash';
 import React, { KeyboardEvent, PureComponent } from 'react';
-import { ITableCellProps, ITableTriggerCellValueChangeParams } from '../../type';
+import { ITableCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
-import { TABLE_CELL_VALUE_CHANGE, TABLE_CELL_VALUE_CHANGED } from '../constants/EVENT';
+import { TABLE_CELL_VALUE_CHANGED } from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
@@ -35,6 +35,17 @@ class SwitchCell extends PureComponent<
   public $renderingCell: RenderingCell;
 
   public form: WrappedFormUtils;
+
+  public cacheInitialValue: any;
+
+  constructor(props) {
+    super(props);
+    const {
+      record,
+      colDef: { dataIndex },
+    } = props;
+    this.cacheInitialValue = record[dataIndex];
+  }
 
   public isSelectionCell = () => {
     return this.props.className === 'ant-table-selection-column';
@@ -154,7 +165,7 @@ class SwitchCell extends PureComponent<
     const { colDef } = this.props;
     const { editable, dataIndex } = colDef;
     const { editing } = this.state;
-    const wrapedForm = wrapFormGetDecorator(dataIndex, form);
+    const wrapedForm = wrapFormGetDecorator(dataIndex, form, this.cacheInitialValue);
     if (editable && editing) {
       return React.createElement(EditingCell, {
         ...this.props,
