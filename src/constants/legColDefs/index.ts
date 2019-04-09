@@ -44,12 +44,12 @@ export interface ILegType {
   type: string;
   name: string;
   assetClass: string;
-  columnDefs: IColDef[];
+  getColumnDefs: (env?: string) => IColDef[];
+  getPricingColumnDefs?: () => any[];
   isAnnualized: boolean;
   getDefault?: any;
   getPosition?: any;
   getPageData?: any;
-  pricingColumnDefs?: any[];
 }
 
 export const allLegTypes: ILegType[] = [
@@ -88,69 +88,7 @@ export const allLegTypes: ILegType[] = [
   AutoCallSnowAnnual,
   AsiaAnnual,
   AsiaUnAnnual,
-  AutoCallPhoenixAnnual
+  AutoCallPhoenixAnnual,
 ];
 
-export const allTryPricingLegTypes: ILegType[] = [
-  [
-    AnnulizedVanillaOptionDTOAmericanAnnual,
-    AnnulizedVanillaOptionDTOAmericanAnnual.pricingColumnDefs,
-  ],
-  [
-    AnnulizedVanillaOptionDTOAmericanUnAnnual,
-    AnnulizedVanillaOptionDTOAmericanUnAnnual.pricingColumnDefs,
-  ],
-  [
-    AnnulizedVanillaOptionDTOEuropeanAnnual,
-    AnnulizedVanillaOptionDTOEuropeanAnnual.pricingColumnDefs,
-  ],
-  [
-    AnnulizedVanillaOptionDTOEuropeanUnAnnual,
-    AnnulizedVanillaOptionDTOEuropeanUnAnnual.pricingColumnDefs,
-  ],
-  [DigitalLegAmericanAnnual, DigitalLegAmericanAnnual.pricingColumnDefs],
-  [DigitalLegAmericanUnAnnual, DigitalLegAmericanUnAnnual.pricingColumnDefs],
-  [DigitalLegEuropeanAnnual, DigitalLegEuropeanAnnual.pricingColumnDefs],
-  [DigitalLegEuropeanUnAnnual, DigitalLegEuropeanUnAnnual.pricingColumnDefs],
-  [
-    AnnualizedVerticalSpreadOptionDTOEuropeanAnnual,
-    AnnualizedVerticalSpreadOptionDTOEuropeanAnnual.pricingColumnDefs,
-  ],
-  [
-    AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual,
-    AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual.pricingColumnDefs,
-  ],
-  [BarrierAnnual, BarrierAnnual.pricingColumnDefs],
-  [BarrierUnAnnual, BarrierUnAnnual.pricingColumnDefs],
-  [DoubleSharkFinAnnual, DoubleSharkFinAnnual.pricingColumnDefs],
-  [DoubleSharkFinUnAnnual, DoubleSharkFinUnAnnual.pricingColumnDefs],
-  [EagleAnnual, EagleAnnual.pricingColumnDefs],
-  [EagleUnAnnual, EagleUnAnnual.pricingColumnDefs],
-  [DoubleTouchAnnual, DoubleTouchAnnual.pricingColumnDefs],
-  [DoubleTouchUnAnnual, DoubleTouchUnAnnual.pricingColumnDefs],
-  [DoubleNoTouchAnnual, DoubleNoTouchAnnual.pricingColumnDefs],
-  [DoubleNoTouchUnAnnual, DoubleNoTouchUnAnnual.pricingColumnDefs],
-  [AutoCallSnowAnnual, AutoCallSnowAnnual.pricingColumnDefs],
-  [AsiaAnnual, AsiaAnnual.pricingColumnDefs],
-  [AsiaUnAnnual, AsiaUnAnnual.pricingColumnDefs],
-  [ConcavaAnnual, ConcavaAnnual.pricingColumnDefs],
-  [ConcavaUnAnnual, ConcavaUnAnnual.pricingColumnDefs],
-  [ConvexAnnual, ConvexAnnual.pricingColumnDefs],
-  [ConvexUnAnnual, ConvexUnAnnual.pricingColumnDefs],
-  [DoubleDigitalAnnual, DoubleDigitalAnnual.pricingColumnDefs],
-  [DoubleDigitalUnAnnual, DoubleDigitalUnAnnual.pricingColumnDefs],
-  [TripleDigitalAnnual, TripleDigitalAnnual.pricingColumnDefs],
-  [TripleDigitalUnAnnual, TripleDigitalUnAnnual.pricingColumnDefs],
-  [RangeAccrualsAnnual, RangeAccrualsAnnual.pricingColumnDefs],
-  [RangeAccrualsUnAnnual, RangeAccrualsUnAnnual.pricingColumnDefs],
-  [StraddleAnnual, StraddleAnnual.pricingColumnDefs],
-  [StraddleUnAnnual, StraddleUnAnnual.pricingColumnDefs],
-  [AutoCallPhoenixAnnual, AutoCallPhoenixAnnual.pricingColumnDefs],
-].map(([leg, colDefs]) => pickColumns(leg, colDefs));
-
-function pickColumns(leg, colDefs) {
-  return {
-    ...leg,
-    columnDefs: colDefs || [],
-  };
-}
+export const allTryPricingLegTypes: ILegType[] = allLegTypes;

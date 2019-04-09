@@ -1,6 +1,6 @@
 import { LEG_NAME_FIELD, LEG_PRICING_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { allTryPricingLegTypes } from '@/constants/legColDefs';
+import { allLegTypes, allTryPricingLegTypes } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -58,10 +58,11 @@ class TradeManagementPricing extends PureComponent<any> {
       totalable: false,
     }));
 
-    this.computedAllLegTypes = allTryPricingLegTypes.map(item => {
+    this.computedAllLegTypes = allLegTypes.map(item => {
       return {
         ...item,
-        columnDefs: item.columnDefs
+        columnDefs: item
+          .getColumnDefs('pricing')
           .map(item => ({
             ...item,
             totalable: false,
@@ -114,23 +115,23 @@ class TradeManagementPricing extends PureComponent<any> {
   };
 
   public handleAddLeg = event => {
-    const leg = this.computedAllLegTypes.find(item => item.type === event.key);
+    const computedLeg = this.computedAllLegTypes.find(item => item.type === event.key);
 
-    if (!leg) return;
+    if (!computedLeg) return;
 
-    if (this.cacheTyeps.indexOf(leg.type) === -1) {
-      this.cacheTyeps.push(leg.type);
+    if (this.cacheTyeps.indexOf(computedLeg.type) === -1) {
+      this.cacheTyeps.push(computedLeg.type);
     }
 
     const legData = getAddLegItem(
-      leg,
-      createLegDataSourceItem(leg, {
+      computedLeg,
+      createLegDataSourceItem(computedLeg, {
         [LEG_PRICING_FIELD]: true,
       }),
       true
     );
 
-    this.addLegData(leg, legData);
+    this.addLegData(computedLeg, legData);
   };
 
   public handleJudge = params => {
@@ -138,12 +139,12 @@ class TradeManagementPricing extends PureComponent<any> {
     return this.judgeLegTypeExsit(colDef, data);
   };
 
-  public addLegData = (leg, rowData) => {
+  public addLegData = (computedLeg, rowData) => {
     this.props.dispatch({
       type: 'pricingData/addLegData',
       payload: {
         cacheTyeps: this.cacheTyeps,
-        leg,
+        computedLeg,
         computedAllLegTypes: this.computedAllLegTypes,
         nextTradesColDefs: this.nextTradesColDefs,
         rowData,
