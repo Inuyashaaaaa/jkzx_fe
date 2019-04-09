@@ -3,7 +3,7 @@ import { wkApproveGroupList, wkApproveGroupModify } from '@/services/auditing';
 import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import AuditGourpLists from './AuditGourpLists';
-import styles from './Auditing.less';
+import styles from './AuditGourpLists.less';
 import DrawerContarner from './DrawerContarner';
 
 class SystemSettingsRoleManagement extends PureComponent {

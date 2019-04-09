@@ -5,7 +5,7 @@ import {
 } from '@/services/auditing';
 import { Button, Icon, Input, Modal, notification, Popconfirm } from 'antd';
 import React, { PureComponent } from 'react';
-import styles from './Auditing.less';
+import styles from './AuditGourpLists.less';
 
 class AuditLists extends PureComponent {
   public state = {
