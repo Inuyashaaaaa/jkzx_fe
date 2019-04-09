@@ -5,7 +5,7 @@ import {
 } from '@/services/auditing';
 import { Button, Icon, Input, Modal, notification, Popconfirm } from 'antd';
 import React, { PureComponent } from 'react';
-import styles from './auditing.less';
+import styles from './Auditing.less';
 
 class AuditLists extends PureComponent {
   public state = {
@@ -39,14 +39,19 @@ class AuditLists extends PureComponent {
       });
     } else {
       const newList = [];
+      const approveGroupList = this.state.approveGroupList.filter(
+        item => item.approveGroupId !== param.approveGroupId
+      );
+
       this.state.approveGroupList.forEach(item => {
         if (item.approveGroupId !== param.approveGroupId) {
           newList.push(item);
         }
       });
       this.setState({
-        approveGroupList: newList,
+        approveGroupList,
       });
+      this.changeGroupList();
 
       notification.success({
         message: `删除成功`,
@@ -56,15 +61,21 @@ class AuditLists extends PureComponent {
   };
 
   public onEdit = param => () => {
+    // this.props.fetchGourp();
     const approveGroupList = this.state.approveGroupList.map(item => {
       if (item.approveGroupId === param.approveGroupId) {
         item.editable = !param.editable;
       }
       return item;
     });
-    this.setState({
-      approveGroupList,
-    });
+    this.setState(
+      {
+        approveGroupList,
+      },
+      () => {
+        this.changeGroupList();
+      }
+    );
   };
 
   public onAdd = () => {
@@ -86,9 +97,14 @@ class AuditLists extends PureComponent {
       },
     ];
     approveGroupList = approveGroupList.concat(newItem);
-    this.setState({
-      approveGroupList,
-    });
+    this.setState(
+      {
+        approveGroupList,
+      },
+      () => {
+        this.changeGroupList();
+      }
+    );
   };
 
   public showModal = param => {
@@ -133,13 +149,18 @@ class AuditLists extends PureComponent {
         }
         return item;
       });
-      this.setState({
-        approveGroupList,
-        visible: false,
-        approveGroupId: '',
-        approveGroupName: '',
-        description: '',
-      });
+      this.setState(
+        {
+          approveGroupList,
+          visible: false,
+          approveGroupId: '',
+          approveGroupName: '',
+          description: '',
+        },
+        () => {
+          this.changeGroupList();
+        }
+      );
       return;
     }
     // 创建审批组
@@ -160,10 +181,15 @@ class AuditLists extends PureComponent {
       });
       let { approveGroupList } = this.state;
       approveGroupList = approveGroupList.concat(data);
-      this.setState({
-        visible: false,
-        approveGroupList,
-      });
+      this.setState(
+        {
+          visible: false,
+          approveGroupList,
+        },
+        () => {
+          this.changeGroupList();
+        }
+      );
     }
   };
 
@@ -171,6 +197,10 @@ class AuditLists extends PureComponent {
     this.setState({
       visible: false,
     });
+  };
+
+  public changeGroupList = () => {
+    this.props.handleGroupList(this.state.approveGroupList);
   };
 
   public handleInput = e => {
