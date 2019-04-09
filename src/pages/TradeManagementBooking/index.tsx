@@ -7,9 +7,9 @@ import { TRADESCOL_FIELDS } from '@/constants/legColDefs/computedColDefs/TradesC
 import { LEG_MAP } from '@/constants/legType';
 import { PRICING_FROM_TAG } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
+import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
-import Form from '@/lib/components/_Form2';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdBookList } from '@/services/general-service';
 import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service';
@@ -278,16 +278,17 @@ class BookCreate extends PureComponent<any> {
     return this.state.dataSource.find(item => item.id === colField);
   };
 
-  public createTrade = async event => {
+  public createTrade = async () => {
     const tableDataSource = this.state.dataSource;
-    if (_.isEmpty(tableDataSource)) {
-      message.warn('请添加期权结构');
-      return false;
-    }
 
     const trade = convertTradePageData2ApiData(
       tableDataSource,
-      this.state.bookTableFormData,
+      _.mapValues(this.state.bookTableFormData, (val, key) => {
+        if (key === 'tradeId') {
+          return val && (val as string).replace('.', '-');
+        }
+        return val;
+      }),
       this.props.currentUser.userName
     );
 
@@ -296,14 +297,14 @@ class BookCreate extends PureComponent<any> {
       validTime: '2018-01-01T10:10:10',
     });
 
-    if (error) return false;
+    if (error) return;
 
     const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
       tradeId: trade.tradeId,
       legalName: trade.positions[0].counterPartyCode,
     });
 
-    if (_error) return false;
+    if (_error) return;
 
     this.setState({
       dataSource: [],
@@ -313,7 +314,7 @@ class BookCreate extends PureComponent<any> {
     });
   };
 
-  public onCreateTradeButtonClick = async event => {
+  public onCreateTradeButtonClick = async () => {
     const validateTableFormRsp: any = await this.$sourceTable.validateTableForm();
 
     if (validateTableFormRsp.error) return;
@@ -329,7 +330,7 @@ class BookCreate extends PureComponent<any> {
     this.setState({
       createTradeLoading: true,
     });
-    await this.createTrade(event);
+    await this.createTrade();
     this.setState({
       createTradeLoading: false,
     });
@@ -557,7 +558,8 @@ class BookCreate extends PureComponent<any> {
     });
   };
 
-  public handleChangeValueOur = values => {
+  public handleChangeValueOur = params => {
+    const values = params.values;
     if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
       this.setState({
         entryMargin: false,
@@ -575,7 +577,8 @@ class BookCreate extends PureComponent<any> {
     });
   };
 
-  public handleChangeValueToOur = values => {
+  public handleChangeValueToOur = params => {
+    const values = params.values;
     this.setState({
       toOurDataSource: values,
     });
@@ -762,7 +765,7 @@ class BookCreate extends PureComponent<any> {
                 }}
                 dataSource={this.state.ourDataSource}
                 controls={OUR_CREATE_FORM_CONTROLS(this.state.entryMargin)}
-                onChangeValue={this.handleChangeValueOur}
+                onValueChange={this.handleChangeValueOur}
                 controlNumberOneRow={1}
                 footer={false}
               />
@@ -777,7 +780,7 @@ class BookCreate extends PureComponent<any> {
                 }}
                 dataSource={this.state.toOurDataSource}
                 controls={TOOUR_CREATE_FORM_CONTROLS}
-                onChangeValue={this.handleChangeValueToOur}
+                onValueChange={this.handleChangeValueToOur}
                 controlNumberOneRow={1}
                 footer={false}
               />
