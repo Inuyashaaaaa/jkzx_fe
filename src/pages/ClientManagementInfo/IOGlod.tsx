@@ -1,6 +1,8 @@
 import Section from '@/components/Section';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import { ModalButton } from '@/design/components';
 import Form from '@/design/components/Form';
-import SourceTable from '@/lib/components/_SourceTable';
+import SourceTable from '@/design/components/SourceTable';
 import {
   clientAccountOpRecordList,
   clientChangeCredit,
@@ -9,8 +11,9 @@ import {
   cliMmarkTradeTaskProcessed,
   cliTradeTaskListByLegalNames,
 } from '@/services/reference-data-service';
-import { Button, message, Modal, Tabs } from 'antd';
+import { Button, message, Modal, Row, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
@@ -21,7 +24,6 @@ import {
   UNCREATE_TABLE_COL_DEFS,
 } from './constants/ioglod';
 const TabPane = Tabs.TabPane;
-import BigNumber from 'bignumber.js';
 
 export interface IOGlodProps {
   selectedRows: any[];
@@ -43,6 +45,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
   public $toOurForm2: WrappedFormUtils = null;
 
   public state = {
+    confirmLoading: false,
     visible: false,
     activeKey: 'our',
     unCreateDataSource: [],
@@ -59,10 +62,13 @@ class IOGlod extends PureComponent<IOGlodProps> {
     accountId: '',
     margin: true,
     entryMargin: true,
+    unCreateTableDataSource: [],
+    unCreateLoading: false,
   };
 
   public componentDidMount = () => {
     this.onFetch();
+    this.onFetchUnCreate();
   };
 
   public onFetch = async () => {
@@ -80,8 +86,6 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }));
     this.setState({
       legalNamesList: markets,
-    });
-    this.setState({
       IOGlodSourceTableLoading: true,
     });
     const { error, data } = await clientAccountOpRecordList({
@@ -90,7 +94,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
     this.setState({
       IOGlodSourceTableLoading: false,
     });
-    if (error) return false;
+    if (error) return;
     this.setState({
       ioGoldDataSource: data,
     });
@@ -101,15 +105,19 @@ class IOGlod extends PureComponent<IOGlodProps> {
       return _.pick(val, ['legalName']).legalName;
     });
 
+    this.setState({ unCreateLoading: true });
     const { error, data } = await cliTradeTaskListByLegalNames({
       legalNames: legalNamesList,
     });
+    this.setState({ unCreateLoading: false });
 
-    if (error) return false;
-    return data;
+    if (error) return;
+    this.setState({
+      unCreateTableDataSource: data,
+    });
   };
 
-  public switchModal = event => {
+  public switchModal = async event => {
     this.modalFormData = event.rowData;
     const ourDataSource = {
       legalName: event.rowData.legalName,
@@ -156,7 +164,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }
 
     resolve(true);
-    this.$unCreateSourceTable.search();
+    this.onFetchUnCreate();
     message.success('录入成功');
   };
 
@@ -184,7 +192,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }
 
     resolve(true);
-    this.$unCreateSourceTable.search();
+    this.onFetchUnCreate();
     message.success('录入成功');
   };
 
@@ -212,7 +220,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
       return resolve(false);
     }
     resolve(true);
-    this.$unCreateSourceTable.search();
+    this.onFetchUnCreate();
     message.success('录入成功');
   };
 
@@ -373,7 +381,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
           return resolve(false);
         }
 
-        this.$unCreateSourceTable.search();
+        this.onFetchUnCreate();
         resolve(true);
         message.success('录入成功');
       });
@@ -527,19 +535,16 @@ class IOGlod extends PureComponent<IOGlodProps> {
     });
   };
 
-  public handleEntryOk = () => {
-    this.setState(
-      {
+  public handleEntryOk = async () => {
+    this.setState({ confirmLoading: true });
+    const success = await (this.state.activeKey === 'our' ? this.createOur() : this.createToOur());
+    this.setState({ confirmLoading: false });
+
+    if (success) {
+      this.setState({
         entryVisible: false,
-      },
-      () => {
-        if (this.state.activeKey === 'our') {
-          return this.createOur();
-        } else {
-          return this.createToOur();
-        }
-      }
-    );
+      });
+    }
   };
 
   public handleEntryCancel = () => {
@@ -568,51 +573,14 @@ class IOGlod extends PureComponent<IOGlodProps> {
   public render() {
     return (
       <>
-        {/* <Modal visible={this.state.visible} onCancel={this.switchModal} closable={false}>
-          <Tabs defaultActiveKey="保证金事件">
-            <TabPane tab="保证金事件" key="保证金事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={MARGIN_FORM_CONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-            <TabPane tab="现金流事件" key="现金流事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={CASH_FLOW_FORM_ONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-            <TabPane tab="授信改变事件" key="授信改变事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={CREDIT_TO_CHANGE_FORM_CONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-            <TabPane tab="出入金事件" key="出入金事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={IO_FORM_CONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-          </Tabs>
-        </Modal> */}
         <Section>待处理任务</Section>
         <SourceTable
           rowKey="uuid"
+          loading={this.state.unCreateLoading}
+          dataSource={this.state.unCreateTableDataSource}
           ref={node => (this.$unCreateSourceTable = node)}
-          tableColumnDefs={UNCREATE_TABLE_COL_DEFS}
-          tableProps={{
-            height: undefined,
-          }}
-          onSearch={this.onFetchUnCreate}
+          columnDefs={UNCREATE_TABLE_COL_DEFS}
+          height={undefined}
           rowActions={[
             <Button key="资金录入" type="primary" onClick={this.switchModal}>
               资金录入
@@ -624,69 +592,67 @@ class IOGlod extends PureComponent<IOGlodProps> {
           loading={this.state.IOGlodSourceTableLoading}
           rowKey="uuid"
           ref={node => (this.$IOGlodSourceTable = node)}
-          createText="资金录入"
-          tableColumnDefs={IOGLOD_COL_DEFS}
-          onSearch={this.onFetch}
-          tableProps={{
-            height: undefined,
-            autoSizeColumnsToFit: false,
-          }}
+          columnDefs={IOGLOD_COL_DEFS}
+          height={undefined}
+          autoSizeColumnsToFit={false}
           dataSource={this.state.ioGoldDataSource}
-          onCreate={this.onCreateIo}
-          // createButtonProps={{
-          //   disabled: !this.state.selectedRows.length,
-          // }}
-          onSwitchCreateModal={this.onSwitchIOCreateModal}
-          createModalProps={{ width: 650 }}
-          createModalContent={
-            <Tabs activeKey={this.state.activeKey} onChange={this.onChangeTabs}>
-              <TabPane tab="客户资金变动" key="our">
-                <Form
-                  wrappedComponentRef={element => {
-                    if (element) {
-                      this.$ourForm2 = element.props.form;
-                    }
-                    return;
-                  }}
-                  dataSource={this.state.ourDataSource2}
-                  controls={OUR_CREATE_FORM_CONTROLS(this.state.legalNamesList, this.state.margin)}
-                  onValueChange={this.handleChangeValueOur2}
-                  controlNumberOneRow={1}
-                  footer={false}
-                />
-              </TabPane>
-              <TabPane tab="我方资金变动" key="toOur">
-                <Form
-                  wrappedComponentRef={element => {
-                    if (element) {
-                      this.$toOurForm2 = element.props.form;
-                    }
-                    return;
-                  }}
-                  dataSource={this.state.toOurDataSource2}
-                  controls={TOOUR_CREATE_FORM_CONTROLS(this.state.legalNamesList)}
-                  onValueChange={this.handleChangeValueToOur2}
-                  controlNumberOneRow={1}
-                  footer={false}
-                />
-              </TabPane>
-            </Tabs>
+          header={
+            <Row style={{ marginBottom: VERTICAL_GUTTER }}>
+              <ModalButton
+                onClick={this.onSwitchIOCreateModal}
+                modalProps={{
+                  onOk: this.onCreateIo,
+                  width: 650,
+                }}
+                content={
+                  <Tabs activeKey={this.state.activeKey} onChange={this.onChangeTabs}>
+                    <TabPane tab="客户资金变动" key="our">
+                      <Form
+                        wrappedComponentRef={element => {
+                          if (element) {
+                            this.$ourForm2 = element.props.form;
+                          }
+                          return;
+                        }}
+                        dataSource={this.state.ourDataSource2}
+                        controls={OUR_CREATE_FORM_CONTROLS(
+                          this.state.legalNamesList,
+                          this.state.margin
+                        )}
+                        onValueChange={this.handleChangeValueOur2}
+                        controlNumberOneRow={1}
+                        footer={false}
+                      />
+                    </TabPane>
+                    <TabPane tab="我方资金变动" key="toOur">
+                      <Form
+                        wrappedComponentRef={element => {
+                          if (element) {
+                            this.$toOurForm2 = element.props.form;
+                          }
+                          return;
+                        }}
+                        dataSource={this.state.toOurDataSource2}
+                        controls={TOOUR_CREATE_FORM_CONTROLS(this.state.legalNamesList)}
+                        onValueChange={this.handleChangeValueToOur2}
+                        controlNumberOneRow={1}
+                        footer={false}
+                      />
+                    </TabPane>
+                  </Tabs>
+                }
+              >
+                资金录入
+              </ModalButton>
+            </Row>
           }
-          // extraActions={[
-          //   <Button key="资金操作" onClick={this.switchModal}>
-          //     资金操作
-          //   </Button>,
-          // ]}
-          // extraActions={[<Button key="资金操作">资金操作</Button>]}
-          // tableProps={{
-          //   autoSizeColumnsToFit: false,
-          // }}
         />
         <Modal
           visible={this.state.entryVisible}
           onOk={this.handleEntryOk}
           onCancel={this.handleEntryCancel}
           width={800}
+          confirmLoading={this.state.confirmLoading}
         >
           <Tabs activeKey={this.state.activeKey} onChange={this.onChangeTabs}>
             <TabPane tab="客户资金变动" key="our">
