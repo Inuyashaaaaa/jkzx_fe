@@ -2,11 +2,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { delay } from '../../../utils';
-import {
-  ITableCellProps,
-  ITableTriggerCellValueChangedParams,
-  ITableTriggerCellValueChangeParams,
-} from '../../type';
+import { ITableCellProps, ITableTriggerCellValueChangedParams } from '../../type';
 import { TABLE_CELL_VALUE_CHANGED } from '../constants/EVENT';
 
 class RenderingCell extends PureComponent<ITableCellProps, any> {
@@ -117,20 +113,29 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
     return record[dataIndex];
   };
 
-  public render() {
+  public getRenderResult = () => {
+    const { record, rowIndex, $$render, form } = this.props;
     const value = this.getValue();
-    const { record, rowIndex, children, $$render } = this.props;
+
+    if (!$$render) return value;
+
+    const node = $$render(value, record, rowIndex, {
+      form,
+      editing: false,
+    });
+    if (React.isValidElement(node)) {
+      return React.cloneElement(node, {
+        key: 'last',
+      });
+    }
+    return node;
+  };
+
+  public render() {
+    const { children } = this.props;
     return React.Children.toArray(children)
       .slice(0, -1)
-      .concat(
-        $$render
-          ? $$render(value, record, rowIndex, {
-              form: this.props.form,
-              editing: false,
-              key: 'last',
-            })
-          : value
-      );
+      .concat(this.getRenderResult());
   }
 }
 

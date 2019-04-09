@@ -44,9 +44,7 @@ class EditableRow extends PureComponent<ITableRowProps> {
 }
 
 const FormRow = Form.create({
-  onFieldsChange(props: ITableRowProps, changedFields: any, allFields) {
-    const changedValues = _.mapValues(changedFields, val => val.value);
-    const allValues = _.mapValues(allFields, val => val.value);
+  onValuesChange(props: ITableRowProps, changedValues, allValues) {
     const { record, rowIndex, api, getRowKey } = props;
     const event: ITableTriggerCellValueChangeParams = {
       changedValues,

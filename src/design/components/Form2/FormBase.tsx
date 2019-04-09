@@ -1,11 +1,10 @@
 import { Button, Col, Form as AntdForm, Row } from 'antd';
 import { FormComponentProps } from 'antd/lib/form/Form';
 import classNames from 'classnames';
-import { chunk, omit } from 'lodash';
+import _, { chunk, omit } from 'lodash';
 import React, { PureComponent } from 'react';
 import { EVERY_EVENT_TYPE } from '../../utils';
-import { defaultInputManager } from '../Input';
-import { IFormBaseProps, IFormColDef } from '../type';
+import { IFormBaseProps, IFormColDef, IFormTriggerCellValueChangeParams } from '../type';
 import SwitchCell from './cells/SwitchCell';
 import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from './constants';
 import FormManager from './formManager';
@@ -20,7 +19,6 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     submitable: true,
     resetable: true,
     dataSource: {},
-    inputManager: defaultInputManager,
   };
 
   public formManager: FormManager = new FormManager();
@@ -44,9 +42,12 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     }
   };
 
-  public validate = async (options = {}) => {
+  public validate = async (
+    options = {},
+    fieldNames = this.props.columns.map(item => item.dataIndex)
+  ) => {
     return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      this.props.form.validateFields(options, (error, values) => {
+      this.props.form.validateFieldsAndScroll(fieldNames, options, (error, values) => {
         resolve({ error, values });
       });
     });
@@ -101,10 +102,26 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     });
   };
 
+  public reset = (names?: string[]) => {
+    const olds = this.props.form.getFieldsValue();
+    this.props.form.resetFields(names);
+    const news = this.props.form.getFieldsValue();
+    const changedValues = _.fromPairs(
+      _.differenceBy(_.toPairs(olds), _.toPairs(news), item => item[1])
+    );
+    const allValues = news;
+    const { dataSource: record } = this.props;
+    const event: IFormTriggerCellValueChangeParams = {
+      changedValues,
+      allValues,
+      record,
+    };
+    this.eventBus.emit(FORM_CELL_VALUE_CHANGE, event);
+  };
+
   public onReset = domEvent => {
     if (!this.props.onResetButtonClick) {
-      this.props.form.resetFields();
-      return;
+      return this.reset();
     }
     return this.props.onResetButtonClick({
       dataSource: this.getFormData(),
@@ -223,7 +240,6 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
           'onResetButtonClick',
           'submitButtonProps',
           'resetButtonProps',
-          'inputManager',
           'getValue',
           'eventBus',
           'onValueChange',

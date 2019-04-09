@@ -28,21 +28,21 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
 
   public eventBus = createEventBus();
 
+  public wrappedComponentRef: FormBase;
+
   constructor(props) {
     super(props);
     this.DecoratorForm = AntdForm.create<IFormBaseProps>({
       ..._.pick(props, Form.createOptionsFields),
-      onFieldsChange: this.onFieldsChange,
+      onValuesChange: this.onValuesChange,
     })(FormBase);
   }
 
-  public onFieldsChange = (
+  public onValuesChange = (
     props: IFormProps & FormCreateOption<IFormProps>,
-    changedFields,
-    allFields
+    changedValues,
+    allValues
   ) => {
-    const changedValues = _.mapValues(changedFields, val => val.value);
-    const allValues = _.mapValues(allFields, val => val.value);
     const { dataSource: record } = props;
     const event: IFormTriggerCellValueChangeParams = {
       changedValues,
@@ -56,15 +56,22 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     options = {},
     fieldNames = this.props.columns.map(item => item.dataIndex)
   ) => {
-    return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      this.decoratorForm.validateFieldsAndScroll(fieldNames, options, (error, values) => {
-        resolve({ error, values });
-      });
-    });
+    return this.wrappedComponentRef.validate(options, fieldNames);
+  };
+
+  public reset = () => {
+    return this.wrappedComponentRef.reset();
   };
 
   public getRef = node => {
     this.decoratorForm = node;
+  };
+
+  public getWrappedComponentRef = node => {
+    this.wrappedComponentRef = node;
+    if (this.props.wrappedComponentRef) {
+      this.props.wrappedComponentRef(node);
+    }
   };
 
   public render() {
@@ -74,6 +81,7 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
         ref={this.getRef}
         {..._.omit(this.props, Form.createOptionsFields)}
         eventBus={this.eventBus}
+        wrappedComponentRef={this.getWrappedComponentRef}
       />
     );
   }
