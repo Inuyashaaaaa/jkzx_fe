@@ -165,7 +165,7 @@ class FixingModal extends PureComponent<
       eventType: LCM_EVENT_TYPE_MAP.OBSERVE,
       userLoginId: this.currentUser.userName,
       eventDetail: {
-        observationDate: data.day,
+        observationDate: data[OB_DAY_FIELD],
         observationPrice: String(data[OB_PRICE_FIELD]),
       },
     });
