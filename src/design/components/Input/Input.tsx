@@ -25,7 +25,11 @@ class Input extends InputBase<IInputProps> {
 
   public renderEditing() {
     return (
-      <AntdInput {...omit(this.props, ['autoSelect'])} onChange={this.onChange} ref={this.getRef} />
+      <AntdInput
+        {...omit(this.props, ['autoSelect', 'onValueChange', 'editing'])}
+        onChange={this.onChange}
+        ref={this.getRef}
+      />
     );
   }
 

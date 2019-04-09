@@ -1,5 +1,4 @@
 import {
-  BIG_NUMBER_CONFIG,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
   INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -16,7 +15,6 @@ import SourceTable from '@/design/components/SourceTable';
 import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { isRangeAccruals } from '@/tools';
-import { getMoment } from '@/utils';
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -26,7 +24,6 @@ import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../../constants';
 import { getObservertionFieldData } from '../../tools';
 import { countAvg, filterObDays } from '../../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
-import ExpirationModal from '../ExpirationModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 class FixingModal extends PureComponent<
@@ -47,8 +44,6 @@ class FixingModal extends PureComponent<
   public currentUser: any = {};
 
   public reload: any;
-
-  public $expirationModal: ExpirationModal;
 
   public state = {
     visible: false,
@@ -103,18 +98,17 @@ class FixingModal extends PureComponent<
   };
 
   public onConfirm = async () => {
-    if (this.$expirationModal) {
+    if (this.$asianExerciseModal) {
       this.setState(
         {
           visible: false,
         },
         () => {
-          this.$expirationModal.show(
+          this.$asianExerciseModal.show(
             this.data,
             this.tableFormData,
             this.currentUser,
-            this.reload,
-            this.state.tableData
+            this.reload
           );
         }
       );
@@ -130,18 +124,14 @@ class FixingModal extends PureComponent<
   public isCanExercise = () => {
     const now = moment();
     // 今天是最后一个观察日
-    const last = (_.last(this.state.tableData) || {}).day;
+    const last = _.get(_.last(this.state.tableData) || {}, [OB_DAY_FIELD]);
     if (
-      (last && now.isSame(last, 'day')) ||
-      now.isSame(this.data[LEG_FIELD.EXPIRATION_DATE], 'day')
+      ((last && now.isSame(last, 'day')) ||
+        now.isSame(this.data[LEG_FIELD.EXPIRATION_DATE], 'day')) &&
+      this.state.tableData.every(item => item[OB_PRICE_FIELD] != null)
     ) {
       return true;
     }
-
-    if (this.state.tableData.every(item => !!item[OB_PRICE_FIELD])) {
-      return true;
-    }
-
     return false;
   };
 
@@ -349,7 +339,6 @@ class FixingModal extends PureComponent<
     const { visible } = this.state;
     return (
       <>
-        <ExpirationModal ref={node => (this.$expirationModal = node)} />
         <AsianExerciseModal ref={node => (this.$asianExerciseModal = node)} />
         <Modal
           onCancel={this.switchModal}

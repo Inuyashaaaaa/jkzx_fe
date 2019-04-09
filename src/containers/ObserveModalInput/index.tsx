@@ -25,6 +25,8 @@ import moment from 'moment';
 import React from 'react';
 
 class ObserveModalInput extends InputPolym<any> {
+  public $sourceTable: SourceTable = null;
+
   public state = {
     visible: false,
     popconfirmVisible: false,
@@ -81,7 +83,7 @@ class ObserveModalInput extends InputPolym<any> {
         return {
           ...item,
           payDay: item[OB_DAY_FIELD],
-          ...(isKnockIn(this.record)
+          ...(this.isAutoCallSnow()
             ? {
                 price: new BigNumber(barrierVal)
                   .plus(
@@ -127,7 +129,11 @@ class ObserveModalInput extends InputPolym<any> {
     });
   };
 
-  public onOk = () => {
+  public onOk = async () => {
+    const validateTableRsp: any = await this.$sourceTable.validateTable();
+
+    if (validateTableRsp.error) return;
+
     this.setState(
       {
         visible: !this.state.visible,
@@ -303,7 +309,7 @@ class ObserveModalInput extends InputPolym<any> {
             ranger: 'day',
           },
         },
-        this.isIn()
+        this.isAutoCallSnow()
           ? {
               headerName: '障碍价格',
               field: 'price',
@@ -416,15 +422,18 @@ class ObserveModalInput extends InputPolym<any> {
             onCancel: this.onCancel,
             destroyOnClose: true,
             width: 700,
+            visible: this.state.visible,
           }}
           onClick={this.onOpen}
-          visible={this.state.visible}
           style={{ width: '100%', display: 'block' }}
           content={
             <SourceTable
               dataSource={this.state.dealDataSource}
               pagination={false}
               rowKey={OB_DAY_FIELD}
+              ref={node => {
+                this.$sourceTable = node;
+              }}
               header={
                 <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
                   <Col>

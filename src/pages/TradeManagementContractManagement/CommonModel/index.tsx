@@ -97,6 +97,7 @@ class CommonModel extends PureComponent {
     this.setState(
       {
         searchFormData: {},
+        bookIdList: [],
       },
       () => {
         this.onTradeTableSearch({ current: 1, pageSize: 10 });

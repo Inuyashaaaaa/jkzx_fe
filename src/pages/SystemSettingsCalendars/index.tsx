@@ -191,9 +191,12 @@ class SystemTradeDate extends PureComponent<any, any> {
                 <Row style={{ marginBottom: VERTICAL_GUTTER }}>
                   <ModalButton
                     type="primary"
-                    visible={this.state.visible}
                     onClick={this.onOpenCreateModal}
-                    onCancel={this.onCloseCreateModal}
+                    modalProps={{
+                      visible: this.state.visible,
+                      onCancel: this.onCloseCreateModal,
+                      onOk: this.onCreate,
+                    }}
                     content={
                       <Form
                         onValueChange={this.onCreateFormChange}
@@ -203,7 +206,6 @@ class SystemTradeDate extends PureComponent<any, any> {
                         controls={createFormControls(this.state.holidays)}
                       />
                     }
-                    onConfirm={this.onCreate}
                   >
                     创建
                   </ModalButton>

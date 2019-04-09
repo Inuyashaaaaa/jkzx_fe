@@ -21,6 +21,7 @@ import {
   UNCREATE_TABLE_COL_DEFS,
 } from './constants/ioglod';
 const TabPane = Tabs.TabPane;
+import BigNumber from 'bignumber.js';
 
 export interface IOGlodProps {
   selectedRows: any[];
@@ -288,15 +289,15 @@ class IOGlod extends PureComponent<IOGlodProps> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '期权费收入':
             return this.handleAIO(uuidList, values, resolve);
           case '授信扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleBIO(uuidList, values, resolve);
           case '保证金释放':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
             return this.handleCIO(uuidList, values, resolve);
           default:
@@ -314,15 +315,15 @@ class IOGlod extends PureComponent<IOGlodProps> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
           case '保证金释放':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
             return this.handleC(uuidList, values, resolve);
           default:

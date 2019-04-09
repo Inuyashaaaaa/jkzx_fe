@@ -1,3 +1,4 @@
+import PopconfirmButton from '@/components/PopconfirmButton';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
@@ -15,7 +16,7 @@ import {
   updateUser,
   updateUserRole,
 } from '@/services/user';
-import { Button, Col, message, Modal, notification, Row } from 'antd';
+import { Button, Col, Modal, notification, Row } from 'antd';
 import produce from 'immer';
 import React, { PureComponent } from 'react';
 import FormBuilder from '../SystemSettingDepartment/components/CommonForm';
@@ -425,9 +426,17 @@ class SystemSettingsUsers extends PureComponent {
     const { rowData } = event;
     const { locked, expired } = rowData;
     return [
-      <Button key="remove" type="danger" onClick={this.onRemove}>
+      <PopconfirmButton
+        type="primary"
+        size="small"
+        key="remove"
+        popconfirmProps={{
+          title: '确定要删除吗?',
+          onConfirm: this.onRemove.bind(this, event),
+        }}
+      >
         删除
-      </Button>,
+      </PopconfirmButton>,
       <Button key="password" type="primary" onClick={this.resetPassword}>
         重置密码
       </Button>,

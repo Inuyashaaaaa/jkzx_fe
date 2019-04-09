@@ -6,9 +6,6 @@ import { FORM_CELL_VALUE_CHANGED } from '../constants';
 
 class RenderingCell extends PureComponent<IFormCellProps> {
   public componentDidMount = () => {
-    if (!this.props.form.isFieldTouched(this.getDataIndex())) {
-      this.props.form.validateFields();
-    }
     this.props.api.eventBus.listen(FORM_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
   };
 
@@ -36,6 +33,9 @@ class RenderingCell extends PureComponent<IFormCellProps> {
     }
 
     this.linkageValue(params);
+
+    // 当前行 form 只要有非自身 field 发生 value changed 就会触发更新
+    this.forceUpdate();
   };
 
   public linkageValue = (params: IFormTriggerCellValueChangedParams) => {

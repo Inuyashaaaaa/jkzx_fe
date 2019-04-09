@@ -1,3 +1,4 @@
+import { getMoment } from '@/utils';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -98,7 +99,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
       [ExpirationDate.field]: moment(),
       [SettlementDate.field]: moment().add(DEFAULT_TERM, 'day'),
       [PremiumType.field]: PREMIUM_TYPE_MAP.PERCENT,
-      [NotionalAmountType.field]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
+      [NotionalAmountType.field]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [ObserveStartDay.field]: moment(),
       [ObserveEndDay.field]: moment().add(DEFAULT_TERM, 'day'),
       [ObservationStep.field]: FREQUENCY_TYPE_MAP['1D'],
@@ -134,7 +135,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingWeights = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item.day] = item.weight;
+        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
         return result;
       },
       {}
@@ -142,7 +143,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
 
     nextPosition.asset.fixingObservations = dataSourceItem[LEG_FIELD.OBSERVATION_DATES].reduce(
       (result, item) => {
-        result[item[OB_DAY_FIELD]] = item.price || null;
+        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
         return result;
       },
       {}
@@ -163,7 +164,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
     nextDataSourceItem[LEG_FIELD.OBSERVE_END_DAY] = moment(days[days.length - 1]);
     nextDataSourceItem[LEG_FIELD.OBSERVATION_DATES] = days.map(day => {
       return {
-        day,
+        [OB_DAY_FIELD]: day,
         weight: nextDataSourceItem.fixingWeights[day],
         price: nextDataSourceItem.fixingObservations[day],
       };

@@ -19,12 +19,13 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 
-export const createLegDataSourceItem = (leg: ILegType) => {
+export const createLegDataSourceItem = (leg: ILegType, extra?) => {
   return {
     [LEG_ID_FIELD]: uuidv4(),
     [LEG_TYPE_FIELD]: leg.type,
     [LEG_NAME_FIELD]: leg.name,
     [LEG_ANNUALIZED_FIELD]: leg.isAnnualized,
+    ...extra,
   };
 };
 
@@ -188,6 +189,14 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
 
 function miniumlPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.AUTO_CALL_STRIKE] !== undefined) {
+      clone[LEG_FIELD.AUTO_CALL_STRIKE] = new BigNumber(clone[LEG_FIELD.AUTO_CALL_STRIKE])
+        .multipliedBy(0.01)
+        .toNumber();
+    }
+  }
 
   if (clone[LEG_FIELD.DOWN_BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER] !== undefined) {
@@ -417,6 +426,14 @@ function miniumlPercent(item) {
 
 function backConvertPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.AUTO_CALL_STRIKE] !== undefined) {
+      clone[LEG_FIELD.AUTO_CALL_STRIKE] = new BigNumber(clone[LEG_FIELD.AUTO_CALL_STRIKE])
+        .multipliedBy(100)
+        .toNumber();
+    }
+  }
 
   if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {

@@ -116,5 +116,4 @@ export const DEFAULT_CONTEXT_MENU_ITEMS = [
   'resetColumns',
   'copy',
   'paste',
-  'export',
 ];

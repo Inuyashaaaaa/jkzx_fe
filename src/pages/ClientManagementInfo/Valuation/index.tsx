@@ -194,11 +194,13 @@ class Valuation extends PureComponent<ValuationProps> {
               <ModalButton
                 key="sends"
                 type="primary"
-                visible={this.state.visible}
+                modalProps={{
+                  visible: this.state.visible,
+                  onOk: this.onConfirm,
+                  onCancel: this.onCancelBatch,
+                }}
                 onClick={this.onClickBatch}
                 content={<div>是否确认向所有已选中的客户邮箱发送估值报告?</div>}
-                onConfirm={this.onConfirm}
-                onCancel={this.onCancelBatch}
               >
                 批量发送报告
               </ModalButton>

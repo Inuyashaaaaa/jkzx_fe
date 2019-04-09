@@ -246,8 +246,8 @@ class InfoManager extends PureComponent<any, any> {
             onValueChange={this.handleChangeValue}
             controls={
               this.clientType === 'PRODUCT'
-                ? PRODUCTIONS(this.state.branchSalesList)
-                : INSITUTIONS(this.state.branchSalesList)
+                ? PRODUCTIONS(this.state.branchSalesList, 'edit')
+                : INSITUTIONS(this.state.branchSalesList, 'edit')
             }
             controlNumberOneRow={2}
             onSubmitButtonClick={this.onSubmit}

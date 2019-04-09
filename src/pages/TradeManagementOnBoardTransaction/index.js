@@ -2,7 +2,11 @@ import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
+import {
+  mktInstrumentSearch,
+  mktQuotesListPaged,
+  mktInstrumentInfo,
+} from '@/services/market-data-service';
 import {
   exeTradeRecordSave,
   queryDetail,
@@ -55,7 +59,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
   componentDidMount() {
     this.queryInstrumentId();
     this.queryRecords({
-      startDate: moment(1, 'days'),
+      startDate: moment().subtract(1, 'days'),
       endDate: moment(),
     });
   }
@@ -276,7 +280,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       }
     } else {
       this.queryRecords({
-        startDate: moment(1, 'days'),
+        startDate: moment().subtract(1, 'days'),
         endDate: moment(),
       });
     }
@@ -335,9 +339,13 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       }
       return val;
     });
+    const mktInstrumentInfoRef = await mktInstrumentInfo({
+      instrumentId: formatValues.instrumentId,
+    });
+    if (mktInstrumentInfoRef.error) return;
     const { error, data } = await exeTradeRecordSave({
       ...formatValues,
-      multiplier: 1,
+      multiplier: mktInstrumentInfoRef.data.instrumentInfo.multiplier,
     });
     if (error) {
       message.error('新建失败');

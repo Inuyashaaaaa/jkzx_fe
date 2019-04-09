@@ -149,7 +149,9 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
                     onValueChange={this.onCreateFormDataChange}
                   />
                 }
-                onConfirm={this.onCreate}
+                modalProps={{
+                  onOk: this.onCreate,
+                }}
               >
                 新建
               </ModalButton>

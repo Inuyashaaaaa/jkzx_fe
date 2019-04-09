@@ -3,12 +3,13 @@ import { FormItemProps } from 'antd/lib/form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import { omit } from 'lodash';
-import React, { PureComponent } from 'react';
+import React, { FocusEvent, KeyboardEvent, PureComponent } from 'react';
 import { IFormCellProps, IFormTriggerCellValueChangeParams } from 'src/components/type';
+import { wrapFormGetDecorator } from '../../utils';
 import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from '../constants';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
-import styles from './SwitchCell.less';
+import './SwitchCell.less';
 
 class SwitchCell extends PureComponent<
   IFormCellProps,
@@ -17,6 +18,10 @@ class SwitchCell extends PureComponent<
     loading: boolean;
   }
 > {
+  public static defaultProps = {
+    prefix: 'form2-switch',
+  };
+
   public state = {
     editing: false,
     loading: false,
@@ -30,15 +35,6 @@ class SwitchCell extends PureComponent<
 
   public componentDidMount = () => {
     this.registeCell();
-
-    if (!this.props.form.isFieldTouched(this.getDataIndex())) {
-      this.props.form.validateFields();
-    }
-    this.props.api.eventBus.listen(FORM_CELL_VALUE_CHANGE, this.onTableCellValueChange);
-  };
-
-  public componentWillUnmount = () => {
-    this.props.api.eventBus.unListen(FORM_CELL_VALUE_CHANGE, this.onTableCellValueChange);
   };
 
   public startLoading = (callback?) => {
@@ -47,16 +43,6 @@ class SwitchCell extends PureComponent<
 
   public stopLoading = (callback?) => {
     this.setState({ loading: false }, callback);
-  };
-
-  public onTableCellValueChange = (params: IFormTriggerCellValueChangeParams) => {
-    const dataIndex = this.getDataIndex();
-    if (Object.keys(params.changedValues).indexOf(dataIndex) !== -1) return;
-
-    // validate after rendered
-    setTimeout(() => {
-      this.validateRowForm({ force: true });
-    }, 0);
   };
 
   public registeCell = () => {
@@ -78,20 +64,21 @@ class SwitchCell extends PureComponent<
 
   public getInlineCell = () => {
     const { colDef, form } = this.props;
-    const { editable } = colDef;
+    const { editable, dataIndex } = colDef;
     const { editing } = this.state;
+    const wrapedForm = wrapFormGetDecorator(dataIndex, form);
     if (editable && editing) {
       return React.createElement(EditingCell, {
         ...this.props,
         cellApi: this,
-        form,
+        form: wrapedForm,
         ref: this.getEditingCellRef,
       });
     } else {
       return React.createElement(RenderingCell, {
         ...this.props,
         cellApi: this,
-        form,
+        form: wrapedForm,
         ref: this.getRenderingCellRef,
       });
     }
@@ -131,7 +118,7 @@ class SwitchCell extends PureComponent<
     this.startEditing();
   };
 
-  public onCellBlur = (e: FocusEvent) => {
+  public onCellBlur = (e: FocusEvent<HTMLDivElement>) => {
     if (!this.getEditable()) return;
     if (this.state.editing) {
       this.saveCell();
@@ -149,8 +136,8 @@ class SwitchCell extends PureComponent<
       return this.setState({ editing: false }, callback);
     }
 
-    const { error } = await this.validateRowForm();
-    if (error) return;
+    const errorMsgs = await this.props.form.getFieldError(dataIndex);
+    if (errorMsgs) return;
     if (this.$editingCell) {
       const value = await this.$editingCell.getValue();
       this.mutableChangeRecordValue(value, false);
@@ -162,14 +149,6 @@ class SwitchCell extends PureComponent<
     const { colDef } = this.props;
     const { dataIndex } = colDef;
     return dataIndex;
-  };
-
-  public validateRowForm = async (options = {}) => {
-    return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      return this.props.form.validateFields(options, (error, values) => {
-        resolve({ error, values });
-      });
-    });
   };
 
   public mutableChangeRecordValue = (value, linkage) => {
@@ -196,7 +175,7 @@ class SwitchCell extends PureComponent<
     });
   };
 
-  public onKeyDown = (e: KeyboardEvent) => {
+  public onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (!this.getEditable()) return;
 
     // Enter
@@ -246,6 +225,9 @@ class SwitchCell extends PureComponent<
       <div
         ref={this.getRef}
         {...omit(this.props, [
+          'prefix',
+          'getValue',
+          'form',
           'colDef',
           'record',
           'rowIndex',
@@ -258,10 +240,10 @@ class SwitchCell extends PureComponent<
         onClick={this.onCellClick}
         onBlur={this.onCellBlur}
         onKeyDown={this.onKeyDown}
-        className={classNames(styles.cell, {
-          [styles.editable]: this.getEditable(),
-          [styles.editing]: this.state.editing,
-          [styles.rendering]: !this.state.editing,
+        className={classNames(`${this.props.prefix}-cell`, {
+          editable: this.getEditable(),
+          editing: this.state.editing,
+          rendering: !this.state.editing,
         })}
       >
         <Spin spinning={this.state.loading}>{this.getInlineCell()}</Spin>

@@ -26,6 +26,7 @@ import {
   KNOCK_DIRECTION_OPTIONS,
   LEG_ANNUALIZED_FIELD,
   LEG_FIELD,
+  LEG_PRICING_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -526,7 +527,6 @@ export const Strike4: IColDef = {
 };
 
 export const ExpirationDate: IColDef = {
-  editable: true,
   headerName: '到期日',
   field: LEG_FIELD.EXPIRATION_DATE,
   input: {
@@ -534,16 +534,43 @@ export const ExpirationDate: IColDef = {
     defaultOpen: true,
   },
   rules: RULES_REQUIRED,
-  getValue: {
-    depends: [LEG_FIELD.TERM, LEG_FIELD.EFFECTIVE_DATE],
-    value: record => {
-      const effectiveDate = record[LEG_FIELD.EFFECTIVE_DATE];
-      const term = record[LEG_FIELD.TERM];
-      if (record[LEG_FIELD.TERM] !== undefined && effectiveDate !== undefined) {
-        return getMoment(effectiveDate, true).add(term, 'days');
+  editable: params => {
+    if (params.data[LEG_PRICING_FIELD]) {
+      if (params.data[LEG_ANNUALIZED_FIELD]) {
+        return false;
       }
-      return record[LEG_FIELD.EXPIRATION_DATE];
-    },
+      return true;
+    }
+    return true;
+  },
+  getValue: params => {
+    if (params.data[LEG_PRICING_FIELD]) {
+      if (params.data[LEG_ANNUALIZED_FIELD]) {
+        return {
+          depends: [LEG_FIELD.TERM],
+          value(record) {
+            return moment().add(record[LEG_FIELD.TERM], 'days');
+          },
+        };
+      }
+      return {
+        depends: [],
+        value(record) {
+          return record[LEG_FIELD.EXPIRATION_DATE];
+        },
+      };
+    }
+    return {
+      depends: [LEG_FIELD.TERM, LEG_FIELD.EFFECTIVE_DATE],
+      value: record => {
+        const effectiveDate = record[LEG_FIELD.EFFECTIVE_DATE];
+        const term = record[LEG_FIELD.TERM];
+        if (record[LEG_FIELD.TERM] !== undefined && effectiveDate !== undefined) {
+          return getMoment(effectiveDate, true).add(term, 'days');
+        }
+        return record[LEG_FIELD.EXPIRATION_DATE];
+      },
+    };
   },
 };
 
@@ -1104,25 +1131,13 @@ export const ObserveStartDay: IColDef = {
   },
   rules: RULES_REQUIRED,
   getValue: {
-    depends: [LEG_FIELD.EXPIRATION_DATE],
+    depends: [LEG_FIELD.EFFECTIVE_DATE],
     value: record => {
-      if (
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
-      ) {
-        const expirationDate = record[LEG_FIELD.EXPIRATION_DATE];
-        if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
-          return getMoment(expirationDate, true);
-        }
-        return record[LEG_FIELD.OBSERVE_START_DAY];
+      if (record[LEG_FIELD.EFFECTIVE_DATE] !== undefined) {
+        return record[LEG_FIELD.EFFECTIVE_DATE];
       }
 
-      return {
-        depends: [],
-        value(data) {
-          return data[LEG_FIELD.OBSERVE_START_DAY];
-        },
-      };
+      return record[LEG_FIELD.OBSERVE_START_DAY];
     },
   },
 };
@@ -1138,25 +1153,13 @@ export const ObserveEndDay: IColDef = {
   },
   rules: RULES_REQUIRED,
   getValue: {
-    depends: [LEG_FIELD.SETTLEMENT_DATE],
+    depends: [LEG_FIELD.EXPIRATION_DATE],
     value: record => {
-      if (
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-        record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL
-      ) {
-        const settlemenetDate = record[LEG_FIELD.SETTLEMENT_DATE];
-        if (record[LEG_FIELD.SETTLEMENT_DATE] !== undefined) {
-          return getMoment(settlemenetDate, true);
-        }
-        return record[LEG_FIELD.OBSERVE_END_DAY];
+      if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
+        return record[LEG_FIELD.EXPIRATION_DATE];
       }
 
-      return {
-        depends: [],
-        value(data) {
-          return data[LEG_FIELD.OBSERVE_END_DAY];
-        },
-      };
+      return record[LEG_FIELD.OBSERVE_END_DAY];
     },
   },
 };
@@ -1405,10 +1408,40 @@ export const SpecifiedPrice: IColDef = {
 
 export const Term: IColDef = {
   headerName: '期限',
-  editable: true,
   field: LEG_FIELD.TERM,
   input: INPUT_NUMBER_DAYS_CONFIG,
   rules: RULES_REQUIRED,
+  editable: params => {
+    if (params.data[LEG_PRICING_FIELD]) {
+      if (params.data[LEG_ANNUALIZED_FIELD]) {
+        return true;
+      }
+      return false;
+    }
+    return true;
+  },
+  getValue: params => {
+    if (params.data[LEG_PRICING_FIELD]) {
+      if (params.data[LEG_ANNUALIZED_FIELD]) {
+        return {
+          depends: [],
+          value(record) {
+            return record[Term.field];
+          },
+        };
+      }
+      return {
+        depends: [LEG_FIELD.EXPIRATION_DATE],
+        value(record) {
+          return moment(record[LEG_FIELD.EXPIRATION_DATE]).diff(moment(), 'days') + 1;
+        },
+      };
+    }
+    return {
+      depends: [],
+      value: record => record[LEG_FIELD.TERM],
+    };
+  },
 };
 
 export const IsAnnualized: IColDef = {
@@ -1924,54 +1957,6 @@ export const HighRebate: IColDef = {
   rules: RULES_REQUIRED,
 };
 
-export const PricingTerm = {
-  ...Term,
-  editable: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return true;
-    }
-    return false;
-  },
-  getValue: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return {
-        depends: [],
-        value(record) {
-          return record[Term.field];
-        },
-      };
-    }
-    return {
-      depends: [LEG_FIELD.EXPIRATION_DATE],
-      value(record) {
-        return moment(record[LEG_FIELD.EXPIRATION_DATE]).diff(moment(), 'days') + 1;
-      },
-    };
-  },
-};
+export const PricingTerm = Term;
 
-export const PricingExpirationDate = {
-  ...ExpirationDate,
-  editable: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return false;
-    }
-    return true;
-  },
-  getValue: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
-      return {
-        depends: [LEG_FIELD.TERM],
-        value(record) {
-          return moment().add(record[LEG_FIELD.TERM], 'days');
-        },
-      };
-    }
-    return {
-      depends: [],
-      value(record) {
-        return record[LEG_FIELD.EXPIRATION_DATE];
-      },
-    };
-  },
-};
+export const PricingExpirationDate = ExpirationDate;

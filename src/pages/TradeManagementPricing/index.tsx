@@ -1,6 +1,6 @@
-import { LEG_NAME_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import { LEG_NAME_FIELD, LEG_PRICING_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { allTryPricingLegTypes, ILegType } from '@/constants/legColDefs';
+import { allTryPricingLegTypes } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -11,7 +11,6 @@ import {
   TradesColDefs,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { LEG_MAP } from '@/constants/legType';
 import { PRICING_FROM_TAG } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
@@ -22,10 +21,8 @@ import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service'
 import { convertTradePositions, createLegDataSourceItem, getAddLegItem } from '@/services/pages';
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
-import { convertOptions } from '@/utils';
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
 import { Button, Col, Input, message, notification, Row, Select } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -125,7 +122,13 @@ class TradeManagementPricing extends PureComponent<any> {
       this.cacheTyeps.push(leg.type);
     }
 
-    const legData = getAddLegItem(leg, createLegDataSourceItem(leg), true);
+    const legData = getAddLegItem(
+      leg,
+      createLegDataSourceItem(leg, {
+        [LEG_PRICING_FIELD]: true,
+      }),
+      true
+    );
 
     this.addLegData(leg, legData);
   };
@@ -168,7 +171,6 @@ class TradeManagementPricing extends PureComponent<any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 

@@ -55,17 +55,17 @@ export const bookingTableFormControls = (
       after: (
         <ModalButton
           type="primary"
-          visible={modalVisible}
-          onClick={onSwtichModal}
-          disabled={!formData.counterPartyCode}
-          onCancel={onClearCounterPartyCodeButtonClick}
           modalProps={{
             title: `${formData.counterPartyCode} 的基本信息`,
             width: 800,
             maskClosable: false,
             okText: '确认并继续',
             onOk: onSwtichModal,
+            visible: modalVisible,
+            onCancel: onClearCounterPartyCodeButtonClick,
           }}
+          onClick={onSwtichModal}
+          disabled={!formData.counterPartyCode}
           content={
             <div>
               <Typography>

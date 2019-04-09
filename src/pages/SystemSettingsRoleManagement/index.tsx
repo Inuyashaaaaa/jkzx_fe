@@ -204,13 +204,13 @@ class SystemSettingsRoleManagement extends PureComponent {
                   <ModalButton
                     modalProps={{
                       title: '',
+                      visible: this.state.visible,
+                      onCancel: this.onCancel,
+                      onOk: this.onConfirm,
                     }}
                     size="default"
                     type="primary"
-                    visible={this.state.visible}
                     onClick={this.onClick}
-                    onCancel={this.onCancel}
-                    onConfirm={this.onConfirm}
                     content={
                       <Form
                         wrappedComponentRef={element => {

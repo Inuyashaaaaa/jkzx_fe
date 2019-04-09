@@ -304,7 +304,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 

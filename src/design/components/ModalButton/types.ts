@@ -1,14 +1,14 @@
 import { ButtonProps } from 'antd/lib/button';
 import { ModalProps } from 'antd/lib/modal';
+import { Omit } from '../common/types';
 
 interface IModalButtonBaseProps {
-  onCancel?: IModalButtonCancelHandle;
-  onConfirm?: IModalButtonClickHandle;
   /* 模态框内部的元素 */
   content?: React.ReactNode;
-  visible?: boolean;
-  modalProps?: ModalProps;
-  confirmLoading?: boolean;
+  modalProps?: Omit<ModalProps, 'onCancel' | 'onOk'> & {
+    onCancel?: IModalButtonCancelHandle;
+    onOk?: IModalButtonClickHandle;
+  };
 }
 
 export type ModalButtonBaseProps = IModalButtonBaseProps & ButtonProps;
@@ -22,6 +22,6 @@ export interface ModalButtonState {
   confirmLoading?: boolean;
 }
 
-export type IModalButtonCancelHandle = () => any;
+export type IModalButtonCancelHandle = () => void;
 
-export type IModalButtonClickHandle = () => Promise<any>;
+export type IModalButtonClickHandle = () => void | Promise<any>;

@@ -70,6 +70,17 @@ class TradeManagementMarketManagement extends PureComponent {
     );
   };
 
+  public onReset = event => {
+    this.setState(
+      {
+        searchFormData: {},
+      },
+      () => {
+        this.$sourceTable.search();
+      }
+    );
+  };
+
   public render() {
     return (
       <PageHeaderWrapper>
@@ -80,6 +91,7 @@ class TradeManagementMarketManagement extends PureComponent {
           searchButtonProps={{
             icon: 'reload',
           }}
+          onReset={this.onReset}
           searchText={`刷新 ${this.state.lastUpdateTime}`}
           searchFormControls={searchFormControls}
           searchFormData={this.state.searchFormData}
