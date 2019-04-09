@@ -367,22 +367,22 @@ export const INSITUTIONS: (
   //   field: 'fundManager',
   // },
 
-  {
-    control: {
-      label: '我方授信额度',
-    },
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  // {
+  //   control: {
+  //     label: '我方授信额度',
+  //   },
+  //   input: INPUT_NUMBER_DIGITAL_CONFIG,
 
-    field: 'ourCreditLimit',
-  },
-  {
-    control: {
-      label: '对方授信额度',
-    },
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  //   field: 'ourCreditLimit',
+  // },
+  // {
+  //   control: {
+  //     label: '对方授信额度',
+  //   },
+  //   input: INPUT_NUMBER_DIGITAL_CONFIG,
 
-    field: 'cptyCreditLimit',
-  },
+  //   field: 'cptyCreditLimit',
+  // },
   {
     control: {
       label: '保证金折扣',
