@@ -1,10 +1,6 @@
 import ModalButton from '@/design/components/ModalButton';
-import {
-  DOWN_LOAD_SETTLEMENT_URL,
-  DOWN_LOAD_TRADE_URL,
-  emlSendSettleReport,
-} from '@/services/document';
-import { Button, Col, message, Row } from 'antd';
+import { DOWN_LOAD_SETTLEMENT_URL, emlSendSettleReport } from '@/services/document';
+import { Alert, Button, Col, message, Row } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 
@@ -64,7 +60,12 @@ class TradeModal extends PureComponent {
           type="primary"
           content={
             <>
-              <h3>结算通知书基于最新的模板即时生成，系统不会留存每次生成的结果。</h3>
+              <Alert
+                style={{ marginBottom: 40 }}
+                message="结算通知书基于最新的模板即时生成，系统不会留存每次生成的结果。"
+                type="info"
+                showIcon={true}
+              />
               <Row type="flex" justify="end" align="middle" gutter={8}>
                 <Col>
                   <Button type="default">
