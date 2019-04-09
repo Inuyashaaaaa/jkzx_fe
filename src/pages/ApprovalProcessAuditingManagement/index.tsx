@@ -61,7 +61,6 @@ class SystemSettingsRoleManagement extends PureComponent {
   };
 
   public handleDelete = async key => {
-    // 审批组成员移出
     const { currentGroup } = this.state;
     let userList = [...this.state.userList];
     userList = userList.filter(item => item.userApproveGroupId !== key);
@@ -70,15 +69,15 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { data, error } = await wkApproveGroupModify(currentGroup);
     const { message } = error;
     if (error) {
-      return notification.error({
-        message: `移出失败`,
-        description: message,
-      });
+      // return notification.error({
+      //   message: `移出失败`,
+      //   description: message,
+      // });
     } else {
-      notification.success({
-        message: `移出成功`,
-        description: message,
-      });
+      // notification.success({
+      //   message: `移出成功`,
+      //   description: message,
+      // });
       if (this.$drawer) {
         this.$drawer.fetchTable();
       }
@@ -91,7 +90,6 @@ class SystemSettingsRoleManagement extends PureComponent {
   };
 
   public fetchList = async () => {
-    console.log('fetch');
     this.setState({
       loading: true,
     });
@@ -107,7 +105,6 @@ class SystemSettingsRoleManagement extends PureComponent {
   };
 
   public handleDrawer = () => {
-    // this.$drawer && this.$drawer.fetchTable();
     if (this.$drawer) {
       this.$drawer.fetchTable();
     }
@@ -129,7 +126,6 @@ class SystemSettingsRoleManagement extends PureComponent {
   };
 
   public handleMenber = async param => {
-    // 切换审批组成员
     if (!param) return;
     this.setState({
       userList: param.userList,
@@ -138,20 +134,16 @@ class SystemSettingsRoleManagement extends PureComponent {
   };
 
   public onBatchAdd = async param => {
-    // 批量加入
     const { currentGroup } = this.state;
     currentGroup.userList = currentGroup.userList.concat(param);
     const { data, error } = await wkApproveGroupModify(currentGroup);
-    const { message } = error;
     if (error) {
       return notification.error({
         message: `加入失败`,
-        description: message,
       });
     } else {
       notification.success({
         message: `加入成功`,
-        description: message,
       });
       this.setState({
         visible: false,

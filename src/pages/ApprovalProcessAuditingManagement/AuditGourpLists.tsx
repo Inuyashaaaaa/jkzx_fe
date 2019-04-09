@@ -61,7 +61,6 @@ class AuditLists extends PureComponent {
   };
 
   public onEdit = param => () => {
-    // this.props.fetchGourp();
     const approveGroupList = this.state.approveGroupList.map(item => {
       if (item.approveGroupId === param.approveGroupId) {
         item.editable = !param.editable;
@@ -79,7 +78,7 @@ class AuditLists extends PureComponent {
   };
 
   public onAdd = () => {
-    let blockGroupName = false; // 是否有新建空组名，如有则不继续增加空输入框
+    let blockGroupName = false;
     let { approveGroupList } = this.state;
     approveGroupList.forEach(item => {
       if (!item.approveGroupId) {
@@ -121,7 +120,6 @@ class AuditLists extends PureComponent {
   };
 
   public handleOk = async e => {
-    // 编辑审批组
     if (this.state.approveGroupId) {
       const { data, error } = await wkApproveGroupModify({
         approveGroupId: this.state.approveGroupId,
@@ -163,7 +161,6 @@ class AuditLists extends PureComponent {
       );
       return;
     }
-    // 创建审批组
     const { data, error, raw } = await wkApproveGroupCreate({
       approveGroupName: this.state.approveGroupName,
       description: this.state.description,
@@ -204,7 +201,6 @@ class AuditLists extends PureComponent {
   };
 
   public handleInput = e => {
-    // 对话框输入审批组名称和描述
     if (e.target.name === 'approveGroupName') {
       this.setState({
         approveGroupName: e.target.value,
@@ -217,17 +213,7 @@ class AuditLists extends PureComponent {
   };
 
   public handleMenber = param => {
-    // 切换审批组成员
-    // const { approveGroupList } = this.state;
-    // approveGroupList.forEach(item => {
-    //   if (item.approveGroupId === param.approveGroupId) {
-    //     item.background = true;
-    //   } else {
-    //     item.background = false;
-    //   }
-    // });
     this.setState({
-      // approveGroupList,
       indexGroupId: param.approveGroupId,
     });
     this.props.handleMenber(param);

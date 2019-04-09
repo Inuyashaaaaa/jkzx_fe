@@ -56,10 +56,13 @@ class Operation extends PureComponent {
       loading: true,
     });
     const requests = () => Promise.all([authRolesList(), authUserList()]);
-    const [roles, users] = await requests();
-    console.log(roles, users);
+    const res = await requests();
+    const [roles, users] = res;
+    const error = res.some(item => {
+      return item.error;
+    });
 
-    if (roles.error || users.error) {
+    if (error) {
       this.setState({
         loading: false,
       });
@@ -69,7 +72,6 @@ class Operation extends PureComponent {
     const dataSource = users.data.filter(item => {
       return !currentGroup.userList.find(items => item.username === items.username);
     });
-    // 过滤
     this.setState({
       loading: false,
       dataSource,
@@ -98,7 +100,6 @@ class Operation extends PureComponent {
   };
 
   public onSearch = async () => {
-    // 筛选条件
     const dataSource = this.state.dataSource.filter(item => {
       return item.username === this.state.username || item.roleName.includes(this.state.roleName);
     });
@@ -116,7 +117,6 @@ class Operation extends PureComponent {
   };
 
   public onAdd = key => {
-    // 单个加入审批组
     const selectObj = this.state.dataSource.filter(item => item.id === key);
     let selectArray = [...selectObj];
     selectArray = selectArray.map(item => {
@@ -131,7 +131,6 @@ class Operation extends PureComponent {
   };
 
   public onSelectChange = (selectedRowKeys, selectedRow) => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys, selectedRow);
     let selectArray = [];
     selectArray = selectedRow.map(item => {
       return {
@@ -150,9 +149,7 @@ class Operation extends PureComponent {
       selectedRowKeys,
       onChange: this.onSelectChange,
       hideDefaultSelections: true,
-      // onSelection: this.onSelection,
     };
-    console.log('drawer');
     return (
       <>
         <div>
