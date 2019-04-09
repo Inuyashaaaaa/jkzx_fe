@@ -33,10 +33,7 @@ class AuditLists extends PureComponent {
     });
     const { message } = error;
     if (error) {
-      return notification.error({
-        message: `删除失败`,
-        description: message,
-      });
+      return;
     } else {
       const newList = [];
       const approveGroupList = this.state.approveGroupList.filter(
@@ -128,10 +125,7 @@ class AuditLists extends PureComponent {
       });
       const { message } = error;
       if (error) {
-        return notification.error({
-          message: `编辑失败`,
-          description: message,
-        });
+        return;
       } else {
         notification.success({
           message: `编辑成功`,
@@ -167,10 +161,7 @@ class AuditLists extends PureComponent {
     });
     const { message } = error;
     if (error) {
-      return notification.error({
-        message: `创建失败，请重新创建`,
-        description: message,
-      });
+      return;
     } else {
       notification.success({
         message: `创建成功`,

@@ -69,15 +69,12 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { data, error } = await wkApproveGroupModify(currentGroup);
     const { message } = error;
     if (error) {
-      // return notification.error({
-      //   message: `移出失败`,
-      //   description: message,
-      // });
+      return;
     } else {
-      // notification.success({
-      //   message: `移出成功`,
-      //   description: message,
-      // });
+      notification.success({
+        message: `移出成功`,
+        description: message,
+      });
       if (this.$drawer) {
         this.$drawer.fetchTable();
       }
@@ -138,9 +135,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     currentGroup.userList = currentGroup.userList.concat(param);
     const { data, error } = await wkApproveGroupModify(currentGroup);
     if (error) {
-      return notification.error({
-        message: `加入失败`,
-      });
+      return;
     } else {
       notification.success({
         message: `加入成功`,
