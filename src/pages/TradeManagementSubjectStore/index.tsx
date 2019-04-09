@@ -120,8 +120,6 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public onSearchFormChange = params => {
-    // console.log(params);
-    // debugger;
     if (Object.keys(params.changed)[0] === 'assetClass') {
       return this.setState({
         searchFormData: {
