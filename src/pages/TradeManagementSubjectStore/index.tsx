@@ -16,6 +16,7 @@ class TradeManagementMarketManagement extends PureComponent {
 
   public state = {
     createFormData: {},
+    searchFormData: {},
   };
 
   public fetchTable = event => {
@@ -118,6 +119,22 @@ class TradeManagementMarketManagement extends PureComponent {
     });
   };
 
+  public onSearchFormChange = params => {
+    // console.log(params);
+    // debugger;
+    if (Object.keys(params.changed)[0] === 'assetClass') {
+      return this.setState({
+        searchFormData: {
+          ...params.formData,
+          instrumentType: undefined,
+        },
+      });
+    }
+    return this.setState({
+      searchFormData: params.formData,
+    });
+  };
+
   public render() {
     return (
       <PageHeaderWrapper back={true}>
@@ -133,6 +150,8 @@ class TradeManagementMarketManagement extends PureComponent {
           createFormControls={createFormControls}
           createFormData={this.state.createFormData}
           searchFormControls={searchFormControls}
+          searchFormData={this.state.searchFormData}
+          onSearchFormChange={this.onSearchFormChange}
           onCreate={this.onCreate}
           paginationProps={{
             backend: true,
