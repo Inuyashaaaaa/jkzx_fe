@@ -1,7 +1,7 @@
 import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/lib/components/_Form2';
 import { IColumnDef } from '@/lib/components/_Table2';
-import { mktInstrumentSearch } from '@/services/market-data-service';
+import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 
 export const SEARCH_FORM_CONTROLS: IFormControl[] = [
   {
@@ -13,7 +13,7 @@ export const SEARCH_FORM_CONTROLS: IFormControl[] = [
       type: 'select',
       mode: 'multiple',
       options: async (value: string) => {
-        const { data, error } = await mktInstrumentSearch({
+        const { data, error } = await mktInstrumentWhitelistSearch({
           instrumentIdPart: value,
         });
         if (error) return [];
