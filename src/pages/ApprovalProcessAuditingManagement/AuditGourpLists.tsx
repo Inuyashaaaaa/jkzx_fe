@@ -218,19 +218,37 @@ class AuditLists extends PureComponent {
 
   public handleMenber = param => {
     // 切换审批组成员
+    // const { approveGroupList } = this.state;
+    // approveGroupList.forEach(item => {
+    //   if (item.approveGroupId === param.approveGroupId) {
+    //     item.background = true;
+    //   } else {
+    //     item.background = false;
+    //   }
+    // });
+    this.setState({
+      // approveGroupList,
+      indexGroupId: param.approveGroupId,
+    });
     this.props.handleMenber(param);
   };
 
   public render() {
-    console.log('list');
     return (
       <div style={{ height: '100%', position: 'relative' }}>
         {this.state.approveGroupList && this.state.approveGroupList.length ? (
-          <ul style={{ padding: '15px' }}>
+          <ul style={{ padding: '0 15px 15px 15px' }}>
             {this.state.approveGroupList.map((item, index) => {
               return (
                 <li key={index} className={styles.listItem}>
-                  <a className={styles.value} onClick={() => this.handleMenber(item)}>
+                  <a
+                    className={
+                      item.approveGroupId === this.state.indexGroupId
+                        ? styles.background
+                        : styles.value
+                    }
+                    onClick={() => this.handleMenber(item)}
+                  >
                     {item.approveGroupName}
                   </a>
                   <span className={styles.icon}>
