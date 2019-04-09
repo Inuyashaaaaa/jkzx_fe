@@ -5,6 +5,13 @@ const common = [
   },
 ];
 
+const SCRIPT_USER = [
+  {
+    value: 'CREATE_SCRIPT_USER',
+    zh: '创建脚本用户',
+  },
+];
+
 const ROLE = common.concat([
   {
     value: 'CREATE_ROLE',
@@ -252,7 +259,7 @@ const TEMP = [
   ...ROLE,
   ...USER,
 ];
-const ROOT = [...common];
+const ROOT = [...common, ...SCRIPT_USER];
 TEMP.forEach(t => {
   if (!ROOT.find(r => r.value === t.value)) {
     ROOT.push(t);
