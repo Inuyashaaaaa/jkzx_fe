@@ -36,14 +36,16 @@ const uploadData = {
 };
 
 export const PRODUCTIONS: (
-  branchSalesList: CascaderOptionType[]
-) => IFormControl[] = branchSalesList => [
+  branchSalesList: CascaderOptionType[],
+  type: string
+) => IFormControl[] = (branchSalesList, type) => [
   {
     control: {
       label: '开户名称',
     },
     input: {
       type: 'input',
+      ...(type === 'edit' ? { disabled: true } : null),
     },
     decorator: {
       rules: [

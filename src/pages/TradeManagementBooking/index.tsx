@@ -1,4 +1,10 @@
-import { LEG_FIELD, LEG_NAME_FIELD, LEG_TYPE_FIELD, PREMIUM_TYPE_MAP } from '@/constants/common';
+import {
+  LEG_FIELD,
+  LEG_NAME_FIELD,
+  LEG_PRICING_FIELD,
+  LEG_TYPE_FIELD,
+  PREMIUM_TYPE_MAP,
+} from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes, ILegType } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
@@ -120,6 +126,7 @@ class BookCreate extends PureComponent<any> {
           ...defaultData,
           ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
           ...this.getConvertPremium(leg, defaultData, item),
+          [LEG_PRICING_FIELD]: false,
         };
       });
       this.setState({
@@ -252,7 +259,6 @@ class BookCreate extends PureComponent<any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 

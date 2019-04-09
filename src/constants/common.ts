@@ -15,6 +15,8 @@ export const LEG_NAME_FIELD = '$legName';
 
 export const LEG_ANNUALIZED_FIELD = '$isAnnualized';
 
+export const LEG_PRICING_FIELD = '$isPricing';
+
 export const RULES_REQUIRED = [
   {
     required: true,
@@ -105,14 +107,14 @@ export const DIRECTION_TYPE_OPTIONS = convertOptions(DIRECTION_TYPE_MAP, DIRECTI
 export const EVENT_TYPE_MAP = {
   EXPIRATION: 'EXPIRATION',
   KNOCK_OUT: 'KNOCK_OUT',
-  PAYMENT: 'PAYMENT',
+  // PAYMENT: 'PAYMENT',
   OBSERVE: 'OBSERVE',
 };
 
 export const EVENT_TYPE_ZHCN_MAP = {
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
-  PAYMENT: '支付',
+  // PAYMENT: '支付',
   OBSERVE: '观察',
 };
 
@@ -537,6 +539,7 @@ export const LEG_INJECT_FIELDS = [
   LEG_TYPE_FIELD,
   LEG_NAME_FIELD,
   LEG_ANNUALIZED_FIELD,
+  LEG_PRICING_FIELD,
 ];
 
 export const BIG_NUMBER_CONFIG = {

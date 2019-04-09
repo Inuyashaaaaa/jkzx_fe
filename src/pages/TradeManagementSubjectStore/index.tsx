@@ -97,6 +97,12 @@ class TradeManagementMarketManagement extends PureComponent {
   public onCreate = async (event: SourceTableState) => {
     const { createFormData } = event;
     const { error } = await mktInstrumentCreate(this.composeInstrumentInfo(createFormData));
+    if (error) {
+      return;
+    }
+    this.setState({
+      createFormData: {},
+    });
     return !error;
   };
 
@@ -130,6 +136,9 @@ class TradeManagementMarketManagement extends PureComponent {
           onCreate={this.onCreate}
           paginationProps={{
             backend: true,
+          }}
+          createModalProps={{
+            visible: this.state.visible,
           }}
           rowActions={[
             <ModalButton
