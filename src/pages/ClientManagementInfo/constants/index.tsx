@@ -93,10 +93,10 @@ export const TABLE_COLUMN_DEFS: IColumnDef[] = [
     pinned: 'left',
     checkboxSelection: true,
   },
-  {
-    headerName: '账户编号',
-    field: 'accountId',
-  },
+  // {
+  //   headerName: '账户编号',
+  //   field: 'accountId',
+  // },
   {
     headerName: '开户销售',
     field: 'salesName',

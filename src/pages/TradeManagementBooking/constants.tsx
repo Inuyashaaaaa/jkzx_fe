@@ -1,5 +1,6 @@
 import { IFormControl } from '@/design/components/Form/types';
 import { IColumnDef } from '@/design/components/Table/types';
+import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 
 export const TABLE_COL_DEFS: IColumnDef[] = [
   {
@@ -20,6 +21,11 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
     field: 'cashFlow',
   },
   {
+    headerName: '期权费',
+    field: 'premium',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  },
+  {
     headerName: '生命周期事件',
     field: 'lcmEventType',
   },
@@ -37,7 +43,11 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
   },
 ];
 
-export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMargin => {
+export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) => IFormControl[] = (
+  entryMargin,
+  entryPremium,
+  entryCash
+) => {
   const tradeId = {
     decorator: {
       rules: [
@@ -51,6 +61,48 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
     },
     field: 'tradeId',
   };
+
+  const premiumlist = {
+    decorator: {
+      rules: [
+        {
+          required: true,
+        },
+      ],
+    },
+    control: {
+      label: '期权费',
+    },
+    field: 'premium',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  };
+
+  const cashFlow = {
+    decorator: {
+      rules: [
+        {
+          required: true,
+        },
+      ],
+    },
+    control: {
+      label: '金额',
+    },
+    field: 'cashFlow',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  };
+
+  let extra = [];
+  if (entryMargin) {
+    extra.push(tradeId);
+  }
+  if (entryPremium) {
+    extra.push(premiumlist);
+  }
+  if (entryCash) {
+    extra.push(cashFlow);
+  }
+
   return ([
     {
       decorator: {
@@ -89,6 +141,22 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
             value: '期权费收入',
           },
           {
+            label: '平仓金额扣除',
+            value: '平仓金额扣除',
+          },
+          {
+            label: '平仓金额收入',
+            value: '平仓金额收入',
+          },
+          {
+            label: '结算金额扣除',
+            value: '结算金额扣除',
+          },
+          {
+            label: '结算金额收入',
+            value: '结算金额收入',
+          },
+          {
             label: '授信扣除',
             value: '授信扣除',
           },
@@ -108,20 +176,7 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
       },
       field: 'cashType',
     },
-    {
-      decorator: {
-        rules: [
-          {
-            required: true,
-          },
-        ],
-      },
-      control: {
-        label: '金额',
-      },
-      field: 'cashFlow',
-    },
-  ] as IFormControl[]).concat(entryMargin ? tradeId : []);
+  ] as IFormControl[]).concat(extra);
 };
 
 export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
