@@ -218,6 +218,9 @@ class ModalButton extends PureComponent<ModalButtonProps & ButtonProps, ModalBut
       return judagePromise(this.props.onCancel(event), result => {
         this.hideModal();
 
+        if (typeof result === 'object') {
+          this.setState(result);
+        }
         return result;
       });
     }
