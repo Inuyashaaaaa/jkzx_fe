@@ -6,7 +6,11 @@ import { defaultInputManager } from '../Input';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
 import SwitchCell from './cells/SwitchCell';
-import { TABLE_CELL_VALUE_CHANGE, TABLE_CELL_VALUE_CHANGED } from './constants/EVENT';
+import {
+  TABLE_CELL_FIELDS_CHANGE,
+  TABLE_CELL_VALUE_CHANGED,
+  TABLE_CELL_VALUES_CHANGE,
+} from './constants/EVENT';
 import FormRow from './rows/FormRow';
 import './styles.less';
 
@@ -120,6 +124,7 @@ class Table2 extends PureComponent<ITableProps> {
             ? this.props.rowKey
             : this.props.rowKey(record, rowIndex);
         },
+        columns: this.props.columns,
       };
     };
   };
@@ -128,8 +133,11 @@ class Table2 extends PureComponent<ITableProps> {
     if (eventName === TABLE_CELL_VALUE_CHANGED) {
       return this.props.onCellValueChanged && this.props.onCellValueChanged(params);
     }
-    if (eventName === TABLE_CELL_VALUE_CHANGE) {
-      return this.props.onCellValueChange && this.props.onCellValueChange(params);
+    if (eventName === TABLE_CELL_VALUES_CHANGE) {
+      return this.props.onCellValuesChange && this.props.onCellValuesChange(params);
+    }
+    if (eventName === TABLE_CELL_FIELDS_CHANGE) {
+      return this.props.onCellFieldsChange && this.props.onCellFieldsChange(params);
     }
   };
 

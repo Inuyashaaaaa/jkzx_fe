@@ -29,19 +29,24 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     super(props);
     this.DecoratorForm = AntdForm.create<IFormBaseProps>({
       ..._.pick(props, Form.createOptionsFields),
+      onFieldsChange: this.onFieldsChange,
       onValuesChange: this.onValuesChange,
       mapPropsToFields:
         props.dataSource &&
         (props => {
           const { dataSource } = props;
-          if (!dataSource) return null;
           const filledDataSource = props.columns.reduce((data, next) => {
             data[next.dataIndex] = dataSource[next.dataIndex];
             return data;
           }, {});
-          const result = _.mapValues(filledDataSource, (val: IFormField) => {
-            return AntdForm.createFormField(val);
-          });
+          const result = _.mapValues(
+            _.pickBy(filledDataSource, (val: IFormField) => {
+              return typeof val === 'object' && val.type === 'field';
+            }),
+            (val: IFormField) => {
+              return AntdForm.createFormField(val);
+            }
+          );
           return result;
         }),
     })(FormBase);
@@ -62,6 +67,23 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
       record,
     };
     this.eventBus.emit(FORM_CELL_VALUES_CHANGE, event);
+  };
+
+  public onFieldsChange = (
+    props: IFormProps & FormCreateOption<IFormProps>,
+    fields: object,
+    allFields: any,
+    add: string
+  ) => {
+    const { onFieldsChange } = props;
+    if (onFieldsChange) {
+      onFieldsChange(
+        props,
+        _.mapValues(fields, (val: IFormField) => ({ ...val, type: 'field' })),
+        _.mapValues(allFields, (val: IFormField) => ({ ...val, type: 'field' })),
+        add
+      );
+    }
   };
 
   public validate = async (

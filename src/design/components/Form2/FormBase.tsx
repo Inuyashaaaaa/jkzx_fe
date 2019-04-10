@@ -101,7 +101,7 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
 
   public onReset = domEvent => {
     if (!this.props.onResetButtonClick) {
-      return;
+      return this.props.form.resetFields();
     }
     return this.props.onResetButtonClick({
       dataSource: this.getFormData(),

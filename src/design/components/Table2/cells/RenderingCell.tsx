@@ -53,7 +53,7 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
             record,
             colDef: { dataIndex },
           } = this.props;
-          const oldVal = record[dataIndex];
+          const oldVal = this.props.cellApi.getValue();
 
           if (newVal === oldVal) return;
 
@@ -110,7 +110,7 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
   public getValue = () => {
     const { colDef, record } = this.props;
     const { dataIndex } = colDef;
-    return record[dataIndex];
+    return this.props.cellApi.getValue();
   };
 
   public getRenderResult = () => {

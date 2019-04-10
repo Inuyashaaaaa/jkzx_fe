@@ -5,6 +5,10 @@ export default [
     path: '/socket-test-page',
     component: './SocketTestPage/index',
   },
+  {
+    path: '/component-test',
+    component: './ComponentTest/index',
+  },
   // user
   {
     path: '/user',

@@ -133,7 +133,7 @@ class SwitchCell extends PureComponent<
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
     const val = record[dataIndex];
-    if (val != null && typeof val === 'object') {
+    if (typeof val === 'object' && val.type === 'field') {
       return val.value;
     }
     return val;
@@ -143,10 +143,11 @@ class SwitchCell extends PureComponent<
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
     const val = record[dataIndex];
-    if (typeof val === 'object' && val.value) {
+    if (typeof val === 'object' && val.type === 'field') {
       val.value = newVal;
+    } else {
+      record[dataIndex] = newVal;
     }
-    record[dataIndex] = newVal;
   };
 
   public saveCell = async (callback?) => {
@@ -154,11 +155,6 @@ class SwitchCell extends PureComponent<
     if (!this.state.editing) return;
     const dataIndex = this.getDataIndex();
     if (this.props.form.isFieldValidating(dataIndex)) return;
-
-    const { record } = this.props;
-    if (this.getValue() === this.props.form.getFieldValue(dataIndex)) {
-      return this.setState({ editing: false }, callback);
-    }
 
     const errorMsgs = await this.props.form.getFieldError(dataIndex);
     if (errorMsgs) return;
@@ -179,8 +175,6 @@ class SwitchCell extends PureComponent<
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
     const oldValue = this.getValue();
-
-    if (oldValue === value) return;
 
     this.setValue(value);
 

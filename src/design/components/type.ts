@@ -15,16 +15,27 @@ import InputManager from './Input/register';
 import TableManager from './Table2/api';
 import TableSwitchCell from './Table2/cells/SwitchCell';
 
-export type IFormField =
-  | any
-  | {
-      value: any;
-      name: string;
-      touched: boolean;
-      dirty: boolean;
-      errors: string[];
-      validating: boolean;
-    };
+export interface IFormField {
+  type: 'field';
+  value?: any;
+  name?: string;
+  touched?: boolean;
+  dirty?: boolean;
+  errors?: string[];
+  validating?: boolean;
+}
+
+export interface IFormSection {
+  type: 'section';
+}
+
+export interface IFormDataSource {
+  [key: string]: IFormField | IFormSection | any;
+}
+
+export interface ITableDataSource {
+  [key: string]: IFormField | any;
+}
 
 export interface IColDef {
   dataIndex?: string;
@@ -101,6 +112,7 @@ export interface ITableRowProps<T = any> extends FormComponentProps {
   api: ITableApi;
   context: ITableContext;
   getRowKey: () => string;
+  columns: ITableColDef[];
 }
 
 export interface ITableTriggerCellValueChangedParams<T = any> {
@@ -121,6 +133,16 @@ export interface ITableTriggerCellValueChangeParams<T = any> {
   rowId?: string;
 }
 
+export interface ITableTriggerCellFieldsChangeParams<T = any> {
+  record?: T;
+  rowIndex?: number;
+  value?: any;
+  rowId?: string;
+  changedFields?: any;
+  allFields?: any;
+  add?: string;
+}
+
 export interface IFormTriggerCellValueChangeParams<T = any> {
   record?: T;
   value?: any;
@@ -136,9 +158,10 @@ export interface IFormTriggerCellValueChangedParams<T = any> {
   value: any;
 }
 
-export interface ITableProps<T = any> extends Omit<TableProps<T>, 'columns'> {
+export interface ITableProps<T = ITableDataSource> extends Omit<TableProps<T>, 'columns'> {
   onCellValueChanged?: (params: ITableTriggerCellValueChangedParams) => void;
-  onCellValueChange?: (params: ITableTriggerCellValueChangeParams) => void;
+  onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
+  onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
   columns?: ITableColDef[];
   vertical?: boolean;
 }
@@ -151,7 +174,7 @@ export interface ITableApi {
   eventBus: any;
 }
 
-export interface IFormBaseProps<T = any> extends FormProps {
+export interface IFormBaseProps<T = IFormDataSource> extends FormProps {
   onValueChanged?: IFormValueChangedHandle<T>;
   onValuesChange?: IFormValuesChangeHandle<T>;
   actionFieldProps?: FormItemProps;
@@ -161,9 +184,7 @@ export interface IFormBaseProps<T = any> extends FormProps {
   className?: string;
   style?: CSSProperties;
   columnNumberOneRow?: number;
-  dataSource?: {
-    [key: string]: any | IFormField;
-  };
+  dataSource?: T;
   columns?: IFormColDef[];
   footer?: boolean | JSX.Element;
   submitLoading?: boolean;
@@ -176,8 +197,8 @@ export interface IFormBaseProps<T = any> extends FormProps {
   colProps?: (params: { rowIndex: number; index: number }) => any;
   ref?: (node: any) => void;
   wrappedComponentRef?: (node: any) => void;
-  onSubmitButtonClick?: (params: { dataSource: any; domEvent: MouseEvent }) => void;
-  onResetButtonClick?: (params: { dataSource: any; domEvent: MouseEvent }) => void;
+  onSubmitButtonClick?: (params: { dataSource: IFormDataSource; domEvent: MouseEvent }) => void;
+  onResetButtonClick?: (params: { dataSource: IFormDataSource; domEvent: MouseEvent }) => void;
   submitButtonProps?: ButtonProps;
   resetButtonProps?: ButtonProps;
   eventBus?: any;

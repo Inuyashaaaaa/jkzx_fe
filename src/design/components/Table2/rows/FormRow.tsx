@@ -2,9 +2,14 @@ import { Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _, { omit } from 'lodash';
 import React, { PureComponent } from 'react';
-import { ITableRowProps, ITableTriggerCellValueChangeParams } from '../../type';
+import {
+  IFormField,
+  ITableRowProps,
+  ITableTriggerCellFieldsChangeParams,
+  ITableTriggerCellValueChangeParams,
+} from '../../type';
 import styles from '../cells/SwitchCell.less';
-import { TABLE_CELL_VALUE_CHANGE } from '../constants/EVENT';
+import { TABLE_CELL_FIELDS_CHANGE, TABLE_CELL_VALUES_CHANGE } from '../constants/EVENT';
 
 const EditableContext = React.createContext<{ form?: WrappedFormUtils }>({});
 
@@ -53,7 +58,36 @@ const FormRow = Form.create({
       rowIndex,
       rowId: record[getRowKey()],
     };
-    api.eventBus.emit(TABLE_CELL_VALUE_CHANGE, event);
+    api.eventBus.emit(TABLE_CELL_VALUES_CHANGE, event);
+  },
+  onFieldsChange(props: ITableRowProps, changedFields: object, allFields: any, add: string) {
+    const { record, rowIndex, api, getRowKey } = props;
+    const event: ITableTriggerCellFieldsChangeParams = {
+      changedFields: _.mapValues(changedFields, (val: IFormField) => ({ ...val, type: 'field' })),
+      allFields: _.mapValues(allFields, (val: IFormField) => ({ ...val, type: 'field' })),
+      record,
+      rowIndex,
+      rowId: record[getRowKey()],
+      add,
+    };
+    api.eventBus.emit(TABLE_CELL_FIELDS_CHANGE, event);
+  },
+  mapPropsToFields: props => {
+    const { record, columns } = props;
+    if (!record) return null;
+    const filledDataSource = columns.reduce((data, next) => {
+      data[next.dataIndex] = record[next.dataIndex];
+      return data;
+    }, {});
+    const result = _.mapValues(
+      _.pickBy(filledDataSource, (val: IFormField) => {
+        return typeof val === 'object' && val.type === 'field';
+      }),
+      (val: IFormField) => {
+        return Form.createFormField(val);
+      }
+    );
+    return result;
   },
 })(EditableRow);
 

@@ -36,15 +36,8 @@ class SwitchCell extends PureComponent<
 
   public form: WrappedFormUtils;
 
-  public cacheInitialValue: any;
-
   constructor(props) {
     super(props);
-    const {
-      record,
-      colDef: { dataIndex },
-    } = props;
-    this.cacheInitialValue = record[dataIndex];
   }
 
   public isSelectionCell = () => {
@@ -104,10 +97,10 @@ class SwitchCell extends PureComponent<
     const dataIndex = this.getDataIndex();
     if (this.form.isFieldValidating(dataIndex)) return;
 
-    const { record } = this.props;
-    if (record[dataIndex] === this.form.getFieldValue(dataIndex)) {
-      return this.setState({ editing: false }, callback);
-    }
+    // const { record } = this.props;
+    // if (this.getValue() === this.form.getFieldValue(dataIndex)) {
+    //   return this.setState({ editing: false }, callback);
+    // }
 
     const errorMsgs = await this.form.getFieldError(dataIndex);
     if (errorMsgs) return;
@@ -122,14 +115,33 @@ class SwitchCell extends PureComponent<
     }
   };
 
+  public getValue = () => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    if (typeof val === 'object' && val.type === 'field') {
+      return val.value;
+    }
+    return val;
+  };
+
+  public setValue = newVal => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    if (typeof val === 'object' && val.type === 'field') {
+      val.value = newVal;
+    } else {
+      record[dataIndex] = newVal;
+    }
+  };
+
   public mutableChangeRecordValue = (value, linkage) => {
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
-    const oldValue = record[dataIndex];
+    const oldValue = this.getValue();
 
-    if (oldValue === value) return;
-
-    record[dataIndex] = value;
+    this.setValue(value);
 
     this.triggerTableCellValueChanged(TABLE_CELL_VALUE_CHANGED, value, oldValue, linkage);
   };
@@ -165,7 +177,7 @@ class SwitchCell extends PureComponent<
     const { colDef } = this.props;
     const { editable, dataIndex } = colDef;
     const { editing } = this.state;
-    const wrapedForm = wrapFormGetDecorator(dataIndex, form, this.cacheInitialValue);
+    const wrapedForm = wrapFormGetDecorator(dataIndex, form);
     if (editable && editing) {
       return React.createElement(EditingCell, {
         ...this.props,
