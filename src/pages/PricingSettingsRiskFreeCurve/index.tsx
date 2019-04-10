@@ -111,6 +111,8 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public onConfirm = event => {
+    if (!event.formData.tenor) return;
+
     const clone = [...this.state.tableDataSource];
     clone.splice(event.extra.rowIndex + 1, 0, {
       ...event.extra.rowData,
@@ -160,6 +162,12 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
       this.reject = reject;
     });
     return this.confirmPromise;
+  };
+
+  public onCancel = () => {
+    return {
+      formData: {},
+    };
   };
 
   public render() {
@@ -234,6 +242,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               ref={node => (this.$modalButton = node)}
               onConfirm={this.onConfirm}
               onClick={this.onClick}
+              onCancel={this.onCancel}
             >
               插入
             </ModalButton>,
