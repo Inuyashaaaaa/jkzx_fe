@@ -2,6 +2,7 @@ import { INPUT_NUMBER_DIGITAL_CONFIG, LCM_EVENT_TYPE_OPTIONS } from '@/constants
 import SourceTable from '@/design/components/SourceTable';
 import Form, { IFormControl } from '@/lib/components/_Form2';
 import { IColumnDef } from '@/lib/components/_Table2';
+import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientChangeCredit,
   clientSaveAccountOpRecord,
@@ -84,7 +85,7 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) =>
   };
 
   const premiumlist = {
-    decorator: {
+    options: {
       rules: [
         {
           required: true,
@@ -94,12 +95,12 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) =>
     control: {
       label: '期权费',
     },
-    field: 'premium',
+    dataIndex: 'premium',
     input: INPUT_NUMBER_DIGITAL_CONFIG,
   };
 
   const cashFlow = {
-    decorator: {
+    options: {
       rules: [
         {
           required: true,
@@ -109,7 +110,7 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) =>
     control: {
       label: '金额',
     },
-    field: 'cashFlow',
+    dataIndex: 'cashFlow',
     input: INPUT_NUMBER_DIGITAL_CONFIG,
   };
 
@@ -561,7 +562,7 @@ class ExportModal extends PureComponent<any, any> {
   };
 
   public handleChangeValueOur = params => {
-    const values = params.values;
+    const values = params;
     if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
       this.setState({
         item: false,
