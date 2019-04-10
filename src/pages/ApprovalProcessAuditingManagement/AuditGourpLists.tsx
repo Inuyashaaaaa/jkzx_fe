@@ -254,7 +254,7 @@ class AuditLists extends PureComponent {
           </ul>
         ) : (
           <Button className={styles.center} type="primary" onClick={this.showModal}>
-            新建
+            新建审批组
           </Button>
         )}
         <Modal
