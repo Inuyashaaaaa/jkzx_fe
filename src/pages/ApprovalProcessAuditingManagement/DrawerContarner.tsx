@@ -66,13 +66,9 @@ class Operation extends PureComponent {
     const res = await requests();
     const [roles, users, departmentsRes] = res;
 
-    console.log(departmentsRes.data);
-
     let departments = departmentsRes.data || {};
     let departmentTree = [];
     departmentTree.push(departments);
-    // const data = this.toTree(departmentTree)
-    // console.log(data);
 
     const error = res.some(item => {
       return item.error;
@@ -235,7 +231,6 @@ class Operation extends PureComponent {
                 <TreeSelect
                   value={this.state.departmentId}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  placeholder="Please select"
                   treeDefaultExpandAll
                   onChange={this.onDepartment}
                 >
