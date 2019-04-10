@@ -91,12 +91,19 @@ class SystemSettingsRoleManagement extends PureComponent {
       loading: true,
     });
 
-    const { data, error, raw } = await wkApproveGroupList();
+    const { data, error } = await wkApproveGroupList();
     if (error) return;
+
+    data.sort((a, b) => {
+      return a.approveGroupName.localeCompare(b.approveGroupName);
+    });
+
+    if (this.$gourpLists) {
+      this.$gourpLists.handleMenber(data[0]);
+    }
 
     this.setState({
       approveGroupList: data,
-      userList: data.userList,
       loading: false,
     });
   };
@@ -170,6 +177,10 @@ class SystemSettingsRoleManagement extends PureComponent {
   };
 
   public render() {
+    let { userList } = this.state;
+    userList = (userList || []).sort((a, b) => {
+      return a.username.localeCompare(b.username);
+    });
     return (
       <>
         <div className={styles.auditingWrapper}>
@@ -177,6 +188,7 @@ class SystemSettingsRoleManagement extends PureComponent {
             <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
               <p>审批组列表</p>
               <AuditGourpLists
+                ref={node => (this.$gourpLists = node)}
                 approveGroupList={this.state.approveGroupList}
                 handleEdit={param => this.onEdit(param)}
                 handleMenber={this.handleMenber}
@@ -204,7 +216,7 @@ class SystemSettingsRoleManagement extends PureComponent {
                 <Table
                   className={styles.menberTable}
                   columns={this.state.columns}
-                  dataSource={this.state.userList}
+                  dataSource={userList}
                   rowKey={data => data.userApproveGroupId}
                 />
               ) : (

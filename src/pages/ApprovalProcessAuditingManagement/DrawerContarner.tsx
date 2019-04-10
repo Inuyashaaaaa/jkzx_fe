@@ -94,6 +94,9 @@ class Operation extends PureComponent {
     dataSource = dataSource.filter(item => {
       return !currentGroup.userList.find(items => item.username === items.username);
     });
+    dataSource.sort((a, b) => {
+      return a.username.localeCompare(b.username);
+    });
     this.setState({
       loading: false,
       dataSource,
@@ -106,7 +109,7 @@ class Operation extends PureComponent {
 
   public toArray = data => {
     let array = [];
-    let children = data.children || [];
+    const children = data.children || [];
     delete data.children;
     array.push(data);
 
