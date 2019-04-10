@@ -20,6 +20,7 @@ import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import { trdBookList } from '@/services/general-service';
 import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service';
 import {
@@ -86,6 +87,8 @@ class BookCreate extends PureComponent<any> {
     tadeInfo: {},
     modalVisible: false,
     entryMargin: true,
+    entryPremium: true,
+    entryCash: false,
   };
 
   public modalFormData: any;
@@ -368,20 +371,20 @@ class BookCreate extends PureComponent<any> {
   };
 
   public handleA = async (uuidList, values, resolve) => {
-    const clientTradeCashFlowRsp = await clientTradeCashFlow({
+    const clientNewTradeRsp = await clientNewTrade({
       accountId: this.modalFormData
         ? this.modalFormData.accountId
         : this.state.selectedRows[0].accountId,
+      premium: values.premium,
+      information: '',
       tradeId: values.tradeId,
-      cashFlow: String(values.cashFlow),
-      marginFlow: String(0),
     });
 
-    if (clientTradeCashFlowRsp.error) {
+    if (clientNewTradeRsp.error) {
       return resolve(false);
     }
-    if (!clientTradeCashFlowRsp.data.status) {
-      message.error(clientTradeCashFlowRsp.data.information);
+    if (!clientNewTradeRsp.data.status) {
+      message.error(clientNewTradeRsp.data.information);
       return resolve(false);
     }
     const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
@@ -390,6 +393,38 @@ class BookCreate extends PureComponent<any> {
     if (cliMmarkTradeTaskProcessedRsp.error) {
       return resolve(false);
     }
+
+    resolve(true);
+    this.onFetch();
+    message.success('录入成功');
+  };
+
+  public handleD = async (uuidList, values, resolve, type) => {
+    const clientSettleTradeRsp = await clientSettleTrade({
+      accountId: this.modalFormData
+        ? this.modalFormData.accountId
+        : this.state.selectedRows[0].accountId,
+      amount: values.cashFlow,
+      accountEvent: type,
+      premium: values.premium,
+      information: '',
+      tradeId: values.tradeId,
+    });
+
+    if (clientSettleTradeRsp.error) {
+      return resolve(false);
+    }
+    if (!clientSettleTradeRsp.data.status) {
+      message.error(clientSettleTradeRsp.data.information);
+      return resolve(false);
+    }
+    const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
+      uuidList,
+    });
+    if (cliMmarkTradeTaskProcessedRsp.error) {
+      return resolve(false);
+    }
+
     resolve(true);
     this.onFetch();
     message.success('录入成功');
@@ -458,13 +493,25 @@ class BookCreate extends PureComponent<any> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            values.premium = new BigNumber(values.premium).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
+          case '平仓金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '平仓金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '结算金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
+          case '结算金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
           case '保证金释放':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
@@ -563,6 +610,7 @@ class BookCreate extends PureComponent<any> {
       legalName: event.rowData.legalName,
       tradeId: event.rowData.tradeId,
       cashFlow: event.rowData.cashFlow,
+      premium: event.rowData.premium,
     };
     const toOurDataSource = {
       legalName: event.rowData.legalName,
@@ -589,17 +637,73 @@ class BookCreate extends PureComponent<any> {
     const values = params.values;
     if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
       this.setState({
+        item: false,
         entryMargin: false,
+        entryPremium: false,
+        entryCash: true,
         ourDataSource: values,
+      });
+      return;
+    }
+    if (
+      values.cashType === '平仓金额收入' ||
+      values.cashType === '平仓金额扣除' ||
+      values.cashType === '结算金额收入' ||
+      values.cashType === '结算金额扣除'
+    ) {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '期权费收入' || values.cashType === '期权费扣除') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: false,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '授信扣除' || values.cashType === '授信恢复') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: false,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
       });
       return;
     }
 
     this.setState({
       entryMargin: true,
+      entryPremium: false,
+      entryCash: false,
       ourDataSource: {
         ...values,
         tradeId: this.modalFormData.tradeId,
+        premium: this.modalFormData.premium,
+        cashFlow: this.modalFormData.cashFlow,
       },
     });
   };
@@ -801,7 +905,11 @@ class BookCreate extends PureComponent<any> {
                   return;
                 }}
                 dataSource={this.state.ourDataSource}
-                controls={OUR_CREATE_FORM_CONTROLS(this.state.entryMargin)}
+                controls={OUR_CREATE_FORM_CONTROLS(
+                  this.state.entryMargin,
+                  this.state.entryPremium,
+                  this.state.entryCash
+                )}
                 onValueChange={this.handleChangeValueOur}
                 controlNumberOneRow={1}
                 footer={false}

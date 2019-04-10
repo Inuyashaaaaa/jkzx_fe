@@ -3,6 +3,7 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import { ModalButton } from '@/design/components';
 import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
+import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientAccountOpRecordList,
   clientChangeCredit,
@@ -64,6 +65,10 @@ class IOGlod extends PureComponent<IOGlodProps> {
     entryMargin: true,
     unCreateTableDataSource: [],
     unCreateLoading: false,
+    entryPremium: true,
+    premium: true,
+    entryCash: false,
+    cash: false,
   };
 
   public componentDidMount = () => {
@@ -122,6 +127,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
     const ourDataSource = {
       legalName: event.rowData.legalName,
       tradeId: event.rowData.tradeId,
+      premium: event.rowData.premium,
       cashFlow: event.rowData.cashFlow,
     };
     const toOurDataSource = {
@@ -140,20 +146,51 @@ class IOGlod extends PureComponent<IOGlodProps> {
   };
 
   public handleA = async (uuidList, values, resolve) => {
-    const clientTradeCashFlowRsp = await clientTradeCashFlow({
+    const clientNewTradeRsp = await clientNewTrade({
       accountId: this.modalFormData
         ? this.modalFormData.accountId
         : this.state.selectedRows[0].accountId,
+      premium: values.premium,
+      information: '',
       tradeId: values.tradeId,
-      cashFlow: String(values.cashFlow),
-      marginFlow: String(0),
     });
 
-    if (clientTradeCashFlowRsp.error) {
+    if (clientNewTradeRsp.error) {
       return resolve(false);
     }
-    if (!clientTradeCashFlowRsp.data.status) {
-      message.error(clientTradeCashFlowRsp.data.information);
+    if (!clientNewTradeRsp.data.status) {
+      message.error(clientNewTradeRsp.data.information);
+      return resolve(false);
+    }
+    const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
+      uuidList,
+    });
+    if (cliMmarkTradeTaskProcessedRsp.error) {
+      return resolve(false);
+    }
+
+    resolve(true);
+    this.onFetchUnCreate();
+    message.success('录入成功');
+  };
+
+  public handleD = async (uuidList, values, resolve, type) => {
+    const clientSettleTradeRsp = await clientSettleTrade({
+      accountId: this.modalFormData
+        ? this.modalFormData.accountId
+        : this.state.selectedRows[0].accountId,
+      amount: values.cashFlow,
+      accountEvent: type,
+      premium: values.premium,
+      information: '',
+      tradeId: values.tradeId,
+    });
+
+    if (clientSettleTradeRsp.error) {
+      return resolve(false);
+    }
+    if (!clientSettleTradeRsp.data.status) {
+      message.error(clientSettleTradeRsp.data.information);
       return resolve(false);
     }
     const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
@@ -225,19 +262,42 @@ class IOGlod extends PureComponent<IOGlodProps> {
   };
 
   public handleAIO = async (uuidList, values, resolve) => {
-    const clientTradeCashFlowRsp = await clientTradeCashFlow({
+    const clientNewTradeRsp = await clientNewTrade({
       accountId: this.state.accountId,
+      premium: values.premium,
+      information: '',
       tradeId: values.tradeId,
-      cashFlow: String(values.cashFlow),
-      marginFlow: String(0),
     });
 
-    if (clientTradeCashFlowRsp.error) {
-      message.error(clientTradeCashFlowRsp.data.information);
+    if (clientNewTradeRsp.error) {
+      message.error(clientNewTradeRsp.data.information);
       return resolve(false);
     }
 
-    if (!clientTradeCashFlowRsp.data.status) {
+    if (!clientNewTradeRsp.data.status) {
+      return resolve(false);
+    }
+
+    this.onFetch();
+    return resolve({
+      message: '录入成功',
+    });
+  };
+
+  public handleDIO = async (uuidList, values, resolve, type) => {
+    const clientSettleTradeRsp = await clientSettleTrade({
+      accountId: this.state.accountId,
+      amount: values.cashFlow,
+      accountEvent: type,
+      premium: values.premium,
+      information: '',
+      tradeId: values.tradeId,
+    });
+    if (clientSettleTradeRsp.error) {
+      return resolve(false);
+    }
+    if (!clientSettleTradeRsp.data.status) {
+      message.error(clientSettleTradeRsp.data.information);
       return resolve(false);
     }
 
@@ -258,7 +318,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
       return resolve(false);
     }
     if (!clientChangeCreditRsp.data.status) {
-      message.error(clientTradeCashFlowRsp.data.information);
+      message.error(clientChangeCreditRsp.data.information);
       return resolve(false);
     }
 
@@ -297,13 +357,25 @@ class IOGlod extends PureComponent<IOGlodProps> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            values.premium = new BigNumber(values.premium).negated().toNumber();
           case '期权费收入':
             return this.handleAIO(uuidList, values, resolve);
           case '授信扣除':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleBIO(uuidList, values, resolve);
+          case '平仓金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '平仓金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '结算金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'SETTLE_TRADE');
+          case '结算金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'SETTLE_TRADE');
           case '保证金释放':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
@@ -323,13 +395,25 @@ class IOGlod extends PureComponent<IOGlodProps> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            values.premium = new BigNumber(values.premium).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
+          case '平仓金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '平仓金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '结算金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
+          case '结算金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
           case '保证金释放':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
@@ -464,16 +548,71 @@ class IOGlod extends PureComponent<IOGlodProps> {
       this.setState({
         item: false,
         entryMargin: false,
+        entryPremium: false,
+        entryCash: true,
         ourDataSource: values,
+      });
+      return;
+    }
+    if (
+      values.cashType === '平仓金额收入' ||
+      values.cashType === '平仓金额扣除' ||
+      values.cashType === '结算金额收入' ||
+      values.cashType === '结算金额扣除'
+    ) {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '期权费收入' || values.cashType === '期权费扣除') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: false,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '授信扣除' || values.cashType === '授信恢复') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: false,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
       });
       return;
     }
 
     this.setState({
       entryMargin: true,
+      entryPremium: false,
+      entryCash: false,
       ourDataSource: {
         ...values,
         tradeId: this.modalFormData.tradeId,
+        premium: this.modalFormData.premium,
+        cashFlow: this.modalFormData.cashFlow,
       },
     });
   };
@@ -491,6 +630,42 @@ class IOGlod extends PureComponent<IOGlodProps> {
       this.setState({
         item: false,
         margin: false,
+        premium: false,
+        cash: true,
+        ourDataSource2: values,
+      });
+      return;
+    }
+    if (
+      values.cashType === '平仓金额收入' ||
+      values.cashType === '平仓金额扣除' ||
+      values.cashType === '结算金额收入' ||
+      values.cashType === '结算金额扣除'
+    ) {
+      this.setState({
+        margin: true,
+        premium: true,
+        cash: true,
+        ourDataSource2: values,
+      });
+      return;
+    }
+
+    if (values.cashType === '期权费收入' || values.cashType === '期权费扣除') {
+      this.setState({
+        margin: true,
+        premium: true,
+        cash: false,
+        ourDataSource2: values,
+      });
+      return;
+    }
+
+    if (values.cashType === '授信扣除' || values.cashType === '授信恢复') {
+      this.setState({
+        margin: true,
+        premium: false,
+        cash: true,
         ourDataSource2: values,
       });
       return;
@@ -508,6 +683,8 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }
     this.setState({
       margin: true,
+      premium: true,
+      cash: false,
       ourDataSource2: values,
     });
   };
@@ -600,6 +777,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
             <Row style={{ marginBottom: VERTICAL_GUTTER }}>
               <ModalButton
                 onClick={this.onSwitchIOCreateModal}
+                type="primary"
                 modalProps={{
                   onOk: this.onCreateIo,
                   width: 650,
@@ -617,7 +795,9 @@ class IOGlod extends PureComponent<IOGlodProps> {
                         dataSource={this.state.ourDataSource2}
                         controls={OUR_CREATE_FORM_CONTROLS(
                           this.state.legalNamesList,
-                          this.state.margin
+                          this.state.margin,
+                          this.state.premium,
+                          this.state.cash
                         )}
                         onValueChange={this.handleChangeValueOur2}
                         controlNumberOneRow={1}
@@ -666,7 +846,9 @@ class IOGlod extends PureComponent<IOGlodProps> {
                 dataSource={this.state.ourDataSource}
                 controls={OUR_CREATE_FORM_CONTROLS(
                   this.state.legalNamesList,
-                  this.state.entryMargin
+                  this.state.entryMargin,
+                  this.state.entryPremium,
+                  this.state.entryCash
                 )}
                 onValueChange={this.handleChangeValueOur}
                 controlNumberOneRow={1}
