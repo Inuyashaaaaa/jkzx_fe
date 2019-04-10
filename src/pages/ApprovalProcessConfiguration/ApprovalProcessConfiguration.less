@@ -1,0 +1,57 @@
+@import '~antd/lib/style/themes/default.less';
+
+.approvalProcessConfiguration {
+  :global {
+    .ant-card-body {
+      display: flex;
+      min-height: 720px;
+      padding: 0;
+      background: #f3f3f3;
+    }
+    .ant-tabs {
+      width: 100%;
+    }
+    .ant-tabs-bar {
+      background: #fff;
+    }
+    .ant-tabs-content {
+      height: 100%;
+    }
+    .ant-checkbox-wrapper {
+      margin-left: 0;
+      span {
+        font-size: 12px;
+      }
+    }
+  }
+  .rightBox {
+    width: '300px';
+    background: '#FFF';
+    padding: '30px';
+    float: 'right';
+    height: '100%';
+  }
+  .leftBox {
+    margin-right: '320px';
+    background: '#FFF';
+    padding: '30px';
+    position: 'relative';
+    height: '100%';
+  }
+  .configButtonBox {
+    text-align: center;
+    position: absolute;
+    bottom: 100px;
+    :global {
+      .ant-btn {
+        width: 220px;
+        border-radius: 6px;
+      }
+    }
+  }
+  .message {
+    margin-top: 40px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+  }
+}

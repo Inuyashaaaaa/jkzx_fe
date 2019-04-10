@@ -63,6 +63,7 @@ const pagesCollection = [
   'riskSettings',
   'approvalProcessManagement',
   'approvalAuditingManagement',
+  'approvalProcessConfiguration',
   'customReport',
   'portfolioManagement',
   'tradeDocuments',

@@ -33,6 +33,7 @@ export function setPermissions(permissions) {
     JSON.stringify({
       ...permissions,
       auditingManagement: true,
+      processConfiguration: true,
     })
   );
 }

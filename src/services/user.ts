@@ -46,6 +46,7 @@ export const permissions = {
   documentManagement: true,
   roleManagement: true,
   auditingManagement: true,
+  processConfiguration: true,
 };
 
 /**
