@@ -15,6 +15,17 @@ import InputManager from './Input/register';
 import TableManager from './Table2/api';
 import TableSwitchCell from './Table2/cells/SwitchCell';
 
+export type IFormField =
+  | any
+  | {
+      value: any;
+      name: string;
+      touched: boolean;
+      dirty: boolean;
+      errors: string[];
+      validating: boolean;
+    };
+
 export interface IColDef {
   dataIndex?: string;
   render?: any;
@@ -129,7 +140,6 @@ export interface ITableProps<T = any> extends Omit<TableProps<T>, 'columns'> {
   onCellValueChanged?: (params: ITableTriggerCellValueChangedParams) => void;
   onCellValueChange?: (params: ITableTriggerCellValueChangeParams) => void;
   columns?: ITableColDef[];
-  inputManager?: InputManager;
   vertical?: boolean;
 }
 
@@ -143,8 +153,7 @@ export interface ITableApi {
 
 export interface IFormBaseProps<T = any> extends FormProps {
   onValueChanged?: IFormValueChangedHandle<T>;
-  onValueChange?: IFormValueChangeHandle<T>;
-  inputManager?: InputManager;
+  onValuesChange?: IFormValuesChangeHandle<T>;
   actionFieldProps?: FormItemProps;
   submitable?: boolean;
   resetable?: boolean;
@@ -152,7 +161,9 @@ export interface IFormBaseProps<T = any> extends FormProps {
   className?: string;
   style?: CSSProperties;
   columnNumberOneRow?: number;
-  dataSource?: object;
+  dataSource?: {
+    [key: string]: any | IFormField;
+  };
   columns?: IFormColDef[];
   footer?: boolean | JSX.Element;
   submitLoading?: boolean;
@@ -178,7 +189,11 @@ export interface IFormProps<T = any> extends IFormBaseProps {
 
 export type IFormValueChangedHandle<T = any> = (params: IFormTriggerCellValueChangedParams) => void;
 
-export type IFormValueChangeHandle<T = any> = (params: IFormTriggerCellValueChangeParams) => void;
+export type IFormValuesChangeHandle<T = any> = (
+  props: T,
+  changedValues: any,
+  allValues: any
+) => void;
 
 export abstract class InputBase<P = any, S = any> extends React.PureComponent<
   P & {

@@ -32,3 +32,5 @@ export const TRADER_TYPE = {
   PRODUCT: 'product',
   ENTERPRISE: 'enterprise',
 };
+
+export const PARTY_DOC_CREATE_OR_UPDATE = 'partyDocCreateOrUpdate';

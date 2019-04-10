@@ -4,18 +4,13 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React, { ComponentClass, PureComponent } from 'react';
 import { createEventBus } from '../../utils';
-import { IFormBaseProps, IFormProps, IFormTriggerCellValueChangeParams } from '../type';
-import { FORM_CELL_VALUE_CHANGE } from './constants';
+import { IFormBaseProps, IFormProps, IFormTriggerCellValueChangeParams, IFormField } from '../type';
+import { FORM_CELL_VALUES_CHANGE } from './constants';
 import FormBase from './FormBase';
 
 class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
-  public static defaultProps = {
-    dataSource: {},
-  };
-
   public static createOptionsFields = [
     'onFieldsChange',
-    'onValuesChange',
     'mapPropsToFields',
     'validateMessages',
     'withRef',
@@ -35,6 +30,20 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     this.DecoratorForm = AntdForm.create<IFormBaseProps>({
       ..._.pick(props, Form.createOptionsFields),
       onValuesChange: this.onValuesChange,
+      mapPropsToFields:
+        props.dataSource &&
+        (props => {
+          const { dataSource } = props;
+          if (!dataSource) return null;
+          const filledDataSource = props.columns.reduce((data, next) => {
+            data[next.dataIndex] = dataSource[next.dataIndex];
+            return data;
+          }, {});
+          const result = _.mapValues(filledDataSource, (val: IFormField) => {
+            return AntdForm.createFormField(val);
+          });
+          return result;
+        }),
     })(FormBase);
   }
 
@@ -43,13 +52,16 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     changedValues,
     allValues
   ) => {
-    const { dataSource: record } = props;
+    const { dataSource: record = {}, onValuesChange } = props;
+    if (onValuesChange) {
+      onValuesChange(props, changedValues, allValues);
+    }
     const event: IFormTriggerCellValueChangeParams = {
       changedValues,
       allValues,
       record,
     };
-    this.eventBus.emit(FORM_CELL_VALUE_CHANGE, event);
+    this.eventBus.emit(FORM_CELL_VALUES_CHANGE, event);
   };
 
   public validate = async (
@@ -57,10 +69,6 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     fieldNames = this.props.columns.map(item => item.dataIndex)
   ) => {
     return this.wrappedComponentRef.validate(options, fieldNames);
-  };
-
-  public reset = () => {
-    return this.wrappedComponentRef.reset();
   };
 
   public getRef = node => {

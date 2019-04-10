@@ -5,10 +5,10 @@ import { clientAccountSearch, refSimilarLegalNameList } from '@/services/referen
 import { queryCompleteCompanys } from '@/services/sales';
 import { arr2treeOptions } from '@/tools';
 import { getMoment } from '@/utils';
-import { Card, Divider, Row } from 'antd';
+import { Card, Divider, Form, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import CreateModalButton from './CreateModalButton';
 
@@ -46,7 +46,7 @@ const ClientManagementInfo = memo(() => {
   const [salesCascaderList, setSalesCascaderList] = useState([]);
 
   const initialFormData = {
-    [STATUS_FIELD]: ALL_OPTIONS_VALUE,
+    [STATUS_FIELD]: { value: ALL_OPTIONS_VALUE },
   };
   const [searchFormData, setSearchFormData] = useState(initialFormData);
 
@@ -96,22 +96,37 @@ const ClientManagementInfo = memo(() => {
     fetchBranchSalesList();
   });
 
+  const [resetFetchNumber, setResetFetchNumber] = useState(0);
+
+  useEffect(
+    () => {
+      if (resetFetchNumber <= 0) return;
+      const formData = getFormData();
+      fetchTableData(formData);
+    },
+    [resetFetchNumber]
+  );
+
   return (
     <PageHeaderWrapper title="客户信息管理" card={false}>
       <Card>
         <Form2
+          ref={node => (formEl.current = node)}
+          onResetButtonClick={() => {
+            setSearchFormData(initialFormData);
+            setResetFetchNumber(resetFetchNumber + 1);
+          }}
           onSubmitButtonClick={async ({ domEvent }) => {
             domEvent.preventDefault();
             const formData = getFormData();
             fetchTableData(formData);
           }}
-          ref={node => (formEl.current = node)}
           layout="inline"
           submitText="查询"
           submitButtonProps={{
             icon: 'search',
           }}
-          onValueChange={({ allValues }) => {
+          onValuesChange={(props, changedValues, allValues) => {
             setSearchFormData(allValues);
           }}
           dataSource={searchFormData}
@@ -186,7 +201,7 @@ const ClientManagementInfo = memo(() => {
               render: (value, record, index, { form }) => {
                 return (
                   <FormItem>
-                    {form.getFieldDecorator({})(
+                    {form.getFieldDecorator()(
                       <Select
                         placeholder="请选择内容"
                         options={[
@@ -206,7 +221,7 @@ const ClientManagementInfo = memo(() => {
       </Card>
       <Card style={{ marginTop: VERTICAL_GUTTER }}>
         <Row type="flex" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <CreateModalButton />
+          <CreateModalButton salesCascaderList={salesCascaderList} />
         </Row>
         <Table2
           size="middle"

@@ -33,15 +33,8 @@ class SwitchCell extends PureComponent<
 
   public $renderingCell: RenderingCell;
 
-  public cacheInitialValue: any;
-
   constructor(props) {
     super(props);
-    const {
-      record,
-      colDef: { dataIndex },
-    } = props;
-    this.cacheInitialValue = record[dataIndex];
   }
 
   public componentDidMount = () => {
@@ -77,7 +70,7 @@ class SwitchCell extends PureComponent<
     const { colDef, form } = this.props;
     const { editable, dataIndex } = colDef;
     const { editing } = this.state;
-    const wrapedForm = wrapFormGetDecorator(dataIndex, form, this.cacheInitialValue);
+    const wrapedForm = wrapFormGetDecorator(dataIndex, form);
     if (editable && editing) {
       return React.createElement(EditingCell, {
         ...this.props,
@@ -136,6 +129,26 @@ class SwitchCell extends PureComponent<
     }
   };
 
+  public getValue = () => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    if (val != null && typeof val === 'object') {
+      return val.value;
+    }
+    return val;
+  };
+
+  public setValue = newVal => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    if (typeof val === 'object' && val.value) {
+      val.value = newVal;
+    }
+    record[dataIndex] = newVal;
+  };
+
   public saveCell = async (callback?) => {
     if (!this.getEditable()) return;
     if (!this.state.editing) return;
@@ -143,7 +156,7 @@ class SwitchCell extends PureComponent<
     if (this.props.form.isFieldValidating(dataIndex)) return;
 
     const { record } = this.props;
-    if (record[dataIndex] === this.props.form.getFieldValue(dataIndex)) {
+    if (this.getValue() === this.props.form.getFieldValue(dataIndex)) {
       return this.setState({ editing: false }, callback);
     }
 
@@ -165,11 +178,11 @@ class SwitchCell extends PureComponent<
   public mutableChangeRecordValue = (value, linkage) => {
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
-    const oldValue = record[dataIndex];
+    const oldValue = this.getValue();
 
     if (oldValue === value) return;
 
-    record[dataIndex] = value;
+    this.setValue(value);
 
     this.triggerTableCellValueChanged(value, oldValue, linkage);
   };

@@ -1,24 +1,15 @@
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 
-export const wrapFormGetDecorator = (dataIndex, form: WrappedFormUtils, initialValue: any) => {
+export const wrapFormGetDecorator = (dataIndex, form: WrappedFormUtils) => {
   const old = form.getFieldDecorator;
   form.getFieldDecorator = function() {
-    if (typeof arguments[0] === 'object') {
-      return old.apply(this, [
-        dataIndex,
-        {
-          initialValue,
-          ...arguments[0],
-        },
-      ]);
+    if (!arguments.length) {
+      return old.apply(this, [dataIndex, {}]);
     }
-    return old.apply(this, [
-      arguments[0],
-      {
-        initialValue,
-        ...arguments[1],
-      },
-    ]);
+    if (typeof arguments[0] === 'object') {
+      return old.apply(this, [dataIndex, ...arguments]);
+    }
+    return old.apply(this, arguments);
   };
   return form;
 };

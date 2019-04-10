@@ -56,7 +56,7 @@ class RenderingCell extends PureComponent<IFormCellProps> {
             record,
             colDef: { dataIndex },
           } = this.props;
-          const oldVal = record[dataIndex];
+          const oldVal = cellApi.getValue();
 
           if (newVal === oldVal) return;
 
@@ -96,7 +96,7 @@ class RenderingCell extends PureComponent<IFormCellProps> {
       colDef: { dataIndex, render },
       cellApi,
     } = this.props;
-    const value = record[dataIndex];
+    const value = cellApi.getValue();
     if (render) {
       return cellApi.renderElement(
         render(value, record, 0, {

@@ -6,7 +6,7 @@ import React, { PureComponent } from 'react';
 import { EVERY_EVENT_TYPE } from '../../utils';
 import { IFormBaseProps, IFormColDef, IFormTriggerCellValueChangeParams } from '../type';
 import SwitchCell from './cells/SwitchCell';
-import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from './constants';
+import { FORM_CELL_VALUES_CHANGE, FORM_CELL_VALUE_CHANGED } from './constants';
 import FormManager from './formManager';
 import './index.less';
 
@@ -36,9 +36,6 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
   public handleTableEvent = (params, eventName) => {
     if (eventName === FORM_CELL_VALUE_CHANGED) {
       return this.props.onValueChanged && this.props.onValueChanged(params);
-    }
-    if (eventName === FORM_CELL_VALUE_CHANGE) {
-      return this.props.onValueChange && this.props.onValueChange(params);
     }
   };
 
@@ -102,26 +99,9 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     });
   };
 
-  public reset = (names?: string[]) => {
-    const olds = this.props.form.getFieldsValue();
-    this.props.form.resetFields(names);
-    const news = this.props.form.getFieldsValue();
-    const changedValues = _.fromPairs(
-      _.differenceBy(_.toPairs(olds), _.toPairs(news), item => item[1])
-    );
-    const allValues = news;
-    const { dataSource: record } = this.props;
-    const event: IFormTriggerCellValueChangeParams = {
-      changedValues,
-      allValues,
-      record,
-    };
-    this.eventBus.emit(FORM_CELL_VALUE_CHANGE, event);
-  };
-
   public onReset = domEvent => {
     if (!this.props.onResetButtonClick) {
-      return this.reset();
+      return;
     }
     return this.props.onResetButtonClick({
       dataSource: this.getFormData(),
@@ -242,8 +222,8 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
           'resetButtonProps',
           'getValue',
           'eventBus',
-          'onValueChange',
           'onValueChanged',
+          'onValuesChange',
         ])}
         className={classNames(`tongyu-form2`, className)}
         layout={layout}
@@ -256,7 +236,11 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
                 cols.length > this.maxRowControlNumber ? cols.length : this.maxRowControlNumber;
 
               return (
-                <Row gutter={24} key={key} {...(rowProps ? rowProps({ index: key }) : undefined)}>
+                <Row
+                  gutter={16 + 8 * 2}
+                  key={key}
+                  {...(rowProps ? rowProps({ index: key }) : undefined)}
+                >
                   {cols.map((item, index) => {
                     const { dataIndex } = item;
                     return (
