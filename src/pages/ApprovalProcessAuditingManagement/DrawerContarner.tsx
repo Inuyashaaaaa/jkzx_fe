@@ -1,9 +1,13 @@
 import SourceTable from '@/design/components/SourceTable';
 import { authRolesList } from '@/services/role';
+import { queryAuthDepartmentList } from '@/services/department';
 import { authUserList } from '@/services/user';
-import { Button, Form, Input, Row, Select, Table } from 'antd';
+import { Button, Form, Input, Row, Select, Table, TreeSelect } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import Item from 'antd/lib/list/Item';
+
+const TreeNode = TreeSelect.TreeNode;
 const { Option } = Select;
 
 class Operation extends PureComponent {
@@ -33,6 +37,7 @@ class Operation extends PureComponent {
         render: (text, record) => <a onClick={() => this.onAdd(record.id)}>加入审批组</a>,
       },
     ],
+    departmentTree: [],
     visible: false,
     username: '',
     roleName: '',
@@ -41,6 +46,7 @@ class Operation extends PureComponent {
     loading: false,
     selectedRowKeys: [],
     selectArray: [],
+    departmentId: undefined,
   };
 
   constructor(props) {
@@ -55,9 +61,19 @@ class Operation extends PureComponent {
     this.setState({
       loading: true,
     });
-    const requests = () => Promise.all([authRolesList(), authUserList()]);
+    const requests = () =>
+      Promise.all([authRolesList(), authUserList(), queryAuthDepartmentList({})]);
     const res = await requests();
-    const [roles, users] = res;
+    const [roles, users, departmentsRes] = res;
+
+    console.log(departmentsRes.data);
+
+    let departments = departmentsRes.data || {};
+    let departmentTree = [];
+    departmentTree.push(departments);
+    // const data = this.toTree(departmentTree)
+    // console.log(data);
+
     const error = res.some(item => {
       return item.error;
     });
@@ -78,7 +94,24 @@ class Operation extends PureComponent {
       selectedRowKeys: [],
       selectArray: [],
       rolesList: roles.data,
+      departmentTree,
     });
+  };
+
+  public toTree = (data = []) => {
+    if (!data) return null;
+    data.forEach(item => {
+      item.title = item.departmentName;
+      item.value = item.id;
+      item.key = item.id;
+      if (!!item.children) {
+        item.children.forEach(item => {
+          this.toTree(item.children);
+        });
+      }
+    });
+
+    return data;
   };
 
   public onClose = () => {
@@ -99,9 +132,19 @@ class Operation extends PureComponent {
     });
   };
 
+  public onDepartment = e => {
+    this.setState({
+      departmentId: e,
+    });
+  };
+
   public onSearch = async () => {
     const dataSource = this.state.dataSource.filter(item => {
-      return item.username === this.state.username || item.roleName.includes(this.state.roleName);
+      return (
+        item.username === this.state.username ||
+        item.roleName.includes(this.state.roleName) ||
+        item.departmentId === this.state.departmentId
+      );
     });
     this.setState({
       dataSource,
@@ -143,6 +186,19 @@ class Operation extends PureComponent {
     this.setState({ selectArray, selectedRowKeys });
   };
 
+  public renderTreeNode = (treeData = []) => {
+    if (!treeData) return;
+    let treeNode = [];
+    treeData.map((ele, index) => {
+      treeNode.push(
+        <TreeNode value={ele.id} title={ele.departmentName} key={ele.id}>
+          {this.renderTreeNode(ele.children)}
+        </TreeNode>
+      );
+    });
+    return treeNode;
+  };
+
   public render() {
     const { selectedRowKeys } = this.state;
     const rowSelection = {
@@ -150,16 +206,21 @@ class Operation extends PureComponent {
       onChange: this.onSelectChange,
       hideDefaultSelections: true,
     };
+
+    const formItemLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 14 },
+    };
     return (
       <>
         <div>
           <Row>
-            <Form layout="inline" style={{ marginBottom: '15px' }}>
-              <Form.Item label="用户名">
-                <Input style={{ width: 120 }} onBlur={this.onUserName} />
+            <Form style={{ marginBottom: '15px' }}>
+              <Form.Item label="用户名" {...formItemLayout}>
+                <Input onBlur={this.onUserName} />
               </Form.Item>
-              <Form.Item label="角色">
-                <Select style={{ width: 120 }} onChange={this.onRole}>
+              <Form.Item label="角色" {...formItemLayout}>
+                <Select onChange={this.onRole}>
                   {this.state.rolesList &&
                     this.state.rolesList.map(item => {
                       return (
@@ -170,8 +231,24 @@ class Operation extends PureComponent {
                     })}
                 </Select>
               </Form.Item>
+              <Form.Item label="部门" {...formItemLayout}>
+                <TreeSelect
+                  value={this.state.departmentId}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  placeholder="Please select"
+                  treeDefaultExpandAll
+                  onChange={this.onDepartment}
+                >
+                  {this.renderTreeNode(this.state.departmentTree)}
+                </TreeSelect>
+              </Form.Item>
               <Form.Item>
-                <Button type="primary" icon="search" onClick={this.onSearch} />
+                <Button
+                  type="primary"
+                  icon="search"
+                  onClick={this.onSearch}
+                  style={{ float: 'right' }}
+                />
               </Form.Item>
             </Form>
           </Row>
