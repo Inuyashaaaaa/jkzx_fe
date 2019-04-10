@@ -187,7 +187,7 @@ class Operation extends PureComponent {
   };
 
   public onSearch = async () => {
-    let { data } = this.state;
+    const { data } = this.state;
     let dataSource = data;
     if (this.state.username) {
       dataSource = data.filter(item => {
