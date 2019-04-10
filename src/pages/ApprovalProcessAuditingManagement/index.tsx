@@ -18,13 +18,13 @@ class SystemSettingsRoleManagement extends PureComponent {
       },
       {
         title: '昵称',
-        dataIndex: 'alias',
-        key: 'alias',
+        dataIndex: 'nickName',
+        key: 'nickName',
       },
       {
         title: '部门',
-        dataIndex: 'address',
-        key: 'address',
+        dataIndex: 'departmentName',
+        key: 'departmentName',
       },
       {
         title: '操作',
@@ -147,9 +147,6 @@ class SystemSettingsRoleManagement extends PureComponent {
       notification.success({
         message: `加入成功`,
       });
-      this.setState({
-        visible: false,
-      });
     }
 
     currentGroup.userList = data.userList;
@@ -160,12 +157,18 @@ class SystemSettingsRoleManagement extends PureComponent {
       }
       return item;
     });
-    this.setState({
-      approveGroupList,
-      visible: false,
-      currentGroup,
-      userList: data.userList,
-    });
+    this.setState(
+      {
+        approveGroupList,
+        currentGroup,
+        userList: data.userList,
+      },
+      () => {
+        if (this.$drawer) {
+          this.$drawer.filterData();
+        }
+      }
+    );
   };
 
   public handleGroupList = approveGroupList => {

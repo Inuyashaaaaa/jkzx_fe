@@ -34,7 +34,14 @@ class Operation extends PureComponent {
         title: '操作',
         key: 'operation',
         dataIndex: 'operation',
-        render: (text, record) => <a onClick={() => this.onAdd(record.id)}>加入审批组</a>,
+        render: (text, record) => (
+          <a
+            onClick={() => this.onAdd(record.id)}
+            style={{ display: 'inline-block', minWidth: '40px', fontSize: '12px' }}
+          >
+            加入审批组
+          </a>
+        ),
       },
     ],
     departmentTree: [],
@@ -104,6 +111,17 @@ class Operation extends PureComponent {
       selectArray: [],
       rolesList: roles.data,
       departmentTree,
+    });
+  };
+
+  public filterData = () => {
+    const { currentGroup } = this.props;
+    let { dataSource } = this.state;
+    dataSource = dataSource.filter(item => {
+      return !currentGroup.userList.find(items => item.username === items.username);
+    });
+    this.setState({
+      dataSource,
     });
   };
 
@@ -189,7 +207,7 @@ class Operation extends PureComponent {
       return {
         userApproveGroupId: item.id,
         username: item.username,
-        department_id: item.departmentId,
+        department_name: item.departmentName,
         nick_name: item.nickName,
       };
     });
@@ -202,7 +220,7 @@ class Operation extends PureComponent {
       return {
         userApproveGroupId: item.id,
         username: item.username,
-        department_id: item.departmentId,
+        department_name: item.departmentName,
         nick_name: item.nickName,
       };
     });
