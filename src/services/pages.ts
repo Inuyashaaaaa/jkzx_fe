@@ -190,6 +190,14 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
 function miniumlPercent(item) {
   const clone = { ...item };
 
+  if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
+    clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
+      clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM]
+    )
+      .multipliedBy(0.01)
+      .toNumber();
+  }
+
   if (clone[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.AUTO_CALL_STRIKE] !== undefined) {
       clone[LEG_FIELD.AUTO_CALL_STRIKE] = new BigNumber(clone[LEG_FIELD.AUTO_CALL_STRIKE])
@@ -426,6 +434,14 @@ function miniumlPercent(item) {
 
 function backConvertPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
+    clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
+      clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM]
+    )
+      .multipliedBy(100)
+      .toNumber();
+  }
 
   if (clone[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.AUTO_CALL_STRIKE] !== undefined) {

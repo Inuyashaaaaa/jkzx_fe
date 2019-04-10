@@ -208,14 +208,15 @@ export const UnderlyerInstrumentId: IColDef = {
   field: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
   editable: true,
   input: record => {
-    const service = record[LEG_PRICING_FIELD] ? mktInstrumentSearch : searchTradableInstrument;
     return {
       placeholder: '请输入内容搜索',
       defaultOpen: true,
       type: 'select',
       showSearch: true,
       options: async (value: string) => {
-        const { data, error } = await service({
+        const { data, error } = await (record[LEG_PRICING_FIELD]
+          ? mktInstrumentSearch
+          : searchTradableInstrument)({
           instrumentIdPart: value,
         });
         if (error) return [];
