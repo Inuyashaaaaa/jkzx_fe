@@ -4,7 +4,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React, { ComponentClass, PureComponent } from 'react';
 import { createEventBus } from '../../utils';
-import { IFormBaseProps, IFormProps, IFormTriggerCellValueChangeParams, IFormField } from '../type';
+import { IFormBaseProps, IFormField, IFormProps, IFormTriggerCellValueChangeParams } from '../type';
 import { FORM_CELL_VALUES_CHANGE } from './constants';
 import FormBase from './FormBase';
 

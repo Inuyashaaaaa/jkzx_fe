@@ -6,7 +6,7 @@ import React, { PureComponent } from 'react';
 import { EVERY_EVENT_TYPE } from '../../utils';
 import { IFormBaseProps, IFormColDef, IFormTriggerCellValueChangeParams } from '../type';
 import SwitchCell from './cells/SwitchCell';
-import { FORM_CELL_VALUES_CHANGE, FORM_CELL_VALUE_CHANGED } from './constants';
+import { FORM_CELL_VALUE_CHANGED, FORM_CELL_VALUES_CHANGE } from './constants';
 import FormManager from './formManager';
 import './index.less';
 
