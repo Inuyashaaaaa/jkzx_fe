@@ -238,11 +238,19 @@ class AuditLists extends PureComponent {
                     >
                       <Icon type="minus-circle" />
                     </Popconfirm>
-                    <Icon type="plus-circle" onClick={this.showModal} />
                   </span>
                 </li>
               );
             })}
+            <li className={styles.listItem}>
+              <Button
+                type="dashed"
+                style={{ width: '100%', border: '1px dashed #ccc', borderRadius: '8px' }}
+                onClick={this.showModal}
+              >
+                新建审批组
+              </Button>
+            </li>
           </ul>
         ) : (
           <Button className={styles.center} type="primary" onClick={this.showModal}>
