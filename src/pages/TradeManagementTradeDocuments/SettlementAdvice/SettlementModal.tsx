@@ -25,7 +25,7 @@ class TradeModal extends PureComponent {
     this.setState({
       visible: false,
     });
-    this.props.onFetch({ current: 1, pageSize: 10 });
+    this.props.onFetch();
   };
 
   public onConfirm = async () => {
