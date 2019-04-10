@@ -1,4 +1,4 @@
-import { LCM_EVENT_TYPE_OPTIONS, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import { INPUT_NUMBER_DIGITAL_CONFIG, LCM_EVENT_TYPE_OPTIONS } from '@/constants/common';
 import SourceTable from '@/design/components/SourceTable';
 import Form, { IFormControl } from '@/lib/components/_Form2';
 import { IColumnDef } from '@/lib/components/_Table2';
@@ -113,7 +113,7 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) =>
     input: INPUT_NUMBER_DIGITAL_CONFIG,
   };
 
-  let extra = [];
+  const extra = [];
   if (entryMargin) {
     extra.push(tradeId);
   }

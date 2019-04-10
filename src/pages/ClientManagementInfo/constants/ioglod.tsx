@@ -325,7 +325,7 @@ export const OUR_CREATE_FORM_CONTROLS: (salesNameList, margin, premium, cash) =>
     input: INPUT_NUMBER_DIGITAL_CONFIG,
   };
 
-  let extra = [];
+  const extra = [];
   if (margin) {
     extra.push(tradeId);
   }

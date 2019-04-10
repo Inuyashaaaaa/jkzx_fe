@@ -1,6 +1,6 @@
+import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { IColumnDef } from '@/design/components/Table/types';
-import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 
 export const TABLE_COL_DEFS: IColumnDef[] = [
   {
@@ -92,7 +92,7 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) =>
     input: INPUT_NUMBER_DIGITAL_CONFIG,
   };
 
-  let extra = [];
+  const extra = [];
   if (entryMargin) {
     extra.push(tradeId);
   }
