@@ -252,7 +252,7 @@ export const treeData = [
         children: [
           {
             title: '审批组管理',
-            key: 'approvalAuditingManagement',
+            key: 'auditingManagement',
           },
           {
             title: '流程管理',
@@ -275,10 +275,6 @@ export const treeData = [
           {
             title: '波动率管理日历',
             key: 'volatilityCalendar',
-          },
-          {
-            title: '权限设置',
-            key: 'permissions',
           },
           // {
           //   title: '角色管理',
