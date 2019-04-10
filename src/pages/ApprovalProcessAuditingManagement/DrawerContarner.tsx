@@ -1,11 +1,11 @@
 import SourceTable from '@/design/components/SourceTable';
-import { authRolesList } from '@/services/role';
 import { queryAuthDepartmentList } from '@/services/department';
+import { authRolesList } from '@/services/role';
 import { authUserList } from '@/services/user';
 import { Button, Form, Input, Row, Select, Table, TreeSelect } from 'antd';
+import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import Item from 'antd/lib/list/Item';
 
 const TreeNode = TreeSelect.TreeNode;
 const { Option } = Select;
@@ -27,8 +27,8 @@ class Operation extends PureComponent {
       },
       {
         title: '部门',
-        dataIndex: 'address',
-        key: 'address',
+        dataIndex: 'departmentName',
+        key: 'departmentName',
       },
       {
         title: '操作',
@@ -47,6 +47,7 @@ class Operation extends PureComponent {
     selectedRowKeys: [],
     selectArray: [],
     departmentId: undefined,
+    array: [],
   };
 
   constructor(props) {
@@ -66,8 +67,8 @@ class Operation extends PureComponent {
     const res = await requests();
     const [roles, users, departmentsRes] = res;
 
-    let departments = departmentsRes.data || {};
-    let departmentTree = [];
+    const departments = departmentsRes.data || {};
+    const departmentTree = [];
     departmentTree.push(departments);
 
     const error = res.some(item => {
@@ -81,7 +82,16 @@ class Operation extends PureComponent {
       return false;
     }
     const { currentGroup } = this.props;
-    const dataSource = users.data.filter(item => {
+
+    const cloneDepartments = JSON.parse(JSON.stringify(departments));
+
+    const array = this.toArray(cloneDepartments);
+    let dataSource = users.data.map(item => {
+      const department = array.find(obj => obj.id === item.departmentId);
+      item.departmentName = department.departmentName;
+      return item;
+    });
+    dataSource = dataSource.filter(item => {
       return !currentGroup.userList.find(items => item.username === items.username);
     });
     this.setState({
@@ -92,6 +102,20 @@ class Operation extends PureComponent {
       rolesList: roles.data,
       departmentTree,
     });
+  };
+
+  public toArray = data => {
+    let array = [];
+    let children = data.children || [];
+    delete data.children;
+    array.push(data);
+
+    array = array.concat(children);
+    if (!children) return;
+    children.forEach(item => {
+      this.toArray(item);
+    });
+    return array;
   };
 
   public toTree = (data = []) => {
@@ -184,7 +208,7 @@ class Operation extends PureComponent {
 
   public renderTreeNode = (treeData = []) => {
     if (!treeData) return;
-    let treeNode = [];
+    const treeNode = [];
     treeData.map((ele, index) => {
       treeNode.push(
         <TreeNode value={ele.id} title={ele.departmentName} key={ele.id}>
@@ -231,7 +255,7 @@ class Operation extends PureComponent {
                 <TreeSelect
                   value={this.state.departmentId}
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  treeDefaultExpandAll
+                  treeDefaultExpandAll={true}
                   onChange={this.onDepartment}
                 >
                   {this.renderTreeNode(this.state.departmentTree)}
