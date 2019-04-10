@@ -46,15 +46,16 @@ class Operation extends PureComponent {
     ],
     departmentTree: [],
     visible: false,
-    username: '',
-    roleName: '',
+    username: null,
+    roleName: null,
     rolesList: [],
     dataSource: [],
     loading: false,
     selectedRowKeys: [],
     selectArray: [],
-    departmentId: undefined,
+    departmentId: null,
     array: [],
+    data: [],
   };
 
   constructor(props) {
@@ -101,9 +102,13 @@ class Operation extends PureComponent {
     dataSource = dataSource.filter(item => {
       return !currentGroup.userList.find(items => item.username === items.username);
     });
+
     dataSource.sort((a, b) => {
       return a.username.localeCompare(b.username);
     });
+
+    const data = dataSource;
+
     this.setState({
       loading: false,
       dataSource,
@@ -111,6 +116,7 @@ class Operation extends PureComponent {
       selectArray: [],
       rolesList: roles.data,
       departmentTree,
+      data,
     });
   };
 
@@ -122,6 +128,7 @@ class Operation extends PureComponent {
     });
     this.setState({
       dataSource,
+      data: dataSource,
     });
   };
 
@@ -180,13 +187,23 @@ class Operation extends PureComponent {
   };
 
   public onSearch = async () => {
-    const dataSource = this.state.dataSource.filter(item => {
-      return (
-        item.username === this.state.username ||
-        item.roleName.includes(this.state.roleName) ||
-        item.departmentId === this.state.departmentId
-      );
-    });
+    let { data } = this.state;
+    let dataSource = data;
+    if (this.state.username) {
+      dataSource = data.filter(item => {
+        return item.username.indexOf(this.state.username) >= 0;
+      });
+    }
+    if (this.state.roleName) {
+      dataSource = data.filter(item => {
+        return item.roleName.includes(this.state.roleName);
+      });
+    }
+    if (this.state.departmentId) {
+      dataSource = data.filter(item => {
+        return item.departmentId === this.state.departmentId;
+      });
+    }
     this.setState({
       dataSource,
     });
@@ -258,10 +275,10 @@ class Operation extends PureComponent {
           <Row>
             <Form style={{ marginBottom: '15px' }}>
               <Form.Item label="用户名" {...formItemLayout}>
-                <Input onBlur={this.onUserName} />
+                <Input onChange={this.onUserName} onPressEnter={this.onSearch} />
               </Form.Item>
               <Form.Item label="角色" {...formItemLayout}>
-                <Select onChange={this.onRole}>
+                <Select onChange={this.onRole} allowClear={true}>
                   {this.state.rolesList &&
                     this.state.rolesList.map(item => {
                       return (
@@ -278,6 +295,7 @@ class Operation extends PureComponent {
                   dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                   treeDefaultExpandAll={true}
                   onChange={this.onDepartment}
+                  allowClear={true}
                 >
                   {this.renderTreeNode(this.state.departmentTree)}
                 </TreeSelect>
