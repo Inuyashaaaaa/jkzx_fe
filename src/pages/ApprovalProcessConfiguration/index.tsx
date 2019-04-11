@@ -1,11 +1,11 @@
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
-  wkTaskApproveGroupList,
   wkProcessStatusModify,
   wkTaskApproveGroupCreateBatch,
+  wkTaskApproveGroupList,
 } from '@/services/approvalProcessConfiguration';
 import { wkApproveGroupList } from '@/services/auditing';
-import { Button, Checkbox, Icon, List, notification, Select, Switch, Tabs, Modal } from 'antd';
+import { Button, Checkbox, Icon, List, Modal, notification, Select, Switch, Tabs } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
 
