@@ -27,22 +27,6 @@ class Related extends PureComponent {
     this.setState({
       loading: true,
     });
-    // delay(
-    //   1000,
-    //   mockData({
-    //     processSequenceNum: '@name',
-    //     processName: '@name',
-    //     initiatorName: '@name',
-    //     subject: '@name',
-    //     startTime: '@date',
-    //     status: ['process_finish', 'process_unfinished', 'process_abandon'],
-    //   })
-    // ).then(res => {
-    //   this.setState({
-    //     dataSource: res,
-    //     loading: false,
-    //   });
-    // });
     const { error, data } = await wkProcessInstanceComplexList({
       processInstanceUserPerspective: this.state.type,
       keyword: this.state.formData.status

@@ -1,6 +1,4 @@
 import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay, mockData } from '@/lib/utils';
 import { queryProcessToDoList } from '@/services/approval';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -20,21 +18,7 @@ class Pending extends PureComponent {
     this.setState({
       loading: true,
     });
-    // delay(
-    //   1000,
-    //   mockData({
-    //     processSequenceNum: '@name',
-    //     processName: '@name',
-    //     initiatorName: '@name',
-    //     subject: '@name',
-    //     startTime: '@date',
-    //   })
-    // ).then(res => {
-    //   this.setState({
-    //     dataSource: res,
-    //     loading: false,
-    //   });
-    // });
+
     const { error, data } = await queryProcessToDoList();
     this.setState({ loading: false });
     if (error) return;

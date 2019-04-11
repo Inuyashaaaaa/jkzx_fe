@@ -7,7 +7,6 @@ import {
   queryProcessToDoList,
 } from '@/services/approval';
 import { Button, Input, Modal, Tabs } from 'antd';
-import { async } from 'q';
 import React, { PureComponent } from 'react';
 import ApprovalForm from './ApprovalForm';
 // import CommonForm from '../SystemSettingDepartment/components/CommonForm';
