@@ -50,3 +50,13 @@ export async function wkTaskApproveGroupModify(params = {}) {
     },
   });
 }
+
+export async function wkProcessList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessList',
+      params,
+    },
+  });
+}

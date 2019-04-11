@@ -1,5 +1,6 @@
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
+  wkProcessList,
   wkProcessStatusModify,
   wkTaskApproveGroupCreateBatch,
   wkTaskApproveGroupList,
@@ -14,21 +15,14 @@ const Option = Select.Option;
 
 class ApprovalProcessConfiguration extends PureComponent {
   public state = {
-    tabsData: [
-      {
-        tabName: '交易录入审批',
-        processName: '交易录入经办复合流程',
-      },
-      {
-        tabName: '出入金审批',
-        processName: '出入金经办复合流程',
-      },
-    ],
     approveGroupList: [],
     taskApproveGroupList: [],
+    processList: [],
     loading: false,
     currentProcessName: '交易录入经办复合流程',
     visible: false,
+    status: false,
+    resetVisible: false,
   };
 
   constructor(props) {
@@ -47,9 +41,10 @@ class ApprovalProcessConfiguration extends PureComponent {
       Promise.all([
         wkTaskApproveGroupList({ processName: this.state.currentProcessName }),
         wkApproveGroupList(),
+        wkProcessList(),
       ]);
     const res = await requests();
-    const [taskApproveGroupList, approveGroupList] = res;
+    const [taskApproveGroupList, approveGroupList, processList] = res;
     const error = res.some(item => {
       return item.error;
     });
@@ -60,27 +55,49 @@ class ApprovalProcessConfiguration extends PureComponent {
         taskApproveGroupList: [],
       });
     }
+    
+    const tabsData = (processList.data || []).map(item => {
+      item.tabName = item.processName.split('经办复合流程')[0] + '审批'
+      return item;
+    })
+    
+    const taskData = (taskApproveGroupList.data || []).map(item => {
+      item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
+      return item;
+    });
+
     this.setState({
       loading: false,
       approveGroupList: approveGroupList.data || [],
-      taskApproveGroupList: taskApproveGroupList.data || [],
+      taskApproveGroupList: taskData,
+      processList: tabsData,
     });
   };
 
-  public handleStatus = async e => {
-    // 更新流程状态
-    const { currentProcessName } = this.state;
-    const { data, error } = await wkProcessStatusModify({
-      processName: currentProcessName,
+  public handleStatus = async (e, processName) => {
+    this.setState({
       status: e,
+    })
+    let { processList } = this.state;
+    processList = processList.map(item => {
+      if (item.processName === processName) {
+          item.status = e;
+      }
+      return item;
     });
-    if (error) return;
-    const { message } = error;
-    notification.success({
-      message: `流程${e ? '启用' : '停用'}成功`,
-      description: message,
+    this.setState({
+      processList,
     });
   };
+
+  public onProcess = async () => {
+    const { currentProcessName, status } = this.state;
+    const { data, error } = await wkProcessStatusModify({
+      processName: currentProcessName,
+      status,
+    });
+    if (error) return;
+  }
 
   public tabsChange = e => {
     this.setState(
@@ -94,11 +111,12 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public handleApproveGroup = (e, taskId) => {
-    const { taskApproveGroupList } = this.state;
-    taskApproveGroupList.forEach(item => {
+    let { taskApproveGroupList } = this.state;
+    taskApproveGroupList = taskApproveGroupList.map(item => {
       if (item.taskId === taskId) {
-        item.approveGroupList = e;
+          item.approveGroupList = e;
       }
+      return item;
     });
     this.setState({
       taskApproveGroupList,
@@ -106,7 +124,6 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public onSave = async () => {
-    // 判断所有节点均已分配了审批组，并弹窗确认
     const { taskApproveGroupList } = this.state;
     const isEvery = taskApproveGroupList.every(item => {
       return item.approveGroupList && item.approveGroupList.length > 0;
@@ -121,20 +138,26 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
+  public onReset = async () => {
+    this.setState({
+      resetVisible: true,
+    });
+  }
+
   public handleOk = async () => {
     this.setState({
       visible: false,
     });
     const { currentProcessName, taskApproveGroupList } = this.state;
-    const { data, error } = await wkTaskApproveGroupCreateBatch({
+    const { error } = await wkTaskApproveGroupCreateBatch({
       processName: currentProcessName,
       taskList: taskApproveGroupList,
     });
     if (error) return;
-    const { message } = error;
     notification.success({
       message: `保存成功`,
     });
+
   };
 
   public handleCancel = e => {
@@ -143,7 +166,20 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public renderTabs = () => {
+  public handleResetOk = async () => {
+    this.fetchData();
+    this.setState({
+      resetVisible: false,
+    });
+  };
+
+  public handleResetCancel = e => {
+    this.setState({
+      resetVisible: false,
+    });
+  };
+
+  public renderTabs = (tab) => {
     return (
       <div
         style={{
@@ -159,8 +195,8 @@ class ApprovalProcessConfiguration extends PureComponent {
           <Switch
             checkedChildren="开"
             unCheckedChildren="关"
-            defaultChecked={true}
-            onClick={this.handleStatus}
+            checked={tab.status}
+            onClick={(e) => this.handleStatus(e, tab.processName)}
           />
           <span style={{ marginLeft: '6px' }}>启用流程</span>
         </div>
@@ -177,7 +213,7 @@ class ApprovalProcessConfiguration extends PureComponent {
             </Button>
           </p>
           <p>
-            <Button>重置</Button>
+            <Button onClick={this.onReset}>重置</Button>
           </p>
           <p className={styles.message}>离开页面前，请确认所做的修改已经保存。</p>
         </div>
@@ -190,10 +226,10 @@ class ApprovalProcessConfiguration extends PureComponent {
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
           <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
-            {this.state.tabsData.map(tab => {
+            {this.state.processList.map(tab => {
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
-                  {this.renderTabs()}
+                  {this.renderTabs(tab)}
                   <div
                     style={{
                       marginRight: '320px',
@@ -224,12 +260,12 @@ class ApprovalProcessConfiguration extends PureComponent {
                               <span style={{ marginLeft: '20px' }}>{group.taskName}</span>
                               <span className={styles.selectTile}>选择审批组</span>
                               <Select
-                                defaultValue={(group.approveGroupDTO || []).map(
-                                  dto => dto.approveGroupName
-                                )}
+                                value={group.approveGroupList}
                                 style={{ width: 500 }}
                                 mode="multiple"
                                 onChange={e => this.handleApproveGroup(e, group.taskId)}
+                                optionFilterProp="children"
+                                filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                               >
                                 {this.state.approveGroupList.map(item => {
                                   return (
@@ -261,6 +297,16 @@ class ApprovalProcessConfiguration extends PureComponent {
           >
             <p>
               流程被修改后，所有进行中的审批单均会被重置，从第一个节点开始重新进行审批。是否确定保存修改？
+            </p>
+          </Modal>
+          <Modal
+            title="消息提示"
+            visible={this.state.resetVisible}
+            onOk={this.handleResetOk}
+            onCancel={this.handleResetCancel}
+          >
+            <p>
+              重置后即放弃当前页面的编辑，恢复到编辑前的状态。是否确定重置？
             </p>
           </Modal>
         </PageHeaderWrapper>
