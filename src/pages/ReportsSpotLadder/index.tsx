@@ -3,7 +3,6 @@ import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
   INPUT_NUMBER_LOT_CONFIG,
-  INPUT_NUMBER_PERCENTAGE_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
 import RangeNumberInput from '@/containers/RangeNumberInput';
@@ -16,6 +15,7 @@ import {
   countDeltaCash,
   countGamaCash,
   countGamma,
+  countPnlValue,
   countRhoR,
   countTheta,
   countVega,
@@ -25,7 +25,6 @@ import { prcSpotScenarios } from '@/services/pricing-service';
 import { trdBookListBySimilarBookName, trdInstrumentListByBook } from '@/services/trade-service';
 import { Card, Empty, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
-import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
@@ -57,6 +56,11 @@ class Component extends PureComponent<
         {
           headerName: '价格',
           field: 'price',
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+        },
+        {
+          headerName: 'PNL变动',
+          field: 'pnlChange',
           input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
@@ -119,6 +123,7 @@ class Component extends PureComponent<
         tableDataSource: item.tableDataSource.map((dataItem, key) => {
           return {
             ...dataItem,
+            pnlChange: countPnlValue(dataItem.pnlChange),
             delta: countDelta(dataItem.delta, multiplier),
             deltaCash: countDeltaCash(dataItem.delta, dataItem.underlyerPrice),
             gamma: countGamma(dataItem.gamma, multiplier, dataItem.underlyerPrice),
@@ -192,27 +197,9 @@ class Component extends PureComponent<
         return group.reduce((dist, next) => {
           Object.keys(next).forEach(key => {
             const value = next[key];
-            // 'delta',
-            // 'deltaCash',
-            // 'gamma',
-            // 'gammaCash',
-            // 'positionId',
-            // 'price',
-            // 'q',
-            // 'quantity',
-            // 'r',
-            // 'rhoQ',
-            // 'rhoR',
-            // 'scenarioId',
-            // 'scenarioResult',
-            // 'theta',
-            // 'underlyerForward',
-            // 'underlyerInstrumentId',
-            // 'underlyerPrice',
-            // 'vega',
-            // 'vol',
             dist[key] =
               [
+                'pnlChange',
                 'delta',
                 'deltaCash',
                 'gamma',
