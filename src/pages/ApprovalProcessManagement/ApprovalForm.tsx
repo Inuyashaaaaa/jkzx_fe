@@ -67,7 +67,7 @@ class ApprovalForm extends PureComponent {
       return;
     }
     const isCheckBtn =
-      params && params.taskName && params.taskName.includes('复核资金流水') && status === 'pending';
+      params && params.taskName && params.taskName.includes('录入资金流水') && status === 'queued';
     this.setState({
       loading: true,
     });
@@ -89,7 +89,7 @@ class ApprovalForm extends PureComponent {
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
       // instance.startTime = moment(instance.startTime).format('YYYY-MM-DD hh:mm:ss');
     }
-    if (isCheckBtn) {
+    if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
       this.setState({
         data,
@@ -212,11 +212,7 @@ class ApprovalForm extends PureComponent {
   public confirmAbandon = async () => {
     const { formData } = this.props;
     const params = {
-      taskId: formData.taskId,
-      ctlProcessData: {
-        abandon: true,
-      },
-      businessProcessData: {},
+      processInstanceId: formData.processInstanceId,
     };
     this.executeModify(params, 'abandon');
   };
@@ -245,7 +241,6 @@ class ApprovalForm extends PureComponent {
         taskId: formData.taskId,
         ctlProcessData: {
           comment: modifyComment,
-          abandon: false,
         },
         businessProcessData: obj,
       };
@@ -289,7 +284,7 @@ class ApprovalForm extends PureComponent {
       modifying: true,
       modifyBtn: modifyType,
     });
-    const executeMethod = completeTaskProcess;
+    const executeMethod = modifyType === 'abandon' ? terminateProcess : completeTaskProcess;
     const res = await executeMethod(params);
     this.setState({
       modifying: false,
@@ -315,7 +310,7 @@ class ApprovalForm extends PureComponent {
       modifyComment,
     } = this.state;
     const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
+      formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
@@ -360,7 +355,7 @@ class ApprovalForm extends PureComponent {
                 bordered={false}
               />
             </div>
-            {status === 'pending' && (
+            {status === 'queued' && (
               <div
                 style={{
                   borderTopStyle: 'solid',
@@ -419,39 +414,37 @@ class ApprovalForm extends PureComponent {
                   </div>
                 )}
                 {!isCheckBtn && (
-                  <>
-                    <div style={{ marginLeft: 10 }}>
-                      <Popconfirm
-                        title={
-                          <div>
-                            <p>确认将此次修改提交复核吗？</p>
-                            <TextArea onChange={this.setModifyComment} value={modifyComment} />
-                          </div>
-                        }
-                        onConfirm={this.confirmModify}
+                  <div style={{ marginLeft: 10 }}>
+                    <Popconfirm
+                      title={
+                        <div>
+                          <p>确认将此次修改提交复核吗？</p>
+                          <TextArea onChange={this.setModifyComment} value={modifyComment} />
+                        </div>
+                      }
+                      onConfirm={this.confirmModify}
+                    >
+                      <Button
+                        type="primary"
+                        disabled={modifying && modifyBtn === 'modify'}
+                        loading={modifying && modifyBtn !== 'modify'}
                       >
-                        <Button
-                          type="primary"
-                          disabled={modifying && modifyBtn === 'modify'}
-                          loading={modifying && modifyBtn !== 'modify'}
-                        >
-                          确认修改
-                        </Button>
-                      </Popconfirm>
-                    </div>
-                    <div style={{ marginLeft: 10 }}>
-                      <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
-                        <Button
-                          type="danger"
-                          loading={modifying && modifyBtn === 'abandon'}
-                          disabled={modifying && modifyBtn !== 'abandon'}
-                        >
-                          废弃
-                        </Button>
-                      </Popconfirm>
-                    </div>
-                  </>
+                        确认修改
+                      </Button>
+                    </Popconfirm>
+                  </div>
                 )}
+                <div style={{ marginLeft: 10 }}>
+                  <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
+                    <Button
+                      type="danger"
+                      loading={modifying && modifyBtn === 'abandon'}
+                      disabled={modifying && modifyBtn !== 'abandon'}
+                    >
+                      废弃
+                    </Button>
+                  </Popconfirm>
+                </div>
               </div>
             )}
           </div>
