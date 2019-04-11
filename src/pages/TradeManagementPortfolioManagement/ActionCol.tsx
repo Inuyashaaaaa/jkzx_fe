@@ -32,9 +32,10 @@ class ActionCol extends PureComponent<any, any> {
       portfolioName: params.data.portfolioName,
     });
     if (error) return;
-    return () => {
-      this.props.reload();
-    };
+    // return () => {
+    //   this.props.reload();
+    // };
+    this.props.reload();
   };
 
   public onValueChange = async params => {
