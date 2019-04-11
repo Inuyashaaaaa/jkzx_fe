@@ -23,6 +23,7 @@ const Option = Select.Option;
 class ApprovalProcessConfiguration extends PureComponent {
   public state = {
     approveGroupList: [],
+    taskApproveGroupList: [],
   };
 
   constructor(props) {
@@ -34,10 +35,22 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public fetchData = async () => {
-    const { data, error } = await wkApproveGroupList();
+    const requests = () =>
+      Promise.all([
+        wkTaskApproveGroupList({ processName: '交易录入经办复合流程' }),
+        wkApproveGroupList(),
+      ]);
+    const res = await requests();
+    const [taskApproveGroupList, approveGroupList] = res;
+    console.log(approveGroupList.data, taskApproveGroupList.data);
+    const error = res.some(item => {
+      return item.error;
+    });
+
     if (error) return;
     this.setState({
-      approveGroupList: data,
+      approveGroupList: approveGroupList.data || [],
+      taskApproveGroupList: taskApproveGroupList.data || [],
     });
   };
 
@@ -106,23 +119,35 @@ class ApprovalProcessConfiguration extends PureComponent {
                     </div>
                     <span className={styles.approvalIcon}>{/* <Icon type="plus-circle" /> */}</span>
                   </List.Item>
-                  <List.Item>
-                    <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
-                      <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                      <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                      <span style={{ marginLeft: '20px' }}>审批节点</span>
-                      <span className={styles.selectTile}>选择审批组</span>
-                      <Select defaultValue="a1" style={{ width: 500 }} mode="multiple">
-                        {this.state.approveGroupList.map(item => (
-                          <Option key={item.approveGroupId}>{item.approveGroupName}</Option>
-                        ))}
-                      </Select>
-                    </div>
-                    <span className={styles.approvalIcon}>
-                      {/* <Icon type="minus-circle" />  
-                      <Icon type="plus-circle" /> */}
-                    </span>
-                  </List.Item>
+                  {this.state.taskApproveGroupList.map(group => {
+                    return (
+                      <List.Item key={group.taskId}>
+                        <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
+                          <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                          <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                          <span style={{ marginLeft: '20px' }}>{group.taskName}</span>
+                          <span className={styles.selectTile}>选择审批组</span>
+                          <Select
+                            defaultValue={(group.approveGroupDTO || []).map(
+                              dto => dto.approveGroupName
+                            )}
+                            style={{ width: 500 }}
+                            mode="multiple"
+                          >
+                            {this.state.approveGroupList.map(item => {
+                              return (
+                                <Option key={item.approveGroupId}>{item.approveGroupName}</Option>
+                              );
+                            })}
+                          </Select>
+                        </div>
+                        <span className={styles.approvalIcon}>
+                          {/* <Icon type="minus-circle" />  
+                            <Icon type="plus-circle" /> */}
+                        </span>
+                      </List.Item>
+                    );
+                  })}
                   {/* <List.Item>
                     <div className={styles.approvalNode}  style={{ background: '#cce7f2' }}>
                       <Icon type="more" style={{ width: '4px', color: '#999' }}/>
