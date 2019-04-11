@@ -23,6 +23,16 @@
         font-size: 12px;
       }
     }
+    .ant-list-item-content-single {
+      display: flex;
+      justify-content: space-between;
+    }
+    .ant-list-split .ant-list-item {
+      border: none;
+    }
+    .ant-select {
+      padding: 13px 10px;
+    }
   }
   .rightBox {
     width: '300px';
@@ -53,5 +63,37 @@
     margin-top: 40px;
     color: rgba(0, 0, 0, 0.45);
     font-size: 12px;
+  }
+  .approvalNode {
+    flex: 1;
+    height: 60px;
+    border-radius: 10px;
+    border-color: #ccc;
+    line-height: 60px;
+    padding: 0 10px;
+    margin-right: 20px;
+    :global {
+      .ant-btn {
+        width: 100%;
+        height: 100%;
+        border: none;
+        font-size: 16px;
+      }
+    }
+  }
+  .approvalIcon {
+    width: 100px;
+    line-height: 60px;
+    i {
+      font-size: 16px;
+      padding: 8px;
+      cursor: pointer;
+    }
+  }
+  .selectTile {
+    margin: 0 10px 0 80px;
+  }
+  .bolder {
+    font-weight: bolder;
   }
 }
