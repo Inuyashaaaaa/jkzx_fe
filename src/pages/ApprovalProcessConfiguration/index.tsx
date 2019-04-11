@@ -55,12 +55,12 @@ class ApprovalProcessConfiguration extends PureComponent {
         taskApproveGroupList: [],
       });
     }
-    
+
     const tabsData = (processList.data || []).map(item => {
-      item.tabName = item.processName.split('经办复合流程')[0] + '审批'
+      item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
-    })
-    
+    });
+
     const taskData = (taskApproveGroupList.data || []).map(item => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       return item;
@@ -77,11 +77,11 @@ class ApprovalProcessConfiguration extends PureComponent {
   public handleStatus = async (e, processName) => {
     this.setState({
       status: e,
-    })
+    });
     let { processList } = this.state;
     processList = processList.map(item => {
       if (item.processName === processName) {
-          item.status = e;
+        item.status = e;
       }
       return item;
     });
@@ -97,7 +97,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       status,
     });
     if (error) return;
-  }
+  };
 
   public tabsChange = e => {
     this.setState(
@@ -114,7 +114,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     let { taskApproveGroupList } = this.state;
     taskApproveGroupList = taskApproveGroupList.map(item => {
       if (item.taskId === taskId) {
-          item.approveGroupList = e;
+        item.approveGroupList = e;
       }
       return item;
     });
@@ -142,7 +142,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     this.setState({
       resetVisible: true,
     });
-  }
+  };
 
   public handleOk = async () => {
     this.setState({
@@ -157,7 +157,6 @@ class ApprovalProcessConfiguration extends PureComponent {
     notification.success({
       message: `保存成功`,
     });
-
   };
 
   public handleCancel = e => {
@@ -179,7 +178,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public renderTabs = (tab) => {
+  public renderTabs = tab => {
     return (
       <div
         style={{
@@ -196,7 +195,7 @@ class ApprovalProcessConfiguration extends PureComponent {
             checkedChildren="开"
             unCheckedChildren="关"
             checked={tab.status}
-            onClick={(e) => this.handleStatus(e, tab.processName)}
+            onClick={e => this.handleStatus(e, tab.processName)}
           />
           <span style={{ marginLeft: '6px' }}>启用流程</span>
         </div>
@@ -232,7 +231,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                   {this.renderTabs(tab)}
                   <div
                     style={{
-                      marginRight: '320px',
+                      marginRight: '302px',
                       background: '#FFF',
                       padding: '30px',
                       position: 'relative',
@@ -265,7 +264,11 @@ class ApprovalProcessConfiguration extends PureComponent {
                                 mode="multiple"
                                 onChange={e => this.handleApproveGroup(e, group.taskId)}
                                 optionFilterProp="children"
-                                filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                filterOption={(input, option) =>
+                                  option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                                }
                               >
                                 {this.state.approveGroupList.map(item => {
                                   return (
@@ -305,9 +308,7 @@ class ApprovalProcessConfiguration extends PureComponent {
             onOk={this.handleResetOk}
             onCancel={this.handleResetCancel}
           >
-            <p>
-              重置后即放弃当前页面的编辑，恢复到编辑前的状态。是否确定重置？
-            </p>
+            <p>重置后即放弃当前页面的编辑，恢复到编辑前的状态。是否确定重置？</p>
           </Modal>
         </PageHeaderWrapper>
       </div>
