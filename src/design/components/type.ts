@@ -11,7 +11,6 @@ import React, { CSSProperties } from 'react';
 import { Omit } from './common/types';
 import FormSwitchCell from './Form2/cells/SwitchCell';
 import FormBase from './Form2/FormBase';
-import InputManager from './Input/register';
 import TableManager from './Table2/api';
 import TableSwitchCell from './Table2/cells/SwitchCell';
 
@@ -37,7 +36,7 @@ export interface ITableDataSource {
   [key: string]: IFormField | any;
 }
 
-export interface IColDef {
+export interface IColDef<T> {
   dataIndex?: string;
   render?: any;
 }
@@ -55,40 +54,43 @@ export interface IRenderOptions<T = any> {
   editing?: boolean;
 }
 
-export interface IFormColDef<T = any> extends IColDef {
+export interface IFormColDef<T = any> extends IColDef<T> {
   render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
   /* 作用和 field 中的 label 一样，方便直接使用 table.columns 的数据 */
   title?: React.ReactNode;
   editable?: boolean;
-  getValue?:
-    | ((record: T, params: IFormTriggerCellValueChangedParams) => any)
-    | ([(record: T, params: IFormTriggerCellValueChangedParams) => any, ...string[]]);
+  loading?: boolean;
 }
 
-export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render'> {
+export interface ITableColDef<T = any> extends IColDef<T>, Omit<ColumnProps<T>, 'render'> {
   // totalable?: boolean | ((params: { totalData: number; record: object }) => number);
   title?: React.ReactNode;
   editable?: boolean;
   render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
-  getValue?:
-    | ((record: T, params: ITableTriggerCellValueChangedParams) => any)
-    | ([(record: T, params: ITableTriggerCellValueChangedParams) => any, ...string[]]);
+  loading?: (record: T, index?: number) => boolean;
 }
 
-export interface IFormCellProps<T = any> {
+export interface IFormCellProps<T = IFormDataSource> {
   prefix?: string;
   colDef: IFormColDef<T>;
   record: T;
   api: FormBase;
   cellApi?: FormSwitchCell;
   form?: WrappedFormUtils;
-  getValue?: {
-    depends: string[];
-    value: (record: T, params: IFormTriggerCellValueChangedParams) => any;
-  };
 }
 
-export interface ITableCellProps<T = any> {
+export interface ITableContextMenuParams<T = ITableDataSource> {
+  record: T;
+  rowIndex: number;
+  api: ITableApi;
+  context: ITableContext;
+  getRowKey: () => string;
+  columns: ITableColDef[];
+  rowId: string;
+}
+
+export interface ITableCellProps<T = ITableDataSource> {
+  loading: boolean;
   colDef: ITableColDef<T>;
   record: T;
   rowIndex: number;
@@ -98,10 +100,6 @@ export interface ITableCellProps<T = any> {
   className?: string;
   style?: CSSProperties;
   $$render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
-  getValue?: {
-    depends: string[];
-    value: (record: T, params: ITableTriggerCellValueChangedParams) => any;
-  };
   cellApi?: TableSwitchCell;
   form?: WrappedFormUtils;
 }
@@ -113,15 +111,19 @@ export interface ITableRowProps<T = any> extends FormComponentProps {
   context: ITableContext;
   getRowKey: () => string;
   columns: ITableColDef[];
+  rowId: string;
+  getEditing: () => boolean;
+  setEditing: (editing: boolean) => void;
+  getContextMenu: (
+    params: ITableContextMenuParams
+  ) => React.ReactNode | (() => React.ReactNode) | boolean;
 }
 
-export interface ITableTriggerCellValueChangedParams<T = any> {
+export interface ITableTriggerCellEditingChangedParams<T = any> {
   record: T;
   rowIndex: number;
   dataIndex: string;
-  oldValue: any;
   rowId?: string;
-  linkage?: boolean;
 }
 
 export interface ITableTriggerCellValueChangeParams<T = any> {
@@ -150,7 +152,7 @@ export interface IFormTriggerCellValueChangeParams<T = any> {
   allValues?: any;
 }
 
-export interface IFormTriggerCellValueChangedParams<T = any> {
+export interface IFormTriggerCellEditingChangedParams<T = any> {
   record: T;
   dataIndex: string;
   oldValue: any;
@@ -159,9 +161,12 @@ export interface IFormTriggerCellValueChangedParams<T = any> {
 }
 
 export interface ITableProps<T = ITableDataSource> extends Omit<TableProps<T>, 'columns'> {
-  onCellValueChanged?: (params: ITableTriggerCellValueChangedParams) => void;
+  onCellEditingChanged?: (params: ITableTriggerCellEditingChangedParams) => void;
   onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
   onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
+  getContextMenu: (
+    params: ITableContextMenuParams
+  ) => React.ReactNode | (() => React.ReactNode) | boolean;
   columns?: ITableColDef[];
   vertical?: boolean;
 }
@@ -170,12 +175,11 @@ export type ITableContext = any;
 
 export interface ITableApi {
   tableManager: TableManager;
-  inputManager: InputManager;
   eventBus: any;
 }
 
 export interface IFormBaseProps<T = IFormDataSource> extends FormProps {
-  onValueChanged?: IFormValueChangedHandle<T>;
+  onEditingChanged?: IFormEditingChangedHandle<T>;
   onValuesChange?: IFormValuesChangeHandle<T>;
   actionFieldProps?: FormItemProps;
   submitable?: boolean;
@@ -208,7 +212,9 @@ export interface IFormProps<T = any> extends IFormBaseProps {
   eventBus?: any;
 }
 
-export type IFormValueChangedHandle<T = any> = (params: IFormTriggerCellValueChangedParams) => void;
+export type IFormEditingChangedHandle<T = any> = (
+  params: IFormTriggerCellEditingChangedParams
+) => void;
 
 export type IFormValuesChangeHandle<T = any> = (
   props: T,

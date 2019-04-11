@@ -10,7 +10,6 @@ class EditingCell extends PureComponent<ITableCellProps, any> {
   public getValue = async () => {
     const dataIndex = this.getDataIndex();
     const value = this.props.form.getFieldValue(dataIndex);
-    const { record } = this.props;
     const oldValue = this.props.cellApi.getValue();
 
     if (this.props.form.isFieldValidating(dataIndex)) {
@@ -31,8 +30,7 @@ class EditingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public render() {
-    const { colDef, record, rowIndex, children, $$render } = this.props;
-    const { dataIndex } = colDef;
+    const { record, rowIndex, children, $$render } = this.props;
     const value = this.props.cellApi.getValue();
     return $$render
       ? $$render(value, record, rowIndex, {

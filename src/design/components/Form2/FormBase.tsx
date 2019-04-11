@@ -6,7 +6,7 @@ import React, { PureComponent } from 'react';
 import { EVERY_EVENT_TYPE } from '../../utils';
 import { IFormBaseProps, IFormColDef, IFormTriggerCellValueChangeParams } from '../type';
 import SwitchCell from './cells/SwitchCell';
-import { FORM_CELL_VALUE_CHANGED, FORM_CELL_VALUES_CHANGE } from './constants';
+import { FORM_CELL_EDITING_CHANGED, FORM_CELL_VALUES_CHANGE } from './constants';
 import FormManager from './formManager';
 import './index.less';
 
@@ -34,8 +34,8 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
   }
 
   public handleTableEvent = (params, eventName) => {
-    if (eventName === FORM_CELL_VALUE_CHANGED) {
-      return this.props.onValueChanged && this.props.onValueChanged(params);
+    if (eventName === FORM_CELL_EDITING_CHANGED) {
+      return this.props.onEditingChanged && this.props.onEditingChanged(params);
     }
   };
 
@@ -67,25 +67,7 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
 
   public getControlElement = (colDef: IFormColDef = {}, key?) => {
     const { form, dataSource } = this.props;
-    const { getValue } = colDef;
-    return (
-      <SwitchCell
-        key={key}
-        getValue={this.normalizeGetValue(getValue)}
-        colDef={colDef}
-        form={form}
-        record={dataSource}
-        api={this}
-      />
-    );
-  };
-
-  public normalizeGetValue = colGetValue => {
-    const [value, ...depends] = Array.isArray(colGetValue) ? colGetValue : [colGetValue];
-    return {
-      value,
-      depends,
-    };
+    return <SwitchCell key={key} colDef={colDef} form={form} record={dataSource} api={this} />;
   };
 
   public onSubmit = domEvent => {
@@ -222,7 +204,7 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
           'resetButtonProps',
           'getValue',
           'eventBus',
-          'onValueChanged',
+          'onEditingChanged',
           'onValuesChange',
         ])}
         className={classNames(`tongyu-form2`, className)}

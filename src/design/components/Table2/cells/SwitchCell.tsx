@@ -5,7 +5,7 @@ import { omit } from 'lodash';
 import React, { KeyboardEvent, PureComponent } from 'react';
 import { ITableCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
-import { TABLE_CELL_VALUE_CHANGED } from '../constants/EVENT';
+import { TABLE_CELL_EDITING_CHANGED } from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
@@ -39,6 +39,10 @@ class SwitchCell extends PureComponent<
   constructor(props) {
     super(props);
   }
+
+  public componentDidMount = () => {
+    this.registeCell();
+  };
 
   public isSelectionCell = () => {
     return this.props.className === 'ant-table-selection-column';
@@ -97,16 +101,11 @@ class SwitchCell extends PureComponent<
     const dataIndex = this.getDataIndex();
     if (this.form.isFieldValidating(dataIndex)) return;
 
-    // const { record } = this.props;
-    // if (this.getValue() === this.form.getFieldValue(dataIndex)) {
-    //   return this.setState({ editing: false }, callback);
-    // }
-
     const errorMsgs = await this.form.getFieldError(dataIndex);
     if (errorMsgs) return;
     if (this.$editingCell) {
       const value = await this.$editingCell.getValue();
-      this.mutableChangeRecordValue(value, false);
+      this.switchCellEditingStatus(value);
       this.setState({ editing: false }, () => {
         if (callback) {
           callback();
@@ -125,38 +124,19 @@ class SwitchCell extends PureComponent<
     return val;
   };
 
-  public setValue = newVal => {
-    const { record } = this.props;
-    const dataIndex = this.getDataIndex();
-    const val = record[dataIndex];
-    if (typeof val === 'object' && val.type === 'field') {
-      val.value = newVal;
-    } else {
-      record[dataIndex] = newVal;
-    }
+  public switchCellEditingStatus = value => {
+    this.triggerTableCellValueChanged(TABLE_CELL_EDITING_CHANGED, value);
   };
 
-  public mutableChangeRecordValue = (value, linkage) => {
-    const { record } = this.props;
-    const dataIndex = this.getDataIndex();
-    const oldValue = this.getValue();
-
-    this.setValue(value);
-
-    this.triggerTableCellValueChanged(TABLE_CELL_VALUE_CHANGED, value, oldValue, linkage);
-  };
-
-  public triggerTableCellValueChanged = (eventName, value, oldValue, linkage) => {
+  public triggerTableCellValueChanged = (eventName, value) => {
     const { colDef, record, rowIndex, api, getRowKey } = this.props;
     const { dataIndex } = colDef;
     const { eventBus } = api;
     eventBus.emit(eventName, {
-      linkage,
       value,
       record,
       dataIndex,
       rowIndex,
-      oldValue,
       rowId: record[getRowKey()],
     });
   };
@@ -272,7 +252,7 @@ class SwitchCell extends PureComponent<
           'context',
           'getRowKey',
           '$$render',
-          'getValue',
+          'loading',
         ])}
         onClick={this.onCellClick}
         onBlur={this.onCellBlur}
@@ -284,7 +264,7 @@ class SwitchCell extends PureComponent<
         })}
         style={this.getTdStyle()}
       >
-        <Spin spinning={this.state.loading}>
+        <Spin spinning={this.props.loading}>
           <EditableContext.Consumer>
             {({ form }) => {
               this.form = form;

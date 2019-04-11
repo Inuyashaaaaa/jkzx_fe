@@ -2,15 +2,15 @@ import _ from 'lodash';
 import { PureComponent } from 'react';
 import { IFormCellProps, IFormTriggerCellValueChangedParams } from 'src/components/type';
 import { delay } from '../../../utils';
-import { FORM_CELL_VALUE_CHANGED } from '../constants';
+import { FORM_CELL_EDITING_CHANGED } from '../constants';
 
 class RenderingCell extends PureComponent<IFormCellProps> {
   public componentDidMount = () => {
-    this.props.api.eventBus.listen(FORM_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
+    this.props.api.eventBus.listen(FORM_CELL_EDITING_CHANGED, this.onTableCellValueChanged);
   };
 
   public componentWillUnmount = () => {
-    this.props.api.eventBus.unListen(FORM_CELL_VALUE_CHANGED, this.onTableCellValueChanged);
+    this.props.api.eventBus.unListen(FORM_CELL_EDITING_CHANGED, this.onTableCellValueChanged);
   };
 
   public onTableCellValueChanged = (params: IFormTriggerCellValueChangedParams) => {
