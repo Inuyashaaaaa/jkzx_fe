@@ -1,5 +1,5 @@
-import { IFormControl } from '@/lib/components/_Form2';
-import { IColumnDef } from '@/lib/components/_Table2';
+import { IFormControl } from '@/design/components/Form/types';
+import { IColumnDef } from '@/design/components/Table/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
 export const TABLE_COLUMN_DEFS: IColumnDef[] = [
@@ -34,10 +34,10 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '交易对手',
     },
-    options: {
+    decorator: {
       rules: [{ required: true }],
     },
-    dataIndex: 'legalName',
+    field: 'legalName',
     input: {
       type: 'select',
       showSearch: true,
@@ -58,11 +58,11 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '交易对手账号',
     },
-    dataIndex: 'bankAccount',
+    field: 'bankAccount',
     input: {
       type: 'input',
     },
-    options: {
+    decorator: {
       rules: [{ required: true }],
     },
   },
@@ -70,10 +70,10 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '交易对手账户名',
     },
-    options: {
+    decorator: {
       rules: [{ required: true }],
     },
-    dataIndex: 'bankAccountName',
+    field: 'bankAccountName',
     input: {
       type: 'input',
     },
@@ -82,10 +82,10 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '交易对手开户行',
     },
-    options: {
+    decorator: {
       rules: [{ required: true }],
     },
-    dataIndex: 'bankName',
+    field: 'bankName',
     input: {
       type: 'input',
     },
@@ -94,10 +94,10 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '交易对手支付系统行号',
     },
-    options: {
+    decorator: {
       rules: [{ required: true }],
     },
-    dataIndex: 'paymentSystemCode',
+    field: 'paymentSystemCode',
     input: {
       type: 'input',
     },

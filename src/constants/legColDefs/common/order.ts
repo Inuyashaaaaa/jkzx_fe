@@ -94,10 +94,3 @@ export function orderLegColDefs(legColDefs: IColDef[]) {
     return pre;
   }, []).concat(notOrders.map(next => legColDefs.find(item => item.field === next)));
 }
-
-export function orderLeg(leg: ILegType) {
-  return {
-    ...leg,
-    columnDefs: orderLegColDefs(leg.columnDefs),
-  };
-}

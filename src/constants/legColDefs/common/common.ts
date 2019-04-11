@@ -4,6 +4,7 @@ import {
   mktInstrumentInfo,
   mktInstrumentSearch,
   mktQuotesListPaged,
+  searchTradableInstrument,
 } from '@/services/market-data-service';
 import { getMoment } from '@/utils';
 import { ValidationRule } from 'antd/lib/form';
@@ -213,7 +214,9 @@ export const UnderlyerInstrumentId: IColDef = {
       type: 'select',
       showSearch: true,
       options: async (value: string) => {
-        const { data, error } = await mktInstrumentSearch({
+        const { data, error } = await (record[LEG_PRICING_FIELD]
+          ? mktInstrumentSearch
+          : searchTradableInstrument)({
           instrumentIdPart: value,
         });
         if (error) return [];

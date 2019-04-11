@@ -138,4 +138,9 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
       type: 'date',
     },
   },
+  {
+    headerName: '错误信息',
+    field: 'message',
+    width: 200,
+  },
 ];

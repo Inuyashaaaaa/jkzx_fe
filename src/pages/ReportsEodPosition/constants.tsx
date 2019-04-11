@@ -123,4 +123,9 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
     field: 'underlyerPrice',
     input: INPUT_NUMBER_DIGITAL_CONFIG,
   },
+  {
+    headerName: '错误信息',
+    field: 'message',
+    width: 200,
+  },
 ];

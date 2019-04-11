@@ -173,7 +173,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                         return {
                           venueCode: item[0],
                           instrumentId: item[1],
-                          notionalLimit: item[2],
+                          notionalLimit: item[2] ? item[2] : 100000000,
                         };
                       }),
                     });
