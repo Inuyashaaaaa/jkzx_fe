@@ -606,21 +606,6 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
-          {
-            headerName: '审批流程配置',
-            field: 'approvalProcessConfiguration',
-            editable: true,
-            input: {
-              type: 'checkbox',
-              formatValue(value) {
-                if (value) {
-                  return <Icon type="check" />;
-                }
-                return <Icon type="close" />;
-              },
-            },
-            width: 150,
-          },
         ],
       },
       {

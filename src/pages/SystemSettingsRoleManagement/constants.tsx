@@ -258,10 +258,6 @@ export const treeData = [
             title: '流程管理',
             key: 'approvalProcessManagement',
           },
-          {
-            title: '审批流程配置',
-            key: 'approvalProcessConfiguration',
-          },
         ],
       },
       {
