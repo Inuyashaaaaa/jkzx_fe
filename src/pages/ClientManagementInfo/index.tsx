@@ -10,7 +10,9 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import styles from './ClientManagementInfo.less';
 import CreateModalButton from './CreateModalButton';
+import EditModalButton from './EditModelButton';
 
 const SALER_CASCADER = 'SALER_CASCADER';
 
@@ -281,10 +283,17 @@ const ClientManagementInfo = memo(() => {
               dataIndex: 'actions',
               render: (value, record, index) => {
                 return (
-                  <span>
-                    <a href="javascript:;">查看</a>
+                  <span className={styles.action}>
+                    {/* <a href="javascript:;">查看</a>
                     <Divider type="vertical" />
                     <a href="javascript:;">编辑</a>
+                    <Divider type="vertical" />
+                    <a href="javascript:;" style={{ color: 'red' }}>
+                      删除
+                    </a> */}
+                    <EditModalButton salesCascaderList={salesCascaderList} name='查看' record={record} />
+                    <Divider type="vertical" />
+                    <EditModalButton salesCascaderList={salesCascaderList} name='编辑' record={record} />
                     <Divider type="vertical" />
                     <a href="javascript:;" style={{ color: 'red' }}>
                       删除
