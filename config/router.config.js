@@ -283,11 +283,6 @@ export default [
               name: 'auditingManagement',
               component: './ApprovalProcessAuditingManagement/index',
             },
-            {
-              path: '/approval-process/process-configuration',
-              name: 'processConfiguration',
-              component: './ApprovalProcessConfiguration/index',
-            },
           ],
         },
         {
