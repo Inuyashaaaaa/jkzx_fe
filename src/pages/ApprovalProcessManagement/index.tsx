@@ -17,7 +17,7 @@ class ApprovalProcessManage extends PureComponent {
   public render() {
     return (
       <PageHeaderWrapper
-        title="审批管理"
+        title="流程管理"
         tabList={[{ key: 'pending', tab: '待审批事项' }, { key: 'related', tab: '与我相关的' }]}
         tabActiveKey={this.state.activeKey}
         onTabChange={this.onTabChange}
