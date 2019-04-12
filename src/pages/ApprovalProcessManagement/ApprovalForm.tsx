@@ -12,7 +12,6 @@ import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { generateColumns } from './constants';
-import { async } from 'q';
 
 const { TextArea } = Input;
 
