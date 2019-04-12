@@ -46,21 +46,19 @@ const ClientManagementInfo = memo(() => {
   const [salesCascaderList, setSalesCascaderList] = useState([]);
 
   const initialFormData = {
-    [STATUS_FIELD]: { value: ALL_OPTIONS_VALUE },
+    [STATUS_FIELD]: { type: 'field', value: ALL_OPTIONS_VALUE },
   };
   const [searchFormData, setSearchFormData] = useState(initialFormData);
 
   const getFormData = () => {
-    if (Array.isArray(searchFormData[SALER_CASCADER])) {
-      const [subsidiaryName, branchName, salesName] = searchFormData[SALER_CASCADER];
-      return {
-        ..._.omit(searchFormData, [SALER_CASCADER]),
-        subsidiaryName,
-        branchName,
-        salesName,
-      };
-    }
-    return searchFormData;
+    const salerValue = _.get(searchFormData[SALER_CASCADER], 'value', []);
+    const [subsidiaryName, branchName, salesName] = salerValue;
+    return {
+      ..._.mapValues(_.omit(searchFormData, [SALER_CASCADER]), item => _.get(item, 'value')),
+      subsidiaryName,
+      branchName,
+      salesName,
+    };
   };
 
   const fetchBranchSalesList = async () => {
@@ -126,8 +124,8 @@ const ClientManagementInfo = memo(() => {
           submitButtonProps={{
             icon: 'search',
           }}
-          onValuesChange={(props, changedValues, allValues) => {
-            setSearchFormData(allValues);
+          onFieldsChange={(props, changedFields, allFields) => {
+            setSearchFormData(allFields);
           }}
           dataSource={searchFormData}
           columns={[

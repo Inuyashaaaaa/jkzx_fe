@@ -9,13 +9,7 @@ import { FORM_CELL_VALUES_CHANGE } from './constants';
 import FormBase from './FormBase';
 
 class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
-  public static createOptionsFields = [
-    'onFieldsChange',
-    'mapPropsToFields',
-    'validateMessages',
-    'withRef',
-    'name',
-  ];
+  public static createOptionsFields = ['mapPropsToFields', 'validateMessages', 'withRef', 'name'];
 
   public DecoratorForm: ComponentClass<IFormBaseProps>;
 

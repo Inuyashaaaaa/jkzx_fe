@@ -114,7 +114,7 @@ export interface ITableRowProps<T = any> extends FormComponentProps {
   rowId: string;
   getEditing: () => boolean;
   setEditing: (editing: boolean) => void;
-  getContextMenu: (
+  getContextMenu?: (
     params: ITableContextMenuParams
   ) => React.ReactNode | (() => React.ReactNode) | boolean;
 }
@@ -160,15 +160,17 @@ export interface IFormTriggerCellEditingChangedParams<T = any> {
   value: any;
 }
 
-export interface ITableProps<T = ITableDataSource> extends Omit<TableProps<T>, 'columns'> {
+export interface ITableProps<T = ITableDataSource>
+  extends Omit<TableProps<T>, 'columns' | 'dataSource'> {
   onCellEditingChanged?: (params: ITableTriggerCellEditingChangedParams) => void;
   onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
   onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
-  getContextMenu: (
+  getContextMenu?: (
     params: ITableContextMenuParams
   ) => React.ReactNode | (() => React.ReactNode) | boolean;
   columns?: ITableColDef[];
   vertical?: boolean;
+  dataSource?: ITableDataSource[];
 }
 
 export type ITableContext = any;

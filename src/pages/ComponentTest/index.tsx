@@ -2,7 +2,6 @@ import { Form2, Input, InputNumber, Table2 } from '@/design/components';
 import { Button, Menu } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useRef, useState } from 'react';
-import Demo from './Demo';
 
 const StatelessForm = memo(() => {
   const formEl = useRef<Form2>(null);
@@ -21,14 +20,14 @@ const StatelessForm = memo(() => {
         {
           title: 'a',
           dataIndex: 'a',
-          editable: true,
-          loading: true,
+          // editable: true,
+          // loading: true,
           render: (value, record, index, { form, editing }) => {
             return (
               <FormItem>
                 {form.getFieldDecorator({
                   initialValue: 'a',
-                })(<Input editing={editing} />)}
+                })(<Input />)}
               </FormItem>
             );
           },
@@ -212,7 +211,6 @@ const ControlTable = memo(() => {
             }),
             title: 'id',
             dataIndex: 'id',
-            editable: true,
             render: (value, record, index, { form, editing }) => {
               return value;
             },

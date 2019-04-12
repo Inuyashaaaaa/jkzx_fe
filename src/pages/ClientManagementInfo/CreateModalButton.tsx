@@ -809,20 +809,13 @@ const CreateModalButton = memo<any>(props => {
                 pagination={false}
                 dataSource={traderList}
                 ref={node => (tableEl.current = node)}
-                onCellValueChange={({
-                  record,
-                  rowIndex,
-                  value,
-                  changedValues,
-                  allValues,
-                  rowId,
-                }) => {
+                onCellFieldsChange={({ rowIndex, changedFields }) => {
                   setTraderList(
                     traderList.map((item, index) => {
                       if (index === rowIndex) {
                         return {
                           ...item,
-                          ...changedValues,
+                          ...changedFields,
                         };
                       }
                       return item;
@@ -1313,10 +1306,11 @@ const CreateModalButton = memo<any>(props => {
                   // const formData = formRefs.base.decoratorForm.getFieldsValue();
                   return;
                 }
-                // if ([0, 1, 2, 5].findIndex(item => item === currenStep) !== -1) {
-                //   const { error } = await formRef.current.validate();
-                //   if (error) return;
-                // }
+
+                if ([0, 1, 2, 5].findIndex(item => item === currenStep) !== -1) {
+                  const { error } = await formRef.current.validate();
+                  if (error) return;
+                }
 
                 if (
                   currenStep === 0 &&
