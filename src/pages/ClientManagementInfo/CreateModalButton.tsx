@@ -210,7 +210,7 @@ const CreateModalButton = memo<any>(props => {
                 },
                 {
                   title: '开户销售',
-                  dataIndex: '开户销售',
+                  dataIndex: 'salesName',
                   render: (val, record, index, { form }) => {
                     return (
                       <FormItem hasFeedback={true}>
@@ -1303,6 +1303,13 @@ const CreateModalButton = memo<any>(props => {
               type="primary"
               onClick={async () => {
                 if (currenStep === 4) {
+                  console.log(baseFormData);
+                  const baseData = {};
+                  Object.keys(baseFormData).forEach(item => {
+                    baseData[item] = baseFormData[item].value;
+                  });
+                  const [data, error] = await createRefParty(baseData);
+                  console.log(data);
                   // const formData = formRefs.base.decoratorForm.getFieldsValue();
                   return;
                 }
@@ -1314,7 +1321,7 @@ const CreateModalButton = memo<any>(props => {
 
                 if (
                   currenStep === 0 &&
-                  _.get(baseFormData[BASE_FORM_FIELDS.TRADER_TYPE], 'value') ===
+                  _.get(baseFormData[BASE_FORM_FIELDS.TRADER_TYPE], newFunction()) ===
                     TRADER_TYPE.ENTERPRISE
                 ) {
                   return setCurrentStep(currenStep + 2);
@@ -1335,3 +1342,6 @@ const CreateModalButton = memo<any>(props => {
 });
 
 export default CreateModalButton;
+function newFunction(): 'value' | ['value'] {
+  return 'value';
+}
