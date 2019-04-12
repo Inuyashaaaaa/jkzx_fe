@@ -67,7 +67,7 @@ class ApprovalForm extends PureComponent {
       return;
     }
     const isCheckBtn =
-      params && params.taskName && params.taskName.includes('录入资金流水') && status === 'queued';
+      params && params.taskName && params.taskName.includes('修改资金流水') && status === 'queued';
     this.setState({
       loading: true,
     });
@@ -241,6 +241,7 @@ class ApprovalForm extends PureComponent {
         taskId: formData.taskId,
         ctlProcessData: {
           comment: modifyComment,
+          abandon: false,
         },
         businessProcessData: obj,
       };
