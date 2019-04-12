@@ -18,6 +18,7 @@
     &.editable {
       cursor: pointer;
       &.rendering {
+        position: relative;
         .ant-form-item-control-wrapper {
           padding-left: @input-padding-horizontal;
           &:hover {
@@ -25,6 +26,19 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             z-index: 999;
           }
+        }
+        &::after {
+          visibility: visible;
+          content: '';
+          display: block;
+          width: 10px;
+          height: 10px;
+          right: 8px;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: url('../../assets/edit.png') top center;
+          background-size: 100% auto;
         }
       }
       // &.editing {
