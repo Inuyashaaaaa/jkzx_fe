@@ -108,15 +108,6 @@ class SystemSettingsRoleManagement extends PureComponent {
     const cloneDepartments = JSON.parse(JSON.stringify(department.data || {}));
     const array = this.toArray(cloneDepartments);
 
-    // let approveGroupList = data.map(item => {
-    //   item.userList.map(param => {
-    //     const dp = array.find(obj => obj.id === param.departmentId) || {};
-    //     param.departmentName = dp.departmentName;
-    //     return param;
-    //   })
-    //   return item;
-    // });
-
     if (this.$gourpLists) {
       this.$gourpLists.handleMenber(data[0]);
     }
@@ -174,6 +165,15 @@ class SystemSettingsRoleManagement extends PureComponent {
   public onBatchAdd = async param => {
     const { currentGroup } = this.state;
     currentGroup.userList = currentGroup.userList.concat(param);
+    currentGroup.userList.forEach(item => {
+      if (!item.department_id) {
+        item.department_id = item.departmentId;
+      }
+      if (!item.nick_name) {
+        item.nick_name = item.nickName;
+      }
+    });
+
     const { data, error } = await wkApproveGroupModify(currentGroup);
     if (error) {
       return;
@@ -184,7 +184,6 @@ class SystemSettingsRoleManagement extends PureComponent {
     }
 
     currentGroup.userList = data.userList;
-    console.log(data.userList);
 
     const approveGroupList = this.state.approveGroupList.map(item => {
       if (item.approveGroupId === currentGroup.approveGroupId) {
@@ -220,22 +219,11 @@ class SystemSettingsRoleManagement extends PureComponent {
     userList = (userList || []).sort((a, b) => {
       return a.username.localeCompare(b.username);
     });
-    console.log(userList);
     userList.map(param => {
       const dp = department.find(obj => obj.id === param.departmentId) || {};
       param.departmentName = dp.departmentName;
       return param;
     });
-    console.log(userList);
-
-    // let approveGroupList = data.map(item => {
-    //   item.userList.map(param => {
-    //     const dp = department.find(obj => obj.id === param.departmentId) || {};
-    //     param.departmentName = dp.departmentName;
-    //     return param;
-    //   })
-    //   return item;
-    // });
     return (
       <>
         <div className={styles.auditingWrapper}>

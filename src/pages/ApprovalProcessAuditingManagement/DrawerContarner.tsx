@@ -237,7 +237,7 @@ class Operation extends PureComponent {
       return {
         userApproveGroupId: item.id,
         username: item.username,
-        department_name: item.departmentName,
+        department_id: item.departmentId,
         nick_name: item.nickName,
       };
     });
