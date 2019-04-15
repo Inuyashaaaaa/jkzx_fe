@@ -106,10 +106,11 @@ class BookCreate extends PureComponent<any> {
       return {};
     }
     return {
-      [LEG_FIELD.PREMIUM]:
+      [LEG_FIELD.PREMIUM]: Math.abs(
         defaultData[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT
           ? pricingData[COMPUTED_LEG_FIELD_MAP.PRICE_PER]
-          : pricingData[COMPUTED_LEG_FIELD_MAP.PRICE],
+          : pricingData[COMPUTED_LEG_FIELD_MAP.PRICE]
+      ),
     };
   };
 
