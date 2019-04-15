@@ -37,6 +37,12 @@ export default [
         //   component: './Dashboard',
         // },
         {
+          path: '/welcome-page',
+          name: 'welcomePage',
+          component: './WelcomePage',
+          hideInMenu: true,
+        },
+        {
           path: '/trade-management',
           name: 'tradeManagement',
           icon: 'form',

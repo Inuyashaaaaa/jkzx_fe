@@ -21,38 +21,4 @@
   <div id="root"></div>
 </body>
 
-<script type='text/javascript'>
-  (function(){
-    let token = localStorage.getItem('tongyu_TOKEN_LOCAL_FIELD');
-    let currentTime = new Date().getTime();
-    let lastTime = parseInt( localStorage.getItem('last_unload_time') || 0 );
-    let tokenValid = !!token;
-    let href = window.location.href;
-    let isPageLogin =  href.includes('user/login');
-    let firstPage = localStorage.getItem('first-page');
-    // let windowCouter = parseInt( localStorage.getItem('tongyu_window_couter') || 0 );
-    // localStorage.setItem('tongyu_window_couter', windowCouter + 1);
-    console.log(tokenValid);
-    if(!tokenValid){
-      localStorage.setItem('tongyu_TOKEN_LOCAL_FIELD', '');
-      if(!isPageLogin){
-        window.location.href = `/#/user/login`;
-      }
-    }else if(firstPage){
-      if (isPageLogin) {
-        redirect = firstPage || '/trade-management/booking';
-        window.location.href = `/#${redirect}`;
-      }
-    }
-  })();
-  window.onbeforeunload = function(){
-    localStorage.setItem('last_unload_time', new Date().getTime());
-    let windowCouter = parseInt( localStorage.getItem('tongyu_window_couter') || 0 );
-    if(windowCouter > 0){
-      localStorage.setItem('tongyu_window_couter', windowCouter - 1 );
-    }
-
-  }
-</script>
-
 </html>
