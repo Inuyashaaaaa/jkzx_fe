@@ -13,10 +13,10 @@ import {
   List,
   Modal,
   notification,
+  Popconfirm,
   Select,
   Switch,
   Tabs,
-  Popconfirm,
 } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
