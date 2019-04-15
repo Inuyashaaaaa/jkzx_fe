@@ -231,10 +231,9 @@ class ApprovalProcessConfiguration extends PureComponent {
             {this.state.processList.map(tab => {
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
-                  {this.renderTabs(tab)}
                   <div
                     style={{
-                      marginRight: '402px',
+                      marginRight: '2px',
                       background: '#FFF',
                       padding: '30px',
                       position: 'relative',
@@ -308,6 +307,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                       })}
                     </List>
                   </div>
+                  {this.renderTabs(tab)}
                 </TabPane>
               );
             })}
