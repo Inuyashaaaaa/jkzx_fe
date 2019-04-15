@@ -1,5 +1,6 @@
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { wkApproveGroupList, wkApproveGroupModify } from '@/services/auditing';
+import { queryAuthDepartmentList } from '@/services/department';
 import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import AuditGourpLists from './AuditGourpLists';
@@ -50,6 +51,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     approveGroupList: [],
     hover: false,
     currentGroup: null,
+    department: [],
   };
 
   constructor(props) {
@@ -98,6 +100,14 @@ class SystemSettingsRoleManagement extends PureComponent {
       return a.approveGroupName.localeCompare(b.approveGroupName);
     });
 
+    const department = await queryAuthDepartmentList();
+    if (department.error) {
+      return;
+    }
+
+    const cloneDepartments = JSON.parse(JSON.stringify(department.data || {}));
+    const array = this.toArray(cloneDepartments);
+
     if (this.$gourpLists) {
       this.$gourpLists.handleMenber(data[0]);
     }
@@ -105,7 +115,22 @@ class SystemSettingsRoleManagement extends PureComponent {
     this.setState({
       approveGroupList: data,
       loading: false,
+      department: array,
     });
+  };
+
+  public toArray = data => {
+    let array = [];
+    const children = data.children || [];
+    delete data.children;
+    array.push(data);
+
+    array = array.concat(children);
+    if (!children) return;
+    children.forEach(item => {
+      this.toArray(item);
+    });
+    return array;
   };
 
   public handleDrawer = () => {
@@ -140,6 +165,15 @@ class SystemSettingsRoleManagement extends PureComponent {
   public onBatchAdd = async param => {
     const { currentGroup } = this.state;
     currentGroup.userList = currentGroup.userList.concat(param);
+    currentGroup.userList.forEach(item => {
+      if (!item.department_id) {
+        item.department_id = item.departmentId;
+      }
+      if (!item.nick_name) {
+        item.nick_name = item.nickName;
+      }
+    });
+
     const { data, error } = await wkApproveGroupModify(currentGroup);
     if (error) {
       return;
@@ -181,8 +215,14 @@ class SystemSettingsRoleManagement extends PureComponent {
 
   public render() {
     let { userList } = this.state;
+    const { department } = this.state;
     userList = (userList || []).sort((a, b) => {
       return a.username.localeCompare(b.username);
+    });
+    userList.map(param => {
+      const dp = department.find(obj => obj.id === param.departmentId) || {};
+      param.departmentName = dp.departmentName;
+      return param;
     });
     return (
       <>
