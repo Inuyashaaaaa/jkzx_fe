@@ -32,6 +32,7 @@ export function setPermissions(permissions) {
     PERMISSIONS_LOCAL_FIELD,
     JSON.stringify({
       ...permissions,
+      processConfiguration: true,
     })
   );
 }

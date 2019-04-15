@@ -90,15 +90,6 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public onProcess = async () => {
-    const { currentProcessName, status } = this.state;
-    const { data, error } = await wkProcessStatusModify({
-      processName: currentProcessName,
-      status,
-    });
-    if (error) return;
-  };
-
   public tabsChange = e => {
     this.setState(
       {
@@ -148,12 +139,18 @@ class ApprovalProcessConfiguration extends PureComponent {
     this.setState({
       visible: false,
     });
-    const { currentProcessName, taskApproveGroupList } = this.state;
-    const { error } = await wkTaskApproveGroupCreateBatch({
-      processName: currentProcessName,
-      taskList: taskApproveGroupList,
-    });
-    if (error) return;
+    const { currentProcessName, taskApproveGroupList, status } = this.state;
+    const requests = () =>
+      Promise.all([
+        wkProcessStatusModify({ processName: currentProcessName, status }),
+        wkTaskApproveGroupCreateBatch({
+          processName: currentProcessName,
+          taskList: taskApproveGroupList,
+        }),
+      ]);
+    const [modify, batch] = await requests();
+    if (modify.error || batch.error) return;
+
     notification.success({
       message: `保存成功`,
     });
@@ -182,12 +179,11 @@ class ApprovalProcessConfiguration extends PureComponent {
     return (
       <div
         style={{
-          width: '300px',
+          width: '400px',
           background: '#FFF',
           padding: '30px',
           float: 'right',
           height: '100%',
-          position: 'relative',
         }}
       >
         <div style={{ marginBottom: '20px' }}>
@@ -231,7 +227,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                   {this.renderTabs(tab)}
                   <div
                     style={{
-                      marginRight: '302px',
+                      marginRight: '402px',
                       background: '#FFF',
                       padding: '30px',
                       position: 'relative',
@@ -244,7 +240,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                         <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
                           <Icon type="more" style={{ width: '4px', color: '#999' }} />
                           <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                          <span style={{ marginLeft: '20px' }}>发起审批</span>
+                          <span style={{ marginLeft: '30px' }}>发起审批</span>
                         </div>
                         <span className={styles.approvalIcon}>
                           {/* <Icon type="plus-circle" /> */}
@@ -254,30 +250,47 @@ class ApprovalProcessConfiguration extends PureComponent {
                         return (
                           <List.Item key={group.taskId}>
                             <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
-                              <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                              <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                              <span style={{ marginLeft: '20px' }}>{group.taskName}</span>
-                              <span className={styles.selectTile}>选择审批组</span>
-                              <Select
-                                value={group.approveGroupList}
-                                style={{ width: 500 }}
-                                mode="multiple"
-                                onChange={e => this.handleApproveGroup(e, group.taskId)}
-                                optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                  option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                                }
+                              <div
+                                style={{
+                                  display: 'inline-block',
+                                  float: 'left',
+                                  marginRight: '150px',
+                                }}
                               >
-                                {this.state.approveGroupList.map(item => {
-                                  return (
-                                    <Option key={item.approveGroupId}>
-                                      {item.approveGroupName}
-                                    </Option>
-                                  );
-                                })}
-                              </Select>
+                                <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                                <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                                <span style={{ marginLeft: '30px' }}>{group.taskName}</span>
+                              </div>
+                              <div
+                                style={{
+                                  display: 'inline-block',
+                                  float: 'left',
+                                  marginLeft: '40px',
+                                  width: '600px',
+                                }}
+                              >
+                                <span className={styles.selectTile}>选择审批组</span>
+                                <Select
+                                  className={styles.select}
+                                  value={group.approveGroupList}
+                                  mode="multiple"
+                                  onChange={e => this.handleApproveGroup(e, group.taskId)}
+                                  optionFilterProp="children"
+                                  filterOption={(input, option) =>
+                                    option.props.children
+                                      .toLowerCase()
+                                      .indexOf(input.toLowerCase()) >= 0
+                                  }
+                                >
+                                  {this.state.approveGroupList.map(item => {
+                                    return (
+                                      <Option key={item.approveGroupId}>
+                                        {item.approveGroupName}
+                                      </Option>
+                                    );
+                                  })}
+                                </Select>
+                              </div>
                             </div>
                             <span className={styles.approvalIcon}>
                               {/* <Icon type="minus-circle" />  
