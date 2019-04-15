@@ -12,6 +12,16 @@ export async function createApprovalProcess(params = {}) {
   });
 }
 
+export async function wkProcessInstanceComplexList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessInstanceComplexList',
+      params,
+    },
+  });
+}
+
 // 查询审批流程列表
 export async function queryProcessList(params = {}) {
   return request(`${HOST_TEST}workflow-service/api/rpc`, {
