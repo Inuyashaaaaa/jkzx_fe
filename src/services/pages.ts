@@ -175,6 +175,7 @@ export const convertTradeApiData2PageData = (apiData: any = {}) => {
       lcmEventType: position.lcmEventType,
       ...createLegDataSourceItem(Leg),
       id: position.positionId,
+      positionId: position.positionId,
       productType: Leg.type,
     });
 

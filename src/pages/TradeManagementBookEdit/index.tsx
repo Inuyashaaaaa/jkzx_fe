@@ -244,6 +244,11 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
             _.unionBy<IColDef>(
               [
                 {
+                  headerName: '持仓ID',
+                  field: 'positionId',
+                  editable: false,
+                },
+                {
                   headerName: '状态',
                   field: LEG_FIELD.LCM_EVENT_TYPE,
                   oldEditable: false,
