@@ -256,7 +256,7 @@ export async function queryModelVolSurface(params, passError) {
 }
 
 export async function saveModelVolSurface(params) {
-  const { columns, dataSource, underlyer, newQuote, modelName } = params;
+  const { columns, dataSource, underlyer, newQuote, modelName, instance } = params;
 
   return request(`${HOST_TEST}model-service/api/rpc`, {
     method: 'POST',
@@ -265,7 +265,7 @@ export async function saveModelVolSurface(params) {
       params: {
         daysInYear: 365,
         save: true,
-        instance: 'intraday',
+        instance,
         modelName,
         underlyer: {
           ...underlyer,

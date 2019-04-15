@@ -33,6 +33,7 @@ class TradeModal extends PureComponent {
       tos: this.props.data.tradeEmail,
       tradeId: this.props.data.tradeId,
       positionId: this.props.data.positionId,
+      partyName: this.props.data.partyName,
     });
     if (error) {
       message.error('发送失败');
@@ -73,7 +74,7 @@ class TradeModal extends PureComponent {
                       href={encodeURI(
                         `${DOWN_LOAD_SETTLEMENT_URL}tradeId=${this.props.data.tradeId}&positionId=${
                           this.props.data.positionId
-                        }`
+                        }&partyName=${this.props.data.partyName}`
                       )}
                       download="template.t"
                     >

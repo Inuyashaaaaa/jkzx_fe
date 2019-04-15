@@ -42,7 +42,7 @@ function findLoginRedirectPage(routers, userPermissions) {
     if (redirect) {
       return;
     }
-    if (name !== 'trade-management/booking' && userPermissions[name] && !routes) {
+    if (name !== 'welcome-page' && userPermissions[name] && !routes) {
       redirect = path;
       return;
     }
@@ -122,7 +122,7 @@ export default {
 
       const newPermissions = Object.assign({}, permissions);
       Object.keys(newPermissions).forEach(key => (newPermissions[key] = false));
-      newPermissions.booking = true;
+      // newPermissions.booking = true;
       setPagePermissions(
         userInfo,
         roles || [],
@@ -160,7 +160,7 @@ export default {
       // }
 
       let redirect = findLoginRedirectPage(pageRouters[3], newPermissions);
-      redirect = redirect || '/trade-management/booking';
+      redirect = redirect || '/welcome-page';
 
       const nextQueryStr = stringify({
         _random: Math.random(),
