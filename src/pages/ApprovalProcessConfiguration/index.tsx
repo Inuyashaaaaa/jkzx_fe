@@ -56,7 +56,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const tabsData = (processList.data || []).map(item => {
+    const tabsData = ([processList.data[1]] || []).map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
@@ -202,11 +202,11 @@ class ApprovalProcessConfiguration extends PureComponent {
           />
           <span style={{ marginLeft: '6px' }}>启用流程</span>
         </div>
-        <div style={{ marginTop: '60px' }}>
-          <p style={{ fontWeight: 'bolder' }}>全局配置</p>
+        <div style={{ marginTop: '60px', minHeight: '60px' }}>
+          {/* <p style={{ fontWeight: 'bolder' }}>全局配置</p>
           <p>
             <Checkbox>不允许审批自己发起的审批单</Checkbox>
-          </p>
+          </p> */}
         </div>
         <div className={styles.configButtonBox}>
           <p>
