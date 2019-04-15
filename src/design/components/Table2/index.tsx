@@ -42,6 +42,20 @@ class Table2 extends PureComponent<ITableProps> {
     this.context = this.getContext();
   }
 
+  public componentDidMount = () => {
+    window.addEventListener('click', this.onWindowClick, false);
+  };
+
+  public componentWillUnmount = () => {
+    window.removeEventListener('click', this.onWindowClick, false);
+  };
+
+  public onWindowClick = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    this.save();
+  };
+
   public getFieldNames = () => {
     return this.props.columns.map(item => item.dataIndex);
   };
@@ -52,6 +66,16 @@ class Table2 extends PureComponent<ITableProps> {
       .forEach(item => {
         return item.node.validate(options, fieldNames);
       });
+  };
+
+  public save = (rowIds?: string[], colIds?: string[]) => {
+    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+      if (rowIds && rowIds.indexOf(rowId) === -1) return;
+      items.forEach(item => {
+        if (colIds && colIds.indexOf(item.id) === -1) return;
+        item.node.saveCell();
+      });
+    });
   };
 
   public getContext = (): ITableContext => {
@@ -81,22 +105,26 @@ class Table2 extends PureComponent<ITableProps> {
         ...colDef,
         // colDef.render 会首先自己执行一次，因此将它挂在其他位置
         render: undefined,
-        onCell: (record, rowIndex): ITableCellProps => ({
-          ...(colDef.onCell ? colDef.onCell(record, rowIndex) : undefined),
-          $$render: colDef.render,
-          record,
-          rowIndex,
-          colDef,
-          size: this.convertInputSize(size),
-          api: this.api,
-          context: this.context,
-          getRowKey: () => {
+        onCell: (record, rowIndex): ITableCellProps => {
+          const getRowKey = () => {
             return typeof this.props.rowKey === 'string'
               ? this.props.rowKey
               : this.props.rowKey(record, rowIndex);
-          },
-          loading: colDef.loading ? colDef.loading(record, rowIndex) : false,
-        }),
+          };
+          return {
+            ...(colDef.onCell ? colDef.onCell(record, rowIndex) : undefined),
+            $$render: colDef.render,
+            record,
+            rowIndex,
+            colDef,
+            tableApi: this,
+            size: this.convertInputSize(size),
+            api: this.api,
+            context: this.context,
+            getRowKey,
+            rowId: record[getRowKey()],
+          };
+        },
       };
     });
 

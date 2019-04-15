@@ -51,7 +51,7 @@ class Select extends InputBase<
   private lastRequestId: any = null;
 
   public getRef = node => {
-    if (this.props.autoSelect && node) {
+    if (this.props.autoSelect && node && node.select) {
       node.select();
     }
   };
@@ -111,11 +111,23 @@ class Select extends InputBase<
     );
   }
 
+  public getOptions = () => {
+    const options =
+      typeof this.props.options === 'function' ? this.state.options : this.props.options;
+    return options;
+  };
+
   public renderRendering() {
     const { value } = this.props;
     return (
       <span style={{ display: 'inline-block', width: '100%' }}>
-        {value && (Array.isArray(value) ? value : [value]).join(',')}
+        {value &&
+          (Array.isArray(value) ? value : [value])
+            .map(val => {
+              const findItem = this.getOptions().find(item => item.value === val);
+              return findItem ? findItem.label : '';
+            })
+            .join(',')}
       </span>
     );
   }

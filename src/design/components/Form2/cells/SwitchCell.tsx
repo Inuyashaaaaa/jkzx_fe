@@ -15,7 +15,6 @@ class SwitchCell extends PureComponent<
   IFormCellProps,
   {
     editing: boolean;
-    loading: boolean;
   }
 > {
   public static defaultProps = {
@@ -24,7 +23,6 @@ class SwitchCell extends PureComponent<
 
   public state = {
     editing: false,
-    loading: false,
   };
 
   public $cell: HTMLDivElement;
@@ -39,14 +37,6 @@ class SwitchCell extends PureComponent<
 
   public componentDidMount = () => {
     this.registeCell();
-  };
-
-  public startLoading = (callback?) => {
-    this.setState({ loading: true }, callback);
-  };
-
-  public stopLoading = (callback?) => {
-    this.setState({ loading: false }, callback);
   };
 
   public registeCell = () => {
@@ -77,6 +67,7 @@ class SwitchCell extends PureComponent<
         cellApi: this,
         form: wrapedForm,
         ref: this.getEditingCellRef,
+        colDef,
       });
     } else {
       return React.createElement(RenderingCell, {
@@ -84,6 +75,7 @@ class SwitchCell extends PureComponent<
         cellApi: this,
         form: wrapedForm,
         ref: this.getRenderingCellRef,
+        colDef,
       });
     }
   };
@@ -219,11 +211,6 @@ class SwitchCell extends PureComponent<
     return !!this.state.editing;
   };
 
-  public getLoading = () => {
-    const { colDef } = this.props;
-    return !!colDef.loading;
-  };
-
   public render() {
     return (
       <div
@@ -249,7 +236,7 @@ class SwitchCell extends PureComponent<
           rendering: !this.state.editing,
         })}
       >
-        <Spin spinning={this.getLoading()}>{this.getInlineCell()}</Spin>
+        {this.getInlineCell()}
       </div>
     );
   }

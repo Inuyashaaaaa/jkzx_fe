@@ -76,6 +76,7 @@ class EditableRow extends React.Component<ITableRowProps> {
           'getEditing',
           'setEditing',
           'editings',
+          'rowId',
         ])}
         className={styles.row}
       />

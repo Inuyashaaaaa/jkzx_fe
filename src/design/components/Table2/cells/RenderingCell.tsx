@@ -27,7 +27,7 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public getRenderResult = () => {
-    const { record, rowIndex, $$render, form } = this.props;
+    const { record, rowIndex, $$render, form, colDef } = this.props;
     const value = this.getValue();
 
     if (!$$render) return value;
@@ -35,6 +35,7 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
     const node = $$render(value, record, rowIndex, {
       form,
       editing: false,
+      colDef,
     });
     if (React.isValidElement(node)) {
       return React.cloneElement(node, {

@@ -26,18 +26,15 @@ class EditingCell extends PureComponent<IFormCellProps, any> {
   };
 
   public render() {
-    const {
-      form,
-      record,
-      colDef: { dataIndex, render },
-      cellApi,
-    } = this.props;
+    const { form, record, colDef, cellApi } = this.props;
+    const { render } = colDef;
     const value = cellApi.getValue();
     if (render) {
       return cellApi.renderElement(
         render(value, record, 0, {
           form,
           editing: true,
+          colDef,
         })
       );
     }

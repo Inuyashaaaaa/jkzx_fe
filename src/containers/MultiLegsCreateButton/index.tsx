@@ -1,10 +1,10 @@
-import { allLegTypes } from '@/constants/legColDefs';
+import { TOTAL_LEGS } from '@/constants/legs';
+import { ILeg } from '@/types/leg';
 import { Button, Dropdown, Menu } from 'antd';
-import { ClickParam } from 'antd/lib/menu';
 import React, { PureComponent } from 'react';
 
 export default class MultilLegCreateButton extends PureComponent<{
-  handleAddLeg?: (params: ClickParam) => void;
+  handleAddLeg?: (leg: ILeg) => void;
   isPricing?: boolean;
 }> {
   public static defaultProps = {
@@ -12,21 +12,8 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const usedLegs = allLegTypes;
-    return [
-      {
-        name: '年化',
-        children: usedLegs
-          .filter(leg => leg.isAnnualized)
-          .map(item => ({ ...item, name: item.name.replace(' - 年化', '') })),
-      },
-      {
-        name: '非年化',
-        children: usedLegs
-          .filter(leg => !leg.isAnnualized)
-          .map(item => ({ ...item, name: item.name.replace(' - 非年化', '') })),
-      },
-    ];
+    const usedLegs = TOTAL_LEGS;
+    return usedLegs;
   };
 
   public getLegMenuNodes = menus => {
@@ -46,11 +33,12 @@ export default class MultilLegCreateButton extends PureComponent<{
     return (
       <Dropdown
         trigger={['click']}
-        // disabled={this.state.dataSource.length >= 1}
-        key="add"
         overlay={
           <Menu
-            onClick={this.props.handleAddLeg}
+            onClick={event => {
+              const leg = TOTAL_LEGS.find(item => item.type === event.key);
+              this.props.handleAddLeg(leg);
+            }}
             style={{ display: 'flex', justifyContent: 'start' }}
           >
             {this.getLegMenuNodes(this.normalLegMenus())}
