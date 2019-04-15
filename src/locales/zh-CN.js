@@ -14,6 +14,7 @@ export default {
   'menu.testPage': 'testPage',
   'menu.testPageFormControls': 'testPageFormControls',
   'menu.dashboard': '控制面板',
+  'menu.welcomePage': '欢迎页面',
   'menu.systemSettings': '系统设置',
   'menu.systemSettings.calendars': '交易日历',
   'menu.systemSettings.riskSettings': '风控设置',
