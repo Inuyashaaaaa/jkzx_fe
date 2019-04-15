@@ -313,7 +313,8 @@ class Discrepancy extends PureComponent<
         state.modalVisible = false;
       }),
       () => {
-        message.success('已进入流程');
+        message.success(data.processInstanceId ? '已进入流程' : '资金录入成功');
+        this.onFetch();
       }
     );
   };
