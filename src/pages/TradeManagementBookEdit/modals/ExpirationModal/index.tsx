@@ -244,7 +244,7 @@ class ExpirationModal extends PureComponent<
   };
 
   public handleSettleAmount = async () => {
-    const dataSource = this.state.formData;
+    const dataSource = this.state.callPutDataSource;
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -384,7 +384,6 @@ class ExpirationModal extends PureComponent<
         />
       );
     }
-
     return this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED ? (
       <Form
         wrappedComponentRef={node => {
