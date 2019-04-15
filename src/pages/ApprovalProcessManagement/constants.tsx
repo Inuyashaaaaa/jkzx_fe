@@ -6,7 +6,7 @@ import Operation from './Operation';
 const processNum = {
   field: 'processSequenceNum',
   headerName: '审批单号',
-  width: 250,
+  width: 270,
 };
 
 const processName = {
@@ -17,6 +17,7 @@ const processName = {
 const initiatorName = {
   field: 'initiatorName',
   headerName: '发起人',
+  width: 150,
 };
 
 const operatorName = {
@@ -27,6 +28,7 @@ const operatorName = {
 const subject = {
   field: 'subject',
   headerName: '标题',
+  wdith: 200,
 };
 
 const startTime = {
@@ -90,6 +92,8 @@ export const PENDING_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   ...pendingCol,
   {
     headerName: '操作',
+    width: 340,
+    pinned: 'right',
     render: params => {
       return <Operation formData={params.data} status="pending" fetchTable={fetchTable} />;
     },
@@ -122,6 +126,7 @@ export const RELATED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {
     field: 'status',
     headerName: '流程状态',
+    width: 160,
     input: {
       type: 'select',
       options: PROCESS_STATUS_TYPE_OPTIONS,
@@ -129,7 +134,8 @@ export const RELATED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   },
   {
     headerName: '操作',
-    width: 300,
+    width: 200,
+    pinned: 'right',
     render: params => {
       return <Operation formData={params.data} status="related" fetchTable={fetchTable} />;
     },

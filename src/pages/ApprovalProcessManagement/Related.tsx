@@ -122,6 +122,7 @@ class Related extends PureComponent {
           loading={this.state.loading}
           dataSource={this.state.dataSource}
           columnDefs={RELATED_COL_DEFS(this.fetchTable)}
+          autoSizeColumnsToFit={false}
         />
       </>
     );

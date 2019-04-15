@@ -48,6 +48,7 @@ class Pending extends PureComponent {
           loading={this.state.loading}
           dataSource={this.state.dataSource}
           columnDefs={PENDING_COL_DEFS(this.fetchTable)}
+          autoSizeColumnsToFit={false}
         />
       </>
     );
