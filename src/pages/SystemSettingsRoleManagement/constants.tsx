@@ -192,7 +192,7 @@ export const treeData = [
           },
           {
             title: '汇总风险',
-            key: 'intradayRiskByUnderlyerReport',
+            key: 'eodRiskByUnderlyer',
           },
           {
             title: '汇总日盈亏',
