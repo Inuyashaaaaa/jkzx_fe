@@ -121,7 +121,17 @@ class Operation extends PureComponent {
     });
   };
 
-  public filterData = () => {
+  public filterData = keys => {
+    if (keys) {
+      let { selectArray } = this.state;
+      selectArray = selectArray.filter(item => {
+        return !keys.includes(item.username);
+      });
+      this.setState({
+        selectArray,
+      });
+    }
+
     const { currentGroup } = this.props;
     let { dataSource } = this.state;
     dataSource = dataSource.filter(item => {

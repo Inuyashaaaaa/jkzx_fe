@@ -199,7 +199,7 @@ class SystemSettingsRoleManagement extends PureComponent {
       },
       () => {
         if (this.$drawer) {
-          this.$drawer.filterData();
+          this.$drawer.filterData((data.userList || []).map(item => item.username));
         }
       }
     );
