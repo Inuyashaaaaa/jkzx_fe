@@ -91,9 +91,19 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public tabsChange = e => {
+    let status = false;
+    let { processList } = this.state;
+    processList = processList.map(item => {
+      if (item.processName === e) {
+        status = item.status;
+      }
+      return item;
+    });
     this.setState(
       {
         currentProcessName: e,
+        status,
+        processList,
       },
       () => {
         this.fetchData();
