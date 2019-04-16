@@ -5,7 +5,6 @@ import {
   wkTaskApproveGroupCreateBatch,
   wkTaskApproveGroupList,
 } from '@/services/approvalProcessConfiguration';
-import _ from 'lodash';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
   Button,
