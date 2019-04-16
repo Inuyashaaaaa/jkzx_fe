@@ -32,10 +32,7 @@ export function queryModelRiskFreeCurve(params) {
     const { error, data } = result;
     if (error) return result;
 
-    const {
-      modelInfo: { instruments },
-    } = data;
-
+    const instruments = data.modelInfo ? data.modelInfo.instruments : [];
     return {
       error,
       data: {
