@@ -4,7 +4,7 @@ import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { PureStateComponent } from '@/lib/components/_Components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions } from '@/lib/utils';
+import { arr2treeOptions, moment } from '@/lib/utils';
 import { DOWN_LOAD_FIEL_URL } from '@/services/document';
 import {
   clientAccountDel,
@@ -133,8 +133,14 @@ class ClientManagement extends PureStateComponent {
 
     if (error) return;
 
+    const newData = data.map(item => {
+      item.updatedAt = moment(item.updatedAt);
+      item.createdAt = moment(item.updatedAt);
+      return item;
+    });
+
     this.setState({
-      tableDataSource: data,
+      tableDataSource: newData,
     });
   };
 
@@ -447,7 +453,7 @@ class ClientManagement extends PureStateComponent {
                               }
                               return;
                             }}
-                            controls={INSITUTIONS(this.state.branchSalesList, 'create')}
+                            controls={INSITUTIONS(this.state.branchSalesList)}
                             dataSource={this.state.dataSourceInst}
                             onValueChange={this.handleChangeInstValue}
                             controlNumberOneRow={2}
@@ -462,7 +468,7 @@ class ClientManagement extends PureStateComponent {
                               }
                               return;
                             }}
-                            controls={PRODUCTIONS(this.state.branchSalesList, 'create')}
+                            controls={PRODUCTIONS(this.state.branchSalesList)}
                             dataSource={this.state.dataSourceProd}
                             onValueChange={this.handleChangeProdValue}
                             controlNumberOneRow={2}
