@@ -2,7 +2,7 @@ import SourceTable from '@/design/components/SourceTable';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
 import { authUserList } from '@/services/user';
-import { Button, Form, Input, Row, Select, Table, TreeSelect } from 'antd';
+import { Button, Form, Input, Row, Select, Table, TreeSelect, notification } from 'antd';
 import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -210,6 +210,11 @@ class Operation extends PureComponent {
   };
 
   public onBatchAdd = () => {
+    if (this.state.selectArray.length <= 0) {
+      return notification.error({
+        message: `请选择一个成员`,
+      });
+    }
     this.props.onBatchAdd(this.state.selectArray);
     this.setState({
       selectArray: [],
