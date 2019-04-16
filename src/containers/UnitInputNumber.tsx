@@ -11,7 +11,7 @@ export const UnitInputNumber = memo<
 >(({ unit = '¥', ...props }) => {
   let formatter;
   let parser;
-  const options;
+  const options = undefined;
 
   if (unit === '%' || unit === '天') {
     formatter = value => {

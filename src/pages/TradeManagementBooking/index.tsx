@@ -1,15 +1,22 @@
-import { LEG_ID_FIELD, LEG_NAME_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
+import {
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  LEG_NAME_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_ZHCH_MAP,
+} from '@/constants/common';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import { Loading, Table2 } from '@/design/components';
 import { VERTICAL_GUTTER } from '@/design/components/SourceTable';
-import { uuid } from '@/design/utils';
+import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { ILeg, ILegColDef } from '@/types/leg';
-import { Button, Row } from 'antd';
+import { Button, Menu, Row } from 'antd';
 import _ from 'lodash';
 import React, { memo, useState } from 'react';
+import './index.less';
 
 const TradeManagementBooking = memo(() => {
   const [columns, setColumns] = useState([]);
@@ -106,6 +113,20 @@ const TradeManagementBooking = memo(() => {
     });
   };
 
+  const getTitleColumns = (legColDefs: ILegColDef[]) => {
+    return [
+      {
+        title: '结构名称',
+        dataIndex: LEG_FIELD.LEG_META,
+        render: (val, record) => {
+          return LEG_TYPE_ZHCH_MAP[record[LEG_TYPE_FIELD]];
+        },
+      },
+      // meta field 会被 loading 包装
+      ...remove(legColDefs, item => item.dataIndex === LEG_FIELD.LEG_META),
+    ];
+  };
+
   const [createTradeLoading, setCreateTradeLoading] = useState(false);
 
   return (
@@ -120,11 +141,13 @@ const TradeManagementBooking = memo(() => {
                 if (!leg) return;
 
                 setColumns(pre =>
-                  getLoadingsColumns(
-                    getWidthColumns(
-                      getEmptyRenderLegColumns(
-                        getOrderLegColumns(
-                          getUnionLegColumns(pre.concat(leg.getColumns(LEG_ENV.BOOKING)))
+                  getTitleColumns(
+                    getLoadingsColumns(
+                      getWidthColumns(
+                        getEmptyRenderLegColumns(
+                          getOrderLegColumns(
+                            getUnionLegColumns(pre.concat(leg.getColumns(LEG_ENV.BOOKING)))
+                          )
                         )
                       )
                     )
@@ -160,11 +183,11 @@ const TradeManagementBooking = memo(() => {
           </Button.Group>
         </Row>
         <Table2
-          rowKey="id"
+          rowKey={LEG_ID_FIELD}
           onCellFieldsChange={params => {
             setTableData(pre =>
               pre.map(item => {
-                if (item.id === params.rowId) {
+                if (item[LEG_ID_FIELD] === params.rowId) {
                   return {
                     ...item,
                     ...params.changedFields,
@@ -178,6 +201,32 @@ const TradeManagementBooking = memo(() => {
           vertical={true}
           columns={columns}
           dataSource={tableData}
+          getContextMenu={params => {
+            return (
+              <Menu
+                onClick={event => {
+                  if (event.key === 'copy') {
+                    setTableData(pre => {
+                      const next = insert(pre, params.rowIndex, {
+                        ..._.cloneDeep(params.record),
+                        [LEG_ID_FIELD]: uuid(),
+                      });
+                      return next;
+                    });
+                  }
+                  if (event.key === 'remove') {
+                    setTableData(pre => {
+                      const next = remove(pre, params.rowIndex);
+                      return next;
+                    });
+                  }
+                }}
+              >
+                <Menu.Item key="copy">复制</Menu.Item>
+                <Menu.Item key="remove">删除</Menu.Item>
+              </Menu>
+            );
+          }}
         />
       </PageHeaderWrapper>
     </div>

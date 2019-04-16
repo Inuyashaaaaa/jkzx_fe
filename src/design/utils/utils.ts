@@ -25,6 +25,6 @@ export const insert = (
     index = array.findIndex(index);
   }
   const clone = [...array];
-  clone.splice(index, 1, data);
+  clone.splice(index, 0, data);
   return clone;
 };

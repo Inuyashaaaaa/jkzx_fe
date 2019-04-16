@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { ILegType } from '..';
 
 export const LEG_FIELD_ORDERS = [
+  LEG_FIELD.LEG_META,
   LEG_FIELD.IS_ANNUAL,
   LEG_FIELD.DIRECTION,
   LEG_FIELD.OPTION_TYPE,

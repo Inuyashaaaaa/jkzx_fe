@@ -21,8 +21,8 @@ import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 
 export const VanillaAmerican: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VERTICAL_SPREAD_ANNUAL],
-  type: LEG_TYPE_MAP.VERTICAL_SPREAD_ANNUAL,
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
+  type: LEG_TYPE_MAP.VANILLA_AMERICAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     return [
