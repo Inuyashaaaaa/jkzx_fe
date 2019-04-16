@@ -67,7 +67,15 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const tabsData = [_.get(processList, 'data[1]', {})].map(item => {
+    let { data } = processList;
+    if (!Array.isArray(data)) {
+      data = [data];
+    }
+    if (data.length > 1) {
+      data = data.slice(1);
+    }
+
+    const tabsData = data.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
@@ -103,15 +111,18 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public tabsChange = e => {
     let status = false;
-    this.state.processList.forEach(item => {
+    let { processList } = this.state;
+    processList = processList.map(item => {
       if (item.processName === e) {
         status = item.status;
       }
+      return item;
     });
     this.setState(
       {
         currentProcessName: e,
         status,
+        processList,
       },
       () => {
         this.fetchData();
