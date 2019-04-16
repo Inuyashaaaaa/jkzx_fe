@@ -23,7 +23,7 @@ export const OptionType: ILegColDef = {
     return (
       <FormItem
         hasFeedback={true}
-        help={
+        extra={
           record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER && editing
             ? '行权价>障碍价自动为看涨; 行权价>障碍价自动为看跌'
             : null

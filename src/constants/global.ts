@@ -30,3 +30,5 @@ export const SOCKET_MAP = {
 
 // 下拉 select 的 全部 选项
 export const ALL_OPTIONS_VALUE = 'all';
+
+export const CNY_FORMAT = '¥ 0,0.0000';

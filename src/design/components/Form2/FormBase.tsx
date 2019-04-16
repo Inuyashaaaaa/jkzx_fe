@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import _, { chunk, omit } from 'lodash';
 import React, { PureComponent } from 'react';
 import { EVERY_EVENT_TYPE } from '../../utils';
-import { IFormBaseProps, IFormColDef, IFormTriggerCellValueChangeParams } from '../type';
+import { IFormBaseProps, IFormColDef } from '../type';
 import SwitchCell from './cells/SwitchCell';
-import { FORM_CELL_EDITING_CHANGED, FORM_CELL_VALUES_CHANGE } from './constants';
+import { FORM_CELL_EDITING_CHANGED } from './constants';
 import FormManager from './formManager';
 import './index.less';
 
@@ -65,6 +65,13 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     return rules;
   };
 
+  public save = (colIds?: string[]) => {
+    return _.forEach(this.formManager.cellNodes, item => {
+      if (colIds && colIds.indexOf(item.id) === -1) return;
+      item.node.saveCell();
+    });
+  };
+
   public getControlElement = (colDef: IFormColDef = {}, key?) => {
     const { form, dataSource } = this.props;
     return <SwitchCell key={key} colDef={colDef} form={form} record={dataSource} api={this} />;
@@ -79,6 +86,10 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
         domEvent,
       });
     });
+  };
+
+  public getColumnDefs = () => {
+    return this.props.columns || [];
   };
 
   public onReset = domEvent => {

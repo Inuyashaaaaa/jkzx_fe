@@ -1,5 +1,6 @@
 import { InputNumber as AntdInputNumber } from 'antd';
 import { InputNumberProps } from 'antd/lib/input-number';
+import BigNumber from 'bignumber.js';
 import { omit } from 'lodash';
 import React from 'react';
 import { InputBase } from '../type';
@@ -7,6 +8,10 @@ import { InputBase } from '../type';
 export interface IInputNumberProps extends InputNumberProps {}
 
 class InputNumber extends InputBase<IInputNumberProps> {
+  public static defaultProps = {
+    scale: 1,
+  };
+
   public onChange = (e: number | undefined) => {
     if (this.props.onChange) {
       this.props.onChange(e);
@@ -37,9 +42,27 @@ class InputNumber extends InputBase<IInputNumberProps> {
     );
   }
 
+  public getValue = value => {
+    if (typeof value === 'string') {
+      return value.replace(/\.(.{4}).*/, '.$1');
+    }
+    return value;
+  };
+
   public renderRendering() {
-    const { value } = this.props;
-    return <span>{value}</span>;
+    const { value, formatter } = this.props;
+    const nextVal = this.getValue(value);
+
+    return (
+      <span
+        style={{
+          width: '100%',
+          display: 'inline-block',
+        }}
+      >
+        {formatter && nextVal != null ? formatter(nextVal) : nextVal}
+      </span>
+    );
   }
 }
 

@@ -350,6 +350,11 @@ export const SPECIFIED_PRICE_ZHCN_MAP = {
   DERIVATIVES_CLOSE: '标的收盘价',
 };
 
+export const SPECIFIED_PRICE_OPTIONS = Object.keys(SPECIFIED_PRICE_MAP).map(key => ({
+  label: SPECIFIED_PRICE_ZHCN_MAP[key],
+  value: SPECIFIED_PRICE_MAP[key],
+}));
+
 export const REBATETYPE_TYPE_MAP = {
   PAY_NONE: 'PAY_NONE',
   PAY_WHEN_HIT: 'PAY_WHEN_HIT',

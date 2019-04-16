@@ -4,7 +4,9 @@ import {
   ITableTriggerCellFieldsChangeParams,
 } from '@/design/components/type';
 
-export interface ILegColDef extends ITableColDef {}
+export interface ILegColDef extends ITableColDef {
+  linkage?: boolean;
+}
 
 export interface ILeg {
   name: string;

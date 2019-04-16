@@ -1,86 +1,22 @@
-import _ from 'lodash';
 import { PureComponent } from 'react';
-import { IFormCellProps, IFormTriggerCellValueChangedParams } from 'src/components/type';
-import { delay } from '../../../utils';
-import { FORM_CELL_EDITING_CHANGED } from '../constants';
+import { IFormCellProps } from '../../type';
 
 class RenderingCell extends PureComponent<IFormCellProps> {
-  public componentDidMount = () => {
-    this.props.api.eventBus.listen(FORM_CELL_EDITING_CHANGED, this.onTableCellValueChanged);
-  };
-
-  public componentWillUnmount = () => {
-    this.props.api.eventBus.unListen(FORM_CELL_EDITING_CHANGED, this.onTableCellValueChanged);
-  };
-
-  public onTableCellValueChanged = (params: IFormTriggerCellValueChangedParams) => {
-    this.linkage(params);
-  };
-
-  public linkage = (params: IFormTriggerCellValueChangedParams) => {
-    const dataIndex = this.getDataIndex();
-
-    if (params.dataIndex === dataIndex) return;
-
-    if (this.props.form.isFieldValidating(dataIndex)) {
-      return;
+  public renderDiff = () => {
+    const newVal = this.getValue();
+    if (this.props.cellApi.oldValue !== newVal) {
+      setTimeout(() => {
+        this.props.cellApi.$cell.classList.add('tongyu-table-cell-update');
+        setTimeout(() => {
+          this.props.cellApi.$cell.classList.remove('tongyu-table-cell-update');
+        }, 1000);
+      });
     }
-
-    const error = this.props.form.getFieldError(dataIndex);
-
-    if (error) {
-      return;
-    }
-
-    this.linkageValue(params);
-
-    // 当前行 form 只要有非自身 field 发生 value changed 就会触发更新
-    this.forceUpdate();
+    this.props.cellApi.oldValue = newVal;
   };
 
-  public linkageValue = (params: IFormTriggerCellValueChangedParams) => {
-    const { record, getValue } = this.props;
-    if (!getValue.value) return;
-    const changedFields = [params.dataIndex];
-    // 函数形式表示依赖所有 field
-    if (
-      getValue.depends.length === 0 ||
-      _.intersection(changedFields, getValue.depends).length > 0
-    ) {
-      const temp = getValue.value(record, params);
-      const { cellApi } = this.props;
-      cellApi.startLoading();
-      (temp instanceof Promise ? temp : delay(100, temp))
-        .then(newVal => {
-          const {
-            record,
-            colDef: { dataIndex },
-          } = this.props;
-          const oldVal = cellApi.getValue();
-
-          if (newVal === oldVal) return;
-
-          cellApi.mutableChangeRecordValue(newVal, true);
-          const instance = (this.props.form as any).getFieldInstance(dataIndex);
-          if (instance && instance.onChange) {
-            instance.onChange(newVal);
-          } else {
-            this.refreshCellView();
-          }
-        })
-        .finally(() => {
-          cellApi.stopLoading();
-        });
-    }
-  };
-
-  public refreshCellView = () => {
-    const {
-      colDef: { dataIndex },
-    } = this.props;
-    this.forceUpdate(() => {
-      this.props.form.resetFields([dataIndex]);
-    });
+  public getValue = () => {
+    return this.props.cellApi.getValue();
   };
 
   public getDataIndex = () => {
@@ -90,6 +26,8 @@ class RenderingCell extends PureComponent<IFormCellProps> {
   };
 
   public render() {
+    this.renderDiff();
+
     const { form, record, colDef, cellApi } = this.props;
     const { render } = colDef;
     const value = cellApi.getValue();

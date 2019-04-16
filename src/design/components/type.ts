@@ -235,14 +235,16 @@ export type IFormValuesChangeHandle<T = any> = (
   allValues: any
 ) => void;
 
+export interface IInputBaseProps {
+  autoSelect?: boolean;
+  value?: any;
+  onChange?: (...args: any[]) => any;
+  onValueChange?: (...args: any[]) => any;
+  editing?: boolean;
+}
+
 export abstract class InputBase<P = any, S = any> extends React.PureComponent<
-  P & {
-    autoSelect?: boolean;
-    value?: any;
-    onChange?: (...args: any[]) => any;
-    onValueChange?: (...args: any[]) => any;
-    editing?: boolean;
-  },
+  P & IInputBaseProps,
   S
 > {
   public abstract renderEditing(): any;

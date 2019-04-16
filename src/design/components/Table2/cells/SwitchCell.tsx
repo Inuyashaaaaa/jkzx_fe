@@ -1,4 +1,6 @@
+import { FormItemProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import _, { omit } from 'lodash';
 import React, { KeyboardEvent, PureComponent } from 'react';
@@ -24,6 +26,8 @@ class SwitchCell extends PureComponent<
   public state = {
     editing: false,
   };
+
+  public oldValue: any;
 
   public $cell: HTMLTableDataCellElement;
 
@@ -59,6 +63,24 @@ class SwitchCell extends PureComponent<
     return record[getRowKey()];
   };
 
+  public renderElement = elements => {
+    return React.Children.toArray(elements).map((element, index) => {
+      if (!React.isValidElement<FormItemProps & React.ReactNode>(element)) return element;
+      return React.cloneElement(element, {
+        key: index,
+        ...(element.type === (FormItem.default || FormItem)
+          ? {
+              label: '',
+            }
+          : {}),
+        ...element.props,
+        children: _.get(element, 'props.children', false)
+          ? this.renderElement(element.props.children)
+          : undefined,
+      });
+    });
+  };
+
   public getRef = node => {
     this.$cell = node;
   };
@@ -71,11 +93,10 @@ class SwitchCell extends PureComponent<
     this.$renderingCell = node;
   };
 
-  public onCellClick = (event: Event) => {
-    event.preventDefault();
+  public onCellClick = event => {
     event.stopPropagation();
     this.props.tableApi.save(
-      [this.props.rowId],
+      null,
       _.reject(
         this.props.tableApi.getColumnDefs().map(item => item.dataIndex),
         item => item === this.props.colDef.dataIndex
@@ -120,6 +141,20 @@ class SwitchCell extends PureComponent<
     if (typeof val === 'object' && val.type === 'field') {
       return val.value;
     }
+    return val;
+  };
+
+  public cellValueIsField = () => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    return typeof val === 'object' && val.type === 'field';
+  };
+
+  public getCellValue = () => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
     return val;
   };
 
@@ -185,7 +220,9 @@ class SwitchCell extends PureComponent<
         this.startEditing();
         return;
       }
-      this.saveCell();
+      setTimeout(() => {
+        this.saveCell();
+      });
       return;
     }
 
@@ -254,6 +291,7 @@ class SwitchCell extends PureComponent<
           'getRowKey',
           '$$render',
           'tableApi',
+          'rowId',
         ])}
         onClick={this.onCellClick}
         onKeyDown={this.onKeyDown}

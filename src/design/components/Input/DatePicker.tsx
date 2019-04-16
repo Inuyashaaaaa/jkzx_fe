@@ -5,17 +5,28 @@ import moment, { isMoment } from 'moment';
 import React from 'react';
 import { InputBase } from '../type';
 
-export interface IDatePickerProps extends DatePickerProps {}
+export interface IDatePickerProps extends DatePickerProps {
+  defaultOpen?: boolean;
+}
 
 class DatePicker extends InputBase<IDatePickerProps> {
-  // public getRef = node => {
-  //   if (this.props.autoSelect && node) {
-  //     node.select();
-  //   }
-  // };
-
   public static defaultProps = {
     format: 'YYYY-MM-DD HH:mm:ss',
+  };
+
+  public hasDefaultOpend = false;
+
+  public getRef = node => {
+    if (this.props.defaultOpen && !this.hasDefaultOpend && node) {
+      setTimeout(() => {
+        try {
+          node.picker.handleOpenChange(true);
+          this.hasDefaultOpend = true;
+        } catch (error) {
+          console.warn(error);
+        }
+      });
+    }
   };
 
   public onChange = (date: moment.Moment, dateString: string) => {
@@ -50,7 +61,7 @@ class DatePicker extends InputBase<IDatePickerProps> {
           ...this.props.style,
         }}
         onChange={this.onChange}
-        // ref={this.getRef}
+        ref={this.getRef}
       />
     );
   }

@@ -2,7 +2,7 @@ import { Spin } from 'antd';
 import { FormItemProps } from 'antd/lib/form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
-import { omit } from 'lodash';
+import _, { omit } from 'lodash';
 import React, { FocusEvent, KeyboardEvent, PureComponent } from 'react';
 import { IFormCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
@@ -24,6 +24,8 @@ class SwitchCell extends PureComponent<
   public state = {
     editing: false,
   };
+
+  public oldValue: any;
 
   public $cell: HTMLDivElement;
 
@@ -80,19 +82,25 @@ class SwitchCell extends PureComponent<
     }
   };
 
-  public renderElement = element => {
+  public renderElement = elements => {
     const { colDef, api } = this.props;
     const { title } = colDef;
+    return React.Children.toArray(elements).map(element => {
+      if (!React.isValidElement<FormItemProps & React.ReactNode>(element)) return element;
 
-    if (React.isValidElement<FormItemProps>(element) && element.type === FormItem) {
       return React.cloneElement(element, {
-        label: title,
+        ...(element.type === (FormItem.default || FormItem)
+          ? {
+              label: title,
+            }
+          : {}),
         ...api.getFormItemLayout(),
         ...element.props,
+        children: _.get(element, 'props.children', false)
+          ? this.renderElement(element.props.children)
+          : undefined,
       });
-    }
-
-    return element;
+    });
   };
 
   public startEditing = async () => {
@@ -110,15 +118,15 @@ class SwitchCell extends PureComponent<
     return editable;
   };
 
-  public onCellClick = () => {
+  public onCellClick = event => {
+    event.stopPropagation();
+    this.props.api.save(
+      _.reject(
+        this.props.api.getColumnDefs().map(item => item.dataIndex),
+        item => item === this.props.colDef.dataIndex
+      )
+    );
     this.startEditing();
-  };
-
-  public onCellBlur = (e: FocusEvent<HTMLDivElement>) => {
-    if (!this.getEditable()) return;
-    if (this.state.editing) {
-      this.saveCell();
-    }
   };
 
   public getValue = () => {
@@ -175,7 +183,9 @@ class SwitchCell extends PureComponent<
         this.startEditing();
         return;
       }
-      this.saveCell();
+      setTimeout(() => {
+        this.saveCell();
+      });
       return;
     }
 
@@ -228,7 +238,6 @@ class SwitchCell extends PureComponent<
           '$$render',
         ])}
         onClick={this.onCellClick}
-        onBlur={this.onCellBlur}
         onKeyDown={this.onKeyDown}
         className={classNames(`${this.props.prefix}-cell`, {
           editable: this.getEditable(),

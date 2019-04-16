@@ -72,7 +72,7 @@ const TradeManagementBooking = memo(() => {
     return legColDefs.map(item => {
       return {
         ...item,
-        onCell: () => ({ width: '300px' }),
+        onCell: () => ({ width: '250px' }),
       };
     });
   };
@@ -134,7 +134,27 @@ const TradeManagementBooking = memo(() => {
                 setTableData(pre => pre.concat(createLegDataSourceItem(leg)));
               }}
             />
-            <Button key="完成簿记" type="primary" loading={createTradeLoading} onClick={() => {}}>
+            <Button
+              key="完成簿记"
+              type="primary"
+              loading={createTradeLoading}
+              onClick={() => {
+                // setTableData(pre =>
+                //   pre.map(item =>
+                //     _.mapValues(item, val => {
+                //       console.log(val)
+                //       if (typeof val !== 'object') {
+                //         return val;
+                //       }
+                //       return {
+                //         ...val,
+                //         value: '1',
+                //       };
+                //     })
+                //   )
+                // );
+              }}
+            >
               完成簿记
             </Button>
           </Button.Group>

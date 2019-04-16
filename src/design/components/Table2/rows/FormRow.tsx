@@ -1,8 +1,8 @@
-import { getDiffAttrs, isShallowEqual } from '@/design/utils';
+import { isShallowEqual } from '@/design/utils';
 import { Dropdown, Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _, { omit } from 'lodash';
-import React, { PureComponent } from 'react';
+import React from 'react';
 import {
   IFormField,
   ITableRowProps,

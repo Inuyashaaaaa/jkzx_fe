@@ -1,4 +1,6 @@
 @import '~antd/lib/style/themes/default.less';
+@import '../style/common.less';
+@import '../style/themes.less';
 
 @table-padding-vertical-md: @table-padding-vertical * 3 / 4;
 @table-padding-horizontal-md: @table-padding-horizontal / 2;
@@ -120,6 +122,24 @@
   }
 
   .@{ant-prefix}-table-vertical {
+    .has-feedback > .ant-select .ant-select-arrow,
+    .has-feedback > .ant-select .ant-select-selection__clear,
+    .has-feedback :not(.ant-input-group-addon) > .ant-select .ant-select-arrow,
+    .has-feedback :not(.ant-input-group-addon) > .ant-select .ant-select-selection__clear {
+      right: 28px;
+    }
+
+    .has-feedback .ant-calendar-picker-icon,
+    .has-feedback .ant-time-picker-icon,
+    .has-feedback .ant-calendar-picker-clear,
+    .has-feedback .ant-time-picker-clear {
+      right: 28px;
+    }
+
+    .ant-input-number-handler-wrap {
+      z-index: 2;
+    }
+
     .@{ant-prefix}-table-row-indent {
       display: none;
     }

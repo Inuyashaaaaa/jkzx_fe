@@ -1,7 +1,7 @@
 import { uuid } from '@/design/utils';
 import { Select as AntdSelect } from 'antd';
 import { OptionProps, SelectProps } from 'antd/lib/select';
-import { debounce, omit } from 'lodash';
+import _, { debounce, omit } from 'lodash';
 import React from 'react';
 import Loading from '../Loading';
 import { InputBase } from '../type';
@@ -57,7 +57,9 @@ class Select extends InputBase<
   };
 
   public componentDidMount = () => {
-    this.fetchOptions('', this.lastRequestId);
+    if (this.props.editing) {
+      this.fetchOptions('', this.lastRequestId);
+    }
   };
 
   public onChange = (value, option: React.ReactElement<any>) => {
@@ -124,8 +126,11 @@ class Select extends InputBase<
         {value &&
           (Array.isArray(value) ? value : [value])
             .map(val => {
-              const findItem = this.getOptions().find(item => item.value === val);
-              return findItem ? findItem.label : '';
+              const findItem =
+                typeof this.props.options === 'function'
+                  ? this.props.value
+                  : this.props.options.find(item => item.value === val);
+              return _.get(findItem, 'label', this.props.value);
             })
             .join(',')}
       </span>

@@ -1,0 +1,18 @@
+@import '~antd/lib/style/themes/default.less';
+
+@keyframes mymove {
+  from {
+    background: @primary-3;
+  }
+  to {
+    background: #e6f7ff;
+  }
+}
+
+:global {
+  .tongyu-table-cell-update {
+    :local {
+      animation: mymove 0.75s ease-out;
+    }
+  }
+}
