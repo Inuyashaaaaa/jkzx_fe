@@ -5,6 +5,7 @@ import {
   wkTaskApproveGroupCreateBatch,
   wkTaskApproveGroupList,
 } from '@/services/approvalProcessConfiguration';
+import _ from 'lodash';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
   Button,
@@ -20,7 +21,6 @@ import {
 } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
-import _ from 'lodash';
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
