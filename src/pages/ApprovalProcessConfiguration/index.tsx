@@ -6,7 +6,18 @@ import {
   wkTaskApproveGroupList,
 } from '@/services/approvalProcessConfiguration';
 import { wkApproveGroupList } from '@/services/auditing';
-import { Button, Checkbox, Icon, List, Modal, notification, Select, Switch, Tabs } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Icon,
+  List,
+  Modal,
+  notification,
+  Popconfirm,
+  Select,
+  Switch,
+  Tabs,
+} from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
 
@@ -20,7 +31,6 @@ class ApprovalProcessConfiguration extends PureComponent {
     processList: [],
     loading: false,
     currentProcessName: '交易录入经办复合流程',
-    visible: false,
     status: false,
     resetVisible: false,
   };
@@ -134,9 +144,6 @@ class ApprovalProcessConfiguration extends PureComponent {
         message: '确认所有审批节点都已选中审批组',
       });
     }
-    this.setState({
-      visible: true,
-    });
   };
 
   public onReset = async () => {
@@ -145,10 +152,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public handleOk = async () => {
-    this.setState({
-      visible: false,
-    });
+  public onConfirm = async () => {
     const { currentProcessName, taskApproveGroupList, status } = this.state;
     const requests = () =>
       Promise.all([
@@ -163,12 +167,6 @@ class ApprovalProcessConfiguration extends PureComponent {
 
     notification.success({
       message: `保存成功`,
-    });
-  };
-
-  public handleCancel = e => {
-    this.setState({
-      visible: false,
     });
   };
 
@@ -213,9 +211,15 @@ class ApprovalProcessConfiguration extends PureComponent {
         </div>
         <div className={styles.configButtonBox}>
           <p>
-            <Button type="primary" onClick={this.onSave}>
-              保存
-            </Button>
+            <Popconfirm
+              title="确认保存?"
+              onConfirm={this.onConfirm}
+              okText="确认"
+              cancelText="取消"
+            >
+              <Button type="primary">保存</Button>
+            </Popconfirm>
+            ,
           </p>
           <p>
             <Button onClick={this.onReset}>重置</Button>
@@ -234,10 +238,9 @@ class ApprovalProcessConfiguration extends PureComponent {
             {this.state.processList.map(tab => {
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
-                  {this.renderTabs(tab)}
                   <div
                     style={{
-                      marginRight: '402px',
+                      marginRight: '2px',
                       background: '#FFF',
                       padding: '30px',
                       position: 'relative',
@@ -311,20 +314,11 @@ class ApprovalProcessConfiguration extends PureComponent {
                       })}
                     </List>
                   </div>
+                  {this.renderTabs(tab)}
                 </TabPane>
               );
             })}
           </Tabs>
-          <Modal
-            title="消息提示"
-            visible={this.state.visible}
-            onOk={this.handleOk}
-            onCancel={this.handleCancel}
-          >
-            <p>
-              流程被修改后，所有进行中的审批单均会被重置，从第一个节点开始重新进行审批。是否确定保存修改？
-            </p>
-          </Modal>
           <Modal
             title="消息提示"
             visible={this.state.resetVisible}
