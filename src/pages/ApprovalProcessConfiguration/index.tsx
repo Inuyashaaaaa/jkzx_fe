@@ -236,7 +236,8 @@ class ApprovalProcessConfiguration extends PureComponent {
         <PageHeaderWrapper>
           <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
-              if (index === 0) return null;
+              // 只显示第二条数据
+              if (index !== 1) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div
