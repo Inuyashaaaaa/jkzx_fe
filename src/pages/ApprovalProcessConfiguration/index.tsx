@@ -30,7 +30,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     taskApproveGroupList: [],
     processList: [],
     loading: false,
-    currentProcessName: '交易录入经办复合流程',
+    currentProcessName: '资金录入经办复合流程',
     status: false,
     resetVisible: false,
   };
@@ -66,15 +66,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    let { data } = processList;
-    if (!Array.isArray(data)) {
-      data = [data];
-    }
-    if (data.length > 1) {
-      data = data.slice(1);
-    }
-
-    const tabsData = data.map(item => {
+    const tabsData = processList.data.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
@@ -243,7 +235,8 @@ class ApprovalProcessConfiguration extends PureComponent {
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
           <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
-            {this.state.processList.map(tab => {
+            {this.state.processList.map((tab, index) => {
+              if (index === 0) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div
