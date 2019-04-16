@@ -67,9 +67,19 @@ const historySellAmount = {
   headerName: '总卖金额',
 };
 
+const totalBuy = {
+  field: 'totalBuy',
+  headerName: '总买量',
+};
+
 const longPosition = {
   field: 'longPosition',
-  headerName: '总买量',
+  headerName: '多头持仓',
+};
+
+const shortPosition = {
+  field: 'shortPosition',
+  headerName: '空头持仓',
 };
 
 const netPosition = {
@@ -77,8 +87,8 @@ const netPosition = {
   headerName: '持仓数量',
 };
 
-const shortPosition = {
-  field: 'shortPosition',
+const totalSell = {
+  field: 'totalSell',
   headerName: '总卖量',
 };
 
@@ -114,8 +124,10 @@ export function generateColumns(type) {
       instrumentId,
       netPosition,
       longPosition,
-      historyBuyAmount,
       shortPosition,
+      totalBuy,
+      historyBuyAmount,
+      totalSell,
       historySellAmount,
       marketValue,
       totalPnl,
@@ -127,8 +139,10 @@ export function generateColumns(type) {
       instrumentId,
       netPosition,
       longPosition,
-      historyBuyAmount,
       shortPosition,
+      totalBuy,
+      historyBuyAmount,
+      totalSell,
       historySellAmount,
       marketValue,
       totalPnl,
