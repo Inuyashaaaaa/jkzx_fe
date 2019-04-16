@@ -5,6 +5,7 @@ import {
   wkTaskApproveGroupCreateBatch,
   wkTaskApproveGroupList,
 } from '@/services/approvalProcessConfiguration';
+import _ from 'lodash';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
   Button,
@@ -66,7 +67,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const tabsData =  _.get(processList, 'data[1]', []).map(item => {
+    const tabsData = [_.get(processList, 'data[1]', {})].map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
@@ -102,18 +103,15 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public tabsChange = e => {
     let status = false;
-    let { processList } = this.state;
-    processList = processList.map(item => {
+    this.state.processList.forEach(item => {
       if (item.processName === e) {
         status = item.status;
       }
-      return item;
     });
     this.setState(
       {
         currentProcessName: e,
         status,
-        processList,
       },
       () => {
         this.fetchData();
