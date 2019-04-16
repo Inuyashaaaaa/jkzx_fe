@@ -6,6 +6,7 @@ import { Button, Form, Input, Row, Select, Table, TreeSelect, notification } fro
 import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import styles from './AuditGourpLists.less';
 
 const TreeNode = TreeSelect.TreeNode;
 const { Option } = Select;
@@ -325,6 +326,7 @@ class Operation extends PureComponent {
             columns={this.state.columns}
             dataSource={this.state.dataSource}
             rowKey={data => data.id}
+            className={styles.userTable}
           />
         </div>
       </>

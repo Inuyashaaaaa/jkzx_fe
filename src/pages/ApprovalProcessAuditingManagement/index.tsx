@@ -270,7 +270,7 @@ class SystemSettingsRoleManagement extends PureComponent {
               placement="right"
               onClose={this.onClose}
               visible={this.state.visible}
-              width={500}
+              width={600}
               title={
                 <Row type="flex" justify="start" gutter={24}>
                   <p>增加成员</p>
