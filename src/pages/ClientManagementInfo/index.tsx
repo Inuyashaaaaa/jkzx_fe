@@ -18,7 +18,7 @@ import { Button, Col, message, notification, Row, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import produce from 'immer';
 import _ from 'lodash';
-import { isMoment } from 'moment';
+import moment, { isMoment } from 'moment';
 import React from 'react';
 import router from 'umi/router';
 import {
@@ -133,8 +133,14 @@ class ClientManagement extends PureStateComponent {
 
     if (error) return;
 
+    const newData = data.map(item => {
+      item.updatedAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+      item.createdAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+      return item;
+    });
+
     this.setState({
-      tableDataSource: data,
+      tableDataSource: newData,
     });
   };
 
@@ -447,7 +453,7 @@ class ClientManagement extends PureStateComponent {
                               }
                               return;
                             }}
-                            controls={INSITUTIONS(this.state.branchSalesList, 'create')}
+                            controls={INSITUTIONS(this.state.branchSalesList)}
                             dataSource={this.state.dataSourceInst}
                             onValueChange={this.handleChangeInstValue}
                             controlNumberOneRow={2}
@@ -462,7 +468,7 @@ class ClientManagement extends PureStateComponent {
                               }
                               return;
                             }}
-                            controls={PRODUCTIONS(this.state.branchSalesList, 'create')}
+                            controls={PRODUCTIONS(this.state.branchSalesList)}
                             dataSource={this.state.dataSourceProd}
                             onValueChange={this.handleChangeProdValue}
                             controlNumberOneRow={2}
