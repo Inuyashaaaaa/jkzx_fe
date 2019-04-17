@@ -1,11 +1,17 @@
 import { ALL_OPTIONS_VALUE, VERTICAL_GUTTER } from '@/constants/global';
 import { Cascader, Form2, Input, Select, Table2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { clientAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
+import {
+  clientAccountDel,
+  clientAccountSearch,
+  createRefParty,
+  refSalesGetByLegalName,
+  refSimilarLegalNameList,
+} from '@/services/reference-data-service';
 import { queryCompleteCompanys } from '@/services/sales';
 import { arr2treeOptions } from '@/tools';
 import { getMoment } from '@/utils';
-import { Card, Divider, Form, Row } from 'antd';
+import { Button, Card, Divider, Form, notification, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
@@ -38,13 +44,13 @@ const useTableData = initFormData => {
     searchLoading,
     tableData,
     fetchTableData,
+    setTableData,
   };
 };
 
 const ClientManagementInfo = memo(() => {
   const formEl = useRef<Form2>(null);
   const { searchLoading, tableData, fetchTableData } = useTableData({});
-
   const [salesCascaderList, setSalesCascaderList] = useState([]);
 
   const initialFormData = {
@@ -97,6 +103,16 @@ const ClientManagementInfo = memo(() => {
   });
 
   const [resetFetchNumber, setResetFetchNumber] = useState(0);
+
+  const AccountDel = async param => {
+    const { data, error } = await clientAccountDel({ accountId: param.accountId });
+    if (error) return;
+    const formData = getFormData();
+    fetchTableData(formData);
+    notification.success({
+      message: '删除成功',
+    });
+  };
 
   useEffect(
     () => {
@@ -201,7 +217,7 @@ const ClientManagementInfo = memo(() => {
               render: (value, record, index, { form }) => {
                 return (
                   <FormItem>
-                    {form.getFieldDecorator()(
+                    {form.getFieldDecorator({})(
                       <Select
                         placeholder="请选择内容"
                         options={[
@@ -221,7 +237,10 @@ const ClientManagementInfo = memo(() => {
       </Card>
       <Card style={{ marginTop: VERTICAL_GUTTER }}>
         <Row type="flex" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <CreateModalButton salesCascaderList={salesCascaderList} />
+          <CreateModalButton
+            salesCascaderList={salesCascaderList}
+            fetchTableData={fetchTableData}
+          />
         </Row>
         <Table2
           size="middle"
@@ -291,13 +310,28 @@ const ClientManagementInfo = memo(() => {
                     <a href="javascript:;" style={{ color: 'red' }}>
                       删除
                     </a> */}
-                    <EditModalButton salesCascaderList={salesCascaderList} name='查看' record={record} />
+                    <EditModalButton
+                      salesCascaderList={salesCascaderList}
+                      name="查看"
+                      fetchTableData={fetchTableData}
+                      record={record}
+                    />
                     <Divider type="vertical" />
-                    <EditModalButton salesCascaderList={salesCascaderList} name='编辑' record={record} />
+                    <EditModalButton
+                      salesCascaderList={salesCascaderList}
+                      name="编辑"
+                      record={record}
+                      fetchTableData={fetchTableData}
+                    />
                     <Divider type="vertical" />
-                    <a href="javascript:;" style={{ color: 'red' }}>
+                    <Button
+                      style={{ color: 'red' }}
+                      onClick={() => {
+                        AccountDel(record);
+                      }}
+                    >
                       删除
-                    </a>
+                    </Button>
                   </span>
                 );
               },

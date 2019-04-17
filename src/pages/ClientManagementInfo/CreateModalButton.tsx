@@ -10,14 +10,26 @@ import {
 } from '@/design/components';
 import { remove, uuid } from '@/design/utils';
 import { UPLOAD_URL } from '@/services/document';
-import { Button, Cascader, Divider, Icon, Row, Steps } from 'antd';
+import { createRefParty } from '@/services/reference-data-service';
+import {
+  AutoComplete,
+  Button,
+  Cascader,
+  Divider,
+  Icon,
+  Modal,
+  notification,
+  Row,
+  Steps,
+} from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 
 const CreateModalButton = memo<any>(props => {
-  const { salesCascaderList } = props;
+  const { salesCascaderList, fetchTableData } = props;
+
   const formRef = useRef<Form2>(null);
   const initialFormDatas: any = {};
   const [traderList, setTraderList] = useState(
@@ -31,6 +43,8 @@ const CreateModalButton = memo<any>(props => {
   const [currenStep, setCurrentStep] = useState(0);
   const editable = true;
   const [modalVisible, setModalVisible] = useState(false);
+  const [trustorSource, setTrustorSourceSource] = useState([]);
+  const [tradeSource, setTradeSource] = useState([]);
 
   const getProduceIcon = () => {
     if (baseFormData[BASE_FORM_FIELDS.TRADER_TYPE] === TRADER_TYPE.PRODUCT) {
@@ -48,6 +62,22 @@ const CreateModalButton = memo<any>(props => {
     }
 
     return <Icon type="fork" />;
+  };
+
+  const trustorChange = value => {
+    const trustorSource = [`${value}@gmail.com`, `${value}@163.com`, `${value}@qq.com`];
+    if (!value || value.indexOf('@') >= 0) {
+      const trustorSource = [];
+    }
+    setTrustorSourceSource(trustorSource);
+  };
+
+  const tradeChange = value => {
+    const tradeSource = [`${value}@gmail.com`, `${value}@163.com`, `${value}@qq.com`];
+    if (!value || value.indexOf('@') >= 0) {
+      const tradeSource = [];
+    }
+    setTradeSource(tradeSource);
   };
 
   return (
@@ -290,7 +320,16 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(<Input editing={editable} />)}
+                        })(
+                          <span>
+                            {/* <Input editing={editable}/> */}
+                            <AutoComplete
+                              dataSource={trustorSource}
+                              style={{ width: '100%' }}
+                              onChange={trustorChange}
+                            />
+                          </span>
+                        )}
                       </FormItem>
                     );
                   },
@@ -334,7 +373,7 @@ const CreateModalButton = memo<any>(props => {
                 },
                 {
                   title: '交易指定邮箱',
-                  dataIndex: 'email',
+                  dataIndex: 'tradeEmail',
                   render: (val, record, index, { form }) => {
                     return (
                       <FormItem hasFeedback={true}>
@@ -345,7 +384,14 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(<Input editing={editable} />)}
+                        })(
+                          // <Input editing={editable} />
+                          <AutoComplete
+                            dataSource={tradeSource}
+                            style={{ width: '100%' }}
+                            onChange={tradeChange}
+                          />
+                        )}
                       </FormItem>
                     );
                   },
@@ -377,8 +423,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -395,8 +440,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<DatePicker editing={editable} />)}
@@ -413,8 +457,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -431,8 +474,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -449,11 +491,10 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
-                        })(<Input editing={editable} />)}
+                        })(<DatePicker editing={editable} />)}
                       </FormItem>
                     );
                   },
@@ -477,15 +518,14 @@ const CreateModalButton = memo<any>(props => {
               columns={[
                 {
                   title: '产品名称',
-                  dataIndex: BASE_FORM_FIELDS.LEGALNAME,
+                  dataIndex: BASE_FORM_FIELDS.PRODUCTNAME,
                   render: (val, record, index, { form }) => {
                     return (
                       <FormItem hasFeedback={true}>
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -502,8 +542,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -520,8 +559,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -538,8 +576,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -556,8 +593,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<DatePicker editing={editable} />)}
@@ -574,8 +610,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<DatePicker editing={editable} />)}
@@ -592,8 +627,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -627,8 +661,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -663,8 +696,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -699,8 +731,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -717,8 +748,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -749,8 +779,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<InputNumber editing={editable} />)}
@@ -767,8 +796,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<InputNumber editing={editable} />)}
@@ -789,8 +817,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(<InputNumber editing={editable} />)}
@@ -872,7 +899,7 @@ const CreateModalButton = memo<any>(props => {
                                 message: '必填',
                               },
                             ],
-                          })(<Input editing={editable} />)}
+                          })(<DatePicker editing={editable} />)}
                         </FormItem>
                       );
                     },
@@ -950,8 +977,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -979,8 +1005,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1008,8 +1033,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1037,8 +1061,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1066,8 +1089,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1095,8 +1117,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1124,8 +1145,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1153,8 +1173,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1182,8 +1201,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1211,8 +1229,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1240,8 +1257,7 @@ const CreateModalButton = memo<any>(props => {
                         {form.getFieldDecorator({
                           rules: [
                             {
-                              required: true,
-                              message: '必填',
+                              required: false,
                             },
                           ],
                         })(
@@ -1303,14 +1319,58 @@ const CreateModalButton = memo<any>(props => {
               type="primary"
               onClick={async () => {
                 if (currenStep === 4) {
-                  console.log(baseFormData);
                   const baseData = {};
+                  console.log(productFormData, authFormData, attachFormData, traderList);
+                  console.log(baseFormData);
                   Object.keys(baseFormData).forEach(item => {
                     baseData[item] = baseFormData[item].value;
+                    if (item.endsWith('Date') && baseData[item]) {
+                      baseData[item] = baseData[item].split(' ')[0];
+                    }
                   });
-                  const [data, error] = await createRefParty(baseData);
-                  console.log(data);
-                  // const formData = formRefs.base.decoratorForm.getFieldsValue();
+                  Object.keys(productFormData).forEach(item => {
+                    baseData[item] = productFormData[item].value;
+                    if (item.endsWith('Date') && baseData[item]) {
+                      baseData[item] = baseData[item].split(' ')[0];
+                    }
+                  });
+                  Object.keys(authFormData).forEach(item => {
+                    baseData[item] = authFormData[item].value;
+                    if (item.endsWith('Date') && baseData[item]) {
+                      baseData[item] = baseData[item].split(' ')[0];
+                    }
+                  });
+                  Object.keys(attachFormData).forEach(item => {
+                    baseData[item] = attachFormData[item].value;
+                    if (attachFormData[item].value) {
+                      baseData[item] = attachFormData[item].value[0].response.result.uuid;
+                    }
+                  });
+                  console.log(traderList);
+                  const tradeAuthorizer = traderList.map(item => {
+                    return {
+                      tradeAuthorizerName: item.姓名.value,
+                      tradeAuthorizerIdNumber: item.身份证号.value,
+                      tradeAuthorizerIdExpiryDate: item.证件有效期.value.split(' ')[0],
+                      tradeAuthorizerPhone: item.联系电话.value,
+                    };
+                  });
+                  const [subsidiaryName, branchName, salesName] = baseData.salesName;
+                  baseData.subsidiaryName = subsidiaryName;
+                  baseData.branchName = branchName;
+                  baseData.salesName = salesName;
+                  baseData.tradeAuthorizer = tradeAuthorizer;
+                  console.log(baseData);
+                  // console.log(productFormData,authFormData,attachFormData, traderList);
+
+                  const { data, error } = await createRefParty(baseData);
+                  if (error) return;
+                  setModalVisible(false);
+                  // console.log(fetchTableData)
+                  fetchTableData({});
+                  notification.success({
+                    message: '新建交易对手成功',
+                  });
                   return;
                 }
 
@@ -1321,7 +1381,7 @@ const CreateModalButton = memo<any>(props => {
 
                 if (
                   currenStep === 0 &&
-                  _.get(baseFormData[BASE_FORM_FIELDS.TRADER_TYPE], newFunction()) ===
+                  _.get(baseFormData[BASE_FORM_FIELDS.TRADER_TYPE], 'value') ===
                     TRADER_TYPE.ENTERPRISE
                 ) {
                   return setCurrentStep(currenStep + 2);
@@ -1342,6 +1402,3 @@ const CreateModalButton = memo<any>(props => {
 });
 
 export default CreateModalButton;
-function newFunction(): 'value' | ['value'] {
-  return 'value';
-}

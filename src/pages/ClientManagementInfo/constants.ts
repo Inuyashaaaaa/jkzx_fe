@@ -1,5 +1,5 @@
 export const BASE_FORM_FIELDS = {
-  TRADER_TYPE: 'traderType',
+  TRADER_TYPE: 'clientType',
   LEGALNAME: 'legalName',
   LEGALREPRESENTATIVE: 'legalRepresentative',
   ADDRESS: 'address',
@@ -29,8 +29,8 @@ export const BASE_FORM_FIELDS = {
 };
 
 export const TRADER_TYPE = {
-  PRODUCT: 'product',
-  ENTERPRISE: 'enterprise',
+  PRODUCT: 'PRODUCT',
+  ENTERPRISE: 'ENTERPRISE',
 };
 
 export const PARTY_DOC_CREATE_OR_UPDATE = 'partyDocCreateOrUpdate';
