@@ -4,7 +4,7 @@ import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { PureStateComponent } from '@/lib/components/_Components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions, moment } from '@/lib/utils';
+import { arr2treeOptions } from '@/lib/utils';
 import { DOWN_LOAD_FIEL_URL } from '@/services/document';
 import {
   clientAccountDel,
@@ -18,7 +18,7 @@ import { Button, Col, message, notification, Row, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import produce from 'immer';
 import _ from 'lodash';
-import { isMoment } from 'moment';
+import moment, { isMoment } from 'moment';
 import React from 'react';
 import router from 'umi/router';
 import {
@@ -134,8 +134,8 @@ class ClientManagement extends PureStateComponent {
     if (error) return;
 
     const newData = data.map(item => {
-      item.updatedAt = moment(item.updatedAt);
-      item.createdAt = moment(item.updatedAt);
+      item.updatedAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+      item.createdAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss');
       return item;
     });
 

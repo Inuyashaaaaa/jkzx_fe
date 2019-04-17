@@ -188,7 +188,7 @@ export const TABLE_COLUMN_DEFS: IColumnDef[] = [
     input: {
       type: 'date',
       range: 'day',
-      format: 'YYYY-MM-DD h:mm:ss a',
+      format: 'YYYY-MM-DD HH:mm:ss',
     },
   },
   {
@@ -198,7 +198,7 @@ export const TABLE_COLUMN_DEFS: IColumnDef[] = [
     input: {
       type: 'date',
       range: 'day',
-      format: 'YYYY-MM-DD h:mm:ss a',
+      format: 'YYYY-MM-DD HH:mm:ss',
     },
   },
 ];
