@@ -402,24 +402,6 @@ function miniumlPercent(item) {
       .toNumber();
   }
 
-  if (clone[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
-    if (clone[LEG_FIELD.BARRIER] !== undefined) {
-      clone[LEG_FIELD.BARRIER] = new BigNumber(clone[LEG_FIELD.BARRIER])
-        .multipliedBy(0.01)
-        .toNumber();
-    }
-    if (clone[LEG_FIELD.LOW_BARRIER] !== undefined) {
-      clone[LEG_FIELD.LOW_BARRIER] = new BigNumber(clone[LEG_FIELD.LOW_BARRIER])
-        .multipliedBy(0.01)
-        .toNumber();
-    }
-    if (clone[LEG_FIELD.HIGH_BARRIER] !== undefined) {
-      clone[LEG_FIELD.HIGH_BARRIER] = new BigNumber(clone[LEG_FIELD.HIGH_BARRIER])
-        .multipliedBy(0.01)
-        .toNumber();
-    }
-  }
-
   if (clone[LEG_FIELD.DOWN_BARRIER] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
       clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
