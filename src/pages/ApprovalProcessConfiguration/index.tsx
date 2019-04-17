@@ -5,7 +5,6 @@ import {
   wkTaskApproveGroupCreateBatch,
   wkTaskApproveGroupList,
 } from '@/services/approvalProcessConfiguration';
-import _ from 'lodash';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
   Button,
@@ -31,7 +30,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     taskApproveGroupList: [],
     processList: [],
     loading: false,
-    currentProcessName: '交易录入经办复合流程',
+    currentProcessName: '资金录入经办复合流程',
     status: false,
     resetVisible: false,
   };
@@ -67,7 +66,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const tabsData = [_.get(processList, 'data[1]', {})].map(item => {
+    const tabsData = processList.data.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
@@ -103,15 +102,18 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public tabsChange = e => {
     let status = false;
-    this.state.processList.forEach(item => {
+    let { processList } = this.state;
+    processList = processList.map(item => {
       if (item.processName === e) {
         status = item.status;
       }
+      return item;
     });
     this.setState(
       {
         currentProcessName: e,
         status,
+        processList,
       },
       () => {
         this.fetchData();
@@ -233,7 +235,9 @@ class ApprovalProcessConfiguration extends PureComponent {
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
           <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
-            {this.state.processList.map(tab => {
+            {this.state.processList.map((tab, index) => {
+              // 只显示第二条数据
+              if (index !== 1) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div

@@ -81,7 +81,20 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     });
     if (error) return;
     const { dataSource } = data;
-    const tableDataSource = this.sortDataSource(dataSource);
+    let tableDataSource;
+    if (!dataSource.length) {
+      tableDataSource = [
+        {
+          tenor: '1D',
+          quote: 0,
+          use: true,
+          expiry: null,
+          id: uuidv4(),
+        },
+      ];
+    } else {
+      tableDataSource = this.sortDataSource(dataSource);
+    }
     this.setState({ tableDataSource });
     // return tableDataSource;
   };
