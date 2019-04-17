@@ -101,6 +101,16 @@ export async function refSimilarLegalNameList(params) {
   });
 }
 
+export async function refSimilarSalesNameList(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refSimilarSalesNameList',
+      params,
+    },
+  });
+}
+
 export async function refMasterAgreementSearch(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,

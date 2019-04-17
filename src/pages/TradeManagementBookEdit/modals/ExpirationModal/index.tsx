@@ -198,7 +198,7 @@ class ExpirationModal extends PureComponent<
     }
 
     return {
-      ...(formData[UNDERLYER_PRICE] ? { underlyerProce: String(formData[UNDERLYER_PRICE]) } : null),
+      ...(formData[UNDERLYER_PRICE] ? { underlyerPrice: String(formData[UNDERLYER_PRICE]) } : null),
       settleAmount: String(formData[SETTLE_AMOUNT]),
     };
   };

@@ -50,6 +50,7 @@ export default {
   'menu.tradeManagement': '交易管理',
   'menu.tradeManagement.booking': '交易录入',
   'menu.tradeManagement.contractManagement': '合约管理',
+  'menu.tradeManagement.contractManage': '合约管理二',
   'menu.tradeManagement.pricing': '交易定价',
   'menu.tradeManagement.notifications': '事件提醒',
   'menu.tradeManagement.bookEdit': '交易编辑',

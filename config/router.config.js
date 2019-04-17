@@ -58,6 +58,11 @@ export default [
               component: './TradeManagementContractManagement/index',
             },
             {
+              path: '/trade-management/contract-manage',
+              name: 'contractManage',
+              component: './TradeManagementContractManage/index',
+            },
+            {
               path: '/trade-management/pricing',
               name: 'pricing',
               component: './TradeManagementPricing/index',
