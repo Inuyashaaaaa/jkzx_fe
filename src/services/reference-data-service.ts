@@ -331,11 +331,11 @@ export async function cliUnProcessedTradeTaskListByTradeId(params) {
   });
 }
 
-export async function clientAccountSearch(params = {}) {
+export async function refPartyList(params = {}) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'clientAccountSearch',
+      method: 'refPartyList',
       params,
     },
   });

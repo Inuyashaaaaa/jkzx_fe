@@ -1320,8 +1320,6 @@ const CreateModalButton = memo<any>(props => {
               onClick={async () => {
                 if (currenStep === 4) {
                   const baseData = {};
-                  console.log(productFormData, authFormData, attachFormData, traderList);
-                  console.log(baseFormData);
                   Object.keys(baseFormData).forEach(item => {
                     baseData[item] = baseFormData[item].value;
                     if (item.endsWith('Date') && baseData[item]) {
@@ -1346,7 +1344,6 @@ const CreateModalButton = memo<any>(props => {
                       baseData[item] = attachFormData[item].value[0].response.result.uuid;
                     }
                   });
-                  console.log(traderList);
                   const tradeAuthorizer = traderList.map(item => {
                     return {
                       tradeAuthorizerName: item.姓名.value,
@@ -1360,13 +1357,10 @@ const CreateModalButton = memo<any>(props => {
                   baseData.branchName = branchName;
                   baseData.salesName = salesName;
                   baseData.tradeAuthorizer = tradeAuthorizer;
-                  console.log(baseData);
-                  // console.log(productFormData,authFormData,attachFormData, traderList);
 
                   const { data, error } = await createRefParty(baseData);
                   if (error) return;
                   setModalVisible(false);
-                  // console.log(fetchTableData)
                   fetchTableData({});
                   notification.success({
                     message: '新建交易对手成功',

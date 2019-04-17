@@ -12,7 +12,7 @@ import { remove, uuid } from '@/design/utils';
 import { getPartyDoc, UPLOAD_URL } from '@/services/document';
 
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
-import { Button, Cascader, Divider, Icon, notification, Row, Steps, Tabs, Spin } from 'antd';
+import { Button, Cascader, Divider, Icon, notification, Row, Spin, Steps, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
@@ -45,7 +45,6 @@ const useTableData = props => {
           setLoading(true);
           const doc = await getPartyDoc({ uuid: data[item] });
           setLoading(false);
-          // console.log(doc.data)
           if (!doc.error && doc.data.name) {
             newData[item].value.push({
               name: doc.data.templates[0].fileName,
@@ -56,8 +55,6 @@ const useTableData = props => {
           }
         }
       }
-
-      // console.log(newData[item].value, item)
     });
     setBaseFormData(newData);
     const _traderList = (authorizers || []).map(item => {
@@ -95,7 +92,7 @@ const useTableData = props => {
   };
 };
 
-const CreateModalButton = memo<any>(props => {
+const EditModalButton = memo<any>(props => {
   const columns = [
     {
       title: '姓名',
@@ -185,7 +182,7 @@ const CreateModalButton = memo<any>(props => {
     },
   ];
 
-  const { salesCascaderList, name, fetchTableData } = props;
+  const { salesCascaderList, name, fetchTable, formData } = props;
   const formRef = useRef<Form2>(null);
   const initialFormDatas: any = {};
   const {
@@ -209,10 +206,9 @@ const CreateModalButton = memo<any>(props => {
     columns.pop();
   }
 
-  console.log(baseFormData);
-
   return (
     <ModalButton
+      style={{ color: '#096dd9' }}
       content={
         <Spin spinning={loading}>
           <>
@@ -968,7 +964,6 @@ const CreateModalButton = memo<any>(props => {
                         return item;
                       })
                     );
-                    console.log(traderList);
                   }}
                   columns={columns}
                 />
@@ -1004,7 +999,6 @@ const CreateModalButton = memo<any>(props => {
                       title: '主协议',
                       dataIndex: 'masterAgreementDoc',
                       render: (val, record, index, { form }) => {
-                        console.log(val, record);
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1444,7 +1438,6 @@ const CreateModalButton = memo<any>(props => {
                   type="primary"
                   onClick={async () => {
                     const baseData = {};
-                    console.log(baseFormData);
                     Object.keys(baseFormData).forEach(item => {
                       baseData[item] = baseFormData[item].value;
                       if (item.endsWith('Date') && baseData[item]) {
@@ -1473,7 +1466,6 @@ const CreateModalButton = memo<any>(props => {
                         tradeAuthorizerPhone: item.联系电话.value,
                       };
                     });
-                    // console.log(tradeAuthorizer)
                     if (Array.isArray(baseData.salesName)) {
                       const [subsidiaryName, branchName, salesName] = baseData.salesName;
                       baseData.subsidiaryName = subsidiaryName;
@@ -1486,8 +1478,7 @@ const CreateModalButton = memo<any>(props => {
                     setLoading(false);
                     if (error) return;
                     setModalVisible(false);
-                    fetchTableData({});
-                    // fetchData();
+                    fetchTable();
                     notification.success({
                       message: '保存成功',
                     });
@@ -1506,4 +1497,4 @@ const CreateModalButton = memo<any>(props => {
   );
 });
 
-export default CreateModalButton;
+export default EditModalButton;

@@ -3,7 +3,7 @@ import { Cascader, Form2, Input, Select, Table2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
   clientAccountDel,
-  clientAccountSearch,
+  refPartyList,
   createRefParty,
   refSalesGetByLegalName,
   refSimilarLegalNameList,
@@ -30,7 +30,7 @@ const useTableData = initFormData => {
   const [tableData, setTableData] = useState([]);
   const fetchTableData = async formData => {
     setSearchLoading(true);
-    const { data, error } = await clientAccountSearch(formData);
+    const { data, error } = await refPartyList(formData);
     setSearchLoading(false);
     if (error) return;
     setTableData(data);
@@ -112,6 +112,11 @@ const ClientManagementInfo = memo(() => {
     notification.success({
       message: '删除成功',
     });
+  };
+
+  const fetchTable = () => {
+    const formData = getFormData();
+    fetchTableData(formData);
   };
 
   useEffect(
@@ -211,27 +216,6 @@ const ClientManagementInfo = memo(() => {
                 );
               },
             },
-            {
-              title: '状态',
-              dataIndex: STATUS_FIELD,
-              render: (value, record, index, { form }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        placeholder="请选择内容"
-                        options={[
-                          {
-                            label: '全部',
-                            value: ALL_OPTIONS_VALUE,
-                          },
-                        ]}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
-            },
           ]}
         />
       </Card>
@@ -269,18 +253,14 @@ const ClientManagementInfo = memo(() => {
               dataIndex: 'masterAgreementId',
             },
             {
-              title: '状态',
-              dataIndex: 'normalStatus',
+              title: '类型',
+              dataIndex: 'clientType',
               render: (value, record, index) => {
-                if (value) {
-                  return '正常';
+                if (value === 'PRODUCT') {
+                  return '产品户';
                 }
-                return '错误';
+                return '机构户';
               },
-            },
-            {
-              title: '账户信息',
-              dataIndex: 'accountInformation',
             },
             {
               title: '创建时间',
@@ -313,7 +293,7 @@ const ClientManagementInfo = memo(() => {
                     <EditModalButton
                       salesCascaderList={salesCascaderList}
                       name="查看"
-                      fetchTableData={fetchTableData}
+                      fetchTable={fetchTable}
                       record={record}
                     />
                     <Divider type="vertical" />
@@ -321,7 +301,7 @@ const ClientManagementInfo = memo(() => {
                       salesCascaderList={salesCascaderList}
                       name="编辑"
                       record={record}
-                      fetchTableData={fetchTableData}
+                      fetchTable={fetchTable}
                     />
                     <Divider type="vertical" />
                     <Button
