@@ -277,7 +277,7 @@ const EditModalButton = memo<any>(props => {
                                     value: TRADER_TYPE.PRODUCT,
                                   },
                                   {
-                                    label: '企业户',
+                                    label: '机构户',
                                     value: TRADER_TYPE.ENTERPRISE,
                                   },
                                 ]}

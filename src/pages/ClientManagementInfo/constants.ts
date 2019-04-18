@@ -30,7 +30,7 @@ export const BASE_FORM_FIELDS = {
 
 export const TRADER_TYPE = {
   PRODUCT: 'PRODUCT',
-  ENTERPRISE: 'ENTERPRISE',
+  ENTERPRISE: 'INSTITUTION',
 };
 
 export const PARTY_DOC_CREATE_OR_UPDATE = 'partyDocCreateOrUpdate';
