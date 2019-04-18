@@ -4,6 +4,8 @@ import {
   wkProcessStatusModify,
   wkTaskApproveGroupCreateBatch,
   wkTaskApproveGroupList,
+  wkGlobalConfigList,
+  wkGlobalConfigModify,
 } from '@/services/approvalProcessConfiguration';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
@@ -33,6 +35,8 @@ class ApprovalProcessConfiguration extends PureComponent {
     currentProcessName: '资金录入经办复合流程',
     status: false,
     resetVisible: false,
+    globalConfigList: [],
+    globalConfig: null,
   };
 
   constructor(props) {
@@ -52,9 +56,10 @@ class ApprovalProcessConfiguration extends PureComponent {
         wkTaskApproveGroupList({ processName: this.state.currentProcessName }),
         wkApproveGroupList(),
         wkProcessList(),
+        wkGlobalConfigList({ processName: this.state.currentProcessName }),
       ]);
     const res = await requests();
-    const [taskApproveGroupList, approveGroupList, processList] = res;
+    const [taskApproveGroupList, approveGroupList, processList, globalConfigList] = res;
     const error = res.some(item => {
       return item.error;
     });
@@ -81,6 +86,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       approveGroupList: approveGroupList.data || [],
       taskApproveGroupList: taskData,
       processList: tabsData,
+      globalConfigList: globalConfigList.data || [],
     });
   };
 
@@ -153,7 +159,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public onConfirm = async () => {
-    const { currentProcessName, taskApproveGroupList, status } = this.state;
+    const { currentProcessName, taskApproveGroupList, status, globalConfig } = this.state;
     const requests = () =>
       Promise.all([
         wkProcessStatusModify({ processName: currentProcessName, status }),
@@ -161,9 +167,14 @@ class ApprovalProcessConfiguration extends PureComponent {
           processName: currentProcessName,
           taskList: taskApproveGroupList,
         }),
+        wkGlobalConfigModify(globalConfig),
       ]);
-    const [modify, batch] = await requests();
-    if (modify.error || batch.error) return;
+    const res = await requests();
+    const [modify, batch, globalConfigModify] = res;
+    const error = res.some(item => {
+      return item.error;
+    });
+    if (error) return;
 
     notification.success({
       message: `保存成功`,
@@ -180,6 +191,16 @@ class ApprovalProcessConfiguration extends PureComponent {
   public handleResetCancel = e => {
     this.setState({
       resetVisible: false,
+    });
+  };
+
+  public configListChange = (e, param) => {
+    this.setState({
+      globalConfig: {
+        processName: param.processName,
+        id: param.id,
+        status: e.target.checked,
+      },
     });
   };
 
@@ -204,10 +225,19 @@ class ApprovalProcessConfiguration extends PureComponent {
           <span style={{ marginLeft: '6px' }}>启用流程</span>
         </div>
         <div style={{ marginTop: '60px', minHeight: '60px' }}>
-          {/* <p style={{ fontWeight: 'bolder' }}>全局配置</p>
-          <p>
-            <Checkbox>不允许审批自己发起的审批单</Checkbox>
-          </p> */}
+          <p style={{ fontWeight: 'bolder' }}>全局配置</p>
+          {this.state.globalConfigList.map(item => {
+            return (
+              <p key={item.id}>
+                <Checkbox
+                  onChange={e => this.configListChange(e, item)}
+                  defaultChecked={item.processName === this.state.currentProcessName}
+                >
+                  {item.globalName}
+                </Checkbox>
+              </p>
+            );
+          })}
         </div>
         <div className={styles.configButtonBox}>
           <p>
