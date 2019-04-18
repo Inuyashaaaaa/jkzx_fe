@@ -33,7 +33,6 @@ export function setPermissions(permissions) {
     JSON.stringify({
       ...permissions,
       welcomePage: true,
-      contractManage: true,
     })
   );
 }

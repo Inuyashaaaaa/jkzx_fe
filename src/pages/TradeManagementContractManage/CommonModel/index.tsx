@@ -37,7 +37,7 @@ class CommonModel extends PureComponent<{ status: any }> {
       pageSize: 10,
       total: 0,
     },
-    pageSize: 0,
+    pageSizeCurrent: 0,
     bookList: [],
     tableDataSource: [],
   };
@@ -430,7 +430,7 @@ class CommonModel extends PureComponent<{ status: any }> {
               //   onShowSizeChange: this.onShowSizeChange,
               showQuickJumper: true,
               current: this.state.pagination.current,
-              pageSize: this.state.pageSize,
+              pageSize: this.state.pageSizeCurrent,
               onChange: this.onChange,
               total: this.state.pagination.total,
             }}

@@ -4,24 +4,37 @@ import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
   LCM_EVENT_TYPE_OPTIONS,
   LCM_EVENT_TYPE_ZHCN_MAP,
-  LEG_TYPE_ZHCH_MAP,
   PRODUCTTYPE_ZHCH_MAP,
 } from '@/constants/common';
 import { IColumnDef } from '@/design/components/Table/types';
 import { Timeline } from 'antd';
 import React from 'react';
 import Operations from './CommonModel/Operations';
+import styles from './index.less';
 const TimelineItem = Timeline.Item;
 
 export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易ID',
     dataIndex: 'tradeId',
+    onCell: record => {
+      return {
+        style: { paddingLeft: '20px' },
+      };
+    },
+    onHeaderCell: record => {
+      return {
+        style: { paddingLeft: '20px' },
+      };
+    },
     render: (text, record, index) => {
       if (record.timeLineNumber) {
         return (
           <>
-            <Timeline style={{ position: 'absolute', left: '-15px', top: '5px' }}>
+            <Timeline
+              style={{ position: 'absolute', left: '-20px', top: '5px' }}
+              className={styles.timelines}
+            >
               {record.positions.map((item, index) => {
                 return <TimelineItem style={{ marginBottom: '27px' }} key={index} />;
               })}

@@ -54,12 +54,12 @@ export default [
             },
             {
               path: '/trade-management/contract-management',
-              name: 'contractManagement',
+              name: 'contractManage',
               component: './TradeManagementContractManagement/index',
             },
             {
               path: '/trade-management/contract-manage',
-              name: 'contractManage',
+              name: 'contractManagement',
               component: './TradeManagementContractManage/index',
             },
             {
