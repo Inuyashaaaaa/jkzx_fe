@@ -1460,7 +1460,12 @@ export const IsAnnualized: IColDef = {
 
 export const DaysInYear: IColDef = {
   headerName: '年度计息天数',
-  editable: true,
+  editable: params => {
+    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL) {
+      return false;
+    }
+    return true;
+  },
   field: LEG_FIELD.DAYS_IN_YEAR,
   input: {
     type: 'number',
