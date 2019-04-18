@@ -42,10 +42,11 @@ export const ComputedColDefs: IColDef[] = [
     editable: false,
     headerName: '百分比价格',
     field: COMPUTED_LEG_FIELD_MAP.PRICE_PER,
-    input: {
-      ...INPUT_NUMBER_PERCENTAGE_CONFIG,
-      formatValue: val => (val !== undefined ? Math.abs(val) : val),
-    },
+    // input: {
+    //   ...INPUT_NUMBER_PERCENTAGE_CONFIG,
+    //   formatValue: val => (val !== undefined ? Math.abs(val) : val),
+    // },
+    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     cellStyle: CELL_STYLE,
   },
   {
