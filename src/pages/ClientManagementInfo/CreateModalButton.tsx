@@ -11,17 +11,7 @@ import {
 import { remove, uuid } from '@/design/utils';
 import { UPLOAD_URL } from '@/services/document';
 import { createRefParty } from '@/services/reference-data-service';
-import {
-  AutoComplete,
-  Button,
-  Cascader,
-  Divider,
-  Icon,
-  Modal,
-  notification,
-  Row,
-  Steps,
-} from 'antd';
+import { AutoComplete, Button, Cascader, Divider, Icon, notification, Row, Steps } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';

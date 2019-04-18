@@ -12,10 +12,10 @@ import { remove, uuid } from '@/design/utils';
 import { getPartyDoc, UPLOAD_URL } from '@/services/document';
 
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
-import { Button, Cascader, Divider, Icon, notification, Row, Spin, Steps, Tabs } from 'antd';
+import { Button, Cascader, Icon, notification, Row, Spin, Steps, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 
