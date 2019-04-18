@@ -1389,71 +1389,69 @@ const EditModalButton = memo<any>(props => {
         width: 900,
         visible: modalVisible,
         onCancel: () => setModalVisible(false),
-        footer: (
+        footer: disabled ? (
+          false
+        ) : (
           <Row gutter={8} type="flex" justify="end">
-            {!disabled ? (
-              <div>
-                <Button
-                  onClick={() => {
-                    setModalVisible(false);
-                  }}
-                >
-                  取消
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={async () => {
-                    const baseData = {};
-                    Object.keys(baseFormData).forEach(item => {
-                      baseData[item] = baseFormData[item].value;
-                      if (item.endsWith('Date') && baseData[item]) {
-                        baseData[item] = baseData[item].split(' ')[0];
-                      }
-                      // debugger
-                      if (item.endsWith('Doc')) {
-                        baseData[item] = baseFormData[item].value
-                          .map(param => {
-                            if (param.id) {
-                              return param.id;
-                            }
-                            if (param.response) {
-                              return param.response.result.uuid;
-                            }
-                            return param;
-                          })
-                          .join('');
-                      }
-                    });
-                    const tradeAuthorizer = traderList.map(item => {
-                      return {
-                        tradeAuthorizerName: item.姓名.value,
-                        tradeAuthorizerIdNumber: item.身份证号.value,
-                        tradeAuthorizerIdExpiryDate: item.证件有效期.value.split(' ')[0],
-                        tradeAuthorizerPhone: item.联系电话.value,
-                      };
-                    });
-                    if (Array.isArray(baseData.salesName)) {
-                      const [subsidiaryName, branchName, salesName] = baseData.salesName;
-                      baseData.subsidiaryName = subsidiaryName;
-                      baseData.branchName = branchName;
-                      baseData.salesName = salesName;
-                    }
-                    baseData.tradeAuthorizer = tradeAuthorizer;
-                    setLoading(true);
-                    const { data, error } = await createRefParty(baseData);
-                    setLoading(false);
-                    if (error) return;
-                    setModalVisible(false);
-                    fetchTable();
-                    notification.success({
-                      message: '保存成功',
-                    });
-                  }}
-                >
-                  提交修改
-                </Button>
-              </div>
-            ) : null}
+            <Button
+              onClick={() => {
+                setModalVisible(false);
+              }}
+            >
+              取消
+            </Button>
+            <Button
+              type="primary"
+              onClick={async () => {
+                const baseData = {};
+                Object.keys(baseFormData).forEach(item => {
+                  baseData[item] = baseFormData[item].value;
+                  if (item.endsWith('Date') && baseData[item]) {
+                    baseData[item] = baseData[item].split(' ')[0];
+                  }
+                  // debugger
+                  if (item.endsWith('Doc')) {
+                    baseData[item] = baseFormData[item].value
+                      .map(param => {
+                        if (param.id) {
+                          return param.id;
+                        }
+                        if (param.response) {
+                          return param.response.result.uuid;
+                        }
+                        return param;
+                      })
+                      .join('');
+                  }
+                });
+                const tradeAuthorizer = traderList.map(item => {
+                  return {
+                    tradeAuthorizerName: item.姓名.value,
+                    tradeAuthorizerIdNumber: item.身份证号.value,
+                    tradeAuthorizerIdExpiryDate: item.证件有效期.value.split(' ')[0],
+                    tradeAuthorizerPhone: item.联系电话.value,
+                  };
+                });
+                if (Array.isArray(baseData.salesName)) {
+                  const [subsidiaryName, branchName, salesName] = baseData.salesName;
+                  baseData.subsidiaryName = subsidiaryName;
+                  baseData.branchName = branchName;
+                  baseData.salesName = salesName;
+                }
+                baseData.tradeAuthorizer = tradeAuthorizer;
+                setLoading(true);
+                const { data, error } = await createRefParty(baseData);
+                setLoading(false);
+                if (error) return;
+                setModalVisible(false);
+                fetchTable();
+                notification.success({
+                  message: '保存成功',
+                });
+              }}
+            >
+              提交修改
+            </Button>
           </Row>
         ),
       }}
