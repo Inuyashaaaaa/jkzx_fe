@@ -60,3 +60,23 @@ export async function wkProcessList(params = {}) {
     },
   });
 }
+
+export async function wkGlobalConfigList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkGlobalConfigList',
+      params,
+    },
+  });
+}
+
+export async function wkGlobalConfigModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkGlobalConfigModify',
+      params,
+    },
+  });
+}
