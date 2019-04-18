@@ -888,40 +888,6 @@ const EditModalButton = memo<any>(props => {
                       },
                     },
                     {
-                      title: '我方授信额度',
-                      dataIndex: 'ourCreditLimit',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<InputNumber editing={editable} disabled={disabled} />)}
-                          </FormItem>
-                        );
-                      },
-                    },
-                    {
-                      title: '对方授信额度',
-                      dataIndex: 'cptyCreditLimit',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<InputNumber editing={editable} disabled={disabled} />)}
-                          </FormItem>
-                        );
-                      },
-                    },
-                    {
                       title: (
                         <span>
                           保证金折扣<span style={{ fontSize: 12 }}>（例如：0.8表示八折）</span>
