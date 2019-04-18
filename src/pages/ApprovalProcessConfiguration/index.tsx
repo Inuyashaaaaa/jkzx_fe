@@ -1,11 +1,11 @@
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
+  wkGlobalConfigList,
+  wkGlobalConfigModify,
   wkProcessList,
   wkProcessStatusModify,
   wkTaskApproveGroupCreateBatch,
   wkTaskApproveGroupList,
-  wkGlobalConfigList,
-  wkGlobalConfigModify,
 } from '@/services/approvalProcessConfiguration';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
@@ -231,7 +231,7 @@ class ApprovalProcessConfiguration extends PureComponent {
               <p key={item.id}>
                 <Checkbox
                   onChange={e => this.configListChange(e, item)}
-                  defaultChecked={item.processName === this.state.currentProcessName}
+                  defaultChecked={!!item.status}
                 >
                   {item.globalName}
                 </Checkbox>
