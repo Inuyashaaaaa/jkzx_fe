@@ -12,7 +12,7 @@ class CreateFormModal extends PureComponent {
       <>
         <Form
           dataSource={this.props.dataSource}
-          controls={CREATE_FORM_CONTROLS}
+          controls={CREATE_FORM_CONTROLS(this.props.branchSalesList)}
           footer={false}
           onValueChange={this.onValueChange}
           controlNumberOneRow={1}

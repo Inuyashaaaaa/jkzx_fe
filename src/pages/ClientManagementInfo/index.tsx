@@ -14,7 +14,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import styles from './ClientManagementInfo.less'
+import styles from './ClientManagementInfo.less';
 import CreateModalButton from './CreateModalButton';
 import EditModalButton from './EditModelButton';
 
@@ -72,8 +72,8 @@ const ClientManagementInfo = memo(() => {
     if (error) return;
     const newData = arr2treeOptions(
       data,
-      ['subsidiary', 'branch', 'salesName'],
-      ['subsidiary', 'branch', 'salesName']
+      ['subsidiaryName', 'branchName', 'salesName'],
+      ['subsidiaryName', 'branchName', 'salesName']
     );
     const branchSalesList = newData.map(subsidiary => {
       return {

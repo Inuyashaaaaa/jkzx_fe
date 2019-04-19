@@ -1,14 +1,17 @@
 import PopconfirmButton from '@/components/PopconfirmButton';
 import ModalButton from '@/design/components/ModalButton';
-import { Col, Row } from 'antd';
+import { Col, Row, message } from 'antd';
 import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
+import { refSalesDelete, queryCompanys, refSalesUpdate } from '@/services/sales';
+import { arr2treeOptions } from '@/lib/utils';
 
-class Operation extends PureComponent<{ record: any }> {
+class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public state = {
     visible: false,
     confirmLoading: false,
     editFormData: {},
+    branchSalesList: [],
   };
 
   public componentDidMount = () => {
@@ -17,17 +20,58 @@ class Operation extends PureComponent<{ record: any }> {
     });
   };
 
-  public switchModal = () => {
+  public switchModal = async () => {
+    const { error, data } = await queryCompanys();
+    if (error) return;
+    const newData = arr2treeOptions(
+      data,
+      ['subsidiaryId', 'branchId'],
+      ['subsidiaryName', 'branchName']
+    );
+    const branchSalesList = newData.map(subsidiaryName => {
+      return {
+        value: subsidiaryName.value,
+        label: subsidiaryName.label,
+        children: subsidiaryName.children.map(branchName => {
+          return {
+            value: branchName.value,
+            label: branchName.label,
+          };
+        }),
+      };
+    });
     this.setState({
-      visible: !this.state.visible,
+      visible: true,
+      branchSalesList,
     });
   };
 
-  public onEdit = () => {
+  public onCancel = () => {
+    this.setState({
+      visible: false,
+    });
+  };
+
+  public onEdit = async () => {
     this.setState({
       confirmLoading: true,
       visible: false,
     });
+    if (this.state.editFormData.cascSubBranch.length === 1) {
+      message.error('必须存在营业部');
+      return;
+    }
+    const { error, data } = await refSalesUpdate({
+      salesId: this.props.record.uuid,
+      branchId: this.state.editFormData.cascSubBranch[1],
+      salesName: this.state.editFormData.salesName,
+    });
+    if (error) {
+      message.error('编辑失败');
+      return;
+    }
+    this.props.fetchTable();
+    return;
   };
 
   public handleValueChange = params => {
@@ -36,7 +80,18 @@ class Operation extends PureComponent<{ record: any }> {
     });
   };
 
-  public onRemove = () => {};
+  public onRemove = async () => {
+    const { error, data } = await refSalesDelete({
+      salesId: this.props.record.uuid,
+    });
+    if (error) {
+      message.error('删除失败');
+      return;
+    }
+    message.success('删除成功');
+    this.props.fetchTable();
+    return;
+  };
 
   public render() {
     return (
@@ -52,13 +107,14 @@ class Operation extends PureComponent<{ record: any }> {
               title: '新建销售',
               visible: this.state.visible,
               comfirmLoading: this.state.confirmLoading,
-              onCancel: this.switchModal,
+              onCancel: this.onCancel,
               onOk: this.onEdit,
             }}
             content={
               <CreateFormModal
                 dataSource={this.state.editFormData}
                 handleValueChange={this.handleValueChange}
+                branchSalesList={this.state.branchSalesList}
               />
             }
           >

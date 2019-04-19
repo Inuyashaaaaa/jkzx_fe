@@ -158,3 +158,113 @@ export function removeSalers(params) {
     },
   });
 }
+
+// 创建分公司
+export function refSubsidiaryCreate(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSubsidiaryCreate',
+      params,
+    },
+  });
+}
+
+// 更新分公司
+export function refSubsidiaryUpdate(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSubsidiaryUpdate',
+      params,
+    },
+  });
+}
+
+// 删除分公司
+export function refSubsidiaryDelete(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSubsidiaryDelete',
+      params,
+    },
+  });
+}
+
+// 创建营业部
+export function refBranchCreate(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refBranchCreate',
+      params,
+    },
+  });
+}
+
+// 更新营业部
+export function refBranchUpdate(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refBranchUpdate',
+      params,
+    },
+  });
+}
+
+// 删除营业部
+export function refBranchDelete(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refBranchDelete',
+      params,
+    },
+  });
+}
+
+// 创建销售
+export function refSalesCreate(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSalesCreate',
+      params,
+    },
+  });
+}
+
+// 更新销售
+export function refSalesUpdate(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSalesUpdate',
+      params,
+    },
+  });
+}
+
+// 删除销售
+export function refSalesDelete(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSalesDelete',
+      params,
+    },
+  });
+}
+
+// 根据销售人员姓名进行模糊查询，获取销售列表
+export function refSimilarSalesNameList(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSimilarSalesNameList',
+      params,
+    },
+  });
+}

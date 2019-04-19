@@ -1,20 +1,33 @@
+import { Form2, Input } from '@/design/components';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions, delay, mockData } from '@/lib/utils';
-import { queryCompanys, querySalers } from '@/services/sales';
-import { Col, Icon, Modal, Popconfirm, Row, Tree } from 'antd';
+import { arr2treeOptions } from '@/lib/utils';
+import {
+  queryCompanys,
+  querySalers,
+  refSubsidiaryCreate,
+  refSubsidiaryUpdate,
+  refBranchUpdate,
+  refBranchCreate,
+  refSalesCreate,
+  refSalesUpdate,
+  refSalesDelete,
+  refBranchDelete,
+  refSubsidiaryDelete,
+} from '@/services/sales';
+import { Col, Icon, Modal, Popconfirm, Row, Tree, message } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEF } from './constants';
 import CreateFormModal from './CreateFormModal';
-import css from './index.less';
 const { TreeNode } = Tree;
-import { Form2, Input } from '@/design/components';
-import FormItem from 'antd/lib/form/FormItem';
 
 class ClientManagementSalesManagement extends PureComponent {
   public $subModalForm: Form2 = null;
   public $branchModalForm: Form2 = null;
+
+  public $sourceTable: SourceTable = null;
 
   public state = {
     dataSource: [],
@@ -29,6 +42,11 @@ class ClientManagementSalesManagement extends PureComponent {
     branchModalVisible: false,
     subFormData: {},
     branchFormData: {},
+    branchSalesList: [],
+    editSub: true,
+    editBranch: true,
+    branchId: '',
+    subsidiaryId: '',
   };
 
   public componentDidMount = () => {
@@ -39,7 +57,24 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleTreeNode = async () => {
     const { error, data } = await queryCompanys();
     if (error) return;
-    const newData = arr2treeOptions(data, ['subsidiary', 'branch'], ['subsidiary', 'branch']);
+    const newData = arr2treeOptions(
+      data,
+      ['subsidiaryId', 'branchId'],
+      ['subsidiaryName', 'branchName']
+    );
+    const branchSalesList = newData.map(subsidiaryName => {
+      return {
+        value: subsidiaryName.value,
+        label: subsidiaryName.label,
+        children: subsidiaryName.children.map(branchName => {
+          return {
+            value: branchName.value,
+            label: branchName.label,
+          };
+        }),
+      };
+    });
+
     const treeData = newData.map(item => {
       return {
         title: item.label,
@@ -47,34 +82,29 @@ class ClientManagementSalesManagement extends PureComponent {
         children: item.children.map(branchName => {
           return {
             title: branchName.label,
-            key: item.value + '-' + branchName.value,
+            key: item.label + '/' + item.value + '/' + branchName.value,
           };
         }),
       };
     });
     this.setState({
       treeNodeData: treeData,
+      branchSalesList,
     });
   };
 
-  public fetchTable = () => {
-    // this.setState({
-    //   loading: true,
-    // });
-    // delay(
-    //   1000,
-    //   mockData({
-    //     salesName: '@name',
-    //     branch: '@name',
-    //     subsidiary: '@name',
-    //     createAt: '@date',
-    //   })
-    // ).then(res => {
-    //   this.setState({
-    //     dataSource: res,
-    //     loading: false,
-    //   });
-    // });
+  public fetchTable = async () => {
+    this.setState({
+      loading: true,
+    });
+    const { error, data } = await querySalers();
+    this.setState({
+      loading: false,
+    });
+    if (error) return;
+    this.setState({
+      dataSource: data,
+    });
   };
 
   public switchModal = () => {
@@ -83,11 +113,26 @@ class ClientManagementSalesManagement extends PureComponent {
     });
   };
 
-  public onCreate = () => {
+  public onCreate = async () => {
     this.setState({
       confirmLoading: true,
       visible: false,
     });
+    if (this.state.createFormData.cascSubBranch.length === 1) {
+      message.error('必须存在营业部');
+      return;
+    }
+    const { error, data } = await refSalesCreate({
+      salesName: this.state.createFormData.salesName,
+      branchId: this.state.createFormData.cascSubBranch[1],
+    });
+    if (error) {
+      message.error('创建失败');
+      return;
+    }
+    message.success('创建成功');
+    this.handleTreeNode();
+    this.fetchTable();
   };
 
   public handleValueChange = params => {
@@ -97,24 +142,43 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public onEdit = (params, e) => {
-    console.log(this);
     e.stopPropagation();
+    console.log(params);
     if (params.children) {
-      return this.setState({
-        subModalVisible: true,
-      });
+      return this.setState(
+        {
+          editSub: true,
+          subsidiaryId: params.key,
+          subFormData: {
+            subsidiaryName: {
+              type: 'field',
+              value: params.title,
+            },
+          },
+        },
+        () => {
+          this.setState({
+            subModalVisible: true,
+          });
+        }
+      );
     }
     return this.setState(
       {
+        editBranch: true,
+        branchId: params.key.split('/')[2],
         branchFormData: {
           subsidiaryName: {
             type: 'field',
-            value: params.key.split('-')[0],
+            value: params.key.split('/')[0],
+          },
+          branchName: {
+            type: 'field',
+            value: params.title,
           },
         },
       },
       () => {
-        console.log(this.state.branchFormData);
         this.setState({
           branchModalVisible: true,
         });
@@ -123,26 +187,57 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   // 未完成remove
-  public onRemove = params => {};
+  public bindRemove = item => async e => {
+    e.stopPropagation();
+    const deleteEdit = item.children ? refSubsidiaryDelete : refBranchDelete;
+    const params = item.children
+      ? {
+          subsidiaryId: item.key,
+        }
+      : {
+          branchId: item.key.split('/')[2],
+        };
+    const { error, data } = await deleteEdit({
+      ...params,
+    });
+    if (error) {
+      message.error('删除失败');
+      return;
+    }
+    this.handleTreeNode();
+  };
+
+  public remove = e => {
+    e.stopPropagation();
+  };
 
   public onAdd = (params, e) => {
     e.stopPropagation();
     if (params.children) {
-      return this.setState({
-        subModalVisible: true,
-      });
+      return this.setState(
+        {
+          editSub: false,
+          subFormData: {},
+        },
+        () => {
+          this.setState({
+            subModalVisible: true,
+          });
+        }
+      );
     }
     return this.setState(
       {
+        subsidiaryId: params.key.split('/')[1],
+        editBranch: false,
         branchFormData: {
           subsidiaryName: {
             type: 'field',
-            value: params.key.split('-')[0],
+            value: params.key.split('/')[0],
           },
         },
       },
       () => {
-        console.log(this.state.branchFormData);
         this.setState({
           branchModalVisible: true,
         });
@@ -151,52 +246,6 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public renderTreeNodes = data => {
-    // return data.map(item => {
-    //   if (item.children) {
-    //     return (
-    //       <li key={item.key + '-root'} style={{ marginBottom: '10px' }} className={css.listItem}>
-    //         <div style={{ marginBottom: '5px' }}>
-    //           <Icon type="plus-square" style={{ marginRight: '10px' }} />
-    //           <span
-    //             className={item.key === this.state.key ? css.background : css.value}
-    //             onClick={() => this.changeKey(item)}
-    //           >
-    //             {item.title}
-    //           </span>
-    //         </div>
-    //         <ul>{this.renderTreeNodes(item.children)}</ul>
-    //       </li>
-    //     );
-    //   }
-    //   return (
-    //     <li key={item.key + '-node'} style={{ display: 'flex', marginBottom: '5px' }}>
-    //       <div style={{ marginRight: '30px' }}>
-    //         {/* <Icon type="plus-square" style={{ marginRight: '10px' }} /> */}
-    //         <div
-    //           className={item.key === this.state.key ? css.background : css.value}
-    //           onClick={() => this.changeKey(item)}
-    //           contenteditable={String(this.state.editable)}
-    //           onBlur={this.cancelEdit.bind(this, item)}
-    //         >
-    //           {item.title}
-    //         </div>
-    //       </div>
-    //       <div className={css.icon}>
-    //         <Icon type="edit" style={{ marginRight: '5px' }} onClick={() => this.onEdit(item)} />
-    //         <Icon
-    //           type="minus-circle"
-    //           style={{ marginRight: '5px' }}
-    //           onCLick={() => this.onRemove(item)}
-    //         />
-    //         <Icon
-    //           type="plus-circle"
-    //           style={{ marginRight: '5px' }}
-    //           onClick={() => this.onAdd(item)}
-    //         />
-    //       </div>
-    //     </li>
-    //   );
-    // });
     return data.map(item => {
       if (item.children) {
         return (
@@ -213,15 +262,19 @@ class ClientManagementSalesManagement extends PureComponent {
                   <Icon
                     type="plus-circle"
                     style={{ marginRight: '10px' }}
-                    onClick={this.onEdit.bind(this, item)}
+                    onClick={this.onAdd.bind(this, item)}
                   />
                   <Popconfirm
-                    title="确认删除此审批组"
-                    onConfirm={this.onRemove(item)}
+                    title="确认删除该分公司？"
+                    onConfirm={this.bindRemove(item)}
                     okText="确认"
                     cancelText="取消"
                   >
-                    <Icon type="minus-circle" style={{ marginRight: '10px' }} />
+                    <Icon
+                      type="minus-circle"
+                      style={{ marginRight: '10px' }}
+                      onClick={this.remove.bind(this)}
+                    />
                   </Popconfirm>
                 </span>
               </>
@@ -247,15 +300,19 @@ class ClientManagementSalesManagement extends PureComponent {
                 <Icon
                   type="plus-circle"
                   style={{ marginRight: '10px' }}
-                  onClick={this.onEdit.bind(this, item)}
+                  onClick={this.onAdd.bind(this, item)}
                 />
                 <Popconfirm
-                  title="确认删除此审批组"
-                  onConfirm={this.onRemove(item)}
+                  title="确认删除该营业部？"
+                  onConfirm={this.bindRemove(item)}
                   okText="确认"
                   cancelText="取消"
                 >
-                  <Icon type="minus-circle" style={{ marginRight: '10px' }} />
+                  <Icon
+                    type="minus-circle"
+                    style={{ marginRight: '10px' }}
+                    onClick={this.remove.bind(this)}
+                  />
                 </Popconfirm>
               </span>
             </>
@@ -269,14 +326,14 @@ class ClientManagementSalesManagement extends PureComponent {
 
   public onSelect = async selectedKeys => {
     console.log(selectedKeys);
-    const arr = selectedKeys[0].split('-');
-    if (arr.length === 2) {
+    if (!selectedKeys.length) return;
+    const arr = selectedKeys[0].split('/');
+    if (arr.length === 3) {
       this.setState({
         loading: true,
       });
       const { error, data } = await querySalers({
-        subsidiaryName: arr[0],
-        branchName: arr[1],
+        branchId: arr[2],
       });
       this.setState({
         loading: false,
@@ -291,12 +348,14 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleCancelSub = () => {
     this.setState({
       subModalVisible: false,
+      subFormData: {},
     });
   };
 
   public handleCancelBranch = () => {
     this.setState({
       branchModalVisible: false,
+      branchFormData: {},
     });
   };
 
@@ -304,18 +363,49 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleConfirmSub = async () => {
     const { error } = await this.$subModalForm.validate();
     if (error) return;
-    this.setState(
-      {
-        subModalVisible: false,
-      },
-      () => {}
-    );
+    console.log(this.state.subFormData);
+    const subsidiaryEdit = this.state.editSub ? refSubsidiaryUpdate : refSubsidiaryCreate;
+    const params = this.state.editSub
+      ? {
+          subsidiaryId: this.state.subsidiaryId,
+          subsidiaryName: this.state.subFormData.subsidiaryName.value,
+        }
+      : { subsidiaryName: this.state.subFormData.subsidiaryName.value };
+    const { error: _error, data: _data } = await subsidiaryEdit({
+      ...params,
+    });
+    if (_error) {
+      message.error(this.state.editSub ? '更新失败' : '创建失败');
+      return;
+    }
+    this.handleTreeNode();
+    this.setState({
+      subModalVisible: false,
+    });
   };
 
   // 未完成后端编辑接口
   public handleConfirmBranch = async () => {
     const { error } = await this.$branchModalForm.validate();
     if (error) return;
+    const branchEdit = this.state.editBranch ? refBranchUpdate : refBranchCreate;
+    const params = this.state.editBranch
+      ? {
+          branchId: this.state.branchId,
+          branchName: this.state.branchFormData.branchName.value,
+        }
+      : {
+          subsidiaryId: this.state.subsidiaryId,
+          branchName: this.state.branchFormData.branchName.value,
+        };
+    const { error: _error, data: _data } = await branchEdit({
+      ...params,
+    });
+    if (_error) {
+      message.error(this.state.branchEdit ? '更新成功' : '创建成功');
+      return;
+    }
+    this.handleTreeNode();
     this.setState({
       branchModalVisible: false,
     });
@@ -341,13 +431,13 @@ class ClientManagementSalesManagement extends PureComponent {
             <Tree showLine={true} onSelect={this.onSelect} blockNode={false}>
               {this.renderTreeNodes(this.state.treeNodeData)}
             </Tree>
-            {/* <ul>{this.renderTreeNodes(this.state.treeNodeData)}</ul> */}
           </Col>
           <Col>
             <SourceTable
               rowKey="uuid"
+              ref={node => (this.$sourceTable = node)}
               dataSource={this.state.dataSource}
-              columnDefs={TABLE_COL_DEF}
+              columnDefs={TABLE_COL_DEF(this.state.branchSalesList, this.fetchTable)}
               loading={this.state.loading}
               header={
                 <ModalButton
@@ -366,6 +456,7 @@ class ClientManagementSalesManagement extends PureComponent {
                     <CreateFormModal
                       dataSource={this.state.createFormData}
                       handleValueChange={this.handleValueChange}
+                      branchSalesList={this.state.branchSalesList}
                     />
                   }
                 >
@@ -376,25 +467,24 @@ class ClientManagementSalesManagement extends PureComponent {
           </Col>
         </Row>
         <Modal
-          title={'创建分公司'}
+          title={this.state.editSub ? '更新分公司' : '创建分公司'}
           visible={this.state.subModalVisible}
           onCancel={this.handleCancelSub}
           onOk={this.handleConfirmSub}
         >
           <Form2
             ref={node => (this.$subModalForm = node)}
-            layout="inline"
+            columnNumberOneRow={1}
             dataSource={this.state.subFormData}
             onFieldsChange={this.onSubFormChange}
-            submitable={false}
-            resetable={false}
+            footer={false}
             columns={[
               {
                 title: '分公司',
                 dataIndex: 'subsidiaryName',
                 render: (value, record, index, { form }) => {
                   return (
-                    <FormItem>
+                    <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
                       {form.getFieldDecorator({
                         rules: [
                           {
@@ -411,18 +501,16 @@ class ClientManagementSalesManagement extends PureComponent {
           />
         </Modal>
         <Modal
-          title={'创建营业部'}
+          title={this.state.editBranch ? '更新营业部' : '创建营业部'}
           visible={this.state.branchModalVisible}
           onCancel={this.handleCancelBranch}
           onOk={this.handleConfirmBranch}
         >
           <Form2
             ref={node => (this.$branchModalForm = node)}
-            layout="inline"
             dataSource={this.state.branchFormData}
             onFieldsChange={this.onBranchFormChange}
-            submitable={false}
-            resetable={false}
+            footer={false}
             columns={[
               {
                 title: '分公司',
@@ -437,7 +525,7 @@ class ClientManagementSalesManagement extends PureComponent {
                             message: '分公司名称必填',
                           },
                         ],
-                      })(<Input />)}
+                      })(<Input disabled={true} />)}
                     </FormItem>
                   );
                 },

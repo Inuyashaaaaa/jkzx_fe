@@ -154,11 +154,6 @@ export default [
               component: './ClientManagementInfo/index',
             },
             {
-              path: '/client-management/new-client',
-              name: 'newClient',
-              component: './ClientManagementNewClient/index',
-            },
-            {
               path: '/client-management/sales-management',
               name: 'salesManagement',
               component: './ClientManagementSalesManagement/index',
