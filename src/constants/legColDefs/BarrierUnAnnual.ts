@@ -10,13 +10,14 @@ import {
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { DEFAULT_TERM } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
 import _ from 'lodash';
 import moment from 'moment';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
 import {
   Barrier,
   BarrierType,
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -94,6 +95,7 @@ export const BarrierUnAnnual = pipeLeg({
           PremiumType,
           Premium,
           ObservationType,
+          DaysInYear,
         ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -105,6 +107,7 @@ export const BarrierUnAnnual = pipeLeg({
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
       [LEG_FIELD.REBATE_UNIT]: REBATETYPE_UNIT_MAP.PERCENT,
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
