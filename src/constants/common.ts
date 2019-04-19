@@ -233,8 +233,8 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   CLOSED: '结束',
   UNWIND_PARTIAL: '部分平仓',
   OBSERVE: '观察',
-  SNOW_BALL_EXERCISE: '雪球式到期行权',
-  PHOENIX_EXERCISE: '凤凰式到期行权',
+  SNOW_BALL_EXERCISE: '雪球式到期结算',
+  PHOENIX_EXERCISE: '凤凰式到期结算',
 };
 
 export const FREQUENCY_TYPE_MAP = {
@@ -764,8 +764,8 @@ export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, LEG_TYPE_ZH
 export const PRODUCTTYPE_ZHCH_MAP = {
   MODEL_XY: '自定义产品',
   [LEG_TYPE_MAP.ASIAN]: '亚式',
-  [LEG_TYPE_MAP.AUTOCALL_PHOENIX]: '凤凰式AutoCall',
-  [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
+  [LEG_TYPE_MAP.AUTOCALL_PHOENIX]: '凤凰式',
+  [LEG_TYPE_MAP.AUTOCALL]: '雪球式',
   [LEG_TYPE_MAP.GENERIC_SINGLE_ASSET_OPTION]: '其他单资产期权',
   [LEG_TYPE_MAP.VANILLA_EUROPEAN]: '欧式',
   [LEG_TYPE_MAP.VANILLA_AMERICAN]: '美式',

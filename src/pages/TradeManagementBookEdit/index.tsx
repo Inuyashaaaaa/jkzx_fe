@@ -27,7 +27,7 @@ import {
   trdTradeLCMEventProcess,
   trdTradeLCMUnwindAmountGet,
 } from '@/services/trade-service';
-import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
+import { ComponentResolver, GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
 import { message } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
@@ -192,10 +192,14 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         positionId: item.id,
       }).then(rsp => {
         if (rsp.error) return;
+        const data = [...rsp.data];
+        const removeExporation = _.remove(data, n => {
+          return n === 'EXPIRATION';
+        });
         this.setState({
           eventTypes: {
             ...this.state.eventTypes,
-            [item.id]: rsp.data,
+            [item.id]: data,
           },
         });
       });

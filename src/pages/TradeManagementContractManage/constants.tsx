@@ -17,6 +17,8 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易ID',
     dataIndex: 'tradeId',
+    fixed: 'left',
+    // width: 150,
     onCell: record => {
       return {
         style: { paddingLeft: '20px' },
@@ -57,6 +59,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '标的物',
     dataIndex: 'underlyerInstrumentId',
+    // width: 150,
   },
   {
     title: '买/卖',
@@ -68,6 +71,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '期权类型',
     dataIndex: 'productType',
+    // width: 150,
     render: (text, record, index) => {
       return PRODUCTTYPE_ZHCH_MAP[text];
     },
@@ -75,6 +79,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '涨/跌',
     dataIndex: 'optionType',
+    // width: 60,
     render: (text, record, index) => {
       return EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[text];
     },
@@ -82,14 +87,17 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易日',
     dataIndex: 'tradeDate',
+    // width: 120,
   },
   {
     title: '到期日',
     dataIndex: 'expirationDate',
+    // width: 120,
   },
   {
     title: '持仓状态',
     dataIndex: 'lcmEventType',
+    // width: 130,
     render: (text, record, index) => {
       return LCM_EVENT_TYPE_ZHCN_MAP[text];
     },
@@ -101,6 +109,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '销售',
     dataIndex: 'salesName',
+    // width: 100,
   },
   {
     title: '所属投资组合',
@@ -108,6 +117,8 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   },
   {
     title: '操作',
+    fixed: 'right',
+    width: 100,
     render: (value, record, index) => {
       console.log(record); // rowData
       return <Operations record={record} onSearch={onSearch} />;
