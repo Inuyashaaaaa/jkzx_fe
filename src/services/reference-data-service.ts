@@ -61,15 +61,15 @@ export async function mgnMarginsUpdate(params) {
   });
 }
 
-// export async function refPartyList(params = {}) {
-//   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
-//     method: `POST`,
-//     body: {
-//       method: 'refPartyList',
-//       params,
-//     },
-//   });
-// }
+export async function refPartyList(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refPartyList',
+      params,
+    },
+  });
+}
 
 export async function refPartyGetByLegalName(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {

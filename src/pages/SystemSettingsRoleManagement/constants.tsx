@@ -144,6 +144,10 @@ export const treeData = [
             title: '定价设置',
             key: 'pricingEnvironment',
           },
+          {
+            title: '自定义模型',
+            key: 'customModel',
+          },
         ],
       },
       {
