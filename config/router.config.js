@@ -41,6 +41,12 @@ export default [
         //   component: './Dashboard',
         // },
         {
+          path: '/welcome-page',
+          name: 'welcomePage',
+          component: './WelcomePage',
+          hideInMenu: true,
+        },
+        {
           path: '/trade-management',
           name: 'tradeManagement',
           icon: 'form',
@@ -52,8 +58,13 @@ export default [
             },
             {
               path: '/trade-management/contract-management',
-              name: 'contractManagement',
+              name: 'contractManage',
               component: './TradeManagementContractManagement/index',
+            },
+            {
+              path: '/trade-management/contract-manage',
+              name: 'contractManagement',
+              component: './TradeManagementContractManage/index',
             },
             {
               path: '/trade-management/pricing',
@@ -281,6 +292,16 @@ export default [
               path: '/approval-process/process-manangement',
               name: 'approvalProcessManagement',
               component: './ApprovalProcessManagement/index',
+            },
+            {
+              path: '/approval-process/auditing-management',
+              name: 'auditingManagement',
+              component: './ApprovalProcessAuditingManagement/index',
+            },
+            {
+              path: '/approval-process/process-configuration',
+              name: 'processConfiguration',
+              component: './ApprovalProcessConfiguration/index',
             },
           ],
         },

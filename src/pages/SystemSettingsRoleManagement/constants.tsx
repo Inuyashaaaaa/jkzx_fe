@@ -192,7 +192,7 @@ export const treeData = [
           },
           {
             title: '汇总风险',
-            key: 'intradayRiskByUnderlyerReport',
+            key: 'eodRiskByUnderlyer',
           },
           {
             title: '汇总日盈亏',
@@ -251,8 +251,16 @@ export const treeData = [
         key: 'approvalProcess',
         children: [
           {
+            title: '审批组管理',
+            key: 'auditingManagement',
+          },
+          {
             title: '流程管理',
             key: 'approvalProcessManagement',
+          },
+          {
+            title: '审批流程配置',
+            key: 'processConfiguration',
           },
         ],
       },
@@ -271,10 +279,6 @@ export const treeData = [
           {
             title: '波动率管理日历',
             key: 'volatilityCalendar',
-          },
-          {
-            title: '权限设置',
-            key: 'permissions',
           },
           // {
           //   title: '角色管理',

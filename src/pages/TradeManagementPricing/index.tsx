@@ -1,6 +1,6 @@
-import { LEG_NAME_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import { LEG_NAME_FIELD, LEG_PRICING_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { allTryPricingLegTypes, ILegType } from '@/constants/legColDefs';
+import { allLegTypes, allTryPricingLegTypes } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -11,7 +11,6 @@ import {
   TradesColDefs,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { LEG_MAP } from '@/constants/legType';
 import { PRICING_FROM_TAG } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
@@ -22,10 +21,8 @@ import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service'
 import { convertTradePositions, createLegDataSourceItem, getAddLegItem } from '@/services/pages';
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
-import { convertOptions } from '@/utils';
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
 import { Button, Col, Input, message, notification, Row, Select } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -61,10 +58,11 @@ class TradeManagementPricing extends PureComponent<any> {
       totalable: false,
     }));
 
-    this.computedAllLegTypes = allTryPricingLegTypes.map(item => {
+    this.computedAllLegTypes = allLegTypes.map(item => {
       return {
         ...item,
-        columnDefs: item.columnDefs
+        columnDefs: item
+          .getColumnDefs('pricing')
           .map(item => ({
             ...item,
             totalable: false,
@@ -117,17 +115,23 @@ class TradeManagementPricing extends PureComponent<any> {
   };
 
   public handleAddLeg = event => {
-    const leg = this.computedAllLegTypes.find(item => item.type === event.key);
+    const computedLeg = this.computedAllLegTypes.find(item => item.type === event.key);
 
-    if (!leg) return;
+    if (!computedLeg) return;
 
-    if (this.cacheTyeps.indexOf(leg.type) === -1) {
-      this.cacheTyeps.push(leg.type);
+    if (this.cacheTyeps.indexOf(computedLeg.type) === -1) {
+      this.cacheTyeps.push(computedLeg.type);
     }
 
-    const legData = getAddLegItem(leg, createLegDataSourceItem(leg), true);
+    const legData = getAddLegItem(
+      computedLeg,
+      createLegDataSourceItem(computedLeg, {
+        [LEG_PRICING_FIELD]: true,
+      }),
+      true
+    );
 
-    this.addLegData(leg, legData);
+    this.addLegData(computedLeg, legData);
   };
 
   public handleJudge = params => {
@@ -135,12 +139,12 @@ class TradeManagementPricing extends PureComponent<any> {
     return this.judgeLegTypeExsit(colDef, data);
   };
 
-  public addLegData = (leg, rowData) => {
+  public addLegData = (computedLeg, rowData) => {
     this.props.dispatch({
       type: 'pricingData/addLegData',
       payload: {
         cacheTyeps: this.cacheTyeps,
-        leg,
+        computedLeg,
         computedAllLegTypes: this.computedAllLegTypes,
         nextTradesColDefs: this.nextTradesColDefs,
         rowData,
@@ -168,7 +172,6 @@ class TradeManagementPricing extends PureComponent<any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 

@@ -1,4 +1,4 @@
-import { IFormControl } from '@/lib/components/_Form2';
+import { IFormControl } from '@/design/components/Form/types';
 import {
   refSimilarAccountNameList,
   refSimilarBankAccountList,
@@ -14,7 +14,7 @@ export const searchFormControls: (legalNameList, markets) => IFormControl[] = (
       control: {
         label: '交易对手',
       },
-      dataIndex: 'legalName',
+      field: 'legalName',
       input: {
         type: 'select',
         showSearch: true,
@@ -36,7 +36,7 @@ export const searchFormControls: (legalNameList, markets) => IFormControl[] = (
       control: {
         label: '交易账号',
       },
-      dataIndex: 'bankAccount',
+      field: 'bankAccount',
       input: {
         type: 'select',
         showSearch: true,
@@ -59,13 +59,12 @@ export const searchFormControls: (legalNameList, markets) => IFormControl[] = (
     {
       control: {
         label: '交易对手账户名',
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 },
       },
-      dataIndex: 'bankAccountName',
+      field: 'bankAccountName',
       input: {
         type: 'select',
         showSearch: true,
+        allowClear: true,
         showArrow: false,
         placeholder: '请输入内容搜索',
         options: async (value: string = '') => {

@@ -1,7 +1,8 @@
-import { LCM_EVENT_TYPE_OPTIONS } from '@/constants/common';
+import { INPUT_NUMBER_DIGITAL_CONFIG, LCM_EVENT_TYPE_OPTIONS } from '@/constants/common';
 import SourceTable from '@/design/components/SourceTable';
 import Form, { IFormControl } from '@/lib/components/_Form2';
 import { IColumnDef } from '@/lib/components/_Table2';
+import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientChangeCredit,
   clientSaveAccountOpRecord,
@@ -38,6 +39,11 @@ const TABLE_COL_DEFS: IColumnDef[] = [
     field: 'cashFlow',
   },
   {
+    headerName: '期权费',
+    field: 'premium',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  },
+  {
     headerName: '生命周期事件',
     field: 'lcmEventType',
     input: {
@@ -59,7 +65,11 @@ const TABLE_COL_DEFS: IColumnDef[] = [
   },
 ];
 
-export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMargin => {
+export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) => IFormControl[] = (
+  entryMargin,
+  entryPremium,
+  entryCash
+) => {
   const tradeId = {
     options: {
       rules: [
@@ -73,6 +83,48 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
     },
     dataIndex: 'tradeId',
   };
+
+  const premiumlist = {
+    options: {
+      rules: [
+        {
+          required: true,
+        },
+      ],
+    },
+    control: {
+      label: '期权费',
+    },
+    dataIndex: 'premium',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  };
+
+  const cashFlow = {
+    options: {
+      rules: [
+        {
+          required: true,
+        },
+      ],
+    },
+    control: {
+      label: '金额',
+    },
+    dataIndex: 'cashFlow',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  };
+
+  const extra = [];
+  if (entryMargin) {
+    extra.push(tradeId);
+  }
+  if (entryPremium) {
+    extra.push(premiumlist);
+  }
+  if (entryCash) {
+    extra.push(cashFlow);
+  }
+
   return ([
     {
       options: {
@@ -111,6 +163,22 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
             value: '期权费收入',
           },
           {
+            label: '平仓金额扣除',
+            value: '平仓金额扣除',
+          },
+          {
+            label: '平仓金额收入',
+            value: '平仓金额收入',
+          },
+          {
+            label: '结算金额扣除',
+            value: '结算金额扣除',
+          },
+          {
+            label: '结算金额收入',
+            value: '结算金额收入',
+          },
+          {
             label: '授信扣除',
             value: '授信扣除',
           },
@@ -130,20 +198,7 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
       },
       dataIndex: 'cashType',
     },
-    {
-      options: {
-        rules: [
-          {
-            required: true,
-          },
-        ],
-      },
-      control: {
-        label: '金额',
-      },
-      dataIndex: 'cashFlow',
-    },
-  ] as IFormControl[]).concat(entryMargin ? tradeId : []);
+  ] as IFormControl[]).concat(extra);
 };
 
 const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
@@ -245,6 +300,8 @@ class ExportModal extends PureComponent<any, any> {
       ourDataSource: [],
       toOurDataSource: [],
       entryMargin: true,
+      entryPremium: true,
+      entryCash: false,
     };
   }
 
@@ -278,20 +335,20 @@ class ExportModal extends PureComponent<any, any> {
   };
 
   public handleA = async (uuidList, values, resolve) => {
-    const clientTradeCashFlowRsp = await clientTradeCashFlow({
+    const clientNewTradeRsp = await clientNewTrade({
       accountId: this.modalFormData
         ? this.modalFormData.accountId
         : this.state.selectedRows[0].accountId,
+      premium: values.premium,
+      information: '',
       tradeId: values.tradeId,
-      cashFlow: String(values.cashFlow),
-      marginFlow: String(0),
     });
 
-    if (clientTradeCashFlowRsp.error) {
+    if (clientNewTradeRsp.error) {
       return resolve(false);
     }
-    if (!clientTradeCashFlowRsp.data.status) {
-      message.error(clientTradeCashFlowRsp.data.information);
+    if (!clientNewTradeRsp.data.status) {
+      message.error(clientNewTradeRsp.data.information);
       return resolve(false);
     }
     const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
@@ -300,6 +357,38 @@ class ExportModal extends PureComponent<any, any> {
     if (cliMmarkTradeTaskProcessedRsp.error) {
       return resolve(false);
     }
+
+    resolve(true);
+    this.onFetch();
+    message.success('录入成功');
+  };
+
+  public handleD = async (uuidList, values, resolve, type) => {
+    const clientSettleTradeRsp = await clientSettleTrade({
+      accountId: this.modalFormData
+        ? this.modalFormData.accountId
+        : this.state.selectedRows[0].accountId,
+      amount: values.cashFlow,
+      accountEvent: type,
+      premium: values.premium,
+      information: '',
+      tradeId: values.tradeId,
+    });
+
+    if (clientSettleTradeRsp.error) {
+      return resolve(false);
+    }
+    if (!clientSettleTradeRsp.data.status) {
+      message.error(clientSettleTradeRsp.data.information);
+      return resolve(false);
+    }
+    const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
+      uuidList,
+    });
+    if (cliMmarkTradeTaskProcessedRsp.error) {
+      return resolve(false);
+    }
+
     resolve(true);
     this.onFetch();
     message.success('录入成功');
@@ -368,13 +457,25 @@ class ExportModal extends PureComponent<any, any> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            values.premium = new BigNumber(values.premium).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
+          case '平仓金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '平仓金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '结算金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
+          case '结算金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
           case '保证金释放':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
@@ -460,20 +561,77 @@ class ExportModal extends PureComponent<any, any> {
     );
   };
 
-  public handleChangeValueOur = values => {
+  public handleChangeValueOur = params => {
+    const values = params;
     if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
       this.setState({
+        item: false,
         entryMargin: false,
+        entryPremium: false,
+        entryCash: true,
         ourDataSource: values,
+      });
+      return;
+    }
+    if (
+      values.cashType === '平仓金额收入' ||
+      values.cashType === '平仓金额扣除' ||
+      values.cashType === '结算金额收入' ||
+      values.cashType === '结算金额扣除'
+    ) {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '期权费收入' || values.cashType === '期权费扣除') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: false,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '授信扣除' || values.cashType === '授信恢复') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: false,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
       });
       return;
     }
 
     this.setState({
       entryMargin: true,
+      entryPremium: false,
+      entryCash: false,
       ourDataSource: {
         ...values,
         tradeId: this.modalFormData.tradeId,
+        premium: this.modalFormData.premium,
+        cashFlow: this.modalFormData.cashFlow,
       },
     });
   };
@@ -500,6 +658,7 @@ class ExportModal extends PureComponent<any, any> {
       legalName: event.rowData.legalName,
       tradeId: event.rowData.tradeId,
       cashFlow: event.rowData.cashFlow,
+      premium: event.rowData.premium,
     };
     const toOurDataSource = {
       legalName: event.rowData.legalName,
@@ -555,7 +714,11 @@ class ExportModal extends PureComponent<any, any> {
                   return;
                 }}
                 dataSource={this.state.ourDataSource}
-                controls={OUR_CREATE_FORM_CONTROLS(this.state.entryMargin)}
+                controls={OUR_CREATE_FORM_CONTROLS(
+                  this.state.entryMargin,
+                  this.state.entryPremium,
+                  this.state.entryCash
+                )}
                 onChangeValue={this.handleChangeValueOur}
                 controlNumberOneRow={1}
                 footer={false}

@@ -1,5 +1,7 @@
-import { IFormControl } from '@/lib/components/_Form2';
-import { IColumnDef } from '@/lib/components/_Table2';
+import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import { IFormControl } from '@/design/components/Form/types';
+import { IColumnDef } from '@/design/components/Table/types';
+
 export const TABLE_COL_DEFS: IColumnDef[] = [
   {
     headerName: '交易对手',
@@ -19,6 +21,11 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
     field: 'cashFlow',
   },
   {
+    headerName: '期权费',
+    field: 'premium',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  },
+  {
     headerName: '生命周期事件',
     field: 'lcmEventType',
   },
@@ -36,9 +43,13 @@ export const TABLE_COL_DEFS: IColumnDef[] = [
   },
 ];
 
-export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMargin => {
+export const OUR_CREATE_FORM_CONTROLS: (entryMargin, entryPremium, entryCash) => IFormControl[] = (
+  entryMargin,
+  entryPremium,
+  entryCash
+) => {
   const tradeId = {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -48,11 +59,53 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
     control: {
       label: '交易ID',
     },
-    dataIndex: 'tradeId',
+    field: 'tradeId',
   };
+
+  const premiumlist = {
+    decorator: {
+      rules: [
+        {
+          required: true,
+        },
+      ],
+    },
+    control: {
+      label: '期权费',
+    },
+    field: 'premium',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  };
+
+  const cashFlow = {
+    decorator: {
+      rules: [
+        {
+          required: true,
+        },
+      ],
+    },
+    control: {
+      label: '金额',
+    },
+    field: 'cashFlow',
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
+  };
+
+  const extra = [];
+  if (entryMargin) {
+    extra.push(tradeId);
+  }
+  if (entryPremium) {
+    extra.push(premiumlist);
+  }
+  if (entryCash) {
+    extra.push(cashFlow);
+  }
+
   return ([
     {
-      options: {
+      decorator: {
         rules: [
           {
             required: true,
@@ -62,10 +115,10 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
       control: {
         label: '客户名称',
       },
-      dataIndex: 'legalName',
+      field: 'legalName',
     },
     {
-      options: {
+      decorator: {
         rules: [
           {
             required: true,
@@ -88,6 +141,22 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
             value: '期权费收入',
           },
           {
+            label: '平仓金额扣除',
+            value: '平仓金额扣除',
+          },
+          {
+            label: '平仓金额收入',
+            value: '平仓金额收入',
+          },
+          {
+            label: '结算金额扣除',
+            value: '结算金额扣除',
+          },
+          {
+            label: '结算金额收入',
+            value: '结算金额收入',
+          },
+          {
             label: '授信扣除',
             value: '授信扣除',
           },
@@ -105,27 +174,14 @@ export const OUR_CREATE_FORM_CONTROLS: (entryMargin) => IFormControl[] = entryMa
           },
         ],
       },
-      dataIndex: 'cashType',
+      field: 'cashType',
     },
-    {
-      options: {
-        rules: [
-          {
-            required: true,
-          },
-        ],
-      },
-      control: {
-        label: '金额',
-      },
-      dataIndex: 'cashFlow',
-    },
-  ] as IFormControl[]).concat(entryMargin ? tradeId : []);
+  ] as IFormControl[]).concat(extra);
 };
 
 export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -135,10 +191,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '客户名称',
     },
-    dataIndex: 'legalName',
+    field: 'legalName',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -148,10 +204,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '交易ID',
     },
-    dataIndex: 'tradeId',
+    field: 'tradeId',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -161,10 +217,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '可用资金变化',
     },
-    dataIndex: 'counterPartyFundChange',
+    field: 'counterPartyFundChange',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -174,10 +230,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '剩余授信总额变化',
     },
-    dataIndex: 'counterPartyCreditBalanceChange',
+    field: 'counterPartyCreditBalanceChange',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -187,10 +243,10 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '授信总额变化',
     },
-    dataIndex: 'counterPartyCreditChange',
+    field: 'counterPartyCreditChange',
   },
   {
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
@@ -200,6 +256,6 @@ export const TOOUR_CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '冻结保证金变化',
     },
-    dataIndex: 'counterPartyMarginChange',
+    field: 'counterPartyMarginChange',
   },
 ];

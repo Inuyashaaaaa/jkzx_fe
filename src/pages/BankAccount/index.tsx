@@ -1,4 +1,7 @@
-import SourceTable from '@/lib/components/_SourceTable';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import Form from '@/design/components/Form';
+import ModalButton from '@/design/components/ModalButton';
+import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { refBankAccountSave, refBankAccountSearch } from '@/services/reference-data-service';
 import { message } from 'antd';
@@ -15,31 +18,51 @@ class BankAccount extends PureComponent {
       legalNameValue: '',
       bankAccountFormData: {},
       legalNameList: [],
+      loading: false,
+      dataSource: [],
+      createModalVisible: false,
+      confirmLoading: false,
+      createFormData: {},
     };
   }
 
-  public fetchTable = async event => {
-    if (event) {
-      const { error, data } = await refBankAccountSearch({
-        ...event.searchFormData,
-      });
-      if (error) return false;
-      return data;
-    }
+  public componentDidMount = () => {
+    this.fetchTable();
+  };
+
+  public fetchTable = async () => {
+    this.setState({
+      loading: true,
+    });
+    const { error, data } = await refBankAccountSearch({
+      ...this.state.bankAccountFormData,
+    });
+    this.setState({
+      loading: false,
+    });
+    if (error) return;
+    this.setState({
+      dataSource: data,
+    });
   };
 
   public onCreate = async event => {
-    const { error, data } = await refBankAccountSave({
-      bankName: event.createFormData.bankName,
-      legalName: event.createFormData.legalName,
-      bankAccount: event.createFormData.bankAccount,
-      bankAccountName: event.createFormData.bankAccountName,
-      paymentSystemCode: event.createFormData.paymentSystemCode,
+    this.setState({
+      confirmLoading: true,
     });
-    if (error) return false;
-    return {
-      tableDataSource: event.tableDataSource.concat(data),
-    };
+    const { error, data } = await refBankAccountSave(this.state.createFormData);
+    this.setState({
+      confirmLoading: false,
+    });
+    if (error) {
+      message.error('创建失败');
+      return;
+    }
+    message.success('创建成功');
+    this.setState({
+      createModalVisible: false,
+    });
+    this.fetchTable();
   };
 
   public onCellValueChanged = async event => {
@@ -53,24 +76,21 @@ class BankAccount extends PureComponent {
   };
 
   public handleSearchFormChange = async event => {
-    if (Object.keys(event.changed)[0] === 'legalName' && !event.changed.legalName) {
+    if (Object.keys(event.changedValues)[0] === 'legalName' && !event.changedValues.legalName) {
       return this.setState({
         markets: [],
         bankAccountFormData: {},
       });
     }
 
-    if (event.changed.legalName) {
-      event.formData.bankAccount = '';
-      event.formData.bankAccountName = '';
+    if (Object.keys(event.changedValues)[0] === 'legalName' && event.changedValues.legalName) {
+      event.values.bankAccount = '';
+      event.values.bankAccountName = '';
     }
 
     const { error, data } = await refBankAccountSearch({
-      legalName: event.formData.legalName,
+      legalName: event.values.legalName,
     });
-    // const { error, data } = await refBankAccountSearch({
-    //   ...event.changed,
-    // });
     if (error) return false;
 
     const markets = data.map(item => ({
@@ -82,19 +102,26 @@ class BankAccount extends PureComponent {
     let legalNameValue;
     let bankAccountValue;
 
-    if (event.changed.bankAccount || event.changed.bankAccountName) {
+    if (event.changedValues.bankAccount) {
       const { error, data } = await refBankAccountSearch({
-        bankAccount: event.formData.bankAccount,
+        bankAccount: event.values.bankAccount,
       });
       bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
       legalNameValue = data[0].legalName;
       bankAccountValue = data[0].bankAccount;
+    } else if (event.changedValues.bankAccountName) {
+      const { error, data } = await refBankAccountSearch({
+        bankAccountName: event.values.bankAccountName,
+      });
+      bankAccountNameValue = data[0].bankAccountName;
+      legalNameValue = data[0].legalName;
+      bankAccountValue = data[0] ? data[0].bankAccount : '';
     }
 
     this.setState({
       markets,
       bankAccountFormData: {
-        legalName: legalNameValue ? legalNameValue : event.formData.legalName,
+        legalName: legalNameValue ? legalNameValue : event.values.legalName,
         bankAccount: bankAccountValue,
         bankAccountName: bankAccountNameValue,
       },
@@ -102,24 +129,71 @@ class BankAccount extends PureComponent {
     return data;
   };
 
+  public onReset = () => {
+    this.setState(
+      {
+        bankAccountFormData: {},
+      },
+      () => {
+        this.fetchTable();
+      }
+    );
+  };
+
+  public switchModal = () => {
+    this.setState({
+      createModalVisible: !this.state.createModalVisible,
+    });
+  };
+
+  public onValueChange = params => {
+    this.setState({
+      createFormData: params.values,
+    });
+  };
+
   public render() {
     return (
       <PageHeaderWrapper back={true}>
         <SourceTable
           rowKey="uuid"
+          loading={this.state.loading}
+          dataSource={this.state.dataSource}
+          resetable={true}
+          searchable={true}
+          onResetButtonClick={this.onReset}
           searchFormControls={searchFormControls(this.state.legalNameList, this.state.markets)}
           searchFormData={this.state.bankAccountFormData}
-          createFormControls={CREATE_FORM_CONTROLS}
-          tableColumnDefs={TABLE_COLUMN_DEFS}
-          autoFetch={false}
+          columnDefs={TABLE_COLUMN_DEFS}
           onSearchFormChange={this.handleSearchFormChange}
-          onSearch={this.fetchTable}
-          createText="创建银行账户"
-          createModalProps={{ width: 700 }}
-          onCreate={this.onCreate}
-          tableProps={{
-            onCellValueChanged: this.onCellValueChanged,
-          }}
+          onSearchButtonClick={this.fetchTable}
+          onCellValueChanged={this.onCellValueChanged}
+          header={
+            <ModalButton
+              style={{ marginBottom: VERTICAL_GUTTER }}
+              type="primary"
+              onClick={this.switchModal}
+              modalProps={{
+                width: 700,
+                title: '创建银行账户',
+                onCancel: this.switchModal,
+                onOk: this.onCreate,
+                visible: this.state.createModalVisible,
+                confirmLoading: this.state.confirmLoading,
+              }}
+              content={
+                <Form
+                  controlNumberOneRow={1}
+                  controls={CREATE_FORM_CONTROLS}
+                  dataSource={this.state.createFormData}
+                  footer={false}
+                  onValueChange={this.onValueChange}
+                />
+              }
+            >
+              创建银行账户
+            </ModalButton>
+          }
         />
       </PageHeaderWrapper>
     );
