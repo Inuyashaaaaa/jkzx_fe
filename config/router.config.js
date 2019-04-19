@@ -153,6 +153,46 @@ export default [
               name: 'clientInfo',
               component: './ClientManagementInfo/index',
             },
+            {
+              path: '/client-management/new-client',
+              name: 'newClient',
+              component: './ClientManagementNewClient/index',
+            },
+            {
+              path: '/client-management/sales-management',
+              name: 'salesManagement',
+              component: './ClientManagementSalesManagement/index',
+            },
+            {
+              path: '/client-management/bank-account',
+              name: 'bankAccount',
+              component: './ClientManagementBankAccount/index',
+            },
+            {
+              path: '/client-management/fund-statistics',
+              name: 'fundStatistics',
+              component: './ClientManagementFundStatistics/index',
+            },
+            {
+              path: '/client-management/margin-management',
+              name: 'marginManagement',
+              component: './ClientManagementMarginManagement/index',
+            },
+            {
+              path: '/client-management/ioglod-management',
+              name: 'ioglodManagement',
+              component: './ClientManagementIoglodManagement/index',
+            },
+            {
+              path: '/client-management/discrepancy-management',
+              name: 'discrepancyManagement',
+              component: './ClientManagementDiscrepancyManagement/index',
+            },
+            {
+              path: '/client-management/valuation-management',
+              name: 'valuationManagement',
+              component: './ClientManagementValuationManagement/index',
+            },
           ],
         },
         {
@@ -174,12 +214,12 @@ export default [
 
           hideInMenu: true,
         },
-        {
-          path: '/bank-account',
-          name: 'bankAccount',
-          component: './BankAccount/index',
-          hideInMenu: true,
-        },
+        // {
+        //   path: '/bank-account',
+        //   name: 'bankAccount',
+        //   component: './BankAccount/index',
+        //   hideInMenu: true,
+        // },
         {
           path: '/workflow-management',
           name: 'workflowManagement',
