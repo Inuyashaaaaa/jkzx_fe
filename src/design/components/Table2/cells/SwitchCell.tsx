@@ -176,9 +176,9 @@ class SwitchCell extends PureComponent<
   };
 
   public getEditable = () => {
-    const { colDef, record } = this.props;
+    const { colDef, record, rowIndex } = this.props;
     const { editable } = colDef;
-    return typeof editable === 'function' ? editable(record) : editable;
+    return typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable;
   };
 
   public getDataIndex = () => {

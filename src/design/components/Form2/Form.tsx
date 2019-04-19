@@ -11,6 +11,21 @@ import FormBase from './FormBase';
 class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
   public static createOptionsFields = ['mapPropsToFields', 'validateMessages', 'withRef', 'name'];
 
+  public static createField = (value: any) => {
+    return {
+      type: 'field',
+      value,
+    };
+  };
+
+  public static createFields = (data: any) => {
+    return _.mapValues(data, val => Form.createField(val));
+  };
+
+  public static getFieldValue = (field: any) => {
+    return field.value;
+  };
+
   public DecoratorForm: ComponentClass<IFormBaseProps>;
 
   public decoratorForm: WrappedFormUtils;

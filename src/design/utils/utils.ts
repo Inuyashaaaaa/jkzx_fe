@@ -7,6 +7,7 @@ export const remove = (
   }
   if (typeof index === 'function') {
     index = array.findIndex(index);
+    if (index === -1) return array;
   }
   const clone = [...array];
   clone.splice(index, 1);
@@ -23,6 +24,7 @@ export const insert = (
   }
   if (typeof index === 'function') {
     index = array.findIndex(index);
+    if (index === -1) return array;
   }
   const clone = [...array];
   clone.splice(index, 0, data);

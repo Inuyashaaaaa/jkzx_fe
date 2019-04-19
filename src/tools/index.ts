@@ -1,4 +1,5 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import { TOTAL_LEGS } from '@/constants/legs';
 import _ from 'lodash';
 
 export const isAutocallPhoenix = data => {
@@ -93,3 +94,8 @@ export function arr2treeOptions(arr, paths, labelPaths) {
   }
   return getTree(deeps);
 }
+
+export const getLegByRecord = record => {
+  const leg = TOTAL_LEGS.find(item => item.type === record[LEG_TYPE_FIELD]);
+  return leg;
+};

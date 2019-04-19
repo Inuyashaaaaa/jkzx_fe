@@ -16,6 +16,12 @@ export const FrontPremium: ILegColDef = {
   editable: true,
   // 权利金总和
   title: '合约期权费',
+  exsitable: record => {
+    if (_.get(record, [LEG_FIELD.IS_ANNUAL, 'value'])) {
+      return true;
+    }
+    return false;
+  },
   dataIndex: LEG_FIELD.FRONT_PREMIUM,
   render: (val, record, index, { form, editing }) => {
     return (

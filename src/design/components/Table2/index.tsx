@@ -112,7 +112,7 @@ class Table2 extends PureComponent<ITableProps> {
               : this.props.rowKey(record, rowIndex);
           };
           return {
-            ...(colDef.onCell ? colDef.onCell(record, rowIndex) : undefined),
+            ...(colDef.onCell ? colDef.onCell(record, rowIndex, { colDef }) : undefined),
             $$render: colDef.render,
             record,
             rowIndex,

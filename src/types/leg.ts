@@ -6,6 +6,7 @@ import {
 
 export interface ILegColDef extends ITableColDef {
   linkage?: boolean;
+  exsitable?: (record: any) => boolean;
 }
 
 export interface ILeg {
@@ -19,7 +20,11 @@ export interface ILeg {
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
-    setLoadings: (colId: string, loading: boolean) => void,
-    setData: (newData: ITableData) => void
-  ) => ITableData;
+    record: ITableData,
+    tableData: ITableData[],
+    setColLoadings: (colId: string, loading: boolean) => void,
+    setLoadings: (colId: string, rowId: string, loading: boolean) => void,
+    setColValue: (colId: string, newVal: ITableData) => void,
+    setTableData: (newData: ITableData[]) => void
+  ) => void;
 }

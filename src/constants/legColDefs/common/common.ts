@@ -51,12 +51,12 @@ import {
 } from '../../common';
 
 export const OptionType: IColDef = {
-  headerName: '类型',
-  field: LEG_FIELD.OPTION_TYPE,
-  editable: params => {
+  title: '类型',
+  dataIndex: LEG_FIELD.OPTION_TYPE,
+  editable: record => {
     if (
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return false;
     }
@@ -64,8 +64,8 @@ export const OptionType: IColDef = {
   },
   input: record => {
     if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
         type: 'select',
@@ -83,14 +83,20 @@ export const OptionType: IColDef = {
   rules: RULES_REQUIRED,
   getValue: params => {
     if (
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
         depends: [LEG_FIELD.BARRIER, LEG_FIELD.STRIKE],
         value(record) {
-          if (record[LEG_FIELD.BARRIER] !== undefined && record[LEG_FIELD.STRIKE] !== undefined) {
-            if (record[LEG_FIELD.BARRIER] > record[LEG_FIELD.STRIKE]) {
+          if (
+            _.get(record, [LEG_FIELD.BARRIER, 'value']) !== undefined &&
+            _.get(record, [LEG_FIELD.STRIKE, 'value']) !== undefined
+          ) {
+            if (
+              _.get(record, [LEG_FIELD.BARRIER, 'value']) >
+              _.get(record, [LEG_FIELD.STRIKE, 'value'])
+            ) {
               return OPTION_TYPE_MAP.CALL;
             }
             return OPTION_TYPE_MAP.PUT;
@@ -109,48 +115,48 @@ export const OptionType: IColDef = {
 };
 
 export const NotionalLot: IColDef = {
-  headerName: '手数',
-  field: 'notionalLot',
+  title: '手数',
+  dataIndex: 'notionalLot',
   editable: true,
   input: INPUT_NUMBER_DIGITAL_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const PremiumValue: IColDef = {
-  headerName: '期权费',
-  field: 'premiumValue',
+  title: '期权费',
+  dataIndex: 'premiumValue',
   editable: true,
   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const ParticipationRate: IColDef = {
-  headerName: '参与率',
-  field: LEG_FIELD.PARTICIPATION_RATE,
+  title: '参与率',
+  dataIndex: LEG_FIELD.PARTICIPATION_RATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const LowParticipationRate: IColDef = {
-  headerName: '低参与率',
-  field: LEG_FIELD.LOW_PARTICIPATION_RATE,
+  title: '低参与率',
+  dataIndex: LEG_FIELD.LOW_PARTICIPATION_RATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const HighParticipationRate: IColDef = {
-  headerName: '高参与率',
-  field: LEG_FIELD.HIGH_PARTICIPATION_RATE,
+  title: '高参与率',
+  dataIndex: LEG_FIELD.HIGH_PARTICIPATION_RATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const ParticipationRate1: IColDef = {
-  headerName: '参与率1',
-  field: LEG_FIELD.PARTICIPATION_RATE1,
+  title: '参与率1',
+  dataIndex: LEG_FIELD.PARTICIPATION_RATE1,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: ([
@@ -167,8 +173,8 @@ export const ParticipationRate1: IColDef = {
 };
 
 export const ParticipationRate2: IColDef = {
-  headerName: '参与率2',
-  field: LEG_FIELD.PARTICIPATION_RATE2,
+  title: '参与率2',
+  dataIndex: LEG_FIELD.PARTICIPATION_RATE2,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: ([
@@ -186,8 +192,8 @@ export const ParticipationRate2: IColDef = {
 
 export const SettlementDate: IColDef = {
   editable: true,
-  headerName: '结算日期',
-  field: LEG_FIELD.SETTLEMENT_DATE,
+  title: '结算日期',
+  dataIndex: LEG_FIELD.SETTLEMENT_DATE,
   input: {
     type: 'date',
     defaultOpen: true,
@@ -196,14 +202,14 @@ export const SettlementDate: IColDef = {
   getValue: {
     depends: [LEG_FIELD.EXPIRATION_DATE],
     value: record => {
-      return getMoment(record[LEG_FIELD.EXPIRATION_DATE], true);
+      return getMoment(_.get(record, [LEG_FIELD.EXPIRATION_DATE, 'value']));
     },
   },
 };
 
 export const UnderlyerInstrumentId: IColDef = {
-  headerName: '标的物',
-  field: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
+  title: '标的物',
+  dataIndex: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
   editable: true,
   input: record => {
     return {
@@ -229,14 +235,14 @@ export const UnderlyerInstrumentId: IColDef = {
 
 export const InitialSpot: IColDef = {
   editable: true,
-  headerName: '期初价格',
-  field: LEG_FIELD.INITIAL_SPOT,
+  title: '期初价格',
+  dataIndex: LEG_FIELD.INITIAL_SPOT,
   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   getValue: {
     depends: [LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
     value: record => {
       return mktQuotesListPaged({
-        instrumentIds: [record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID]],
+        instrumentIds: [_.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value'])],
       }).then(rsp => {
         if (rsp.error) return undefined;
         return new BigNumber(
@@ -256,10 +262,10 @@ export const InitialSpot: IColDef = {
 
 export const LowStrike: IColDef = {
   editable: true,
-  headerName: '低行权价',
-  field: LEG_FIELD.LOW_STRIKE,
+  title: '低行权价',
+  dataIndex: LEG_FIELD.LOW_STRIKE,
   input: record => {
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -276,10 +282,10 @@ export const LowStrike: IColDef = {
 
 export const HighStrike: IColDef = {
   editable: true,
-  headerName: '高行权价',
-  field: LEG_FIELD.HIGH_STRIKE,
+  title: '高行权价',
+  dataIndex: LEG_FIELD.HIGH_STRIKE,
   input: record => {
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -296,24 +302,24 @@ export const HighStrike: IColDef = {
 
 export const Strike: IColDef = {
   editable: true,
-  headerName: '行权价',
-  field: LEG_FIELD.STRIKE,
+  title: '行权价',
+  dataIndex: LEG_FIELD.STRIKE,
   input: record => {
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.USD) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.PERCENT) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.PERCENT) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -330,24 +336,24 @@ export const Strike: IColDef = {
 
 export const Strike1: IColDef = {
   editable: true,
-  headerName: '行权价1',
-  field: LEG_FIELD.STRIKE1,
+  title: '行权价1',
+  dataIndex: LEG_FIELD.STRIKE1,
   input: record => {
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.USD) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.PERCENT) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.PERCENT) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -364,24 +370,24 @@ export const Strike1: IColDef = {
 
 export const Strike2: IColDef = {
   editable: true,
-  headerName: '行权价2',
-  field: LEG_FIELD.STRIKE2,
+  title: '行权价2',
+  dataIndex: LEG_FIELD.STRIKE2,
   input: record => {
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.USD) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.PERCENT) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.PERCENT) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -400,7 +406,7 @@ export const Strike2: IColDef = {
         {
           message: '必须满足条件(行权价1 < 行权价2)',
           validator(rule, value, callback) {
-            if (!(record[LEG_FIELD.STRIKE1] < value)) {
+            if (!(_.get(record, [LEG_FIELD.STRIKE1, 'value']) < value)) {
               return callback(true);
             }
             callback();
@@ -413,24 +419,24 @@ export const Strike2: IColDef = {
 
 export const Strike3: IColDef = {
   editable: true,
-  headerName: '行权价3',
-  field: LEG_FIELD.STRIKE3,
+  title: '行权价3',
+  dataIndex: LEG_FIELD.STRIKE3,
   input: record => {
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.USD) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.PERCENT) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.PERCENT) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -450,8 +456,9 @@ export const Strike3: IColDef = {
           validator(rule, value, callback) {
             if (
               !(
-                record[LEG_FIELD.STRIKE1] < record[LEG_FIELD.STRIKE2] &&
-                record[LEG_FIELD.STRIKE2] < value
+                _.get(record, [LEG_FIELD.STRIKE1, 'value']) <
+                  _.get(record, [LEG_FIELD.STRIKE2, 'value']) &&
+                _.get(record, [LEG_FIELD.STRIKE2, 'value']) < value
               )
             ) {
               return callback(true);
@@ -467,24 +474,24 @@ export const Strike3: IColDef = {
 
 export const Strike4: IColDef = {
   editable: false,
-  headerName: '行权价4',
-  field: LEG_FIELD.STRIKE4,
+  title: '行权价4',
+  dataIndex: LEG_FIELD.STRIKE4,
   input: record => {
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.USD) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.PERCENT) {
+    if (_.get(record, [LEG_FIELD.STRIKE_TYPE, 'value']) === STRIKE_TYPES_MAP.PERCENT) {
       return {
         depends: [LEG_FIELD.STRIKE_TYPE],
         value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -499,11 +506,11 @@ export const Strike4: IColDef = {
   rules: RULES_REQUIRED,
   getValue: {
     value(record) {
-      const participationRate1 = record[LEG_FIELD.PARTICIPATION_RATE1];
-      const participationRate2 = record[LEG_FIELD.PARTICIPATION_RATE2];
-      const strike1 = record[LEG_FIELD.STRIKE1];
-      const strike2 = record[LEG_FIELD.STRIKE2];
-      const strike3 = record[LEG_FIELD.STRIKE3];
+      const participationRate1 = _.get(record, [LEG_FIELD.PARTICIPATION_RATE1, 'value']);
+      const participationRate2 = _.get(record, [LEG_FIELD.PARTICIPATION_RATE2, 'value']);
+      const strike1 = _.get(record, [LEG_FIELD.STRIKE1, 'value']);
+      const strike2 = _.get(record, [LEG_FIELD.STRIKE2, 'value']);
+      const strike3 = _.get(record, [LEG_FIELD.STRIKE3, 'value']);
 
       if (participationRate1 && participationRate2 && strike1 && strike2 && strike3) {
         return new BigNumber(participationRate1)
@@ -527,8 +534,8 @@ export const Strike4: IColDef = {
 
 export const ExpirationDate: IColDef = {
   editable: true,
-  headerName: '到期日',
-  field: LEG_FIELD.EXPIRATION_DATE,
+  title: '到期日',
+  dataIndex: LEG_FIELD.EXPIRATION_DATE,
   input: {
     type: 'date',
     defaultOpen: true,
@@ -537,32 +544,32 @@ export const ExpirationDate: IColDef = {
   getValue: {
     depends: [LEG_FIELD.TERM, LEG_FIELD.EFFECTIVE_DATE],
     value: record => {
-      const effectiveDate = record[LEG_FIELD.EFFECTIVE_DATE];
-      const term = record[LEG_FIELD.TERM];
-      if (record[LEG_FIELD.TERM] !== undefined && effectiveDate !== undefined) {
+      const effectiveDate = _.get(record, [LEG_FIELD.EFFECTIVE_DATE, 'value']);
+      const term = _.get(record, [LEG_FIELD.TERM, 'value']);
+      if (_.get(record, [LEG_FIELD.TERM, 'value']) !== undefined && effectiveDate !== undefined) {
         return getMoment(effectiveDate, true).add(term, 'days');
       }
-      return record[LEG_FIELD.EXPIRATION_DATE];
+      return _.get(record, [LEG_FIELD.EXPIRATION_DATE, 'value']);
     },
   },
 };
 
 export const ExpirationTime: IColDef = {
   editable: true,
-  headerName: '到期时间',
-  field: 'expirationTime',
+  title: '到期时间',
+  dataIndex: 'expirationTime',
   // @todo input 增加依赖关系
   input: record => {
     if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.VANILLA_EUROPEAN_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.VANILLA_AMERICAN_ANNUAL
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.VANILLA_EUROPEAN_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.VANILLA_AMERICAN_ANNUAL
     ) {
       return {
         type: 'time',
         defaultOpen: true,
         exisable: !(
-          record[LEG_FIELD.SPECIFIED_PRICE] === SPECIFIED_PRICE_MAP.CLOSE ||
-          record[LEG_FIELD.SPECIFIED_PRICE] === SPECIFIED_PRICE_MAP.TWAP
+          _.get(record, [LEG_FIELD.SPECIFIED_PRICE, 'value']) === SPECIFIED_PRICE_MAP.CLOSE ||
+          _.get(record, [LEG_FIELD.SPECIFIED_PRICE, 'value']) === SPECIFIED_PRICE_MAP.TWAP
         ),
       };
     }
@@ -577,8 +584,8 @@ export const ExpirationTime: IColDef = {
 
 export const NumTradeDays: IColDef = {
   editable: true,
-  headerName: '期限(交易日)',
-  field: 'numTradeDays',
+  title: '期限(交易日)',
+  dataIndex: 'numTradeDays',
   input: {
     type: 'date',
     defaultOpen: true,
@@ -588,14 +595,14 @@ export const NumTradeDays: IColDef = {
 };
 
 export const UnderlyerMultiplier: IColDef = {
-  headerName: '合约乘数',
-  field: LEG_FIELD.UNDERLYER_MULTIPLIER,
+  title: '合约乘数',
+  dataIndex: LEG_FIELD.UNDERLYER_MULTIPLIER,
   input: INPUT_NUMBER_DIGITAL_CONFIG,
   getValue: {
     depends: [LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
     value: record => {
       return mktInstrumentInfo({
-        instrumentId: record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
+        instrumentId: _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']),
       }).then(rsp => {
         if (rsp.error || undefined === rsp.data.instrumentInfo.multiplier) return 1;
         return new BigNumber(rsp.data.instrumentInfo.multiplier)
@@ -608,32 +615,32 @@ export const UnderlyerMultiplier: IColDef = {
 };
 
 export const Premium: IColDef = {
-  editable: params => {
-    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL) {
+  editable: record => {
+    if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL) {
       return false;
     }
     return true;
   },
-  headerName: '实际期权费',
-  field: LEG_FIELD.PREMIUM,
+  title: '实际期权费',
+  dataIndex: LEG_FIELD.PREMIUM,
   input: record => {
     if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
-      if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY) {
+      if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.CNY) {
         return {
           depends: [LEG_FIELD.PREMIUM_TYPE],
           value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         };
       }
-      if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.USD) {
+      if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.USD) {
         return {
           depends: [LEG_FIELD.PREMIUM_TYPE],
           value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
         };
       }
-      if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT) {
+      if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.PERCENT) {
         return {
           depends: [LEG_FIELD.PREMIUM_TYPE],
           value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -641,7 +648,7 @@ export const Premium: IColDef = {
       }
     }
 
-    if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PREMIUM_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -658,8 +665,8 @@ export const Premium: IColDef = {
 
 export const Direction: IColDef = {
   editable: true,
-  headerName: '买卖方向',
-  field: LEG_FIELD.DIRECTION,
+  title: '买卖方向',
+  dataIndex: LEG_FIELD.DIRECTION,
   input: {
     type: 'select',
     defaultOpen: true,
@@ -679,17 +686,17 @@ export const Direction: IColDef = {
 
 export const Barrier: IColDef = {
   editable: true,
-  headerName: '障碍价',
-  field: LEG_FIELD.BARRIER,
+  title: '障碍价',
+  dataIndex: LEG_FIELD.BARRIER,
   input: record => {
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.BARRIER_TYPE, 'value']) === UNIT_ENUM_MAP.CNY) {
       return {
         depends: [LEG_FIELD.BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.BARRIER_TYPE, 'value']) === UNIT_ENUM_MAP.USD) {
       return {
         depends: [LEG_FIELD.BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
@@ -706,8 +713,8 @@ export const Barrier: IColDef = {
 
 export const UpBarrierType: IColDef = {
   editable: true,
-  headerName: '敲出障碍价类型',
-  field: LEG_FIELD.UP_BARRIER_TYPE,
+  title: '敲出障碍价类型',
+  dataIndex: LEG_FIELD.UP_BARRIER_TYPE,
   input: {
     type: 'select',
     options: UP_BARRIER_TYPE_OPTIONS,
@@ -717,8 +724,8 @@ export const UpBarrierType: IColDef = {
 
 export const DownBarrierType: IColDef = {
   editable: true,
-  headerName: '敲入障碍价类型',
-  field: LEG_FIELD.DOWN_BARRIER_TYPE,
+  title: '敲入障碍价类型',
+  dataIndex: LEG_FIELD.DOWN_BARRIER_TYPE,
   input: {
     type: 'select',
     options: UNIT_ENUM_OPTIONS2,
@@ -729,8 +736,8 @@ export const DownBarrierType: IColDef = {
 
 export const DownBarrierOptionsStrikeType: IColDef = {
   editable: true,
-  headerName: '敲入期权行权价类型',
-  field: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE,
+  title: '敲入期权行权价类型',
+  dataIndex: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE,
   input: {
     type: 'select',
     options: UNIT_ENUM_OPTIONS2,
@@ -740,10 +747,12 @@ export const DownBarrierOptionsStrikeType: IColDef = {
 
 export const DownBarrierOptionsStrike: IColDef = {
   editable: true,
-  headerName: '敲入期权行权价',
-  field: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE,
+  title: '敲入期权行权价',
+  dataIndex: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE,
   input: record => {
-    if (record[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_MAP2.CNY) {
+    if (
+      _.get(record, [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE, 'value']) === UNIT_ENUM_MAP2.CNY
+    ) {
       return {
         depends: [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -760,8 +769,8 @@ export const DownBarrierOptionsStrike: IColDef = {
 
 export const DownBarrierOptionsType: IColDef = {
   editable: true,
-  headerName: '敲入期权类型',
-  field: LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE,
+  title: '敲入期权类型',
+  dataIndex: LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE,
   input: {
     type: 'select',
     options: OPTION_TYPE_OPTIONS,
@@ -771,17 +780,17 @@ export const DownBarrierOptionsType: IColDef = {
 
 export const UpBarrier: IColDef = {
   editable: true,
-  headerName: '敲出障碍价',
-  field: LEG_FIELD.UP_BARRIER,
+  title: '敲出障碍价',
+  dataIndex: LEG_FIELD.UP_BARRIER,
   input: record => {
-    if (record[LEG_FIELD.UP_BARRIER_TYPE] === UP_BARRIER_TYPE_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.UP_BARRIER_TYPE, 'value']) === UP_BARRIER_TYPE_MAP.CNY) {
       return {
         depends: [LEG_FIELD.UP_BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    // if (record[LEG_FIELD.UP_BARRIER_TYPE] === UP_BARRIER_TYPE_MAP.PERCENT) {
+    // if (_.get(record, [LEG_FIELD.UP_BARRIER_TYPE, 'value']) === UP_BARRIER_TYPE_MAP.PERCENT) {
     return {
       depends: [LEG_FIELD.UP_BARRIER_TYPE],
       value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -792,10 +801,10 @@ export const UpBarrier: IColDef = {
 
 export const DownBarrier: IColDef = {
   editable: true,
-  headerName: '敲入障碍价',
-  field: LEG_FIELD.DOWN_BARRIER,
+  title: '敲入障碍价',
+  dataIndex: LEG_FIELD.DOWN_BARRIER,
   input: record => {
-    if (record[LEG_FIELD.DOWN_BARRIER_TYPE] === UNIT_ENUM_MAP2.CNY) {
+    if (_.get(record, [LEG_FIELD.DOWN_BARRIER_TYPE, 'value']) === UNIT_ENUM_MAP2.CNY) {
       return {
         depends: [LEG_FIELD.DOWN_BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -812,30 +821,30 @@ export const DownBarrier: IColDef = {
 
 export const CouponEarnings: IColDef = {
   editable: true,
-  headerName: '收益/coupon(%)',
-  field: LEG_FIELD.COUPON_PAYMENT,
+  title: '收益/coupon(%)',
+  dataIndex: LEG_FIELD.COUPON_PAYMENT,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const Step: IColDef = {
   editable: true,
-  headerName: '逐步调整步长(%)',
-  field: LEG_FIELD.STEP,
+  title: '逐步调整步长(%)',
+  dataIndex: LEG_FIELD.STEP,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
 };
 
 export const Coupon: IColDef = {
   editable: true,
-  headerName: 'coupon障碍',
-  field: LEG_FIELD.COUPON_BARRIER,
+  title: 'coupon障碍',
+  dataIndex: LEG_FIELD.COUPON_BARRIER,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
 };
 
 export const ExpireNoBarrierPremiumType: IColDef = {
   editable: true,
-  headerName: '到期未敲出收益类型',
-  field: LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE,
+  title: '到期未敲出收益类型',
+  dataIndex: LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE,
   input: {
     type: 'select',
     options: EXPIRE_NO_BARRIER_PREMIUM_TYPE_OPTIONS,
@@ -844,18 +853,18 @@ export const ExpireNoBarrierPremiumType: IColDef = {
 
 export const AutoCallStrikeUnit: IColDef = {
   editable: true,
-  exsitable: params => {
+  exsitable: record => {
     return {
       depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       value:
-        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+        _.get(record, [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE, 'value']) ===
           EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.CALL ||
-        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+        _.get(record, [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE, 'value']) ===
           EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT,
     };
   },
-  headerName: '到期未敲出行权价类型',
-  field: LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
+  title: '到期未敲出行权价类型',
+  dataIndex: LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
   input: {
     type: 'select',
     options: UNIT_ENUM_OPTIONS2,
@@ -864,27 +873,27 @@ export const AutoCallStrikeUnit: IColDef = {
 
 export const AutoCallStrike: IColDef = {
   editable: true,
-  exsitable: params => {
+  exsitable: record => {
     return {
       depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       value:
-        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+        _.get(record, [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE, 'value']) ===
           EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.CALL ||
-        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+        _.get(record, [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE, 'value']) ===
           EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT,
     };
   },
-  headerName: '到期未敲出行权价格',
-  field: LEG_FIELD.AUTO_CALL_STRIKE,
+  title: '到期未敲出行权价格',
+  dataIndex: LEG_FIELD.AUTO_CALL_STRIKE,
   input: record => {
-    if (record[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_MAP2.CNY) {
+    if (_.get(record, [LEG_FIELD.AUTO_CALL_STRIKE_UNIT, 'value']) === UNIT_ENUM_MAP2.CNY) {
       return {
         depends: [LEG_FIELD.AUTO_CALL_STRIKE_UNIT],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    // if (record[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] === UNIT_ENUM_OPTIONS2.PERCENT) {
+    // if (_.get(record, [LEG_FIELD.AUTO_CALL_STRIKE_UNIT, 'value']) === UNIT_ENUM_OPTIONS2.PERCENT) {
     return {
       depends: [LEG_FIELD.AUTO_CALL_STRIKE_UNIT],
       value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -895,23 +904,23 @@ export const AutoCallStrike: IColDef = {
 
 export const ExpireNoBarrierPremium: IColDef = {
   editable: true,
-  exsitable: params => {
+  exsitable: record => {
     return {
       depends: [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       value:
-        params.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+        _.get(record, [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE, 'value']) ===
         EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
     };
   },
-  headerName: '到期未敲出固定收益',
-  field: LEG_FIELD.EXPIRE_NOBARRIERPREMIUM,
+  title: '到期未敲出固定收益',
+  dataIndex: LEG_FIELD.EXPIRE_NOBARRIERPREMIUM,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
 };
 
 export const ExpireNoBarrierObserveDay: IColDef = {
   editable: true,
-  headerName: '敲出/coupon观察日',
-  field: LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
+  title: '敲出/coupon观察日',
+  dataIndex: LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
   input: record => {
     return {
       type: ObserveModalInput,
@@ -924,8 +933,8 @@ export const ExpireNoBarrierObserveDay: IColDef = {
 
 export const InExpireNoBarrierObserveDay: IColDef = {
   editable: true,
-  headerName: '敲入观察日',
-  field: LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY,
+  title: '敲入观察日',
+  dataIndex: LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY,
   input: record => {
     return {
       type: ObserveModalInput,
@@ -938,17 +947,17 @@ export const InExpireNoBarrierObserveDay: IColDef = {
 
 export const LowBarrier: IColDef = {
   editable: true,
-  headerName: '低障碍价',
-  field: LEG_FIELD.LOW_BARRIER,
+  title: '低障碍价',
+  dataIndex: LEG_FIELD.LOW_BARRIER,
   input: record => {
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.BARRIER_TYPE, 'value']) === UNIT_ENUM_MAP.CNY) {
       return {
         depends: [LEG_FIELD.BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.BARRIER_TYPE, 'value']) === UNIT_ENUM_MAP.USD) {
       return {
         depends: [LEG_FIELD.BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
@@ -965,17 +974,17 @@ export const LowBarrier: IColDef = {
 
 export const HighBarrier: IColDef = {
   editable: true,
-  headerName: '高障碍价',
-  field: LEG_FIELD.HIGH_BARRIER,
+  title: '高障碍价',
+  dataIndex: LEG_FIELD.HIGH_BARRIER,
   input: record => {
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.BARRIER_TYPE, 'value']) === UNIT_ENUM_MAP.CNY) {
       return {
         depends: [LEG_FIELD.BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       };
     }
 
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.BARRIER_TYPE, 'value']) === UNIT_ENUM_MAP.USD) {
       return {
         depends: [LEG_FIELD.BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
@@ -991,19 +1000,19 @@ export const HighBarrier: IColDef = {
 };
 
 export const ObservationType: IColDef = {
-  editable: params => {
+  editable: record => {
     if (
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL_AMERICAN_ANNUAL ||
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL_AMERICAN_UNANNUAL ||
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL ||
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL_AMERICAN_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL_AMERICAN_UNANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL
     ) {
       return false;
     }
     return true;
   },
-  headerName: '障碍观察类型',
-  field: LEG_FIELD.OBSERVATION_TYPE,
+  title: '障碍观察类型',
+  dataIndex: LEG_FIELD.OBSERVATION_TYPE,
   input: {
     type: 'select',
     defaultOpen: true,
@@ -1014,8 +1023,8 @@ export const ObservationType: IColDef = {
 
 export const BarrierType: IColDef = {
   editable: true,
-  headerName: '障碍类型',
-  field: LEG_FIELD.BARRIER_TYPE,
+  title: '障碍类型',
+  dataIndex: LEG_FIELD.BARRIER_TYPE,
   input: {
     type: 'select',
     defaultOpen: true,
@@ -1025,16 +1034,16 @@ export const BarrierType: IColDef = {
 };
 
 export const RebateLow: IColDef = {
-  headerName: '低敲出补偿(¥)',
+  title: '低敲出补偿(¥)',
   editable: true,
-  field: 'rebateLow',
+  dataIndex: 'rebateLow',
   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const ObservationStep: IColDef = {
-  headerName: '观察频率',
-  field: LEG_FIELD.OBSERVATION_STEP,
+  title: '观察频率',
+  dataIndex: LEG_FIELD.OBSERVATION_STEP,
   editable: true,
   input: {
     type: 'select',
@@ -1045,8 +1054,8 @@ export const ObservationStep: IColDef = {
 };
 
 export const UpObservationStep: IColDef = {
-  headerName: '敲出观察频率',
-  field: LEG_FIELD.UP_OBSERVATION_STEP,
+  title: '敲出观察频率',
+  dataIndex: LEG_FIELD.UP_OBSERVATION_STEP,
   editable: true,
   input: {
     type: 'select',
@@ -1057,8 +1066,8 @@ export const UpObservationStep: IColDef = {
 };
 
 export const DownObservationStep: IColDef = {
-  headerName: '敲入观察频率',
-  field: LEG_FIELD.DOWN_OBSERVATION_STEP,
+  title: '敲入观察频率',
+  dataIndex: LEG_FIELD.DOWN_OBSERVATION_STEP,
   editable: true,
   input: {
     type: 'select',
@@ -1069,8 +1078,8 @@ export const DownObservationStep: IColDef = {
 };
 
 export const AlreadyBarrier: IColDef = {
-  headerName: '已经敲入',
-  field: LEG_FIELD.ALREADY_BARRIER,
+  title: '已经敲入',
+  dataIndex: LEG_FIELD.ALREADY_BARRIER,
   editable: true,
   input: {
     type: 'checkbox',
@@ -1079,13 +1088,13 @@ export const AlreadyBarrier: IColDef = {
 };
 
 export const DownBarrierDate: IColDef = {
-  headerName: '敲入日期',
-  field: LEG_FIELD.DOWN_BARRIER_DATE,
+  title: '敲入日期',
+  dataIndex: LEG_FIELD.DOWN_BARRIER_DATE,
   editable: true,
-  exsitable: params => {
+  exsitable: record => {
     return {
       depends: [LEG_FIELD.ALREADY_BARRIER],
-      value: !!params.data[LEG_FIELD.ALREADY_BARRIER],
+      value: !!_.get(record, [LEG_FIELD.ALREADY_BARRIER, 'value']),
     };
   },
   input: {
@@ -1094,8 +1103,8 @@ export const DownBarrierDate: IColDef = {
 };
 
 export const ObserveStartDay: IColDef = {
-  headerName: '观察起始日',
-  field: LEG_FIELD.OBSERVE_START_DAY,
+  title: '观察起始日',
+  dataIndex: LEG_FIELD.OBSERVE_START_DAY,
   editable: true,
   input: {
     type: 'date',
@@ -1106,18 +1115,18 @@ export const ObserveStartDay: IColDef = {
   getValue: {
     depends: [LEG_FIELD.EFFECTIVE_DATE],
     value: record => {
-      if (record[LEG_FIELD.EFFECTIVE_DATE] !== undefined) {
-        return record[LEG_FIELD.EFFECTIVE_DATE];
+      if (_.get(record, [LEG_FIELD.EFFECTIVE_DATE, 'value']) !== undefined) {
+        return _.get(record, [LEG_FIELD.EFFECTIVE_DATE, 'value']);
       }
 
-      return record[LEG_FIELD.OBSERVE_START_DAY];
+      return _.get(record, [LEG_FIELD.OBSERVE_START_DAY, 'value']);
     },
   },
 };
 
 export const ObserveEndDay: IColDef = {
-  headerName: '观察终止日',
-  field: LEG_FIELD.OBSERVE_END_DAY,
+  title: '观察终止日',
+  dataIndex: LEG_FIELD.OBSERVE_END_DAY,
   editable: true,
   input: {
     type: 'date',
@@ -1128,18 +1137,18 @@ export const ObserveEndDay: IColDef = {
   getValue: {
     depends: [LEG_FIELD.EXPIRATION_DATE],
     value: record => {
-      if (record[LEG_FIELD.EXPIRATION_DATE] !== undefined) {
-        return record[LEG_FIELD.EXPIRATION_DATE];
+      if (_.get(record, [LEG_FIELD.EXPIRATION_DATE, 'value']) !== undefined) {
+        return _.get(record, [LEG_FIELD.EXPIRATION_DATE, 'value']);
       }
 
-      return record[LEG_FIELD.OBSERVE_END_DAY];
+      return _.get(record, [LEG_FIELD.OBSERVE_END_DAY, 'value']);
     },
   },
 };
 
 export const Holidays: IColDef = {
-  headerName: '交易日历',
-  field: 'holidays',
+  title: '交易日历',
+  dataIndex: 'holidays',
   editable: true,
   input: {
     mode: 'multiple',
@@ -1174,9 +1183,9 @@ export const Holidays: IColDef = {
 };
 
 export const ObservationDates: IColDef = {
-  headerName: '观察日',
+  title: '观察日',
   editable: true,
-  field: LEG_FIELD.OBSERVATION_DATES,
+  dataIndex: LEG_FIELD.OBSERVATION_DATES,
   input: record => ({
     type: ObserveModalInput,
     record,
@@ -1185,9 +1194,9 @@ export const ObservationDates: IColDef = {
 };
 
 export const PositionId: IColDef = {
-  headerName: '持仓编号',
+  title: '持仓编号',
   editable: true,
-  field: 'positionId',
+  dataIndex: 'positionId',
   input: {
     type: 'input',
   },
@@ -1195,9 +1204,9 @@ export const PositionId: IColDef = {
 };
 
 export const Quantity: IColDef = {
-  headerName: '交易数量',
+  title: '交易数量',
   editable: true,
-  field: 'quantity',
+  dataIndex: 'quantity',
   input: {
     type: 'number',
   },
@@ -1232,9 +1241,9 @@ export const AssetClassOptions = [
 ];
 
 export const AssetClass: IColDef = {
-  headerName: '标的物类型',
+  title: '标的物类型',
   editable: true,
-  field: 'assetClass',
+  dataIndex: 'assetClass',
   input: {
     type: 'select',
     defaultOpen: true,
@@ -1244,9 +1253,9 @@ export const AssetClass: IColDef = {
 };
 
 export const EffectiveDate: IColDef = {
-  headerName: '起始日',
+  title: '起始日',
   editable: true,
-  field: LEG_FIELD.EFFECTIVE_DATE,
+  dataIndex: LEG_FIELD.EFFECTIVE_DATE,
   input: {
     type: 'date',
     defaultOpen: true,
@@ -1256,9 +1265,9 @@ export const EffectiveDate: IColDef = {
 };
 
 export const PremiumPaymentDate: IColDef = {
-  headerName: '期权费支付日',
+  title: '期权费支付日',
   editable: true,
-  field: 'premiumPaymentDate',
+  dataIndex: 'premiumPaymentDate',
   input: {
     type: 'date',
     defaultOpen: true,
@@ -1268,15 +1277,15 @@ export const PremiumPaymentDate: IColDef = {
 };
 
 export const StrikeType: IColDef = {
-  headerName: '行权价类型',
+  title: '行权价类型',
   editable: true,
-  field: LEG_FIELD.STRIKE_TYPE,
+  dataIndex: LEG_FIELD.STRIKE_TYPE,
   input: record => {
     if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.EAGLE_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.EAGLE_UNANNUAL
     ) {
       return {
         defaultOpen: true,
@@ -1317,14 +1326,14 @@ export const StrikeType: IColDef = {
 };
 
 export const SpecifiedPrice: IColDef = {
-  headerName: '结算方式',
+  title: '结算方式',
   editable: true,
-  field: LEG_FIELD.SPECIFIED_PRICE,
+  dataIndex: LEG_FIELD.SPECIFIED_PRICE,
   input: record => {
     if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.AUTOCALL_ANNUAL
     ) {
       return {
         defaultOpen: true,
@@ -1380,17 +1389,17 @@ export const SpecifiedPrice: IColDef = {
 };
 
 export const Term: IColDef = {
-  headerName: '期限',
+  title: '期限',
   editable: true,
-  field: LEG_FIELD.TERM,
+  dataIndex: LEG_FIELD.TERM,
   input: INPUT_NUMBER_DAYS_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const IsAnnualized: IColDef = {
-  headerName: '是否年化',
+  title: '是否年化',
   editable: true,
-  field: 'isAnnualized',
+  dataIndex: 'isAnnualized',
   input: {
     type: 'checkbox',
     emptyFormatWhenNullValue: true,
@@ -1399,9 +1408,9 @@ export const IsAnnualized: IColDef = {
 };
 
 export const DaysInYear: IColDef = {
-  headerName: '年度计息天数',
+  title: '年度计息天数',
   editable: true,
-  field: LEG_FIELD.DAYS_IN_YEAR,
+  dataIndex: LEG_FIELD.DAYS_IN_YEAR,
   input: {
     type: 'number',
   },
@@ -1410,10 +1419,10 @@ export const DaysInYear: IColDef = {
 
 export const NotionalAmount: IColDef = {
   editable: true,
-  headerName: '名义本金',
-  field: LEG_FIELD.NOTIONAL_AMOUNT,
+  title: '名义本金',
+  dataIndex: LEG_FIELD.NOTIONAL_AMOUNT,
   input: record => {
-    if (record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.NOTIONAL_AMOUNT_TYPE, 'value']) === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
       return {
         depends: [LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1428,14 +1437,14 @@ export const NotionalAmount: IColDef = {
 };
 
 export const NotionalAmountType: IColDef = {
-  editable: params => {
-    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
+  editable: record => {
+    if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
       return false;
     }
     return true;
   },
-  headerName: '名义本金类型',
-  field: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
+  title: '名义本金类型',
+  dataIndex: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   input: {
     defaultOpen: true,
     type: 'select',
@@ -1452,7 +1461,7 @@ export const NotionalAmountType: IColDef = {
   },
   rules: RULES_REQUIRED,
   getValue: params => {
-    if (params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
+    if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
       return {
         depends: [],
         value(data) {
@@ -1463,7 +1472,7 @@ export const NotionalAmountType: IColDef = {
     return {
       depends: [LEG_FIELD.PREMIUM_TYPE],
       value(record) {
-        if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT) {
+        if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.PERCENT) {
           return NOTIONAL_AMOUNT_TYPE_MAP.CNY;
         }
         return NOTIONAL_AMOUNT_TYPE_MAP.LOT;
@@ -1474,12 +1483,12 @@ export const NotionalAmountType: IColDef = {
 
 export const PremiumType: IColDef = {
   editable: true,
-  headerName: '权利金类型',
-  field: LEG_FIELD.PREMIUM_TYPE,
+  title: '权利金类型',
+  dataIndex: LEG_FIELD.PREMIUM_TYPE,
   input: record => {
     if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD], 'value') === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
         defaultOpen: true,
@@ -1508,10 +1517,10 @@ export const PremiumType: IColDef = {
 export const FrontPremium: IColDef = {
   editable: true,
   // 权利金总和
-  headerName: '合约期权费',
-  field: LEG_FIELD.FRONT_PREMIUM,
+  title: '合约期权费',
+  dataIndex: LEG_FIELD.FRONT_PREMIUM,
   input: record => {
-    if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PREMIUM_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1527,11 +1536,14 @@ export const FrontPremium: IColDef = {
   getValue: {
     depends: [LEG_FIELD.PREMIUM, LEG_FIELD.MINIMUM_PREMIUM],
     value: record => {
-      if (record[LEG_FIELD.PREMIUM] === undefined && record[LEG_FIELD.MINIMUM_PREMIUM]) {
+      if (
+        _.get(record, [LEG_FIELD.PREMIUM, 'value']) === undefined &&
+        _.get(record, [LEG_FIELD.MINIMUM_PREMIUM, 'value'])
+      ) {
         return undefined;
       }
-      return new BigNumber(record[LEG_FIELD.PREMIUM] || 0)
-        .plus(record[LEG_FIELD.MINIMUM_PREMIUM] || 0)
+      return new BigNumber(_.get(record, [LEG_FIELD.PREMIUM, 'value']) || 0)
+        .plus(_.get(record, [LEG_FIELD.MINIMUM_PREMIUM, 'value']) || 0)
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
         .toNumber();
     },
@@ -1540,10 +1552,10 @@ export const FrontPremium: IColDef = {
 
 export const MinimumPremium: IColDef = {
   editable: true,
-  headerName: '保底收益',
-  field: LEG_FIELD.MINIMUM_PREMIUM,
+  title: '保底收益',
+  dataIndex: LEG_FIELD.MINIMUM_PREMIUM,
   input: record => {
-    if (record[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PREMIUM_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1560,8 +1572,8 @@ export const MinimumPremium: IColDef = {
 
 export const CounterpartyCode: IColDef = {
   editable: true,
-  headerName: '对手方',
-  field: 'counterpartyCode',
+  title: '对手方',
+  dataIndex: 'counterpartyCode',
   input: {
     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   },
@@ -1570,8 +1582,8 @@ export const CounterpartyCode: IColDef = {
 
 export const PaymentType: IColDef = {
   editable: true,
-  headerName: '行权支付类型',
-  field: LEG_FIELD.PAYMENT_TYPE,
+  title: '行权支付类型',
+  dataIndex: LEG_FIELD.PAYMENT_TYPE,
   input: {
     defaultOpen: true,
     type: 'select',
@@ -1591,10 +1603,10 @@ export const PaymentType: IColDef = {
 
 export const Payment: IColDef = {
   editable: true,
-  headerName: '行权收益',
-  field: LEG_FIELD.PAYMENT,
+  title: '行权收益',
+  dataIndex: LEG_FIELD.PAYMENT,
   input: record => {
-    if (record[LEG_FIELD.PAYMENT_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PAYMENT_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PAYMENT_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1611,10 +1623,10 @@ export const Payment: IColDef = {
 
 export const Payment1: IColDef = {
   editable: true,
-  headerName: '行权收益1',
-  field: LEG_FIELD.PAYMENT1,
+  title: '行权收益1',
+  dataIndex: LEG_FIELD.PAYMENT1,
   input: record => {
-    if (record[LEG_FIELD.PAYMENT_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PAYMENT_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PAYMENT_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1631,10 +1643,10 @@ export const Payment1: IColDef = {
 
 export const Payment2: IColDef = {
   editable: true,
-  headerName: '行权收益2',
-  field: LEG_FIELD.PAYMENT2,
+  title: '行权收益2',
+  dataIndex: LEG_FIELD.PAYMENT2,
   input: record => {
-    if (record[LEG_FIELD.PAYMENT_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PAYMENT_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PAYMENT_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1647,14 +1659,14 @@ export const Payment2: IColDef = {
     };
   },
   rules: record => {
-    return record[LEG_FIELD.OPTION_TYPE] === 'CALL'
+    return _.get(record, [LEG_FIELD.OPTION_TYPE, 'value']) === 'CALL'
       ? {
           depends: [LEG_FIELD.PAYMENT1],
           value: ([
             {
               message: '必须满足条件(行权收益1<行权收益2)',
               validator(rule, value, callback) {
-                if (!(record[LEG_FIELD.PAYMENT1] < value)) {
+                if (!(_.get(record, [LEG_FIELD.PAYMENT1, 'value']) < value)) {
                   return callback(true);
                 }
                 callback();
@@ -1668,7 +1680,7 @@ export const Payment2: IColDef = {
             {
               message: '必须满足条件(行权收益1>行权收益2)',
               validator(rule, value, callback) {
-                if (!(record[LEG_FIELD.PAYMENT1] > value)) {
+                if (!(_.get(record, [LEG_FIELD.PAYMENT1, 'value']) > value)) {
                   return callback(true);
                 }
                 callback();
@@ -1681,10 +1693,10 @@ export const Payment2: IColDef = {
 
 export const Payment3: IColDef = {
   editable: true,
-  headerName: '行权收益3',
-  field: LEG_FIELD.PAYMENT3,
+  title: '行权收益3',
+  dataIndex: LEG_FIELD.PAYMENT3,
   input: record => {
-    if (record[LEG_FIELD.PAYMENT_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PAYMENT_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PAYMENT_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1697,7 +1709,7 @@ export const Payment3: IColDef = {
     };
   },
   rules: record => {
-    return record[LEG_FIELD.OPTION_TYPE] === 'CALL'
+    return _.get(record, [LEG_FIELD.OPTION_TYPE, 'value']) === 'CALL'
       ? {
           depends: [LEG_FIELD.PAYMENT1, LEG_FIELD.PAYMENT2],
           value: ([
@@ -1706,8 +1718,9 @@ export const Payment3: IColDef = {
               validator(rule, value, callback) {
                 if (
                   !(
-                    record[LEG_FIELD.PAYMENT1] < record[LEG_FIELD.PAYMENT2] &&
-                    record[LEG_FIELD.PAYMENT2] < value
+                    _.get(record, [LEG_FIELD.PAYMENT1, 'value']) <
+                      _.get(record, [LEG_FIELD.PAYMENT2, 'value']) &&
+                    _.get(record, [LEG_FIELD.PAYMENT2, 'value']) < value
                   )
                 ) {
                   return callback(true);
@@ -1725,8 +1738,9 @@ export const Payment3: IColDef = {
               validator(rule, value, callback) {
                 if (
                   !(
-                    record[LEG_FIELD.PAYMENT1] > record[LEG_FIELD.PAYMENT2] &&
-                    record[LEG_FIELD.PAYMENT2] > value
+                    _.get(record, [LEG_FIELD.PAYMENT1, 'value']) >
+                      _.get(record, [LEG_FIELD.PAYMENT2, 'value']) &&
+                    _.get(record, [LEG_FIELD.PAYMENT2, 'value']) > value
                   )
                 ) {
                   return callback(true);
@@ -1741,10 +1755,10 @@ export const Payment3: IColDef = {
 
 export const LowPayment: IColDef = {
   editable: true,
-  headerName: '低行权收益',
-  field: LEG_FIELD.LOW_PAYMENT,
+  title: '低行权收益',
+  dataIndex: LEG_FIELD.LOW_PAYMENT,
   input: record => {
-    if (record[LEG_FIELD.PAYMENT_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PAYMENT_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PAYMENT_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1761,10 +1775,10 @@ export const LowPayment: IColDef = {
 
 export const HighPayment: IColDef = {
   editable: true,
-  headerName: '高行权收益',
-  field: LEG_FIELD.HIGH_PAYMENT,
+  title: '高行权收益',
+  dataIndex: LEG_FIELD.HIGH_PAYMENT,
   input: record => {
-    if (record[LEG_FIELD.PAYMENT_TYPE] === STRIKE_TYPES_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.PAYMENT_TYPE, 'value']) === STRIKE_TYPES_MAP.CNY) {
       return {
         depends: [LEG_FIELD.PAYMENT_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -1780,17 +1794,17 @@ export const HighPayment: IColDef = {
 };
 
 export const KnockDirection: IColDef = {
-  editable: params => {
+  editable: record => {
     if (
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return false;
     }
     return true;
   },
-  headerName: '敲出方向',
-  field: LEG_FIELD.KNOCK_DIRECTION,
+  title: '敲出方向',
+  dataIndex: LEG_FIELD.KNOCK_DIRECTION,
   input: {
     type: 'select',
     defaultOpen: true,
@@ -1799,8 +1813,8 @@ export const KnockDirection: IColDef = {
   rules: RULES_REQUIRED,
   getValue: params => {
     if (
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_ANNUAL ||
+      _.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
         depends: [LEG_FIELD.BARRIER, LEG_FIELD.STRIKE],
@@ -1826,8 +1840,8 @@ export const KnockDirection: IColDef = {
 
 export const RebateUnit: IColDef = {
   editable: true,
-  headerName: '障碍补偿类型',
-  field: LEG_FIELD.REBATE_UNIT,
+  title: '障碍补偿类型',
+  dataIndex: LEG_FIELD.REBATE_UNIT,
   input: {
     type: 'select',
     defaultOpen: true,
@@ -1838,8 +1852,8 @@ export const RebateUnit: IColDef = {
 
 export const PayOffType: IColDef = {
   editable: true,
-  headerName: '收益单位',
-  field: LEG_FIELD.PAY_OFF_TYPE,
+  title: '收益单位',
+  dataIndex: LEG_FIELD.PAY_OFF_TYPE,
   input: {
     type: 'select',
     defaultOpen: true,
@@ -1850,13 +1864,13 @@ export const PayOffType: IColDef = {
 
 export const PayOff: IColDef = {
   editable: true,
-  headerName: '收益',
-  field: LEG_FIELD.PAY_OFF,
+  title: '收益',
+  dataIndex: LEG_FIELD.PAY_OFF,
   input: record => {
-    if (record[LEG_FIELD.REBATE_UNIT] === UNIT_ENUM_MAP.CNY) {
+    if (_.get(record, [LEG_FIELD.REBATE_UNIT, 'value']) === UNIT_ENUM_MAP.CNY) {
       return INPUT_NUMBER_CURRENCY_CNY_CONFIG;
     }
-    if (record[LEG_FIELD.REBATE_UNIT] === UNIT_ENUM_MAP.USD) {
+    if (_.get(record, [LEG_FIELD.REBATE_UNIT, 'value']) === UNIT_ENUM_MAP.USD) {
       return INPUT_NUMBER_CURRENCY_USD_CONFIG;
     }
     return INPUT_NUMBER_PERCENTAGE_CONFIG;
@@ -1866,8 +1880,8 @@ export const PayOff: IColDef = {
 
 export const RebateType: IColDef = {
   editable: true,
-  headerName: '补偿支付方式',
-  field: LEG_FIELD.REBATE_TYPE,
+  title: '补偿支付方式',
+  dataIndex: LEG_FIELD.REBATE_TYPE,
   input: {
     type: 'select',
     defaultOpen: true,
@@ -1877,24 +1891,24 @@ export const RebateType: IColDef = {
 };
 
 export const Rebate: IColDef = {
-  headerName: '敲出补偿',
-  field: LEG_FIELD.REBATE,
+  title: '敲出补偿',
+  dataIndex: LEG_FIELD.REBATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const LowRebate: IColDef = {
-  headerName: '低敲出补偿价',
-  field: LEG_FIELD.LOW_REBATE,
+  title: '低敲出补偿价',
+  dataIndex: LEG_FIELD.LOW_REBATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
 };
 
 export const HighRebate: IColDef = {
-  headerName: '高敲出补偿价',
-  field: LEG_FIELD.HIGH_REBATE,
+  title: '高敲出补偿价',
+  dataIndex: LEG_FIELD.HIGH_REBATE,
   editable: true,
   input: INPUT_NUMBER_PERCENTAGE_CONFIG,
   rules: RULES_REQUIRED,
@@ -1902,25 +1916,27 @@ export const HighRebate: IColDef = {
 
 export const PricingTerm = {
   ...Term,
-  editable: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
+  editable: record => {
+    if (_.get(record, [LEG_ANNUALIZED_FIELD, 'value'])) {
       return true;
     }
     return false;
   },
   getValue: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
+    if (_.get(record, [LEG_ANNUALIZED_FIELD, 'value'])) {
       return {
         depends: [],
         value(record) {
-          return record[Term.field];
+          return _.get(record, [Term.field, 'value']);
         },
       };
     }
     return {
       depends: [LEG_FIELD.EXPIRATION_DATE],
       value(record) {
-        return moment(record[LEG_FIELD.EXPIRATION_DATE]).diff(moment(), 'days') + 1;
+        return (
+          moment(_.get(record, [LEG_FIELD.EXPIRATION_DATE, 'value'])).diff(moment(), 'days') + 1
+        );
       },
     };
   },
@@ -1928,25 +1944,25 @@ export const PricingTerm = {
 
 export const PricingExpirationDate = {
   ...ExpirationDate,
-  editable: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
+  editable: record => {
+    if (_.get(record, [LEG_ANNUALIZED_FIELD, 'value'])) {
       return false;
     }
     return true;
   },
   getValue: params => {
-    if (params.data[LEG_ANNUALIZED_FIELD]) {
+    if (_.get(record, [LEG_ANNUALIZED_FIELD, 'value'])) {
       return {
         depends: [LEG_FIELD.TERM],
         value(record) {
-          return moment().add(record[LEG_FIELD.TERM], 'days');
+          return moment().add(_.get(record, [LEG_FIELD.TERM, 'value']), 'days');
         },
       };
     }
     return {
       depends: [],
       value(record) {
-        return record[LEG_FIELD.EXPIRATION_DATE];
+        return _.get(record, [LEG_FIELD.EXPIRATION_DATE, 'value']);
       },
     };
   },

@@ -8,14 +8,17 @@ import {
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
-import { Loading, Table2 } from '@/design/components';
+import { Form2, Loading, Table2 } from '@/design/components';
 import { VERTICAL_GUTTER } from '@/design/components/SourceTable';
+import { ITableData } from '@/design/components/type';
 import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { getLegByRecord } from '@/tools';
 import { ILeg, ILegColDef } from '@/types/leg';
-import { Button, Menu, Row } from 'antd';
+import { Button, Menu, Modal, Row } from 'antd';
 import _ from 'lodash';
 import React, { memo, useState } from 'react';
+import CreateForm from './CreateForm';
 import './index.less';
 
 const TradeManagementBooking = memo(() => {
@@ -45,23 +48,50 @@ const TradeManagementBooking = memo(() => {
     return TOTAL_LEGS.find(item => item.type === type);
   };
 
+  const cellIsEmpty = (record, colDef) => {
+    const legBelongByRecord = getLegByType(record[LEG_TYPE_FIELD]);
+
+    if (
+      (colDef.exsitable && !colDef.exsitable(record)) ||
+      !(
+        legBelongByRecord &&
+        legBelongByRecord
+          .getColumns(LEG_ENV.PRICING)
+          .find(item => item.dataIndex === colDef.dataIndex)
+      )
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const getEmptyRenderLegColumns = (legColDefs: ILegColDef[]) => {
     return legColDefs.map(item => {
       return {
         ...item,
+        editable(record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return false;
+          }
+          if (typeof item.editable === 'function') {
+            return item.editable.apply(this, arguments);
+          }
+          return !!item.editable;
+        },
+        onCell(record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return {
+              style: { backgroundColor: '#e8e8e8' },
+              ...(item.onCell ? item.onCell.apply(this, arguments) : null),
+            };
+          }
+        },
         render(val, record, index, { colDef }) {
-          const legBelongByRecord = getLegByType(record[LEG_TYPE_FIELD]);
-
-          if (
-            legBelongByRecord &&
-            legBelongByRecord
-              .getColumns(LEG_ENV.PRICING)
-              .find(item => item.dataIndex === colDef.dataIndex)
-          ) {
-            return item.render.apply(this, arguments);
+          if (cellIsEmpty(record, colDef)) {
+            return null;
           }
 
-          return 'empty';
+          return item.render.apply(this, arguments);
         },
       };
     });
@@ -79,23 +109,13 @@ const TradeManagementBooking = memo(() => {
     return legColDefs.map(item => {
       return {
         ...item,
-        onCell: () => ({ width: '250px' }),
+        onCell() {
+          return {
+            width: '250px',
+            ...(item.onCell ? item.onCell.apply(this, arguments) : null),
+          };
+        },
       };
-    });
-  };
-
-  const [loadings, setLoadings] = useState({});
-
-  const saveSetLoadings = (colId, rowId, loading) => {
-    setLoadings(pre => {
-      if (pre[colId]) {
-        pre[colId][rowId] = loading;
-      } else {
-        pre[colId] = {
-          [rowId]: loading,
-        };
-      }
-      return pre;
     });
   };
 
@@ -104,9 +124,8 @@ const TradeManagementBooking = memo(() => {
       return {
         ...item,
         render(val, record, index, { colDef }) {
-          const loading = loadings[colDef.dataIndex]
-            ? loadings[colDef.dataIndex][record.id]
-            : false;
+          console.log(val, record);
+          const loading = _.get(record[colDef.dataIndex], 'loading', false);
           return <Loading loading={loading}>{item.render.apply(this, arguments)}</Loading>;
         },
       };
@@ -116,7 +135,7 @@ const TradeManagementBooking = memo(() => {
   const getTitleColumns = (legColDefs: ILegColDef[]) => {
     return [
       {
-        title: '结构名称',
+        title: '结构类型',
         dataIndex: LEG_FIELD.LEG_META,
         render: (val, record) => {
           return LEG_TYPE_ZHCH_MAP[record[LEG_TYPE_FIELD]];
@@ -129,107 +148,175 @@ const TradeManagementBooking = memo(() => {
 
   const [createTradeLoading, setCreateTradeLoading] = useState(false);
 
-  return (
-    <div>
-      <PageHeaderWrapper>
-        <Row style={{ marginBottom: VERTICAL_GUTTER }}>
-          <Button.Group>
-            <MultilLegCreateButton
-              isPricing={false}
-              key="create"
-              handleAddLeg={(leg: ILeg) => {
-                if (!leg) return;
+  // useEffect(
+  //   () => {
+  //     setColumns(pre => pre.map(item => item));
+  //   },
+  //   [loadings]
+  // );
 
-                setColumns(pre =>
-                  getTitleColumns(
-                    getLoadingsColumns(
-                      getWidthColumns(
-                        getEmptyRenderLegColumns(
-                          getOrderLegColumns(
-                            getUnionLegColumns(pre.concat(leg.getColumns(LEG_ENV.BOOKING)))
-                          )
+  const setLoadings = (colId: string, rowId: string, loading: boolean) => {
+    setTableData(pre =>
+      pre.map(record => {
+        if (record[LEG_ID_FIELD] === rowId) {
+          return {
+            ...record,
+            [colId]: {
+              ...record[colId],
+              loading,
+            },
+          };
+        }
+        return record;
+      })
+    );
+  };
+
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+
+  return (
+    <PageHeaderWrapper>
+      <Row style={{ marginBottom: VERTICAL_GUTTER }}>
+        <Button.Group>
+          <MultilLegCreateButton
+            isPricing={false}
+            key="create"
+            handleAddLeg={(leg: ILeg) => {
+              if (!leg) return;
+
+              setColumns(pre => {
+                const next = getTitleColumns(
+                  getLoadingsColumns(
+                    getWidthColumns(
+                      getEmptyRenderLegColumns(
+                        getOrderLegColumns(
+                          getUnionLegColumns(pre.concat(leg.getColumns(LEG_ENV.BOOKING)))
                         )
                       )
                     )
                   )
                 );
+                return next;
+              });
 
-                setTableData(pre => pre.concat(createLegDataSourceItem(leg)));
-              }}
-            />
-            <Button
-              key="完成簿记"
-              type="primary"
-              loading={createTradeLoading}
-              onClick={() => {
-                // setTableData(pre =>
-                //   pre.map(item =>
-                //     _.mapValues(item, val => {
-                //       console.log(val)
-                //       if (typeof val !== 'object') {
-                //         return val;
-                //       }
-                //       return {
-                //         ...val,
-                //         value: '1',
-                //       };
-                //     })
-                //   )
-                // );
+              setTableData(pre =>
+                pre.concat({
+                  ...createLegDataSourceItem(leg),
+                  ...leg.getDefaultData(LEG_ENV.BOOKING),
+                })
+              );
+            }}
+          />
+          <Button
+            key="完成簿记"
+            type="primary"
+            loading={createTradeLoading}
+            onClick={() => {
+              setCreateModalVisible(true);
+              // setTableData(pre =>
+              //   pre.map(item =>
+              //     _.mapValues(item, val => {
+              //       console.log(val);
+              //       if (typeof val !== 'object') {
+              //         return val;
+              //       }
+              //       return {
+              //         ...val,
+              //         value: '1',
+              //       };
+              //     })
+              //   )
+              // );
+            }}
+          >
+            完成簿记
+          </Button>
+        </Button.Group>
+      </Row>
+      <Modal
+        visible={createModalVisible}
+        title="创建簿记"
+        onCancel={() => setCreateModalVisible(false)}
+      >
+        <CreateForm setCreateModalVisible={setCreateModalVisible} />
+      </Modal>
+      <Table2
+        rowKey={LEG_ID_FIELD}
+        onCellFieldsChange={params => {
+          const { record } = params;
+          const leg = getLegByRecord(record);
+
+          setTableData(pre => {
+            const newData = pre.map(item => {
+              if (item[LEG_ID_FIELD] === params.rowId) {
+                return {
+                  ...item,
+                  ...params.changedFields,
+                };
+              }
+              return item;
+            });
+            if (leg.onDataChange) {
+              leg.onDataChange(
+                LEG_ENV.BOOKING,
+                params,
+                newData[params.rowIndex],
+                newData,
+                (colId: string, loading: boolean) => {
+                  setLoadings(colId, params.rowId, loading);
+                },
+                setLoadings,
+                (colId: string, newVal: ITableData) => {
+                  setTableData(pre =>
+                    pre.map(item => {
+                      if (item[LEG_ID_FIELD] === params.rowId) {
+                        return {
+                          ...item,
+                          [colId]: newVal,
+                        };
+                      }
+                      return item;
+                    })
+                  );
+                },
+                setTableData
+              );
+            }
+            return newData;
+          });
+        }}
+        pagination={false}
+        vertical={true}
+        columns={columns}
+        dataSource={tableData}
+        getContextMenu={params => {
+          return (
+            <Menu
+              onClick={event => {
+                if (event.key === 'copy') {
+                  setTableData(pre => {
+                    const next = insert(pre, params.rowIndex, {
+                      ..._.cloneDeep(params.record),
+                      [LEG_ID_FIELD]: uuid(),
+                    });
+                    return next;
+                  });
+                }
+                if (event.key === 'remove') {
+                  setTableData(pre => {
+                    const next = remove(pre, params.rowIndex);
+                    return next;
+                  });
+                }
               }}
             >
-              完成簿记
-            </Button>
-          </Button.Group>
-        </Row>
-        <Table2
-          rowKey={LEG_ID_FIELD}
-          onCellFieldsChange={params => {
-            setTableData(pre =>
-              pre.map(item => {
-                if (item[LEG_ID_FIELD] === params.rowId) {
-                  return {
-                    ...item,
-                    ...params.changedFields,
-                  };
-                }
-                return item;
-              })
-            );
-          }}
-          pagination={false}
-          vertical={true}
-          columns={columns}
-          dataSource={tableData}
-          getContextMenu={params => {
-            return (
-              <Menu
-                onClick={event => {
-                  if (event.key === 'copy') {
-                    setTableData(pre => {
-                      const next = insert(pre, params.rowIndex, {
-                        ..._.cloneDeep(params.record),
-                        [LEG_ID_FIELD]: uuid(),
-                      });
-                      return next;
-                    });
-                  }
-                  if (event.key === 'remove') {
-                    setTableData(pre => {
-                      const next = remove(pre, params.rowIndex);
-                      return next;
-                    });
-                  }
-                }}
-              >
-                <Menu.Item key="copy">复制</Menu.Item>
-                <Menu.Item key="remove">删除</Menu.Item>
-              </Menu>
-            );
-          }}
-        />
-      </PageHeaderWrapper>
-    </div>
+              <Menu.Item key="copy">复制</Menu.Item>
+              <Menu.Item key="remove">删除</Menu.Item>
+            </Menu>
+          );
+        }}
+      />
+    </PageHeaderWrapper>
   );
 });
 

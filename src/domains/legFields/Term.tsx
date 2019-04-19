@@ -8,7 +8,8 @@ import React from 'react';
 export const Term: ILegColDef = {
   title: '期限',
   dataIndex: LEG_FIELD.TERM,
-  editable: record => {
+  editable: true,
+  exsitable: record => {
     if (_.get(record, [LEG_FIELD.IS_ANNUAL, 'value'])) {
       return true;
     }

@@ -69,16 +69,31 @@ export interface IFormColDef<T = any> extends IColDef {
   editable?: boolean;
 }
 
-export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render'> {
+export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render' | 'onCell'> {
   // totalable?: boolean | ((params: { totalData: number; record: object }) => number);
   title?: React.ReactNode;
-  editable?: boolean | ((record: T) => boolean);
+  editable?:
+    | boolean
+    | ((
+        record: T,
+        index: number,
+        params: {
+          colDef: ITableColDef<T>;
+        }
+      ) => boolean);
   render?: (
     value: any,
     record: T,
     index: number,
-    params: IRenderOptions<T, ITableColDef>
+    params: IRenderOptions<T, ITableColDef<T>>
   ) => React.ReactNode;
+  onCell?: (
+    record: T,
+    index: number,
+    params: {
+      colDef: ITableColDef<T>;
+    }
+  ) => any;
 }
 
 export interface IFormCellProps<T = IFormData> {

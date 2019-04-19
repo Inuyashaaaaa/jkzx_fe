@@ -6,21 +6,21 @@ import React, { memo } from 'react';
 export const UnitInputNumber = memo<
   IInputNumberProps &
     IInputBaseProps & {
-      unit?: '%' | '$' | '¥' | '天' | string;
+      unit?: string;
     }
 >(({ unit = '¥', ...props }) => {
   let formatter;
   let parser;
   const options = undefined;
 
-  if (unit === '%' || unit === '天') {
+  if (unit === '$' || unit === '¥') {
+    formatter = value => `${unit} ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    parser = value => (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');
+  } else {
     formatter = value => {
       return `${value}${unit}`;
     };
     parser = value => value.replace(unit, '');
-  } else {
-    formatter = value => `${unit} ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    parser = value => (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');
   }
 
   return (
