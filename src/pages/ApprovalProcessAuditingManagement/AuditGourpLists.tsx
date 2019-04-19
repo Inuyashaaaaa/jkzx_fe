@@ -30,6 +30,7 @@ class AuditLists extends PureComponent {
   public confirm = param => async () => {
     const { error } = await wkApproveGroupDelete({
       approveGroupId: param.approveGroupId,
+      approveGroupName: param.approveGroupName,
     });
     const { message } = error;
     if (error) {

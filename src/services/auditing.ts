@@ -40,3 +40,13 @@ export async function wkApproveGroupList(params = {}) {
     },
   });
 }
+
+export async function wkApproveGroupUserListModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkApproveGroupUserListModify',
+      params,
+    },
+  });
+}
