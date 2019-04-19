@@ -60,12 +60,23 @@ class Table2 extends PureComponent<ITableProps> {
     return this.props.columns.map(item => item.dataIndex);
   };
 
-  public validate = (options = {}, fieldNames = this.getFieldNames(), rowIds?) => {
-    return this.api.tableManager.rowNodes
-      .filter(item => rowIds == null || rowIds.findIndex(id => id === item.id))
-      .forEach(item => {
-        return item.node.validate(options, fieldNames);
-      });
+  public validate = (
+    options = {},
+    rowIds?: string[],
+    colIds = this.getFieldNames()
+  ): Promise<
+    Array<{
+      error: any;
+      values: any;
+    }>
+  > => {
+    return Promise.all(
+      this.api.tableManager.rowNodes
+        .filter(item => rowIds == null || rowIds.findIndex(id => id === item.id))
+        .map(item => {
+          return item.node.validate(options, colIds);
+        })
+    );
   };
 
   public save = (rowIds?: string[], colIds?: string[]) => {

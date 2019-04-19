@@ -1,6 +1,8 @@
 import {
   ASSET_CLASS_MAP,
   BIG_NUMBER_CONFIG,
+  EXERCISETYPE_MAP,
+  LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
@@ -175,8 +177,43 @@ export const VanillaAmerican: ILeg = {
       val => Form2.createField(val)
     );
   },
-  getPosition: () => {
-    return {};
+  getPosition: (env: string, dataItem: any, baseInfo: any) => {
+    const nextPosition: any = {};
+    const COMPUTED_FIELDS = [
+      'numOfOptions',
+      'strikePercent',
+      'numOfUnderlyerContracts',
+      'premiumPerUnit',
+      'trigger',
+      'notional',
+      'premiumPercent',
+    ];
+
+    nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;
+    nextPosition.asset = _.omit(dataItem, [
+      ...LEG_INJECT_FIELDS,
+      ...COMPUTED_FIELDS,
+      ...(dataItem[LEG_FIELD.IS_ANNUAL]
+        ? []
+        : [
+            LEG_FIELD.TERM,
+            LEG_FIELD.DAYS_IN_YEAR,
+            MinimumPremium.dataIndex,
+            FrontPremium.dataIndex,
+          ]),
+    ]);
+
+    nextPosition.asset.effectiveDate =
+      nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+    nextPosition.asset.expirationDate =
+      nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+    nextPosition.asset.settlementDate =
+      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+
+    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
+    nextPosition.asset.annualized = true;
+
+    return nextPosition;
   },
   getPageData: () => {
     return {};
@@ -192,7 +229,7 @@ export const VanillaAmerican: ILeg = {
     setTableData: (newData: ITableData[]) => void
   ) => {
     const { changedFields } = changeFieldsParams;
-    if (changedFields[LEG_FIELD.UNDERLYER_INSTRUMENT_ID]) {
+    if (Form2.fieldIsEffective(changedFields[LEG_FIELD.UNDERLYER_INSTRUMENT_ID])) {
       fetchUnderlyerMultiplier(
         env,
         changeFieldsParams,
@@ -205,7 +242,7 @@ export const VanillaAmerican: ILeg = {
       );
     }
 
-    if (changedFields[LEG_FIELD.UNDERLYER_INSTRUMENT_ID]) {
+    if (Form2.fieldIsEffective(changedFields[LEG_FIELD.UNDERLYER_INSTRUMENT_ID])) {
       fetchInitialSpot(
         env,
         changeFieldsParams,

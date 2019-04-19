@@ -15,7 +15,7 @@ export interface ILeg {
   assetClass: string;
   getColumns: (env: string) => ILegColDef[];
   getDefaultData: (env: string) => ITableData;
-  getPosition: (env: string, baseInfo: any) => any;
+  getPosition: (env: string, dataItem: any, baseInfo: any) => any;
   getPageData: (env: string) => any;
   onDataChange: (
     env: string,

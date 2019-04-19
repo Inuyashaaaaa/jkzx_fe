@@ -5,11 +5,23 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
 
+/**
+ * if (默认) {}
+ * if (环境默认) {}
+ * if (腿类型默认) {}
+ * if (腿 + 环境 默认) {}
+ * if (腿 + 环境) return;
+ * if (腿) return;
+ */
 const getProps = record => {
+  let props;
+
   if (_.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']) === PREMIUM_TYPE_MAP.CNY) {
-    return { unit: '¥' };
+    props = { unit: '¥' };
   }
-  return { unit: '%' };
+  props = { unit: '%' };
+
+  return props;
 };
 
 export const MinimumPremium: ILegColDef = {

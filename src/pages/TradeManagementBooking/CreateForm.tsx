@@ -22,17 +22,22 @@ const InputGroup = AntInput.Group;
 const { Title } = Typography;
 
 const CreateForm = memo<any>(props => {
-  const { setCreateModalVisible } = props;
-  const [createFormData, setCreateFormData] = useState({});
+  const { setCreateModalVisible, createFormData, setCreateFormData } = props;
   const [tradeInfo, settradeInfo] = useState({});
   const [tradeTableData, settradeTableData] = useState([]);
+  const [tradeBaseLoading, setTradeBaseLoading] = useState(false);
 
-  const featchTradeData = async () => {
+  const featchTradeData = async counterPartyCode => {
+    setTradeBaseLoading(true);
     const refSalesGetByLegalNameRsp = await refSalesGetByLegalName({
-      legalName: Form2.getFieldValue(createFormData.counterPartyCode),
+      legalName: counterPartyCode,
     });
+    setTradeBaseLoading(false);
     if (refSalesGetByLegalNameRsp.error) return;
-    setCreateFormData(refSalesGetByLegalNameRsp.data);
+    setCreateFormData(pre => ({
+      ...pre,
+      salesCode: Form2.createField(refSalesGetByLegalNameRsp.data.salesName),
+    }));
   };
 
   const featchTraderInfo = async () => {
@@ -72,6 +77,10 @@ const CreateForm = memo<any>(props => {
       footer={false}
       dataSource={createFormData}
       onFieldsChange={(props, changedFields, allFields) => {
+        if (changedFields.counterPartyCode) {
+          featchTradeData(Form2.getFieldValue(changedFields.counterPartyCode));
+        }
+
         setCreateFormData(allFields);
       }}
       columns={[
@@ -108,6 +117,9 @@ const CreateForm = memo<any>(props => {
         {
           title: '交易编号',
           dataIndex: 'tradeId',
+          render: (val, record, index, { form }) => {
+            return <FormItem>{form.getFieldDecorator()(<Input />)}</FormItem>;
+          },
         },
         {
           title: '交易对手',
@@ -145,16 +157,21 @@ const CreateForm = memo<any>(props => {
                       width: '40%',
                     }}
                     onClick={async () => {
-                      featchTradeData();
                       setLoading(true);
                       await featchTraderInfo();
                       setLoading(false);
                     }}
                     modalProps={{
-                      title: `${createFormData.counterPartyCode} 的基本信息`,
+                      title: `${Form2.getFieldValue(createFormData.counterPartyCode)} 的基本信息`,
                       width: 800,
                       maskClosable: false,
                       okText: '确认并继续',
+                      onCancel: () => {
+                        setCreateFormData(pre => ({
+                          ...pre,
+                          counterPartyCode: undefined,
+                        }));
+                      },
                     }}
                     disabled={!createFormData.counterPartyCode}
                     content={
@@ -203,6 +220,9 @@ const CreateForm = memo<any>(props => {
                               {
                                 dataIndex: 'tradingPermissionNote',
                                 title: '交易权限备注',
+                                render: (value, record, index) => {
+                                  return <FormItem>{value}</FormItem>;
+                                },
                               },
                               {
                                 dataIndex: 'tradingUnderlyers',
@@ -260,7 +280,12 @@ const CreateForm = memo<any>(props => {
                                   const isOverlate = moment(value).isBefore(moment());
 
                                   if (isOverlate) {
-                                    return `${value}${isOverlate ? `(已过期)` : ``}`;
+                                    return (
+                                      <span>
+                                        {value}
+                                        <span style={{ color: 'red' }}>(已过期)</span>
+                                      </span>
+                                    );
                                   }
                                   return value;
                                 },
@@ -287,14 +312,20 @@ const CreateForm = memo<any>(props => {
           title: '销售',
           dataIndex: 'salesCode',
           render: (value, record, index, { form }) => {
-            return <FormItem>{form.getFieldDecorator()(<Input disabled={true} />)}</FormItem>;
+            return (
+              <Loading loading={tradeBaseLoading}>
+                <FormItem>{form.getFieldDecorator()(<Input disabled={true} />)}</FormItem>
+              </Loading>
+            );
           },
         },
         {
           title: '交易日',
           dataIndex: 'tradeDate',
           render: (value, record, index, { form }) => {
-            return <FormItem>{form.getFieldDecorator()(<DatePicker />)}</FormItem>;
+            return (
+              <FormItem>{form.getFieldDecorator()(<DatePicker format="YYYY-MM-DD" />)}</FormItem>
+            );
           },
         },
       ]}

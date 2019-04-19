@@ -33,9 +33,9 @@ class EditableRow extends React.Component<ITableRowProps> {
     this.props.api.tableManager.registeRow(record[getRowKey()], this);
   };
 
-  public validate = async (options = {}, fieldNames = []) => {
+  public validate = (options = {}, colIds = []) => {
     return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      return this.props.form.validateFields(fieldNames, options, (error, values) => {
+      return this.props.form.validateFields(colIds, options, (error, values) => {
         resolve({ error, values });
       });
     });

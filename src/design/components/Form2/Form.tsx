@@ -11,6 +11,13 @@ import FormBase from './FormBase';
 class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
   public static createOptionsFields = ['mapPropsToFields', 'validateMessages', 'withRef', 'name'];
 
+  public static isField = (field: any) => {
+    if (typeof field === 'object' && field !== null) {
+      return field.type && field.type === 'field';
+    }
+    return false;
+  };
+
   public static createField = (value: any) => {
     return {
       type: 'field',
@@ -23,7 +30,18 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
   };
 
   public static getFieldValue = (field: any) => {
-    return field.value;
+    if (Form.isField(field)) {
+      return field.value;
+    }
+    return field;
+  };
+
+  public static getFieldsValue = (fields: any) => {
+    return _.mapValues(fields, val => Form.getFieldValue(val));
+  };
+
+  public static fieldIsEffective = (field: any) => {
+    return field && !_.get(field, 'validating') && !_.get(field, 'errors');
   };
 
   public DecoratorForm: ComponentClass<IFormBaseProps>;
