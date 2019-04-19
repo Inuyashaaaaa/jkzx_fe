@@ -1,9 +1,4 @@
-import {
-  BOOK_NAME_FIELD,
-  LCM_EVENT_TYPE_OPTIONS,
-  PRODUCT_TYPE_OPTIONS,
-  PRODUCTTYPE_OPTIONS,
-} from '@/constants/common';
+import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Select, Table2 } from '@/design/components';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
@@ -16,12 +11,13 @@ import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { Card, DatePicker, Divider } from 'antd';
+import { DatePicker, Divider } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import { BOOKING_TABLE_COLUMN_DEFS } from '../constants';
+import styles from '../index.less';
 
 class CommonModel extends PureComponent<{ status: any }> {
   public $table2: Table2 = null;
@@ -78,7 +74,7 @@ class CommonModel extends PureComponent<{ status: any }> {
     this.setState({ loading: true });
     const { error, data } = await trdTradeSearchIndexPaged({
       page: (paramsPagination || pagination).current - 1,
-      pageSize: (paramsPagination || pagination).pageSize,
+      pageSize: 10,
       ...formatValues,
       ...(this.status ? { status: this.status } : null),
     });
@@ -119,7 +115,7 @@ class CommonModel extends PureComponent<{ status: any }> {
         ...paramsPagination,
         total: data.totalCount,
       },
-      pageSize: tableDataSource.length,
+      pageSizeCurrent: tableDataSource.length,
     });
   };
 
@@ -435,6 +431,7 @@ class CommonModel extends PureComponent<{ status: any }> {
               total: this.state.pagination.total,
             }}
             rowKey={'positionId'}
+            scroll={{ x: 1500 }}
             loading={this.state.loading}
             dataSource={this.state.tableDataSource}
             columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}

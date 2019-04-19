@@ -25,6 +25,7 @@ import { trdTradeLCMEventList } from '@/services/general-service';
 import { convertTradeApiData2PageData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { connect } from 'dva';
+import _ from 'lodash';
 import moment from 'moment';
 import uuidv4 from 'uuid';
 import LifeModalTable from '../LifeModalTable';
@@ -59,10 +60,14 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
 
   public componentDidMount = async () => {
     const item = this.props.record;
-    const { error, data } = await trdPositionLCMEventTypes({
+    const rsp = await trdPositionLCMEventTypes({
       positionId: item.positionId,
     });
-    if (error) return;
+    if (rsp.error) return;
+    const data = [...rsp.data];
+    const removeExporation = _.remove(data, n => {
+      return n === 'EXPIRATION';
+    });
     this.setState({
       eventTypes: {
         ...this.state.eventTypes,
@@ -297,7 +302,7 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
             <Menu onClick={this.onClick}>
               <MenuItem key="bookEdit">查看合约详情</MenuItem>
               <MenuItem key="searchLifeStyle">查看生命周期事件</MenuItem>
-              <SubMenu key="carryListStyle" title={<span>执行生命周期时间</span>}>
+              <SubMenu key="carryListStyle" title={<span>执行生命周期事件</span>}>
                 {this.loadCommon()}
               </SubMenu>
               <MenuItem key="portfolio">加入投资组合</MenuItem>

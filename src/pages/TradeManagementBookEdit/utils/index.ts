@@ -6,8 +6,9 @@ import moment from 'moment';
 export const countAvg = tableData => {
   return tableData
     .reduce((sum, next) => {
-      return sum.plus(new BigNumber(next.weight || 0).multipliedBy(next.price || 0));
+      return sum.plus(next.price || 0);
     }, new BigNumber(0))
+    .div(tableData.length)
     .toNumber();
 };
 
