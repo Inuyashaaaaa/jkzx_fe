@@ -27,3 +27,6 @@ export const SOCKET_MAP = {
   POSITION: 'POSITION',
   VALUATION: 'VALUATION',
 };
+
+// 下拉 select 的 全部 选项
+export const ALL_OPTIONS_VALUE = 'all';

@@ -28,6 +28,10 @@ class InputNumber extends InputBase<IInputNumberProps> {
       <AntdInputNumber
         {...omit(this.props, ['autoSelect', 'onValueChange', 'editing'])}
         onChange={this.onChange}
+        style={{
+          width: '100%',
+          ...this.props.style,
+        }}
         ref={this.getRef}
       />
     );
