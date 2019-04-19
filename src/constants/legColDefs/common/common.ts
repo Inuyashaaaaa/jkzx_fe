@@ -1469,7 +1469,6 @@ export const DaysInYear: IColDef = {
     }
     return true;
   },
-
   field: LEG_FIELD.DAYS_IN_YEAR,
   input: {
     type: 'number',

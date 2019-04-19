@@ -119,7 +119,7 @@ export const DigitalLegEuropeanAnnual = pipeLeg({
           }
         : undefined),
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.CONTINUOUS,
+      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.TERMINAL,
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
