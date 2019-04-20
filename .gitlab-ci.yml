@@ -28,6 +28,7 @@ Install:
     - master
     - master-staging
     - zz-master-staging
+    - feature/OTMS-2738
 
 Lint:
   stage: test
@@ -37,6 +38,7 @@ Lint:
     - master
     - master-staging
     - zz-master-staging
+    - feature/OTMS-2738
 
 Test:
   stage: test
@@ -46,6 +48,7 @@ Test:
     - master
     - master-staging
     - zz-master-staging
+    - feature/OTMS-2738
 
 Build:
   stage: build
@@ -55,6 +58,7 @@ Build:
     - master
     - master-staging
     - zz-master-staging
+    - feature/OTMS-2738
 
 Deploy-Test:
   stage: deploy
@@ -80,9 +84,9 @@ Deploy-Prod:
   only:
     - master
 
-
 Deploy-Feature:
   stage: deploy
   script:
     - yarn run deploy:feature
-  when: manual
+  only:
+    - feature/OTMS-2738
