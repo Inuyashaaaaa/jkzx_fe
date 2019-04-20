@@ -90,6 +90,10 @@
     }
 
     &.@{ant-prefix}-table-default {
+      .ant-form-explain,
+      .ant-form-extra {
+        left: calc(100% + @table-padding-horizontal + 5px);
+      }
       tbody {
         > tr {
           &.@{ant-prefix}-table-expanded-row {
@@ -106,6 +110,10 @@
     }
 
     &.@{ant-prefix}-table-middle {
+      .ant-form-explain,
+      .ant-form-extra {
+        left: calc(100% + @table-padding-horizontal-md + 5px);
+      }
       tbody {
         > tr {
           &.@{ant-prefix}-table-expanded-row {
@@ -122,6 +130,10 @@
     }
 
     &.@{ant-prefix}-table-small {
+      .ant-form-explain,
+      .ant-form-extra {
+        left: calc(100% + @table-padding-horizontal-sm + 5px);
+      }
       tbody {
         > tr {
           &.@{ant-prefix}-table-expanded-row {
@@ -155,7 +167,7 @@
     .ant-form-extra {
       right: inherit;
       bottom: inherit;
-      left: calc(100% + 30px);
+      left: 100%;
       top: 50%;
       width: 100%;
       transform: translateY(-50%);

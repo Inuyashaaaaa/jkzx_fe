@@ -3,6 +3,7 @@ import { Dropdown, Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _, { omit } from 'lodash';
 import React from 'react';
+import { VALIDATE_MESSAGES } from '../../constants';
 import {
   IFormField,
   ITableRowProps,
@@ -96,6 +97,7 @@ class EditableRow extends React.Component<ITableRowProps> {
 }
 
 const FormRow = Form.create({
+  validateMessages: VALIDATE_MESSAGES,
   onValuesChange(props: ITableRowProps, changedValues, allValues) {
     const { record, rowIndex, api, getRowKey } = props;
     const event: ITableTriggerCellValueChangeParams = {
