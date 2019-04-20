@@ -32,7 +32,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
     render: (text, record, index) => {
       if (record.timeLineNumber) {
         return (
-          <>
+          <div style={{ position: 'relative' }}>
             <Timeline
               style={{ position: 'absolute', left: '-20px', top: '5px' }}
               className={styles.timelines}
@@ -42,7 +42,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
               })}
             </Timeline>
             <span>{record.tradeId}</span>
-          </>
+          </div>
         );
       }
       return <span>{record.tradeId}</span>;
