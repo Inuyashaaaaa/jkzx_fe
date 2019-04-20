@@ -158,6 +158,7 @@ const ClientManagementInfo = memo(() => {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         fetchOptionsOnSearch={true}
