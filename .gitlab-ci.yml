@@ -79,3 +79,10 @@ Deploy-Prod:
   when: manual
   only:
     - master
+
+
+Deploy-Feature:
+  stage: deploy
+  script:
+    - yarn run deploy:feature
+  when: manual

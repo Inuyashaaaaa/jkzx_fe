@@ -5,6 +5,7 @@ const fs = require('fs');
 
 const TEST_CONTAINER = 'FE-test';
 const PROD_CONTAINER = 'FE-release';
+const PROD_FEATURE = 'FE-feature';
 const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 
@@ -65,6 +66,20 @@ function test() {
   last(prodContainerPath);
 }
 
+function feature() {
+  const prodContainerPath = path.join(USER_PATH, PROD_FEATURE);
+  // 检测目标容器
+  // @todo 获取当前 master 的标签作为文件名
+  const filename = new Date().toISOString();
+  console.log(`文件名：${filename}`);
+
+  // 拷贝文件到目标位置
+  cp(path.join(__dirname, '../dist/*'), path.join(prodContainerPath, filename));
+
+  // 更新 last
+  last(prodContainerPath);
+}
+
 function doc() {
   const prodContainerPath = path.join(USER_PATH, DOC_CONTAINER);
 
@@ -83,6 +98,10 @@ if (denv === 'prod') {
 
 if (denv === 'test') {
   test();
+}
+
+if (denv === 'feature') {
+  feature();
 }
 
 if (denv === 'doc') {
