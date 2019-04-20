@@ -1,9 +1,9 @@
-import { Spin } from 'antd';
 import { FormItemProps } from 'antd/lib/form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import _, { omit } from 'lodash';
-import React, { FocusEvent, KeyboardEvent, PureComponent } from 'react';
+import React, { KeyboardEvent, PureComponent } from 'react';
+import { EMPTY_VALUE } from '../../constants';
 import { IFormCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
 import { FORM_CELL_EDITING_CHANGED } from '../constants';
@@ -25,7 +25,7 @@ class SwitchCell extends PureComponent<
     editing: false,
   };
 
-  public oldValue: any;
+  public oldValue: any = EMPTY_VALUE;
 
   public $cell: HTMLDivElement;
 

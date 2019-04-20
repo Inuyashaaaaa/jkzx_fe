@@ -4,6 +4,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import _, { omit } from 'lodash';
 import React, { KeyboardEvent, PureComponent } from 'react';
+import { EMPTY_VALUE } from '../../constants';
 import { ITableCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
 import { TABLE_CELL_EDITING_CHANGED } from '../constants/EVENT';
@@ -27,7 +28,7 @@ class SwitchCell extends PureComponent<
     editing: false,
   };
 
-  public oldValue: any;
+  public oldValue: any = EMPTY_VALUE;
 
   public $cell: HTMLTableDataCellElement;
 
@@ -295,10 +296,10 @@ class SwitchCell extends PureComponent<
         ])}
         onClick={this.onCellClick}
         onKeyDown={this.onKeyDown}
-        className={classNames(styles.cell, {
-          [styles.editable]: this.getEditable(),
-          [styles.editing]: this.state.editing,
-          [styles.rendering]: !this.state.editing,
+        className={classNames('tongyu-cell', {
+          editable: this.getEditable(),
+          editing: this.state.editing,
+          rendering: !this.state.editing,
         })}
         style={this.getTdStyle()}
       >

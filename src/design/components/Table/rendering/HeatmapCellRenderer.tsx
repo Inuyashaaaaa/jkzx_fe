@@ -56,9 +56,9 @@ export class HeatmapCellRenderer extends PureComponent<IInputCellRendererParams>
     HeatmapCellRenderer.caches[id] = this.getNormalValue();
     HeatmapCellRenderer.backgroundCaches[id] = this.background;
     HeatmapCellRenderer.colorCaches[id] = this.color;
-    // this.eContainer = this.getItemDom('tongyu-table-cell-container');
-    // this.eDelta = this.getItemDom('tongyu-table-cell-delta');
-    // this.eValue = this.getItemDom('tongyu-table-cell-value');
+    // this.eContainer = this.getItemDom('tongyu-cell-container');
+    // this.eDelta = this.getItemDom('tongyu-cell-delta');
+    // this.eValue = this.getItemDom('tongyu-cell-value');
     // this.refresh(this.props);
   };
 
@@ -88,7 +88,7 @@ export class HeatmapCellRenderer extends PureComponent<IInputCellRendererParams>
     return (
       <Input
         {...normalizeInput(this.props.data, this.props.colDef).value}
-        className={'tongyu-table-cell-container'}
+        className={'tongyu-cell-container'}
         style={{
           background,
           color,

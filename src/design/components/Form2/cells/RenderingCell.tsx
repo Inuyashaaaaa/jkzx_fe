@@ -1,15 +1,24 @@
 import { PureComponent } from 'react';
+import { EMPTY_VALUE } from '../../constants';
 import { IFormCellProps } from '../../type';
 
 class RenderingCell extends PureComponent<IFormCellProps> {
+  public cn;
+
   public renderDiff = () => {
     const newVal = this.getValue();
-    if (this.props.cellApi.oldValue !== newVal) {
+    if (this.props.cellApi.oldValue !== EMPTY_VALUE && this.props.cellApi.oldValue !== newVal) {
       setTimeout(() => {
-        this.props.cellApi.$cell.classList.add('tongyu-table-cell-update');
-        setTimeout(() => {
-          this.props.cellApi.$cell.classList.remove('tongyu-table-cell-update');
-        }, 1000);
+        this.props.cellApi.$cell.classList.add('tongyu-cell-diff');
+
+        if (this.cn) {
+          clearTimeout(this.cn);
+          this.cn = null;
+        }
+        this.cn = setTimeout(() => {
+          this.cn = null;
+          this.props.cellApi.$cell.classList.remove('tongyu-cell-diff');
+        }, 500);
       });
     }
     this.props.cellApi.oldValue = newVal;

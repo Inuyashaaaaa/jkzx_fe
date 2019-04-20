@@ -22,7 +22,6 @@ import { Button, Menu, message, Modal, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
-import CashModal from './CashModal';
 import CreateForm from './CreateForm';
 import './index.less';
 
@@ -296,6 +295,7 @@ const TradeManagementBooking = props => {
         </Button.Group>
       </Row>
       <Table2
+        size="middle"
         ref={node => (tableEl.current = node)}
         rowKey={LEG_ID_FIELD}
         onCellFieldsChange={params => {
@@ -372,7 +372,12 @@ const TradeManagementBooking = props => {
           );
         }}
       />
-      <Modal visible={cashModalVisible} title="现金流管理" width={900}>
+      <Modal
+        visible={cashModalVisible}
+        title="现金流管理"
+        width={900}
+        onCancel={() => setCashModalVisible(false)}
+      >
         <Table2
           pagination={false}
           dataSource={cashModalDataSource}
@@ -411,25 +416,7 @@ const TradeManagementBooking = props => {
               title: '操作',
               dataIndex: 'action',
               render: (val, record) => {
-                const current: any = {};
-                return (
-                  <ModalButton
-                    text={true}
-                    key="资金录入"
-                    type="primary"
-                    onClick={() => {}}
-                    modalProps={{
-                      width: 800,
-                      title: '资金录入',
-                      children: <CashModal record={record} current={current} />,
-                      onOk: async () => {
-                        console.log(current);
-                      },
-                    }}
-                  >
-                    资金录入
-                  </ModalButton>
-                );
+                return <a href="javascript:;">资金录入</a>;
               },
             },
           ]}

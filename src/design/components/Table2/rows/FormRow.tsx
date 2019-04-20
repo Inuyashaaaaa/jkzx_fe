@@ -78,7 +78,6 @@ class EditableRow extends React.Component<ITableRowProps> {
           'editings',
           'rowId',
         ])}
-        className={styles.row}
       />
     );
     const contextMenu = this.getContextMenu();
