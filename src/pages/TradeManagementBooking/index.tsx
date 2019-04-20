@@ -377,6 +377,7 @@ const TradeManagementBooking = props => {
         title="现金流管理"
         width={900}
         onCancel={() => setCashModalVisible(false)}
+        onOk={() => setCashModalVisible(false)}
       >
         <Table2
           pagination={false}
@@ -416,7 +417,7 @@ const TradeManagementBooking = props => {
               title: '操作',
               dataIndex: 'action',
               render: (val, record) => {
-                return <a href="javascript:;">资金录入</a>;
+                return <a href="javascript:;">资金录入(等待接入新的资金窗口）</a>;
               },
             },
           ]}
