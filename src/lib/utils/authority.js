@@ -32,6 +32,15 @@ export function setPermissions(permissions) {
     PERMISSIONS_LOCAL_FIELD,
     JSON.stringify({
       ...permissions,
+      welcomePage: true,
+      contractManage: true,
+      newClient: true,
+      fundStatistics: true,
+      marginManagement: true,
+      discrepancyManagement: true,
+      valuationManagement: true,
+      salesManagement: true,
+      ioglodManagement: true,
     })
   );
 }

@@ -157,13 +157,14 @@ export default {
 
     addLegData(state, action) {
       const {
-        payload: { cacheTyeps, leg, computedAllLegTypes, nextTradesColDefs, rowData },
+        payload: { cacheTyeps, computedLeg, computedAllLegTypes, nextTradesColDefs, rowData },
       } = action;
-      if (cacheTyeps.indexOf(leg.type) !== -1) {
+      if (cacheTyeps.indexOf(computedLeg.type) !== -1) {
         state.columnDefs = orderLegColDefs(
           _.unionBy<IColDef>(
             state.columnDefs.concat(
-              leg.columnDefs.map(col => {
+              // 这里的 leg 中的 columnDefs 是 computedAllLegTypes 查找到的
+              computedLeg.columnDefs.map(col => {
                 return {
                   ...col,
                   suppressMenu: true,

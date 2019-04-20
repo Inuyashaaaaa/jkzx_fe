@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_TERM } from '.';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '.';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -17,6 +17,7 @@ import {
   STRIKE_TYPES_MAP,
 } from '../common';
 import {
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -47,46 +48,49 @@ export const DigitalLegEuropeanUnAnnual = pipeLeg({
   type: LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: false,
-  pricingColumnDefs: [
-    Direction,
-    NotionalAmountType,
-    InitialSpot,
-    StrikeType,
-    UnderlyerMultiplier,
-    UnderlyerInstrumentId,
-    OptionType,
-    Strike,
-    PricingTerm,
-    PricingExpirationDate,
-    Payment,
-    ParticipationRate,
-    NotionalAmount,
-    ObservationType,
-  ],
-  columnDefs: [
-    Direction,
-    OptionType,
-    UnderlyerInstrumentId,
-    UnderlyerMultiplier,
-    InitialSpot,
-    StrikeType,
-    Strike,
-    SpecifiedPrice,
-    SettlementDate,
-    ParticipationRate,
-    NotionalAmountType,
-    NotionalAmount,
-    PaymentType,
-    Payment,
-    PremiumType,
-    Premium,
 
-    ExpirationDate,
-    // ExpirationTime,
-    EffectiveDate,
-    ObservationType,
-    RebateType,
-  ],
+  getColumnDefs: (env = 'booking') =>
+    env === 'pricing'
+      ? [
+          Direction,
+          NotionalAmountType,
+          InitialSpot,
+          StrikeType,
+          UnderlyerMultiplier,
+          UnderlyerInstrumentId,
+          OptionType,
+          Strike,
+          PricingTerm,
+          PricingExpirationDate,
+          Payment,
+          ParticipationRate,
+          NotionalAmount,
+          ObservationType,
+        ]
+      : [
+          Direction,
+          OptionType,
+          UnderlyerInstrumentId,
+          UnderlyerMultiplier,
+          InitialSpot,
+          StrikeType,
+          Strike,
+          SpecifiedPrice,
+          SettlementDate,
+          ParticipationRate,
+          NotionalAmountType,
+          NotionalAmount,
+          PaymentType,
+          Payment,
+          PremiumType,
+          Premium,
+          DaysInYear,
+          ExpirationDate,
+          // ExpirationTime,
+          EffectiveDate,
+          ObservationType,
+          RebateType,
+        ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
       ...nextDataSourceItem,
@@ -98,6 +102,7 @@ export const DigitalLegEuropeanUnAnnual = pipeLeg({
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
       [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
@@ -107,7 +112,7 @@ export const DigitalLegEuropeanUnAnnual = pipeLeg({
           }
         : undefined),
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.CONTINUOUS,
+      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.TERMINAL,
     };
   },
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {

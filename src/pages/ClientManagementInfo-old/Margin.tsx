@@ -1,10 +1,11 @@
 import Section from '@/components/Section';
 import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
 import { IFormControl } from '@/design/components/Form/types';
+import SourceTable from '@/design/components/SourceTable';
 import { IColumnDef } from '@/design/components/Table/types';
 import ImportExcelButton from '@/lib/components/_ImportExcelButton';
-import SourceTable from '@/lib/components/_SourceTable';
 import {
   clientTradeCashFlow,
   mgnMarginList,
@@ -185,19 +186,6 @@ const IOGLOD_FORM_CONTROLS: (salesNameList) => IFormControl[] = salesNameList =>
     },
     field: 'cashType',
   },
-  // {
-  //   decorator: {
-  //     rules: [
-  //       {
-  //         required: true,
-  //       },
-  //     ],
-  //   },
-  //   control: {
-  //     label: '交易ID',
-  //   },
-  //   field: 'tradeId',
-  // },
   {
     decorator: {
       rules: [
@@ -234,9 +222,18 @@ class Margin extends PureComponent<MarginProps> {
     ioGlodVisible: false,
     legalNamesList: [],
     excelData: [],
+    dataSource: [],
+    loading: false,
+  };
+
+  public componentDidMount = () => {
+    this.fetchTable();
   };
 
   public fetchTable = async () => {
+    this.setState({
+      loading: true,
+    });
     const legalNamesList = this.props.selectedRows.map((val, key) => {
       return _.pick(val, ['legalName']).legalName;
     });
@@ -255,8 +252,14 @@ class Margin extends PureComponent<MarginProps> {
     const { error, data } = await mgnMarginList({
       accountIds: accountIdList,
     });
+    this.setState({
+      loading: false,
+    });
     if (error) return false;
-    return data;
+    // return data;
+    this.setState({
+      dataSource: data,
+    });
   };
 
   public updateFormValueChange = params => {
@@ -304,7 +307,8 @@ class Margin extends PureComponent<MarginProps> {
           message.error('更新失败');
           return resolve(false);
         }
-        this.$marginSourceTable.search();
+        // this.$marginSourceTable.search();
+        this.fetchTable();
         message.success('更新成功');
         return resolve(true);
       });
@@ -328,7 +332,8 @@ class Margin extends PureComponent<MarginProps> {
     }
 
     resolve(true);
-    this.$marginSourceTable.search();
+    // this.$marginSourceTable.search();
+    this.fetchTable();
     message.success('录入成功');
   };
 
@@ -344,7 +349,7 @@ class Margin extends PureComponent<MarginProps> {
     });
   };
 
-  public switchUpdateMargin = event => {
+  public switchUpdateMargin = async event => {
     const dataSource = {
       ...event.rowData,
       originMaintenanceMargin: event.rowData.maintenanceMargin,
@@ -363,7 +368,7 @@ class Margin extends PureComponent<MarginProps> {
     });
   };
 
-  public switchIOGlod = event => {
+  public switchIOGlod = async event => {
     this.modalFormData = event.rowData;
     const IOGlodDataSource = {
       cashFlow: 0,
@@ -391,7 +396,8 @@ class Margin extends PureComponent<MarginProps> {
       return false;
     }
     message.success('批量更新成功');
-    this.$marginSourceTable.search();
+    // this.$marginSourceTable.search();
+    this.fetchTable();
     return true;
   };
 
@@ -419,15 +425,18 @@ class Margin extends PureComponent<MarginProps> {
         <SourceTable
           rowKey={'uuid'}
           ref={node => (this.$marginSourceTable = node)}
+          loading={this.state.loading}
           // searchFormControls={SEARCH_FORM_CONTROLS}
-          tableColumnDefs={TABLE_COL_DEFS}
-          onSearch={this.fetchTable}
-          searchable={false}
-          resetable={false}
-          extraActions={[
+          columnDefs={TABLE_COL_DEFS}
+          dataSource={this.state.dataSource}
+          // onSearch={this.fetchTable}
+          // searchable={false}
+          // resetable={false}
+          header={
             <ImportExcelButton
               key="import"
               type="primary"
+              style={{ marginBottom: VERTICAL_GUTTER }}
               onImport={data => {
                 this.setState({
                   excelVisible: true,
@@ -441,13 +450,13 @@ class Margin extends PureComponent<MarginProps> {
               }}
             >
               批量更新
-            </ImportExcelButton>,
-          ]}
+            </ImportExcelButton>
+          }
           actionColDef={{
             width: 300,
           }}
           rowActions={[
-            <Button key="台账调整" type="primary" onClick={this.switchIOGlod}>
+            <Button key="switch" type="primary" onClick={this.switchIOGlod}>
               台账调整
             </Button>,
             <Button key="update" type="primary" onClick={this.switchUpdateMargin}>
@@ -503,7 +512,7 @@ class Margin extends PureComponent<MarginProps> {
         >
           <SourceTable
             rowKey="legalName"
-            tableColumnDefs={PAGE_TABLE_COL_DEFS}
+            columnDefs={PAGE_TABLE_COL_DEFS}
             dataSource={this.state.excelData}
             editable={false}
           />

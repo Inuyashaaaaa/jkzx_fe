@@ -63,18 +63,18 @@ class ApprovalForm extends PureComponent {
   }
 
   public fetchData = async (params, status) => {
-    if (!params.processInstanceId) {
-      return;
-    }
+    const processInstanceId = params.processInstanceId || params.processInstance.processInstanceId;
     const isCheckBtn =
-      params && params.taskName && params.taskName.includes('录入资金流水') && status === 'queued';
+      params && params.taskName && status === 'pending' && params.taskName.includes('修改资金流水');
+
     this.setState({
       loading: true,
     });
-    const isCompleted = !!params.operator;
+
+    const isCompleted = params.status ? !params.status.includes('unfinished') : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
-      processInstanceId: params.processInstanceId,
+      processInstanceId,
     });
     if (!res || res.error) {
       this.setState({
@@ -87,7 +87,6 @@ class ApprovalForm extends PureComponent {
       const instance = data.processInstance;
       instance.initiatorName = (instance.initiator && instance.initiator.userName) || '';
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
-      // instance.startTime = moment(instance.startTime).format('YYYY-MM-DD hh:mm:ss');
     }
     if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
@@ -210,12 +209,24 @@ class ApprovalForm extends PureComponent {
   };
 
   public confirmAbandon = async () => {
-    const { formData } = this.props;
-    const params = {
-      processInstanceId: formData.processInstanceId,
-    };
-    this.executeModify(params, 'abandon');
+    this.$formBuilder.validateForm(values => {
+      const obj = { ...values };
+      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
+      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
+      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+      const { formData } = this.props;
+      const { modifyComment } = this.state;
+      const params = {
+        taskId: formData.taskId,
+        ctlProcessData: {
+          abandon: true,
+        },
+        businessProcessData: obj,
+      };
+      this.executeModify(params, 'abandon');
+    });
   };
+
   public confirmPass = async () => {
     const { formData } = this.props;
     const { passComment } = this.state;
@@ -241,6 +252,7 @@ class ApprovalForm extends PureComponent {
         taskId: formData.taskId,
         ctlProcessData: {
           comment: modifyComment,
+          abandon: false,
         },
         businessProcessData: obj,
       };
@@ -284,7 +296,7 @@ class ApprovalForm extends PureComponent {
       modifying: true,
       modifyBtn: modifyType,
     });
-    const executeMethod = modifyType === 'abandon' ? terminateProcess : completeTaskProcess;
+    const executeMethod = completeTaskProcess;
     const res = await executeMethod(params);
     this.setState({
       modifying: false,
@@ -310,7 +322,7 @@ class ApprovalForm extends PureComponent {
       modifyComment,
     } = this.state;
     const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
+      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
@@ -355,7 +367,7 @@ class ApprovalForm extends PureComponent {
                 bordered={false}
               />
             </div>
-            {status === 'queued' && (
+            {status === 'pending' && (
               <div
                 style={{
                   borderTopStyle: 'solid',
@@ -414,37 +426,39 @@ class ApprovalForm extends PureComponent {
                   </div>
                 )}
                 {!isCheckBtn && (
-                  <div style={{ marginLeft: 10 }}>
-                    <Popconfirm
-                      title={
-                        <div>
-                          <p>确认将此次修改提交复核吗？</p>
-                          <TextArea onChange={this.setModifyComment} value={modifyComment} />
-                        </div>
-                      }
-                      onConfirm={this.confirmModify}
-                    >
-                      <Button
-                        type="primary"
-                        disabled={modifying && modifyBtn === 'modify'}
-                        loading={modifying && modifyBtn !== 'modify'}
+                  <>
+                    <div style={{ marginLeft: 10 }}>
+                      <Popconfirm
+                        title={
+                          <div>
+                            <p>确认将此次修改提交复核吗？</p>
+                            <TextArea onChange={this.setModifyComment} value={modifyComment} />
+                          </div>
+                        }
+                        onConfirm={this.confirmModify}
                       >
-                        确认修改
-                      </Button>
-                    </Popconfirm>
-                  </div>
+                        <Button
+                          type="primary"
+                          disabled={modifying && modifyBtn === 'modify'}
+                          loading={modifying && modifyBtn !== 'modify'}
+                        >
+                          确认修改
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                    <div style={{ marginLeft: 10 }}>
+                      <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
+                        <Button
+                          type="danger"
+                          loading={modifying && modifyBtn === 'abandon'}
+                          disabled={modifying && modifyBtn !== 'abandon'}
+                        >
+                          废弃
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                  </>
                 )}
-                <div style={{ marginLeft: 10 }}>
-                  <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
-                    <Button
-                      type="danger"
-                      loading={modifying && modifyBtn === 'abandon'}
-                      disabled={modifying && modifyBtn !== 'abandon'}
-                    >
-                      废弃
-                    </Button>
-                  </Popconfirm>
-                </div>
               </div>
             )}
           </div>

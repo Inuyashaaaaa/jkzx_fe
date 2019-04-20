@@ -1,11 +1,31 @@
 import { HOST_TEST } from '@/constants/global';
 import request from '@/lib/utils/request';
 
+export async function mktInstrumentWhitelistSearch(params = {}) {
+  return request(`${HOST_TEST}market-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'mktInstrumentWhitelistSearch',
+      params,
+    },
+  });
+}
+
 export async function mktInstrumentSearch(params = {}) {
   return request(`${HOST_TEST}market-data-service/api/rpc`, {
     method: `POST`,
     body: {
       method: 'mktInstrumentSearch',
+      params,
+    },
+  });
+}
+
+export async function searchTradableInstrument(params = {}) {
+  return request(`${HOST_TEST}market-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'searchTradableInstrument',
       params,
     },
   });

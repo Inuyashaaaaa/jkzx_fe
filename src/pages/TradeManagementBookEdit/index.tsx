@@ -27,7 +27,7 @@ import {
   trdTradeLCMEventProcess,
   trdTradeLCMUnwindAmountGet,
 } from '@/services/trade-service';
-import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
+import { ComponentResolver, GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
 import { message } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
@@ -192,10 +192,14 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         positionId: item.id,
       }).then(rsp => {
         if (rsp.error) return;
+        const data = [...rsp.data];
+        const removeExporation = _.remove(data, n => {
+          return n === 'EXPIRATION';
+        });
         this.setState({
           eventTypes: {
             ...this.state.eventTypes,
-            [item.id]: rsp.data,
+            [item.id]: data,
           },
         });
       });
@@ -220,7 +224,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
 
     if (!legType) return false;
 
-    return !!legType.columnDefs.find(item => item.field === colDef.field);
+    return !!legType.getColumnDefs('editing').find(item => item.field === colDef.field);
   };
 
   public handleAddLeg = event => {
@@ -244,6 +248,11 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
             _.unionBy<IColDef>(
               [
                 {
+                  headerName: '持仓ID',
+                  field: 'positionId',
+                  editable: false,
+                },
+                {
                   headerName: '状态',
                   field: LEG_FIELD.LCM_EVENT_TYPE,
                   oldEditable: false,
@@ -254,7 +263,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
                   },
                 },
                 ...state.columnDefs.concat(
-                  leg.columnDefs.map(col => {
+                  leg.getColumnDefs('editing').map(col => {
                     return {
                       ...col,
                       oldEditable: col.editable,
@@ -304,7 +313,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 

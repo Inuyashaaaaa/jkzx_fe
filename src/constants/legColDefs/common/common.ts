@@ -4,6 +4,7 @@ import {
   mktInstrumentInfo,
   mktInstrumentSearch,
   mktQuotesListPaged,
+  searchTradableInstrument,
 } from '@/services/market-data-service';
 import { getMoment } from '@/utils';
 import { ValidationRule } from 'antd/lib/form';
@@ -26,6 +27,7 @@ import {
   KNOCK_DIRECTION_OPTIONS,
   LEG_ANNUALIZED_FIELD,
   LEG_FIELD,
+  LEG_PRICING_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -218,7 +220,9 @@ export const UnderlyerInstrumentId: IColDef = {
       type: 'select',
       showSearch: true,
       options: async (value: string) => {
-        const { data, error } = await mktInstrumentSearch({
+        const { data, error } = await (record[LEG_PRICING_FIELD]
+          ? mktInstrumentSearch
+          : searchTradableInstrument)({
           instrumentIdPart: value,
         });
         if (error) return [];
@@ -1394,6 +1398,37 @@ export const Term: IColDef = {
   dataIndex: LEG_FIELD.TERM,
   input: INPUT_NUMBER_DAYS_CONFIG,
   rules: RULES_REQUIRED,
+  editable: params => {
+    if (params.data[LEG_PRICING_FIELD]) {
+      if (params.data[LEG_ANNUALIZED_FIELD]) {
+        return true;
+      }
+      return false;
+    }
+    return true;
+  },
+  getValue: params => {
+    if (params.data[LEG_PRICING_FIELD]) {
+      if (params.data[LEG_ANNUALIZED_FIELD]) {
+        return {
+          depends: [],
+          value(record) {
+            return record[Term.field];
+          },
+        };
+      }
+      return {
+        depends: [LEG_FIELD.EXPIRATION_DATE],
+        value(record) {
+          return moment(record[LEG_FIELD.EXPIRATION_DATE]).diff(moment(), 'days') + 1;
+        },
+      };
+    }
+    return {
+      depends: [],
+      value: record => record[LEG_FIELD.TERM],
+    };
+  },
 };
 
 export const IsAnnualized: IColDef = {

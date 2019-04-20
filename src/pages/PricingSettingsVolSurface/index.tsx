@@ -107,7 +107,7 @@ class PricingSettingVolSurface extends PureComponent {
   public fetchTableData = async () => {
     const { searchFormData } = this.state;
     this.setState({ tableLoading: true });
-
+    console.log(this.state.searchFormData);
     const rsp = await queryModelVolSurface(
       {
         underlyer: searchFormData[MARKET_KEY],
@@ -193,6 +193,7 @@ class PricingSettingVolSurface extends PureComponent {
         searchFormData: event.formData,
       },
       () => {
+        console.log(this.state.searchFormData);
         this.fetchTableData();
       }
     );
@@ -205,6 +206,7 @@ class PricingSettingVolSurface extends PureComponent {
       underlyer: this.underlyer,
       newQuote: (this.state.tableFormData as any).quote,
       modelName: this.state.searchFormData[GROUP_KEY],
+      instance: this.state.searchFormData[INSTANCE_KEY],
     });
 
     return !error;

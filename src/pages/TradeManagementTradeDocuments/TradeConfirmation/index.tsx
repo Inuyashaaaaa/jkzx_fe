@@ -1,5 +1,4 @@
 import SourceTable from '@/design/components/SourceTable';
-import { delay, mockData } from '@/lib/utils';
 import { trdTradeListByBook } from '@/services/general-service';
 import { tradeDocSearch } from '@/services/trade-service';
 import _ from 'lodash';
@@ -25,17 +24,6 @@ class TradeConfirmation extends PureComponent {
 
   public componentDidMount = () => {
     this.onFetch();
-    // delay(
-    //   1000,
-    //   mockData({
-    //     tradeId: '555555',
-    //     tradeEmail: 'zhangjiaan@tongyu.tech',
-    //   })
-    // ).then(result => {
-    //   this.setState({
-    //     dataSource: result,
-    //   });
-    // });
   };
 
   public onFetch = async (paramsPagination?) => {

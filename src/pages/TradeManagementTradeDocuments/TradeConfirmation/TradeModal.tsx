@@ -1,11 +1,7 @@
 import Form from '@/design/components/Form';
 import ModalButton from '@/design/components/ModalButton';
-import {
-  DOWN_LOAD_SETTLEMENT_URL,
-  DOWN_LOAD_TRADE_URL,
-  emlSendSupplementaryAgreementReport,
-} from '@/services/document';
-import { Button, Col, message, Row } from 'antd';
+import { DOWN_LOAD_TRADE_URL, emlSendSupplementaryAgreementReport } from '@/services/document';
+import { Alert, Button, Col, message, Row } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 
@@ -38,7 +34,7 @@ class TradeModal extends PureComponent {
     this.setState({
       visible: false,
     });
-    this.props.onFetch({ current: 1, pageSize: 10 });
+    this.props.onFetch();
   };
 
   public onConfirm = async () => {
@@ -47,6 +43,7 @@ class TradeModal extends PureComponent {
       tradeId: this.props.data.tradeId,
       description7: this.state.modalData.marketDisruption,
       description8: this.state.modalData.tradeOption,
+      partyName: this.props.data.partyName,
     });
     if (error) {
       message.error('发送失败');
@@ -74,8 +71,13 @@ class TradeModal extends PureComponent {
           type="primary"
           content={
             <>
-              <h3>交易确认书使用最新模板和下方输入的内容即时生成，系统不会留存每次生成的文档。</h3>
-              <h3>请在下载或发送前，确认以下自定义内容。</h3>
+              <Alert
+                style={{ marginBottom: 40 }}
+                message="交易确认书使用最新模板和下方输入的内容即时生成，系统不会留存每次生成的文档。"
+                description="请在下载或发送前，确认以下自定义内容。"
+                type="info"
+                showIcon={true}
+              />
               <Form
                 wrappedComponentRef={element => {
                   if (element) {
@@ -93,6 +95,8 @@ class TradeModal extends PureComponent {
                       type: 'textarea',
                       autosize: { minRows: 6, maxRows: 6 },
                       maxLength: 500,
+                      showMaxLength: true,
+                      showResetButton: true,
                     },
                   },
                   {
@@ -104,12 +108,15 @@ class TradeModal extends PureComponent {
                       type: 'textarea',
                       autosize: { minRows: 6, maxRows: 6 },
                       maxLength: 500,
+                      showMaxLength: true,
+                      showResetButton: true,
                     },
                   },
                 ]}
                 dataSource={this.state.modalData}
                 onValueChange={this.handleChange}
                 controlNumberOneRow={1}
+                layout="vertical"
                 footer={false}
               />
               <Row type="flex" justify="end" align="middle" gutter={8}>
@@ -119,7 +126,9 @@ class TradeModal extends PureComponent {
                       href={encodeURI(
                         `${DOWN_LOAD_TRADE_URL}tradeId=${this.props.data.tradeId}&description7=${
                           this.state.modalData.marketDisruption
-                        }&description8=${this.state.modalData.tradeOption}`
+                        }&description8=${this.state.modalData.tradeOption}&partyName=${
+                          this.props.data.partyName
+                        }`
                       )}
                       download="template.t"
                     >

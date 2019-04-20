@@ -16,7 +16,7 @@ export const permissions = {
   bookEdit: true,
   subjectStore: true,
   marketManagement: true,
-  bankAccount: true,
+  // bankAccount: true,
   customSalesManage: true,
   userInfo: true,
   users: true,
@@ -45,6 +45,16 @@ export const permissions = {
   tradeBooks: true,
   documentManagement: true,
   roleManagement: true,
+  auditingManagement: true,
+  processConfiguration: true,
+  newClient: true,
+  fundStatistics: true,
+  marginManagement: true,
+  discrepancyManagement: true,
+  voluationManagement: true,
+  bankAccount: true,
+  ioglodManagement: true,
+  salesManagement: true,
 };
 
 /**

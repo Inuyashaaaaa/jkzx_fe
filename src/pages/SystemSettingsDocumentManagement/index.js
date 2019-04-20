@@ -22,7 +22,7 @@ const TRADE_MAP = {
 const DOC_MAP = {
   SETTLE_NOTIFICATION: '结算通知书',
   CLOSE_CONFIRMATION: '平仓确认书',
-  TRADE_CONFIRMATION: '交易确认书',
+  SUPPLEMENTARY_AGREEMENT: '交易确认书',
   VALUATION_REPORT: '估值报告',
   MARGIN_CALL: '追保函',
 };

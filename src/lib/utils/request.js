@@ -151,7 +151,6 @@ export default function request(url, options = {}, passError = false) {
       onCatch ||
         (error => {
           const { code, message } = error;
-
           !passError &&
             notification.error({
               message: `请求失败`,

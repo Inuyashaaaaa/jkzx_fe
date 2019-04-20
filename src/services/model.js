@@ -32,10 +32,7 @@ export function queryModelRiskFreeCurve(params) {
     const { error, data } = result;
     if (error) return result;
 
-    const {
-      modelInfo: { instruments },
-    } = data;
-
+    const instruments = data.modelInfo ? data.modelInfo.instruments : [];
     return {
       error,
       data: {
@@ -256,7 +253,7 @@ export async function queryModelVolSurface(params, passError) {
 }
 
 export async function saveModelVolSurface(params) {
-  const { columns, dataSource, underlyer, newQuote, modelName } = params;
+  const { columns, dataSource, underlyer, newQuote, modelName, instance } = params;
 
   return request(`${HOST_TEST}model-service/api/rpc`, {
     method: 'POST',
@@ -265,7 +262,7 @@ export async function saveModelVolSurface(params) {
       params: {
         daysInYear: 365,
         save: true,
-        instance: 'intraday',
+        instance,
         modelName,
         underlyer: {
           ...underlyer,

@@ -97,6 +97,7 @@ class CommonModel extends PureComponent {
     this.setState(
       {
         searchFormData: {},
+        bookIdList: [],
       },
       () => {
         this.onTradeTableSearch({ current: 1, pageSize: 10 });
@@ -121,7 +122,10 @@ class CommonModel extends PureComponent {
     }
 
     let refSalesGetByLegalNameRsp;
-    if (params.changedValues.counterPartyCode) {
+    if (
+      Object.keys(params.changedValues)[0] === 'counterPartyCode' &&
+      params.changedValues.counterPartyCode
+    ) {
       refSalesGetByLegalNameRsp = await refSalesGetByLegalName({
         legalName: params.changedValues.counterPartyCode,
       });
@@ -130,6 +134,16 @@ class CommonModel extends PureComponent {
         searchFormData: {
           ...params.values,
           salesName: refSalesGetByLegalNameRsp.data.salesName,
+        },
+      });
+    } else if (
+      Object.keys(params.changedValues)[0] === 'counterPartyCode' &&
+      !params.changedValues.counterPartyCode
+    ) {
+      return this.setState({
+        searchFormData: {
+          ...params.values,
+          salesName: undefined,
         },
       });
     }

@@ -4047,6 +4047,13 @@ copy-to-clipboard@^3, copy-to-clipboard@^3.0.8:
   dependencies:
     toggle-selection "^1.0.3"
 
+copy-to-clipboard@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/copy-to-clipboard/-/copy-to-clipboard-3.1.0.tgz#0a28141899e6bd217b9dc13fd1689b3b38820b44"
+  integrity sha512-+RNyDq266tv5aGhfRsL6lxgj8Y6sCvTrVJnFUVvuxuqkcSMaLISt1wd4JkdQSphbcLTIQ9kEpTULNnoCXAFdng==
+  dependencies:
+    toggle-selection "^1.0.6"
+
 copy-webpack-plugin@4.6.0:
   version "4.6.0"
   resolved "https://registry.npmjs.org/copy-webpack-plugin/-/copy-webpack-plugin-4.6.0.tgz#e7f40dd8a68477d405dd1b7a854aae324b158bae"
@@ -13071,6 +13078,11 @@ react-error-overlay@^5.1.2:
   resolved "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-5.1.2.tgz#888957b884d4b25b083a82ad550f7aad96585394"
   integrity sha512-7kEBKwU9R8fKnZJBRa5RSIfay4KJwnYvKB6gODGicUmDSAhQJ7Tdnll5S0RLtYrzRfMVXlqYw61rzrSpP4ThLQ==
 
+react-fast-compare@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-2.0.4.tgz#e84b4d455b0fec113e0402c329352715196f81f9"
+  integrity sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==
+
 react-fittext@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/react-fittext/-/react-fittext-1.0.0.tgz#836a1c04f9322f6c94cb69e45c66006fc42d37a5"
@@ -13246,12 +13258,14 @@ react-tween-state@^0.1.5:
     raf "^3.1.0"
     tween-functions "^1.0.1"
 
-react-use@^7.3.1:
-  version "7.3.1"
-  resolved "https://registry.npmjs.org/react-use/-/react-use-7.3.1.tgz#cdf5f3b9eab6c0e0de02bdf1c88900e3087870c7"
-  integrity sha512-uzbibSTURCtBD4Qrzxb9dvqNuTTfJ9pGnTFdHy34HmQWcU0/AiNWflriACnwU+IDTKKpXACSMTmT4MB6XBo0Iw==
+react-use@^8.1.3:
+  version "8.1.3"
+  resolved "https://registry.yarnpkg.com/react-use/-/react-use-8.1.3.tgz#d3619b82e5988f25d57c5e86771c1b910a61942d"
+  integrity sha512-CdqKsrFY/geypyjW/difwZR+ILjRcAjDik2xDG7x3gaES3sE93k42rpH9pKWpxSFp+hEPKWG8xYLSs14S+yVtA==
   dependencies:
+    copy-to-clipboard "^3.1.0"
     nano-css "^5.1.0"
+    react-fast-compare "^2.0.4"
     react-wait "^0.3.0"
     screenfull "^4.1.0"
     throttle-debounce "^2.0.1"
@@ -15629,7 +15643,7 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
 
-toggle-selection@^1.0.3:
+toggle-selection@^1.0.3, toggle-selection@^1.0.6:
   version "1.0.6"
   resolved "https://registry.npmjs.org/toggle-selection/-/toggle-selection-1.0.6.tgz#6e45b1263f2017fa0acc7d89d78b15b8bf77da32"
   integrity sha1-bkWxJj8gF/oKzH2J14sVuL932jI=

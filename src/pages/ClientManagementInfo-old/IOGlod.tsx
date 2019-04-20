@@ -1,6 +1,9 @@
 import Section from '@/components/Section';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import { ModalButton } from '@/design/components';
 import Form from '@/design/components/Form';
-import SourceTable from '@/lib/components/_SourceTable';
+import SourceTable from '@/design/components/SourceTable';
+import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientAccountOpRecordList,
   clientChangeCredit,
@@ -9,8 +12,9 @@ import {
   cliMmarkTradeTaskProcessed,
   cliTradeTaskListByLegalNames,
 } from '@/services/reference-data-service';
-import { Button, message, Modal, Tabs } from 'antd';
+import { Button, message, Modal, Row, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
@@ -21,7 +25,6 @@ import {
   UNCREATE_TABLE_COL_DEFS,
 } from './constants/ioglod';
 const TabPane = Tabs.TabPane;
-import BigNumber from 'bignumber.js';
 
 export interface IOGlodProps {
   selectedRows: any[];
@@ -43,6 +46,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
   public $toOurForm2: WrappedFormUtils = null;
 
   public state = {
+    confirmLoading: false,
     visible: false,
     activeKey: 'our',
     unCreateDataSource: [],
@@ -59,10 +63,17 @@ class IOGlod extends PureComponent<IOGlodProps> {
     accountId: '',
     margin: true,
     entryMargin: true,
+    unCreateTableDataSource: [],
+    unCreateLoading: false,
+    entryPremium: true,
+    premium: true,
+    entryCash: false,
+    cash: false,
   };
 
   public componentDidMount = () => {
     this.onFetch();
+    this.onFetchUnCreate();
   };
 
   public onFetch = async () => {
@@ -80,8 +91,6 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }));
     this.setState({
       legalNamesList: markets,
-    });
-    this.setState({
       IOGlodSourceTableLoading: true,
     });
     const { error, data } = await clientAccountOpRecordList({
@@ -90,7 +99,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
     this.setState({
       IOGlodSourceTableLoading: false,
     });
-    if (error) return false;
+    if (error) return;
     this.setState({
       ioGoldDataSource: data,
     });
@@ -101,19 +110,24 @@ class IOGlod extends PureComponent<IOGlodProps> {
       return _.pick(val, ['legalName']).legalName;
     });
 
+    this.setState({ unCreateLoading: true });
     const { error, data } = await cliTradeTaskListByLegalNames({
       legalNames: legalNamesList,
     });
+    this.setState({ unCreateLoading: false });
 
-    if (error) return false;
-    return data;
+    if (error) return;
+    this.setState({
+      unCreateTableDataSource: data,
+    });
   };
 
-  public switchModal = event => {
+  public switchModal = async event => {
     this.modalFormData = event.rowData;
     const ourDataSource = {
       legalName: event.rowData.legalName,
       tradeId: event.rowData.tradeId,
+      premium: event.rowData.premium,
       cashFlow: event.rowData.cashFlow,
     };
     const toOurDataSource = {
@@ -132,20 +146,20 @@ class IOGlod extends PureComponent<IOGlodProps> {
   };
 
   public handleA = async (uuidList, values, resolve) => {
-    const clientTradeCashFlowRsp = await clientTradeCashFlow({
+    const clientNewTradeRsp = await clientNewTrade({
       accountId: this.modalFormData
         ? this.modalFormData.accountId
         : this.state.selectedRows[0].accountId,
+      premium: values.premium,
+      information: '',
       tradeId: values.tradeId,
-      cashFlow: String(values.cashFlow),
-      marginFlow: String(0),
     });
 
-    if (clientTradeCashFlowRsp.error) {
+    if (clientNewTradeRsp.error) {
       return resolve(false);
     }
-    if (!clientTradeCashFlowRsp.data.status) {
-      message.error(clientTradeCashFlowRsp.data.information);
+    if (!clientNewTradeRsp.data.status) {
+      message.error(clientNewTradeRsp.data.information);
       return resolve(false);
     }
     const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
@@ -156,7 +170,38 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }
 
     resolve(true);
-    this.$unCreateSourceTable.search();
+    this.onFetchUnCreate();
+    message.success('录入成功');
+  };
+
+  public handleD = async (uuidList, values, resolve, type) => {
+    const clientSettleTradeRsp = await clientSettleTrade({
+      accountId: this.modalFormData
+        ? this.modalFormData.accountId
+        : this.state.selectedRows[0].accountId,
+      amount: values.cashFlow,
+      accountEvent: type,
+      premium: values.premium,
+      information: '',
+      tradeId: values.tradeId,
+    });
+
+    if (clientSettleTradeRsp.error) {
+      return resolve(false);
+    }
+    if (!clientSettleTradeRsp.data.status) {
+      message.error(clientSettleTradeRsp.data.information);
+      return resolve(false);
+    }
+    const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
+      uuidList,
+    });
+    if (cliMmarkTradeTaskProcessedRsp.error) {
+      return resolve(false);
+    }
+
+    resolve(true);
+    this.onFetchUnCreate();
     message.success('录入成功');
   };
 
@@ -184,7 +229,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }
 
     resolve(true);
-    this.$unCreateSourceTable.search();
+    this.onFetchUnCreate();
     message.success('录入成功');
   };
 
@@ -212,24 +257,47 @@ class IOGlod extends PureComponent<IOGlodProps> {
       return resolve(false);
     }
     resolve(true);
-    this.$unCreateSourceTable.search();
+    this.onFetchUnCreate();
     message.success('录入成功');
   };
 
   public handleAIO = async (uuidList, values, resolve) => {
-    const clientTradeCashFlowRsp = await clientTradeCashFlow({
+    const clientNewTradeRsp = await clientNewTrade({
       accountId: this.state.accountId,
+      premium: values.premium,
+      information: '',
       tradeId: values.tradeId,
-      cashFlow: String(values.cashFlow),
-      marginFlow: String(0),
     });
 
-    if (clientTradeCashFlowRsp.error) {
-      message.error(clientTradeCashFlowRsp.data.information);
+    if (clientNewTradeRsp.error) {
+      message.error(clientNewTradeRsp.data.information);
       return resolve(false);
     }
 
-    if (!clientTradeCashFlowRsp.data.status) {
+    if (!clientNewTradeRsp.data.status) {
+      return resolve(false);
+    }
+
+    this.onFetch();
+    return resolve({
+      message: '录入成功',
+    });
+  };
+
+  public handleDIO = async (uuidList, values, resolve, type) => {
+    const clientSettleTradeRsp = await clientSettleTrade({
+      accountId: this.state.accountId,
+      amount: values.cashFlow,
+      accountEvent: type,
+      premium: values.premium,
+      information: '',
+      tradeId: values.tradeId,
+    });
+    if (clientSettleTradeRsp.error) {
+      return resolve(false);
+    }
+    if (!clientSettleTradeRsp.data.status) {
+      message.error(clientSettleTradeRsp.data.information);
       return resolve(false);
     }
 
@@ -250,7 +318,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
       return resolve(false);
     }
     if (!clientChangeCreditRsp.data.status) {
-      message.error(clientTradeCashFlowRsp.data.information);
+      message.error(clientChangeCreditRsp.data.information);
       return resolve(false);
     }
 
@@ -289,13 +357,25 @@ class IOGlod extends PureComponent<IOGlodProps> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            values.premium = new BigNumber(values.premium).negated().toNumber();
           case '期权费收入':
             return this.handleAIO(uuidList, values, resolve);
           case '授信扣除':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleBIO(uuidList, values, resolve);
+          case '平仓金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '平仓金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '结算金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'SETTLE_TRADE');
+          case '结算金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleDIO(uuidList, values, resolve, 'SETTLE_TRADE');
           case '保证金释放':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
@@ -315,13 +395,25 @@ class IOGlod extends PureComponent<IOGlodProps> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            values.premium = new BigNumber(values.premium).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
+          case '平仓金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '平仓金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '结算金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
+          case '结算金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
           case '保证金释放':
             values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
@@ -373,7 +465,7 @@ class IOGlod extends PureComponent<IOGlodProps> {
           return resolve(false);
         }
 
-        this.$unCreateSourceTable.search();
+        this.onFetchUnCreate();
         resolve(true);
         message.success('录入成功');
       });
@@ -456,16 +548,71 @@ class IOGlod extends PureComponent<IOGlodProps> {
       this.setState({
         item: false,
         entryMargin: false,
+        entryPremium: false,
+        entryCash: true,
         ourDataSource: values,
+      });
+      return;
+    }
+    if (
+      values.cashType === '平仓金额收入' ||
+      values.cashType === '平仓金额扣除' ||
+      values.cashType === '结算金额收入' ||
+      values.cashType === '结算金额扣除'
+    ) {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '期权费收入' || values.cashType === '期权费扣除') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: false,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '授信扣除' || values.cashType === '授信恢复') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: false,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
       });
       return;
     }
 
     this.setState({
       entryMargin: true,
+      entryPremium: false,
+      entryCash: false,
       ourDataSource: {
         ...values,
         tradeId: this.modalFormData.tradeId,
+        premium: this.modalFormData.premium,
+        cashFlow: this.modalFormData.cashFlow,
       },
     });
   };
@@ -483,6 +630,42 @@ class IOGlod extends PureComponent<IOGlodProps> {
       this.setState({
         item: false,
         margin: false,
+        premium: false,
+        cash: true,
+        ourDataSource2: values,
+      });
+      return;
+    }
+    if (
+      values.cashType === '平仓金额收入' ||
+      values.cashType === '平仓金额扣除' ||
+      values.cashType === '结算金额收入' ||
+      values.cashType === '结算金额扣除'
+    ) {
+      this.setState({
+        margin: true,
+        premium: true,
+        cash: true,
+        ourDataSource2: values,
+      });
+      return;
+    }
+
+    if (values.cashType === '期权费收入' || values.cashType === '期权费扣除') {
+      this.setState({
+        margin: true,
+        premium: true,
+        cash: false,
+        ourDataSource2: values,
+      });
+      return;
+    }
+
+    if (values.cashType === '授信扣除' || values.cashType === '授信恢复') {
+      this.setState({
+        margin: true,
+        premium: false,
+        cash: true,
         ourDataSource2: values,
       });
       return;
@@ -500,6 +683,8 @@ class IOGlod extends PureComponent<IOGlodProps> {
     }
     this.setState({
       margin: true,
+      premium: true,
+      cash: false,
       ourDataSource2: values,
     });
   };
@@ -527,19 +712,16 @@ class IOGlod extends PureComponent<IOGlodProps> {
     });
   };
 
-  public handleEntryOk = () => {
-    this.setState(
-      {
+  public handleEntryOk = async () => {
+    this.setState({ confirmLoading: true });
+    const success = await (this.state.activeKey === 'our' ? this.createOur() : this.createToOur());
+    this.setState({ confirmLoading: false });
+
+    if (success) {
+      this.setState({
         entryVisible: false,
-      },
-      () => {
-        if (this.state.activeKey === 'our') {
-          return this.createOur();
-        } else {
-          return this.createToOur();
-        }
-      }
-    );
+      });
+    }
   };
 
   public handleEntryCancel = () => {
@@ -568,51 +750,14 @@ class IOGlod extends PureComponent<IOGlodProps> {
   public render() {
     return (
       <>
-        {/* <Modal visible={this.state.visible} onCancel={this.switchModal} closable={false}>
-          <Tabs defaultActiveKey="保证金事件">
-            <TabPane tab="保证金事件" key="保证金事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={MARGIN_FORM_CONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-            <TabPane tab="现金流事件" key="现金流事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={CASH_FLOW_FORM_ONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-            <TabPane tab="授信改变事件" key="授信改变事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={CREDIT_TO_CHANGE_FORM_CONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-            <TabPane tab="出入金事件" key="出入金事件">
-              <Form
-                ref={node => (this.$form = node)}
-                controls={IO_FORM_CONTROLS}
-                controlNumberOneRow={1}
-                footer={false}
-              />
-            </TabPane>
-          </Tabs>
-        </Modal> */}
         <Section>待处理任务</Section>
         <SourceTable
           rowKey="uuid"
+          loading={this.state.unCreateLoading}
+          dataSource={this.state.unCreateTableDataSource}
           ref={node => (this.$unCreateSourceTable = node)}
-          tableColumnDefs={UNCREATE_TABLE_COL_DEFS}
-          tableProps={{
-            height: undefined,
-          }}
-          onSearch={this.onFetchUnCreate}
+          columnDefs={UNCREATE_TABLE_COL_DEFS}
+          height={undefined}
           rowActions={[
             <Button key="资金录入" type="primary" onClick={this.switchModal}>
               资金录入
@@ -624,69 +769,70 @@ class IOGlod extends PureComponent<IOGlodProps> {
           loading={this.state.IOGlodSourceTableLoading}
           rowKey="uuid"
           ref={node => (this.$IOGlodSourceTable = node)}
-          createText="资金录入"
-          tableColumnDefs={IOGLOD_COL_DEFS}
-          onSearch={this.onFetch}
-          tableProps={{
-            height: undefined,
-            autoSizeColumnsToFit: false,
-          }}
+          columnDefs={IOGLOD_COL_DEFS}
+          height={undefined}
+          autoSizeColumnsToFit={false}
           dataSource={this.state.ioGoldDataSource}
-          onCreate={this.onCreateIo}
-          // createButtonProps={{
-          //   disabled: !this.state.selectedRows.length,
-          // }}
-          onSwitchCreateModal={this.onSwitchIOCreateModal}
-          createModalProps={{ width: 650 }}
-          createModalContent={
-            <Tabs activeKey={this.state.activeKey} onChange={this.onChangeTabs}>
-              <TabPane tab="客户资金变动" key="our">
-                <Form
-                  wrappedComponentRef={element => {
-                    if (element) {
-                      this.$ourForm2 = element.props.form;
-                    }
-                    return;
-                  }}
-                  dataSource={this.state.ourDataSource2}
-                  controls={OUR_CREATE_FORM_CONTROLS(this.state.legalNamesList, this.state.margin)}
-                  onValueChange={this.handleChangeValueOur2}
-                  controlNumberOneRow={1}
-                  footer={false}
-                />
-              </TabPane>
-              <TabPane tab="我方资金变动" key="toOur">
-                <Form
-                  wrappedComponentRef={element => {
-                    if (element) {
-                      this.$toOurForm2 = element.props.form;
-                    }
-                    return;
-                  }}
-                  dataSource={this.state.toOurDataSource2}
-                  controls={TOOUR_CREATE_FORM_CONTROLS(this.state.legalNamesList)}
-                  onValueChange={this.handleChangeValueToOur2}
-                  controlNumberOneRow={1}
-                  footer={false}
-                />
-              </TabPane>
-            </Tabs>
+          header={
+            <Row style={{ marginBottom: VERTICAL_GUTTER }}>
+              <ModalButton
+                onClick={this.onSwitchIOCreateModal}
+                type="primary"
+                modalProps={{
+                  onOk: this.onCreateIo,
+                  width: 650,
+                }}
+                content={
+                  <Tabs activeKey={this.state.activeKey} onChange={this.onChangeTabs}>
+                    <TabPane tab="客户资金变动" key="our">
+                      <Form
+                        wrappedComponentRef={element => {
+                          if (element) {
+                            this.$ourForm2 = element.props.form;
+                          }
+                          return;
+                        }}
+                        dataSource={this.state.ourDataSource2}
+                        controls={OUR_CREATE_FORM_CONTROLS(
+                          this.state.legalNamesList,
+                          this.state.margin,
+                          this.state.premium,
+                          this.state.cash
+                        )}
+                        onValueChange={this.handleChangeValueOur2}
+                        controlNumberOneRow={1}
+                        footer={false}
+                      />
+                    </TabPane>
+                    <TabPane tab="我方资金变动" key="toOur">
+                      <Form
+                        wrappedComponentRef={element => {
+                          if (element) {
+                            this.$toOurForm2 = element.props.form;
+                          }
+                          return;
+                        }}
+                        dataSource={this.state.toOurDataSource2}
+                        controls={TOOUR_CREATE_FORM_CONTROLS(this.state.legalNamesList)}
+                        onValueChange={this.handleChangeValueToOur2}
+                        controlNumberOneRow={1}
+                        footer={false}
+                      />
+                    </TabPane>
+                  </Tabs>
+                }
+              >
+                资金录入
+              </ModalButton>
+            </Row>
           }
-          // extraActions={[
-          //   <Button key="资金操作" onClick={this.switchModal}>
-          //     资金操作
-          //   </Button>,
-          // ]}
-          // extraActions={[<Button key="资金操作">资金操作</Button>]}
-          // tableProps={{
-          //   autoSizeColumnsToFit: false,
-          // }}
         />
         <Modal
           visible={this.state.entryVisible}
           onOk={this.handleEntryOk}
           onCancel={this.handleEntryCancel}
           width={800}
+          confirmLoading={this.state.confirmLoading}
         >
           <Tabs activeKey={this.state.activeKey} onChange={this.onChangeTabs}>
             <TabPane tab="客户资金变动" key="our">
@@ -700,7 +846,9 @@ class IOGlod extends PureComponent<IOGlodProps> {
                 dataSource={this.state.ourDataSource}
                 controls={OUR_CREATE_FORM_CONTROLS(
                   this.state.legalNamesList,
-                  this.state.entryMargin
+                  this.state.entryMargin,
+                  this.state.entryPremium,
+                  this.state.entryCash
                 )}
                 onValueChange={this.handleChangeValueOur}
                 controlNumberOneRow={1}

@@ -24,6 +24,10 @@ export const countRhoR = rhoR => {
     .toNumber();
 };
 
+export const countPnlValue = pnlChange => {
+  return new BigNumber(pnlChange).decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES).toNumber();
+};
+
 export const countDelta = (delta, multiplier) => {
   return new BigNumber(delta)
     .dividedBy(multiplier)

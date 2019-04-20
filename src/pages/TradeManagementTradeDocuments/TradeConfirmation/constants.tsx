@@ -3,6 +3,7 @@ import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import { Row } from 'antd';
 import React from 'react';
 import TradeModal from './TradeModal';
 
@@ -148,7 +149,11 @@ export const TRADE_COLUMN_DEFS: (onFetch) => IColumnDef[] = onFetch => [
   {
     headerName: '操作',
     render: params => {
-      return <TradeModal data={params.data} onFetch={onFetch} />;
+      return (
+        <Row type="flex" align="middle" style={{ height: params.node.rowHeight }}>
+          <TradeModal data={params.data} onFetch={onFetch} />
+        </Row>
+      );
     },
   },
 ];

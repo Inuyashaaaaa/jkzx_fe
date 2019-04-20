@@ -6,6 +6,7 @@ import {
 } from '@/constants/common';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
+import { getMoment } from '@/utils';
 import { message, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -41,18 +42,32 @@ class ExerciseModal extends PureComponent<
     dataSource: {},
     exportVisible: false,
   };
+
+  public getInitialKnockOutDate = data => {
+    const dateVals = (data.observationDates || [])
+      .map(item => getMoment(item).valueOf())
+      .sort((a, b) => a - b);
+    const now = moment().valueOf();
+    if (!dateVals.length) return moment(now);
+    if (now < dateVals[0]) {
+      return moment(dateVals[0]);
+    }
+    if (now > dateVals[dateVals.length - 1]) {
+      return moment(dateVals[dateVals.length - 1]);
+    }
+    return moment(now);
+  };
+
   public show = (data = {}, tableFormData, currentUser, reload) => {
     this.data = data;
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-
-    const direction = this.data.direction;
     this.setState({
       visible: true,
       dataSource: {
         [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-        [KNOCK_OUT_DATE]: moment(),
+        [KNOCK_OUT_DATE]: this.getInitialKnockOutDate(this.data),
       },
     });
   };

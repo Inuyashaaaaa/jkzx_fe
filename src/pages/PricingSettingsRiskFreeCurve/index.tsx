@@ -81,7 +81,20 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     });
     if (error) return;
     const { dataSource } = data;
-    const tableDataSource = this.sortDataSource(dataSource);
+    let tableDataSource;
+    if (!dataSource.length) {
+      tableDataSource = [
+        {
+          tenor: '1D',
+          quote: 0,
+          use: true,
+          expiry: null,
+          id: uuidv4(),
+        },
+      ];
+    } else {
+      tableDataSource = this.sortDataSource(dataSource);
+    }
     this.setState({ tableDataSource });
     // return tableDataSource;
   };
@@ -111,6 +124,8 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public onConfirm = event => {
+    if (!event.formData.tenor) return;
+
     const clone = [...this.state.tableDataSource];
     clone.splice(event.extra.rowIndex + 1, 0, {
       ...event.extra.rowData,
@@ -160,6 +175,12 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
       this.reject = reject;
     });
     return this.confirmPromise;
+  };
+
+  public onCancel = () => {
+    return {
+      formData: {},
+    };
   };
 
   public render() {
@@ -234,6 +255,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               ref={node => (this.$modalButton = node)}
               onConfirm={this.onConfirm}
               onClick={this.onClick}
+              onCancel={this.onCancel}
             >
               插入
             </ModalButton>,
