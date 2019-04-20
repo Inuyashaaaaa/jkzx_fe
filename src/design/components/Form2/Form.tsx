@@ -4,6 +4,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React, { ComponentClass, PureComponent } from 'react';
 import { createEventBus } from '../../utils';
+import { VALIDATE_MESSAGES } from '../constants';
 import { IFormBaseProps, IFormField, IFormProps, IFormTriggerCellValueChangeParams } from '../type';
 import { FORM_CELL_VALUES_CHANGE } from './constants';
 import FormBase from './FormBase';
@@ -55,6 +56,7 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
   constructor(props) {
     super(props);
     this.DecoratorForm = AntdForm.create<IFormBaseProps>({
+      validateMessages: VALIDATE_MESSAGES,
       ..._.pick(props, Form.createOptionsFields),
       onFieldsChange: this.onFieldsChange,
       onValuesChange: this.onValuesChange,
