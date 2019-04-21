@@ -1,19 +1,26 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 export const InitialSpot: ILegColDef = {
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   title: '期初价格',
   dataIndex: LEG_FIELD.INITIAL_SPOT,
-  render: (val, record, index, { form, editing }) => {
+  render: (val, record, index, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber autoSelect={true} editing={editing} />)}
+        })(<UnitInputNumber autoSelect={!isBooking} editing={isBooking ? true : editing} />)}
       </FormItem>
     );
   },

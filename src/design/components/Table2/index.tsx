@@ -122,6 +122,7 @@ class Table2 extends PureComponent<ITableProps> {
               ? this.props.rowKey
               : this.props.rowKey(record, rowIndex);
           };
+          const rowId = record[getRowKey()];
           return {
             ...(colDef.onCell ? colDef.onCell(record, rowIndex, { colDef }) : undefined),
             $$render: colDef.render,
@@ -133,7 +134,10 @@ class Table2 extends PureComponent<ITableProps> {
             api: this.api,
             context: this.context,
             getRowKey,
-            rowId: record[getRowKey()],
+            rowId,
+            // setEditing: this.bindSetEditing(rowId, colDef.dataIndex),
+            // getEditing: this.bindGetEditing(rowId, colDef.dataIndex),
+            // editings: this.editings,
           };
         },
       };
@@ -160,9 +164,9 @@ class Table2 extends PureComponent<ITableProps> {
         context: this.context,
         getRowKey,
         columns: this.props.columns,
-        setEditing: this.bindSetEditing(rowId),
-        getEditing: this.bindGetEditing(rowId),
-        editings: this.editings,
+        // setEditing: this.bindSetEditing(rowId),
+        // getEditing: this.bindGetEditing(rowId),
+        // editings: this.editings,
         getContextMenu: this.props.getContextMenu,
       };
     };
@@ -176,19 +180,22 @@ class Table2 extends PureComponent<ITableProps> {
       return this.props.onCellValuesChange && this.props.onCellValuesChange(params);
     }
     if (eventName === TABLE_CELL_FIELDS_CHANGE) {
-      this.editings[params.rowId] = true;
+      // const { changedFields } = params;
+      // Object.keys(changedFields).forEach(key => {
+      //   _.set(this.editings, [params.rowId, key], true);
+      // });
       return this.props.onCellFieldsChange && this.props.onCellFieldsChange(params);
     }
   };
 
-  public bindSetEditing = rowId =>
-    _.debounce(editing => {
-      this.editings[rowId] = editing;
-    }, 50);
+  // public bindSetEditing = (rowId, colId) =>
+  //   _.debounce(editing => {
+  //     _.set(this.editings, [rowId, colId], editing);
+  //   }, 50);
 
-  public bindGetEditing = rowId => () => {
-    return this.editings[rowId];
-  };
+  // public bindGetEditing = (rowId, colId) => () => {
+  //   return _.get(this.editings, [rowId, colId]);
+  // };
 
   public listen = (eventName: string, callback, scope) => {
     this.api.eventBus.listen(eventName, callback, scope);

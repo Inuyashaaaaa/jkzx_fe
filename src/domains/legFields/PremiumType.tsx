@@ -8,6 +8,7 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { Select } from '@/design/components';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -16,12 +17,10 @@ import React from 'react';
 const getSelectProps = record => {
   if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.BARRIER) {
     return {
-      defaultOpen: true,
       options: PREMIUM_TYPE_OPTIONS,
     };
   }
   return {
-    defaultOpen: true,
     options: [
       {
         label: PREMIUM_TYPE_ZHCN_MAP.PERCENT,
@@ -36,15 +35,27 @@ const getSelectProps = record => {
 };
 
 export const PremiumType: ILegColDef = {
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   title: '权利金类型',
   dataIndex: LEG_FIELD.PREMIUM_TYPE,
-  render: (val, record, idnex, { form, editing }) => {
+  render: (val, record, idnex, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select {...getSelectProps(record)} editing={editing} />)}
+        })(
+          <Select
+            {...getSelectProps(record)}
+            defaultOpen={!isBooking}
+            editing={isBooking ? true : editing}
+          />
+        )}
       </FormItem>
     );
   },

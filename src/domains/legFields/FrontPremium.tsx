@@ -1,5 +1,6 @@
 import { LEG_FIELD, PREMIUM_TYPE_MAP, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -13,7 +14,12 @@ const getProps = record => {
 };
 
 export const FrontPremium: ILegColDef = {
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   // 权利金总和
   title: '合约期权费',
   exsitable: record => {
@@ -23,12 +29,19 @@ export const FrontPremium: ILegColDef = {
     return false;
   },
   dataIndex: LEG_FIELD.FRONT_PREMIUM,
-  render: (val, record, index, { form, editing }) => {
+  render: (val, record, index, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber autoSelect={true} editing={editing} {...getProps(record)} />)}
+        })(
+          <UnitInputNumber
+            autoSelect={!isBooking}
+            editing={isBooking ? true : editing}
+            {...getProps(record)}
+          />
+        )}
       </FormItem>
     );
   },

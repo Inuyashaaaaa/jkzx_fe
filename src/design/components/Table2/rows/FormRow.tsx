@@ -16,18 +16,18 @@ import { TABLE_CELL_FIELDS_CHANGE, TABLE_CELL_VALUES_CHANGE } from '../constants
 const EditableContext = React.createContext<{ form?: WrappedFormUtils }>({});
 
 class EditableRow extends React.Component<ITableRowProps> {
-  public shouldComponentUpdate(nextProps) {
-    if (nextProps.getEditing()) {
-      nextProps.setEditing(false);
-      return true;
-    }
+  // public shouldComponentUpdate(nextProps) {
+  //   if (nextProps.getEditing()) {
+  //     nextProps.setEditing(false);
+  //     return true;
+  //   }
 
-    if (_.some(nextProps.editings, val => !!val)) {
-      return false;
-    }
+  //   if (_.some(nextProps.editings, val => !!val)) {
+  //     return false;
+  //   }
 
-    return !isShallowEqual(nextProps, this.props);
-  }
+  //   return !isShallowEqual(nextProps, this.props);
+  // }
 
   public componentDidMount = () => {
     const { record, getRowKey } = this.props;

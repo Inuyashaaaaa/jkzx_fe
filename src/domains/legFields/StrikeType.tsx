@@ -6,6 +6,7 @@ import {
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
 import { Select } from '@/design/components';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
@@ -16,7 +17,6 @@ const getSelectProps = record => {
     record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE
   ) {
     return {
-      defaultOpen: true,
       options: [
         {
           label: '人民币',
@@ -35,7 +35,6 @@ const getSelectProps = record => {
   }
 
   return {
-    defaultOpen: true,
     options: [
       {
         label: '人民币',
@@ -51,14 +50,26 @@ const getSelectProps = record => {
 
 export const StrikeType: ILegColDef = {
   title: '行权价类型',
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   dataIndex: LEG_FIELD.STRIKE_TYPE,
-  render: (val, record, idnex, { form, editing }) => {
+  render: (val, record, idnex, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select {...getSelectProps(record)} editing={editing} />)}
+        })(
+          <Select
+            {...getSelectProps(record)}
+            defaultOpen={!isBooking}
+            editing={isBooking ? true : editing}
+          />
+        )}
       </FormItem>
     );
   },

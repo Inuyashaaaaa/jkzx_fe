@@ -177,6 +177,20 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     return buttonItemLayout;
   };
 
+  public componentDidMount = () => {
+    window.addEventListener('click', this.onWindowClick, false);
+  };
+
+  public componentWillUnmount = () => {
+    window.removeEventListener('click', this.onWindowClick, false);
+  };
+
+  public onWindowClick = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    this.save();
+  };
+
   public render() {
     const {
       rowProps,

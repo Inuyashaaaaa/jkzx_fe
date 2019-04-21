@@ -9,6 +9,8 @@ export const TRADE_ID_FIELD = 'tradeId';
 
 export const LEG_TYPE_FIELD = '$legType';
 
+export const LEG_ENV_FIELD = '$legEnv';
+
 export const LEG_ID_FIELD = 'id';
 
 export const LEG_NAME_FIELD = '$legName';
@@ -628,6 +630,7 @@ export const LEG_INJECT_FIELDS = [
   LEG_TYPE_FIELD,
   LEG_NAME_FIELD,
   LEG_FIELD.IS_ANNUAL,
+  LEG_ENV_FIELD,
 ];
 
 export const BIG_NUMBER_CONFIG = {

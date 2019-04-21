@@ -16,7 +16,7 @@ export interface ILeg {
   getColumns: (env: string) => ILegColDef[];
   getDefaultData: (env: string) => ITableData;
   getPosition: (env: string, dataItem: any, baseInfo: any) => any;
-  getPageData: (env: string) => any;
+  getPageData: (env: string, position: any) => any;
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,

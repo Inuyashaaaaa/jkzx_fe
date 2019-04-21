@@ -32,3 +32,12 @@ export const SOCKET_MAP = {
 export const ALL_OPTIONS_VALUE = 'all';
 
 export const CNY_FORMAT = '¥ 0,0.0000';
+
+export const FORM_EDITABLE_STATUS = {
+  // 编辑表单
+  EDITING_NO_CONVERT: 'EDITING_NO_CONVERT',
+  // 编辑转换表单
+  EDITING_CAN_CONVERT: 'EDITING_CAN_CONVERT',
+  // 展示表单
+  SHOW: 'SHOW',
+};

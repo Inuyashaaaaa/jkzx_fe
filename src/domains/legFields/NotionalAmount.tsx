@@ -1,5 +1,6 @@
 import { LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -13,15 +14,27 @@ const getProps = record => {
 };
 
 export const NotionalAmount: ILegColDef = {
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   title: '名义本金',
   dataIndex: LEG_FIELD.NOTIONAL_AMOUNT,
-  render: (val, record, index, { form, editing }) => {
+  render: (val, record, index, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber autoSelect={true} editing={editing} {...getProps(record)} />)}
+        })(
+          <UnitInputNumber
+            autoSelect={!isBooking}
+            editing={isBooking ? true : editing}
+            {...getProps(record)}
+          />
+        )}
       </FormItem>
     );
   },

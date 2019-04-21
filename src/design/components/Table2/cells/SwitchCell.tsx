@@ -1,3 +1,4 @@
+import { isShallowEqual } from '@/design/utils';
 import { FormItemProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import FormItem from 'antd/lib/form/FormItem';
@@ -11,7 +12,6 @@ import { TABLE_CELL_EDITING_CHANGED } from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
-import styles from './SwitchCell.less';
 
 class SwitchCell extends PureComponent<
   ITableCellProps,
@@ -24,10 +24,6 @@ class SwitchCell extends PureComponent<
     record: {},
   };
 
-  public state = {
-    editing: false,
-  };
-
   public oldValue: any = EMPTY_VALUE;
 
   public $cell: HTMLTableDataCellElement;
@@ -38,12 +34,20 @@ class SwitchCell extends PureComponent<
 
   public form: WrappedFormUtils;
 
-  constructor(props) {
+  public constructor(props) {
     super(props);
+    this.state = {
+      editing: _.get(props.colDef, 'defaultEditing', false),
+    };
   }
 
   public componentDidMount = () => {
     this.registeCell();
+  };
+
+  public valueHasChanged = () => {
+    const newVal = this.getValue();
+    return this.oldValue !== EMPTY_VALUE && this.oldValue !== newVal;
   };
 
   public isSelectionCell = () => {
@@ -106,24 +110,29 @@ class SwitchCell extends PureComponent<
     this.startEditing();
   };
 
+  public getEditing = () => {
+    return _.get(this.props.colDef, 'editing', this.state.editing);
+  };
+
   public startEditing = async () => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) {
+    if (!this.getEditing()) {
       return this.setState({
-        editing: !this.state.editing,
+        editing: !this.getEditing(),
       });
     }
   };
 
   public saveCell = async (callback?) => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) return;
+    if (!this.getEditing()) return;
 
     const dataIndex = this.getDataIndex();
     if (this.form.isFieldValidating(dataIndex)) return;
 
     const errorMsgs = await this.form.getFieldError(dataIndex);
     if (errorMsgs) return;
+
     if (this.$editingCell) {
       const value = await this.$editingCell.getValue();
       this.switchCellEditingStatus(value);
@@ -191,9 +200,9 @@ class SwitchCell extends PureComponent<
   public getInlineCell = form => {
     const { colDef } = this.props;
     const { editable, dataIndex } = colDef;
-    const { editing } = this.state;
+    const editing = this.getEditing();
     const wrapedForm = wrapFormGetDecorator(dataIndex, form);
-    if (editable && editing) {
+    if (editing) {
       return React.createElement(EditingCell, {
         ...this.props,
         cellApi: this,
@@ -214,10 +223,9 @@ class SwitchCell extends PureComponent<
 
   public onKeyDown = (e: KeyboardEvent<HTMLTableDataCellElement>) => {
     if (!this.getEditable()) return;
-
     // Enter
     if (e.keyCode === 13) {
-      if (!this.state.editing) {
+      if (!this.getEditing()) {
         this.startEditing();
         return;
       }
@@ -229,7 +237,7 @@ class SwitchCell extends PureComponent<
 
     // Tab
     if (e.keyCode === 9) {
-      if (this.state.editing) {
+      if (this.getEditing()) {
         this.saveCell(() => {
           setTimeout(() => {
             this.nextCellStartEditing();
@@ -256,12 +264,12 @@ class SwitchCell extends PureComponent<
   };
 
   public isEditing = () => {
-    return !!this.state.editing;
+    return !!this.getEditing();
   };
 
   public onCellBlur = event => {
     if (!this.getEditable()) return;
-    if (this.state.editing) {
+    if (this.getEditing()) {
       this.saveCell();
     }
   };
@@ -298,8 +306,8 @@ class SwitchCell extends PureComponent<
         onKeyDown={this.onKeyDown}
         className={classNames('tongyu-cell', {
           editable: this.getEditable(),
-          editing: this.state.editing,
-          rendering: !this.state.editing,
+          editing: this.getEditing(),
+          rendering: !this.getEditing(),
         })}
         style={this.getTdStyle()}
       >
