@@ -1,5 +1,6 @@
 import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -21,15 +22,27 @@ const getProps = record => {
 };
 
 export const Strike: ILegColDef = {
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   title: '行权价',
   dataIndex: LEG_FIELD.STRIKE,
-  render: (val, record, index, { form, editing }) => {
+  render: (val, record, index, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber autoSelect={true} editing={editing} {...getProps(record)} />)}
+        })(
+          <UnitInputNumber
+            autoSelect={!isBooking}
+            editing={isBooking ? true : editing}
+            {...getProps(record)}
+          />
+        )}
       </FormItem>
     );
   },

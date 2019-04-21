@@ -8,6 +8,7 @@ import {
   SPECIFIED_PRICE_ZHCN_MAP,
 } from '@/constants/common';
 import { Select } from '@/design/components';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -18,12 +19,10 @@ const getProps = record => {
     record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL
   ) {
     return {
-      defaultOpen: true,
       options: SPECIFIED_PRICE_OPTIONS,
     };
   }
   return {
-    defaultOpen: true,
     options: [
       {
         label: SPECIFIED_PRICE_ZHCN_MAP.CLOSE,
@@ -39,14 +38,27 @@ const getProps = record => {
 
 export const SpecifiedPrice: ILegColDef = {
   title: '结算方式',
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   dataIndex: LEG_FIELD.SPECIFIED_PRICE,
-  render: (val, record, index, { form, editing }) => {
+  render: (val, record, index, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select {...getProps(record)} autoSelect={true} editing={editing} />)}
+        })(
+          <Select
+            {...getProps(record)}
+            defaultOpen={!isBooking}
+            autoSelect={!isBooking}
+            editing={isBooking ? true : editing}
+          />
+        )}
       </FormItem>
     );
   },

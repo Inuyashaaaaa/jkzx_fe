@@ -1,5 +1,12 @@
-import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
-import { TOTAL_LEGS } from '@/constants/legs';
+import {
+  LCM_EVENT_TYPE_MAP,
+  LEG_ENV_FIELD,
+  LEG_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
+} from '@/constants/common';
+import { FORM_EDITABLE_STATUS } from '@/constants/global';
+import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import _ from 'lodash';
 
 export const isAutocallPhoenix = data => {
@@ -98,4 +105,24 @@ export function arr2treeOptions(arr, paths, labelPaths) {
 export const getLegByRecord = record => {
   const leg = TOTAL_LEGS.find(item => item.type === record[LEG_TYPE_FIELD]);
   return leg;
+};
+
+export const legEnvIsBooking = record => record[LEG_ENV_FIELD] === LEG_ENV.BOOKING;
+
+export const getFormEditingMeta = (status: string) => {
+  if (status === FORM_EDITABLE_STATUS.EDITING_NO_CONVERT) {
+    return {
+      editable: true,
+      editing: true,
+    };
+  } else if (status === FORM_EDITABLE_STATUS.EDITING_CAN_CONVERT) {
+    return {
+      editable: true,
+    };
+  } else {
+    return {
+      editable: false,
+      editing: false,
+    };
+  }
 };

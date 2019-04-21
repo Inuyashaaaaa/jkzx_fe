@@ -17,7 +17,7 @@ class DatePicker extends InputBase<IDatePickerProps> {
   public hasDefaultOpend = false;
 
   public getRef = node => {
-    if (this.props.defaultOpen && !this.hasDefaultOpend && node) {
+    if (this.props.defaultOpen && !this.hasDefaultOpend && node && node.picker) {
       setTimeout(() => {
         try {
           node.picker.handleOpenChange(true);

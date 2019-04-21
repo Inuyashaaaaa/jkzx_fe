@@ -32,7 +32,7 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
 
   public static getFieldValue = (field: any) => {
     if (Form.isField(field)) {
-      return field.value;
+      return _.get(field, 'value');
     }
     return field;
   };

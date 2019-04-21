@@ -1,570 +1,411 @@
-import {
-  LCM_EVENT_TYPE_MAP,
-  LCM_EVENT_TYPE_OPTIONS,
-  LCM_EVENT_TYPE_ZHCN_MAP,
-  LEG_FIELD,
-  LEG_NAME_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
-} from '@/constants/common';
-import { allLegTypes } from '@/constants/legColDefs';
-import { orderLegColDefs } from '@/constants/legColDefs/common/order';
-import { AlUnwindNotionalAmount, InitialNotionalAmount } from '@/constants/legColDefs/extraColDefs';
-import { IFormControl } from '@/design/components/Form/types';
-import SourceTable from '@/design/components/SourceTable';
-import { IColDef } from '@/design/components/Table/types';
-import ModalButton from '@/lib/components/_ModalButton2';
+import { LEG_FIELD, LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
+import { FORM_EDITABLE_STATUS } from '@/constants/global';
+import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
+import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
+import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
+import { Form2, Loading, Table2 } from '@/design/components';
+import { ITableData } from '@/design/components/type';
+import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { convertObservetions } from '@/services/common';
-import { trdBookList, trdTradeGet } from '@/services/general-service';
+import { trdTradeGet } from '@/services/general-service';
 import {
-  bookingTableFormControls,
-  convertTradeApiData2PageData,
+  backConvertPercent,
   createLegDataSourceItem,
+  getTradeCreateModalData,
 } from '@/services/pages';
-import {
-  trdPositionLCMEventTypes,
-  trdTradeLCMEventProcess,
-  trdTradeLCMUnwindAmountGet,
-} from '@/services/trade-service';
-import { ComponentResolver, GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { message } from 'antd';
+import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
+import { getLegByRecord } from '@/tools';
+import { ILeg, ILegColDef } from '@/types/leg';
+import { Affix, Button, Divider, Menu, message, Row, Typography } from 'antd';
 import { connect } from 'dva';
-import produce from 'immer';
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
-import uuidv4 from 'uuid/v4';
-import ExportModal from './ExportModal';
-import AsianExerciseModal from './modals/AsianExerciseModal';
-import BarrierIn from './modals/BarrierIn';
-import ExerciseModal from './modals/ExerciseModal';
-import ExpirationModal from './modals/ExpirationModal';
-import FixingModal from './modals/FixingModal';
-import KnockOutModal from './modals/KnockOutModal';
-import UnwindModal from './modals/UnwindModal';
-import { modalFormControls } from './services';
-import { filterObDays } from './utils';
+import React, { memo, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import './index.less';
 
-class TradeManagementBookEdit extends PureComponent<any, any> {
-  public rowKey: string = 'id';
+const TradeManagementBooking = props => {
+  const [columnMeta, setColumnMeta] = useState({
+    columns: [],
+    unionColumns: [],
+  });
+  const [tableData, setTableData] = useState([]);
+  const [tableLoading, setTableLoading] = useState(false);
 
-  public $souceTable: SourceTable = null;
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [createFormData, setCreateFormData] = useState({});
+  const tableEl = useRef<Table2>(null);
+  const [cashModalDataSource, setcashModalDataSource] = useState([]);
+  const [cashModalVisible, setCashModalVisible] = useState(false);
+  const [eventTypes, setEventTypes] = useState({});
 
-  public $modelButton: ModalButton = null;
+  const addLeg = (leg: ILeg, position) => {
+    if (!leg) return;
 
-  public cacheTyeps = [];
-
-  public activeRowData: any = {};
-
-  public $unwindModal: UnwindModal;
-
-  public $exerciseModal: ExerciseModal;
-
-  public $expirationModal: ExpirationModal;
-
-  public $knockOutModal: KnockOutModal;
-
-  public $fixingModal: FixingModal;
-
-  public $asianExerciseModal: AsianExerciseModal;
-
-  public $barrierIn: BarrierIn;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      unwindModalState: {
-        visible: false,
-      },
-      columnDefs: [],
-      dataSource: [],
-      loading: false,
-      tableFormData: {},
-      bookList: [],
-      eventTypes: {},
-      markets: {},
-      visible: false,
-    };
-  }
-
-  public componentDidMount = () => {
-    trdBookList().then(rsp => {
-      if (rsp.error) return;
-      this.setState({
-        bookList: rsp.data,
-      });
+    setColumnMeta(pre => {
+      const { columns, unionColumns } = pre;
+      const nextUnion = getUnionLegColumns(unionColumns.concat(leg.getColumns(LEG_ENV.EDITING)));
+      const nextColumns = getTitleColumns(
+        getLoadingsColumns(getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion))))
+      );
+      return {
+        columns: nextColumns,
+        unionColumns: nextUnion,
+      };
     });
 
-    this.loadData();
+    const isAnnualized = position.asset.annualized;
+
+    setTableData(pre =>
+      pre.concat({
+        ...createLegDataSourceItem(leg, LEG_ENV.EDITING),
+        [LEG_ID_FIELD]: position.positionId,
+        lcmEventType: position.lcmEventType,
+        ...leg.getPageData(LEG_ENV.EDITING, position),
+        ...Form2.createFields(
+          backConvertPercent({
+            ..._.omitBy(
+              _.omit(position.asset, ['counterpartyCode', 'annualized', 'exerciseType']),
+              _.isNull
+            ),
+            [LEG_FIELD.IS_ANNUAL]: isAnnualized,
+          })
+        ),
+      })
+    );
   };
 
-  public loadData = async (reset = false) => {
-    if (!this.props.location.query.id) {
+  const loadTableData = async () => {
+    if (!props.location.query.id) {
       return message.warn('查看 id 不存在');
     }
 
-    this.setState({ loading: true });
+    setTableLoading(true);
 
     const { error, data } = await trdTradeGet({
-      tradeId: this.props.location.query.id,
+      tradeId: props.location.query.id,
     });
 
     if (error) return;
 
-    const { tableDataSource, tableFormData } = convertTradeApiData2PageData(data);
+    const tableFormData = getTradeCreateModalData(data);
 
-    const composeTableDataSource = await Promise.all(
-      tableDataSource.map(item => {
+    const { positions } = data;
+
+    const composePositions = await Promise.all(
+      positions.map(position => {
         return trdTradeLCMUnwindAmountGet({
           tradeId: tableFormData.tradeId,
-          positionId: item.id,
+          positionId: position.positionId,
         }).then(rsp => {
           const { error, data } = rsp;
-          if (error) return item;
+          if (error) return position;
           return {
-            ...item,
-            [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
-            [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
+              [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
+            },
           };
         });
       })
     );
 
-    this.setState({ loading: false });
-
-    if (reset) {
-      this.cacheTyeps = [];
-      return this.setState(
-        {
-          dataSource: [],
-          columnDefs: [],
-        },
-        () => {
-          this.loadCommon(composeTableDataSource, tableFormData, reset);
-          // setTimeout(() => {
-          //   this.computeCellValues();
-          // }, 0);
-        }
-      );
-    }
-
-    this.loadCommon(composeTableDataSource, tableFormData, reset);
-    // setTimeout(() => {
-    //   this.computeCellValues();
-    // }, 0);
+    setTableLoading(false);
+    setCreateFormData(Form2.createFields(tableFormData));
+    mockAddLegItem(composePositions, tableFormData);
+    fetchEventType(composePositions);
   };
 
-  public getDepends = (getValue, data, colDef) => {
-    if (colDef.oldEditable) return [];
-    if (!getValue) return [];
-    if (typeof getValue === 'function') {
-      const result = getValue({ data, colDef }) || {};
-      return result.depends || [];
-    }
-    return getValue.depends || [];
-  };
-
-  public computeCellValues = () => {
-    const dependeds = _.flatten(
-      this.state.dataSource.map(dataSourceItem => {
-        return _.union<string>(
-          this.state.columnDefs.reduce((arr, item) => {
-            return arr.concat(this.getDepends(item.getValue, dataSourceItem, item));
-          }, [])
-        );
-      })
-    );
-
-    this.state.dataSource.forEach(rowData => {
-      const rowId = rowData[this.rowKey];
-      dependeds.forEach(colField => {
-        const value = rowData[colField];
-        this.$souceTable.$baseSourceTable.$table.$baseTable.setCellValue(rowId, colField, value);
-      });
+  const mockAddLegItem = async (composePositions, tableFormData) => {
+    composePositions.forEach(position => {
+      const leg = TOTAL_LEGS.find(it => it.type === position.productType);
+      addLeg(leg, position);
     });
   };
 
-  public loadCommon = (tableDataSource, tableFormData, reset) => {
-    tableDataSource.forEach(item => {
-      const leg = allLegTypes.find(it => it.type === item.productType);
-
+  const fetchEventType = composePositions => {
+    composePositions.forEach(position => {
       trdPositionLCMEventTypes({
-        positionId: item.id,
+        positionId: position.positionId,
       }).then(rsp => {
         if (rsp.error) return;
         const data = [...rsp.data];
-        const removeExporation = _.remove(data, n => {
-          return n === 'EXPIRATION';
-        });
-        this.setState({
-          eventTypes: {
-            ...this.state.eventTypes,
-            [item.id]: data,
-          },
-        });
+        setEventTypes(pre => ({
+          ...pre,
+          [position.positionId]: data,
+        }));
       });
-      this.addLegData(leg, this.makeData(leg, item));
-    });
-
-    this.setState({
-      tableFormData,
-      loading: false,
     });
   };
 
-  public makeData(leg, data) {
-    return {
-      ...createLegDataSourceItem(leg),
-      ...data,
-    };
-  }
+  useLifecycles(() => {
+    loadTableData();
+  });
 
-  public judgeLegTypeExsit = (colDef, data) => {
-    const legType = allLegTypes.find(item => item.type === data[LEG_TYPE_FIELD]);
-
-    if (!legType) return false;
-
-    return !!legType.getColumnDefs('editing').find(item => item.field === colDef.field);
+  const getUnionLegColumns = (legColDefs: ILegColDef[]) => {
+    return _.unionBy(legColDefs, item => item.dataIndex);
   };
 
-  public handleAddLeg = event => {
-    const leg = allLegTypes.find(item => item.type === event.key);
-
-    if (!leg) return;
-
-    const id = uuidv4();
-    this.addLegData(leg, { id, [LEG_TYPE_FIELD]: leg.type });
-  };
-
-  public addLegData = (leg, rowData) => {
-    if (this.cacheTyeps.indexOf(leg.type) === -1) {
-      this.cacheTyeps.push(leg.type);
+  const getOrderLegColumns = (legColDefs: ILegColDef[]) => {
+    if (!legColDefs) return [];
+    const notOrders = _.difference(legColDefs.map(item => item.dataIndex), LEG_FIELD_ORDERS);
+    if (notOrders && notOrders.length) {
+      console.error(`leg self colDef.dataIndex:[${notOrders}] not join orders yet.`);
     }
-
-    this.setState(
-      produce((state: any) => {
-        if (this.cacheTyeps.indexOf(leg.type) !== -1) {
-          state.columnDefs = orderLegColDefs(
-            _.unionBy<IColDef>(
-              [
-                {
-                  headerName: '持仓ID',
-                  field: 'positionId',
-                  editable: false,
-                },
-                {
-                  headerName: '状态',
-                  field: LEG_FIELD.LCM_EVENT_TYPE,
-                  oldEditable: false,
-                  editable: false,
-                  input: {
-                    type: 'select',
-                    options: LCM_EVENT_TYPE_OPTIONS,
-                  },
-                },
-                ...state.columnDefs.concat(
-                  leg.getColumnDefs('editing').map(col => {
-                    return {
-                      ...col,
-                      oldEditable: col.editable,
-                      suppressMenu: true,
-                      editable: false,
-                      exsitable: params => {
-                        const { colDef, data } = params;
-                        return this.judgeLegTypeExsit(colDef, data);
-                      },
-                    };
-                  })
-                ),
-                {
-                  ...InitialNotionalAmount,
-                  editable: false,
-                },
-                {
-                  ...AlUnwindNotionalAmount,
-                  editable: false,
-                },
-              ],
-              item => item.field
-            )
-          );
-        }
-        state.dataSource.push(rowData);
-      })
-    );
-  };
-
-  public getHorizontalrColumnDef = params => {
-    return {
-      headerName: params.rowData[LEG_NAME_FIELD],
-      suppressMenu: true,
-    };
-  };
-
-  public getContextMenuItems = (params): Array<MenuItemDef | string> => {
-    return [
-      ...(this.state.eventTypes[params.rowData.id] &&
-        this.state.eventTypes[params.rowData.id].map(eventType => {
-          return {
-            name: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
-            action: this.bindEventAction(eventType, params),
-          };
-        })),
-      'separator',
-      'copy',
-      'paste',
-    ];
-  };
-
-  public bindEventAction = (eventType, params) => () => {
-    const legType = params.rowData[LEG_TYPE_FIELD];
-
-    // 每次操作后及时更新，并保证数据一致性
-    this.activeRowData = params.rowData;
-
-    if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
-      return this.$expirationModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_IN) {
-      return this.$barrierIn.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.OBSERVE) {
-      return this.$fixingModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-      if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
-        const convertedData = filterObDays(convertObservetions(params.rowData));
-        if (convertedData.some(item => !item.price)) {
-          return message.warn('请先完善观察日价格');
-        }
-
-        return this.$asianExerciseModal.show(
-          this.activeRowData,
-          this.state.tableFormData,
-          this.props.currentUser,
-          () => this.loadData(true)
-        );
+    return LEG_FIELD_ORDERS.reduce((pre, next) => {
+      const colDef = legColDefs.find(item => item.dataIndex === next);
+      if (colDef) {
+        return pre.concat(colDef);
       }
+      return pre;
+    }, []).concat(notOrders.map(next => legColDefs.find(item => item.dataIndex === next)));
+  };
 
-      return this.$exerciseModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
+  const getLegByType = (type: string) => {
+    return TOTAL_LEGS.find(item => item.type === type);
+  };
+
+  const cellIsEmpty = (record, colDef) => {
+    const legBelongByRecord = getLegByType(record[LEG_TYPE_FIELD]);
+
+    if (
+      (colDef.exsitable && !colDef.exsitable(record)) ||
+      !(
+        legBelongByRecord &&
+        legBelongByRecord
+          .getColumns(LEG_ENV.PRICING)
+          .find(item => item.dataIndex === colDef.dataIndex)
+      )
+    ) {
+      return true;
     }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
-      if (this.activeRowData[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
-        return message.warn(
-          `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
-        );
-      }
-
-      this.$unwindModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.ROLL) {
-      this.$modelButton.click({
-        formControls: modalFormControls({
-          info: 'expirationDate',
-          name: '到期日',
-          input: { type: 'date', startDate: params.rowData.expirationDate },
-        }),
-        extra: {
-          ...params,
-          eventType,
-        },
-      });
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE) {
-      this.$expirationModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_OUT) {
-      this.$knockOutModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
+    return false;
   };
 
-  public removeLegData = (params: GetContextMenuItemsParams) => {
-    if (!params.column) return;
-
-    const colId = params.column.getColDef().field;
-    this.setState(
-      produce((state: any) => {
-        const index = state.dataSource.findIndex(item => item[LEG_TYPE_FIELD] === colId);
-        state.dataSource.splice(index - 1, 1);
-      })
-    );
-  };
-
-  public copyLegData = (params: GetContextMenuItemsParams) => {
-    if (!params.column) return;
-
-    const colId = params.column.getColDef().field;
-    const leg = this.getLeyByColId(colId);
-
-    if (!leg) return;
-
-    this.addLegData(leg, {
-      ...this.getDataItemByColId(colId),
-      id: uuidv4(),
-    });
-  };
-
-  public getLeyByColId = colId => {
-    const legType = this.getLegTypeByColId(colId);
-    return allLegTypes.find(item => item.type === legType);
-  };
-
-  public getLegTypeByColId = colId => {
-    return _.get(this.getDataItemByColId(colId), LEG_TYPE_FIELD);
-  };
-
-  public getDataItemByColId = colId => {
-    return this.state.dataSource.find(item => item.id === colId);
-  };
-
-  public handleEventType = eventType => {
-    switch (eventType) {
-      case 'EXERCISE':
-        return '行权成功';
-      case 'UNWIND':
-        return '平仓成功';
-      case 'ROLL':
-        return '展期成功';
-      default:
-        break;
-    }
-  };
-
-  public onConfirm = params => {
-    return trdTradeLCMEventProcess({
-      positionId: params.extra.rowData.id,
-      tradeId: this.state.tableFormData.tradeId,
-      eventType: params.extra.eventType,
-      userLoginId: this.props.currentUser.userName,
-      eventDetail: {
-        underlyerPrice: params.formData.underlyerPrice,
-        cashFlow: params.formData.cashFlow,
-        expirationDate: params.formData.expirationDate
-          ? params.formData.expirationDate.format('YYYY-MM-DD')
-          : undefined,
-      },
-    }).then(rsp => {
-      if (rsp.error) return;
-      setTimeout(() => {
-        message.success(this.handleEventType(params.extra.eventType));
-        // this.loadData(true);
-      }, 100);
-      this.setState({
-        visible: true,
-      });
+  const getEmptyRenderLegColumns = (legColDefs: ILegColDef[]) => {
+    return legColDefs.map(item => {
       return {
-        formData: {},
+        ...item,
+        editable(record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return false;
+          }
+          if (typeof item.editable === 'function') {
+            return item.editable.apply(this, arguments);
+          }
+          return !!item.editable;
+        },
+        onCell(record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return {
+              style: { backgroundColor: '#e8e8e8' },
+              ...(item.onCell ? item.onCell.apply(this, arguments) : null),
+            };
+          }
+        },
+        render(val, record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return null;
+          }
+
+          return item.render.apply(this, arguments);
+        },
       };
     });
   };
 
-  public convertVisible = () => {
-    this.setState({
-      visible: false,
+  const getWidthColumns = (legColDefs: ILegColDef[]) => {
+    return legColDefs.map(item => {
+      return {
+        ...item,
+        onCell() {
+          return {
+            width: '250px',
+            ...(item.onCell ? item.onCell.apply(this, arguments) : null),
+          };
+        },
+      };
     });
   };
-  public render() {
-    return (
-      <PageHeaderWrapper back={true}>
-        <SourceTable
-          loading={this.state.loading}
-          tableFormControls={bookingTableFormControls().map<IFormControl>(item => ({
-            ...item,
-            input: {
-              ...item.input,
-              type: 'input',
-              subtype: 'show',
-            },
-          }))}
-          tableFormData={this.state.tableFormData}
-          ref={node => (this.$souceTable = node)}
-          rowKey={this.rowKey}
-          pagination={false}
-          vertical={true}
-          autoSizeColumnsToFit={false}
-          enableSorting={false}
-          getHorizontalrColumnDef={this.getHorizontalrColumnDef}
-          getContextMenuItems={this.getContextMenuItems}
-          dataSource={this.state.dataSource}
-          columnDefs={this.state.columnDefs}
-        />
-        <ModalButton ref={node => (this.$modelButton = node)} onConfirm={this.onConfirm} />
-        <UnwindModal ref={node => (this.$unwindModal = node)} />
-        <ExerciseModal
-          ref={node => {
-            this.$exerciseModal = node;
-          }}
-        />
-        <ExpirationModal ref={node => (this.$expirationModal = node)} />
-        <KnockOutModal ref={node => (this.$knockOutModal = node)} />
-        <ExportModal
-          visible={this.state.visible}
-          trade={this.state.tableFormData}
-          convertVisible={this.convertVisible}
-          loadData={this.loadData}
-        />
-        <FixingModal
-          ref={node => {
-            this.$fixingModal = node;
-          }}
-        />
-        <AsianExerciseModal
-          ref={node => {
-            this.$asianExerciseModal = node;
-          }}
-        />
-        <BarrierIn
-          ref={node => {
-            this.$barrierIn = node;
-          }}
-        />
-      </PageHeaderWrapper>
-    );
-  }
-}
 
-export default connect(state => ({
-  currentUser: (state.user as any).currentUser,
-}))(TradeManagementBookEdit);
+  const getLoadingsColumns = (legColDefs: ILegColDef[]) => {
+    return legColDefs.map(item => {
+      return {
+        ...item,
+        render(val, record, index, { colDef }) {
+          const loading = _.get(record[colDef.dataIndex], 'loading', false);
+          return <Loading loading={loading}>{item.render.apply(this, arguments)}</Loading>;
+        },
+      };
+    });
+  };
+
+  const getTitleColumns = (legColDefs: ILegColDef[]) => {
+    return [
+      {
+        title: '结构类型',
+        dataIndex: LEG_FIELD.LEG_META,
+        render: (val, record) => {
+          return LEG_TYPE_ZHCH_MAP[record[LEG_TYPE_FIELD]];
+        },
+      },
+      // meta field 会被 loading 包装
+      ...remove(legColDefs, item => item.dataIndex === LEG_FIELD.LEG_META),
+    ];
+  };
+
+  const [createTradeLoading, setCreateTradeLoading] = useState(false);
+
+  // useEffect(
+  //   () => {
+  //     setColumns(pre => pre.map(item => item));
+  //   },
+  //   [loadings]
+  // );
+
+  const setLoadings = (colId: string, rowId: string, loading: boolean) => {
+    setTableData(pre =>
+      pre.map(record => {
+        if (record[LEG_ID_FIELD] === rowId) {
+          return {
+            ...record,
+            [colId]: {
+              ...record[colId],
+              loading,
+            },
+          };
+        }
+        return record;
+      })
+    );
+  };
+
+  const [affixed, setAffixed] = useState(false);
+
+  return (
+    <PageHeaderWrapper>
+      <Typography.Title level={4}>基本信息</Typography.Title>
+      <Divider />
+      <Loading loading={tableLoading}>
+        <BookingBaseInfoForm
+          editableStatus={FORM_EDITABLE_STATUS.EDITING_CAN_CONVERT}
+          createFormData={createFormData}
+          setCreateFormData={setCreateFormData}
+        />
+      </Loading>
+      <Typography.Title style={{ marginTop: 20 }} level={4}>
+        交易结构信息
+      </Typography.Title>
+      <Divider />
+      <Table2
+        loading={tableLoading}
+        size="middle"
+        ref={node => (tableEl.current = node)}
+        rowKey={LEG_ID_FIELD}
+        onCellFieldsChange={params => {
+          const { record } = params;
+          const leg = getLegByRecord(record);
+
+          setTableData(pre => {
+            const newData = pre.map(item => {
+              if (item[LEG_ID_FIELD] === params.rowId) {
+                return {
+                  ...item,
+                  ...params.changedFields,
+                };
+              }
+              return item;
+            });
+            if (leg.onDataChange) {
+              leg.onDataChange(
+                LEG_ENV.EDITING,
+                params,
+                newData[params.rowIndex],
+                newData,
+                (colId: string, loading: boolean) => {
+                  setLoadings(colId, params.rowId, loading);
+                },
+                setLoadings,
+                (colId: string, newVal: ITableData) => {
+                  setTableData(pre =>
+                    pre.map(item => {
+                      if (item[LEG_ID_FIELD] === params.rowId) {
+                        return {
+                          ...item,
+                          [colId]: newVal,
+                        };
+                      }
+                      return item;
+                    })
+                  );
+                },
+                setTableData
+              );
+            }
+            return newData;
+          });
+        }}
+        pagination={false}
+        vertical={true}
+        columns={columnMeta.columns}
+        dataSource={tableData}
+        // getContextMenu={params => {
+        //   return (
+        //     <Menu
+        //       onClick={event => {
+        //         if (event.key === 'copy') {
+        //           setTableData(pre => {
+        //             const next = insert(pre, params.rowIndex, {
+        //               ..._.cloneDeep(params.record),
+        //               [LEG_ID_FIELD]: uuid(),
+        //             });
+        //             return next;
+        //           });
+        //         }
+        //         if (event.key === 'remove') {
+        //           setTableData(pre => {
+        //             const next = remove(pre, params.rowIndex);
+        //             return next;
+        //           });
+        //         }
+        //       }}
+        //     >
+        //       <Menu.Item key="copy">复制</Menu.Item>
+        //       <Menu.Item key="remove">删除</Menu.Item>
+        //     </Menu>
+        //   );
+        // }}
+      />
+      <Affix offsetBottom={0} onChange={affixed => setAffixed(affixed)}>
+        <Row
+          type="flex"
+          justify="end"
+          style={{
+            background: affixed ? '#fff' : 'initial',
+            padding: '20px 10px',
+            borderTop: affixed ? '1px solid #ddd' : 'none',
+          }}
+        >
+          <Button
+            type="primary"
+            onClick={() => {
+              this.setState({
+                top: this.state.top + 10,
+              });
+            }}
+          >
+            保存
+          </Button>
+        </Row>
+      </Affix>
+    </PageHeaderWrapper>
+  );
+};
+
+export default memo(
+  connect(state => ({
+    currentUser: (state.user as any).currentUser,
+    pricingData: state.pricingData,
+  }))(TradeManagementBooking)
+);

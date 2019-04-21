@@ -13,7 +13,7 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
 
   public renderDiff = () => {
     const newVal = this.getValue();
-    if (this.props.cellApi.oldValue !== EMPTY_VALUE && this.props.cellApi.oldValue !== newVal) {
+    if (this.props.cellApi.valueHasChanged()) {
       setTimeout(() => {
         this.props.cellApi.$cell.classList.add('tongyu-cell-diff');
 

@@ -67,11 +67,15 @@ export interface IFormColDef<T = any> extends IColDef {
   /* 作用和 field 中的 label 一样，方便直接使用 table.columns 的数据 */
   title?: React.ReactNode;
   editable?: boolean;
+  defaultEditing?: boolean;
+  editing?: boolean;
 }
 
 export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render' | 'onCell'> {
   // totalable?: boolean | ((params: { totalData: number; record: object }) => number);
   title?: React.ReactNode;
+  defaultEditing?: boolean;
+  editing?: boolean;
   editable?:
     | boolean
     | ((

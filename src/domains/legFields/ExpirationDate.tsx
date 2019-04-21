@@ -1,20 +1,32 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { DatePicker } from '@/design/components';
+import { legEnvIsBooking } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 export const ExpirationDate: ILegColDef = {
-  editable: true,
+  editable: record => {
+    if (legEnvIsBooking(record)) {
+      return false;
+    }
+    return true;
+  },
   title: '到期日',
   dataIndex: LEG_FIELD.EXPIRATION_DATE,
-  render: (val, record, index, { form, editing }) => {
+  render: (val, record, index, { form, editing, colDef }) => {
+    const isBooking = legEnvIsBooking(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(
-          <DatePicker format="YYYY-MM-DD" defaultOpen={true} autoSelect={true} editing={editing} />
+          <DatePicker
+            format="YYYY-MM-DD"
+            defaultOpen={!isBooking}
+            autoSelect={!isBooking}
+            editing={isBooking ? true : editing}
+          />
         )}
       </FormItem>
     );

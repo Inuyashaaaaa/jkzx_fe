@@ -22,7 +22,7 @@ import UnwindModal from '@/pages/TradeManagementBookEdit/modals/UnwindModal';
 import { modalFormControls } from '@/pages/TradeManagementBookEdit/services';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
 import { trdTradeLCMEventList } from '@/services/general-service';
-import { convertTradeApiData2PageData } from '@/services/pages';
+import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -104,7 +104,7 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
       });
     }
     if (keyPath.length === 2) {
-      const { tableDataSource, tableFormData } = convertTradeApiData2PageData(this.props.record);
+      const { tableDataSource, tableFormData } = getTradeCreateModalData(this.props.record);
       this.setState(
         {
           tableFormData,

@@ -153,29 +153,26 @@ export const VanillaAmerican: ILeg = {
     ];
   },
   getDefaultData: env => {
-    return _.mapValues(
-      {
-        // expirationTime: '15:00:00',
-        [IsAnnual.dataIndex]: true,
-        [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-        [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-        [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-        [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
-        [LEG_FIELD.PARTICIPATION_RATE]: 100,
-        [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
-        [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-        [LEG_FIELD.TERM]: DEFAULT_TERM,
-        [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-        [LEG_FIELD.STRIKE]: 100,
-        [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-        ...(env === LEG_ENV.PRICING
-          ? {
-              [LEG_FIELD.TERM]: DEFAULT_TERM,
-            }
-          : null),
-      },
-      val => Form2.createField(val)
-    );
+    return Form2.createFields({
+      // expirationTime: '15:00:00',
+      [IsAnnual.dataIndex]: true,
+      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
+      [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
+      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
+      [LEG_FIELD.TERM]: DEFAULT_TERM,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
+      [LEG_FIELD.STRIKE]: 100,
+      [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
+      ...(env === LEG_ENV.PRICING
+        ? {
+            [LEG_FIELD.TERM]: DEFAULT_TERM,
+          }
+        : null),
+    });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
@@ -215,8 +212,10 @@ export const VanillaAmerican: ILeg = {
 
     return nextPosition;
   },
-  getPageData: () => {
-    return {};
+  getPageData: (env: string, position: any) => {
+    return Form2.createFields({
+      strikePercentAndNumber: position.asset.strike,
+    });
   },
   onDataChange: (
     env: string,

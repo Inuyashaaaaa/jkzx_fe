@@ -18,11 +18,7 @@ class SwitchCell extends PureComponent<
   }
 > {
   public static defaultProps = {
-    prefix: 'form2-switch',
-  };
-
-  public state = {
-    editing: false,
+    prefix: 'tongyu',
   };
 
   public oldValue: any = EMPTY_VALUE;
@@ -33,8 +29,11 @@ class SwitchCell extends PureComponent<
 
   public $renderingCell: RenderingCell;
 
-  constructor(props) {
+  public constructor(props) {
     super(props);
+    this.state = {
+      editing: _.get(props.colDef, 'defaultEditing', false),
+    };
   }
 
   public componentDidMount = () => {
@@ -61,9 +60,9 @@ class SwitchCell extends PureComponent<
   public getInlineCell = () => {
     const { colDef, form } = this.props;
     const { editable, dataIndex } = colDef;
-    const { editing } = this.state;
+    const editing = this.getEditing();
     const wrapedForm = wrapFormGetDecorator(dataIndex, form);
-    if (editable && editing) {
+    if (editing) {
       return React.createElement(EditingCell, {
         ...this.props,
         cellApi: this,
@@ -103,11 +102,15 @@ class SwitchCell extends PureComponent<
     });
   };
 
+  public getEditing = () => {
+    return _.get(this.props.colDef, 'editing', this.state.editing);
+  };
+
   public startEditing = async () => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) {
+    if (!this.getEditing()) {
       return this.setState({
-        editing: !this.state.editing,
+        editing: !this.getEditing(),
       });
     }
   };
@@ -141,7 +144,7 @@ class SwitchCell extends PureComponent<
 
   public saveCell = async (callback?) => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) return;
+    if (!this.getEditing()) return;
     const dataIndex = this.getDataIndex();
     if (this.props.form.isFieldValidating(dataIndex)) return;
 
@@ -179,7 +182,7 @@ class SwitchCell extends PureComponent<
 
     // Enter
     if (e.keyCode === 13) {
-      if (!this.state.editing) {
+      if (!this.getEditing()) {
         this.startEditing();
         return;
       }
@@ -191,7 +194,7 @@ class SwitchCell extends PureComponent<
 
     // Tab
     if (e.keyCode === 9) {
-      if (this.state.editing) {
+      if (this.getEditing()) {
         this.saveCell(() => {
           setTimeout(() => {
             this.nextCellStartEditing();
@@ -218,7 +221,7 @@ class SwitchCell extends PureComponent<
   };
 
   public isEditing = () => {
-    return !!this.state.editing;
+    return !!this.getEditing();
   };
 
   public render() {
@@ -241,8 +244,8 @@ class SwitchCell extends PureComponent<
         onKeyDown={this.onKeyDown}
         className={classNames(`${this.props.prefix}-cell`, {
           editable: this.getEditable(),
-          editing: this.state.editing,
-          rendering: !this.state.editing,
+          editing: this.getEditing(),
+          rendering: !this.getEditing(),
         })}
       >
         {this.getInlineCell()}

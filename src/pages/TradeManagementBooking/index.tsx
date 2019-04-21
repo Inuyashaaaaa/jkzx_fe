@@ -4,21 +4,24 @@ import {
   LEG_NAME_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
+  LEG_ENV_FIELD,
 } from '@/constants/common';
+import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
+import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import { Form2, Loading, ModalButton, Table2 } from '@/design/components';
 import { VERTICAL_GUTTER } from '@/design/components/SourceTable';
 import { ITableData } from '@/design/components/type';
 import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { convertTradePageData2ApiData } from '@/services/pages';
+import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
 import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
 import { trdTradeCreate } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
 import { ILeg, ILegColDef } from '@/types/leg';
-import { Button, Menu, message, Modal, Row } from 'antd';
+import { Button, Menu, message, Modal, Row, Divider } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
@@ -26,7 +29,10 @@ import CreateForm from './CreateForm';
 import './index.less';
 
 const TradeManagementBooking = props => {
-  const [columns, setColumns] = useState([]);
+  const [columnMeta, setColumnMeta] = useState({
+    columns: [],
+    unionColumns: [],
+  });
   const [tableData, setTableData] = useState([]);
 
   const getUnionLegColumns = (legColDefs: ILegColDef[]) => {
@@ -99,14 +105,6 @@ const TradeManagementBooking = props => {
         },
       };
     });
-  };
-
-  const createLegDataSourceItem = (leg: ILeg) => {
-    return {
-      [LEG_ID_FIELD]: uuid(),
-      [LEG_TYPE_FIELD]: leg.type,
-      [LEG_NAME_FIELD]: leg.name,
-    };
   };
 
   const getWidthColumns = (legColDefs: ILegColDef[]) => {
@@ -191,24 +189,25 @@ const TradeManagementBooking = props => {
             handleAddLeg={(leg: ILeg) => {
               if (!leg) return;
 
-              setColumns(pre => {
-                const next = getTitleColumns(
+              setColumnMeta(pre => {
+                const { columns, unionColumns } = pre;
+                const nextUnion = getUnionLegColumns(
+                  unionColumns.concat(leg.getColumns(LEG_ENV.BOOKING))
+                );
+                const nextColumns = getTitleColumns(
                   getLoadingsColumns(
-                    getWidthColumns(
-                      getEmptyRenderLegColumns(
-                        getOrderLegColumns(
-                          getUnionLegColumns(pre.concat(leg.getColumns(LEG_ENV.BOOKING)))
-                        )
-                      )
-                    )
+                    getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion)))
                   )
                 );
-                return next;
+                return {
+                  columns: nextColumns,
+                  unionColumns: nextUnion,
+                };
               });
 
               setTableData(pre =>
                 pre.concat({
-                  ...createLegDataSourceItem(leg),
+                  ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
                   ...leg.getDefaultData(LEG_ENV.BOOKING),
                 })
               );
@@ -261,12 +260,12 @@ const TradeManagementBooking = props => {
                   validTime: '2018-01-01T10:10:10',
                 });
 
-                if (error) return false;
+                if (error) return;
 
                 message.success('簿记成功');
 
                 setCreateModalVisible(false);
-                setColumns([]);
+                setColumnMeta({ columns: [], unionColumns: [] });
                 setTableData([]);
                 setCreateFormData({});
 
@@ -282,8 +281,8 @@ const TradeManagementBooking = props => {
               },
               onCancel: () => setCreateModalVisible(false),
               children: (
-                <CreateForm
-                  setCreateModalVisible={setCreateModalVisible}
+                <BookingBaseInfoForm
+                  editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
                   createFormData={createFormData}
                   setCreateFormData={setCreateFormData}
                 />
@@ -294,6 +293,7 @@ const TradeManagementBooking = props => {
           </ModalButton>
         </Button.Group>
       </Row>
+      <Divider />
       <Table2
         size="middle"
         ref={node => (tableEl.current = node)}
@@ -343,7 +343,7 @@ const TradeManagementBooking = props => {
         }}
         pagination={false}
         vertical={true}
-        columns={columns}
+        columns={columnMeta.columns}
         dataSource={tableData}
         getContextMenu={params => {
           return (

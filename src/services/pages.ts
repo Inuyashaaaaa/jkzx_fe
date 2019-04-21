@@ -1,5 +1,5 @@
 import {
-  LEG_ANNUALIZED_FIELD,
+  LEG_ENV_FIELD,
   LEG_FIELD,
   LEG_ID_FIELD,
   LEG_NAME_FIELD,
@@ -10,21 +10,23 @@ import {
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
+import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import { LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
+import { uuid } from '@/design/utils';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import { ILeg } from '@/types/leg';
 import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import uuidv4 from 'uuid/v4';
 
-export const createLegDataSourceItem = (leg: ILeg) => {
+export const createLegDataSourceItem = (leg: ILeg, env: string) => {
   return {
-    [LEG_ID_FIELD]: uuidv4(),
+    [LEG_ID_FIELD]: uuid(),
     [LEG_TYPE_FIELD]: leg.type,
     [LEG_NAME_FIELD]: leg.name,
+    [LEG_ENV_FIELD]: env,
   };
 };
 
@@ -148,46 +150,18 @@ export const convertTradePageData2ApiData = (tableDataSource, tableFormData, use
   return params;
 };
 
-export const convertTradeApiData2PageData = (apiData: any = {}) => {
+export const getTradeCreateModalData = (apiData: any = {}) => {
   const tableFormData: any = {};
   const { positions } = apiData;
 
   tableFormData.salesCode = apiData.salesCode;
-  tableFormData.counterPartyCode = positions[0].counterPartyCode;
+  tableFormData.counterPartyCode = _.get(positions, '[0].counterPartyCode');
   tableFormData.bookName = apiData.bookName;
   tableFormData.tradeId = apiData.tradeId;
   tableFormData.salesCode = apiData.salesCode;
   tableFormData.tradeDate = apiData.tradeDate;
 
-  const tableDataSource = positions.map(position => {
-    const isAnnualized = position.asset.annualized;
-    let Leg;
-    if (position.productType === LEG_TYPE_MAP.DIGITAL) {
-      Leg =
-        LEG_MAP[
-          `${position.productType}_${position.asset.exerciseType}_${
-            isAnnualized ? 'ANNUAL' : 'UNANNUAL'
-          }`
-        ];
-    } else {
-      Leg = LEG_MAP[`${position.productType}_${isAnnualized ? 'ANNUAL' : 'UNANNUAL'}`];
-    }
-    const nextPageDataItem: any = backConvertPercent({
-      ..._.omitBy(position.asset, _.isNull),
-      lcmEventType: position.lcmEventType,
-      ...createLegDataSourceItem(Leg),
-      id: position.positionId,
-      positionId: position.positionId,
-      productType: Leg.type,
-    });
-
-    return Leg.getPageData(nextPageDataItem, position);
-  });
-
-  return {
-    tableDataSource,
-    tableFormData,
-  };
+  return tableFormData;
 };
 
 function miniumlPercent(item) {
@@ -417,7 +391,7 @@ function miniumlPercent(item) {
   return clone;
 }
 
-function backConvertPercent(item) {
+export function backConvertPercent(item) {
   const clone = { ...item };
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
