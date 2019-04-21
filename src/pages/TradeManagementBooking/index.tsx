@@ -1,11 +1,4 @@
-import {
-  LEG_ENV_FIELD,
-  LEG_FIELD,
-  LEG_ID_FIELD,
-  LEG_NAME_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_ZHCH_MAP,
-} from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
@@ -25,7 +18,6 @@ import { Button, Divider, Menu, message, Modal, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
-import CreateForm from './CreateForm';
 import './index.less';
 
 const TradeManagementBooking = props => {
