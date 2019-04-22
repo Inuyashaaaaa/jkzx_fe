@@ -1,4 +1,4 @@
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { IColumnDef } from '@/lib/components/_Table2';
 import {
@@ -6,6 +6,8 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { CascaderOptionType } from 'antd/lib/cascader';
+import React from 'react';
+import Operation from './Operation';
 
 export const ADDRESS_CASCADER = 'ADDRESS_CASCADER';
 
@@ -79,7 +81,7 @@ export const SEARCH_FORM_CONTROLS: (
   },
 ];
 
-export const TABLE_COL_DEF: IColumnDef[] = [
+export const TABLE_COL_DEF: (fetchTable) => IColumnDef[] = fetchTable => [
   {
     headerName: '交易对手',
     field: 'legalName',
@@ -155,5 +157,12 @@ export const TABLE_COL_DEF: IColumnDef[] = [
     headerName: '我方冻结保证金 (¥)',
     field: 'counterPartyMargin',
     input: INPUT_NUMBER_DIGITAL_CONFIG,
+  },
+  {
+    headerName: '操作',
+    pinned: 'right',
+    render: params => {
+      return <Operation record={params.data} fetchTable={fetchTable} />;
+    },
   },
 ];
