@@ -80,7 +80,6 @@ class ApprovalProcessConfiguration extends PureComponent {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       return item;
     });
-    console.log(globalConfigList.data);
 
     this.setState({
       loading: false,
@@ -89,6 +88,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       processList: tabsData,
       globalConfigList: globalConfigList.data || [],
       globalConfig: globalConfigList.data ? globalConfigList.data[0] : {},
+      status: tabsData[1].status,
     });
   };
 
@@ -263,6 +263,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public render() {
+    console.log(this.state.processList);
     return (
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
