@@ -3,6 +3,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import classNames from 'classnames';
 import { omit } from 'lodash';
 import React, { KeyboardEvent, PureComponent } from 'react';
+import Form2 from '../../Form2';
 import { ITableCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
 import { TABLE_CELL_EDITING_CHANGED } from '../constants/EVENT';
@@ -118,7 +119,7 @@ class SwitchCell extends PureComponent<
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
     const val = record[dataIndex];
-    if (typeof val === 'object' && val.type === 'field') {
+    if (Form2.isField(val)) {
       return val.value;
     }
     return val;
