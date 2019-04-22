@@ -82,7 +82,6 @@ class ApprovalProcessConfiguration extends PureComponent {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       return item;
     });
-    console.log(tabsData);
 
     this.setState({
       loading: false,
