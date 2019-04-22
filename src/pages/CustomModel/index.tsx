@@ -2,7 +2,7 @@ import { Form2, Select, Table2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { wkApproveGroupList, wkApproveGroupModify } from '@/services/auditing';
 import { queryAuthDepartmentList } from '@/services/department';
-import { Button, Input, notification, Popconfirm, Row, Tabs } from 'antd';
+import { Button, Input, notification, Popconfirm, Row, Tabs, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
@@ -66,6 +66,19 @@ const CustomModel = memo(() => {
   const [modelList, setmodelList] = useState([]);
   const [searchList, setSearchList] = useState([1, 2, 3]);
   const [tableData, setTableData] = useState([]);
+  const [visible, setVisible] = useState(false);
+
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  const handleOk = e => {
+    setVisible(false);
+  };
+
+  const handleCancel = e => {
+    setVisible(false);
+  };
 
   return (
     <div className={styles.customModel}>
@@ -109,7 +122,7 @@ const CustomModel = memo(() => {
             <div>
               <Row style={{ marginBottom: '10px', maxHeight: '28px' }}>
                 <Button style={{ marginRight: '15px' }}>下载</Button>
-                <Button size="default" type="primary" loading={importLoading}>
+                <Button size="default" type="primary" loading={importLoading} onClick={showModal}>
                   导入
                 </Button>
               </Row>
@@ -135,6 +148,11 @@ const CustomModel = memo(() => {
           )}
         </div>
       </PageHeaderWrapper>
+      <Modal title="Basic Modal" visible={visible} onOk={handleOk} onCancel={handleCancel}>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
     </div>
   );
 });

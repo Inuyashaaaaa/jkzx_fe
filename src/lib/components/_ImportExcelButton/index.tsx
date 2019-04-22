@@ -66,10 +66,16 @@ class ImportExcelButton extends PureComponent<ImportButtonProps> {
       const bstr = event.target.result;
       const wb = XLSX.read(bstr, { type: rABS ? 'binary' : 'array' });
       /* Get first worksheet */
+      // debugger
+      let data = null;
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       /* Convert array of arrays */
-      const data = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1 });
+      //   data = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1 });
+      data = wb.SheetNames.map((item, index) => {
+        return { [item]: XLSX.utils.sheet_to_json<string[]>(wb.Sheets[item], { header: 1 }) };
+      });
+
       /* Update state */
       this.onImport({ data, cols: makeCols(ws['!ref']) });
     };
