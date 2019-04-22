@@ -302,7 +302,7 @@ const ClientManagementInfo = memo(() => {
                       record={record}
                       fetchTable={fetchTable}
                     />
-                    <Divider type="vertical" />
+                    {/* <Divider type="vertical" />
                     <Button
                       style={{ color: 'red' }}
                       onClick={() => {
@@ -310,7 +310,7 @@ const ClientManagementInfo = memo(() => {
                       }}
                     >
                       删除
-                    </Button>
+                    </Button> */}
                   </span>
                 );
               },

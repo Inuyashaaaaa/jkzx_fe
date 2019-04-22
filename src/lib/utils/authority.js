@@ -33,14 +33,6 @@ export function setPermissions(permissions) {
     JSON.stringify({
       ...permissions,
       welcomePage: true,
-      contractManage: true,
-      newClient: true,
-      fundStatistics: true,
-      marginManagement: true,
-      discrepancyManagement: true,
-      valuationManagement: true,
-      salesManagement: true,
-      ioglodManagement: true,
     })
   );
 }

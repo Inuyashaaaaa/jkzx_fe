@@ -3,7 +3,6 @@ import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { arr2treeOptions } from '@/lib/utils';
 import {
   clientAccountSearch,
-  clientAccountSearch,
   refSalesGetByLegalName,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
