@@ -60,10 +60,14 @@ class ReportsEodRiskByUnderlyer extends PureComponent {
     this.setState({
       loading: false,
     });
+    const page = data.page.sort((a, b) => {
+      return a.underlyerInstrumentId.localeCompare(b.underlyerInstrumentId);
+    });
+
     if (!data.page.length) {
       this.setState({
         info: false,
-        dataSource: data.page,
+        dataSource: page,
         pagination: {
           current: 1,
           pageSize: 20,
@@ -74,7 +78,7 @@ class ReportsEodRiskByUnderlyer extends PureComponent {
     }
     message.success('查询成功');
     this.setState({
-      dataSource: data.page,
+      dataSource: page,
       pagination: {
         ...this.state.pagination,
         total: data.totalCount,
