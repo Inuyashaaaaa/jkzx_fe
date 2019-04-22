@@ -156,11 +156,31 @@ export const treeData = [
           },
           {
             title: '销售管理',
-            key: 'customSalesManage',
+            key: 'salesManagement',
           },
           {
-            title: '客户银行账户管理',
+            title: '银行账户管理',
             key: 'bankAccount',
+          },
+          {
+            title: '客户资金统计',
+            key: 'fundStatistics',
+          },
+          {
+            title: '保证金管理',
+            key: 'marginManagement',
+          },
+          {
+            title: '台账管理',
+            key: 'ioglodManagement',
+          },
+          {
+            title: '财务出入金管理',
+            key: 'discrepancyManagement',
+          },
+          {
+            title: '客户估值报告',
+            key: 'valuationManagement',
           },
         ],
       },

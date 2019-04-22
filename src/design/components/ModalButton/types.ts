@@ -9,9 +9,13 @@ interface IModalButtonBaseProps {
     onCancel?: IModalButtonCancelHandle;
     onOk?: IModalButtonClickHandle;
   };
+  text?: boolean;
 }
 
-export type ModalButtonBaseProps = IModalButtonBaseProps & ButtonProps;
+export type ModalButtonBaseProps =
+  | IModalButtonBaseProps & ButtonProps
+  | IModalButtonBaseProps &
+      React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>;
 
 export interface IModalButtonProps extends IModalButtonBaseProps {}
 

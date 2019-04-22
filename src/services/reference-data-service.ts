@@ -423,3 +423,13 @@ export async function rptValuationReportSearch(params = {}) {
     },
   });
 }
+
+export async function clientAccountSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientAccountSearch',
+      params,
+    },
+  });
+}
