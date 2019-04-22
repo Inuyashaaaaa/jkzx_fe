@@ -78,6 +78,7 @@ export const LEG_FIELD_ORDERS = [
   LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY,
   LEG_FIELD.ALREADY_BARRIER,
   LEG_FIELD.DOWN_BARRIER_DATE,
+  LEG_FIELD.COMMENT,
 ];
 
 export function orderLegColDefs(legColDefs: IColDef[]) {
