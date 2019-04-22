@@ -32,7 +32,7 @@ class SwitchCell extends PureComponent<
   public constructor(props) {
     super(props);
     this.state = {
-      editing: _.get(props.colDef, 'defaultEditing', false),
+      editing: _.get(props.colDef, 'defaultEditing', !props.colDef.editable),
     };
   }
 

@@ -112,7 +112,7 @@ export const legEnvIsBooking = record => record[LEG_ENV_FIELD] === LEG_ENV.BOOKI
 export const getFormEditingMeta = (status: string) => {
   if (status === FORM_EDITABLE_STATUS.EDITING_NO_CONVERT) {
     return {
-      editable: true,
+      editable: false,
       editing: true,
     };
   } else if (status === FORM_EDITABLE_STATUS.EDITING_CAN_CONVERT) {
