@@ -71,15 +71,18 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const tabsData = processList.data.map(item => {
+    let tabsData = processList.data.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
+
+    tabsData = tabsData.filter(item => item.tabName.indexOf('资金录入') >= 0);
 
     const taskData = (taskApproveGroupList.data || []).map(item => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       return item;
     });
+    console.log(tabsData);
 
     this.setState({
       loading: false,
@@ -88,7 +91,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       processList: tabsData,
       globalConfigList: globalConfigList.data || [],
       globalConfig: globalConfigList.data ? globalConfigList.data[0] : {},
-      status: tabsData[1].status,
+      status: tabsData[0].status,
     });
   };
 
@@ -263,14 +266,13 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public render() {
-    console.log(this.state.processList);
     return (
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
           <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
               // 只显示第二条数据
-              if (index !== 1) return null;
+              // if (index !== 1) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div
