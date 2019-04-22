@@ -114,7 +114,7 @@ export const MARGIN_STATUS_TYPE_ZHCN_MAP = {
   UNKNOWN: '未知',
   NORMAL: '正常',
   NOT_ENOUGH: '保证金不足',
-  PENDING_MARGIN_CALL: '带追保证金',
+  PENDING_MARGIN_CALL: '待追保',
 };
 
 export const MARGIN_STATUS_TYPE_OPTIONS = convertOptions(
