@@ -1,6 +1,6 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -10,7 +10,7 @@ export const Term: ILegColDef = {
   title: '期限',
   dataIndex: LEG_FIELD.TERM,
   editable: record => {
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
@@ -23,12 +23,17 @@ export const Term: ILegColDef = {
   },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(
-          <UnitInputNumber autoSelect={!isBooking} editing={isBooking ? true : editing} unit="天" />
+          <UnitInputNumber
+            autoSelect={!(isBooking || isPricing)}
+            editing={isBooking || isPricing ? true : editing}
+            unit="天"
+          />
         )}
       </FormItem>
     );

@@ -6,7 +6,7 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -33,7 +33,7 @@ export const NotionalAmountType: ILegColDef = {
     if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
       return false;
     }
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
@@ -42,6 +42,7 @@ export const NotionalAmountType: ILegColDef = {
   dataIndex: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
 
     return (
       <FormItem hasFeedback={true}>
@@ -50,8 +51,8 @@ export const NotionalAmountType: ILegColDef = {
         })(
           <Select
             {...getSelectProps(record)}
-            defaultOpen={!isBooking}
-            editing={isBooking ? true : editing}
+            defaultOpen={!(isBooking || isPricing)}
+            editing={isBooking || isPricing ? true : editing}
           />
         )}
       </FormItem>

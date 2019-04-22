@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export const ROLE_LOCAL_FIELD = 'tongyu_ROLE_LOCAL_FIELD';
 
 export const TOKEN_LOCAL_FIELD = 'tongyu_TOKEN_LOCAL_FIELD';
@@ -41,3 +43,12 @@ export const FORM_EDITABLE_STATUS = {
   // 展示表单
   SHOW: 'SHOW',
 };
+
+export const TRADESCOLDEFS_LEG_FIELD_MAP = {
+  UNDERLYER_PRICE: 'underlyerPrice',
+  VOL: 'vol',
+  R: 'r',
+  Q: 'q',
+};
+
+export const TRADESCOL_FIELDS = _.map(TRADESCOLDEFS_LEG_FIELD_MAP, val => val);

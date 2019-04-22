@@ -8,7 +8,7 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -36,7 +36,7 @@ const getSelectProps = record => {
 
 export const PremiumType: ILegColDef = {
   editable: record => {
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
@@ -45,6 +45,7 @@ export const PremiumType: ILegColDef = {
   dataIndex: LEG_FIELD.PREMIUM_TYPE,
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
@@ -52,8 +53,8 @@ export const PremiumType: ILegColDef = {
         })(
           <Select
             {...getSelectProps(record)}
-            defaultOpen={!isBooking}
-            editing={isBooking ? true : editing}
+            defaultOpen={!(isBooking || isPricing)}
+            editing={isBooking || isPricing ? true : editing}
           />
         )}
       </FormItem>

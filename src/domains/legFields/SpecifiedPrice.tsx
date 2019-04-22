@@ -8,7 +8,7 @@ import {
   SPECIFIED_PRICE_ZHCN_MAP,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -39,7 +39,7 @@ const getProps = record => {
 export const SpecifiedPrice: ILegColDef = {
   title: '结算方式',
   editable: record => {
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
@@ -47,6 +47,7 @@ export const SpecifiedPrice: ILegColDef = {
   dataIndex: LEG_FIELD.SPECIFIED_PRICE,
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
@@ -54,9 +55,9 @@ export const SpecifiedPrice: ILegColDef = {
         })(
           <Select
             {...getProps(record)}
-            defaultOpen={!isBooking}
-            autoSelect={!isBooking}
-            editing={isBooking ? true : editing}
+            defaultOpen={!(isBooking || isPricing)}
+            autoSelect={!(isBooking || isPricing)}
+            editing={isBooking || isPricing ? true : editing}
           />
         )}
       </FormItem>

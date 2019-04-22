@@ -1,7 +1,7 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { Input, Select } from '@/design/components';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -10,14 +10,15 @@ export const UnderlyerInstrumentId: ILegColDef = {
   title: '标的物',
   dataIndex: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
   editable: record => {
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
   },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
-    editing = isBooking ? true : editing;
+    const isPricing = legEnvIsPricing(record);
+    editing = isBooking || isPricing ? true : editing;
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
@@ -25,7 +26,7 @@ export const UnderlyerInstrumentId: ILegColDef = {
         })(
           editing ? (
             <Select
-              defaultOpen={!isBooking}
+              defaultOpen={!(isBooking || isPricing)}
               {...{
                 editing,
                 fetchOptionsOnSearch: true,

@@ -7,7 +7,7 @@ import {
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/design/components';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -38,7 +38,7 @@ export const Premium: ILegColDef = {
     if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL) {
       return false;
     }
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
@@ -47,14 +47,15 @@ export const Premium: ILegColDef = {
   dataIndex: LEG_FIELD.PREMIUM,
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={!isBooking}
-            editing={isBooking ? true : editing}
+            autoSelect={!(isBooking || isPricing)}
+            editing={isBooking || isPricing ? true : editing}
             {...getProps(record)}
           />
         )}

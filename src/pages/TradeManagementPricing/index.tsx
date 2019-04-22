@@ -1,480 +1,434 @@
-import { LEG_NAME_FIELD, LEG_PRICING_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { allLegTypes, allTryPricingLegTypes } from '@/constants/legColDefs';
-import { AssetClassOptions } from '@/constants/legColDefs/common/common';
-import {
-  COMPUTED_LEG_FIELDS,
-  ComputedColDefs,
-} from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
-import {
-  TRADESCOL_FIELDS,
-  TradesColDefs,
-  TRADESCOLDEFS_LEG_FIELD_MAP,
-} from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { PRICING_FROM_TAG } from '@/constants/trade';
+import { LEG_FIELD, LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
+import { FORM_EDITABLE_STATUS } from '@/constants/global';
+import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
+import { LEG_ENV, TOTAL_LEGS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
+import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
-import SourceTable from '@/design/components/SourceTable';
-import { IColDef } from '@/design/components/Table/types';
+import { Form2, Loading, ModalButton, Table2 } from '@/design/components';
+import { VERTICAL_GUTTER } from '@/design/components/SourceTable';
+import { ITableData } from '@/design/components/type';
+import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { trdBookList } from '@/services/general-service';
-import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service';
-import { convertTradePositions, createLegDataSourceItem, getAddLegItem } from '@/services/pages';
-import { prcTrialPositionsService } from '@/services/pricing';
-import { prcPricingEnvironmentsList } from '@/services/pricing-service';
-import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { Button, Col, Input, message, notification, Row, Select } from 'antd';
-import BigNumber from 'bignumber.js';
+import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
+import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
+import { trdTradeCreate } from '@/services/trade-service';
+import { getLegByRecord } from '@/tools';
+import { ILeg, ILegColDef } from '@/types/leg';
+import { Button, Divider, Menu, message, Modal, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
-import router from 'umi/router';
-import uuidv4 from 'uuid/v4';
+import React, { memo, useRef, useState } from 'react';
+import './index.less';
 
-class TradeManagementPricing extends PureComponent<any> {
-  public $sourceTable: SourceTable = null;
+const TradeManagementBooking = props => {
+  const [columnMeta, setColumnMeta] = useState({
+    columns: [],
+    unionColumns: [],
+  });
+  const [tableData, setTableData] = useState([]);
 
-  public cacheTyeps = [];
-
-  public rowKey = 'id';
-
-  public nextTradesColDefs: IColDef[];
-
-  public computedAllLegTypes: IColDef[];
-
-  public state = {
-    columnDefs: [],
-    dataSource: [],
-    bookList: [],
-    pricingEnvironmentsList: [],
-    mktInstrumentIds: [],
-    createTradeLoading: false,
-    curPricingEnv: null,
+  const getUnionLegColumns = (legColDefs: ILegColDef[]) => {
+    return _.unionBy(legColDefs, item => item.dataIndex);
   };
 
-  constructor(props) {
-    super(props);
-    this.nextTradesColDefs = TradesColDefs.map(item => ({
-      ...item,
-      totalable: false,
-    }));
-
-    this.computedAllLegTypes = allLegTypes.map(item => {
-      return {
-        ...item,
-        columnDefs: item
-          .getColumnDefs('pricing')
-          .map(item => ({
-            ...item,
-            totalable: false,
-          }))
-          .concat(this.nextTradesColDefs)
-          .concat(ComputedColDefs),
-      };
-    });
-  }
-
-  public componentDidMount = () => {
-    trdBookList().then(rsp => {
-      if (rsp.error) return;
-      this.setState({
-        bookList: rsp.data,
-      });
-    });
-
-    this.loadInstrumentIds();
-    this.loadPricingEnv();
+  const getOrderLegColumns = (legColDefs: ILegColDef[]) => {
+    if (!legColDefs) return [];
+    const notOrders = _.difference(legColDefs.map(item => item.dataIndex), LEG_FIELD_ORDERS);
+    if (notOrders && notOrders.length) {
+      console.error(`leg self colDef.dataIndex:[${notOrders}] not join orders yet.`);
+    }
+    return LEG_FIELD_ORDERS.reduce((pre, next) => {
+      const colDef = legColDefs.find(item => item.dataIndex === next);
+      if (colDef) {
+        return pre.concat(colDef);
+      }
+      return pre;
+    }, []).concat(notOrders.map(next => legColDefs.find(item => item.dataIndex === next)));
   };
 
-  public loadPricingEnv = async () => {
-    const { error, data } = await prcPricingEnvironmentsList();
-    if (error) return;
-    this.setState({
-      pricingEnvironmentsList: data,
-      curPricingEnv: data[0],
-    });
+  const getLegByType = (type: string) => {
+    return TOTAL_LEGS.find(item => item.type === type);
   };
 
-  public loadInstrumentIds = () => {
-    mktInstrumentWhitelistListPaged().then(rsp => {
-      if (rsp.error) return;
-      this.setState({
-        mktInstrumentIds: rsp.data.page,
-      });
-    });
-  };
+  const cellIsEmpty = (record, colDef) => {
+    const legBelongByRecord = getLegByType(record[LEG_TYPE_FIELD]);
 
-  public judgeLegTypeExsit = (colDef, data) => {
-    // 纵向表格，删除一行数据时，已删除 colDef 会执行一次 render ？
-    if (!data) return false;
-
-    const legType = this.computedAllLegTypes.find(item => item.type === data[LEG_TYPE_FIELD]);
-
-    if (!legType) return false;
-
-    return !!legType.columnDefs.find(item => item.field === colDef.field);
-  };
-
-  public handleAddLeg = event => {
-    const computedLeg = this.computedAllLegTypes.find(item => item.type === event.key);
-
-    if (!computedLeg) return;
-
-    if (this.cacheTyeps.indexOf(computedLeg.type) === -1) {
-      this.cacheTyeps.push(computedLeg.type);
+    if (TOTAL_TRADESCOL_FIELDS.find(item => item.dataIndex === colDef.dataIndex)) {
+      return false;
     }
 
-    const legData = getAddLegItem(
-      computedLeg,
-      createLegDataSourceItem(computedLeg, {
-        [LEG_PRICING_FIELD]: true,
-      }),
-      true
-    );
-
-    this.addLegData(computedLeg, legData);
+    if (
+      (colDef.exsitable && !colDef.exsitable(record)) ||
+      !(
+        legBelongByRecord &&
+        legBelongByRecord
+          .getColumns(LEG_ENV.PRICING)
+          .find(item => item.dataIndex === colDef.dataIndex)
+      )
+    ) {
+      return true;
+    }
+    return false;
   };
 
-  public handleJudge = params => {
-    const { colDef, data } = params;
-    return this.judgeLegTypeExsit(colDef, data);
-  };
+  const getEmptyRenderLegColumns = (legColDefs: ILegColDef[]) => {
+    return legColDefs.map(item => {
+      return {
+        ...item,
+        editable(record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return false;
+          }
+          if (typeof item.editable === 'function') {
+            return item.editable.apply(this, arguments);
+          }
+          return !!item.editable;
+        },
+        onCell(record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return {
+              style: { backgroundColor: '#e8e8e8' },
+              ...(item.onCell ? item.onCell.apply(this, arguments) : null),
+            };
+          }
+        },
+        render(val, record, index, { colDef }) {
+          if (cellIsEmpty(record, colDef)) {
+            return null;
+          }
 
-  public addLegData = (computedLeg, rowData) => {
-    this.props.dispatch({
-      type: 'pricingData/addLegData',
-      payload: {
-        cacheTyeps: this.cacheTyeps,
-        computedLeg,
-        computedAllLegTypes: this.computedAllLegTypes,
-        nextTradesColDefs: this.nextTradesColDefs,
-        rowData,
-      },
+          return item.render.apply(this, arguments);
+        },
+      };
     });
   };
 
-  public getHorizontalrColumnDef = ({ rowData }) => {
-    return {
-      headerName: rowData[LEG_NAME_FIELD],
-      suppressMenu: true,
-    };
+  const getWidthColumns = (legColDefs: ILegColDef[]) => {
+    return legColDefs.map(item => {
+      return {
+        ...item,
+        onCell() {
+          return {
+            width: '250px',
+            ...(item.onCell ? item.onCell.apply(this, arguments) : null),
+          };
+        },
+      };
+    });
   };
 
-  public getContextMenuItems = (params: GetContextMenuItemsParams): Array<MenuItemDef | string> => {
+  const getLoadingsColumns = (legColDefs: ILegColDef[]) => {
+    return legColDefs.map(item => {
+      return {
+        ...item,
+        render(val, record, index, { colDef }) {
+          const loading = _.get(record[colDef.dataIndex], 'loading', false);
+          return <Loading loading={loading}>{item.render.apply(this, arguments)}</Loading>;
+        },
+      };
+    });
+  };
+
+  const getTitleColumns = (legColDefs: ILegColDef[]) => {
     return [
       {
-        name: '复制该腿',
-        action: () => this.copyLegData(params),
+        title: '结构类型',
+        dataIndex: LEG_FIELD.LEG_META,
+        render: (val, record) => {
+          return LEG_TYPE_ZHCH_MAP[record[LEG_TYPE_FIELD]];
+        },
       },
-      {
-        name: '删除该腿',
-        action: () => this.removeLegData(params),
-      },
-      'separator',
-      'copy',
-      'paste',
+      // meta field 会被 loading 包装
+      ...remove(legColDefs, item => item.dataIndex === LEG_FIELD.LEG_META),
     ];
   };
 
-  public removeLegData = (params: GetContextMenuItemsParams) => {
-    if (!params.column) return;
+  const [createTradeLoading, setCreateTradeLoading] = useState(false);
 
-    const id = params.column.getColDef().field;
-    this.props.dispatch({
-      type: 'pricingData/removeLegData',
-      payload: { id, rowKey: this.rowKey },
-    });
-  };
+  // useEffect(
+  //   () => {
+  //     setColumns(pre => pre.map(item => item));
+  //   },
+  //   [loadings]
+  // );
 
-  public copyLegData = (params: GetContextMenuItemsParams) => {
-    if (!params.column) return;
-
-    const colField = params.column.getColDef().field;
-    const leg = this.getLeyByCoField(colField);
-
-    if (!leg) return;
-
-    this.addLegData(leg, {
-      ...this.getDataItemByColField(colField),
-      id: uuidv4(),
-    });
-  };
-
-  public getLeyByCoField = colField => {
-    const legType = this.getLegTypeByColField(colField);
-    return this.computedAllLegTypes.find(item => item.type === legType);
-  };
-
-  public getLegTypeByColField = colField => {
-    return _.get(this.getDataItemByColField(colField), LEG_TYPE_FIELD);
-  };
-
-  public getDataItemByColField = colField => {
-    return this.props.pricingData.dataSource.find(item => item.id === colField);
-  };
-
-  public switchLoading = loading => {
-    this.setState({
-      createTradeLoading: loading,
-    });
-  };
-
-  public onSave = async params => {
-    const tableDataSource = this.props.pricingData.dataSource;
-
-    if (_.isEmpty(tableDataSource)) {
-      message.warn('请添加期权结构');
-      return;
-    }
-
-    // const validateTableFormRsp: any = await this.$sourceTable.validateTableForm();
-
-    // if (validateTableFormRsp.error) return;
-
-    const validateTableRsp: any = await this.$sourceTable.validateTable();
-
-    if (validateTableRsp.error) return;
-
-    this.switchLoading(true);
-
-    const positions = convertTradePositions(
-      tableDataSource.map(item => _.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])),
-      {},
-      true
-    );
-
-    const rsps = await Promise.all(
-      positions.map((item, index) => {
-        return prcTrialPositionsService({
-          // 需要计算的值，可选price, delta, gamma, vega, theta, rhoR和rhoQ。若为空数组或null，则计算所有值
-          // requests,
-          // pricingEnvironmentId,
-          // valuationDateTime,
-          // timezone,
-          positions: [item],
-          ..._.mapValues(_.pick(tableDataSource[index], TRADESCOL_FIELDS), (val, key) => {
-            if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
-              return val;
-            }
-            return val ? new BigNumber(val).multipliedBy(0.01).toNumber() : val;
-          }),
-          pricingEnvironmentId: this.state.curPricingEnv,
-        });
-      })
-    );
-
-    this.switchLoading(false);
-
-    if (
-      rsps.some(rsp => {
-        const { raw } = rsp;
-        if (raw && raw.diagnostics && raw.diagnostics.length) {
-          return true;
+  const setLoadings = (colId: string, rowId: string, loading: boolean) => {
+    setTableData(pre =>
+      pre.map(record => {
+        if (record[LEG_ID_FIELD] === rowId) {
+          return {
+            ...record,
+            [colId]: {
+              ...record[colId],
+              loading,
+            },
+          };
         }
-        return false;
-      })
-    ) {
-      return notification.error({
-        message: rsps.map(item => _.get(item.raw.diagnostics, '[0].message', [])).join(','),
-      });
-    }
-
-    if (rsps.some(rsp => rsp.error) || rsps.some(rsp => _.isEmpty(rsp.data))) return;
-
-    this.props.dispatch({
-      type: 'pricingData/pricingLegData',
-      payload: { rsps },
-    });
-  };
-
-  public getDepends = (getValue, data, colDef) => {
-    if (!getValue) return [];
-    if (typeof getValue === 'function') {
-      const result = getValue({ data, colDef }) || {};
-      return result.depends || [];
-    }
-    return getValue.depends || [];
-  };
-
-  public computeCellValues = () => {
-    const dependeds = _.flatten(
-      this.props.pricingData.dataSource.map(dataSourceItem => {
-        return _.union<string>(
-          this.props.pricingData.columnDefs.reduce((arr, item) => {
-            return arr.concat(this.getDepends(item.getValue, dataSourceItem, item));
-          }, [])
-        );
+        return record;
       })
     );
-
-    this.props.pricingData.dataSource.forEach(rowData => {
-      const rowId = rowData[this.rowKey];
-      dependeds.forEach(colField => {
-        const value = rowData[colField];
-        this.$sourceTable.$baseSourceTable.$table.$baseTable.setCellValue(rowId, colField, value);
-      });
-    });
   };
 
-  public normalLegMenus = () => {
-    const allAsset = _.union(
-      this.computedAllLegTypes.map(item =>
-        AssetClassOptions.find(it => it.value === item.assetClass)
-      )
-    );
-    return allAsset.map(val => ({
-      name: val.label,
-      children: this.computedAllLegTypes.filter(item => item.assetClass === val.value),
-    }));
-  };
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [createFormData, setCreateFormData] = useState({});
+  const tableEl = useRef<Table2>(null);
+  const [cashModalDataSource, setcashModalDataSource] = useState([]);
+  const [cashModalVisible, setCashModalVisible] = useState(false);
 
-  public getRef = node => {
-    this.$sourceTable = node;
-  };
+  return (
+    <PageHeaderWrapper>
+      <Row style={{ marginBottom: VERTICAL_GUTTER }}>
+        <Button.Group>
+          <MultilLegCreateButton
+            isPricing={false}
+            key="create"
+            handleAddLeg={(leg: ILeg) => {
+              if (!leg) return;
 
-  public convertBooking = () => {
-    router.push({
-      pathname: '/trade-management/booking',
-      query: {
-        from: PRICING_FROM_TAG,
-      },
-    });
-  };
+              setColumnMeta(pre => {
+                const { columns, unionColumns } = pre;
+                const nextUnion = getUnionLegColumns(
+                  unionColumns.concat([
+                    ...leg.getColumns(LEG_ENV.PRICING),
+                    ...TOTAL_TRADESCOL_FIELDS,
+                  ])
+                );
+                const nextColumns = getTitleColumns(
+                  getLoadingsColumns(
+                    getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion)))
+                  )
+                );
+                return {
+                  columns: nextColumns,
+                  unionColumns: nextUnion,
+                };
+              });
 
-  public onCellValueChanged = params => {
-    this.fetchDefaultPricingEnvData(params.data);
-  };
+              setTableData(pre =>
+                pre.concat({
+                  ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+                  ...leg.getDefaultData(LEG_ENV.PRICING),
+                })
+              );
+            }}
+          />
+          <ModalButton
+            key="完成簿记"
+            type="primary"
+            loading={createTradeLoading}
+            onClick={async () => {
+              if (tableData.length === 0) {
+                return message.warn('缺少交易结构');
+              }
 
-  public fetchDefaultPricingEnvData = async legData => {
-    // 交易要素都不为空
-    const validateTableRsp: any = await this.$sourceTable.validateTable({
-      rowId: legData[this.rowKey],
-      showError: false,
-    });
+              const rsps = await tableEl.current.validate();
+              if (rsps.some(item => item.error)) {
+                return;
+              }
 
-    if (validateTableRsp.error) {
-      console.warn('validateTable: has error');
-      return;
-    }
-    // val，q 等都为空，视为默认
-    if (
-      _.some(
-        _.pick(
-          legData,
-          TRADESCOL_FIELDS.filter(item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE)
-        ),
-        item => item != null
-      )
-    ) {
-      console.warn('val，q 等都为空才去获取默认值');
-      return;
-    }
-    const { error, data = [] } = await prcTrialPositionsService({
-      positions: convertTradePositions(
-        [_.omit(legData, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])],
-        {},
-        true
-      ),
-      pricingEnvironmentId: this.state.curPricingEnv,
-    });
+              setCreateModalVisible(true);
 
-    if (error) return;
+              // setTableData(pre =>
+              //   pre.map(item =>
+              //     _.mapValues(item, val => {
+              //       console.log(val);
+              //       if (typeof val !== 'object') {
+              //         return val;
+              //       }
+              //       return {
+              //         ...val,
+              //         value: '1',
+              //       };
+              //     })
+              //   )
+              // );
+            }}
+            modalProps={{
+              title: '创建簿记',
+              visible: createModalVisible,
+              onOk: async () => {
+                const trade = convertTradePageData2ApiData(
+                  tableData.map(item => Form2.getFieldsValue(item)),
+                  Form2.getFieldsValue(createFormData),
+                  props.currentUser.userName,
+                  LEG_ENV.PRICING
+                );
 
-    this.props.dispatch({
-      type: 'pricingData/setPricingDefault',
-      payload: { data: _.first(data), rowId: legData[this.rowKey] },
-    });
-  };
+                const { error } = await trdTradeCreate({
+                  trade,
+                  validTime: '2018-01-01T10:10:10',
+                });
 
-  public onPricingEnvSelectChange = val => {
-    this.setState(
-      {
-        curPricingEnv: val,
-      },
-      () => {
-        this.props.dispatch({
-          type: 'pricingData/clearPricingDefault',
-        });
-        // clearPricingDefault push state queue
-        setTimeout(() => {
-          this.props.pricingData.dataSource.forEach(item => this.fetchDefaultPricingEnvData(item));
-        });
-      }
-    );
-  };
+                if (error) return;
 
-  public render() {
-    const getAction = (top = true) => (
-      <Row
-        type="flex"
-        justify="space-between"
-        style={{ [top ? 'marginBottom' : 'marginTop']: VERTICAL_GUTTER }}
-      >
-        <Row type="flex" align="middle">
-          <Col>
-            <MultilLegCreateButton isPricing={true} key="create" handleAddLeg={this.handleAddLeg} />
-          </Col>
-          <Col style={{ marginLeft: 15 }}>定价环境:</Col>
-          <Col style={{ marginLeft: 10, width: 400 }}>
-            <Input.Group compact={true}>
-              <Select
-                onChange={this.onPricingEnvSelectChange}
-                value={this.state.curPricingEnv}
-                style={{ width: 200 }}
-              >
-                {this.state.pricingEnvironmentsList.map(item => {
-                  return (
-                    <Select.Option key={item} value={item}>
-                      {item}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-              <Button
-                loading={this.state.createTradeLoading}
-                key="试定价"
-                type="primary"
-                onClick={this.onSave}
-              >
-                试定价
-              </Button>
-            </Input.Group>
-          </Col>
-        </Row>
-        <Button key="转换簿记" type="primary" onClick={this.convertBooking}>
-          转换簿记
-        </Button>
+                message.success('簿记成功');
+
+                setCreateModalVisible(false);
+                setColumnMeta({ columns: [], unionColumns: [] });
+                setTableData([]);
+                setCreateFormData({});
+
+                const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
+                  tradeId: trade.tradeId,
+                  legalName: Form2.getFieldValue(createFormData.counterPartyCode),
+                });
+
+                if (_error) return;
+
+                setcashModalDataSource(_data);
+                setCashModalVisible(true);
+              },
+              onCancel: () => setCreateModalVisible(false),
+              children: (
+                <BookingBaseInfoForm
+                  editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
+                  createFormData={createFormData}
+                  setCreateFormData={setCreateFormData}
+                />
+              ),
+            }}
+          >
+            完成簿记
+          </ModalButton>
+        </Button.Group>
       </Row>
-    );
-    return (
-      <PageHeaderWrapper>
-        <SourceTable
-          vertical={true}
-          totalable={true}
-          ref={this.getRef}
-          header={getAction()}
-          footer={
-            this.props.pricingData.dataSource && this.props.pricingData.dataSource.length > 0
-              ? getAction(false)
-              : undefined
-          }
-          // extraActions={[<Button key="生成交易确认书">生成交易确认书</Button>]}
-          rowKey={this.rowKey}
-          autoSizeColumnsToFit={false}
-          darkIfDoNotEditable={true}
-          enableSorting={false}
-          getHorizontalrColumnDef={this.getHorizontalrColumnDef}
-          getContextMenuItems={this.getContextMenuItems}
-          dataSource={this.props.pricingData.dataSource}
-          columnDefs={this.props.pricingData.columnDefs}
-          pagination={false}
-          onCellValueChanged={this.onCellValueChanged}
-        />
-      </PageHeaderWrapper>
-    );
-  }
-}
+      <Divider />
+      <Table2
+        size="middle"
+        ref={node => (tableEl.current = node)}
+        rowKey={LEG_ID_FIELD}
+        onCellFieldsChange={params => {
+          const { record } = params;
+          const leg = getLegByRecord(record);
 
-export default connect(state => ({
-  currentUser: (state.user as any).currentUser,
-  pricingData: state.pricingData,
-}))(TradeManagementPricing);
+          setTableData(pre => {
+            const newData = pre.map(item => {
+              if (item[LEG_ID_FIELD] === params.rowId) {
+                return {
+                  ...item,
+                  ...params.changedFields,
+                };
+              }
+              return item;
+            });
+            if (leg.onDataChange) {
+              leg.onDataChange(
+                LEG_ENV.PRICING,
+                params,
+                newData[params.rowIndex],
+                newData,
+                (colId: string, loading: boolean) => {
+                  setLoadings(colId, params.rowId, loading);
+                },
+                setLoadings,
+                (colId: string, newVal: ITableData) => {
+                  setTableData(pre =>
+                    pre.map(item => {
+                      if (item[LEG_ID_FIELD] === params.rowId) {
+                        return {
+                          ...item,
+                          [colId]: newVal,
+                        };
+                      }
+                      return item;
+                    })
+                  );
+                },
+                setTableData
+              );
+            }
+            return newData;
+          });
+        }}
+        pagination={false}
+        vertical={true}
+        columns={columnMeta.columns}
+        dataSource={tableData}
+        getContextMenu={params => {
+          return (
+            <Menu
+              onClick={event => {
+                if (event.key === 'copy') {
+                  setTableData(pre => {
+                    const next = insert(pre, params.rowIndex, {
+                      ..._.cloneDeep(params.record),
+                      [LEG_ID_FIELD]: uuid(),
+                    });
+                    return next;
+                  });
+                }
+                if (event.key === 'remove') {
+                  setTableData(pre => {
+                    const next = remove(pre, params.rowIndex);
+                    return next;
+                  });
+                }
+              }}
+            >
+              <Menu.Item key="copy">复制</Menu.Item>
+              <Menu.Item key="remove">删除</Menu.Item>
+            </Menu>
+          );
+        }}
+      />
+      <Modal
+        visible={cashModalVisible}
+        title="现金流管理"
+        width={900}
+        onCancel={() => setCashModalVisible(false)}
+        onOk={() => setCashModalVisible(false)}
+      >
+        <Table2
+          pagination={false}
+          dataSource={cashModalDataSource}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+            },
+            {
+              title: '交易编号',
+              dataIndex: 'tradeId',
+            },
+            {
+              title: '账户编号',
+              dataIndex: 'accountId',
+            },
+            {
+              title: '现金流',
+              dataIndex: 'cashFlow',
+            },
+            {
+              title: '生命周期事件',
+              dataIndex: 'lcmEventType',
+            },
+            {
+              title: '处理状态',
+              dataIndex: 'processStatus',
+              render: value => {
+                if (value === 'PROCESSED') {
+                  return '已处理';
+                }
+                return '未处理';
+              },
+            },
+            {
+              title: '操作',
+              dataIndex: 'action',
+              render: (val, record) => {
+                return <a href="javascript:;">资金录入(等待接入新的资金窗口）</a>;
+              },
+            },
+          ]}
+        />
+      </Modal>
+    </PageHeaderWrapper>
+  );
+};
+
+export default memo(
+  connect(state => ({
+    currentUser: (state.user as any).currentUser,
+    pricingData: state.pricingData,
+  }))(TradeManagementBooking)
+);

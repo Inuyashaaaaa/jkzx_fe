@@ -6,7 +6,7 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -18,13 +18,14 @@ export const OptionType: ILegColDef = {
     if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER) {
       return false;
     }
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
   },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem
         hasFeedback={true}
@@ -38,9 +39,9 @@ export const OptionType: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <Select
-            defaultOpen={!isBooking}
+            defaultOpen={!(isBooking || isPricing)}
             {...{
-              editing: isBooking ? true : editing,
+              editing: isBooking || isPricing ? true : editing,
               type: 'select',
               options: OPTION_TYPE_OPTIONS,
             }}

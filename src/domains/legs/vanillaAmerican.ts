@@ -128,6 +128,23 @@ export const VanillaAmerican: ILeg = {
   type: LEG_TYPE_MAP.VANILLA_AMERICAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
+    if (env === LEG_ENV.PRICING) {
+      return [
+        IsAnnual,
+        Direction,
+        NotionalAmountType,
+        InitialSpot,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        OptionType,
+        StrikeType,
+        Strike,
+        Term,
+        ExpirationDate,
+        ParticipationRate,
+        NotionalAmount,
+      ];
+    }
     return [
       Direction,
       OptionType,

@@ -6,7 +6,7 @@ import {
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
@@ -51,7 +51,7 @@ const getSelectProps = record => {
 export const StrikeType: ILegColDef = {
   title: '行权价类型',
   editable: record => {
-    if (legEnvIsBooking(record)) {
+    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
       return false;
     }
     return true;
@@ -59,6 +59,7 @@ export const StrikeType: ILegColDef = {
   dataIndex: LEG_FIELD.STRIKE_TYPE,
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
@@ -66,8 +67,8 @@ export const StrikeType: ILegColDef = {
         })(
           <Select
             {...getSelectProps(record)}
-            defaultOpen={!isBooking}
-            editing={isBooking ? true : editing}
+            defaultOpen={!(isBooking || isPricing)}
+            editing={isBooking || isPricing ? true : editing}
           />
         )}
       </FormItem>

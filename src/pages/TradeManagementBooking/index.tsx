@@ -58,7 +58,7 @@ const TradeManagementBooking = props => {
       !(
         legBelongByRecord &&
         legBelongByRecord
-          .getColumns(LEG_ENV.PRICING)
+          .getColumns(LEG_ENV.BOOKING)
           .find(item => item.dataIndex === colDef.dataIndex)
       )
     ) {
