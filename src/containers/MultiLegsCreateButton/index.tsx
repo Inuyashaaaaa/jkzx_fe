@@ -1,6 +1,7 @@
 import { allLegTypes } from '@/constants/legColDefs';
 import { Button, Dropdown, Menu } from 'antd';
 import { ClickParam } from 'antd/lib/menu';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
 export default class MultilLegCreateButton extends PureComponent<{
@@ -12,7 +13,11 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const usedLegs = allLegTypes;
+    const pricingUsedLegs = [...allLegTypes];
+    const removeUsedLegs = _.remove(pricingUsedLegs, item => {
+      return item.type === 'MODEL_XY_ANNUAL' || item.type === 'MODEL_XY_UNANNUAL';
+    });
+    const usedLegs = this.props.isPricing ? pricingUsedLegs : allLegTypes;
     return [
       {
         name: '年化',

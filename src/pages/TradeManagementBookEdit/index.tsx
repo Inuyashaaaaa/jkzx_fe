@@ -27,7 +27,7 @@ import {
   trdTradeLCMEventProcess,
   trdTradeLCMUnwindAmountGet,
 } from '@/services/trade-service';
-import { ComponentResolver, GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
+import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
 import { message } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
@@ -41,6 +41,7 @@ import ExerciseModal from './modals/ExerciseModal';
 import ExpirationModal from './modals/ExpirationModal';
 import FixingModal from './modals/FixingModal';
 import KnockOutModal from './modals/KnockOutModal';
+import SettleModal from './modals/SettleModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
 import { filterObDays } from './utils';
@@ -69,6 +70,8 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public $asianExerciseModal: AsianExerciseModal;
 
   public $barrierIn: BarrierIn;
+
+  public $settleModal: SettleModal;
 
   constructor(props) {
     super(props);
@@ -418,6 +421,15 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         () => this.loadData(true)
       );
     }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+      this.$settleModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
+      );
+    }
   };
 
   public removeLegData = (params: GetContextMenuItemsParams) => {
@@ -505,6 +517,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       visible: false,
     });
   };
+
   public render() {
     return (
       <PageHeaderWrapper back={true}>
@@ -558,6 +571,11 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         <BarrierIn
           ref={node => {
             this.$barrierIn = node;
+          }}
+        />
+        <SettleModal
+          ref={node => {
+            this.$settleModal = node;
           }}
         />
       </PageHeaderWrapper>

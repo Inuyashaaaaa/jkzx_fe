@@ -120,15 +120,9 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public onFieldsChange = (props, changedFields, allFields) => {
-    console.log(allFields);
-    this.setState(
-      {
-        searchFormData: allFields,
-      },
-      () => {
-        console.log(this.state.searchFormData);
-      }
-    );
+    this.setState({
+      searchFormData: allFields,
+    });
   };
 
   //   public onShowSizeChange = (current, pageSize) => {

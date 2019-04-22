@@ -18,6 +18,7 @@ import ExerciseModal from '@/pages/TradeManagementBookEdit/modals/ExerciseModal'
 import ExpirationModal from '@/pages/TradeManagementBookEdit/modals/ExpirationModal';
 import FixingModal from '@/pages/TradeManagementBookEdit/modals/FixingModal';
 import KnockOutModal from '@/pages/TradeManagementBookEdit/modals/KnockOutModal';
+import SettleModal from '@/pages/TradeManagementBookEdit/modals/SettleModal';
 import UnwindModal from '@/pages/TradeManagementBookEdit/modals/UnwindModal';
 import { modalFormControls } from '@/pages/TradeManagementBookEdit/services';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
@@ -45,6 +46,8 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
   public $asianExerciseModal: AsianExerciseModal;
 
   public $barrierIn: BarrierIn;
+
+  public $settleModal: SettleModal;
 
   public $modelButton: ModalButton = null;
 
@@ -224,6 +227,15 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
         () => this.props.onSearch()
       );
     }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+      this.$settleModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.props.onSearch()
+      );
+    }
   };
 
   public fetchOverviewTableData = async () => {
@@ -345,6 +357,11 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
         <BarrierIn
           ref={node => {
             this.$barrierIn = node;
+          }}
+        />
+        <SettleModal
+          ref={node => {
+            this.$settleModal = node;
           }}
         />
         <ModalButton ref={node => (this.$modelButton = node)} onConfirm={this.onConfirm} />

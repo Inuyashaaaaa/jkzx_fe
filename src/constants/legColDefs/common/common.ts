@@ -258,6 +258,13 @@ export const InitialSpot: IColDef = {
   rules: RULES_REQUIRED,
 };
 
+export const Comment: IColDef = {
+  editable: true,
+  headerName: '备注',
+  field: LEG_FIELD.COMMENT,
+  rules: RULES_REQUIRED,
+};
+
 export const LowStrike: IColDef = {
   editable: true,
   headerName: '低行权价',
