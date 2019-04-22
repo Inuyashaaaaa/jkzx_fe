@@ -8,7 +8,7 @@ import {
   prcBaseContractsList,
   updateBaseContract,
 } from '@/services/pricing';
-import { Col, Row } from 'antd';
+import { Col, Modal, notification, Row } from 'antd';
 import produce from 'immer';
 import memo from 'memoize-one';
 import React from 'react';
@@ -29,20 +29,54 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
     listValue: [],
     baseContractIdForceEditing: false,
     hedgingContractIdForceEditing: false,
+    visible: false,
+    count: 0,
+    formValues: {},
   };
 
   public getOptions = memo(nodes => {
+    const data = JSON.parse(JSON.stringify(nodes)).map(item => {
+      item.positionShow = (
+        <div>
+          PositionId: {item.positionId}
+          <br />
+          到期日: {item.expiry}
+          <br />
+          基础合约: {item.baseContractId ? item.baseContractId : '-'}
+          <br />
+          对冲合约: {item.hedgingContractId ? item.hedgingContractId : '-'}
+        </div>
+      );
+      return item;
+    });
     return arr2treeOptions(
-      nodes,
+      data,
       [INSTRUMENT_KEY, EXPIRY_KEY, POSITION_KEY],
       [INSTRUMENT_KEY, EXPIRY_KEY, POSITION_SHOW_KEY]
     );
   });
 
-  public getSelectedNodes = memo((nodes, selectedPositions) => {
-    return nodes.filter(item => {
-      return selectedPositions ? selectedPositions.includes(item[POSITION_KEY]) : false;
+  public getSelectedNodes = memo((nodes, selectedPositions, bol) => {
+    if (!bol) {
+      return nodes.filter(item => {
+        return selectedPositions ? selectedPositions.includes(item[POSITION_KEY]) : false;
+      });
+    }
+    let data = JSON.parse(JSON.stringify(nodes));
+    selectedPositions.forEach((param, index) => {
+      let key = INSTRUMENT_KEY;
+      if (index === 1) {
+        key = EXPIRY_KEY;
+      }
+      if (index === 2) {
+        key = POSITION_KEY;
+      }
+      data = data.filter(item => {
+        return param.length > 0 ? param.includes(item[key]) : true;
+      });
     });
+    this.setState({ count: data.length });
+    return data;
   });
 
   public componentDidMount = () => {
@@ -53,12 +87,10 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
   public fetchNodes = (callback?) => {
     this.setState({ loading: true }, async () => {
       const { error, data } = await prcBaseContractsList();
-
       this.setState({
         loading: false,
       });
       if (error) return;
-
       this.setState(
         {
           nodes: data,
@@ -103,15 +135,21 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
     );
   };
 
-  public onSubmit = async values => {
+  public onSubmit = async () => {
+    const { formValues } = this.state;
     return updateBaseContract({
-      baseContracts: this.getSelectedNodes(this.state.nodes, this.state.listValue[2]).map(item => {
-        return {
-          ...item,
-          ...values,
-        };
-      }),
+      baseContracts: this.getSelectedNodes(this.state.nodes, this.state.listValue, true).map(
+        item => {
+          return {
+            ...item,
+            ...formValues,
+          };
+        }
+      ),
     }).then(rsp => {
+      this.setState({
+        visible: false,
+      });
       if (!rsp.error) {
         this.fetchNodes(() =>
           this.setState({
@@ -120,6 +158,9 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
           })
         );
       }
+      notification.success({
+        message: `保存成功`,
+      });
 
       return !rsp.error;
     });
@@ -156,6 +197,31 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
     );
   };
 
+  public showModal = formValues => {
+    if (this.state.listValue.length === 0) {
+      return notification.error({
+        message: `请选择一个标的物`,
+      });
+    }
+    this.getSelectedNodes(this.state.nodes, this.state.listValue, true);
+    this.setState({
+      visible: true,
+      formValues,
+    });
+  };
+
+  public handleOk = e => {
+    this.setState({
+      visible: false,
+    });
+  };
+
+  public handleCancel = e => {
+    this.setState({
+      visible: false,
+    });
+  };
+
   public render() {
     return (
       <PageHeaderWrapper>
@@ -168,6 +234,7 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
               createable={false}
               removeable={false}
               loading={this.state.loading}
+              sort={true}
               options={this.getOptions(this.state.nodes)}
               list={[
                 {
@@ -206,10 +273,18 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
                 this.state.baseContractIdForceEditing,
                 this.state.hedgingContractIdForceEditing
               )}
-              onSubmit={this.onSubmit}
+              onSubmit={this.showModal}
             />
           </Col>
         </Row>
+        <Modal
+          title="修改基础合约"
+          visible={this.state.visible}
+          onOk={this.onSubmit}
+          onCancel={this.handleCancel}
+        >
+          <p>确定要对选中的{this.state.count}个持仓执行操作吗？</p>
+        </Modal>
       </PageHeaderWrapper>
     );
   }
