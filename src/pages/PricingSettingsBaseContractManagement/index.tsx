@@ -8,7 +8,7 @@ import {
   prcBaseContractsList,
   updateBaseContract,
 } from '@/services/pricing';
-import { Col, Row, Modal, notification } from 'antd';
+import { Col, Modal, notification, Row } from 'antd';
 import produce from 'immer';
 import memo from 'memoize-one';
 import React from 'react';

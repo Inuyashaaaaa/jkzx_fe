@@ -199,7 +199,7 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
               createFormControls,
               ...rest
             } = listItem;
-            let dataSource = this.getListDataSource(index, this.getValue(), nodes);
+            const dataSource = this.getListDataSource(index, this.getValue(), nodes);
             if (sort) {
               dataSource.sort((a, b) => {
                 return b.label.toString().localeCompare(a.label.toString());
