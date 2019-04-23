@@ -11,7 +11,7 @@ import {
 } from '@/constants/common';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { getMinRule, getRequiredRule, isAutocallPhoenix, isKnockIn } from '@/tools';
+import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
 import { Button, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -196,11 +196,15 @@ class ExpirationModal extends PureComponent<
             : String(formData[LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]),
       };
     }
-
-    return {
-      ...(formData[UNDERLYER_PRICE] ? { underlyerPrice: String(formData[UNDERLYER_PRICE]) } : null),
-      settleAmount: String(formData[SETTLE_AMOUNT]),
-    };
+    if (isAutocallSnow(this.data)) {
+      return {
+        ...(formData[UNDERLYER_PRICE]
+          ? { underlyerPrice: String(formData[UNDERLYER_PRICE]) }
+          : null),
+        settleAmount: String(formData[SETTLE_AMOUNT]),
+      };
+    }
+    return null;
   };
 
   public onConfirm = async () => {
@@ -211,7 +215,9 @@ class ExpirationModal extends PureComponent<
       tradeId: this.tableFormData.tradeId,
       eventType: isAutocallPhoenix(this.data)
         ? LCM_EVENT_TYPE_MAP.EXPIRATION
-        : LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
+        : isAutocallSnow(this.data)
+        ? LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE
+        : LCM_EVENT_TYPE_MAP.EXPIRATION,
       userLoginId: this.currentUser.userName,
       eventDetail: this.getEventDetail(usedFormData),
     });
@@ -384,34 +390,37 @@ class ExpirationModal extends PureComponent<
         />
       );
     }
-    return this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED ? (
-      <Form
-        wrappedComponentRef={node => {
-          this.$expirationFixedModal = node;
-        }}
-        dataSource={this.state.fixedDataSource}
-        onValueChange={this.onFixedValueChange}
-        controlNumberOneRow={1}
-        footer={false}
-        controls={EXPIRATION_FIXED_FORM_CONTROLS}
-      />
-    ) : (
-      <>
+    if (isAutocallSnow(this.data)) {
+      return this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED ? (
         <Form
           wrappedComponentRef={node => {
-            this.$expirationCallModal = node;
+            this.$expirationFixedModal = node;
           }}
-          dataSource={this.state.callPutDataSource}
-          onValueChange={this.onCallValueChange}
+          dataSource={this.state.fixedDataSource}
+          onValueChange={this.onFixedValueChange}
           controlNumberOneRow={1}
           footer={false}
-          controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
-            this.state.premiumType,
-            this.handleSettleAmount
-          )}
+          controls={EXPIRATION_FIXED_FORM_CONTROLS}
         />
-      </>
-    );
+      ) : (
+        <>
+          <Form
+            wrappedComponentRef={node => {
+              this.$expirationCallModal = node;
+            }}
+            dataSource={this.state.callPutDataSource}
+            onValueChange={this.onCallValueChange}
+            controlNumberOneRow={1}
+            footer={false}
+            controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
+              this.state.premiumType,
+              this.handleSettleAmount
+            )}
+          />
+        </>
+      );
+    }
+    return '确认到期操作？';
   };
 
   public render() {
@@ -431,7 +440,13 @@ class ExpirationModal extends PureComponent<
           destroyOnClose={true}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={`到期结算 (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
+          title={
+            (isAutocallPhoenix(this.data)
+              ? `到期结算`
+              : isAutocallSnow(this.data)
+              ? `到期结算`
+              : `到期`) + ` (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`
+          }
         >
           {this.getForm()}
         </Modal>
