@@ -23,9 +23,9 @@ import {
   countVega,
 } from '@/services/cash';
 import { getActualNotionAmountBigNumber, handleJudge } from '@/services/trade';
+import { notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { notification } from 'antd';
 
 export default {
   namespace: 'pricingData',
