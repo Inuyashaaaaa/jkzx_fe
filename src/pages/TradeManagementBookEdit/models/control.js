@@ -3,11 +3,17 @@ import { isType } from '@/lib/utils';
 
 const reducers = {
   switchUnwindModalVisible(state, { payload }) {
-    state.unwindModalVisible = isType(payload, 'Boolean') ? payload : !state.unwindModalVisible;
+    return {
+      ...state,
+      unwindModalVisible: isType(payload, 'Boolean') ? payload : !state.unwindModalVisible,
+    };
   },
 
   switchCurUnwindDataSourceItem(state, { payload }) {
-    state.curUnwindDataSourceItem = payload;
+    return {
+      ...state,
+      curUnwindDataSourceItem: payload,
+    };
   },
 
   openUnwindModal(state, { payload: dataSourceItem }) {
@@ -16,7 +22,10 @@ const reducers = {
   },
 
   changeDataSourceItem(state, { payload }) {
-    state.curUnwindDataSourceItem = payload;
+    return {
+      ...state,
+      curUnwindDataSourceItem: payload,
+    };
   },
 };
 

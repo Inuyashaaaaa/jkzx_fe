@@ -8,7 +8,7 @@ import router from 'umi/router';
 import CommonModel from './CommonModel';
 import { ROW_KEY } from './constants';
 
-class TradeManagementContractManagement extends PureComponent {
+class TradeManagementContractManage extends PureComponent {
   public curRowId: any;
 
   public state = {
@@ -83,13 +83,13 @@ class TradeManagementContractManagement extends PureComponent {
 
   public onTabChange = key => {
     this.props.dispatch({
-      type: 'tradeManagementContractManagement/onTabChange',
+      type: 'tradeManagementContractManage/onTabChange',
       payload: { key },
     });
   };
 
   public render() {
-    const activeTabKey = this.props.tradeManagementContractManagement.activeTabKey;
+    const activeTabKey = this.props.tradeManagementContractManage.activeTabKey;
     return (
       <PageHeaderWrapper
         title="合约管理"
@@ -115,6 +115,6 @@ class TradeManagementContractManagement extends PureComponent {
 
 export default connect(state => {
   return {
-    tradeManagementContractManagement: state.tradeManagementContractManagement,
+    tradeManagementContractManage: state.tradeManagementContractManage,
   };
-})(TradeManagementContractManagement);
+})(TradeManagementContractManage);

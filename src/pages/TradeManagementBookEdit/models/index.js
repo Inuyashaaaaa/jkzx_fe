@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
-import { delay } from '@/lib/utils';
 import { allLeg } from '@/constants/leg';
 import { createDataSourceItem } from '@/lib/components/_MultiLeg';
+import { delay } from '@/lib/utils';
+import produce from 'immer';
 
 // const localKey = 'bookEdit-local';
 
@@ -33,73 +34,83 @@ export default {
 
   reducers: {
     addRow(state, { payload }) {
-      const { type } = payload;
-      const [leg] = allLeg.filter(item => item.type === type);
-      state.panel.dataSource.push(
-        createDataSourceItem({
-          title: leg.type + `${Math.random() * 100}`.slice(0, 2),
-          leg,
-        })
-      );
+      return produce(state, draft => {
+        const { type } = payload;
+        const [leg] = allLeg.filter(item => item.type === type);
+        draft.panel.dataSource.push(
+          createDataSourceItem({
+            title: leg.type + `${Math.random() * 100}`.slice(0, 2),
+            leg,
+          })
+        );
+      });
     },
 
     changeDataSourceItem(state, { payload }) {
-      state.panel.dataSource = state.panel.dataSource.map(item => {
-        if (item.id === payload.id) {
-          return payload;
-        }
-        return item;
+      return produce(state, draft => {
+        draft.panel.dataSource = state.panel.dataSource.map(item => {
+          if (item.id === payload.id) {
+            return payload;
+          }
+          return item;
+        });
       });
     },
 
     changeDataSource(state, { payload }) {
-      const { dataSource } = payload;
-      state.panel.dataSource = dataSource;
+      return produce(state, draft => {
+        const { dataSource } = payload;
+        draft.panel.dataSource = dataSource;
+      });
     },
 
     // 修改 panel 下 formData
     changeCommonForm(state, { payload }) {
-      const { field } = payload;
-      const { name, value } = field;
-      state.panel.formData[name] = value;
+      return produce(state, draft => {
+        const { field } = payload;
+        const { name, value } = field;
+        draft.panel.formData[name] = value;
+      });
     },
 
     fetchBookSuccess(state) {
-      state.panel = {
-        name: '3102.',
-        id: '1536228988983',
-        dataSource: [
-          {
-            $title: '双鲨 - 非年化38',
-            $type: '双鲨 - 非年化',
-            $types: ['双鲨 - 非年化'],
-            data: {
-              instrument_id: '0',
-              initial_spot: 123,
-              strike_low: 123,
-              strike_low_percent: '100.00',
-              barrier_low: 123,
-              barrier_low_percent: '100.00',
-              rebate_low: 123,
-              strike_high: 123,
-              strike_high_percent: '100.00',
-              barrier_high: 123123123,
-              barrier_high_percent: '100100100.00',
-              rebate_high: 123123,
-              num_trade_days: 123,
-              multiplier: '5',
-              notional: 123,
-              num_of_options: '1.00',
-              num_of_underlyer_contracts: '0.20',
-              premium: 123123,
-              premium_percent: '100100.00',
-              direction: 'buy',
+      return produce(state, draft => {
+        draft.panel = {
+          name: '3102.',
+          id: '1536228988983',
+          dataSource: [
+            {
+              $title: '双鲨 - 非年化38',
+              $type: '双鲨 - 非年化',
+              $types: ['双鲨 - 非年化'],
+              data: {
+                instrument_id: '0',
+                initial_spot: 123,
+                strike_low: 123,
+                strike_low_percent: '100.00',
+                barrier_low: 123,
+                barrier_low_percent: '100.00',
+                rebate_low: 123,
+                strike_high: 123,
+                strike_high_percent: '100.00',
+                barrier_high: 123123123,
+                barrier_high_percent: '100100100.00',
+                rebate_high: 123123,
+                num_trade_days: 123,
+                multiplier: '5',
+                notional: 123,
+                num_of_options: '1.00',
+                num_of_underlyer_contracts: '0.20',
+                premium: 123123,
+                premium_percent: '100100.00',
+                direction: 'buy',
+              },
+              id: '1536228988985',
             },
-            id: '1536228988985',
-          },
-        ],
-        formData: {},
-      };
+          ],
+          formData: {},
+        };
+      });
     },
 
     // generateBookSuccess(state, { payload }) {

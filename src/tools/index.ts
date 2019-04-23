@@ -128,3 +128,7 @@ export const getFormEditingMeta = (status: string) => {
     };
   }
 };
+
+export const getLegByType = (type: string) => {
+  return TOTAL_LEGS.find(item => item.type === type);
+};

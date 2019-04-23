@@ -8,7 +8,10 @@ export default {
       const {
         payload: { key },
       } = action;
-      state.activeTabKey = key;
+      return {
+        ...state,
+        activeTabKey: key,
+      };
     },
   },
 };
