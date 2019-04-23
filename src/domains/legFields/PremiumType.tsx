@@ -35,12 +35,6 @@ const getSelectProps = record => {
 };
 
 export const PremiumType: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '权利金类型',
   dataIndex: LEG_FIELD.PREMIUM_TYPE,
   render: (val, record, idnex, { form, editing, colDef }) => {

@@ -10,12 +10,6 @@ import React from 'react';
 export const ParticipationRate: ILegColDef = {
   title: '参与率',
   dataIndex: LEG_FIELD.PARTICIPATION_RATE,
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);

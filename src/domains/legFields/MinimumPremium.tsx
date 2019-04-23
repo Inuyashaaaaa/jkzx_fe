@@ -30,12 +30,6 @@ const getProps = record => {
 };
 
 export const MinimumPremium: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '保底收益',
   dataIndex: LEG_FIELD.MINIMUM_PREMIUM,
   exsitable: record => {

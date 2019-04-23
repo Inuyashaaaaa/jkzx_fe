@@ -38,12 +38,6 @@ const getProps = record => {
 
 export const SpecifiedPrice: ILegColDef = {
   title: '结算方式',
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   dataIndex: LEG_FIELD.SPECIFIED_PRICE,
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);

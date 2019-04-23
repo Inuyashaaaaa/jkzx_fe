@@ -6,7 +6,7 @@ import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import { Form2, Loading, ModalButton, Table2 } from '@/design/components';
 import { VERTICAL_GUTTER } from '@/design/components/SourceTable';
-import { ITableData } from '@/design/components/type';
+import { IFormField, ITableData } from '@/design/components/type';
 import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
@@ -14,10 +14,10 @@ import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
 import { trdTradeCreate } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
 import { ILeg, ILegColDef } from '@/types/leg';
-import { Button, Divider, Menu, message, Modal, Row } from 'antd';
+import { Affix, Button, Divider, Menu, message, Modal, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import './index.less';
 
 const TradeManagementBooking = props => {
@@ -118,7 +118,7 @@ const TradeManagementBooking = props => {
       return {
         ...item,
         render(val, record, index, { colDef }) {
-          const loading = _.get(record[colDef.dataIndex], 'loading', false);
+          const loading = _.get(loadingsByRow, [record[LEG_ID_FIELD], colDef.dataIndex], false);
           return <Loading loading={loading}>{item.render.apply(this, arguments)}</Loading>;
         },
       };
@@ -141,28 +141,37 @@ const TradeManagementBooking = props => {
 
   const [createTradeLoading, setCreateTradeLoading] = useState(false);
 
-  // useEffect(
-  //   () => {
-  //     setColumns(pre => pre.map(item => item));
-  //   },
-  //   [loadings]
-  // );
+  const [loadingsByRow, setLoadingsByRow] = useState({});
 
-  const setLoadings = (colId: string, rowId: string, loading: boolean) => {
-    setTableData(pre =>
-      pre.map(record => {
-        if (record[LEG_ID_FIELD] === rowId) {
-          return {
-            ...record,
-            [colId]: {
-              ...record[colId],
-              loading,
-            },
-          };
-        }
-        return record;
-      })
+  const chainLegColumns = nextUnion => {
+    return getTitleColumns(
+      getLoadingsColumns(getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion))))
     );
+  };
+
+  useEffect(
+    () => {
+      if (!tableData.length) return;
+      setColumnMeta(pre => {
+        const { columns, unionColumns } = pre;
+        return {
+          columns: chainLegColumns(unionColumns),
+          unionColumns,
+        };
+      });
+    },
+    [loadingsByRow]
+  );
+
+  const setLoadings = (rowId: string, colId: string, loading: boolean) => {
+    setLoadingsByRow(pre => {
+      return {
+        ..._.set(pre, [rowId], {
+          ..._.get(pre, [rowId], {}),
+          [colId]: loading,
+        }),
+      };
+    });
   };
 
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -170,121 +179,134 @@ const TradeManagementBooking = props => {
   const tableEl = useRef<Table2>(null);
   const [cashModalDataSource, setcashModalDataSource] = useState([]);
   const [cashModalVisible, setCashModalVisible] = useState(false);
+  const [affix, setAffix] = useState(false);
+
+  const ActionBar = () => {
+    return (
+      <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
+        <Row
+          type="flex"
+          justify="space-between"
+          style={{
+            background: '#fff',
+            borderBottom: affix ? '1px solid #ddd' : 'none',
+            padding: affix ? '20px 0' : 0,
+          }}
+        >
+          <Button.Group>
+            <MultilLegCreateButton
+              isPricing={false}
+              key="create"
+              handleAddLeg={(leg: ILeg) => {
+                if (!leg) return;
+
+                setColumnMeta(pre => {
+                  const { columns, unionColumns } = pre;
+                  const nextUnion = getUnionLegColumns(
+                    unionColumns.concat(leg.getColumns(LEG_ENV.BOOKING))
+                  );
+                  const nextColumns = chainLegColumns(nextUnion);
+                  return {
+                    columns: nextColumns,
+                    unionColumns: nextUnion,
+                  };
+                });
+
+                setTableData(pre =>
+                  pre.concat({
+                    ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
+                    ...leg.getDefaultData(LEG_ENV.BOOKING),
+                  })
+                );
+              }}
+            />
+            <ModalButton
+              key="完成簿记"
+              type="primary"
+              loading={createTradeLoading}
+              onClick={async () => {
+                if (tableData.length === 0) {
+                  return message.warn('缺少交易结构');
+                }
+
+                const rsps = await tableEl.current.validate();
+                if (rsps.some(item => item.errors)) {
+                  return;
+                }
+
+                setCreateModalVisible(true);
+
+                // setTableData(pre =>
+                //   pre.map(item =>
+                //     _.mapValues(item, val => {
+                //       console.log(val);
+                //       if (typeof val !== 'object') {
+                //         return val;
+                //       }
+                //       return {
+                //         ...val,
+                //         value: '1',
+                //       };
+                //     })
+                //   )
+                // );
+              }}
+              modalProps={{
+                title: '创建簿记',
+                visible: createModalVisible,
+                onOk: async () => {
+                  const trade = convertTradePageData2ApiData(
+                    tableData.map(item => Form2.getFieldsValue(item)),
+                    Form2.getFieldsValue(createFormData),
+                    props.currentUser.userName,
+                    LEG_ENV.BOOKING
+                  );
+
+                  const { error } = await trdTradeCreate({
+                    trade,
+                    validTime: '2018-01-01T10:10:10',
+                  });
+
+                  if (error) return;
+
+                  message.success('簿记成功');
+
+                  setCreateModalVisible(false);
+                  setColumnMeta({ columns: [], unionColumns: [] });
+                  setTableData([]);
+                  setCreateFormData({});
+
+                  const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
+                    tradeId: trade.tradeId,
+                    legalName: Form2.getFieldValue(createFormData.counterPartyCode),
+                  });
+
+                  if (_error) return;
+
+                  setcashModalDataSource(_data);
+                  setCashModalVisible(true);
+                },
+                onCancel: () => setCreateModalVisible(false),
+                children: (
+                  <BookingBaseInfoForm
+                    editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
+                    createFormData={createFormData}
+                    setCreateFormData={setCreateFormData}
+                  />
+                ),
+              }}
+            >
+              完成簿记
+            </ModalButton>
+          </Button.Group>
+        </Row>
+      </Affix>
+    );
+  };
 
   return (
     <PageHeaderWrapper>
-      <Row style={{ marginBottom: VERTICAL_GUTTER }}>
-        <Button.Group>
-          <MultilLegCreateButton
-            isPricing={false}
-            key="create"
-            handleAddLeg={(leg: ILeg) => {
-              if (!leg) return;
-
-              setColumnMeta(pre => {
-                const { columns, unionColumns } = pre;
-                const nextUnion = getUnionLegColumns(
-                  unionColumns.concat(leg.getColumns(LEG_ENV.BOOKING))
-                );
-                const nextColumns = getTitleColumns(
-                  getLoadingsColumns(
-                    getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion)))
-                  )
-                );
-                return {
-                  columns: nextColumns,
-                  unionColumns: nextUnion,
-                };
-              });
-
-              setTableData(pre =>
-                pre.concat({
-                  ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
-                  ...leg.getDefaultData(LEG_ENV.BOOKING),
-                })
-              );
-            }}
-          />
-          <ModalButton
-            key="完成簿记"
-            type="primary"
-            loading={createTradeLoading}
-            onClick={async () => {
-              if (tableData.length === 0) {
-                return message.warn('缺少交易结构');
-              }
-
-              const rsps = await tableEl.current.validate();
-              if (rsps.some(item => item.error)) {
-                return;
-              }
-
-              setCreateModalVisible(true);
-
-              // setTableData(pre =>
-              //   pre.map(item =>
-              //     _.mapValues(item, val => {
-              //       console.log(val);
-              //       if (typeof val !== 'object') {
-              //         return val;
-              //       }
-              //       return {
-              //         ...val,
-              //         value: '1',
-              //       };
-              //     })
-              //   )
-              // );
-            }}
-            modalProps={{
-              title: '创建簿记',
-              visible: createModalVisible,
-              onOk: async () => {
-                const trade = convertTradePageData2ApiData(
-                  tableData.map(item => Form2.getFieldsValue(item)),
-                  Form2.getFieldsValue(createFormData),
-                  props.currentUser.userName,
-                  LEG_ENV.BOOKING
-                );
-
-                const { error } = await trdTradeCreate({
-                  trade,
-                  validTime: '2018-01-01T10:10:10',
-                });
-
-                if (error) return;
-
-                message.success('簿记成功');
-
-                setCreateModalVisible(false);
-                setColumnMeta({ columns: [], unionColumns: [] });
-                setTableData([]);
-                setCreateFormData({});
-
-                const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
-                  tradeId: trade.tradeId,
-                  legalName: Form2.getFieldValue(createFormData.counterPartyCode),
-                });
-
-                if (_error) return;
-
-                setcashModalDataSource(_data);
-                setCashModalVisible(true);
-              },
-              onCancel: () => setCreateModalVisible(false),
-              children: (
-                <BookingBaseInfoForm
-                  editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
-                  createFormData={createFormData}
-                  setCreateFormData={setCreateFormData}
-                />
-              ),
-            }}
-          >
-            完成簿记
-          </ModalButton>
-        </Button.Group>
-      </Row>
+      <ActionBar />
       <Divider />
       <Table2
         size="middle"
@@ -311,10 +333,10 @@ const TradeManagementBooking = props => {
                 newData[params.rowIndex],
                 newData,
                 (colId: string, loading: boolean) => {
-                  setLoadings(colId, params.rowId, loading);
+                  setLoadings(params.rowId, colId, loading);
                 },
-                setLoadings,
-                (colId: string, newVal: ITableData) => {
+                setLoadingsByRow,
+                (colId: string, newVal: IFormField) => {
                   setTableData(pre =>
                     pre.map(item => {
                       if (item[LEG_ID_FIELD] === params.rowId) {

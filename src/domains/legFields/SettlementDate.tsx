@@ -6,12 +6,6 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 export const SettlementDate: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '结算日期',
   dataIndex: LEG_FIELD.SETTLEMENT_DATE,
   render: (val, record, index, { form, editing, colDef }) => {

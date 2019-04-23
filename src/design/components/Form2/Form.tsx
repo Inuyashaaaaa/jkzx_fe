@@ -19,7 +19,7 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     return false;
   };
 
-  public static createField = (value: any) => {
+  public static createField = (value: any): IFormField => {
     return {
       type: 'field',
       value,

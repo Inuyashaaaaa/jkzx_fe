@@ -7,12 +7,7 @@ import React from 'react';
 
 export const EffectiveDate: ILegColDef = {
   title: '起始日',
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
+
   dataIndex: LEG_FIELD.EFFECTIVE_DATE,
   render: (value, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);

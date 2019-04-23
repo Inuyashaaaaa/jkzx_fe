@@ -9,12 +9,6 @@ import React from 'react';
 export const UnderlyerInstrumentId: ILegColDef = {
   title: '标的物',
   dataIndex: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);

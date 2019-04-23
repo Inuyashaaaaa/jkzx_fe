@@ -8,12 +8,7 @@ import React from 'react';
 export const IsAnnual: ILegColDef = {
   title: '是否年化',
   dataIndex: LEG_FIELD.IS_ANNUAL,
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
+
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);

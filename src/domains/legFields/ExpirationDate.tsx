@@ -6,12 +6,6 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 export const ExpirationDate: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '到期日',
   dataIndex: LEG_FIELD.EXPIRATION_DATE,
   render: (val, record, index, { form, editing, colDef }) => {

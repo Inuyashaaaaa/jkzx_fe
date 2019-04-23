@@ -14,12 +14,6 @@ const getProps = record => {
 };
 
 export const FrontPremium: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   // 权利金总和
   title: '合约期权费',
   exsitable: record => {

@@ -12,6 +12,7 @@ import {
 } from '../../type';
 import styles from '../cells/SwitchCell.less';
 import { TABLE_CELL_FIELDS_CHANGE, TABLE_CELL_VALUES_CHANGE } from '../constants/EVENT';
+// import schema from 'async-validator';
 
 const EditableContext = React.createContext<{ form?: WrappedFormUtils }>({});
 
@@ -34,10 +35,36 @@ class EditableRow extends React.Component<ITableRowProps> {
     this.props.api.tableManager.registeRow(record[getRowKey()], this);
   };
 
-  public validate = (options = {}, colIds = []) => {
-    return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      return this.props.form.validateFields(colIds, options, (error, values) => {
-        resolve({ error, values });
+  public validate = (options: any = {}, colIds = []) => {
+    const { silence } = options;
+    const { columns, record } = this.props;
+
+    return new Promise<{ errors: any; values: any }>((resolve, reject) => {
+      // if (silence) {
+      //   const fieldsProps = columns
+      //     .map(item => {
+      //       return item.dataIndex;
+      //     })
+      //     .reduce((obj, dataIndex) => {
+      //       obj[dataIndex] = this.props.form.getFieldProps(dataIndex);
+      //       return obj;
+      //     }, {});
+
+      //   const schemaConfig = _.mapValues(fieldsProps, (meta, dataIndex) => {
+      //     return meta['data-__meta'].rules || [];
+      //   });
+
+      //   const validator = new schema(schemaConfig);
+
+      //   const values = this.props.form.getFieldsValue();
+      //   validator.validate(values, errors => {
+      //     resolve({ errors, values });
+      //   });
+      //   return;
+      // }
+
+      return this.props.form.validateFields(colIds, options, (errors, values) => {
+        resolve({ errors, values });
       });
     });
   };

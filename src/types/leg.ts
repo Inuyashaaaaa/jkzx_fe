@@ -1,4 +1,5 @@
 import {
+  IFormField,
   ITableColDef,
   ITableData,
   ITableTriggerCellFieldsChangeParams,
@@ -22,9 +23,9 @@ export interface ILeg {
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
     record: ITableData,
     tableData: ITableData[],
-    setColLoadings: (colId: string, loading: boolean) => void,
-    setLoadings: (colId: string, rowId: string, loading: boolean) => void,
-    setColValue: (colId: string, newVal: ITableData) => void,
+    setColLoading: (colId: string, loading: boolean) => void,
+    setLoading: (rowId: string, colId: string, loading: boolean) => void,
+    setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => void;
 }

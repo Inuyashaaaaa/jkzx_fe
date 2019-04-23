@@ -6,12 +6,6 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 export const InitialSpot: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '期初价格',
   dataIndex: LEG_FIELD.INITIAL_SPOT,
   render: (val, record, index, { form, editing, colDef }) => {

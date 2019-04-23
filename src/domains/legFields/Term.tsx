@@ -9,12 +9,6 @@ import React from 'react';
 export const Term: ILegColDef = {
   title: '期限',
   dataIndex: LEG_FIELD.TERM,
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   exsitable: record => {
     if (_.get(record, [LEG_FIELD.IS_ANNUAL, 'value'])) {
       return true;

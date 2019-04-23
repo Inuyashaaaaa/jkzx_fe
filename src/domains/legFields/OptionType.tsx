@@ -11,18 +11,15 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
+const getProps = record => {
+  if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER) {
+    return { disabled: true };
+  }
+};
+
 export const OptionType: ILegColDef = {
   title: '类型',
   dataIndex: LEG_FIELD.OPTION_TYPE,
-  editable: record => {
-    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER) {
-      return false;
-    }
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -45,6 +42,7 @@ export const OptionType: ILegColDef = {
               type: 'select',
               options: OPTION_TYPE_OPTIONS,
             }}
+            {...getProps(record)}
           />
         )}
       </FormItem>

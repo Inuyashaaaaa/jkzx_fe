@@ -14,12 +14,6 @@ const getProps = record => {
 };
 
 export const NotionalAmount: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '名义本金',
   dataIndex: LEG_FIELD.NOTIONAL_AMOUNT,
   render: (val, record, index, { form, editing, colDef }) => {

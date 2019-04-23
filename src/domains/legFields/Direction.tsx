@@ -6,12 +6,6 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 export const Direction: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '买卖方向',
   dataIndex: LEG_FIELD.DIRECTION,
   render: (value, record, index, { form, editing, colDef }) => {

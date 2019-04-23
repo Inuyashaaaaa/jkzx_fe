@@ -14,35 +14,34 @@ import _ from 'lodash';
 import React from 'react';
 
 const getProps = record => {
+  let props;
+
+  if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL) {
+    props = {
+      disabled: true,
+    };
+  }
+
   if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.BARRIER) {
     if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY) {
-      return { unit: '¥' };
+      return { unit: '¥', ...props };
     }
     if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.USD) {
-      return { unit: '$' };
+      return { unit: '$', ...props };
     }
     if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.PERCENT) {
-      return { unit: '%' };
+      return { unit: '%', ...props };
     }
   }
 
   if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY) {
-    return { unit: '¥' };
+    return { unit: '¥', ...props };
   }
 
-  return { unit: '%' };
+  return { unit: '%', ...props };
 };
 
 export const Premium: ILegColDef = {
-  editable: record => {
-    if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL) {
-      return false;
-    }
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '实际期权费',
   dataIndex: LEG_FIELD.PREMIUM,
   render: (val, record, index, { form, editing, colDef }) => {

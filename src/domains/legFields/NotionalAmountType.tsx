@@ -13,6 +13,13 @@ import _ from 'lodash';
 import React from 'react';
 
 const getSelectProps = record => {
+  let props;
+  if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
+    props = {
+      disabled: true,
+    };
+  }
+
   return {
     type: 'select',
     options: [
@@ -25,19 +32,11 @@ const getSelectProps = record => {
         value: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       },
     ],
+    ...props,
   };
 };
 
 export const NotionalAmountType: ILegColDef = {
-  editable: record => {
-    if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
-      return false;
-    }
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '名义本金类型',
   dataIndex: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   render: (val, record, idnex, { form, editing, colDef }) => {

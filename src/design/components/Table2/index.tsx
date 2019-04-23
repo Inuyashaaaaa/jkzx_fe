@@ -66,7 +66,7 @@ class Table2 extends PureComponent<ITableProps> {
     colIds = this.getFieldNames()
   ): Promise<
     Array<{
-      error: any;
+      errors: any;
       values: any;
     }>
   > => {

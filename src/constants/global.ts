@@ -52,3 +52,18 @@ export const TRADESCOLDEFS_LEG_FIELD_MAP = {
 };
 
 export const TRADESCOL_FIELDS = _.map(TRADESCOLDEFS_LEG_FIELD_MAP, val => val);
+
+export const COMPUTED_LEG_FIELD_MAP = {
+  PRICE_PER: 'PRICE_PER',
+  PRICE: 'PRICE',
+  STD_DELTA: 'STD_DELTA',
+  DELTA: 'DELTA',
+  DELTA_CASH: 'DELTA_CASH',
+  GAMMA: 'GAMMA',
+  GAMMA_CASH: 'GAMMA_CASH',
+  VEGA: 'VEGA',
+  THETA: 'THETA',
+  RHO_R: 'RHO_R',
+};
+
+export const COMPUTED_LEG_FIELDS = _.map(COMPUTED_LEG_FIELD_MAP, val => val);

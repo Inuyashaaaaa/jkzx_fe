@@ -5,7 +5,7 @@ import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import { Form2, Loading, Table2 } from '@/design/components';
 import { ITableData } from '@/design/components/type';
-import { insert, remove, uuid } from '@/design/utils';
+import { remove } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdTradeGet } from '@/services/general-service';
 import {
@@ -16,10 +16,10 @@ import {
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
 import { ILeg, ILegColDef } from '@/types/leg';
-import { Affix, Button, Divider, Menu, message, Row, Typography } from 'antd';
+import { Affix, Button, Divider, message, Row, Typography } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
 
@@ -44,9 +44,7 @@ const TradeManagementBooking = props => {
     setColumnMeta(pre => {
       const { columns, unionColumns } = pre;
       const nextUnion = getUnionLegColumns(unionColumns.concat(leg.getColumns(LEG_ENV.EDITING)));
-      const nextColumns = getTitleColumns(
-        getLoadingsColumns(getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion))))
-      );
+      const nextColumns = chainLegColumns(nextUnion);
       return {
         columns: nextColumns,
         unionColumns: nextUnion,
@@ -166,6 +164,16 @@ const TradeManagementBooking = props => {
     return TOTAL_LEGS.find(item => item.type === type);
   };
 
+  const getEditableLegColumns = (legColDefs: ILegColDef[]) => {
+    return legColDefs.map(item => {
+      return {
+        ...item,
+        defaultEditing: false,
+        editable: false,
+      };
+    });
+  };
+
   const cellIsEmpty = (record, colDef) => {
     const legBelongByRecord = getLegByType(record[LEG_TYPE_FIELD]);
 
@@ -174,7 +182,7 @@ const TradeManagementBooking = props => {
       !(
         legBelongByRecord &&
         legBelongByRecord
-          .getColumns(LEG_ENV.PRICING)
+          .getColumns(LEG_ENV.EDITING)
           .find(item => item.dataIndex === colDef.dataIndex)
       )
     ) {
@@ -255,33 +263,40 @@ const TradeManagementBooking = props => {
     ];
   };
 
-  const [createTradeLoading, setCreateTradeLoading] = useState(false);
+  const [loadingsByRow, setLoadingsByRow] = useState({});
 
-  // useEffect(
-  //   () => {
-  //     setColumns(pre => pre.map(item => item));
-  //   },
-  //   [loadings]
-  // );
-
-  const setLoadings = (colId: string, rowId: string, loading: boolean) => {
-    setTableData(pre =>
-      pre.map(record => {
-        if (record[LEG_ID_FIELD] === rowId) {
-          return {
-            ...record,
-            [colId]: {
-              ...record[colId],
-              loading,
-            },
-          };
-        }
-        return record;
-      })
+  const chainLegColumns = nextUnion => {
+    return getTitleColumns(
+      getEditableLegColumns(
+        getLoadingsColumns(getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion))))
+      )
     );
   };
 
-  const [affixed, setAffixed] = useState(false);
+  useEffect(
+    () => {
+      if (!tableData.length) return;
+      setColumnMeta(pre => {
+        const { columns, unionColumns } = pre;
+        return {
+          columns: chainLegColumns(unionColumns),
+          unionColumns,
+        };
+      });
+    },
+    [loadingsByRow]
+  );
+
+  const setLoadings = (rowId: string, colId: string, loading: boolean) => {
+    setLoadingsByRow(pre => {
+      return {
+        ..._.set(pre, [rowId], {
+          ..._.get(pre, [rowId], {}),
+          [colId]: loading,
+        }),
+      };
+    });
+  };
 
   return (
     <PageHeaderWrapper>
@@ -289,7 +304,8 @@ const TradeManagementBooking = props => {
       <Divider />
       <Loading loading={tableLoading}>
         <BookingBaseInfoForm
-          editableStatus={FORM_EDITABLE_STATUS.EDITING_CAN_CONVERT}
+          columnNumberOneRow={2}
+          editableStatus={FORM_EDITABLE_STATUS.SHOW}
           createFormData={createFormData}
           setCreateFormData={setCreateFormData}
         />
@@ -324,7 +340,7 @@ const TradeManagementBooking = props => {
                 newData[params.rowIndex],
                 newData,
                 (colId: string, loading: boolean) => {
-                  setLoadings(colId, params.rowId, loading);
+                  setLoadings(params.rowId, colId, loading);
                 },
                 setLoadings,
                 (colId: string, newVal: ITableData) => {
@@ -377,28 +393,6 @@ const TradeManagementBooking = props => {
         //   );
         // }}
       />
-      <Affix offsetBottom={0} onChange={affixed => setAffixed(affixed)}>
-        <Row
-          type="flex"
-          justify="end"
-          style={{
-            background: affixed ? '#fff' : 'initial',
-            padding: '20px 10px',
-            borderTop: affixed ? '1px solid #ddd' : 'none',
-          }}
-        >
-          <Button
-            type="primary"
-            onClick={() => {
-              this.setState({
-                top: this.state.top + 10,
-              });
-            }}
-          >
-            保存
-          </Button>
-        </Row>
-      </Affix>
     </PageHeaderWrapper>
   );
 };

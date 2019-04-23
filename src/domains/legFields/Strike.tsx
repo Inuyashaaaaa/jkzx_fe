@@ -22,12 +22,6 @@ const getProps = record => {
 };
 
 export const Strike: ILegColDef = {
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   title: '行权价',
   dataIndex: LEG_FIELD.STRIKE,
   render: (val, record, index, { form, editing, colDef }) => {

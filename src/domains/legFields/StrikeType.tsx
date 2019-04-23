@@ -50,12 +50,6 @@ const getSelectProps = record => {
 
 export const StrikeType: ILegColDef = {
   title: '行权价类型',
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
   dataIndex: LEG_FIELD.STRIKE_TYPE,
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);

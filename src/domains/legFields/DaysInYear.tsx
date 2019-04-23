@@ -8,12 +8,7 @@ import React from 'react';
 
 export const DaysInYear: ILegColDef = {
   title: '年度计息天数',
-  editable: record => {
-    if (legEnvIsBooking(record) || legEnvIsPricing(record)) {
-      return false;
-    }
-    return true;
-  },
+
   exsitable: record => {
     if (_.get(record, [LEG_FIELD.IS_ANNUAL, 'value'])) {
       return true;
