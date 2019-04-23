@@ -3,7 +3,6 @@ import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { arr2treeOptions } from '@/lib/utils';
 import {
   clientAccountSearch,
-  clientAccountSearch,
   refSalesGetByLegalName,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
@@ -134,7 +133,7 @@ class ClientManagementFundStatistics extends PureComponent {
         <SourceTable
           rowKey="accountId"
           loading={this.state.loading}
-          columnDefs={TABLE_COL_DEF}
+          columnDefs={TABLE_COL_DEF(this.fetchTable)}
           dataSource={this.state.tableDataSource}
           autoSizeColumnsToFit={false}
           searchable={true}

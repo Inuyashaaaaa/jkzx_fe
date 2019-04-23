@@ -57,6 +57,7 @@ class Operation extends PureComponent {
     departmentId: null,
     array: [],
     data: [],
+    filterItem: 'username',
   };
 
   constructor(props) {
@@ -198,23 +199,11 @@ class Operation extends PureComponent {
   };
 
   public onSearch = async () => {
-    const { data } = this.state;
+    const { data, filterItem } = this.state;
     let dataSource = data;
-    if (this.state.username) {
-      dataSource = data.filter(item => {
-        return item.username.indexOf(this.state.username) >= 0;
-      });
-    }
-    if (this.state.roleName) {
-      dataSource = data.filter(item => {
-        return item.roleName.includes(this.state.roleName);
-      });
-    }
-    if (this.state.departmentId) {
-      dataSource = data.filter(item => {
-        return item.departmentId === this.state.departmentId;
-      });
-    }
+    dataSource = data.filter(item => {
+      return item[filterItem].indexOf(this.state[filterItem]) >= 0;
+    });
     this.setState({
       dataSource,
     });
@@ -273,6 +262,21 @@ class Operation extends PureComponent {
     return treeNode;
   };
 
+  public handleChange = e => {
+    this.setState({
+      filterItem: e,
+    });
+  };
+
+  public onReset = e => {
+    this.setState({
+      filterItem: 'user',
+      username: null,
+      roleName: null,
+      departmentId: null,
+    });
+  };
+
   public render() {
     const { selectedRowKeys } = this.state;
     const rowSelection = {
@@ -289,40 +293,72 @@ class Operation extends PureComponent {
       <>
         <div>
           <Row>
-            <Form style={{ marginBottom: '15px' }}>
-              <Form.Item label="用户名" {...formItemLayout}>
-                <Input onChange={this.onUserName} onPressEnter={this.onSearch} />
-              </Form.Item>
-              <Form.Item label="角色" {...formItemLayout}>
-                <Select onChange={this.onRole} allowClear={true}>
-                  {this.state.rolesList &&
-                    this.state.rolesList.map(item => {
-                      return (
-                        <Option value={item.roleName} key={item.id}>
-                          {item.roleName}
-                        </Option>
-                      );
-                    })}
+            <Form style={{ marginBottom: '15px' }} layout="inline">
+              <Form.Item {...formItemLayout}>
+                <Select
+                  defaultValue={this.state.filterItem}
+                  onChange={this.handleChange}
+                  style={{ width: '150px' }}
+                >
+                  <Option value="username">按用户名查询</Option>
+                  <Option value="roleName">按角色筛选</Option>
+                  <Option value="departmentId">按部门筛选</Option>
                 </Select>
               </Form.Item>
-              <Form.Item label="部门" {...formItemLayout}>
-                <TreeSelect
-                  value={this.state.departmentId}
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  treeDefaultExpandAll={true}
-                  onChange={this.onDepartment}
-                  allowClear={true}
-                >
-                  {this.renderTreeNode(this.state.departmentTree)}
-                </TreeSelect>
-              </Form.Item>
+              {this.state.filterItem === 'username' ? (
+                <Form.Item {...formItemLayout}>
+                  <Input
+                    value={this.state.username}
+                    onChange={this.onUserName}
+                    onPressEnter={this.onSearch}
+                    placeholder="请输入"
+                    style={{ width: '200px' }}
+                  />
+                </Form.Item>
+              ) : null}
+              {this.state.filterItem === 'roleName' ? (
+                <Form.Item {...formItemLayout}>
+                  <Select
+                    onChange={this.onRole}
+                    allowClear={true}
+                    placeholder="请选择"
+                    style={{ width: '200px' }}
+                    value={this.state.roleName}
+                  >
+                    {this.state.rolesList &&
+                      this.state.rolesList.map(item => {
+                        return (
+                          <Option value={item.roleName} key={item.id}>
+                            {item.roleName}
+                          </Option>
+                        );
+                      })}
+                  </Select>
+                </Form.Item>
+              ) : null}
+              {this.state.filterItem === 'departmentId' ? (
+                <Form.Item {...formItemLayout}>
+                  <TreeSelect
+                    value={this.state.departmentId}
+                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                    treeDefaultExpandAll={true}
+                    onChange={this.onDepartment}
+                    allowClear={true}
+                    placeholder="请选择"
+                    style={{ width: '200px' }}
+                    value={this.state.departmentId}
+                  >
+                    {this.renderTreeNode(this.state.departmentTree)}
+                  </TreeSelect>
+                </Form.Item>
+              ) : null}
               <Form.Item>
-                <Button
-                  type="primary"
-                  icon="search"
-                  onClick={this.onSearch}
-                  style={{ float: 'right' }}
-                />
+                <Button type="primary" onClick={this.onSearch} style={{ marginRight: '8px' }}>
+                  查询
+                </Button>
+                <Button type="primary" onClick={this.onReset}>
+                  重置
+                </Button>
               </Form.Item>
             </Form>
           </Row>

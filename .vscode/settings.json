@@ -1,5 +1,5 @@
 {
-  "workbench.iconTheme": "vscode-icons",
+  "workbench.iconTheme": "material-icon-theme",
   "git.confirmSync": false,
   "window.zoomLevel": 0,
   "git.enableSmartCommit": true,

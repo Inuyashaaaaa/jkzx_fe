@@ -4,6 +4,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _, { omit } from 'lodash';
 import React from 'react';
 import { VALIDATE_MESSAGES } from '../../constants';
+import Form2 from '../../Form2';
 import {
   IFormField,
   ITableRowProps,
@@ -157,7 +158,7 @@ const FormRow = Form.create({
     }, {});
     const result = _.mapValues(
       _.pickBy(filledDataSource, (val: IFormField) => {
-        return typeof val === 'object' && val.type === 'field';
+        return Form2.isField(val);
       }),
       (val: IFormField) => {
         return Form.createFormField(val);

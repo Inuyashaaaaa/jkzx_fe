@@ -117,7 +117,7 @@ export const MARGIN_STATUS_TYPE_ZHCN_MAP = {
   UNKNOWN: '未知',
   NORMAL: '正常',
   NOT_ENOUGH: '保证金不足',
-  PENDING_MARGIN_CALL: '带追保证金',
+  PENDING_MARGIN_CALL: '待追保',
 };
 
 export const MARGIN_STATUS_TYPE_OPTIONS = convertOptions(
@@ -220,6 +220,7 @@ export const LCM_EVENT_TYPE_MAP = {
   OBSERVE: 'OBSERVE',
   SNOW_BALL_EXERCISE: 'SNOW_BALL_EXERCISE',
   PHOENIX_EXERCISE: 'PHOENIX_EXERCISE',
+  SETTLE: 'SETTLE',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
@@ -238,6 +239,7 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   OBSERVE: '观察',
   SNOW_BALL_EXERCISE: '雪球式到期结算',
   PHOENIX_EXERCISE: '凤凰式到期结算',
+  SETTLE: '结算',
 };
 
 export const FREQUENCY_TYPE_MAP = {
@@ -553,6 +555,7 @@ export const LEG_FIELD = {
   LOW_BARRIER: 'lowBarrier',
   HIGH_BARRIER: 'highBarrier',
   UNDERLYER_INSTRUMENT_PRICE: 'UNDERLYER_INSTRUMENT_PRICE',
+  COMMENT: 'comment',
 };
 
 /**
@@ -702,6 +705,9 @@ export const LEG_TYPE_MAP = {
   STRADDLE: 'STRADDLE',
   STRADDLE_ANNUAL: 'STRADDLE_ANNUAL',
   STRADDLE_UNANNUAL: 'STRADDLE_UNANNUAL',
+  MODEL_XY: 'MODEL_XY',
+  MODEL_XY_ANNUAL: 'MODEL_XY_ANNUAL',
+  MODEL_XY_UNANNUAL: 'MODEL_XY_UNANNUAL',
 };
 
 export const PRODUCT_TYPE_MAP = {
@@ -769,12 +775,15 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.STRADDLE]: '跨式',
   [LEG_TYPE_MAP.STRADDLE_ANNUAL]: '跨式 - 年化',
   [LEG_TYPE_MAP.STRADDLE_UNANNUAL]: '跨式 - 非年化',
+  [LEG_TYPE_MAP.MODEL_XY]: '自定义产品',
+  [LEG_TYPE_MAP.MODEL_XY_ANNUAL]: '自定义产品 - 年化',
+  [LEG_TYPE_MAP.MODEL_XY_UNANNUAL]: '自定义产品 - 非年化',
 };
 
 export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, LEG_TYPE_ZHCH_MAP);
 
 export const PRODUCTTYPE_ZHCH_MAP = {
-  MODEL_XY: '自定义产品',
+  [LEG_TYPE_MAP.MODEL_XY]: '自定义产品',
   [LEG_TYPE_MAP.ASIAN]: '亚式',
   [LEG_TYPE_MAP.AUTOCALL_PHOENIX]: '凤凰式',
   [LEG_TYPE_MAP.AUTOCALL]: '雪球式',

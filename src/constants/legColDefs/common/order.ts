@@ -94,6 +94,7 @@ export const LEG_FIELD_ORDERS = [
   LEG_FIELD.VEGA,
   LEG_FIELD.THETA,
   LEG_FIELD.RHO_R,
+  LEG_FIELD.COMMENT,
 ];
 
 export function orderLegColDefs(legColDefs: IColDef[]) {

@@ -9,6 +9,14 @@ import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import _ from 'lodash';
 
+export const isModelXY = data => {
+  return (
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_ANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_UNANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY
+  );
+};
+
 export const isAutocallPhoenix = data => {
   return (
     data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||

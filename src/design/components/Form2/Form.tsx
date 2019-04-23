@@ -70,7 +70,7 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
           }, {});
           const result = _.mapValues(
             _.pickBy(filledDataSource, (val: IFormField) => {
-              return typeof val === 'object' && val.type === 'field';
+              return Form.isField(val);
             }),
             (val: IFormField) => {
               return AntdForm.createFormField(val);

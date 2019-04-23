@@ -99,14 +99,14 @@ const EditModalButton = memo<any>(props => {
       dataIndex: '姓名',
       render: (val, record, index, { form, editing }) => {
         return (
-          <FormItem hasFeedback={!disabled ? true : false}>
+          <FormItem hasFeedback={editable ? true : false}>
             {form.getFieldDecorator({
               rules: [
                 {
                   required: false,
                 },
               ],
-            })(<Input editing={editable} disabled={disabled} />)}
+            })(<Input editing={editable} />)}
           </FormItem>
         );
       },
@@ -116,14 +116,14 @@ const EditModalButton = memo<any>(props => {
       dataIndex: '身份证号',
       render: (val, record, index, { form, editing }) => {
         return (
-          <FormItem hasFeedback={!disabled ? true : false}>
+          <FormItem hasFeedback={editable ? true : false}>
             {form.getFieldDecorator({
               rules: [
                 {
                   required: false,
                 },
               ],
-            })(<Input editing={editable} disabled={disabled} />)}
+            })(<Input editing={editable} />)}
           </FormItem>
         );
       },
@@ -133,7 +133,7 @@ const EditModalButton = memo<any>(props => {
       dataIndex: '证件有效期',
       render: (val, record, index, { form, editing }) => {
         return (
-          <FormItem hasFeedback={!disabled ? true : false}>
+          <FormItem hasFeedback={editable ? true : false}>
             {form.getFieldDecorator({
               rules: [
                 {
@@ -150,14 +150,14 @@ const EditModalButton = memo<any>(props => {
       dataIndex: '联系电话',
       render: (val, record, index, { form, editing }) => {
         return (
-          <FormItem hasFeedback={!disabled ? true : false}>
+          <FormItem hasFeedback={editable ? true : false}>
             {form.getFieldDecorator({
               rules: [
                 {
                   required: false,
                 },
               ],
-            })(<Input editing={editable} disabled={disabled} />)}
+            })(<Input editing={editable} />)}
           </FormItem>
         );
       },
@@ -196,19 +196,25 @@ const EditModalButton = memo<any>(props => {
   } = useTableData(props);
 
   const tableEl = useRef<Table2>(null);
-  const editable = true;
+  let editable = true;
   const [modalVisible, setModalVisible] = useState(false);
-  let disabled = false;
+  // let disabled = null;
+  baseFormData._salesName = baseFormData.salesName;
   if (name === '查看') {
-    disabled = true;
+    editable = false;
+  } else {
+    baseFormData._salesName = [
+      baseFormData.subsidiaryName ? baseFormData.subsidiaryName.value : '',
+      baseFormData.branchName ? baseFormData.branchName.value : '',
+      baseFormData.salesName ? baseFormData.salesName.value : '',
+    ];
   }
-  if (disabled) {
+  if (!editable) {
     columns.pop();
   }
-
   return (
     <ModalButton
-      style={{ color: '#096dd9' }}
+      text={true}
       content={
         <Spin spinning={loading}>
           <>
@@ -237,7 +243,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: BASE_FORM_FIELDS.LEGALNAME,
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -256,7 +262,7 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         return (
                           <FormItem
-                            hasFeedback={!disabled ? true : false}
+                            hasFeedback={editable ? true : false}
                             extra={'产品户 需要在下一步补充产品信息内容'}
                           >
                             {form.getFieldDecorator({
@@ -270,7 +276,6 @@ const EditModalButton = memo<any>(props => {
                               <Select
                                 style={{ width: '100%' }}
                                 editing={editable}
-                                disabled={disabled}
                                 options={[
                                   {
                                     label: '产品户',
@@ -292,7 +297,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'investorType',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -303,7 +308,6 @@ const EditModalButton = memo<any>(props => {
                             })(
                               <Select
                                 editing={editable}
-                                disabled={disabled}
                                 options={[
                                   {
                                     label: ' 一般机构普通投资者',
@@ -333,7 +337,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'legalRepresentative',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -341,7 +345,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -351,7 +355,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'address',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -359,17 +363,17 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
                     },
                     {
                       title: '开户销售',
-                      dataIndex: '开户销售',
+                      dataIndex: '_salesName',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -378,22 +382,30 @@ const EditModalButton = memo<any>(props => {
                                 },
                               ],
                             })(
-                              <Cascader
-                                placeholder="请输入内容"
-                                style={{ width: '100%' }}
-                                options={salesCascaderList}
-                                disabled={disabled}
-                                showSearch={{
-                                  filter: (inputValue, path) => {
-                                    return path.some(
-                                      option =>
-                                        option.label
-                                          .toLowerCase()
-                                          .indexOf(inputValue.toLowerCase()) > -1
-                                    );
-                                  },
-                                }}
-                              />
+                              <span>
+                                {editable ? (
+                                  <Cascader
+                                    placeholder="请输入内容"
+                                    style={{ width: '100%' }}
+                                    options={salesCascaderList}
+                                    editing={editable}
+                                    defaultValue={val}
+                                    // defaultValue={[baseFormData.subsidiaryName, baseFormData.branchName, val]}
+                                    showSearch={{
+                                      filter: (inputValue, path) => {
+                                        return path.some(
+                                          option =>
+                                            option.label
+                                              .toLowerCase()
+                                              .indexOf(inputValue.toLowerCase()) > -1
+                                        );
+                                      },
+                                    }}
+                                  />
+                                ) : (
+                                  val
+                                )}
+                              </span>
                             )}
                           </FormItem>
                         );
@@ -404,7 +416,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'warrantor',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -412,7 +424,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -422,7 +434,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'warrantorAddress',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -430,7 +442,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -440,7 +452,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'trustorEmail',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -448,7 +460,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -459,7 +471,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'contact',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -467,7 +479,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -477,7 +489,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'tradePhone',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -485,17 +497,17 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
                     },
                     {
                       title: '交易指定邮箱',
-                      dataIndex: 'email',
+                      dataIndex: 'tradeEmail',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -503,7 +515,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -513,7 +525,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'masterAgreementId',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -521,7 +533,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -531,14 +543,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'supplementalAgreementId',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -548,14 +560,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'authorizeExpiryDate',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<DatePicker editing={editable} disabled={disabled} />)}
+                            })(<DatePicker editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -565,14 +577,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'signAuthorizerName',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -582,14 +594,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'signAuthorizerIdNumber',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -599,7 +611,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'signAuthorizerIdExpiryDate',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -634,14 +646,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: BASE_FORM_FIELDS.LEGALNAME,
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -651,14 +663,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'productCode',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -668,14 +680,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'productType',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -685,14 +697,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'recordNumber',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -702,14 +714,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'productFoundDate',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<DatePicker editing={editable} disabled={disabled} />)}
+                            })(<DatePicker editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -719,14 +731,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'productExpiringDate',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<DatePicker editing={editable} disabled={disabled} />)}
+                            })(<DatePicker editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -736,14 +748,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'fundManager',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -771,7 +783,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'tradingDirection',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -781,7 +793,6 @@ const EditModalButton = memo<any>(props => {
                             })(
                               <Select
                                 editing={editable}
-                                disabled={disabled}
                                 options={[
                                   {
                                     label: '买',
@@ -807,7 +818,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'tradingPermission',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -817,7 +828,6 @@ const EditModalButton = memo<any>(props => {
                             })(
                               <Select
                                 editing={editable}
-                                disabled={disabled}
                                 options={[
                                   {
                                     label: '交易',
@@ -843,14 +853,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'tradingPermissionNote',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<Input editing={editable} disabled={disabled} />)}
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -860,7 +870,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'tradingUnderlyers',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -869,7 +879,6 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <Select
-                                disabled={disabled}
                                 options={[
                                   {
                                     label: '个股商品',
@@ -896,14 +905,14 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'marginDiscountRate',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
                                   required: false,
                                 },
                               ],
-                            })(<InputNumber editing={editable} disabled={disabled} />)}
+                            })(<InputNumber editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -933,7 +942,7 @@ const EditModalButton = memo<any>(props => {
                   }}
                   columns={columns}
                 />
-                {!disabled ? (
+                {editable ? (
                   <Button
                     style={{ marginTop: 10 }}
                     onClick={() => {
@@ -966,7 +975,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'masterAgreementDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -975,7 +984,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -985,7 +994,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   >
                                     <Button>
                                       <Icon type="upload" />
@@ -1008,7 +1016,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'supplementalAgreementDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1017,7 +1025,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1027,7 +1035,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1045,7 +1052,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'riskSurveyDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1054,7 +1061,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1064,7 +1071,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1082,7 +1088,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'tradeAuthDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1091,7 +1097,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1101,7 +1107,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1119,7 +1124,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'dueDiligenceDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1128,7 +1133,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1138,7 +1143,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1156,7 +1160,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'riskPreferenceDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1165,7 +1169,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1175,7 +1179,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1193,7 +1196,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'complianceDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1202,7 +1205,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1212,7 +1215,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1230,7 +1232,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'riskRevelationDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1239,7 +1241,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1249,7 +1251,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1267,7 +1268,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'qualificationWarningDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1276,7 +1277,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1286,7 +1287,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1304,7 +1304,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'creditAgreement',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1313,7 +1313,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1323,7 +1323,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1341,7 +1340,7 @@ const EditModalButton = memo<any>(props => {
                       dataIndex: 'performanceGuaranteeDoc',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={editable ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1350,7 +1349,7 @@ const EditModalButton = memo<any>(props => {
                               ],
                             })(
                               <span>
-                                {!disabled ? (
+                                {editable ? (
                                   <Upload
                                     action={UPLOAD_URL}
                                     data={{
@@ -1360,7 +1359,6 @@ const EditModalButton = memo<any>(props => {
                                       }),
                                     }}
                                     editing={editable}
-                                    disabled={disabled}
                                   />
                                 ) : val && val[0] ? (
                                   val[0].name
@@ -1389,7 +1387,7 @@ const EditModalButton = memo<any>(props => {
         width: 900,
         visible: modalVisible,
         onCancel: () => setModalVisible(false),
-        footer: disabled ? (
+        footer: !editable ? (
           false
         ) : (
           <Row gutter={8} type="flex" justify="end">
