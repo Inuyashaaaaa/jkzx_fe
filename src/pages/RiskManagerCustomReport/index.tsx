@@ -45,16 +45,18 @@ class RiskManagerCustomReport extends PureComponent implements ISourceTable {
 
     const tableDataSource = data.page.map(item => {
       return {
-        ...JSON.parse(_.get(item, 'reportData', '{}')),
+        ..._.get(item, 'reportData', {}),
         rowId: unionId(),
       };
     });
 
-    const tableColumnDefs = Object.keys(_.get(tableDataSource, '[0]', {})).map(item => ({
-      headerName: item,
-      field: item,
-      width: 200,
-    }));
+    const tableColumnDefs = Object.keys(_.get(tableDataSource, '[0]', {}))
+      .filter(key => key !== 'rowId')
+      .map(item => ({
+        headerName: item,
+        field: item,
+        width: 200,
+      }));
 
     this.setState({
       tableColumnDefs,
