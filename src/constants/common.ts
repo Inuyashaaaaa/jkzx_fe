@@ -217,6 +217,7 @@ export const LCM_EVENT_TYPE_MAP = {
   OBSERVE: 'OBSERVE',
   SNOW_BALL_EXERCISE: 'SNOW_BALL_EXERCISE',
   PHOENIX_EXERCISE: 'PHOENIX_EXERCISE',
+  AMEND: 'AMEND',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
@@ -235,6 +236,7 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   OBSERVE: '观察',
   SNOW_BALL_EXERCISE: '雪球式到期结算',
   PHOENIX_EXERCISE: '凤凰式到期结算',
+  AMEND: '修改交易要素',
 };
 
 export const FREQUENCY_TYPE_MAP = {

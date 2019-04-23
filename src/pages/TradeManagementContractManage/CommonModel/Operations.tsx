@@ -64,14 +64,10 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
       positionId: item.positionId,
     });
     if (rsp.error) return;
-    const data = [...rsp.data];
-    const removeExporation = _.remove(data, n => {
-      return n === 'EXPIRATION';
-    });
     this.setState({
       eventTypes: {
         ...this.state.eventTypes,
-        [item.positionId]: data,
+        [item.positionId]: rsp.data,
       },
     });
   };

@@ -7,19 +7,22 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
 } from '@/constants/common';
+import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import { AlUnwindNotionalAmount, InitialNotionalAmount } from '@/constants/legColDefs/extraColDefs';
+import Form from '@/design/components/Form';
 import { IFormControl } from '@/design/components/Form/types';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
-import ModalButton from '@/lib/components/_ModalButton2';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import ModalButton from '@/lib/components/_ModalButton2';
 import { convertObservetions } from '@/services/common';
-import { trdBookList, trdTradeGet } from '@/services/general-service';
+import { trdTradeGet } from '@/services/general-service';
 import {
   bookingTableFormControls,
   convertTradeApiData2PageData,
+  convertTradePageData2ApiData,
   createLegDataSourceItem,
 } from '@/services/pages';
 import {
@@ -27,13 +30,12 @@ import {
   trdTradeLCMEventProcess,
   trdTradeLCMUnwindAmountGet,
 } from '@/services/trade-service';
-import { ComponentResolver, GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { message } from 'antd';
+import { MenuItemDef } from 'ag-grid-community';
+import { Button, Col, message, Row } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import uuidv4 from 'uuid/v4';
 import ExportModal from './ExportModal';
 import AsianExerciseModal from './modals/AsianExerciseModal';
 import BarrierIn from './modals/BarrierIn';
@@ -44,6 +46,7 @@ import KnockOutModal from './modals/KnockOutModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
 import { filterObDays } from './utils';
+import moment, { isMoment } from 'moment';
 
 class TradeManagementBookEdit extends PureComponent<any, any> {
   public rowKey: string = 'id';
@@ -70,6 +73,15 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
 
   public $barrierIn: BarrierIn;
 
+  public unEditDir = [
+    LEG_FIELD.UNDERLYER_MULTIPLIER,
+    LEG_FIELD.TERM,
+    LEG_FIELD.EFFECTIVE_DATE,
+    LEG_FIELD.EXPIRATION_DATE,
+    LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
+    LEG_FIELD.NOTIONAL_AMOUNT,
+  ];
+
   constructor(props) {
     super(props);
     this.state = {
@@ -84,17 +96,13 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       eventTypes: {},
       markets: {},
       visible: false,
+      editable: false,
+      editablePositionId: '',
+      buttonDisable: true,
     };
   }
 
   public componentDidMount = () => {
-    trdBookList().then(rsp => {
-      if (rsp.error) return;
-      this.setState({
-        bookList: rsp.data,
-      });
-    });
-
     this.loadData();
   };
 
@@ -141,71 +149,30 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         },
         () => {
           this.loadCommon(composeTableDataSource, tableFormData, reset);
-          // setTimeout(() => {
-          //   this.computeCellValues();
-          // }, 0);
         }
       );
     }
 
     this.loadCommon(composeTableDataSource, tableFormData, reset);
-    // setTimeout(() => {
-    //   this.computeCellValues();
-    // }, 0);
-  };
-
-  public getDepends = (getValue, data, colDef) => {
-    if (colDef.oldEditable) return [];
-    if (!getValue) return [];
-    if (typeof getValue === 'function') {
-      const result = getValue({ data, colDef }) || {};
-      return result.depends || [];
-    }
-    return getValue.depends || [];
-  };
-
-  public computeCellValues = () => {
-    const dependeds = _.flatten(
-      this.state.dataSource.map(dataSourceItem => {
-        return _.union<string>(
-          this.state.columnDefs.reduce((arr, item) => {
-            return arr.concat(this.getDepends(item.getValue, dataSourceItem, item));
-          }, [])
-        );
-      })
-    );
-
-    this.state.dataSource.forEach(rowData => {
-      const rowId = rowData[this.rowKey];
-      dependeds.forEach(colField => {
-        const value = rowData[colField];
-        this.$souceTable.$baseSourceTable.$table.$baseTable.setCellValue(rowId, colField, value);
-      });
-    });
   };
 
   public loadCommon = (tableDataSource, tableFormData, reset) => {
+    // 找到每条腿有的生命周期事件
     tableDataSource.forEach(item => {
       const leg = allLegTypes.find(it => it.type === item.productType);
-
       trdPositionLCMEventTypes({
         positionId: item.id,
       }).then(rsp => {
         if (rsp.error) return;
-        const data = [...rsp.data];
-        const removeExporation = _.remove(data, n => {
-          return n === 'EXPIRATION';
-        });
         this.setState({
           eventTypes: {
             ...this.state.eventTypes,
-            [item.id]: data,
+            [item.id]: item.id === this.state.editablePositionId ? [] : rsp.data,
           },
         });
       });
       this.addLegData(leg, this.makeData(leg, item));
     });
-
     this.setState({
       tableFormData,
       loading: false,
@@ -213,34 +180,18 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public makeData(leg, data) {
+    // data是rowData
     return {
       ...createLegDataSourceItem(leg),
       ...data,
     };
   }
 
-  public judgeLegTypeExsit = (colDef, data) => {
-    const legType = allLegTypes.find(item => item.type === data[LEG_TYPE_FIELD]);
-
-    if (!legType) return false;
-
-    return !!legType.getColumnDefs('editing').find(item => item.field === colDef.field);
-  };
-
-  public handleAddLeg = event => {
-    const leg = allLegTypes.find(item => item.type === event.key);
-
-    if (!leg) return;
-
-    const id = uuidv4();
-    this.addLegData(leg, { id, [LEG_TYPE_FIELD]: leg.type });
-  };
-
   public addLegData = (leg, rowData) => {
     if (this.cacheTyeps.indexOf(leg.type) === -1) {
       this.cacheTyeps.push(leg.type);
     }
-
+    const index = this.state.dataSource.findIndex(iitem => iitem.positionId === rowData.positionId);
     this.setState(
       produce((state: any) => {
         if (this.cacheTyeps.indexOf(leg.type) !== -1) {
@@ -268,7 +219,15 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
                       ...col,
                       oldEditable: col.editable,
                       suppressMenu: true,
-                      editable: false,
+                      editable: rowData => {
+                        if (rowData.data.positionId === this.state.editablePositionId) {
+                          if (this.unEditDir.find(item => item === col.field)) {
+                            return false;
+                          }
+                          return true;
+                        }
+                        return false;
+                      },
                       exsitable: params => {
                         const { colDef, data } = params;
                         return this.judgeLegTypeExsit(colDef, data);
@@ -289,9 +248,17 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
             )
           );
         }
-        state.dataSource.push(rowData);
+        state.dataSource.splice(index, 0, rowData);
       })
     );
+  };
+
+  public judgeLegTypeExsit = (colDef, data) => {
+    const legType = allLegTypes.find(item => item.type === data[LEG_TYPE_FIELD]);
+
+    if (!legType) return false;
+
+    return !!legType.getColumnDefs('editing').find(item => item.field === colDef.field);
   };
 
   public getHorizontalrColumnDef = params => {
@@ -314,6 +281,21 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       'copy',
       'paste',
     ];
+  };
+
+  public handleEditable = rowData => {
+    const leg = allLegTypes.find(item => item.type === rowData.productType);
+    const dataSource = [...this.state.dataSource];
+    this.setState(
+      {
+        editablePositionId: rowData.positionId,
+        dataSource: [],
+        buttonDisable: false,
+      },
+      () => {
+        this.loadData();
+      }
+    );
   };
 
   public bindEventAction = (eventType, params) => () => {
@@ -418,45 +400,17 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         () => this.loadData(true)
       );
     }
-  };
 
-  public removeLegData = (params: GetContextMenuItemsParams) => {
-    if (!params.column) return;
-
-    const colId = params.column.getColDef().field;
-    this.setState(
-      produce((state: any) => {
-        const index = state.dataSource.findIndex(item => item[LEG_TYPE_FIELD] === colId);
-        state.dataSource.splice(index - 1, 1);
-      })
-    );
-  };
-
-  public copyLegData = (params: GetContextMenuItemsParams) => {
-    if (!params.column) return;
-
-    const colId = params.column.getColDef().field;
-    const leg = this.getLeyByColId(colId);
-
-    if (!leg) return;
-
-    this.addLegData(leg, {
-      ...this.getDataItemByColId(colId),
-      id: uuidv4(),
-    });
-  };
-
-  public getLeyByColId = colId => {
-    const legType = this.getLegTypeByColId(colId);
-    return allLegTypes.find(item => item.type === legType);
-  };
-
-  public getLegTypeByColId = colId => {
-    return _.get(this.getDataItemByColId(colId), LEG_TYPE_FIELD);
-  };
-
-  public getDataItemByColId = colId => {
-    return this.state.dataSource.find(item => item.id === colId);
+    if (eventType === LCM_EVENT_TYPE_MAP.AMEND) {
+      this.setState(
+        {
+          editable: true,
+        },
+        () => {
+          this.handleEditable(this.activeRowData);
+        }
+      );
+    }
   };
 
   public handleEventType = eventType => {
@@ -505,12 +459,73 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       visible: false,
     });
   };
+
+  public abandonModify = () => {
+    this.setState(
+      {
+        buttonDisable: true,
+        editablePositionId: '',
+        dataSource: [],
+      },
+      () => {
+        this.loadData();
+      }
+    );
+  };
+
+  public saveModify = async () => {
+    const modifyData = this.state.dataSource.filter(item => {
+      return item.positionId === this.state.editablePositionId;
+    });
+    const tableFormData = {
+      ...this.state.tableFormData,
+      tradeDate: moment(this.state.tableFormData.tradeDate),
+    };
+
+    const trade = convertTradePageData2ApiData(
+      modifyData,
+      tableFormData,
+      this.props.currentUser.userName
+    );
+
+    const { error, data } = await trdTradeLCMEventProcess({
+      positionId: modifyData[0].positionId,
+      tradeId: trade.tradeId,
+      eventType: 'AMEND',
+      userLoginId: this.props.currentUser.userName,
+      eventDetail: {
+        asset: _.omit(trade.positions[0].asset, [
+          'lcmEventType',
+          'positionId',
+          'productType',
+          'historyValue',
+          'initialValue',
+        ]),
+        productType: trade.positions[0].productType,
+      },
+    });
+    if (error) {
+      message.error('修改失败');
+      return;
+    }
+    message.success('修改成功');
+    this.setState({
+      editablePositionId: '',
+      buttonDisable: true,
+      dataSource: [],
+    });
+    this.loadData();
+  };
+
   public render() {
     return (
       <PageHeaderWrapper back={true}>
-        <SourceTable
-          loading={this.state.loading}
-          tableFormControls={bookingTableFormControls().map<IFormControl>(item => ({
+        <Form
+          dataSource={this.state.tableFormData}
+          controlNumberOneRow={5}
+          footer={false}
+          layout="inline"
+          controls={bookingTableFormControls().map<IFormControl>(item => ({
             ...item,
             input: {
               ...item.input,
@@ -518,17 +533,47 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
               subtype: 'show',
             },
           }))}
-          tableFormData={this.state.tableFormData}
+        />
+        <SourceTable
+          loading={this.state.loading}
           ref={node => (this.$souceTable = node)}
           rowKey={this.rowKey}
           pagination={false}
           vertical={true}
           autoSizeColumnsToFit={false}
           enableSorting={false}
+          darkIfDoNotEditable={true}
           getHorizontalrColumnDef={this.getHorizontalrColumnDef}
           getContextMenuItems={this.getContextMenuItems}
           dataSource={this.state.dataSource}
           columnDefs={this.state.columnDefs}
+          header={
+            <Row
+              style={{ marginBottom: VERTICAL_GUTTER, marginTop: VERTICAL_GUTTER }}
+              type="flex"
+              justify="start"
+              gutter={16}
+            >
+              <Col>
+                <Button
+                  type="primary"
+                  disabled={this.state.buttonDisable}
+                  onClick={this.saveModify}
+                >
+                  保存修改
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  type="primary"
+                  disabled={this.state.buttonDisable}
+                  onClick={this.abandonModify}
+                >
+                  放弃修改
+                </Button>
+              </Col>
+            </Row>
+          }
         />
         <ModalButton ref={node => (this.$modelButton = node)} onConfirm={this.onConfirm} />
         <UnwindModal ref={node => (this.$unwindModal = node)} />
