@@ -45,7 +45,7 @@ class RiskManagerCustomReport extends PureComponent implements ISourceTable {
 
     const tableDataSource = data.page.map(item => {
       return {
-        ...JSON.parse(_.get(item, 'reportData', '{}')),
+        ..._.get(item, 'reportData', {}),
         rowId: unionId(),
       };
     });
