@@ -7,8 +7,15 @@ import React from 'react';
 
 export const EffectiveDate: ILegColDef = {
   title: '起始日',
-
   dataIndex: LEG_FIELD.EFFECTIVE_DATE,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (value, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -18,9 +25,9 @@ export const EffectiveDate: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <DatePicker
-            defaultOpen={!(isBooking || isPricing)}
+            defaultOpen={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             {...{
-              editing: isBooking || isPricing ? true : editing,
               format: 'YYYY-MM-DD',
             }}
           />

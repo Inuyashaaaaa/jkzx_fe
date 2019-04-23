@@ -14,13 +14,7 @@ import _ from 'lodash';
 import React from 'react';
 
 const getProps = record => {
-  let props;
-
-  if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL) {
-    props = {
-      disabled: true,
-    };
-  }
+  const props;
 
   if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.BARRIER) {
     if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY) {
@@ -44,6 +38,17 @@ const getProps = record => {
 export const Premium: ILegColDef = {
   title: '实际期权费',
   dataIndex: LEG_FIELD.PREMIUM,
+  editable: record => {
+    if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.DIGITAL) {
+      return false;
+    }
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -53,8 +58,8 @@ export const Premium: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            autoSelect={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             {...getProps(record)}
           />
         )}

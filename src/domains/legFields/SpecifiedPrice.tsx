@@ -39,6 +39,14 @@ const getProps = record => {
 export const SpecifiedPrice: ILegColDef = {
   title: '结算方式',
   dataIndex: LEG_FIELD.SPECIFIED_PRICE,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -49,9 +57,8 @@ export const SpecifiedPrice: ILegColDef = {
         })(
           <Select
             {...getProps(record)}
-            defaultOpen={!(isBooking || isPricing)}
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            defaultOpen={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
           />
         )}
       </FormItem>

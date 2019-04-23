@@ -16,13 +16,21 @@ const getProps = record => {
 export const FrontPremium: ILegColDef = {
   // 权利金总和
   title: '合约期权费',
+  dataIndex: LEG_FIELD.FRONT_PREMIUM,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   exsitable: record => {
     if (_.get(record, [LEG_FIELD.IS_ANNUAL, 'value'])) {
       return true;
     }
     return false;
   },
-  dataIndex: LEG_FIELD.FRONT_PREMIUM,
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -32,8 +40,8 @@ export const FrontPremium: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            autoSelect={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             {...getProps(record)}
           />
         )}

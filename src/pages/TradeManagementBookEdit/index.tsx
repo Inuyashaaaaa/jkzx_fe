@@ -22,34 +22,19 @@ import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
+import MultiLegTable from '@/containers/MultiLegTable';
+import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 
 const TradeManagementBooking = props => {
-  const [columnMeta, setColumnMeta] = useState({
-    columns: [],
-    unionColumns: [],
-  });
   const [tableData, setTableData] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
 
-  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
-  const tableEl = useRef<Table2>(null);
-  const [cashModalDataSource, setcashModalDataSource] = useState([]);
-  const [cashModalVisible, setCashModalVisible] = useState(false);
+  const tableEl = useRef<IMultiLegTableEl>(null);
   const [eventTypes, setEventTypes] = useState({});
 
   const addLeg = (leg: ILeg, position) => {
     if (!leg) return;
-
-    setColumnMeta(pre => {
-      const { columns, unionColumns } = pre;
-      const nextUnion = getUnionLegColumns(unionColumns.concat(leg.getColumns(LEG_ENV.EDITING)));
-      const nextColumns = chainLegColumns(nextUnion);
-      return {
-        columns: nextColumns,
-        unionColumns: nextUnion,
-      };
-    });
 
     const isAnnualized = position.asset.annualized;
 
@@ -141,163 +126,6 @@ const TradeManagementBooking = props => {
     loadTableData();
   });
 
-  const getUnionLegColumns = (legColDefs: ILegColDef[]) => {
-    return _.unionBy(legColDefs, item => item.dataIndex);
-  };
-
-  const getOrderLegColumns = (legColDefs: ILegColDef[]) => {
-    if (!legColDefs) return [];
-    const notOrders = _.difference(legColDefs.map(item => item.dataIndex), LEG_FIELD_ORDERS);
-    if (notOrders && notOrders.length) {
-      console.error(`leg self colDef.dataIndex:[${notOrders}] not join orders yet.`);
-    }
-    return LEG_FIELD_ORDERS.reduce((pre, next) => {
-      const colDef = legColDefs.find(item => item.dataIndex === next);
-      if (colDef) {
-        return pre.concat(colDef);
-      }
-      return pre;
-    }, []).concat(notOrders.map(next => legColDefs.find(item => item.dataIndex === next)));
-  };
-
-  const getLegByType = (type: string) => {
-    return TOTAL_LEGS.find(item => item.type === type);
-  };
-
-  const getEditableLegColumns = (legColDefs: ILegColDef[]) => {
-    return legColDefs.map(item => {
-      return {
-        ...item,
-        defaultEditing: false,
-        editable: false,
-      };
-    });
-  };
-
-  const cellIsEmpty = (record, colDef) => {
-    const legBelongByRecord = getLegByType(record[LEG_TYPE_FIELD]);
-
-    if (
-      (colDef.exsitable && !colDef.exsitable(record)) ||
-      !(
-        legBelongByRecord &&
-        legBelongByRecord
-          .getColumns(LEG_ENV.EDITING)
-          .find(item => item.dataIndex === colDef.dataIndex)
-      )
-    ) {
-      return true;
-    }
-    return false;
-  };
-
-  const getEmptyRenderLegColumns = (legColDefs: ILegColDef[]) => {
-    return legColDefs.map(item => {
-      return {
-        ...item,
-        editable(record, index, { colDef }) {
-          if (cellIsEmpty(record, colDef)) {
-            return false;
-          }
-          if (typeof item.editable === 'function') {
-            return item.editable.apply(this, arguments);
-          }
-          return !!item.editable;
-        },
-        onCell(record, index, { colDef }) {
-          if (cellIsEmpty(record, colDef)) {
-            return {
-              style: { backgroundColor: '#e8e8e8' },
-              ...(item.onCell ? item.onCell.apply(this, arguments) : null),
-            };
-          }
-        },
-        render(val, record, index, { colDef }) {
-          if (cellIsEmpty(record, colDef)) {
-            return null;
-          }
-
-          return item.render.apply(this, arguments);
-        },
-      };
-    });
-  };
-
-  const getWidthColumns = (legColDefs: ILegColDef[]) => {
-    return legColDefs.map(item => {
-      return {
-        ...item,
-        onCell() {
-          return {
-            width: '250px',
-            ...(item.onCell ? item.onCell.apply(this, arguments) : null),
-          };
-        },
-      };
-    });
-  };
-
-  const getLoadingsColumns = (legColDefs: ILegColDef[]) => {
-    return legColDefs.map(item => {
-      return {
-        ...item,
-        render(val, record, index, { colDef }) {
-          const loading = _.get(record[colDef.dataIndex], 'loading', false);
-          return <Loading loading={loading}>{item.render.apply(this, arguments)}</Loading>;
-        },
-      };
-    });
-  };
-
-  const getTitleColumns = (legColDefs: ILegColDef[]) => {
-    return [
-      {
-        title: '结构类型',
-        dataIndex: LEG_FIELD.LEG_META,
-        render: (val, record) => {
-          return LEG_TYPE_ZHCH_MAP[record[LEG_TYPE_FIELD]];
-        },
-      },
-      // meta field 会被 loading 包装
-      ...remove(legColDefs, item => item.dataIndex === LEG_FIELD.LEG_META),
-    ];
-  };
-
-  const [loadingsByRow, setLoadingsByRow] = useState({});
-
-  const chainLegColumns = nextUnion => {
-    return getTitleColumns(
-      getEditableLegColumns(
-        getLoadingsColumns(getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion))))
-      )
-    );
-  };
-
-  useEffect(
-    () => {
-      if (!tableData.length) return;
-      setColumnMeta(pre => {
-        const { columns, unionColumns } = pre;
-        return {
-          columns: chainLegColumns(unionColumns),
-          unionColumns,
-        };
-      });
-    },
-    [loadingsByRow]
-  );
-
-  const setLoadings = (rowId: string, colId: string, loading: boolean) => {
-    setLoadingsByRow(pre => {
-      return {
-        ..._.set(pre, [rowId], {
-          ..._.get(pre, [rowId], {}),
-          [colId]: loading,
-        }),
-      };
-    });
-  };
-
   return (
     <PageHeaderWrapper>
       <Typography.Title level={4}>基本信息</Typography.Title>
@@ -314,11 +142,10 @@ const TradeManagementBooking = props => {
         交易结构信息
       </Typography.Title>
       <Divider />
-      <Table2
+      <MultiLegTable
+        env={LEG_ENV.EDITING}
         loading={tableLoading}
-        size="middle"
-        ref={node => (tableEl.current = node)}
-        rowKey={LEG_ID_FIELD}
+        tableEl={tableEl}
         onCellFieldsChange={params => {
           const { record } = params;
           const leg = getLegByRecord(record);
@@ -340,9 +167,9 @@ const TradeManagementBooking = props => {
                 newData[params.rowIndex],
                 newData,
                 (colId: string, loading: boolean) => {
-                  setLoadings(params.rowId, colId, loading);
+                  tableEl.current.setLoadings(params.rowId, colId, loading);
                 },
-                setLoadings,
+                tableEl.current.setLoadingsByRow,
                 (colId: string, newVal: ITableData) => {
                   setTableData(pre =>
                     pre.map(item => {
@@ -362,9 +189,6 @@ const TradeManagementBooking = props => {
             return newData;
           });
         }}
-        pagination={false}
-        vertical={true}
-        columns={columnMeta.columns}
         dataSource={tableData}
         // getContextMenu={params => {
         //   return (

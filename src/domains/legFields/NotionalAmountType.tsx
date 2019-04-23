@@ -13,12 +13,7 @@ import _ from 'lodash';
 import React from 'react';
 
 const getSelectProps = record => {
-  let props;
-  if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
-    props = {
-      disabled: true,
-    };
-  }
+  const props;
 
   return {
     type: 'select',
@@ -39,6 +34,18 @@ const getSelectProps = record => {
 export const NotionalAmountType: ILegColDef = {
   title: '名义本金类型',
   dataIndex: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
+  editable: record => {
+    if (_.get(record, [LEG_TYPE_FIELD, 'value']) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
+      return false;
+    }
+
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -50,8 +57,8 @@ export const NotionalAmountType: ILegColDef = {
         })(
           <Select
             {...getSelectProps(record)}
-            defaultOpen={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            defaultOpen={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
           />
         )}
       </FormItem>

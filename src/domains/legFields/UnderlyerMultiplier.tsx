@@ -7,12 +7,15 @@ import React from 'react';
 export const UnderlyerMultiplier: ILegColDef = {
   title: '合约乘数',
   dataIndex: LEG_FIELD.UNDERLYER_MULTIPLIER,
+  editable: record => {
+    return false;
+  },
   render: (val, record, dataIndex, { form, editing, colDef }) => {
     return (
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<InputNumber disabled={true} />)}
+        })(<InputNumber editing={false} />)}
       </FormItem>
     );
   },

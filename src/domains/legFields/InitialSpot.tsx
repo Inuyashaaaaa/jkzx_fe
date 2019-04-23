@@ -8,6 +8,14 @@ import React from 'react';
 export const InitialSpot: ILegColDef = {
   title: '期初价格',
   dataIndex: LEG_FIELD.INITIAL_SPOT,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -17,8 +25,8 @@ export const InitialSpot: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            autoSelect={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
           />
         )}
       </FormItem>

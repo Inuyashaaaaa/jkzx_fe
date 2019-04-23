@@ -24,6 +24,14 @@ const getProps = record => {
 export const Strike: ILegColDef = {
   title: '行权价',
   dataIndex: LEG_FIELD.STRIKE,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -33,8 +41,8 @@ export const Strike: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            autoSelect={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             {...getProps(record)}
           />
         )}

@@ -14,7 +14,7 @@ export const UnitInputNumber = memo<
   const options = undefined;
 
   if (unit === '$' || unit === '¥') {
-    formatter = value => `${unit} ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    formatter = value => `${unit}${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     parser = value => (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');
   } else {
     formatter = value => {

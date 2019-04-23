@@ -32,6 +32,14 @@ const getProps = record => {
 export const MinimumPremium: ILegColDef = {
   title: '保底收益',
   dataIndex: LEG_FIELD.MINIMUM_PREMIUM,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   exsitable: record => {
     if (Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL])) {
       return true;
@@ -47,8 +55,8 @@ export const MinimumPremium: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            autoSelect={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             {...getProps(record)}
           />
         )}

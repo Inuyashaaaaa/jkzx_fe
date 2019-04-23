@@ -250,7 +250,7 @@ const TradeManagementBooking = props => {
         return item;
       });
     });
-  }, 1000);
+  }, 250);
 
   const [pricingEnvironmentsList, setPricingEnvironmentsList] = useState([]);
 
@@ -447,12 +447,8 @@ const TradeManagementBooking = props => {
             return newData;
           });
         }}
-        onCellValuesChange={params => {
-          // changedValues 里面有最新的字段值
-          fetchDefaultPricingEnvData({
-            ...params.record,
-            ...params.changedValues,
-          });
+        onCellEditingChanged={params => {
+          fetchDefaultPricingEnvData(params.record);
         }}
         dataSource={tableData}
         getContextMenu={params => {

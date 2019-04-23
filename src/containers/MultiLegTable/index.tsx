@@ -19,11 +19,11 @@ import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
 import { trdTradeCreate } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
 import { ILeg, ILegColDef } from '@/types/leg';
-import { Affix, Button, Divider, Menu, message, Modal, Row } from 'antd';
+import { Affix, Button, Divider, Menu, message, Modal, Row, Tag } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { PRICING_FROM_TAG } from '@/constants/trade';
+import { PRICING_FROM_TAgTag } from '@/constants/trade';
 import { LEG_MAP } from '@/constants/legType';
 
 const MultiLegTable = memo<
@@ -167,7 +167,7 @@ const MultiLegTable = memo<
         title: '结构类型',
         dataIndex: LEG_FIELD.LEG_META,
         render: (val, record) => {
-          return LEG_TYPE_ZHCH_MAP[record[LEG_TYPE_FIELD]];
+          return <Tag color="blue">{LEG_TYPE_ZHCH_MAP[record[LEG_TYPE_FIELD]]}</Tag>;
         },
       },
       // meta field 会被 loading 包装
@@ -183,7 +183,7 @@ const MultiLegTable = memo<
 
   return (
     <Table2
-      size="middle"
+      size="small"
       rowKey={LEG_ID_FIELD}
       pagination={false}
       vertical={true}

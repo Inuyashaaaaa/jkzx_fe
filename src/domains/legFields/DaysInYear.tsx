@@ -8,7 +8,14 @@ import React from 'react';
 
 export const DaysInYear: ILegColDef = {
   title: '年度计息天数',
-
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   exsitable: record => {
     if (_.get(record, [LEG_FIELD.IS_ANNUAL, 'value'])) {
       return true;
@@ -25,9 +32,10 @@ export const DaysInYear: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            autoSelect={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             unit="天"
+            precision={0}
           />
         )}
       </FormItem>

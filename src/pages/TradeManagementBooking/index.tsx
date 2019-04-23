@@ -1,5 +1,16 @@
-import { LEG_FIELD, LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
-import { FORM_EDITABLE_STATUS, TRADESCOL_FIELDS, COMPUTED_LEG_FIELDS } from '@/constants/global';
+import {
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_ZHCH_MAP,
+  PREMIUM_TYPE_MAP,
+} from '@/constants/common';
+import {
+  FORM_EDITABLE_STATUS,
+  TRADESCOL_FIELDS,
+  COMPUTED_LEG_FIELDS,
+  COMPUTED_LEG_FIELD_MAP,
+} from '@/constants/global';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import {
   LEG_ENV,
@@ -193,9 +204,13 @@ const TradeManagementBooking = props => {
 
   const [tableData, setTableData] = useState(
     from === PRICING_FROM_TAG
-      ? (props.pricingData.tableData || []).map(item =>
-          _.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])
-        )
+      ? (props.pricingData.tableData || []).map(item => ({
+          ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
+          [LEG_FIELD.PREMIUM]:
+            item[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY
+              ? item[COMPUTED_LEG_FIELD_MAP.PRICE]
+              : item[COMPUTED_LEG_FIELD_MAP.PRICE_PER],
+        }))
       : []
   );
 

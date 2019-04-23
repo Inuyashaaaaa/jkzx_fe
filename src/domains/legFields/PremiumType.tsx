@@ -37,6 +37,14 @@ const getSelectProps = record => {
 export const PremiumType: ILegColDef = {
   title: '权利金类型',
   dataIndex: LEG_FIELD.PREMIUM_TYPE,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -47,8 +55,8 @@ export const PremiumType: ILegColDef = {
         })(
           <Select
             {...getSelectProps(record)}
-            defaultOpen={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            defaultOpen={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
           />
         )}
       </FormItem>

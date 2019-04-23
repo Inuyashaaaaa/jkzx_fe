@@ -50,7 +50,7 @@ class InputNumber extends InputBase<IInputNumberProps> {
   };
 
   public renderRendering() {
-    const { value, formatter } = this.props;
+    const { value, formatter, style } = this.props;
     const nextVal = this.getValue(value);
 
     return (
@@ -58,6 +58,7 @@ class InputNumber extends InputBase<IInputNumberProps> {
         style={{
           width: '100%',
           display: 'inline-block',
+          ...style,
         }}
       >
         {formatter && nextVal != null ? formatter(nextVal) : nextVal}

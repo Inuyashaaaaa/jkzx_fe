@@ -8,7 +8,14 @@ import React from 'react';
 export const IsAnnual: ILegColDef = {
   title: '是否年化',
   dataIndex: LEG_FIELD.IS_ANNUAL,
-
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -16,12 +23,7 @@ export const IsAnnual: ILegColDef = {
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(
-          <Checkbox
-            autoSelect={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
-          />
-        )}
+        })(<Checkbox editing={isBooking || isPricing ? editing : false} />)}
       </FormItem>
     );
   },

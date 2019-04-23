@@ -51,6 +51,14 @@ const getSelectProps = record => {
 export const StrikeType: ILegColDef = {
   title: '行权价类型',
   dataIndex: LEG_FIELD.STRIKE_TYPE,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -61,8 +69,8 @@ export const StrikeType: ILegColDef = {
         })(
           <Select
             {...getSelectProps(record)}
-            defaultOpen={!(isBooking || isPricing)}
-            editing={isBooking || isPricing ? true : editing}
+            defaultOpen={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
           />
         )}
       </FormItem>

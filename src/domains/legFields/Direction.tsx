@@ -8,6 +8,14 @@ import React from 'react';
 export const Direction: ILegColDef = {
   title: '买卖方向',
   dataIndex: LEG_FIELD.DIRECTION,
+  editable: record => {
+    const isBooking = legEnvIsBooking(record);
+    const isPricing = legEnvIsPricing(record);
+    if (isBooking || isPricing) {
+      return true;
+    }
+    return false;
+  },
   render: (value, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -17,9 +25,9 @@ export const Direction: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <Select
-            defaultOpen={!(isBooking || isPricing)}
+            defaultOpen={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             {...{
-              editing: isBooking || isPricing ? true : editing,
               options: [
                 {
                   label: '买',
