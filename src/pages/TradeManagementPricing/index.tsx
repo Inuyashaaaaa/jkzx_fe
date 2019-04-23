@@ -264,22 +264,6 @@ class TradeManagementPricing extends PureComponent<any> {
 
     this.switchLoading(false);
 
-    if (
-      rsps.some(rsp => {
-        const { raw } = rsp;
-        if (raw && raw.diagnostics && raw.diagnostics.length) {
-          return true;
-        }
-        return false;
-      })
-    ) {
-      return notification.error({
-        message: rsps.map(item => _.get(item.raw.diagnostics, '[0].message', [])).join(','),
-      });
-    }
-
-    if (rsps.some(rsp => rsp.error) || rsps.some(rsp => _.isEmpty(rsp.data))) return;
-
     this.props.dispatch({
       type: 'pricingData/pricingLegData',
       payload: { rsps },

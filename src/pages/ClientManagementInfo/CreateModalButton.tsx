@@ -761,40 +761,6 @@ const CreateModalButton = memo<any>(props => {
                   },
                 },
                 {
-                  title: '我方授信额度',
-                  dataIndex: 'ourCreditLimit',
-                  render: (val, record, index, { form }) => {
-                    return (
-                      <FormItem hasFeedback={true}>
-                        {form.getFieldDecorator({
-                          rules: [
-                            {
-                              required: false,
-                            },
-                          ],
-                        })(<InputNumber editing={editable} />)}
-                      </FormItem>
-                    );
-                  },
-                },
-                {
-                  title: '对方授信额度',
-                  dataIndex: 'cptyCreditLimit',
-                  render: (val, record, index, { form }) => {
-                    return (
-                      <FormItem hasFeedback={true}>
-                        {form.getFieldDecorator({
-                          rules: [
-                            {
-                              required: false,
-                            },
-                          ],
-                        })(<InputNumber editing={editable} />)}
-                      </FormItem>
-                    );
-                  },
-                },
-                {
                   title: (
                     <span>
                       保证金折扣<span style={{ fontSize: 12 }}>（例如：0.8表示八折）</span>

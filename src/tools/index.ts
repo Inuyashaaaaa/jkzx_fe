@@ -1,6 +1,14 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import _ from 'lodash';
 
+export const isModelXY = data => {
+  return (
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_ANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_UNANNUAL ||
+    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY
+  );
+};
+
 export const isAutocallPhoenix = data => {
   return (
     data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||

@@ -15,8 +15,8 @@ import Form from '@/design/components/Form';
 import { IFormControl } from '@/design/components/Form/types';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
-import ModalButton from '@/lib/components/_ModalButton2';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import ModalButton from '@/lib/components/_ModalButton2';
 import { convertObservetions } from '@/services/common';
 import { trdTradeGet } from '@/services/general-service';
 import {
@@ -35,7 +35,7 @@ import { Button, Col, message, Row } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
-import moment, { isMoment } from 'moment';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import ExportModal from './ExportModal';
 import AsianExerciseModal from './modals/AsianExerciseModal';
@@ -44,6 +44,7 @@ import ExerciseModal from './modals/ExerciseModal';
 import ExpirationModal from './modals/ExpirationModal';
 import FixingModal from './modals/FixingModal';
 import KnockOutModal from './modals/KnockOutModal';
+import SettleModal from './modals/SettleModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
 import { filterObDays } from './utils';
@@ -72,6 +73,8 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public $asianExerciseModal: AsianExerciseModal;
 
   public $barrierIn: BarrierIn;
+
+  public $settleModal: SettleModal;
 
   public unEditDir = [
     LEG_FIELD.UNDERLYER_MULTIPLIER,
@@ -401,14 +404,12 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
       );
     }
 
-    if (eventType === LCM_EVENT_TYPE_MAP.AMEND) {
-      this.setState(
-        {
-          editable: true,
-        },
-        () => {
-          this.handleEditable(this.activeRowData);
-        }
+    if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+      this.$settleModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.loadData(true)
       );
     }
   };
@@ -603,6 +604,11 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         <BarrierIn
           ref={node => {
             this.$barrierIn = node;
+          }}
+        />
+        <SettleModal
+          ref={node => {
+            this.$settleModal = node;
           }}
         />
       </PageHeaderWrapper>

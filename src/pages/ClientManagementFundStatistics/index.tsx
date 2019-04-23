@@ -133,7 +133,7 @@ class ClientManagementFundStatistics extends PureComponent {
         <SourceTable
           rowKey="accountId"
           loading={this.state.loading}
-          columnDefs={TABLE_COL_DEF}
+          columnDefs={TABLE_COL_DEF(this.fetchTable)}
           dataSource={this.state.tableDataSource}
           autoSizeColumnsToFit={false}
           searchable={true}

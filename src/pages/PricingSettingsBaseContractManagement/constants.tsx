@@ -8,7 +8,7 @@ export const EXPIRY_KEY = 'expiry';
 
 export const POSITION_KEY = 'positionId';
 
-export const POSITION_SHOW_KEY = 'positionId';
+export const POSITION_SHOW_KEY = 'positionShow';
 
 export const FORM_CONTROLS: (
   prices: any[],

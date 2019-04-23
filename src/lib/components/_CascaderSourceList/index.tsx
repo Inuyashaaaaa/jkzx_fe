@@ -29,6 +29,7 @@ export interface CascaderSourceListProps {
   createable?: boolean;
   removeable?: boolean;
   onSearch?: (value: any, index: number) => void;
+  sort?: boolean;
 }
 
 class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
@@ -65,7 +66,7 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
     );
   });
 
-  public countNodes = memo((list, options) => {
+  public countNodes = memo((list, options, sort) => {
     const nodes = [];
     // list 长度和 option 深度得手动保证一致，暂不做验证，提高效率
     const deep = list.length;
@@ -77,7 +78,6 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
       }
       nodes[curDeep] = _.flatten(nodes[curDeep - 1].map(item => item.children));
     });
-
     return nodes;
   });
 
@@ -184,9 +184,8 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
   };
 
   public render() {
-    const { list, width, options, loading, removeable } = this.props;
-
-    const nodes = this.countNodes(list, options);
+    const { list, width, options, loading, removeable, sort } = this.props;
+    const nodes = this.countNodes(list, options, sort);
 
     return (
       <Loading loading={loading}>
@@ -201,6 +200,11 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
               ...rest
             } = listItem;
             const dataSource = this.getListDataSource(index, this.getValue(), nodes);
+            if (sort) {
+              dataSource.sort((a, b) => {
+                return b.label.toString().localeCompare(a.label.toString());
+              });
+            }
             return (
               <Col key={index}>
                 <SourceList

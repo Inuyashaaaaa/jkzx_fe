@@ -120,7 +120,6 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
     fixed: 'right',
     width: 100,
     render: (value, record, index) => {
-      console.log(record); // rowData
       return <Operations record={record} onSearch={onSearch} />;
     },
   },
