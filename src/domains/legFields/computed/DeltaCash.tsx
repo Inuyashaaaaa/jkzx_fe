@@ -1,6 +1,4 @@
-import { RULES_REQUIRED } from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/global';
-import { COMPUTED_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
+import { COMPUTED_LEG_FIELD_MAP } from '@/constants/global';
 import { COMPUTED_HEADER_CELL_STYLE } from '@/constants/legs';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { ILegColDef } from '@/types/leg';
@@ -16,6 +14,8 @@ export const DeltaCash: ILegColDef = {
     };
   },
   render: (value, record, index, { form, editing, colDef }) => {
-    return value;
+    return (
+      <FormItem>{form.getFieldDecorator()(<UnitInputNumber unit="¥" editing={false} />)}</FormItem>
+    );
   },
 };

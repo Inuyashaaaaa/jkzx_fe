@@ -1,5 +1,6 @@
 import { AllInputProps } from '@/lib/components/_Form2/Input';
 import { convertOptions } from '@/utils';
+import { COMPUTED_LEG_FIELD_MAP, TRADESCOLDEFS_LEG_FIELD_MAP } from './global';
 
 export const OB_DAY_FIELD = 'obDay';
 
@@ -466,6 +467,8 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  * 多腿字段名
  */
 export const LEG_FIELD = {
+  ...COMPUTED_LEG_FIELD_MAP,
+  ...TRADESCOLDEFS_LEG_FIELD_MAP,
   LEG_META: 'LEG_META',
   IS_ANNUAL: 'IS_ANNUAL', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日

@@ -1,8 +1,6 @@
-import { RULES_REQUIRED } from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/global';
-import { COMPUTED_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
+import { COMPUTED_LEG_FIELD_MAP } from '@/constants/global';
 import { COMPUTED_HEADER_CELL_STYLE } from '@/constants/legs';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import { Input } from '@/design/components';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -16,6 +14,6 @@ export const Gamma: ILegColDef = {
     };
   },
   render: (value, record, index, { form, editing, colDef }) => {
-    return value;
+    return <FormItem>{form.getFieldDecorator()(<Input editing={false} />)}</FormItem>;
   },
 };

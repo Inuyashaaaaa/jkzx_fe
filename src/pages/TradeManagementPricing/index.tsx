@@ -507,34 +507,41 @@ const TradeManagementBooking = props => {
 
     setPricingLoading(false);
 
-    if (
-      rsps.some(rsp => {
-        const { raw } = rsp;
-        if (raw && raw.diagnostics && raw.diagnostics.length) {
-          return true;
-        }
-        return false;
-      })
-    ) {
-      return notification.error({
-        message: rsps.map(item => _.get(item.raw.diagnostics, '[0].message', [])).join(','),
-      });
-    }
+    const rspIsError = rsp => {
+      const { raw, error } = rsp;
+      if (error || (raw && raw.diagnostics && raw.diagnostics.length)) {
+        return true;
+      }
+      return false;
+    };
 
-    if (rsps.some(rsp => rsp.error) || rsps.some(rsp => _.isEmpty(rsp.data))) return;
+    const rspIsEmpty = rsp => {
+      return _.isEmpty(rsp.data);
+    };
 
     setTableData(pre => {
       return rsps
         .reduce((pre, next) => {
+          const isError = rspIsError(next);
+          if (isError || rspIsEmpty(next)) {
+            if (isError) {
+              notification.error({
+                message: _.get(next.raw.diagnostics, '[0].message', []),
+              });
+            }
+            return pre.concat(null);
+          }
           return pre.concat(next.data);
         }, [])
         .map((item, index) => {
-          const cur = pre[index];
+          const record = pre[index];
+
+          if (item == null) return record;
 
           return {
-            ...cur,
-            ...Form2.createFields(
-              _.mapValues(_.pick(item, TRADESCOL_FIELDS), (val, key) => {
+            ...record,
+            ...Form2.createFields({
+              ..._.mapValues(_.pick(item, TRADESCOL_FIELDS), (val, key) => {
                 val = new BigNumber(val).decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES).toNumber();
                 if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
                   return val;
@@ -545,32 +552,32 @@ const TradeManagementBooking = props => {
                       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
                       .toNumber()
                   : val;
-              })
-            ),
-            [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
-            [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
-              item.price,
-              getActualNotionAmountBigNumber(Form2.getFieldsValue(cur))
-            ),
-            [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
-            [COMPUTED_LEG_FIELD_MAP.DELTA]: countDelta(
-              item.delta,
-              Form2.getFieldValue(cur[LEG_FIELD.UNDERLYER_MULTIPLIER])
-            ),
-            [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(item.delta, item.underlyerPrice),
-            [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
-              item.gamma,
-              Form2.getFieldValue(cur[LEG_FIELD.UNDERLYER_MULTIPLIER]),
-              item.underlyerPrice
-            ),
-            [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),
-            [COMPUTED_LEG_FIELD_MAP.VEGA]: countVega(item.vega),
-            [COMPUTED_LEG_FIELD_MAP.THETA]: countTheta(item.theta),
-            [COMPUTED_LEG_FIELD_MAP.RHO_R]: countRhoR(item.rhoR),
-            // [COMPUTED_LEG_FIELD_MAP.RHO]: new BigNumber(item.rho)
-            // .multipliedBy(100)
-            // .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-            // .toNumber(),
+              }),
+              [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
+              [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
+                item.price,
+                getActualNotionAmountBigNumber(Form2.getFieldsValue(cur))
+              ),
+              [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
+              [COMPUTED_LEG_FIELD_MAP.DELTA]: countDelta(
+                item.delta,
+                Form2.getFieldValue(cur[LEG_FIELD.UNDERLYER_MULTIPLIER])
+              ),
+              [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(item.delta, item.underlyerPrice),
+              [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
+                item.gamma,
+                Form2.getFieldValue(cur[LEG_FIELD.UNDERLYER_MULTIPLIER]),
+                item.underlyerPrice
+              ),
+              [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),
+              [COMPUTED_LEG_FIELD_MAP.VEGA]: countVega(item.vega),
+              [COMPUTED_LEG_FIELD_MAP.THETA]: countTheta(item.theta),
+              [COMPUTED_LEG_FIELD_MAP.RHO_R]: countRhoR(item.rhoR),
+              // [COMPUTED_LEG_FIELD_MAP.RHO]: new BigNumber(item.rho)
+              // .multipliedBy(100)
+              // .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              // .toNumber(),
+            }),
           };
         });
     });
