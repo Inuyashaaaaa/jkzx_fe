@@ -38,7 +38,7 @@ class SwitchCell extends PureComponent<
   public constructor(props) {
     super(props);
     this.state = {
-      editing: _.get(props.colDef, 'defaultEditing', !props.colDef.editable),
+      editing: _.get(props.colDef, 'defaultEditing', !this.getEditable(props.colDef.editable)),
     };
   }
 
@@ -186,9 +186,8 @@ class SwitchCell extends PureComponent<
     });
   };
 
-  public getEditable = () => {
+  public getEditable = (editable = this.props.colDef.editable) => {
     const { colDef, record, rowIndex } = this.props;
-    const { editable } = colDef;
     return typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable;
   };
 
