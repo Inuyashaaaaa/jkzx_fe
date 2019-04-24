@@ -14,25 +14,23 @@ import _ from 'lodash';
 import React from 'react';
 
 const getProps = record => {
-  const props;
-
   if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.BARRIER) {
     if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY) {
-      return { unit: '¥', ...props };
+      return { unit: '¥' };
     }
     if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.USD) {
-      return { unit: '$', ...props };
+      return { unit: '$' };
     }
     if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.PERCENT) {
-      return { unit: '%', ...props };
+      return { unit: '%' };
     }
   }
 
   if (Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY) {
-    return { unit: '¥', ...props };
+    return { unit: '¥' };
   }
 
-  return { unit: '%', ...props };
+  return { unit: '%' };
 };
 
 export const Premium: ILegColDef = {

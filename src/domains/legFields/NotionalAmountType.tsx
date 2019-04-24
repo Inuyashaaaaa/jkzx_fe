@@ -13,8 +13,6 @@ import _ from 'lodash';
 import React from 'react';
 
 const getSelectProps = record => {
-  const props;
-
   return {
     type: 'select',
     options: [
@@ -27,7 +25,6 @@ const getSelectProps = record => {
         value: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       },
     ],
-    ...props,
   };
 };
 
