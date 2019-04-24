@@ -30,9 +30,9 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     return _.mapValues(data, val => Form.createField(val));
   };
 
-  public static getFieldValue = (field: any) => {
+  public static getFieldValue = (field: any, defaultVal?: any) => {
     if (Form.isField(field)) {
-      return _.get(field, 'value');
+      return _.get(field, 'value', defaultVal);
     }
     return field;
   };

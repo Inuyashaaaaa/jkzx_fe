@@ -242,11 +242,17 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
               this.maxRowControlNumber =
                 cols.length > this.maxRowControlNumber ? cols.length : this.maxRowControlNumber;
 
+              const _rowProps = rowProps ? rowProps({ index: key }) : undefined;
               return (
                 <Row
                   gutter={16 + 8 * 2}
                   key={key}
-                  {...(rowProps ? rowProps({ index: key }) : undefined)}
+                  className={classNames(
+                    'tongyu-row',
+                    'tongyu-form-row',
+                    _rowProps && _rowProps.className
+                  )}
+                  {..._rowProps}
                 >
                   {cols.map((item, index) => {
                     const { dataIndex } = item;

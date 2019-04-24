@@ -1,6 +1,6 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
-import { DatePicker } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { DatePicker, Form2 } from '@/design/components';
+import { legEnvIsBooking, legEnvIsPricing, legEnvIsEditing, getLegEnvs } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -9,27 +9,72 @@ export const ExpirationDate: ILegColDef = {
   title: '到期日',
   dataIndex: LEG_FIELD.EXPIRATION_DATE,
   editable: record => {
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
-    if (isBooking || isPricing) {
+    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
+    const isAnnual = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]);
+    if (isPricing) {
+      if (isAnnual) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    if (isBooking) {
       return true;
     }
-    return false;
+    if (isEditing) {
+      return false;
+    }
+    throw new Error('env not match!');
   },
   render: (val, record, index, { form, editing, colDef }) => {
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
+    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
+    const isAnnual = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]);
+
+    const getProps = () => {
+      const commonProps = {
+        defaultOpen: true,
+        format: 'YYYY-MM-DD',
+      };
+
+      if (isPricing) {
+        if (isAnnual) {
+          return {
+            ...commonProps,
+            defaultOpen: false,
+            editing: false,
+          };
+        } else {
+          return {
+            ...commonProps,
+            defaultOpen: true,
+            editing,
+          };
+        }
+      }
+
+      if (isBooking) {
+        return {
+          ...commonProps,
+          editing,
+        };
+      }
+
+      if (isEditing) {
+        return {
+          ...commonProps,
+          defaultOpen: false,
+          editing: false,
+        };
+      }
+
+      throw new Error('env not match!');
+    };
+
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(
-          <DatePicker
-            format="YYYY-MM-DD"
-            defaultOpen={isBooking || isPricing}
-            editing={isBooking || isPricing ? editing : false}
-          />
-        )}
+        })(<DatePicker {...getProps()} />)}
       </FormItem>
     );
   },

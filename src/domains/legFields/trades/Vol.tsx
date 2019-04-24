@@ -24,7 +24,7 @@ export const Vol: ILegColDef = {
   },
   render: (value, record, index, { form, editing, colDef }) => {
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(<UnitInputNumber editing={editing} autoSelect={true} />)}

@@ -1,6 +1,6 @@
-import { isShallowEqual } from '@/design/utils';
 import { Dropdown, Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import classNames from 'classnames';
 import _, { omit } from 'lodash';
 import React from 'react';
 import { VALIDATE_MESSAGES } from '../../constants';
@@ -11,7 +11,6 @@ import {
   ITableTriggerCellFieldsChangeParams,
   ITableTriggerCellValueChangeParams,
 } from '../../type';
-import styles from '../cells/SwitchCell.less';
 import { TABLE_CELL_FIELDS_CHANGE, TABLE_CELL_VALUES_CHANGE } from '../constants/EVENT';
 // import schema from 'async-validator';
 
@@ -107,6 +106,7 @@ class EditableRow extends React.Component<ITableRowProps> {
           'editings',
           'rowId',
         ])}
+        className={classNames('tongyu-row', 'tongyu-table-row', this.props.className)}
       />
     );
     const contextMenu = this.getContextMenu();

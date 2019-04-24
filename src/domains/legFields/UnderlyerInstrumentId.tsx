@@ -23,7 +23,7 @@ export const UnderlyerInstrumentId: ILegColDef = {
     const isPricing = legEnvIsPricing(record);
     editing = isBooking || isPricing ? editing : false;
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(

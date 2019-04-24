@@ -20,10 +20,15 @@ export const IsAnnual: ILegColDef = {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Checkbox editing={isBooking || isPricing ? editing : false} />)}
+        })(
+          <Checkbox
+            editing={isBooking || isPricing ? editing : false}
+            renderingLabels={['年化', '非年化']}
+          />
+        )}
       </FormItem>
     );
   },

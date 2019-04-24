@@ -50,6 +50,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
+import { legEnvIsPricing } from '@/tools';
 
 const linkageInitialSpot = (
   env: string,
@@ -295,8 +296,8 @@ export const VanillaAmerican: ILeg = {
     }
 
     if (changedFields[LEG_FIELD.TERM] || changedFields[LEG_FIELD.EFFECTIVE_DATE]) {
-      const term = _.get(record, [LEG_FIELD.TERM, 'value']);
-      const effectiveDate = _.get(record, [LEG_FIELD.EFFECTIVE_DATE, 'value']);
+      const term = Form2.getFieldValue(record[LEG_FIELD.TERM]);
+      const effectiveDate = Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE]);
       if (term !== undefined && effectiveDate !== undefined) {
         record[LEG_FIELD.EXPIRATION_DATE] = Form2.createField(
           getMoment(effectiveDate, true).add(term, 'days')
@@ -307,9 +308,22 @@ export const VanillaAmerican: ILeg = {
       }
     }
 
+    if (legEnvIsPricing(record)) {
+      if (!Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL])) {
+        if (changedFields[LEG_FIELD.EXPIRATION_DATE]) {
+          record[LEG_FIELD.TERM] = Form2.createField(
+            getMoment(Form2.getFieldValue(changedFields[LEG_FIELD.EXPIRATION_DATE])).diff(
+              getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])),
+              'days'
+            )
+          );
+        }
+      }
+    }
+
     if (changedFields[LEG_FIELD.PREMIUM] || changedFields[LEG_FIELD.MINIMUM_PREMIUM]) {
-      const permium = _.get(record, [LEG_FIELD.PREMIUM, 'value'], 0);
-      const miniumPermium = _.get(record, [LEG_FIELD.MINIMUM_PREMIUM, 'value'], 0);
+      const permium = Form2.getFieldValue(record[LEG_FIELD.PREMIUM], 0);
+      const miniumPermium = Form2.getFieldValue(record[LEG_FIELD.MINIMUM_PREMIUM], 0);
       record[LEG_FIELD.FRONT_PREMIUM] = Form2.createField(
         new BigNumber(miniumPermium)
           .plus(permium)
@@ -319,7 +333,7 @@ export const VanillaAmerican: ILeg = {
     }
 
     if (changedFields[LEG_FIELD.PREMIUM_TYPE]) {
-      const permiumType = _.get(record, [LEG_FIELD.PREMIUM_TYPE, 'value']);
+      const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
       record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
         permiumType === PREMIUM_TYPE_MAP.PERCENT
           ? Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.CNY)

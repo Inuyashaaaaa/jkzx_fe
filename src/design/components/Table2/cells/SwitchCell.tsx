@@ -14,15 +14,33 @@ import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
 
+const getEditable = (editable, colDef, record, rowIndex) => {
+  return typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable;
+};
+
 class SwitchCell extends PureComponent<
   ITableCellProps,
   {
     editing: boolean;
+    editable: boolean;
+    editableChanged: boolean;
   }
 > {
   public static defaultProps = {
     colDef: {},
     record: {},
+  };
+
+  public static getDerivedStateFromProps = (props, state) => {
+    const { record, rowIndex, colDef } = props;
+    const editable = getEditable(props.colDef.editable, colDef, record, rowIndex);
+    const editableChanged = editable !== state.editable;
+
+    return {
+      editableChanged,
+      editable,
+      editing: editableChanged ? _.get(colDef, 'defaultEditing', !editable) : state.editing,
+    };
   };
 
   public oldValue: any = EMPTY_VALUE;
@@ -38,7 +56,9 @@ class SwitchCell extends PureComponent<
   public constructor(props) {
     super(props);
     this.state = {
-      editing: _.get(props.colDef, 'defaultEditing', !this.getEditable(props.colDef.editable)),
+      editing: null,
+      editable: null,
+      editableChanged: null,
     };
   }
 
@@ -304,7 +324,7 @@ class SwitchCell extends PureComponent<
         ])}
         onClick={this.onCellClick}
         onKeyDown={this.onKeyDown}
-        className={classNames('tongyu-cell', {
+        className={classNames('tongyu-cell', 'tongyu-table-cell', {
           editable: this.getEditable(),
           editing: this.getEditing(),
           rendering: !this.getEditing(),

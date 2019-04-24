@@ -242,7 +242,7 @@ class SwitchCell extends PureComponent<
         ])}
         onClick={this.onCellClick}
         onKeyDown={this.onKeyDown}
-        className={classNames(`${this.props.prefix}-cell`, {
+        className={classNames(`${this.props.prefix}-cell`, `${this.props.prefix}-form-cell`, {
           editable: this.getEditable(),
           editing: this.getEditing(),
           rendering: !this.getEditing(),

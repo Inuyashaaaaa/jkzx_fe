@@ -48,7 +48,7 @@ export const NotionalAmountType: ILegColDef = {
     const isPricing = legEnvIsPricing(record);
 
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(

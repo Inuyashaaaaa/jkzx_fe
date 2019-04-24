@@ -20,7 +20,7 @@ export const UnderlyerPrice: ILegColDef = {
   dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE,
   render: (value, record, index, { form, editing, colDef }) => {
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(<UnitInputNumber editing={false} autoSelect={true} />)}

@@ -1,30 +1,14 @@
 import { LEG_FIELD, LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
-import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
-import {
-  LEG_ENV,
-  TOTAL_LEGS,
-  TOTAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
-} from '@/constants/legs';
-import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
-import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
-import { Form2, Loading, ModalButton, Table2 } from '@/design/components';
-import { VERTICAL_GUTTER } from '@/design/components/SourceTable';
-import { IFormField, ITableData, ITableProps } from '@/design/components/type';
-import { insert, remove, uuid } from '@/design/utils';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
-import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
-import { trdTradeCreate } from '@/services/trade-service';
+import { TOTAL_LEGS } from '@/constants/legs';
+import { Loading, Table2 } from '@/design/components';
+import { ITableProps } from '@/design/components/type';
+import { remove } from '@/design/utils';
 import { getLegByRecord } from '@/tools';
-import { ILeg, ILegColDef } from '@/types/leg';
-import { Affix, Button, Divider, Menu, message, Modal, Row, Tag } from 'antd';
-import { connect } from 'dva';
+import { ILegColDef } from '@/types/leg';
+import { Tag } from 'antd';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { PRICING_FROM_TAgTag } from '@/constants/trade';
-import { LEG_MAP } from '@/constants/legType';
 
 const MultiLegTable = memo<
   {

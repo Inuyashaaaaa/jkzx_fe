@@ -49,7 +49,7 @@ export const PremiumType: ILegColDef = {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(

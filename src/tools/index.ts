@@ -119,6 +119,14 @@ export const legEnvIsBooking = record => record[LEG_ENV_FIELD] === LEG_ENV.BOOKI
 
 export const legEnvIsPricing = record => record[LEG_ENV_FIELD] === LEG_ENV.PRICING;
 
+export const legEnvIsEditing = record => record[LEG_ENV_FIELD] === LEG_ENV.EDITING;
+
+export const getLegEnvs = record => ({
+  isBooking: legEnvIsBooking(record),
+  isPricing: legEnvIsPricing(record),
+  isEditing: legEnvIsEditing(record),
+});
+
 export const getFormEditingMeta = (status: string) => {
   if (status === FORM_EDITABLE_STATUS.EDITING_NO_CONVERT) {
     return {

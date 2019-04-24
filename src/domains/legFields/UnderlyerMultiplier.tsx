@@ -12,7 +12,7 @@ export const UnderlyerMultiplier: ILegColDef = {
   },
   render: (val, record, dataIndex, { form, editing, colDef }) => {
     return (
-      <FormItem hasFeedback={true}>
+      <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(<InputNumber editing={false} />)}

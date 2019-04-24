@@ -2,7 +2,7 @@ import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { createEventBus, EVERY_EVENT_TYPE } from '../../utils';
+import { createEventBus, EVERY_EVENT_TYPE, uuid } from '../../utils';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
 import SwitchCell from './cells/SwitchCell';
@@ -29,10 +29,13 @@ class Table2 extends PureComponent<ITableProps> {
 
   public editings: {} = {};
 
+  public domId: string;
+
   constructor(props) {
     super(props);
     const eventBus = createEventBus();
     eventBus.listen(EVERY_EVENT_TYPE, this.handleTableEvent);
+    this.domId = uuid();
 
     this.api = {
       eventBus,
@@ -42,17 +45,31 @@ class Table2 extends PureComponent<ITableProps> {
     this.context = this.getContext();
   }
 
+  public getTbody = () => {
+    return document.getElementById(this.domId).querySelector('.ant-table-tbody');
+  };
+
+  public getThead = () => {
+    return document.getElementById(this.domId).querySelector('.ant-table-thead');
+  };
+
   public componentDidMount = () => {
-    window.addEventListener('click', this.onWindowClick, false);
+    this.getTbody().addEventListener('click', this.onTbodyClick, false);
+    this.getThead().addEventListener('click', this.onTheadClick, false);
   };
 
   public componentWillUnmount = () => {
-    window.removeEventListener('click', this.onWindowClick, false);
+    this.getTbody().removeEventListener('click', this.onTbodyClick, false);
+    this.getThead().removeEventListener('click', this.onTheadClick, false);
   };
 
-  public onWindowClick = (event: Event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  public onTbodyClick = (event: Event) => {
+    if (event.target === this.getTbody()) {
+      this.save();
+    }
+  };
+
+  public onTheadClick = (event: Event) => {
     this.save();
   };
 
@@ -220,13 +237,15 @@ class Table2 extends PureComponent<ITableProps> {
       },
     };
     return (
-      <Table
-        className={this.getClassName()}
-        components={components}
-        {...this.props}
-        columns={this.getColumnDefs()}
-        onRow={this.getOnRow()}
-      />
+      <div id={this.domId}>
+        <Table
+          className={this.getClassName()}
+          components={components}
+          {...this.props}
+          columns={this.getColumnDefs()}
+          onRow={this.getOnRow()}
+        />
+      </div>
     );
   }
 }
