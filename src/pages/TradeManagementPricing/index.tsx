@@ -137,6 +137,12 @@ const TradeManagementBooking = props => {
       type: 'pricingData/setTableData',
       payload,
     });
+
+    if (this.props.location.query.fromEdit) {
+      this.props.pricingData.dataSource.forEach(item => {
+        this.onPricingEnvSelectChange(data[0]);
+      });
+    }
   };
 
   const tableEl = useRef<IMultiLegTableEl>(null);
