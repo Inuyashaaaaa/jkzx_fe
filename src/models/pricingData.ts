@@ -47,6 +47,13 @@ export default {
   },
 
   reducers: {
+    clean(state) {
+      return {
+        columnDefs: [],
+        dataSource: [],
+      };
+    },
+
     removeLegData(state, { payload: { id, rowKey } }) {
       const index = state.dataSource.findIndex(item => item[rowKey] === id);
       state.dataSource.splice(index, 1);
@@ -79,7 +86,7 @@ export default {
           if (isError || rspIsEmpty(next)) {
             if (isError) {
               notification.error({
-                message: _.get(next.raw.diagnostics, '[0].message', []),
+                message: _.get(next.raw, 'diagnostics.[0].message', []),
               });
             }
             return pre.concat(null);
