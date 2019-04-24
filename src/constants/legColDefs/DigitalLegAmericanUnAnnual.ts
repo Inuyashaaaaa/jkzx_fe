@@ -11,11 +11,12 @@ import {
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
-import { DEFAULT_TERM } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
 import _ from 'lodash';
 import moment from 'moment';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
 import {
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -87,6 +88,7 @@ export const DigitalLegAmericanUnAnnual = pipeLeg({
           EffectiveDate,
           ObservationType,
           RebateType,
+          DaysInYear,
         ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -101,6 +103,7 @@ export const DigitalLegAmericanUnAnnual = pipeLeg({
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
       [LEG_FIELD.STRIKE]: 100,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       ...(isPricing
         ? {

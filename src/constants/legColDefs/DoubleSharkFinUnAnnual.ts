@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_TERM } from '.';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '.';
 import {
   ASSET_CLASS_MAP,
   LEG_FIELD,
@@ -17,6 +17,7 @@ import {
 } from '../common';
 import {
   BarrierType,
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -87,6 +88,7 @@ export const DoubleSharkFinUnAnnual = pipeLeg({
           LowParticipationRate,
           HighParticipationRate,
           NotionalAmount,
+          DaysInYear,
           NotionalAmountType,
           EffectiveDate,
           ExpirationDate,
@@ -118,6 +120,7 @@ export const DoubleSharkFinUnAnnual = pipeLeg({
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       ...(isPricing
         ? {}
