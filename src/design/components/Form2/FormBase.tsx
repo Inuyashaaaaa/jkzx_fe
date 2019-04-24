@@ -126,10 +126,11 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
         <Button.Group>
           {!!submitable && (
             <Button
-              htmlType="submit"
+              // htmlType="submit"
               type="primary"
               {...this.props.submitButtonProps}
               loading={submitLoading}
+              onClick={this.onSubmit}
             >
               {submitText}
             </Button>
@@ -234,7 +235,6 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
         ])}
         className={classNames(`tongyu-form2`, className)}
         layout={layout}
-        onSubmit={this.onSubmit}
       >
         {layout === 'inline'
           ? columns.map((item, index) => this.getControlElement(item, index))

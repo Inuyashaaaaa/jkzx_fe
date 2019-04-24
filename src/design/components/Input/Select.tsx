@@ -20,7 +20,7 @@ class Select extends InputBase<
     options?: IOptionProps[];
   }
 > {
-  public static defualtProps = {
+  public static defaultProps = {
     editing: true,
   };
 

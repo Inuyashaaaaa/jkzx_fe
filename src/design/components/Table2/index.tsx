@@ -31,6 +31,8 @@ class Table2 extends PureComponent<ITableProps> {
 
   public domId: string;
 
+  public $dom: HTMLElement;
+
   constructor(props) {
     super(props);
     const eventBus = createEventBus();
@@ -46,14 +48,15 @@ class Table2 extends PureComponent<ITableProps> {
   }
 
   public getTbody = () => {
-    return document.getElementById(this.domId).querySelector('.ant-table-tbody');
+    return this.$dom.querySelector('.ant-table-tbody');
   };
 
   public getThead = () => {
-    return document.getElementById(this.domId).querySelector('.ant-table-thead');
+    return this.$dom.querySelector('.ant-table-thead');
   };
 
   public componentDidMount = () => {
+    this.$dom = document.getElementById(this.domId);
     this.getTbody().addEventListener('click', this.onTbodyClick, false);
     this.getThead().addEventListener('click', this.onTheadClick, false);
   };
