@@ -1,6 +1,6 @@
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SourceTable from '@/design/components/SourceTable';
 import { unionId } from '@/design/utils/unionId';
-import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptIntradayReportNamesList, rptIntradayReportPaged } from '@/services/report-service';
 import { socketHOC } from '@/tools/socketHOC';

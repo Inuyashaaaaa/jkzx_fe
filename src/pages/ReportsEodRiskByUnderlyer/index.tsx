@@ -1,6 +1,6 @@
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SourceTable from '@/design/components/SourceTable';
-import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptReportNameList, rptRiskReportPagedByNameAndDate } from '@/services/report-service';
 import { message } from 'antd';

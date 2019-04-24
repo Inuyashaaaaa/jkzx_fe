@@ -5,11 +5,11 @@ import {
   INPUT_NUMBER_LOT_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import RangeNumberInput from '@/containers/RangeNumberInput';
 import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
-import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
   countDelta,
