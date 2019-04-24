@@ -51,7 +51,7 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
       return;
     }
 
-    let { dataSource, cols, name } = this.props.data;
+    const { dataSource, cols, name } = this.props.data;
     // dataSource = dataSource.unshift(cols)
     console.log(dataSource, cols);
 
@@ -74,7 +74,7 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
 
   public checkData = data => {
     // 检查数据
-    let flag = true;
+    const flag = true;
     // if(data.dataSource)
     return flag;
   };

@@ -1,14 +1,14 @@
-import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import SourceTable from '@/design/components/SourceTable';
+import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
   rptFinanicalOtcClientFundReportPagedByNameAndDate,
   rptReportNameList,
 } from '@/services/report-service';
 import { message } from 'antd';
-import moment from 'moment';
 import _ from 'lodash';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
@@ -128,11 +128,11 @@ class ReportsCustomerFundsSummaryStatements extends PureComponent {
   };
 
   public handleData = (dataSource, cols, headers) => {
-    let data = [];
+    const data = [];
     data.push(headers);
-    let length = data.length;
+    const length = data.length;
     dataSource.forEach((ds, index) => {
-      let _data = [];
+      const _data = [];
       Object.keys(ds).forEach(key => {
         const dsIndex = _.findIndex(cols, k => k === key);
         if (dsIndex >= 0) {
