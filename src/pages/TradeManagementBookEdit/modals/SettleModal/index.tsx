@@ -1,10 +1,10 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
+import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
-import ExportModal from '../../ExportModal';
 import {
   NOTIONAL_AMOUNT,
   NUM_OF_OPTIONS,
@@ -132,7 +132,7 @@ class ExerciseModal extends PureComponent<
     const { visible } = this.state;
     return (
       <>
-        <ExportModal
+        <CashExportModal
           visible={this.state.exportVisible}
           trade={this.tableFormData}
           convertVisible={this.convertVisible}

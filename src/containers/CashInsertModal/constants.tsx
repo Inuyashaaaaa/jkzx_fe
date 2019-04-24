@@ -1,11 +1,5 @@
-import {
-  ACCOUNT_EVENT_TYPE_OPTIONS,
-  DIRECTION_TYPE_OPTIONS,
-  LCM_EVENT_TYPE_OPTIONS,
-  RULES_REQUIRED,
-} from '@/constants/common';
+import { ACCOUNT_EVENT_TYPE_OPTIONS, RULES_REQUIRED } from '@/constants/common';
 import { Input, InputNumber, Select } from '@/design/components';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
@@ -78,15 +72,13 @@ export const PARTY_FORM_CONTROLS = [
       );
     },
   },
-  {
-    title: '冻结保证金变化',
-    dataIndex: 'marginChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
-  },
+  // {
+  //   title: '冻结保证金变化',
+  //   dataIndex: 'marginChange',
+  //   render: (value, record, index, { form, editing }) => {
+  //     return <FormItem>{form.getFieldDecorator({})(<InputNumber  />)}</FormItem>;
+  //   },
+  // },
 ];
 
 export const COUNTER_PARTY_FORM_CONTROLS = [
@@ -123,15 +115,13 @@ export const COUNTER_PARTY_FORM_CONTROLS = [
       return <FormItem>{form.getFieldDecorator({})(<InputNumber disabled={true} />)}</FormItem>;
     },
   },
-  {
-    title: '冻结保证金变化',
-    dataIndex: 'counterPartyMarginChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
-  },
+  // {
+  // title: '冻结保证金变化',
+  //   dataIndex: 'counterPartyMarginChange',
+  //   render: (value, record, index, { form, editing }) => {
+  //     return <FormItem>{form.getFieldDecorator({})(<InputNumber  />)}</FormItem>;
+  //   },
+  // },
 ];
 
 export const MIDDLE_FORM_CONTROLS = [
@@ -139,7 +129,47 @@ export const MIDDLE_FORM_CONTROLS = [
     title: '交易编号',
     dataIndex: 'tradeId',
     render: (value, record, index, { form, editing }) => {
-      return <FormItem>{form.getFieldDecorator({})(<Input type="input" />)}</FormItem>;
+      return (
+        <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
+      );
+    },
+  },
+  {
+    title: '方向',
+    dataIndex: 'direction',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
+      );
+    },
+  },
+  {
+    title: '生命周期事件',
+    dataIndex: 'lcmEventType',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem wrapperCol={{ span: 16 }}>
+          {form.getFieldDecorator({})(<Input type="input" editing={false} />)}
+        </FormItem>
+      );
+    },
+  },
+  {
+    title: '现金流',
+    dataIndex: 'cashFlow',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
+      );
+    },
+  },
+  {
+    title: '期权费',
+    dataIndex: 'premium',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
+      );
     },
   },
   {
@@ -147,58 +177,10 @@ export const MIDDLE_FORM_CONTROLS = [
     dataIndex: 'event',
     render: (value, record, index, { form }) => {
       return (
-        <FormItem>
-          {form.getFieldDecorator({ rules: RULES_REQUIRED })(
-            <Select options={ACCOUNT_EVENT_TYPE_OPTIONS} />
-          )}
+        <FormItem wrapperCol={{ span: 16 }}>
+          {form.getFieldDecorator({})(<Select options={ACCOUNT_EVENT_TYPE_OPTIONS} />)}
         </FormItem>
       );
-    },
-  },
-];
-
-export const LEGAL_FORM_CONTROLS = [
-  {
-    title: '交易对手',
-    dataIndex: 'legalName',
-    render: (value, record, index, { form }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
-              {
-                required: true,
-                message: '交易对手是必填项',
-              },
-            ],
-          })(
-            <Select
-              style={{ minWidth: 180 }}
-              placeholder="请输入内容搜索"
-              allowClear={true}
-              fetchOptionsOnSearch={true}
-              showSearch={true}
-              options={async value => {
-                const { data, error } = await refSimilarLegalNameList({
-                  similarLegalName: value,
-                });
-                if (error) return [];
-                return data.map(item => ({
-                  label: item,
-                  value: item,
-                }));
-              }}
-            />
-          )}
-        </FormItem>
-      );
-    },
-  },
-  {
-    title: '状态',
-    dataIndex: 'normalStatus',
-    render: (value, record, index, { form }) => {
-      return <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>;
     },
   },
 ];

@@ -15,8 +15,8 @@ import {
 import { TRADESCOL_FIELDS } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { LEG_MAP } from '@/constants/legType';
 import { PRICING_FROM_TAG } from '@/constants/trade';
+import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
-import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
@@ -34,13 +34,12 @@ import {
   clientSaveAccountOpRecord,
   clientTradeCashFlow,
   cliMmarkTradeTaskProcessed,
-  cliTasksGenerateByTradeId,
   cliUnProcessedTradeTaskListByTradeId,
   refSalesGetByLegalName,
 } from '@/services/reference-data-service';
 import { refPartyGetByLegalName, trdTradeCreate } from '@/services/trade-service';
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { Button, message, Modal, Row, Tabs } from 'antd';
+import { Button, message, Row, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
@@ -50,7 +49,6 @@ import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
 import uuidv4 from 'uuid/v4';
-import { OUR_CREATE_FORM_CONTROLS, TABLE_COL_DEFS, TOOUR_CREATE_FORM_CONTROLS } from './constants';
 import { bookingTableFormControls } from './services';
 
 const ButtonGroup = Button.Group;
@@ -330,18 +328,18 @@ class BookCreate extends PureComponent<any> {
 
     if (error) return;
 
-    const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
-      tradeId: trade.tradeId,
-      legalName: trade.positions[0].counterPartyCode,
-    });
+    // const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
+    //   tradeId: trade.tradeId,
+    //   legalName: trade.positions[0].counterPartyCode,
+    // });
 
-    if (_error) return;
+    // if (_error) return;
 
     this.setState({
       dataSource: [],
-      createModalDataSource: _data,
+      // createModalDataSource: _data,
       visible: true,
-      bookTableFormData: {},
+      // bookTableFormData: {},
     });
   };
 
@@ -581,6 +579,7 @@ class BookCreate extends PureComponent<any> {
   public handleCancel = () => {
     this.setState({
       visible: false,
+      bookTableFormData: {},
     });
   };
 
@@ -869,7 +868,7 @@ class BookCreate extends PureComponent<any> {
           columnDefs={this.state.columnDefs}
           pagination={false}
         />
-        <Modal
+        {/* <Modal
           visible={this.state.visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
@@ -932,7 +931,12 @@ class BookCreate extends PureComponent<any> {
               />
             </TabPane>
           </Tabs>
-        </Modal>
+        </Modal> */}
+        <CashExportModal
+          visible={this.state.visible}
+          trade={this.state.bookTableFormData}
+          convertVisible={this.handleCancel}
+        />
       </PageHeaderWrapper>
     );
   }

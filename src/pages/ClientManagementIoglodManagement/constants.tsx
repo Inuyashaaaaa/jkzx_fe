@@ -4,6 +4,7 @@ import {
   LCM_EVENT_TYPE_OPTIONS,
   PROCESS_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
+import CashInsertModal from '@/containers/CashInsertModal';
 import { IFormControl } from '@/design/components/Form/types';
 import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
@@ -128,7 +129,7 @@ export const PROCESSED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {
     headerName: '操作',
     render: params => {
-      return <CommonCapitalInput record={params} fetchTable={fetchTable} />;
+      return <CashInsertModal record={params.data} fetchTable={fetchTable} />;
     },
   },
 ];
