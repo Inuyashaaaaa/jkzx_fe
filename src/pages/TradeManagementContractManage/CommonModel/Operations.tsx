@@ -67,14 +67,10 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
       positionId: item.positionId,
     });
     if (rsp.error) return;
-    const data = [...rsp.data];
-    const removeExporation = _.remove(data, n => {
-      return n === 'EXPIRATION';
-    });
     this.setState({
       eventTypes: {
         ...this.state.eventTypes,
-        [item.positionId]: data,
+        [item.positionId]: rsp.data,
       },
     });
   };
@@ -274,7 +270,13 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
     const item = this.props.record;
     if (!this.state.eventTypes[item.positionId]) return;
     return this.state.eventTypes[item.positionId].map(node => {
-      return <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>;
+      return (
+        <MenuItem key={node} disabled={LCM_EVENT_TYPE_MAP[node] === LCM_EVENT_TYPE_MAP.AMEND}>
+          {LCM_EVENT_TYPE_MAP[node] === LCM_EVENT_TYPE_MAP.AMEND
+            ? LCM_EVENT_TYPE_ZHCN_MAP[node] + `(请至合约详情操作)`
+            : LCM_EVENT_TYPE_ZHCN_MAP[node]}
+        </MenuItem>
+      );
     });
   };
 

@@ -1,10 +1,10 @@
 import PopconfirmButton from '@/components/PopconfirmButton';
 import ModalButton from '@/design/components/ModalButton';
-import { Col, Row, message } from 'antd';
+import { arr2treeOptions } from '@/lib/utils';
+import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales';
+import { Col, message, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
-import { refSalesDelete, queryCompanys, refSalesUpdate } from '@/services/sales';
-import { arr2treeOptions } from '@/lib/utils';
 
 class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public state = {

@@ -6,17 +6,17 @@ import { arr2treeOptions } from '@/lib/utils';
 import {
   queryCompanys,
   querySalers,
-  refSubsidiaryCreate,
-  refSubsidiaryUpdate,
-  refBranchUpdate,
   refBranchCreate,
-  refSalesCreate,
-  refSalesUpdate,
-  refSalesDelete,
   refBranchDelete,
+  refBranchUpdate,
+  refSalesCreate,
+  refSalesDelete,
+  refSalesUpdate,
+  refSubsidiaryCreate,
   refSubsidiaryDelete,
+  refSubsidiaryUpdate,
 } from '@/services/sales';
-import { Col, Icon, Modal, Popconfirm, Row, Tree, message } from 'antd';
+import { Col, Icon, message, Modal, Popconfirm, Row, Tree } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEF } from './constants';

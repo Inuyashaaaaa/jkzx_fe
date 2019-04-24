@@ -92,6 +92,12 @@ class TradeManagementPricing extends PureComponent<any> {
       pricingEnvironmentsList: data,
       curPricingEnv: data[0],
     });
+
+    if (this.props.location.query.fromEdit) {
+      this.props.pricingData.dataSource.forEach(item => {
+        this.onPricingEnvSelectChange(data[0]);
+      });
+    }
   };
 
   public loadInstrumentIds = () => {
@@ -352,6 +358,7 @@ class TradeManagementPricing extends PureComponent<any> {
       console.warn('val，q 等都为空才去获取默认值');
       return;
     }
+
     const { error, data = [] } = await prcTrialPositionsService({
       positions: convertTradePositions(
         [_.omit(legData, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])],

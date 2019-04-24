@@ -73,6 +73,7 @@ const pagesCollection = [
   'portfolioManagement',
   'tradeDocuments',
   'portfolioRisk',
+  'customModel',
 ];
 
 function handlePages(data, result1, result2) {

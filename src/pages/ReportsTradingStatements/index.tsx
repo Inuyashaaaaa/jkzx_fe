@@ -1,5 +1,6 @@
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import SourceTable from '@/design/components/SourceTable';
+import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptOtcTradeReportPagedByNameAndDate, rptReportNameList } from '@/services/report-service';
 import { message } from 'antd';
@@ -126,7 +127,29 @@ class ReportsTradingStatements extends PureComponent {
     });
   };
 
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
+
   public render() {
+    const _data = this.handleData(
+      this.state.dataSource,
+      TABLE_COL_DEFS.map(item => item.field),
+      TABLE_COL_DEFS.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper>
         <SourceTable
@@ -166,6 +189,20 @@ class ReportsTradingStatements extends PureComponent {
           autoSizeColumnsToFit={false}
           // onCellValueChanged={this.onCellValueChanged}
           defaultColDef={{ width: 130 }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: TABLE_COL_DEFS.map(item => item.headerName),
+                name: '交易报表',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );

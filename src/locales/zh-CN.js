@@ -31,6 +31,7 @@ export default {
   'menu.pricingSettings.riskFreeCurve': '无风险利率曲线',
   'menu.pricingSettings.dividendCurve': '分红/融券曲线',
   'menu.pricingSettings.pricingEnvironment': '定价设置',
+  'menu.pricingSettings.customModel': '自定义模型',
   'menu.pricingSettings.baseContractManagement': '基础合约管理',
   'menu.riskManager': '风险管理',
   'menu.riskManager.intradayGreeks': '实时风险',

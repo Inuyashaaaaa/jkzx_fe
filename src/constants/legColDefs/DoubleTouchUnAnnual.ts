@@ -13,6 +13,7 @@ import moment from 'moment';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP, LEG_TYPE_ZHCH_MAP } from '../common';
 import {
   BarrierType,
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -78,6 +79,7 @@ export const DoubleTouchUnAnnual = pipeLeg({
           Premium,
           PaymentType,
           Payment,
+          DaysInYear,
         ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -89,6 +91,7 @@ export const DoubleTouchUnAnnual = pipeLeg({
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       ...(isPricing
         ? {
