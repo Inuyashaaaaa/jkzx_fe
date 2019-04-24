@@ -200,9 +200,14 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
               ...rest
             } = listItem;
             const dataSource = this.getListDataSource(index, this.getValue(), nodes);
-            if (sort) {
+            if (sort && listItem.title !== 'Position') {
               dataSource.sort((a, b) => {
                 return b.label.toString().localeCompare(a.label.toString());
+              });
+            }
+            if (sort && listItem.title === 'Position') {
+              dataSource.sort((a, b) => {
+                return b.data.expiry.toString().localeCompare(a.data.expiry.toString());
               });
             }
             return (
