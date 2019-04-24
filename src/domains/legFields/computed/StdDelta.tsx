@@ -8,6 +8,7 @@ import React from 'react';
 export const StdDelta: ILegColDef = {
   title: 'STD DELTA',
   dataIndex: COMPUTED_LEG_FIELD_MAP.STD_DELTA,
+  defaultEditing: false,
   onHeaderCell: () => {
     return {
       style: COMPUTED_HEADER_CELL_STYLE,

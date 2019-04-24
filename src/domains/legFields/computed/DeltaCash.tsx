@@ -8,6 +8,7 @@ import React from 'react';
 export const DeltaCash: ILegColDef = {
   title: 'DELTA CASH',
   dataIndex: COMPUTED_LEG_FIELD_MAP.DELTA_CASH,
+  defaultEditing: false,
   onHeaderCell: () => {
     return {
       style: COMPUTED_HEADER_CELL_STYLE,

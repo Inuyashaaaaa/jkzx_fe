@@ -8,6 +8,7 @@ import React from 'react';
 export const Theta: ILegColDef = {
   title: 'THETA',
   dataIndex: COMPUTED_LEG_FIELD_MAP.THETA,
+  defaultEditing: false,
   onHeaderCell: () => {
     return {
       style: COMPUTED_HEADER_CELL_STYLE,

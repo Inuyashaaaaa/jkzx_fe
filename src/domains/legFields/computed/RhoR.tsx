@@ -8,6 +8,7 @@ import React from 'react';
 export const RhoR: ILegColDef = {
   title: 'RHO_R',
   dataIndex: COMPUTED_LEG_FIELD_MAP.RHO_R,
+  defaultEditing: false,
   onHeaderCell: () => {
     return {
       style: COMPUTED_HEADER_CELL_STYLE,

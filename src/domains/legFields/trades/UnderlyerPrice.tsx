@@ -23,7 +23,7 @@ export const UnderlyerPrice: ILegColDef = {
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber editing={false} />)}
+        })(<UnitInputNumber editing={false} autoSelect={true} />)}
       </FormItem>
     );
   },

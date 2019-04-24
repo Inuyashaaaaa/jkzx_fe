@@ -27,7 +27,7 @@ export const Q: ILegColDef = {
       <FormItem hasFeedback={true}>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber editing={editing} />)}
+        })(<UnitInputNumber editing={editing} autoSelect={true} />)}
       </FormItem>
     );
   },

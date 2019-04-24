@@ -8,6 +8,7 @@ import React from 'react';
 export const GammaCash: ILegColDef = {
   title: 'GAMMA_CASH',
   dataIndex: COMPUTED_LEG_FIELD_MAP.GAMMA_CASH,
+  defaultEditing: false,
   onHeaderCell: () => {
     return {
       style: COMPUTED_HEADER_CELL_STYLE,

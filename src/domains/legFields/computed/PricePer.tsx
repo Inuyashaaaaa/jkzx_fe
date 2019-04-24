@@ -8,6 +8,7 @@ import React from 'react';
 export const PricePer: ILegColDef = {
   title: '百分比价格',
   dataIndex: COMPUTED_LEG_FIELD_MAP.PRICE_PER,
+  defaultEditing: false,
   onHeaderCell: () => {
     return {
       style: COMPUTED_HEADER_CELL_STYLE,

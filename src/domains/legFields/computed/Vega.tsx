@@ -8,6 +8,7 @@ import React from 'react';
 export const Vega: ILegColDef = {
   title: 'VEGA',
   dataIndex: COMPUTED_LEG_FIELD_MAP.VEGA,
+  defaultEditing: false,
   onHeaderCell: () => {
     return {
       style: COMPUTED_HEADER_CELL_STYLE,
