@@ -4,9 +4,9 @@ import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import { omit } from 'lodash';
 import React, { FocusEvent, KeyboardEvent, PureComponent } from 'react';
-import { IFormCellProps, IFormTriggerCellValueChangeParams } from 'src/components/type';
+import { IFormCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
-import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from '../constants';
+import { FORM_CELL_EDITING_CHANGED } from '../constants';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
 import './SwitchCell.less';
@@ -32,6 +32,10 @@ class SwitchCell extends PureComponent<
   public $editingCell: EditingCell;
 
   public $renderingCell: RenderingCell;
+
+  constructor(props) {
+    super(props);
+  }
 
   public componentDidMount = () => {
     this.registeCell();
@@ -125,22 +129,27 @@ class SwitchCell extends PureComponent<
     }
   };
 
+  public getValue = () => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    if (typeof val === 'object' && val.type === 'field') {
+      return val.value;
+    }
+    return val;
+  };
+
   public saveCell = async (callback?) => {
     if (!this.getEditable()) return;
     if (!this.state.editing) return;
     const dataIndex = this.getDataIndex();
     if (this.props.form.isFieldValidating(dataIndex)) return;
 
-    const { record } = this.props;
-    if (record[dataIndex] === this.props.form.getFieldValue(dataIndex)) {
-      return this.setState({ editing: false }, callback);
-    }
-
     const errorMsgs = await this.props.form.getFieldError(dataIndex);
     if (errorMsgs) return;
     if (this.$editingCell) {
       const value = await this.$editingCell.getValue();
-      this.mutableChangeRecordValue(value, false);
+      this.switchCellEditingStatus(value);
       this.setState({ editing: false }, callback);
     }
   };
@@ -151,27 +160,17 @@ class SwitchCell extends PureComponent<
     return dataIndex;
   };
 
-  public mutableChangeRecordValue = (value, linkage) => {
-    const { record } = this.props;
-    const dataIndex = this.getDataIndex();
-    const oldValue = record[dataIndex];
-
-    if (oldValue === value) return;
-
-    record[dataIndex] = value;
-
-    this.triggerTableCellValueChanged(value, oldValue, linkage);
+  public switchCellEditingStatus = value => {
+    this.triggerTableCellValueChanged(value);
   };
 
-  public triggerTableCellValueChanged = (value, oldValue, linkage) => {
+  public triggerTableCellValueChanged = value => {
     const { colDef, record, api } = this.props;
     const { dataIndex } = colDef;
-    api.eventBus.emit(FORM_CELL_VALUE_CHANGED, {
+    api.eventBus.emit(FORM_CELL_EDITING_CHANGED, {
       value,
       record,
       dataIndex,
-      oldValue,
-      linkage,
     });
   };
 
@@ -220,13 +219,17 @@ class SwitchCell extends PureComponent<
     return !!this.state.editing;
   };
 
+  public getLoading = () => {
+    const { colDef } = this.props;
+    return !!colDef.loading;
+  };
+
   public render() {
     return (
       <div
         ref={this.getRef}
         {...omit(this.props, [
           'prefix',
-          'getValue',
           'form',
           'colDef',
           'record',
@@ -246,7 +249,7 @@ class SwitchCell extends PureComponent<
           rendering: !this.state.editing,
         })}
       >
-        <Spin spinning={this.state.loading}>{this.getInlineCell()}</Spin>
+        <Spin spinning={this.getLoading()}>{this.getInlineCell()}</Spin>
       </div>
     );
   }

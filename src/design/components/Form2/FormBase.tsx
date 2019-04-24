@@ -1,13 +1,12 @@
 import { Button, Col, Form as AntdForm, Row } from 'antd';
 import { FormComponentProps } from 'antd/lib/form/Form';
 import classNames from 'classnames';
-import { chunk, omit } from 'lodash';
+import _, { chunk, omit } from 'lodash';
 import React, { PureComponent } from 'react';
 import { EVERY_EVENT_TYPE } from '../../utils';
-import { defaultInputManager } from '../Input';
-import { IFormBaseProps, IFormColDef } from '../type';
+import { IFormBaseProps, IFormColDef, IFormTriggerCellValueChangeParams } from '../type';
 import SwitchCell from './cells/SwitchCell';
-import { FORM_CELL_VALUE_CHANGE, FORM_CELL_VALUE_CHANGED } from './constants';
+import { FORM_CELL_EDITING_CHANGED, FORM_CELL_VALUES_CHANGE } from './constants';
 import FormManager from './formManager';
 import './index.less';
 
@@ -20,7 +19,6 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     submitable: true,
     resetable: true,
     dataSource: {},
-    inputManager: defaultInputManager,
   };
 
   public formManager: FormManager = new FormManager();
@@ -36,17 +34,17 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
   }
 
   public handleTableEvent = (params, eventName) => {
-    if (eventName === FORM_CELL_VALUE_CHANGED) {
-      return this.props.onValueChanged && this.props.onValueChanged(params);
-    }
-    if (eventName === FORM_CELL_VALUE_CHANGE) {
-      return this.props.onValueChange && this.props.onValueChange(params);
+    if (eventName === FORM_CELL_EDITING_CHANGED) {
+      return this.props.onEditingChanged && this.props.onEditingChanged(params);
     }
   };
 
-  public validate = async (options = {}) => {
+  public validate = async (
+    options = {},
+    fieldNames = this.props.columns.map(item => item.dataIndex)
+  ) => {
     return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      this.props.form.validateFields(options, (error, values) => {
+      this.props.form.validateFieldsAndScroll(fieldNames, options, (error, values) => {
         resolve({ error, values });
       });
     });
@@ -67,27 +65,9 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     return rules;
   };
 
-  public getControlElement = (colDef: IFormColDef = {}, key) => {
+  public getControlElement = (colDef: IFormColDef = {}, key?) => {
     const { form, dataSource } = this.props;
-    const { getValue } = colDef;
-    return (
-      <SwitchCell
-        key={key}
-        getValue={this.normalizeGetValue(getValue)}
-        colDef={colDef}
-        form={form}
-        record={dataSource}
-        api={this}
-      />
-    );
-  };
-
-  public normalizeGetValue = colGetValue => {
-    const [value, ...depends] = Array.isArray(colGetValue) ? colGetValue : [colGetValue];
-    return {
-      value,
-      depends,
-    };
+    return <SwitchCell key={key} colDef={colDef} form={form} record={dataSource} api={this} />;
   };
 
   public onSubmit = domEvent => {
@@ -103,8 +83,7 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
 
   public onReset = domEvent => {
     if (!this.props.onResetButtonClick) {
-      this.props.form.resetFields();
-      return;
+      return this.props.form.resetFields();
     }
     return this.props.onResetButtonClick({
       dataSource: this.getFormData(),
@@ -223,11 +202,10 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
           'onResetButtonClick',
           'submitButtonProps',
           'resetButtonProps',
-          'inputManager',
           'getValue',
           'eventBus',
-          'onValueChange',
-          'onValueChanged',
+          'onEditingChanged',
+          'onValuesChange',
         ])}
         className={classNames(`tongyu-form2`, className)}
         layout={layout}
@@ -240,7 +218,11 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
                 cols.length > this.maxRowControlNumber ? cols.length : this.maxRowControlNumber;
 
               return (
-                <Row gutter={24} key={key} {...(rowProps ? rowProps({ index: key }) : undefined)}>
+                <Row
+                  gutter={16 + 8 * 2}
+                  key={key}
+                  {...(rowProps ? rowProps({ index: key }) : undefined)}
+                >
                   {cols.map((item, index) => {
                     const { dataIndex } = item;
                     return (

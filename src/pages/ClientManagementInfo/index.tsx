@@ -1,102 +1,89 @@
-import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import { PureStateComponent } from '@/lib/components/_Components';
+import { ALL_OPTIONS_VALUE, VERTICAL_GUTTER } from '@/constants/global';
+import { Cascader, Form2, Input, Select, Table2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions } from '@/lib/utils';
-import { DOWN_LOAD_FIEL_URL } from '@/services/document';
 import {
   clientAccountDel,
-  clientAccountSearch,
-  createRefParty,
-  refSalesGetByLegalName,
+  refPartyList,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { queryCompleteCompanys } from '@/services/sales';
-import { Button, Col, message, notification, Row, Tabs } from 'antd';
-import { WrappedFormUtils } from 'antd/lib/form/Form';
-import produce from 'immer';
+import { arr2treeOptions } from '@/tools';
+import { getMoment } from '@/utils';
+import { Button, Card, Divider, Form, notification, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
-import moment, { isMoment } from 'moment';
-import React from 'react';
-import router from 'umi/router';
-import {
-  DOC_FIELDS,
-  INSTITUTION,
-  PRODUCT,
-  PRODUCTIONS,
-  SEARCH_FORM_CONTROLS,
-  TABLE_COLUMN_DEFS,
-} from './constants';
-import { ADDRESS_CASCADER, INSITUTIONS } from './constants/INSITUTIONS';
-import Discrepancy from './Discrepancy';
-import InfoManager from './InfoManager';
-import IOGlod from './IOGlod';
-import Margin from './Margin';
-import Valuation from './Valuation/index';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import styles from './ClientManagementInfo.less';
+import CreateModalButton from './CreateModalButton';
+import EditModalButton from './EditModelButton';
 
-const TabPane = Tabs.TabPane;
+const SALER_CASCADER = 'SALER_CASCADER';
 
-class ClientManagement extends PureStateComponent {
-  public $insForm: WrappedFormUtils = null;
+const STATUS_FIELD = 'status';
 
-  public $proForm: WrappedFormUtils = null;
-
-  public $sourceTable: SourceTable = null;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedRows: [],
-      contentType: null,
-      activeKey: INSTITUTION,
-      dataSourceInst: {},
-      dataSourceProd: {},
-      markets: [],
-      searchFormData: {},
-      loading: false,
-      tableDataSource: [],
-      modalVisible: false,
-      confirmLoading: false,
-    };
-  }
-
-  public componentDidMount = async () => {
-    this.fetchBranchSalesList();
-    this.fetchSimilarLegalName();
-    this.fetchTable();
-  };
-
-  public fetchSimilarLegalName = async () => {
-    const { error, data } = await refSimilarLegalNameList({
-      similarLegalName: '',
-    });
+const useTableData = initFormData => {
+  // stateful logic
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [tableData, setTableData] = useState([]);
+  const fetchTableData = async formData => {
+    setSearchLoading(true);
+    const { data, error } = await refPartyList(formData);
+    setSearchLoading(false);
     if (error) return;
-    const markets = data.map(item => ({
-      label: item,
-      value: item,
-    }));
-    this.setState({ markets });
+    setTableData(data);
   };
 
-  public fetchBranchSalesList = async () => {
+  useLifecycles(() => {
+    fetchTableData(initFormData);
+  });
+
+  return {
+    searchLoading,
+    tableData,
+    fetchTableData,
+    setTableData,
+  };
+};
+
+const ClientManagementInfo = memo(() => {
+  const formEl = useRef<Form2>(null);
+  const { searchLoading, tableData, fetchTableData } = useTableData({});
+  const [salesCascaderList, setSalesCascaderList] = useState([]);
+
+  const initialFormData = {
+    [STATUS_FIELD]: { type: 'field', value: ALL_OPTIONS_VALUE },
+  };
+  const [searchFormData, setSearchFormData] = useState(initialFormData);
+
+  const getFormData = () => {
+    const salerValue = _.get(searchFormData[SALER_CASCADER], 'value', []);
+    const [subsidiaryName, branchName, salesName] = salerValue;
+    return {
+      ..._.mapValues(_.omit(searchFormData, [SALER_CASCADER]), item => _.get(item, 'value')),
+      subsidiaryName,
+      branchName,
+      salesName,
+    };
+  };
+
+  const fetchBranchSalesList = async () => {
     const { error, data } = await queryCompleteCompanys();
-    if (error) return false;
+    if (error) return;
     const newData = arr2treeOptions(
       data,
-      ['subsidiary', 'branch', 'salesName'],
-      ['subsidiary', 'branch', 'salesName']
+      ['subsidiaryName', 'branchName', 'salesName'],
+      ['subsidiaryName', 'branchName', 'salesName']
     );
-    const branchSalesList = newData.map(subsidiaryName => {
+    const branchSalesList = newData.map(subsidiary => {
       return {
-        value: subsidiaryName.value,
-        label: subsidiaryName.label,
-        children: subsidiaryName.children.map(branchName => {
+        value: subsidiary.value,
+        label: subsidiary.label,
+        children: subsidiary.children.map(branch => {
           return {
-            value: branchName.value,
-            label: branchName.label,
-            children: branchName.children.map(salesName => {
+            value: branch.value,
+            label: branch.label,
+            children: branch.children.map(salesName => {
               return {
                 value: salesName.value,
                 label: salesName.label,
@@ -106,451 +93,233 @@ class ClientManagement extends PureStateComponent {
         }),
       };
     });
-    this.setState({ branchSalesList });
-    return true;
+    setSalesCascaderList(branchSalesList);
   };
 
-  public fetchTable = async () => {
-    const { searchFormData } = this.state;
+  useLifecycles(() => {
+    fetchBranchSalesList();
+  });
 
-    let datalist = {};
-    if (searchFormData[ADDRESS_CASCADER]) {
-      const [subsidiaryName, branchName, salesName] = searchFormData[ADDRESS_CASCADER];
-      datalist = { subsidiaryName, branchName, salesName };
-    }
+  const [resetFetchNumber, setResetFetchNumber] = useState(0);
 
-    this.setState({ loading: true });
-    const { error, data } = await clientAccountSearch({
-      // page: (paramsPagination || pagination).current - 1,
-      // pageSize: (paramsPagination || pagination).pageSize,
-      ...datalist,
-      ...(searchFormData.legalName ? { legalName: searchFormData.legalName } : {}),
-      ...(searchFormData.masterAgreementId
-        ? { masterAgreementId: searchFormData.masterAgreementId }
-        : {}),
-    });
-    this.setState({ loading: false });
-
+  const AccountDel = async param => {
+    const { data, error } = await clientAccountDel({ accountId: param.accountId });
     if (error) return;
-
-    const newData = data.map(item => {
-      item.updatedAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss');
-      item.createdAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss');
-      return item;
-    });
-
-    this.setState({
-      tableDataSource: newData,
+    const formData = getFormData();
+    fetchTableData(formData);
+    notification.success({
+      message: '删除成功',
     });
   };
 
-  public createProduct = () => {
-    if (!this.$proForm) return;
-
-    this.$proForm.validateFieldsAndScroll(async (error, values) => {
-      if (error) return;
-
-      const formatValues = _.mapValues(values, (val, key) => {
-        if (isMoment(val)) {
-          return val.format('YYYY-MM-DD');
-        }
-        return val;
-      });
-      const { [ADDRESS_CASCADER]: cascader, ...rest } = formatValues;
-
-      const [subsidiaryName, branchName, salesName] = cascader;
-
-      const dataSourceProd = _.mapValues(rest, (val, key) => {
-        if (DOC_FIELDS.indexOf(key) !== -1) {
-          return _.get(val, '[0].response.result.uuid', undefined);
-        }
-        return val;
-      });
-
-      if (!salesName) {
-        return message.warn('销售不存在');
-      }
-
-      const distValues = {
-        ...dataSourceProd,
-        subsidiaryName,
-        branchName,
-        salesName,
-        clientType: PRODUCT,
-      };
-
-      this.switchConfirmLoading();
-      const { error: _error } = await createRefParty(distValues);
-      this.switchConfirmLoading();
-      if (_error) return;
-
-      this.setState(
-        {
-          dataSourceInst: {},
-          dataSourceProd: {},
-          modalVisible: false,
-        },
-        () => {
-          message.success('创建成功');
-          this.fetchTable();
-        }
-      );
-    });
+  const fetchTable = () => {
+    const formData = getFormData();
+    fetchTableData(formData);
   };
 
-  public createInstitution = () => {
-    this.$insForm.validateFieldsAndScroll(async (error, values) => {
-      if (error) return;
-      const formatValues = _.mapValues(values, (val, key) => {
-        if (isMoment(val)) {
-          return val.format('YYYY-MM-DD');
-        }
-        return val;
-      });
-      const { [ADDRESS_CASCADER]: cascader, ...rest } = formatValues;
-      const [subsidiaryName, branchName, salesName] = cascader;
-      const dataSourceInst = _.mapValues(rest, (val, key) => {
-        if (DOC_FIELDS.indexOf(key) !== -1) {
-          return _.get(val, '[0].response.result.uuid', undefined);
-        }
-        return val;
-      });
+  useEffect(
+    () => {
+      if (resetFetchNumber <= 0) return;
+      const formData = getFormData();
+      fetchTableData(formData);
+    },
+    [resetFetchNumber]
+  );
 
-      if (!salesName) {
-        return message.warn('销售不存在');
-      }
-      const distValues = {
-        ...dataSourceInst,
-        subsidiaryName,
-        branchName,
-        salesName,
-        clientType: INSTITUTION,
-      };
-
-      this.switchConfirmLoading();
-      const { error: _error } = await createRefParty(distValues);
-      this.switchConfirmLoading();
-      if (_error) return;
-
-      this.setState(
-        {
-          dataSourceInst: {},
-          dataSourceProd: {},
-          modalVisible: false,
-        },
-        () => {
-          message.success('创建成功');
-          this.fetchTable();
-        }
-      );
-    });
-  };
-
-  public onCreate = async () => {
-    if (this.state.activeKey === INSTITUTION) {
-      return this.createInstitution();
-    } else {
-      return this.createProduct();
-    }
-  };
-
-  public onRemove = async event => {
-    const { error, data } = await clientAccountDel({ accountId: event.rowId });
-    if (error) return;
-    return () => {
-      this.setState(
-        produce((state: any) => {
-          state.tableDataSource.splice(event.rowIndex, 1);
-        }),
-        () => {
-          notification.success({
-            message: '删除成功',
-          });
-        }
-      );
-    };
-  };
-
-  public onSelectionChanged = () => {
-    const selectedRows = this.$sourceTable.$baseSourceTable.$table.$baseTable.gridApi.getSelectedRows();
-    this.setState({ selectedRows, contentType: null });
-  };
-
-  public getContent = () => {
-    const { selectedRows, contentType } = this.state;
-    if (!selectedRows.length) return null;
-
-    if (selectedRows.length === 1 && contentType === 'infoManager') {
-      return <InfoManager data={selectedRows[0]} />;
-    }
-
-    if (contentType === 'valuation') {
-      return <Valuation selectedRows={selectedRows} />;
-    }
-
-    if (contentType === 'margin') {
-      return <Margin selectedRows={selectedRows} />;
-    }
-
-    if (contentType === 'iogold') {
-      return <IOGlod selectedRows={selectedRows} />;
-    }
-
-    if (contentType === 'discrepancy') {
-      return <Discrepancy selectedRows={selectedRows} />;
-    }
-
-    return null;
-  };
-
-  public bindClick = contentType => () => {
-    this.setState({ contentType });
-  };
-
-  public onSalesBtnClick = () => {
-    router.push('/customer-sales-manage');
-  };
-
-  public onBankBtnClick = () => {
-    router.push('/bank-account');
-  };
-
-  public onChangeTabs = activeKey => {
-    this.setState({
-      activeKey,
-    });
-  };
-
-  public isForden = fileType => {
-    if (fileType === 'application/msword' || fileType === 'image/png') {
-      message.error('不支持该文件类型');
-      return false;
-    }
-    return true;
-  };
-
-  public handleChangeInstValue = params => {
-    const nextValues = { ...params.values };
-
-    Object.keys(params.changedValues).map(key => {
-      if (DOC_FIELDS.indexOf(key) !== -1) {
-        nextValues[key] = nextValues[key].map(file => {
-          if (file.response && file.status === 'done') {
-            return {
-              ...file,
-              url: `${DOWN_LOAD_FIEL_URL}${file.response.result.uuid}&partyDoc=true`,
-            };
-          }
-          return file;
-        });
-      }
-    });
-
-    this.setState({
-      dataSourceInst: nextValues,
-    });
-  };
-
-  public handleChangeProdValue = params => {
-    const nextValues = { ...params.values };
-
-    Object.keys(params.changedValues).map(key => {
-      if (DOC_FIELDS.indexOf(key) !== -1) {
-        nextValues[key] = nextValues[key].map(file => {
-          if (file.response && file.status === 'done') {
-            return {
-              ...file,
-              url: `${DOWN_LOAD_FIEL_URL}${file.response.result.uuid}&partyDoc=true`,
-            };
-          }
-          return file;
-        });
-      }
-    });
-
-    this.setState({
-      dataSourceProd: nextValues,
-    });
-  };
-
-  public onSearchFormChange = async params => {
-    let refSalesGetByLegalNameRsp;
-    if (params.changedValues.legalName) {
-      refSalesGetByLegalNameRsp = await refSalesGetByLegalName({
-        legalName: params.changedValues.legalName,
-      });
-      if (refSalesGetByLegalNameRsp.error) return;
-      this.setState({
-        searchFormData: {
-          ...params.values,
-          [ADDRESS_CASCADER]: _.values(
-            _.pick(refSalesGetByLegalNameRsp.data, ['subsidiary', 'branch', 'salesName'])
-          ),
-        },
-      });
-      return;
-    }
-    this.setState({
-      searchFormData: params.values,
-    });
-  };
-
-  public onReset = event => {
-    this.setState(
-      {
-        searchFormData: {},
-      },
-      () => {
-        this.fetchTable();
-      }
-    );
-  };
-
-  public switchModal = () => {
-    this.setState({
-      modalVisible: !this.state.modalVisible,
-    });
-  };
-
-  public switchConfirmLoading = () => {
-    this.setState({
-      confirmLoading: !this.state.confirmLoading,
-    });
-  };
-
-  public render() {
-    return (
-      <PageHeaderWrapper>
-        <SourceTable
-          searchable={true}
-          resetable={true}
-          onSearchButtonClick={this.fetchTable}
-          ref={node => (this.$sourceTable = node)}
-          rowKey="accountId"
-          dataSource={this.state.tableDataSource}
-          onResetButtonClick={this.onReset}
-          header={
-            <Row type="flex" justify="start" style={{ marginBottom: VERTICAL_GUTTER }}>
-              <Col>
-                <Button.Group>
-                  <ModalButton
-                    type="primary"
-                    onClick={this.switchModal}
-                    modalProps={{
-                      width: 1500,
-                      visible: this.state.modalVisible,
-                      onCancel: this.switchModal,
-                      onOk: this.onCreate,
-                      confirmLoading: this.state.confirmLoading,
-                    }}
-                    content={
-                      <Tabs activeKey={this.state.activeKey} onChange={this.onChangeTabs}>
-                        <TabPane tab="机构户" key={INSTITUTION}>
-                          <Form
-                            wrappedComponentRef={element => {
-                              if (element) {
-                                this.$insForm = element.props.form;
-                              }
-                              return;
-                            }}
-                            controls={INSITUTIONS(this.state.branchSalesList)}
-                            dataSource={this.state.dataSourceInst}
-                            onValueChange={this.handleChangeInstValue}
-                            controlNumberOneRow={2}
-                            footer={false}
-                          />
-                        </TabPane>
-                        <TabPane tab="产品户" key={PRODUCT}>
-                          <Form
-                            wrappedComponentRef={element => {
-                              if (element) {
-                                this.$proForm = element.props.form;
-                              }
-                              return;
-                            }}
-                            controls={PRODUCTIONS(this.state.branchSalesList)}
-                            dataSource={this.state.dataSourceProd}
-                            onValueChange={this.handleChangeProdValue}
-                            controlNumberOneRow={2}
-                            footer={false}
-                          />
-                        </TabPane>
-                      </Tabs>
-                    }
-                  >
-                    新建交易对手
-                  </ModalButton>
-                  <Button key="销售管理" onClick={this.onSalesBtnClick}>
-                    销售管理
-                  </Button>
-                  <Button key="客户银行账户管理" onClick={this.onBankBtnClick}>
-                    客户银行账户管理
-                  </Button>
-                </Button.Group>
-              </Col>
-            </Row>
-          }
-          loading={this.state.loading}
-          searchFormControls={SEARCH_FORM_CONTROLS(this.state.branchSalesList)}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          columnDefs={TABLE_COLUMN_DEFS}
-          autoSizeColumnsToFit={false}
-          rowSelection={'multiple'}
-          onSelectionChanged={this.onSelectionChanged}
-          actionColDef={{
-            width: 100,
-            pinned: 'right',
+  return (
+    <PageHeaderWrapper title="客户信息管理" card={false}>
+      <Card>
+        <Form2
+          ref={node => (formEl.current = node)}
+          onResetButtonClick={() => {
+            setSearchFormData(initialFormData);
+            setResetFetchNumber(resetFetchNumber + 1);
           }}
-          rowActions={[
-            <Button key="remove" type="danger" onClick={this.onRemove}>
-              删除
-            </Button>,
+          onSubmitButtonClick={async ({ domEvent }) => {
+            domEvent.preventDefault();
+            const formData = getFormData();
+            fetchTableData(formData);
+          }}
+          layout="inline"
+          submitText="查询"
+          submitButtonProps={{
+            icon: 'search',
+          }}
+          onFieldsChange={(props, changedFields, allFields) => {
+            setSearchFormData(allFields);
+          }}
+          dataSource={searchFormData}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        fetchOptionsOnSearch={true}
+                        showSearch={true}
+                        options={async value => {
+                          const { data, error } = await refSimilarLegalNameList({
+                            similarLegalName: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '主协议编号',
+              dataIndex: 'masterAgreementId',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(<Input placeholder="请输入内容" />)}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '销售',
+              dataIndex: SALER_CASCADER,
+              render: (value, record, index, { form }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Cascader
+                        placeholder="请输入内容"
+                        style={{ width: 250 }}
+                        options={salesCascaderList}
+                        showSearch={{
+                          filter: (inputValue, path) => {
+                            return path.some(
+                              option =>
+                                option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1
+                            );
+                          },
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
           ]}
         />
-        <Row style={{ marginTop: VERTICAL_GUTTER }}>
-          <Button.Group>
-            <Button
-              onClick={this.bindClick('infoManager')}
-              type="primary"
-              disabled={!this.state.selectedRows.length || this.state.selectedRows.length > 1}
-            >
-              交易对手信息管理
-            </Button>
-            <Button
-              onClick={this.bindClick('valuation')}
-              type="primary"
-              disabled={!this.state.selectedRows.length}
-            >
-              持仓估值管理
-            </Button>
-            <Button
-              onClick={this.bindClick('margin')}
-              type="primary"
-              disabled={!this.state.selectedRows.length}
-            >
-              保证金管理
-            </Button>
-            <Button
-              onClick={this.bindClick('iogold')}
-              type="primary"
-              disabled={!this.state.selectedRows.length}
-            >
-              台账管理
-            </Button>
-            <Button
-              onClick={this.bindClick('discrepancy')}
-              type="primary"
-              disabled={!this.state.selectedRows.length}
-            >
-              财务出入金管理
-            </Button>
-          </Button.Group>
+      </Card>
+      <Card style={{ marginTop: VERTICAL_GUTTER }}>
+        <Row type="flex" style={{ marginBottom: VERTICAL_GUTTER }}>
+          <CreateModalButton
+            salesCascaderList={salesCascaderList}
+            fetchTableData={fetchTableData}
+          />
         </Row>
-        <Row style={{ marginTop: VERTICAL_GUTTER }}>{this.getContent()}</Row>
-      </PageHeaderWrapper>
-    );
-  }
-}
+        <Table2
+          size="middle"
+          pagination={{
+            showQuickJumper: true,
+            showSizeChanger: true,
+          }}
+          rowKey={'accountId'}
+          dataSource={tableData}
+          loading={searchLoading}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+            },
+            {
+              title: '账户编号',
+              dataIndex: 'accountId',
+            },
+            {
+              title: '开户销售',
+              dataIndex: 'salesName',
+            },
+            {
+              title: '协议编号',
+              dataIndex: 'masterAgreementId',
+            },
+            {
+              title: '类型',
+              dataIndex: 'clientType',
+              render: (value, record, index) => {
+                if (value === 'PRODUCT') {
+                  return '产品户';
+                }
+                return '机构户';
+              },
+            },
+            {
+              title: '创建时间',
+              dataIndex: 'createdAt',
+              render: (value, record, index) => {
+                return getMoment(value).format('YYYY-MM-DD HH:mm:ss');
+              },
+            },
+            {
+              title: '更新时间',
+              dataIndex: 'updatedAt',
+              render: (value, record, index) => {
+                return getMoment(value).format('YYYY-MM-DD HH:mm:ss');
+              },
+            },
+            {
+              width: 150,
+              title: '操作',
+              dataIndex: 'actions',
+              render: (value, record, index) => {
+                return (
+                  <span className={styles.action}>
+                    {/* <a href="javascript:;">查看</a>
+                    <Divider type="vertical" />
+                    <a href="javascript:;">编辑</a>
+                    <Divider type="vertical" />
+                    <a href="javascript:;" style={{ color: 'red' }}>
+                      删除
+                    </a> */}
+                    <EditModalButton
+                      salesCascaderList={salesCascaderList}
+                      name="查看"
+                      fetchTable={fetchTable}
+                      record={record}
+                    />
+                    <Divider type="vertical" />
+                    <EditModalButton
+                      salesCascaderList={salesCascaderList}
+                      name="编辑"
+                      record={record}
+                      fetchTable={fetchTable}
+                    />
+                    {/* <Divider type="vertical" />
+                    <Button
+                      style={{ color: 'red' }}
+                      onClick={() => {
+                        AccountDel(record);
+                      }}
+                    >
+                      删除
+                    </Button> */}
+                  </span>
+                );
+              },
+            },
+          ]}
+        />
+      </Card>
+    </PageHeaderWrapper>
+  );
+});
 
-export default ClientManagement;
+export default ClientManagementInfo;

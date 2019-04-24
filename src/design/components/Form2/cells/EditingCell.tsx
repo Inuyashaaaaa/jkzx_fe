@@ -6,7 +6,7 @@ class EditingCell extends PureComponent<IFormCellProps, any> {
     const dataIndex = this.getDataIndex();
     const value = this.props.form.getFieldValue(dataIndex);
     const { record } = this.props;
-    const oldValue = record[dataIndex];
+    const oldValue = this.props.cellApi.getValue();
 
     if (this.props.form.isFieldValidating(dataIndex)) {
       return oldValue;
@@ -32,7 +32,7 @@ class EditingCell extends PureComponent<IFormCellProps, any> {
       colDef: { dataIndex, render },
       cellApi,
     } = this.props;
-    const value = record[dataIndex];
+    const value = cellApi.getValue();
     if (render) {
       return cellApi.renderElement(
         render(value, record, 0, {

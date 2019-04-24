@@ -23,6 +23,7 @@ import {
   countVega,
 } from '@/services/cash';
 import { getActualNotionAmountBigNumber, handleJudge } from '@/services/trade';
+import { notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
@@ -59,15 +60,39 @@ export default {
       const {
         payload: { rsps },
       } = action;
+
+      const rspIsError = rsp => {
+        const { raw, error } = rsp;
+        if (error || (raw && raw.diagnostics && raw.diagnostics.length)) {
+          return true;
+        }
+        return false;
+      };
+
+      const rspIsEmpty = rsp => {
+        return _.isEmpty(rsp.data);
+      };
+
       state.dataSource = rsps
         .reduce((pre, next) => {
+          const isError = rspIsError(next);
+          if (isError || rspIsEmpty(next)) {
+            if (isError) {
+              notification.error({
+                message: _.get(next.raw.diagnostics, '[0].message', []),
+              });
+            }
+            return pre.concat(null);
+          }
           return pre.concat(next.data);
         }, [])
         .map((item, index) => {
-          const cur = state.dataSource[index];
+          const record = state.dataSource[index];
+
+          if (item == null) return record;
 
           return {
-            ...cur,
+            ...record,
             ..._.mapValues(_.pick(item, TRADESCOL_FIELDS), (val, key) => {
               val = new BigNumber(val).decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES).toNumber();
               if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
@@ -83,17 +108,17 @@ export default {
             [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
             [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
               item.price,
-              getActualNotionAmountBigNumber(cur)
+              getActualNotionAmountBigNumber(record)
             ),
             [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
             [COMPUTED_LEG_FIELD_MAP.DELTA]: countDelta(
               item.delta,
-              cur[LEG_FIELD.UNDERLYER_MULTIPLIER]
+              record[LEG_FIELD.UNDERLYER_MULTIPLIER]
             ),
             [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(item.delta, item.underlyerPrice),
             [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
               item.gamma,
-              cur[LEG_FIELD.UNDERLYER_MULTIPLIER],
+              record[LEG_FIELD.UNDERLYER_MULTIPLIER],
               item.underlyerPrice
             ),
             [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),

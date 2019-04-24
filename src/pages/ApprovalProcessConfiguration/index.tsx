@@ -36,7 +36,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     status: false,
     resetVisible: false,
     globalConfigList: [],
-    globalConfig: null,
+    globalConfig: {},
   };
 
   constructor(props) {
@@ -71,10 +71,12 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const tabsData = processList.data.map(item => {
+    let tabsData = processList.data.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
+
+    tabsData = tabsData.filter(item => item.tabName.indexOf('资金录入') >= 0);
 
     const taskData = (taskApproveGroupList.data || []).map(item => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
@@ -87,6 +89,8 @@ class ApprovalProcessConfiguration extends PureComponent {
       taskApproveGroupList: taskData,
       processList: tabsData,
       globalConfigList: globalConfigList.data || [],
+      globalConfig: globalConfigList.data ? globalConfigList.data[0] : {},
+      status: tabsData[0].status,
     });
   };
 
@@ -267,7 +271,7 @@ class ApprovalProcessConfiguration extends PureComponent {
           <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
               // 只显示第二条数据
-              if (index !== 1) return null;
+              // if (index !== 1) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div

@@ -61,15 +61,25 @@ export async function mgnMarginsUpdate(params) {
   });
 }
 
-export async function refPartyList(params = {}) {
+export async function mgnMarginSearch(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'refPartyList',
+      method: 'mgnMarginSearch',
       params,
     },
   });
 }
+
+// export async function refPartyList(params = {}) {
+//   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+//     method: `POST`,
+//     body: {
+//       method: 'refPartyList',
+//       params,
+//     },
+//   });
+// }
 
 export async function refPartyGetByLegalName(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
@@ -146,6 +156,16 @@ export async function refBankAccountSave(params) {
     method: `POST`,
     body: {
       method: 'refBankAccountSave',
+      params,
+    },
+  });
+}
+
+export async function refBankAccountDel(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refBankAccountDel',
       params,
     },
   });
@@ -336,6 +356,69 @@ export async function cliUnProcessedTradeTaskListByTradeId(params) {
     method: `POST`,
     body: {
       method: 'cliUnProcessedTradeTaskListByTradeId',
+      params,
+    },
+  });
+}
+
+export async function refPartyList(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refPartyList',
+      params,
+    },
+  });
+}
+
+export async function cliFundEventSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'cliFundEventSearch',
+      params,
+    },
+  });
+}
+
+export async function cliTradeTaskSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'cliTradeTaskSearch',
+      params: {
+        ...params,
+        processStatus: 'UN_PROCESSED',
+      },
+    },
+  });
+}
+
+export async function clientAccountOpRecordSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientAccountOpRecordSearch',
+      params,
+    },
+  });
+}
+
+export async function clientAccountGetByLegalName(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientAccountGetByLegalName',
+      params,
+    },
+  });
+}
+
+export async function rptValuationReportSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptValuationReportSearch',
       params,
     },
   });

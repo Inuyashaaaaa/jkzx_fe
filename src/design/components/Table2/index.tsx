@@ -1,12 +1,16 @@
 import { Table } from 'antd';
 import classNames from 'classnames';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { createEventBus, EVERY_EVENT_TYPE } from '../../utils';
-import { defaultInputManager } from '../Input';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
 import SwitchCell from './cells/SwitchCell';
-import { TABLE_CELL_VALUE_CHANGE, TABLE_CELL_VALUE_CHANGED } from './constants/EVENT';
+import {
+  TABLE_CELL_EDITING_CHANGED,
+  TABLE_CELL_FIELDS_CHANGE,
+  TABLE_CELL_VALUES_CHANGE,
+} from './constants/EVENT';
 import FormRow from './rows/FormRow';
 import './styles.less';
 
@@ -14,7 +18,6 @@ class Table2 extends PureComponent<ITableProps> {
   public static defaultProps = {
     columns: [],
     rowKey: 'key',
-    inputManager: defaultInputManager,
     vertical: false,
     prefixCls: 'ant-table',
     size: 'default',
@@ -24,6 +27,8 @@ class Table2 extends PureComponent<ITableProps> {
 
   public context: ITableContext = {};
 
+  public editings: {} = {};
+
   constructor(props) {
     super(props);
     const eventBus = createEventBus();
@@ -32,7 +37,6 @@ class Table2 extends PureComponent<ITableProps> {
     this.api = {
       eventBus,
       tableManager: new TableManager(),
-      inputManager: props.inputManager,
     };
 
     this.context = this.getContext();
@@ -70,14 +74,6 @@ class Table2 extends PureComponent<ITableProps> {
 
   public defaultRenderItem = val => val;
 
-  public normalizeGetValue = colGetValue => {
-    const [value, ...depends] = Array.isArray(colGetValue) ? colGetValue : [colGetValue];
-    return {
-      value,
-      depends,
-    };
-  };
-
   public getColumnDefs = () => {
     const { size } = this.props;
     const columns = this.props.columns.map(colDef => {
@@ -88,7 +84,6 @@ class Table2 extends PureComponent<ITableProps> {
         onCell: (record, rowIndex): ITableCellProps => ({
           ...(colDef.onCell ? colDef.onCell(record, rowIndex) : undefined),
           $$render: colDef.render,
-          getValue: this.normalizeGetValue(colDef.getValue),
           record,
           rowIndex,
           colDef,
@@ -100,6 +95,7 @@ class Table2 extends PureComponent<ITableProps> {
               ? this.props.rowKey
               : this.props.rowKey(record, rowIndex);
           },
+          loading: colDef.loading ? colDef.loading(record, rowIndex) : false,
         }),
       };
     });
@@ -109,28 +105,50 @@ class Table2 extends PureComponent<ITableProps> {
 
   public getOnRow = () => {
     return (record, rowIndex): ITableRowProps => {
+      const getRowKey = () => {
+        return typeof this.props.rowKey === 'string'
+          ? this.props.rowKey
+          : this.props.rowKey(record, rowIndex);
+      };
+      const rowKey = getRowKey();
+      const rowId = record[rowKey];
       return {
         ...(this.props.onRow ? this.props.onRow(record, rowIndex) : undefined),
         api: this.api,
         record,
+        rowId,
         rowIndex,
         context: this.context,
-        getRowKey: () => {
-          return typeof this.props.rowKey === 'string'
-            ? this.props.rowKey
-            : this.props.rowKey(record, rowIndex);
-        },
+        getRowKey,
+        columns: this.props.columns,
+        setEditing: this.bindSetEditing(rowId),
+        getEditing: this.bindGetEditing(rowId),
+        editings: this.editings,
+        getContextMenu: this.props.getContextMenu,
       };
     };
   };
 
   public handleTableEvent = (params, eventName) => {
-    if (eventName === TABLE_CELL_VALUE_CHANGED) {
-      return this.props.onCellValueChanged && this.props.onCellValueChanged(params);
+    if (eventName === TABLE_CELL_EDITING_CHANGED) {
+      return this.props.onCellEditingChanged && this.props.onCellEditingChanged(params);
     }
-    if (eventName === TABLE_CELL_VALUE_CHANGE) {
-      return this.props.onCellValueChange && this.props.onCellValueChange(params);
+    if (eventName === TABLE_CELL_VALUES_CHANGE) {
+      return this.props.onCellValuesChange && this.props.onCellValuesChange(params);
     }
+    if (eventName === TABLE_CELL_FIELDS_CHANGE) {
+      this.editings[params.rowId] = true;
+      return this.props.onCellFieldsChange && this.props.onCellFieldsChange(params);
+    }
+  };
+
+  public bindSetEditing = rowId =>
+    _.debounce(editing => {
+      this.editings[rowId] = editing;
+    }, 50);
+
+  public bindGetEditing = rowId => () => {
+    return this.editings[rowId];
   };
 
   public listen = (eventName: string, callback, scope) => {

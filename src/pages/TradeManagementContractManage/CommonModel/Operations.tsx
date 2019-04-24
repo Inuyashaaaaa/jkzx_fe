@@ -18,6 +18,7 @@ import ExerciseModal from '@/pages/TradeManagementBookEdit/modals/ExerciseModal'
 import ExpirationModal from '@/pages/TradeManagementBookEdit/modals/ExpirationModal';
 import FixingModal from '@/pages/TradeManagementBookEdit/modals/FixingModal';
 import KnockOutModal from '@/pages/TradeManagementBookEdit/modals/KnockOutModal';
+import SettleModal from '@/pages/TradeManagementBookEdit/modals/SettleModal';
 import UnwindModal from '@/pages/TradeManagementBookEdit/modals/UnwindModal';
 import { modalFormControls } from '@/pages/TradeManagementBookEdit/services';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
@@ -25,6 +26,7 @@ import { trdTradeLCMEventList } from '@/services/general-service';
 import { convertTradeApiData2PageData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { connect } from 'dva';
+import _ from 'lodash';
 import moment from 'moment';
 import uuidv4 from 'uuid';
 import LifeModalTable from '../LifeModalTable';
@@ -45,6 +47,8 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
 
   public $barrierIn: BarrierIn;
 
+  public $settleModal: SettleModal;
+
   public $modelButton: ModalButton = null;
 
   public activeRowData: any;
@@ -59,14 +63,14 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
 
   public componentDidMount = async () => {
     const item = this.props.record;
-    const { error, data } = await trdPositionLCMEventTypes({
+    const rsp = await trdPositionLCMEventTypes({
       positionId: item.positionId,
     });
-    if (error) return;
+    if (rsp.error) return;
     this.setState({
       eventTypes: {
         ...this.state.eventTypes,
-        [item.positionId]: data,
+        [item.positionId]: rsp.data,
       },
     });
   };
@@ -219,6 +223,15 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
         () => this.props.onSearch()
       );
     }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+      this.$settleModal.show(
+        this.activeRowData,
+        this.state.tableFormData,
+        this.props.currentUser,
+        () => this.props.onSearch()
+      );
+    }
   };
 
   public fetchOverviewTableData = async () => {
@@ -257,7 +270,13 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
     const item = this.props.record;
     if (!this.state.eventTypes[item.positionId]) return;
     return this.state.eventTypes[item.positionId].map(node => {
-      return <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>;
+      return (
+        <MenuItem key={node} disabled={LCM_EVENT_TYPE_MAP[node] === LCM_EVENT_TYPE_MAP.AMEND}>
+          {LCM_EVENT_TYPE_MAP[node] === LCM_EVENT_TYPE_MAP.AMEND
+            ? LCM_EVENT_TYPE_ZHCN_MAP[node] + `(请至合约详情操作)`
+            : LCM_EVENT_TYPE_ZHCN_MAP[node]}
+        </MenuItem>
+      );
     });
   };
 
@@ -297,7 +316,7 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
             <Menu onClick={this.onClick}>
               <MenuItem key="bookEdit">查看合约详情</MenuItem>
               <MenuItem key="searchLifeStyle">查看生命周期事件</MenuItem>
-              <SubMenu key="carryListStyle" title={<span>执行生命周期时间</span>}>
+              <SubMenu key="carryListStyle" title={<span>执行生命周期事件</span>}>
                 {this.loadCommon()}
               </SubMenu>
               <MenuItem key="portfolio">加入投资组合</MenuItem>
@@ -340,6 +359,11 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
         <BarrierIn
           ref={node => {
             this.$barrierIn = node;
+          }}
+        />
+        <SettleModal
+          ref={node => {
+            this.$settleModal = node;
           }}
         />
         <ModalButton ref={node => (this.$modelButton = node)} onConfirm={this.onConfirm} />

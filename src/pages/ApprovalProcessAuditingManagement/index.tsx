@@ -1,5 +1,9 @@
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { wkApproveGroupList, wkApproveGroupModify } from '@/services/auditing';
+import {
+  wkApproveGroupList,
+  wkApproveGroupModify,
+  wkApproveGroupUserListModify,
+} from '@/services/auditing';
 import { queryAuthDepartmentList } from '@/services/department';
 import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
 import React, { PureComponent } from 'react';
@@ -68,7 +72,11 @@ class SystemSettingsRoleManagement extends PureComponent {
     userList = userList.filter(item => item.userApproveGroupId !== key);
 
     currentGroup.userList = userList;
-    const { data, error } = await wkApproveGroupModify(currentGroup);
+    const { data, error } = await wkApproveGroupModify({
+      approveGroupId: currentGroup.approveGroupId,
+      description: currentGroup.description,
+      approveGroupName: currentGroup.approveGroupName,
+    });
     const { message } = error;
     if (error) {
       return;
@@ -174,7 +182,11 @@ class SystemSettingsRoleManagement extends PureComponent {
       }
     });
 
-    const { data, error } = await wkApproveGroupModify(currentGroup);
+    const { data, error } = await wkApproveGroupUserListModify({
+      approveGroupId: currentGroup.approveGroupId,
+      approveGroupName: currentGroup.approveGroupName,
+      userList: currentGroup.userList,
+    });
     if (error) {
       return;
     } else {
