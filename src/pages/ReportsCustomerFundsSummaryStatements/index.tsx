@@ -1,3 +1,4 @@
+import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
@@ -7,6 +8,7 @@ import {
 } from '@/services/report-service';
 import { message } from 'antd';
 import moment from 'moment';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
@@ -125,7 +127,43 @@ class ReportsCustomerFundsSummaryStatements extends PureComponent {
     });
   };
 
+  public handleData = (dataSource, cols, headers) => {
+    let data = [];
+    data.push(headers);
+    let length = data.length;
+    dataSource.forEach((ds, index) => {
+      let _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
+
   public render() {
+    const _data = this.handleData(
+      this.state.dataSource,
+      _.flatten(
+        TABLE_COL_DEFS.map(item => {
+          if (item.children) {
+            return item.children.map(c => c.field);
+          }
+          return item.field;
+        })
+      ),
+      _.flatten(
+        TABLE_COL_DEFS.map(item => {
+          if (item.children) {
+            return item.children.map(c => c.headerName);
+          }
+          return item.headerName;
+        })
+      )
+    );
     return (
       <PageHeaderWrapper>
         <SourceTable
@@ -165,6 +203,27 @@ class ReportsCustomerFundsSummaryStatements extends PureComponent {
           autoSizeColumnsToFit={true}
           // onCellValueChanged={this.onCellValueChanged}
           defaultColDef={{ width: 130 }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: _.flatten(
+                  TABLE_COL_DEFS.map(item => {
+                    if (item.children) {
+                      return item.children.map(c => c.headerName);
+                    }
+                    return item.headerName;
+                  })
+                ),
+                name: '客户资金汇总报表',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );
