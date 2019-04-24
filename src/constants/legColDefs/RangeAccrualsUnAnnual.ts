@@ -2,6 +2,7 @@ import { DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
 import { convertObservetions } from '@/services/common';
 import _ from 'lodash';
 import moment from 'moment';
+import { DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   FREQUENCY_TYPE_MAP,
@@ -18,6 +19,7 @@ import {
 } from '../common';
 import {
   BarrierType,
+  DaysInYear,
   DaysInYear,
   Direction,
   EffectiveDate,
@@ -88,6 +90,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
           EffectiveDate,
           ExpirationDate,
           PaymentType,
+          DaysInYear,
           PremiumType,
           Premium,
           Payment,
@@ -108,6 +111,7 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
       [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
       [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),

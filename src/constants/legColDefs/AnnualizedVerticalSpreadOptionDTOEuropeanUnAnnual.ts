@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_TERM } from '.';
+import { DEFAULT_TERM, DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -33,6 +33,7 @@ import {
   StrikeType,
   UnderlyerInstrumentId,
   UnderlyerMultiplier,
+  DaysInYear,
 } from './common/common';
 import { pipeLeg } from './common/pipeLeg';
 
@@ -77,6 +78,7 @@ export const AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual = pipeLeg({
           NotionalAmount,
           PremiumType,
           Premium,
+          DaysInYear,
         ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
@@ -87,6 +89,7 @@ export const AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual = pipeLeg({
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       ...(isPricing

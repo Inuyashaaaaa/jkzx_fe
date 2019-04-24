@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_TERM } from '.';
+import { DEFAULT_TERM, DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -15,6 +15,7 @@ import {
 } from '../common';
 import {
   Direction,
+  DaysInYear,
   EffectiveDate,
   ExpirationDate,
   InitialSpot,
@@ -59,6 +60,7 @@ export const AnnulizedVanillaOptionDTOEuropeanUnAnnual = pipeLeg({
         ]
       : [
           Direction,
+          DaysInYear,
           OptionType,
           UnderlyerInstrumentId,
           UnderlyerMultiplier,
@@ -85,6 +87,7 @@ export const AnnulizedVanillaOptionDTOEuropeanUnAnnual = pipeLeg({
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       ...(isPricing
