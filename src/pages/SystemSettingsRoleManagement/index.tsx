@@ -68,6 +68,7 @@ const pagesCollection = [
   'portfolioManagement',
   'tradeDocuments',
   'portfolioRisk',
+  'customModel',
 ];
 
 class SystemSettingsRoleManagement extends PureComponent {

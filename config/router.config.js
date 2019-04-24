@@ -141,6 +141,11 @@ export default [
               name: 'pricingEnvironment',
               component: './PricingSettingsPricingEnvironment/index',
             },
+            {
+              path: '/pricingSettings/customModel',
+              name: 'customModel',
+              component: './CustomModel/index',
+            },
           ],
         },
         {
