@@ -4,12 +4,18 @@ import {
   LCM_EVENT_TYPE_ZHCN_MAP,
   LEG_FIELD,
   LEG_NAME_FIELD,
+  LEG_PRICING_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
+import { ComputedColDefs } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
+import {
+  TradesColDefs,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { AlUnwindNotionalAmount, InitialNotionalAmount } from '@/constants/legColDefs/extraColDefs';
 import Form from '@/design/components/Form';
 import { IFormControl } from '@/design/components/Form/types';
@@ -24,12 +30,14 @@ import {
   convertTradeApiData2PageData,
   convertTradePageData2ApiData,
   createLegDataSourceItem,
+  getAddLegItem,
 } from '@/services/pages';
 import {
   trdPositionLCMEventTypes,
   trdTradeLCMEventProcess,
   trdTradeLCMUnwindAmountGet,
 } from '@/services/trade-service';
+import { getMoment } from '@/utils';
 import { MenuItemDef } from 'ag-grid-community';
 import { Button, Col, message, Row } from 'antd';
 import { connect } from 'dva';
@@ -37,6 +45,7 @@ import produce from 'immer';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import router from 'umi/router';
 import ExportModal from './ExportModal';
 import AsianExerciseModal from './modals/AsianExerciseModal';
 import BarrierIn from './modals/BarrierIn';
@@ -474,6 +483,85 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     );
   };
 
+  public onConvertPricing = () => {
+    const nextTradesColDefs = TradesColDefs.map(item => ({
+      ...item,
+      totalable: false,
+    }));
+
+    const computedAllLegTypes = allLegTypes.map(item => {
+      return {
+        ...item,
+        columnDefs: item
+          .getColumnDefs('pricing')
+          .map(item => ({
+            ...item,
+            totalable: false,
+          }))
+          .concat(nextTradesColDefs)
+          .concat(ComputedColDefs),
+      };
+    });
+
+    const cacheTyeps = [];
+
+    this.props.dispatch({
+      type: 'pricingData/clean',
+    });
+
+    this.state.dataSource.forEach(record => {
+      const computedLeg = computedAllLegTypes.find(item => item.type === record[LEG_TYPE_FIELD]);
+
+      if (!computedLeg) return;
+
+      if (cacheTyeps.indexOf(computedLeg.type) === -1) {
+        cacheTyeps.push(computedLeg.type);
+      }
+
+      const legData = getAddLegItem(
+        computedLeg,
+        createLegDataSourceItem(computedLeg, {
+          [LEG_PRICING_FIELD]: true,
+        }),
+        true
+      );
+
+      const rowData = _.mapValues(
+        {
+          ...legData,
+          ..._.pick(record, computedLeg.getColumnDefs('pricing').map(item => item.field)),
+          [TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
+        },
+        (val, key) => {
+          if (key === LEG_FIELD.EXPIRATION_DATE) {
+            return getMoment(record[LEG_FIELD.EXPIRATION_DATE]);
+          }
+          if (key === LEG_FIELD.EFFECTIVE_DATE) {
+            return getMoment(record[LEG_FIELD.EFFECTIVE_DATE]);
+          }
+          return val;
+        }
+      );
+
+      this.props.dispatch({
+        type: 'pricingData/addLegData',
+        payload: {
+          cacheTyeps,
+          computedLeg,
+          computedAllLegTypes,
+          nextTradesColDefs,
+          rowData,
+        },
+      });
+    });
+    router.push({
+      pathname: '/trade-management/pricing',
+      query: {
+        fromEdit: true,
+      },
+    });
+  };
+
   public saveModify = async () => {
     const modifyData = this.state.dataSource.filter(item => {
       return item.positionId === this.state.editablePositionId;
@@ -552,7 +640,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
             <Row
               style={{ marginBottom: VERTICAL_GUTTER, marginTop: VERTICAL_GUTTER }}
               type="flex"
-              justify="start"
+              justify="space-between"
               gutter={16}
             >
               <Col>
@@ -563,14 +651,18 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
                 >
                   保存修改
                 </Button>
-              </Col>
-              <Col>
                 <Button
+                  style={{ marginLeft: 10 }}
                   type="primary"
                   disabled={this.state.buttonDisable}
                   onClick={this.abandonModify}
                 >
                   放弃修改
+                </Button>
+              </Col>
+              <Col>
+                <Button type="primary" onClick={this.onConvertPricing}>
+                  转换定价
                 </Button>
               </Col>
             </Row>
