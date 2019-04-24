@@ -77,7 +77,8 @@ class ImportExcelButton extends PureComponent<ImportButtonProps> {
       });
 
       /* Update state */
-      this.onImport({ data, cols: makeCols(ws['!ref']) });
+      this.onImport({ data, cols: wb.SheetNames, fileName: file.name });
+      // this.onImport({ data, cols: makeCols(ws['!ref']), fileName: file.name });
     };
     if (rABS) reader.readAsBinaryString(file);
     else reader.readAsArrayBuffer(file);

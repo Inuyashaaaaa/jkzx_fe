@@ -363,3 +363,15 @@ export async function mdlModelDataGet(params = {}) {
     },
   });
 }
+
+export async function mdlModelXYCreate(params = {}) {
+  return request(`${HOST_TEST}model-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'mdlModelXYCreate',
+      params: {
+        ...params,
+      },
+    },
+  });
+}
