@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_TERM, DEFAULT_DAYS_IN_YEAR } from '.';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '.';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -14,8 +14,8 @@ import {
   STRIKE_TYPES_MAP,
 } from '../common';
 import {
-  Direction,
   DaysInYear,
+  Direction,
   EffectiveDate,
   ExpirationDate,
   InitialSpot,
