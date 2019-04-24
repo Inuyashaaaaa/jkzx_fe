@@ -4,20 +4,25 @@ import {
   LCM_EVENT_TYPE_ZHCN_MAP,
   LEG_FIELD,
   LEG_NAME_FIELD,
+  LEG_PRICING_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  LEG_PRICING_FIELD,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
+import { ComputedColDefs } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
+import {
+  TradesColDefs,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { AlUnwindNotionalAmount, InitialNotionalAmount } from '@/constants/legColDefs/extraColDefs';
 import Form from '@/design/components/Form';
 import { IFormControl } from '@/design/components/Form/types';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import ModalButton from '@/lib/components/_ModalButton2';
+import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { convertObservetions } from '@/services/common';
 import { trdTradeGet } from '@/services/general-service';
 import {
@@ -32,6 +37,7 @@ import {
   trdTradeLCMEventProcess,
   trdTradeLCMUnwindAmountGet,
 } from '@/services/trade-service';
+import { getMoment } from '@/utils';
 import { MenuItemDef } from 'ag-grid-community';
 import { Button, Col, message, Row } from 'antd';
 import { connect } from 'dva';
@@ -39,6 +45,7 @@ import produce from 'immer';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import router from 'umi/router';
 import ExportModal from './ExportModal';
 import AsianExerciseModal from './modals/AsianExerciseModal';
 import BarrierIn from './modals/BarrierIn';
@@ -50,13 +57,6 @@ import SettleModal from './modals/SettleModal';
 import UnwindModal from './modals/UnwindModal';
 import { modalFormControls } from './services';
 import { filterObDays } from './utils';
-import router from 'umi/router';
-import {
-  TradesColDefs,
-  TRADESCOLDEFS_LEG_FIELD_MAP,
-} from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { ComputedColDefs } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
-import { getMoment } from '@/utils';
 
 class TradeManagementBookEdit extends PureComponent<any, any> {
   public rowKey: string = 'id';
