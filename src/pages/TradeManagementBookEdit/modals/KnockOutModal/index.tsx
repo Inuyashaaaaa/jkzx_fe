@@ -4,13 +4,13 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
+import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMoment } from '@/utils';
 import { message, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import ExportModal from '../../ExportModal';
 import {
   KNOCK_OUT_DATE,
   KNOCKOUT_FORM_CONTROLS,
@@ -143,7 +143,7 @@ class ExerciseModal extends PureComponent<
     const { visible } = this.state;
     return (
       <>
-        <ExportModal
+        <CashExportModal
           visible={this.state.exportVisible}
           trade={this.tableFormData}
           convertVisible={this.convertVisible}

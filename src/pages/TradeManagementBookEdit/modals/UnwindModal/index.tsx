@@ -5,13 +5,13 @@ import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
+import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import ExportModal from '../../ExportModal';
 import {
   CAN_UNWIND_NUM,
   CAN_UNWIND_PRICE,
@@ -218,7 +218,7 @@ class UnwindModal extends PureComponent<
 
     return (
       <>
-        <ExportModal
+        <CashExportModal
           visible={this.state.exportVisible}
           trade={this.tableFormData}
           convertVisible={this.convertVisible}
