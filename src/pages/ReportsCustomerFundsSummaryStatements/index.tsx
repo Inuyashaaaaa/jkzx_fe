@@ -1,6 +1,6 @@
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import SourceTable from '@/design/components/SourceTable';
-import DownloadExcelButton from '@/lib/components/_DownloadExcelButton';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
   rptFinanicalOtcClientFundReportPagedByNameAndDate,
