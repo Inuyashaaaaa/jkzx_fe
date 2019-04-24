@@ -11,7 +11,7 @@ import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { DatePicker, Divider } from 'antd';
+import { DatePicker, Divider, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
@@ -412,7 +412,7 @@ class CommonModel extends PureComponent<{ status: any }> {
         />
         <Divider />
         <div style={{ marginTop: VERTICAL_GUTTER }}>
-          <Table2
+          <Table
             size="middle"
             pagination={{
               position: 'bottom',
