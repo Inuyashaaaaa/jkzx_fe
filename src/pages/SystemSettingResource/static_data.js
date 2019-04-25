@@ -266,6 +266,52 @@ TEMP.forEach(t => {
   }
 });
 
+const APPROVAL_GROUP = common.concat([
+  {
+    value: 'CREATE_APPROVAL_GROUP',
+    zh: '创建审批组',
+  },
+  {
+    value: 'UPDATE_APPROVAL_GROUP',
+    zh: '更新审批组',
+  },
+  {
+    value: 'DELETE_APPROVAL_GROUP',
+    zh: '删除审批组',
+  },
+  {
+    value: 'UPDATE_APPROVAL_GROUP_USER',
+    zh: '更新审批组用户列表',
+  },
+  {
+    value: 'UPDATE_TASK_NODE',
+    zh: '审批组关联任务节点',
+  },
+]);
+
+const APPROVAL_GROUP_INFO = common.concat([
+  {
+    value: 'CREATE_APPROVAL_GROUP',
+    zh: '创建审批组',
+  },
+  {
+    value: 'UPDATE_APPROVAL_GROUP',
+    zh: '更新审批组',
+  },
+  {
+    value: 'DELETE_APPROVAL_GROUP',
+    zh: '删除审批组',
+  },
+  {
+    value: 'UPDATE_APPROVAL_GROUP_USER',
+    zh: '更新审批组用户列表',
+  },
+  {
+    value: 'UPDATE_TASK_NODE',
+    zh: '审批组关联任务节点',
+  },
+]);
+
 export const RESOURCE_ENUM = [
   'ROOT',
   'NAMESPACE',
@@ -278,6 +324,8 @@ export const RESOURCE_ENUM = [
   'TRADE',
   'MARGIN',
   'CLIENT_INFO',
+  'APPROVAL_GROUP',
+  'APPROVAL_GROUP_INFO',
 ];
 
 export default {
@@ -292,4 +340,6 @@ export default {
   TRADE,
   MARGIN,
   CLIENT_INFO,
+  APPROVAL_GROUP,
+  APPROVAL_GROUP_INFO,
 };
