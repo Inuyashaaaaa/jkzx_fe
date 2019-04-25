@@ -34,7 +34,7 @@ export const UnderlyerInstrumentId: ILegColDef = {
                 editing,
                 fetchOptionsOnSearch: true,
                 placeholder: '请输入内容搜索',
-                autoFocus: true,
+                autoSelect: true,
                 showSearch: true,
                 options: async (value: string) => {
                   const { data, error } = await mktInstrumentSearch({

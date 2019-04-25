@@ -109,6 +109,16 @@ class Table2 extends PureComponent<ITableProps> {
     });
   };
 
+  public saveBy = (predicate: (rowId?: string, colId?: string) => boolean) => {
+    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+      items.forEach(item => {
+        if (predicate && predicate(rowId, item.id)) {
+          item.node.saveCell();
+        }
+      });
+    });
+  };
+
   public getContext = (): ITableContext => {
     return {
       ...this.context,

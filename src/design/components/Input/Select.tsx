@@ -52,11 +52,22 @@ class Select extends InputBase<
     }
   }, 350);
 
+  private hasDefaultOpend: boolean = false;
+
   private lastRequestId: any = null;
 
   public getRef = node => {
-    if (this.props.autoSelect && node && node.select) {
-      node.select();
+    if (this.props.defaultOpen && !this.hasDefaultOpend) {
+      setTimeout(() => {
+        if (node) {
+          try {
+            (node as any).rcSelect.setOpenState(true);
+            this.hasDefaultOpend = true;
+          } catch (error) {
+            console.warn(error);
+          }
+        }
+      });
     }
   };
 
@@ -101,7 +112,7 @@ class Select extends InputBase<
         filterOption={this.isRemoteOptions() ? false : undefined}
         onSearch={this.onSearch}
         notFoundContent={this.state.loading ? <Loading /> : undefined}
-        {...omit(this.props, ['autoSelect', 'onValueChange', 'editing'])}
+        {...omit(this.props, ['autoSelect', 'onValueChange', 'editing', 'defaultOpen'])}
         style={{ width: '100%', ...this.props.style }}
         onChange={this.onChange}
         ref={this.getRef}

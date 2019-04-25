@@ -40,9 +40,18 @@ class SwitchCell extends PureComponent<
     this.registeCell();
   };
 
+  public componentWillUnmount = () => {
+    this.deleteCell();
+  };
+
   public registeCell = () => {
     const { api } = this.props;
     api.formManager.registeCell(this.getDataIndex(), this);
+  };
+
+  public deleteCell = () => {
+    const { api } = this.props;
+    api.formManager.deleteCell(this.getDataIndex());
   };
 
   public getRef = node => {

@@ -35,6 +35,11 @@ class EditableRow extends React.Component<ITableRowProps> {
     this.props.api.tableManager.registeRow(record[getRowKey()], this);
   };
 
+  public componentWillUnmount = () => {
+    const { record, getRowKey } = this.props;
+    this.props.api.tableManager.deleteRow(record[getRowKey()]);
+  };
+
   public validate = (options: any = {}, colIds = []) => {
     const { silence } = options;
     const { columns, record } = this.props;

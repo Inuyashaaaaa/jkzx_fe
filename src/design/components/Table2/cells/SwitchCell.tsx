@@ -66,6 +66,10 @@ class SwitchCell extends PureComponent<
     this.registeCell();
   };
 
+  public componentWillUnmount = () => {
+    this.deleteCell();
+  };
+
   public valueHasChanged = () => {
     const newVal = this.getValue();
     return this.oldValue !== EMPTY_VALUE && this.oldValue !== newVal;
@@ -82,6 +86,15 @@ class SwitchCell extends PureComponent<
 
     const { record, getRowKey, api } = this.props;
     api.tableManager.registeCell(record[getRowKey()], this.getDataIndex(), this);
+  };
+
+  public deleteCell = () => {
+    if (this.isSelectionCell()) {
+      return;
+    }
+
+    const { record, getRowKey, api } = this.props;
+    api.tableManager.deleteCell(record[getRowKey()], this.getDataIndex());
   };
 
   public getRowId = () => {
@@ -121,13 +134,12 @@ class SwitchCell extends PureComponent<
 
   public onCellClick = event => {
     event.stopPropagation();
-    this.props.tableApi.save(
-      null,
-      _.reject(
-        this.props.tableApi.getColumnDefs().map(item => item.dataIndex),
-        item => item === this.props.colDef.dataIndex
-      )
-    );
+    this.props.tableApi.saveBy((rowId, colId) => {
+      if (rowId === this.props.rowId && colId === this.props.colDef.dataIndex) {
+        return false;
+      }
+      return true;
+    });
     this.startEditing();
   };
 
