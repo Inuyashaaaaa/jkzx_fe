@@ -9,6 +9,7 @@ import {
   OB_DAY_FIELD,
   OPTION_TYPE_OPTIONS,
 } from '@/constants/common';
+import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
@@ -18,7 +19,6 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { OB_LIFE_PAYMENT } from '../../constants';
-import ExportModal from '../../ExportModal';
 import { getObservertionFieldData } from '../../tools';
 import {
   EXERCISE_PRICE,
@@ -427,7 +427,7 @@ class ExpirationModal extends PureComponent<
     const { visible } = this.state;
     return (
       <>
-        <ExportModal
+        <CashExportModal
           visible={this.state.exportVisible}
           trade={this.tableFormData}
           convertVisible={this.convertVisible}

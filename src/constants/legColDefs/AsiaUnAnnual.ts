@@ -1,6 +1,7 @@
 import { getMoment } from '@/utils';
 import _ from 'lodash';
 import moment from 'moment';
+import { DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   FREQUENCY_TYPE_MAP,
@@ -15,6 +16,7 @@ import {
   STRIKE_TYPES_MAP,
 } from '../common';
 import {
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -70,6 +72,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
         ]
       : [
           Direction,
+          DaysInYear,
           OptionType,
           UnderlyerInstrumentId,
           UnderlyerMultiplier,
@@ -102,6 +105,7 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
       [ExpirationDate.field]: moment(),
       [SettlementDate.field]: moment().add(DEFAULT_TERM, 'day'),
       [PremiumType.field]: PREMIUM_TYPE_MAP.PERCENT,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [NotionalAmountType.field]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [ObserveStartDay.field]: moment(),
       [ObserveEndDay.field]: moment().add(DEFAULT_TERM, 'day'),

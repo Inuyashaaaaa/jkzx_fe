@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_TERM } from '.';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '.';
 import {
   ASSET_CLASS_MAP,
   LEG_FIELD,
@@ -13,6 +13,7 @@ import {
 } from '../common';
 import {
   Comment,
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -58,6 +59,7 @@ export const ModelXYUnAnnual = pipeLeg({
           OptionType,
           UnderlyerInstrumentId,
           UnderlyerMultiplier,
+          DaysInYear,
           InitialSpot,
           EffectiveDate,
           ExpirationDate,
@@ -81,6 +83,7 @@ export const ModelXYUnAnnual = pipeLeg({
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       ...(isPricing

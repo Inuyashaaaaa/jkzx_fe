@@ -350,3 +350,28 @@ export async function queryAllModelNameVol(params = {}) {
     },
   });
 }
+
+export async function mdlModelDataGet(params = {}) {
+  return request(`${HOST_TEST}model-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'mdlModelDataGet',
+      params: {
+        modelType: 'VOL_SURFACE',
+        ...params,
+      },
+    },
+  });
+}
+
+export async function mdlModelXYCreate(params = {}) {
+  return request(`${HOST_TEST}model-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'mdlModelXYCreate',
+      params: {
+        ...params,
+      },
+    },
+  });
+}

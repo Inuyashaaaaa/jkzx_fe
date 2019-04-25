@@ -17,8 +17,8 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易ID',
     dataIndex: 'tradeId',
+    width: 100,
     fixed: 'left',
-    // width: 150,
     onCell: record => {
       return {
         style: { paddingLeft: '20px' },
@@ -51,19 +51,23 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '持仓ID',
     dataIndex: 'positionId',
+    width: 100,
   },
   {
     title: '交易簿',
     dataIndex: 'bookName',
+    width: 100,
   },
   {
     title: '标的物',
     dataIndex: 'underlyerInstrumentId',
+    width: 100,
     // width: 150,
   },
   {
     title: '买/卖',
     dataIndex: 'direction',
+    width: 100,
     render: (text, record, index) => {
       return DIRECTION_TYPE_ZHCN_MAP[text];
     },
@@ -71,6 +75,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '期权类型',
     dataIndex: 'productType',
+    width: 100,
     // width: 150,
     render: (text, record, index) => {
       return PRODUCTTYPE_ZHCH_MAP[text];
@@ -79,6 +84,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '涨/跌',
     dataIndex: 'optionType',
+    width: 100,
     // width: 60,
     render: (text, record, index) => {
       return EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[text];
@@ -87,16 +93,19 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易日',
     dataIndex: 'tradeDate',
+    width: 100,
     // width: 120,
   },
   {
     title: '到期日',
     dataIndex: 'expirationDate',
+    width: 100,
     // width: 120,
   },
   {
     title: '持仓状态',
     dataIndex: 'lcmEventType',
+    width: 100,
     // width: 130,
     render: (text, record, index) => {
       return LCM_EVENT_TYPE_ZHCN_MAP[text];
@@ -105,19 +114,23 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易对手',
     dataIndex: 'counterPartyName',
+    width: 100,
   },
   {
     title: '销售',
     dataIndex: 'salesName',
+    width: 100,
     // width: 100,
   },
   {
     title: '所属投资组合',
     dataIndex: 'portfolioNames',
+    width: 100,
   },
   {
     title: '操作',
     fixed: 'right',
+    dataIndex: 'action',
     width: 100,
     render: (value, record, index) => {
       return <Operations record={record} onSearch={onSearch} />;

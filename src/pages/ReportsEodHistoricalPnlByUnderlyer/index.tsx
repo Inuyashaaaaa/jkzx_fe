@@ -1,4 +1,5 @@
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptPnlHstReportPagedByNameAndDate, rptReportNameList } from '@/services/report-service';
@@ -122,7 +123,28 @@ class ReportsEodHistoricalPnlByUnderlyer extends PureComponent {
     });
   };
 
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
   public render() {
+    const _data = this.handleData(
+      this.state.dataSource,
+      TABLE_COL_DEFS.map(item => item.field),
+      TABLE_COL_DEFS.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper>
         <SourceTable
@@ -162,6 +184,20 @@ class ReportsEodHistoricalPnlByUnderlyer extends PureComponent {
           autoSizeColumnsToFit={false}
           // onCellValueChanged={this.onCellValueChanged}
           defaultColDef={{ width: 130 }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: TABLE_COL_DEFS.map(item => item.headerName),
+                name: '历史盈亏',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );

@@ -1,0 +1,35 @@
+@import '~antd/lib/style/themes/default.less';
+
+.searchList {
+  padding: 0;
+  li {
+    padding: 4px;
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-around;
+    cursor: pointer;
+    .itemName {
+      display: inline-block;
+      width: 80%;
+    }
+  }
+  .checked {
+    background: #cce7f2;
+  }
+}
+.customModel {
+  :global {
+    .ant-card-body {
+      display: flex;
+      min-height: 720px;
+      padding: 0;
+      background: #f3f3f3;
+    }
+  }
+}
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}

@@ -5,6 +5,7 @@ import {
   INPUT_NUMBER_LOT_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import RangeNumberInput from '@/containers/RangeNumberInput';
 import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
@@ -273,7 +274,32 @@ class Component extends PureComponent<
     });
   };
 
+  public handleData = (instruments, cols, headers) => {
+    const json = instruments.map(item => {
+      const data = [];
+      data.push(headers);
+      const length = data.length;
+      item.tableDataSource.forEach((ds, index) => {
+        const _data = [];
+        Object.keys(ds).forEach(key => {
+          const dsIndex = _.findIndex(cols, k => k === key);
+          if (dsIndex >= 0) {
+            _data[dsIndex] = ds[key];
+          }
+        });
+        data.push(_data);
+      });
+      return data;
+    });
+    return json;
+  };
+
   public render() {
+    const headers = this.state.tableColumnDefs.map(item => item.headerName);
+    headers.unshift('');
+    const cols = this.state.tableColumnDefs.map(item => item.field);
+    cols.unshift('scenarioId');
+    const _data = this.handleData(this.state.instruments, cols, headers);
     return (
       <PageHeaderWrapper title="标的物情景分析" card={false}>
         <Card>
@@ -349,6 +375,19 @@ class Component extends PureComponent<
           />
         </Card>
         <Card style={{ marginTop: 15 }} loading={this.state.loading}>
+          <DownloadExcelButton
+            style={{ margin: '10px 0' }}
+            key="export"
+            type="primary"
+            data={{
+              dataSource: _data,
+              cols: headers,
+              name: '标的物情景分析',
+            }}
+            tabs={this.state.instruments.map(item => item.underlyerInstrumentId)}
+          >
+            导出Excel
+          </DownloadExcelButton>
           {this.state.instruments && !!this.state.instruments.length ? (
             <Tabs animated={false}>
               {this.state.instruments.map(item => {

@@ -10,8 +10,10 @@ import {
 import { DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
 import _ from 'lodash';
 import moment from 'moment';
+import { DEFAULT_DAYS_IN_YEAR } from '.';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
 import {
+  DaysInYear,
   DaysInYear,
   Direction,
   EffectiveDate,
@@ -69,6 +71,7 @@ export const StraddleUnAnnual: ILegType = pipeLeg({
           UnderlyerInstrumentId,
           InitialSpot,
           SpecifiedPrice,
+          DaysInYear,
           SettlementDate,
           Term,
           DaysInYear,
@@ -94,6 +97,7 @@ export const StraddleUnAnnual: ILegType = pipeLeg({
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.LOW_PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.HIGH_PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,

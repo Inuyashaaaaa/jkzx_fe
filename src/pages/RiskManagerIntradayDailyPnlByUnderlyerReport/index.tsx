@@ -1,4 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import SourceTable from '@/design/components/SourceTable';
 import { unionId } from '@/design/utils/unionId';
@@ -72,7 +73,29 @@ class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent impleme
     );
   };
 
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
+
   public render() {
+    const _data = this.handleData(
+      this.state.tableDataSource,
+      PAGE_TABLE_COL_DEFS.map(item => item.field),
+      PAGE_TABLE_COL_DEFS.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper title="标的盈亏">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
@@ -102,6 +125,20 @@ class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent impleme
           //     return styles.makeError;
           //   }
           // }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: PAGE_TABLE_COL_DEFS.map(item => item.headerName),
+                name: '标的盈亏',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );

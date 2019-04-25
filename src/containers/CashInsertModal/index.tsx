@@ -1,30 +1,24 @@
-import {
-  DIRECTION_TYPE_ZHCN_MAP,
-  LCM_EVENT_TYPE_ZHCN_MAP,
-  RULES_REQUIRED,
-} from '@/constants/common';
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Input, Select } from '@/design/components';
+import { DIRECTION_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
+import { Form2, Input } from '@/design/components';
 import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientAccountGetByLegalName,
   clientSaveAccountOpRecord,
-  refSimilarLegalNameList,
+  cliMmarkTradeTaskProcessed,
 } from '@/services/reference-data-service';
-import { Button, Card, Col, message, Modal, Row, Table } from 'antd';
+import { Alert, Button, Card, Col, message, Modal, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import {
   COUNTER_PARTY_FORM_CONTROLS,
-  LEGAL_FORM_CONTROLS,
   MIDDLE_FORM_CONTROLS,
   PARTY_FORM_CONTROLS,
   TABLE_COL_DEF,
 } from './constants';
 
-const ClientManagementInsert = memo<any>(props => {
+const CashInsertModal = memo<any>(props => {
   const formEl = useRef<Form2>(null);
   const formTrade = useRef<Form2>(null);
   const partyForm = useRef<Form2>(null);
@@ -39,13 +33,11 @@ const ClientManagementInsert = memo<any>(props => {
   const [counterPartyFormData, setCounterPartyFormData] = useState({});
 
   const handleConfirm = async () => {
-    const rsp = await Promise.all([
-      formEl.current.validate(),
-      formTrade.current.validate(),
+    const [{ error: partyError }, { error: counterError }] = await Promise.all([
       partyForm.current.validate(),
       counterPartyForm.current.validate(),
     ]);
-    if (rsp.some(item => item.error)) return;
+    if (partyError || counterError) return;
     setConfirmLoading(true);
     handlePageData2apiData();
   };
@@ -54,26 +46,24 @@ const ClientManagementInsert = memo<any>(props => {
     const fundType = Form2.getFieldsValue(tradeFormData).event;
     const partyData = Form2.getFieldsValue(partyFormData);
     const counterPartyData = Form2.getFieldsValue(counterPartyFormData);
-    const { error: _error, data: _data } = await clientAccountGetByLegalName({
-      legalName: Form2.getFieldsValue(legalFormData).legalName,
-    });
-    if (_error) {
-      setConfirmLoading(false);
-      return;
-    }
-    const params = handleFundChange(_data.accountId, fundType, partyData, counterPartyData);
+    const params = handleFundChange(fundType, partyData, counterPartyData);
     const { error, data } = await clientSaveAccountOpRecord(params);
-    setVisible(false);
-
+    setConfirmLoading(false);
     if (error) {
       message.error('录入失败');
       return;
     }
+    setVisible(false);
     message.success('录入成功');
+
+    const rsp = await cliMmarkTradeTaskProcessed({
+      uuidList: [props.record.uuid],
+    });
+    if (rsp.error) return;
     props.fetchTable();
   };
 
-  const handleFundChange = (accountId, fundType, partyData, counterPartyData) => {
+  const handleFundChange = (fundType, partyData, counterPartyData) => {
     let event;
     if (fundType.includes('START_TRADE')) {
       event = 'START_TRADE';
@@ -88,9 +78,7 @@ const ClientManagementInsert = memo<any>(props => {
     return {
       accountOpRecord: {
         event,
-        accountId,
-        tradeId: Form2.getFieldsValue(tradeFormData).tradeId,
-        legalName: Form2.getFieldsValue(legalFormData).legalName,
+        ..._.pick(props.record, ['legalName', 'tradeId', 'accountId']),
         ...Form2.getFieldsValue(partyData),
         ...Form2.getFieldsValue(counterPartyData),
       },
@@ -101,34 +89,24 @@ const ClientManagementInsert = memo<any>(props => {
     setVisible(false);
   };
 
-  const switchModal = () => {
-    setTableDataSource([
-      {
-        margin: '-',
-        cash: '-',
-        credit: '-',
-        debt: '-',
-        counterPartyCredit: '-',
-        counterPartyFund: '-',
-        counterPartyMargin: '-',
-      },
-    ]);
-    setLegalFormData(Form2.createFields({ normalStatus: '-' }));
-    setCounterPartyFormData(
+  const switchModal = async () => {
+    const { error, data } = await clientAccountGetByLegalName({
+      legalName: props.record.legalName,
+    });
+    if (error) return;
+    const fundType = handleFundEventType(props.record.direction, props.record.lcmEventType);
+    getFundFormData(fundType);
+    setTradeFormData(
       Form2.createFields({
-        counterPartyFundChange: 0,
-        counterPartyCreditChange: 0,
-        counterPartyMarginChange: 0,
+        ...props.record,
+        direction: DIRECTION_TYPE_ZHCN_MAP[props.record.direction],
+        lcmEventType: LCM_EVENT_TYPE_ZHCN_MAP[props.record.lcmEventType],
+        event: fundType,
       })
     );
-    setPartyFormData(
-      Form2.createFields({
-        cashChange: 0,
-        creditChange: 0,
-        debtChange: 0,
-        premiumChange: 0,
-        marginChange: 0,
-      })
+    setTableDataSource([data]);
+    setLegalFormData(
+      Form2.createFields({ ...data, normalStatus: data.normalStatus ? '正常' : '异常' })
     );
     setVisible(true);
   };
@@ -220,10 +198,6 @@ const ClientManagementInsert = memo<any>(props => {
     setTradeFormData(allFields);
   };
 
-  const legalFormChange = (props, changedFields, allFields) => {
-    setLegalFormData(allFields);
-  };
-
   return (
     <>
       <Modal
@@ -241,8 +215,26 @@ const ClientManagementInsert = memo<any>(props => {
           columnNumberOneRow={3}
           footer={false}
           dataSource={legalFormData}
-          columns={LEGAL_FORM_CONTROLS}
-          onFieldsChange={legalFormChange}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(<Input type="input" editing={false} />)}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '状态',
+              dataIndex: 'normalStatus',
+              render: (value, record, index, { form }) => {
+                return <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>;
+              },
+            },
+          ]}
         />
         <Table
           rowKey="id"
@@ -250,7 +242,6 @@ const ClientManagementInsert = memo<any>(props => {
           dataSource={tableDataSource}
           pagination={false}
           size="middle"
-          style={{ marginBottom: VERTICAL_GUTTER }}
         />
         <Form2
           ref={node => (formTrade.current = node)}
@@ -292,17 +283,17 @@ const ClientManagementInsert = memo<any>(props => {
             </Card>
           </Col>
         </Row>
+        {/* <Alert
+          message="注意: 负债一栏输入正数代表降低负债，输入负数代表增加负债"
+          type="info"
+          style={{ width: '720px' }}
+        /> */}
       </Modal>
-      <Button
-        type="primary"
-        onClick={switchModal}
-        size="default"
-        style={{ marginBottom: VERTICAL_GUTTER }}
-      >
+      <Button type="primary" onClick={switchModal} size="small">
         资金录入
       </Button>
     </>
   );
 });
 
-export default ClientManagementInsert;
+export default CashInsertModal;

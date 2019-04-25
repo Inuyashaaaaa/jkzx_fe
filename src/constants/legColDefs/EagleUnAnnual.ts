@@ -6,11 +6,12 @@ import {
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
-import { DEFAULT_TERM } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
 import _ from 'lodash';
 import moment from 'moment';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP, LEG_TYPE_ZHCH_MAP } from '../common';
 import {
+  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -62,6 +63,7 @@ export const EagleUnAnnual = pipeLeg({
         ]
       : [
           Direction,
+          DaysInYear,
           UnderlyerMultiplier,
           UnderlyerInstrumentId,
           InitialSpot,
@@ -91,6 +93,7 @@ export const EagleUnAnnual = pipeLeg({
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.PARTICIPATION_RATE1]: 100,
       [LEG_FIELD.PARTICIPATION_RATE2]: 100,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       ...(isPricing
