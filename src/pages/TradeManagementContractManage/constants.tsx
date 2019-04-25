@@ -41,7 +41,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
               {record.positions.map((item, index) => {
                 return (
                   <TimelineItem
-                    style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 47 }}
+                    style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 46 }}
                     key={index}
                   />
                 );
