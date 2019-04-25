@@ -13,7 +13,6 @@ import {
 } from '../common';
 import {
   Comment,
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -59,7 +58,6 @@ export const ModelXYUnAnnual = pipeLeg({
           OptionType,
           UnderlyerInstrumentId,
           UnderlyerMultiplier,
-          DaysInYear,
           InitialSpot,
           EffectiveDate,
           ExpirationDate,
