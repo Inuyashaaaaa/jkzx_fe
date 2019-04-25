@@ -16,7 +16,6 @@ import {
 } from '../common';
 import {
   DaysInYear,
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -98,7 +97,6 @@ export const TripleDigitalUnAnnual: ILegType = pipeLeg({
           Strike3,
           Payment1,
           Payment2,
-          DaysInYear,
           Payment3,
         ],
   getDefault: (nextDataSourceItem, isPricing) => {
