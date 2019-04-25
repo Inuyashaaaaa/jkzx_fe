@@ -182,6 +182,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -214,6 +215,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -251,6 +253,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -279,6 +282,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -307,6 +311,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -336,6 +341,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -364,6 +370,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -397,6 +404,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
