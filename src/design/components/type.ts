@@ -11,6 +11,7 @@ import React, { CSSProperties } from 'react';
 import { Omit } from './common/types';
 import FormSwitchCell from './Form2/cells/SwitchCell';
 import FormBase from './Form2/FormBase';
+import Table2 from './Table2';
 import TableManager from './Table2/api';
 import TableSwitchCell from './Table2/cells/SwitchCell';
 
@@ -28,20 +29,21 @@ export interface IFormSection {
   type: 'section';
 }
 
-export interface IFormDataSource {
+export interface IFormData {
   [key: string]: IFormField | IFormSection | any;
 }
 
-export interface ITableDataSource {
+export interface ITableData {
   [key: string]: IFormField | any;
 }
 
-export interface IColDef<T> {
-  dataIndex?: string;
+export interface IColDef {
+  title?: any;
   render?: any;
+  dataIndex?: string;
 }
 
-export interface IRenderOptions<T = any> {
+export interface IRenderOptions<T = any, C = IColDef> {
   form?: Omit<WrappedFormUtils, 'getFieldDecorator'> & {
     getFieldDecorator<T extends object>(
       id: keyof T,
@@ -52,25 +54,69 @@ export interface IRenderOptions<T = any> {
     ): (node: React.ReactNode) => React.ReactNode;
   };
   editing?: boolean;
+  colDef?: C;
 }
 
-export interface IFormColDef<T = any> extends IColDef<T> {
-  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
+export interface IFormColDef<T = any> extends IColDef {
+  render?: (
+    value: any,
+    record: T,
+    index: number,
+    params: IRenderOptions<T, IFormColDef>
+  ) => React.ReactNode;
   /* 作用和 field 中的 label 一样，方便直接使用 table.columns 的数据 */
   title?: React.ReactNode;
   editable?: boolean;
-  loading?: boolean;
+  defaultEditing?: boolean;
+  editing?: boolean;
 }
 
-export interface ITableColDef<T = any> extends IColDef<T>, Omit<ColumnProps<T>, 'render'> {
+export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render' | 'onCell'> {
   // totalable?: boolean | ((params: { totalData: number; record: object }) => number);
   title?: React.ReactNode;
-  editable?: boolean;
-  render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
-  loading?: (record: T, index?: number) => boolean;
+  defaultEditing?:
+    | boolean
+    | ((
+        record: T,
+        index: number,
+        params: {
+          colDef: ITableColDef<T>;
+        }
+      ) => boolean);
+  editing?:
+    | boolean
+    | ((
+        record: T,
+        index: number,
+        params: {
+          colDef: ITableColDef<T>;
+        }
+      ) => boolean);
+  editable?:
+    | boolean
+    | ((
+        record: T,
+        index: number,
+        params: {
+          colDef: ITableColDef<T>;
+        }
+      ) => boolean);
+  render?: (
+    value: any,
+    record: T,
+    index: number,
+    params: IRenderOptions<T, ITableColDef<T>>
+  ) => React.ReactNode;
+  onCell?: (
+    record: T,
+    index: number,
+    params: {
+      colDef: ITableColDef<T>;
+    }
+  ) => any;
 }
 
-export interface IFormCellProps<T = IFormDataSource> {
+export interface IFormCellProps<T = IFormData> {
   prefix?: string;
   colDef: IFormColDef<T>;
   record: T;
@@ -79,7 +125,7 @@ export interface IFormCellProps<T = IFormDataSource> {
   form?: WrappedFormUtils;
 }
 
-export interface ITableContextMenuParams<T = ITableDataSource> {
+export interface ITableContextMenuParams<T = ITableData> {
   record: T;
   rowIndex: number;
   api: ITableApi;
@@ -89,18 +135,19 @@ export interface ITableContextMenuParams<T = ITableDataSource> {
   rowId: string;
 }
 
-export interface ITableCellProps<T = ITableDataSource> {
-  loading: boolean;
+export interface ITableCellProps<T = ITableData> {
   colDef: ITableColDef<T>;
   record: T;
+  rowId: string;
   rowIndex: number;
   api: ITableApi;
+  tableApi: Table2;
+  cellApi?: TableSwitchCell;
   context: ITableContext;
   getRowKey: () => string;
   className?: string;
   style?: CSSProperties;
   $$render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
-  cellApi?: TableSwitchCell;
   form?: WrappedFormUtils;
 }
 
@@ -160,8 +207,7 @@ export interface IFormTriggerCellEditingChangedParams<T = any> {
   value: any;
 }
 
-export interface ITableProps<T = ITableDataSource>
-  extends Omit<TableProps<T>, 'columns' | 'dataSource'> {
+export interface ITableProps<T = ITableData> extends Omit<TableProps<T>, 'columns' | 'dataSource'> {
   onCellEditingChanged?: (params: ITableTriggerCellEditingChangedParams) => void;
   onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
   onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
@@ -170,7 +216,7 @@ export interface ITableProps<T = ITableDataSource>
   ) => React.ReactNode | (() => React.ReactNode) | boolean;
   columns?: ITableColDef[];
   vertical?: boolean;
-  dataSource?: ITableDataSource[];
+  dataSource?: ITableData[];
 }
 
 export type ITableContext = any;
@@ -180,7 +226,7 @@ export interface ITableApi {
   eventBus: any;
 }
 
-export interface IFormBaseProps<T = IFormDataSource> extends FormProps {
+export interface IFormBaseProps<T = IFormData> extends FormProps {
   onEditingChanged?: IFormEditingChangedHandle<T>;
   onValuesChange?: IFormValuesChangeHandle<T>;
   actionFieldProps?: FormItemProps;
@@ -203,8 +249,8 @@ export interface IFormBaseProps<T = IFormDataSource> extends FormProps {
   colProps?: (params: { rowIndex: number; index: number }) => any;
   ref?: (node: any) => void;
   wrappedComponentRef?: (node: any) => void;
-  onSubmitButtonClick?: (params: { dataSource: IFormDataSource; domEvent: MouseEvent }) => void;
-  onResetButtonClick?: (params: { dataSource: IFormDataSource; domEvent: MouseEvent }) => void;
+  onSubmitButtonClick?: (params: { dataSource: IFormData; domEvent: MouseEvent }) => void;
+  onResetButtonClick?: (params: { dataSource: IFormData; domEvent: MouseEvent }) => void;
   submitButtonProps?: ButtonProps;
   resetButtonProps?: ButtonProps;
   eventBus?: any;
@@ -224,14 +270,16 @@ export type IFormValuesChangeHandle<T = any> = (
   allValues: any
 ) => void;
 
+export interface IInputBaseProps {
+  autoSelect?: boolean;
+  value?: any;
+  onChange?: (...args: any[]) => any;
+  onValueChange?: (...args: any[]) => any;
+  editing?: boolean;
+}
+
 export abstract class InputBase<P = any, S = any> extends React.PureComponent<
-  P & {
-    autoSelect?: boolean;
-    value?: any;
-    onChange?: (...args: any[]) => any;
-    onValueChange?: (...args: any[]) => any;
-    editing?: boolean;
-  },
+  P & IInputBaseProps,
   S
 > {
   public abstract renderEditing(): any;

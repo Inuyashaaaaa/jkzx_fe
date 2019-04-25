@@ -13,9 +13,7 @@ class ModalButtonBase extends PureComponent<ModalButtonBaseProps> {
     const { content, modalProps, children, text, ...props } = this.props;
     return (
       <>
-        <Modal {...ModalButtonBase.defaultModalProps} {...modalProps}>
-          {content}
-        </Modal>
+        <Modal {...ModalButtonBase.defaultModalProps} children={content} {...modalProps} />
         {children &&
           (text ? (
             <a

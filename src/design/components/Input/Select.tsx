@@ -1,7 +1,7 @@
 import { uuid } from '@/design/utils';
 import { Select as AntdSelect } from 'antd';
 import { OptionProps, SelectProps } from 'antd/lib/select';
-import { debounce, omit } from 'lodash';
+import _, { debounce, omit } from 'lodash';
 import React from 'react';
 import Loading from '../Loading';
 import { InputBase } from '../type';
@@ -20,7 +20,7 @@ class Select extends InputBase<
     options?: IOptionProps[];
   }
 > {
-  public static defualtProps = {
+  public static defaultProps = {
     editing: true,
   };
 
@@ -52,16 +52,29 @@ class Select extends InputBase<
     }
   }, 350);
 
+  private hasDefaultOpend: boolean = false;
+
   private lastRequestId: any = null;
 
   public getRef = node => {
-    if (this.props.autoSelect && node) {
-      node.select();
+    if (this.props.defaultOpen && !this.hasDefaultOpend) {
+      setTimeout(() => {
+        if (node) {
+          try {
+            (node as any).rcSelect.setOpenState(true);
+            this.hasDefaultOpend = true;
+          } catch (error) {
+            console.warn(error);
+          }
+        }
+      });
     }
   };
 
   public componentDidMount = () => {
-    this.fetchOptions('', this.lastRequestId);
+    if (this.props.editing) {
+      this.fetchOptions('', this.lastRequestId);
+    }
   };
 
   public onChange = (value, option: React.ReactElement<any>) => {
@@ -99,8 +112,8 @@ class Select extends InputBase<
         filterOption={this.isRemoteOptions() ? false : undefined}
         onSearch={this.onSearch}
         notFoundContent={this.state.loading ? <Loading /> : undefined}
-        {...omit(this.props, ['autoSelect', 'onValueChange', 'editing'])}
-        style={{ width: '100%', minWidth: 180, ...this.props.style }}
+        {...omit(this.props, ['autoSelect', 'onValueChange', 'editing', 'defaultOpen'])}
+        style={{ width: '100%', ...this.props.style }}
         onChange={this.onChange}
         ref={this.getRef}
       >
@@ -115,11 +128,26 @@ class Select extends InputBase<
     );
   }
 
+  public getOptions = () => {
+    const options =
+      typeof this.props.options === 'function' ? this.state.options : this.props.options;
+    return options;
+  };
+
   public renderRendering() {
     const { value } = this.props;
     return (
-      <span style={{ display: 'inline-block', width: '100%' }}>
-        {value && (Array.isArray(value) ? value : [value]).join(',')}
+      <span style={{ display: 'inline-block', width: '100%', lineHeight: '40px' }}>
+        {value &&
+          (Array.isArray(value) ? value : [value])
+            .map(val => {
+              const findItem =
+                typeof this.props.options === 'function'
+                  ? this.props.value
+                  : this.props.options.find(item => item.value === val);
+              return _.get(findItem, 'label', this.props.value);
+            })
+            .join(',')}
       </span>
     );
   }

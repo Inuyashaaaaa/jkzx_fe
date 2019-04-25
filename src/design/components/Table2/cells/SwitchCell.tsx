@@ -1,8 +1,11 @@
-import { Spin } from 'antd';
+import { isShallowEqual } from '@/design/utils';
+import { FormItemProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
-import { omit } from 'lodash';
+import _, { omit } from 'lodash';
 import React, { KeyboardEvent, PureComponent } from 'react';
+import { EMPTY_VALUE } from '../../constants';
 import Form2 from '../../Form2';
 import { ITableCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
@@ -10,13 +13,17 @@ import { TABLE_CELL_EDITING_CHANGED } from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
-import styles from './SwitchCell.less';
+
+const getEditable = (editable, colDef, record, rowIndex) => {
+  return typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable;
+};
 
 class SwitchCell extends PureComponent<
   ITableCellProps,
   {
     editing: boolean;
-    loading: boolean;
+    editable: boolean;
+    editableChanged: boolean;
   }
 > {
   public static defaultProps = {
@@ -24,10 +31,19 @@ class SwitchCell extends PureComponent<
     record: {},
   };
 
-  public state = {
-    editing: false,
-    loading: false,
+  public static getDerivedStateFromProps = (props, state) => {
+    const { record, rowIndex, colDef } = props;
+    const editable = getEditable(props.colDef.editable, colDef, record, rowIndex);
+    const editableChanged = editable !== state.editable;
+
+    return {
+      editableChanged,
+      editable,
+      editing: editableChanged ? _.get(colDef, 'defaultEditing', !editable) : state.editing,
+    };
   };
+
+  public oldValue: any = EMPTY_VALUE;
 
   public $cell: HTMLTableDataCellElement;
 
@@ -37,24 +53,30 @@ class SwitchCell extends PureComponent<
 
   public form: WrappedFormUtils;
 
-  constructor(props) {
+  public constructor(props) {
     super(props);
+    this.state = {
+      editing: null,
+      editable: null,
+      editableChanged: null,
+    };
   }
 
   public componentDidMount = () => {
     this.registeCell();
   };
 
+  public componentWillUnmount = () => {
+    this.deleteCell();
+  };
+
+  public valueHasChanged = () => {
+    const newVal = this.getValue();
+    return this.oldValue !== EMPTY_VALUE && this.oldValue !== newVal;
+  };
+
   public isSelectionCell = () => {
     return this.props.className === 'ant-table-selection-column';
-  };
-
-  public startLoading = (callback?) => {
-    this.setState({ loading: true }, callback);
-  };
-
-  public stopLoading = (callback?) => {
-    this.setState({ loading: false }, callback);
   };
 
   public registeCell = () => {
@@ -66,9 +88,36 @@ class SwitchCell extends PureComponent<
     api.tableManager.registeCell(record[getRowKey()], this.getDataIndex(), this);
   };
 
+  public deleteCell = () => {
+    if (this.isSelectionCell()) {
+      return;
+    }
+
+    const { record, getRowKey, api } = this.props;
+    api.tableManager.deleteCell(record[getRowKey()], this.getDataIndex());
+  };
+
   public getRowId = () => {
     const { record, getRowKey } = this.props;
     return record[getRowKey()];
+  };
+
+  public renderElement = elements => {
+    return React.Children.toArray(elements).map((element, index) => {
+      if (!React.isValidElement<FormItemProps & React.ReactNode>(element)) return element;
+      return React.cloneElement(element, {
+        key: index,
+        ...(element.type === (FormItem.default || FormItem)
+          ? {
+              label: '',
+            }
+          : {}),
+        ...element.props,
+        children: _.get(element, 'props.children', false)
+          ? this.renderElement(element.props.children)
+          : undefined,
+      });
+    });
   };
 
   public getRef = node => {
@@ -83,27 +132,40 @@ class SwitchCell extends PureComponent<
     this.$renderingCell = node;
   };
 
-  public onCellClick = () => {
+  public onCellClick = event => {
+    event.stopPropagation();
+    this.props.tableApi.saveBy((rowId, colId) => {
+      if (rowId === this.props.rowId && colId === this.props.colDef.dataIndex) {
+        return false;
+      }
+      return true;
+    });
     this.startEditing();
+  };
+
+  public getEditing = () => {
+    return _.get(this.props.colDef, 'editing', this.state.editing);
   };
 
   public startEditing = async () => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) {
+    if (!this.getEditing()) {
       return this.setState({
-        editing: !this.state.editing,
+        editing: !this.getEditing(),
       });
     }
   };
 
   public saveCell = async (callback?) => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) return;
+    if (!this.getEditing()) return;
+
     const dataIndex = this.getDataIndex();
     if (this.form.isFieldValidating(dataIndex)) return;
 
     const errorMsgs = await this.form.getFieldError(dataIndex);
     if (errorMsgs) return;
+
     if (this.$editingCell) {
       const value = await this.$editingCell.getValue();
       this.switchCellEditingStatus(value);
@@ -125,6 +187,20 @@ class SwitchCell extends PureComponent<
     return val;
   };
 
+  public cellValueIsField = () => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    return typeof val === 'object' && val.type === 'field';
+  };
+
+  public getCellValue = () => {
+    const { record } = this.props;
+    const dataIndex = this.getDataIndex();
+    const val = record[dataIndex];
+    return val;
+  };
+
   public switchCellEditingStatus = value => {
     this.triggerTableCellValueChanged(TABLE_CELL_EDITING_CHANGED, value);
   };
@@ -142,10 +218,9 @@ class SwitchCell extends PureComponent<
     });
   };
 
-  public getEditable = () => {
-    const { colDef } = this.props;
-    const { editable } = colDef;
-    return editable;
+  public getEditable = (editable = this.props.colDef.editable) => {
+    const { colDef, record, rowIndex } = this.props;
+    return typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable;
   };
 
   public getDataIndex = () => {
@@ -157,14 +232,15 @@ class SwitchCell extends PureComponent<
   public getInlineCell = form => {
     const { colDef } = this.props;
     const { editable, dataIndex } = colDef;
-    const { editing } = this.state;
+    const editing = this.getEditing();
     const wrapedForm = wrapFormGetDecorator(dataIndex, form);
-    if (editable && editing) {
+    if (editing) {
       return React.createElement(EditingCell, {
         ...this.props,
         cellApi: this,
         form: wrapedForm,
         ref: this.getEditingCellRef,
+        colDef,
       });
     } else {
       return React.createElement(RenderingCell, {
@@ -172,26 +248,28 @@ class SwitchCell extends PureComponent<
         cellApi: this,
         form: wrapedForm,
         ref: this.getRenderingCellRef,
+        colDef,
       });
     }
   };
 
   public onKeyDown = (e: KeyboardEvent<HTMLTableDataCellElement>) => {
     if (!this.getEditable()) return;
-
     // Enter
     if (e.keyCode === 13) {
-      if (!this.state.editing) {
+      if (!this.getEditing()) {
         this.startEditing();
         return;
       }
-      this.saveCell();
+      setTimeout(() => {
+        this.saveCell();
+      });
       return;
     }
 
     // Tab
     if (e.keyCode === 9) {
-      if (this.state.editing) {
+      if (this.getEditing()) {
         this.saveCell(() => {
           setTimeout(() => {
             this.nextCellStartEditing();
@@ -218,12 +296,12 @@ class SwitchCell extends PureComponent<
   };
 
   public isEditing = () => {
-    return !!this.state.editing;
+    return !!this.getEditing();
   };
 
-  public onCellBlur = () => {
+  public onCellBlur = event => {
     if (!this.getEditable()) return;
-    if (this.state.editing) {
+    if (this.getEditing()) {
       this.saveCell();
     }
   };
@@ -253,26 +331,24 @@ class SwitchCell extends PureComponent<
           'context',
           'getRowKey',
           '$$render',
-          'loading',
+          'tableApi',
+          'rowId',
         ])}
         onClick={this.onCellClick}
-        onBlur={this.onCellBlur}
         onKeyDown={this.onKeyDown}
-        className={classNames(styles.cell, {
-          [styles.editable]: this.getEditable(),
-          [styles.editing]: this.state.editing,
-          [styles.rendering]: !this.state.editing,
+        className={classNames('tongyu-cell', 'tongyu-table-cell', {
+          editable: this.getEditable(),
+          editing: this.getEditing(),
+          rendering: !this.getEditing(),
         })}
         style={this.getTdStyle()}
       >
-        <Spin spinning={this.props.loading}>
-          <EditableContext.Consumer>
-            {({ form }) => {
-              this.form = form;
-              return this.getInlineCell(form);
-            }}
-          </EditableContext.Consumer>
-        </Spin>
+        <EditableContext.Consumer>
+          {({ form }) => {
+            this.form = form;
+            return this.getInlineCell(form);
+          }}
+        </EditableContext.Consumer>
       </td>
     );
   }

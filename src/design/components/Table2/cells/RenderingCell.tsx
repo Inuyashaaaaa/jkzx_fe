@@ -1,11 +1,34 @@
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import { EMPTY_VALUE } from '../../constants';
 import { ITableCellProps } from '../../type';
 
 class RenderingCell extends PureComponent<ITableCellProps, any> {
   public $input: HTMLInputElement;
 
   public form: WrappedFormUtils;
+
+  public cn;
+
+  public renderDiff = () => {
+    const newVal = this.getValue();
+    if (this.props.cellApi.valueHasChanged()) {
+      setTimeout(() => {
+        this.props.cellApi.$cell.classList.add('tongyu-cell-diff');
+
+        if (this.cn) {
+          clearTimeout(this.cn);
+          this.cn = null;
+        }
+        this.cn = setTimeout(() => {
+          this.cn = null;
+          this.props.cellApi.$cell.classList.remove('tongyu-cell-diff');
+        }, 500);
+      });
+    }
+    this.props.cellApi.oldValue = newVal;
+  };
 
   public getRowId = () => {
     const { record, getRowKey } = this.props;
@@ -27,15 +50,18 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public getRenderResult = () => {
-    const { record, rowIndex, $$render, form } = this.props;
+    const { record, rowIndex, $$render, form, colDef, cellApi } = this.props;
     const value = this.getValue();
 
     if (!$$render) return value;
 
-    const node = $$render(value, record, rowIndex, {
-      form,
-      editing: false,
-    });
+    const node = cellApi.renderElement(
+      $$render(value, record, rowIndex, {
+        form,
+        editing: false,
+        colDef,
+      })
+    );
     if (React.isValidElement(node)) {
       return React.cloneElement(node, {
         key: 'last',
@@ -45,6 +71,8 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public render() {
+    this.renderDiff();
+
     const { children } = this.props;
     return React.Children.toArray(children)
       .slice(0, -1)

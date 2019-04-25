@@ -30,6 +30,13 @@ class TableManager {
     }
   }
 
+  public deleteRow(rowId: string) {
+    const index = this.rowNodes.findIndex(item => item.id === rowId);
+    if (index !== -1) {
+      this.rowNodes.splice(index, 1);
+    }
+  }
+
   public registeCell(rowId: string, colId: string, cellNode: SwitchCell) {
     if (
       this.cellNodes[rowId] &&
@@ -46,6 +53,14 @@ class TableManager {
           id: colId,
         },
       ];
+    }
+  }
+
+  public deleteCell(rowId: string, colId: string) {
+    if (!Array.isArray(this.cellNodes[rowId])) return;
+    const index = this.cellNodes[rowId].findIndex(item => item.id === colId);
+    if (index !== -1) {
+      this.cellNodes[rowId].splice(index, 1);
     }
   }
 

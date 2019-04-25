@@ -2,7 +2,7 @@ import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { createEventBus, EVERY_EVENT_TYPE } from '../../utils';
+import { createEventBus, EVERY_EVENT_TYPE, uuid } from '../../utils';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
 import SwitchCell from './cells/SwitchCell';
@@ -29,10 +29,15 @@ class Table2 extends PureComponent<ITableProps> {
 
   public editings: {} = {};
 
+  public domId: string;
+
+  public $dom: HTMLElement;
+
   constructor(props) {
     super(props);
     const eventBus = createEventBus();
     eventBus.listen(EVERY_EVENT_TYPE, this.handleTableEvent);
+    this.domId = uuid();
 
     this.api = {
       eventBus,
@@ -42,16 +47,76 @@ class Table2 extends PureComponent<ITableProps> {
     this.context = this.getContext();
   }
 
+  public getTbody = () => {
+    return this.$dom.querySelector('.ant-table-tbody');
+  };
+
+  public getThead = () => {
+    return this.$dom.querySelector('.ant-table-thead');
+  };
+
+  public componentDidMount = () => {
+    this.$dom = document.getElementById(this.domId);
+    this.getTbody().addEventListener('click', this.onTbodyClick, false);
+    this.getThead().addEventListener('click', this.onTheadClick, false);
+  };
+
+  public componentWillUnmount = () => {
+    this.getTbody().removeEventListener('click', this.onTbodyClick, false);
+    this.getThead().removeEventListener('click', this.onTheadClick, false);
+  };
+
+  public onTbodyClick = (event: Event) => {
+    if (event.target === this.getTbody()) {
+      this.save();
+    }
+  };
+
+  public onTheadClick = (event: Event) => {
+    this.save();
+  };
+
   public getFieldNames = () => {
     return this.props.columns.map(item => item.dataIndex);
   };
 
-  public validate = (options = {}, fieldNames = this.getFieldNames(), rowIds?) => {
-    return this.api.tableManager.rowNodes
-      .filter(item => rowIds == null || rowIds.findIndex(id => id === item.id))
-      .forEach(item => {
-        return item.node.validate(options, fieldNames);
+  public validate = (
+    options = {},
+    rowIds?: string[],
+    colIds = this.getFieldNames()
+  ): Promise<
+    Array<{
+      errors: any;
+      values: any;
+    }>
+  > => {
+    return Promise.all(
+      this.api.tableManager.rowNodes
+        .filter(item => rowIds == null || rowIds.findIndex(id => id === item.id))
+        .map(item => {
+          return item.node.validate(options, colIds);
+        })
+    );
+  };
+
+  public save = (rowIds?: string[], colIds?: string[]) => {
+    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+      if (rowIds && rowIds.indexOf(rowId) === -1) return;
+      items.forEach(item => {
+        if (colIds && colIds.indexOf(item.id) === -1) return;
+        item.node.saveCell();
       });
+    });
+  };
+
+  public saveBy = (predicate: (rowId?: string, colId?: string) => boolean) => {
+    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+      items.forEach(item => {
+        if (predicate && predicate(rowId, item.id)) {
+          item.node.saveCell();
+        }
+      });
+    });
   };
 
   public getContext = (): ITableContext => {
@@ -81,22 +146,30 @@ class Table2 extends PureComponent<ITableProps> {
         ...colDef,
         // colDef.render 会首先自己执行一次，因此将它挂在其他位置
         render: undefined,
-        onCell: (record, rowIndex): ITableCellProps => ({
-          ...(colDef.onCell ? colDef.onCell(record, rowIndex) : undefined),
-          $$render: colDef.render,
-          record,
-          rowIndex,
-          colDef,
-          size: this.convertInputSize(size),
-          api: this.api,
-          context: this.context,
-          getRowKey: () => {
+        onCell: (record, rowIndex): ITableCellProps => {
+          const getRowKey = () => {
             return typeof this.props.rowKey === 'string'
               ? this.props.rowKey
               : this.props.rowKey(record, rowIndex);
-          },
-          loading: colDef.loading ? colDef.loading(record, rowIndex) : false,
-        }),
+          };
+          const rowId = record[getRowKey()];
+          return {
+            ...(colDef.onCell ? colDef.onCell(record, rowIndex, { colDef }) : undefined),
+            $$render: colDef.render,
+            record,
+            rowIndex,
+            colDef,
+            tableApi: this,
+            size: this.convertInputSize(size),
+            api: this.api,
+            context: this.context,
+            getRowKey,
+            rowId,
+            // setEditing: this.bindSetEditing(rowId, colDef.dataIndex),
+            // getEditing: this.bindGetEditing(rowId, colDef.dataIndex),
+            // editings: this.editings,
+          };
+        },
       };
     });
 
@@ -121,9 +194,9 @@ class Table2 extends PureComponent<ITableProps> {
         context: this.context,
         getRowKey,
         columns: this.props.columns,
-        setEditing: this.bindSetEditing(rowId),
-        getEditing: this.bindGetEditing(rowId),
-        editings: this.editings,
+        // setEditing: this.bindSetEditing(rowId),
+        // getEditing: this.bindGetEditing(rowId),
+        // editings: this.editings,
         getContextMenu: this.props.getContextMenu,
       };
     };
@@ -137,19 +210,22 @@ class Table2 extends PureComponent<ITableProps> {
       return this.props.onCellValuesChange && this.props.onCellValuesChange(params);
     }
     if (eventName === TABLE_CELL_FIELDS_CHANGE) {
-      this.editings[params.rowId] = true;
+      // const { changedFields } = params;
+      // Object.keys(changedFields).forEach(key => {
+      //   _.set(this.editings, [params.rowId, key], true);
+      // });
       return this.props.onCellFieldsChange && this.props.onCellFieldsChange(params);
     }
   };
 
-  public bindSetEditing = rowId =>
-    _.debounce(editing => {
-      this.editings[rowId] = editing;
-    }, 50);
+  // public bindSetEditing = (rowId, colId) =>
+  //   _.debounce(editing => {
+  //     _.set(this.editings, [rowId, colId], editing);
+  //   }, 50);
 
-  public bindGetEditing = rowId => () => {
-    return this.editings[rowId];
-  };
+  // public bindGetEditing = (rowId, colId) => () => {
+  //   return _.get(this.editings, [rowId, colId]);
+  // };
 
   public listen = (eventName: string, callback, scope) => {
     this.api.eventBus.listen(eventName, callback, scope);
@@ -174,13 +250,15 @@ class Table2 extends PureComponent<ITableProps> {
       },
     };
     return (
-      <Table
-        className={this.getClassName()}
-        components={components}
-        {...this.props}
-        columns={this.getColumnDefs()}
-        onRow={this.getOnRow()}
-      />
+      <div id={this.domId}>
+        <Table
+          className={this.getClassName()}
+          components={components}
+          {...this.props}
+          columns={this.getColumnDefs()}
+          onRow={this.getOnRow()}
+        />
+      </div>
     );
   }
 }

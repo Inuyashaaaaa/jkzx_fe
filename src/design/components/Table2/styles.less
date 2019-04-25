@@ -1,4 +1,6 @@
 @import '~antd/lib/style/themes/default.less';
+@import '../style/common.less';
+@import '../style/themes.less';
 
 @table-padding-vertical-md: @table-padding-vertical * 3 / 4;
 @table-padding-horizontal-md: @table-padding-horizontal / 2;
@@ -13,16 +15,31 @@
 @table-cell-height-md: @input-height-base * 1.3;
 @table-cell-height-sm: @input-height-sm * 1.3;
 
+@keyframes antShowHelpIn {
+  0% {
+    transform: translateY(-5px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-50%);
+    opacity: 1;
+  }
+}
+@keyframes antShowHelpOut {
+  to {
+    transform: translateY(-5px);
+    opacity: 0;
+  }
+}
+
 :global {
   .@{ant-prefix}-table {
     .ant-form-explain,
     .ant-form-extra {
-      position: absolute;
-      top: -100%;
       right: 0;
-      z-index: 1;
-      height: 20px;
-      margin-top: -10px;
+      bottom: calc(100% + 10px);
+      position: absolute;
+      z-index: 9999;
       font-size: 14px;
       line-height: 20px;
       visibility: visible;
@@ -73,6 +90,10 @@
     }
 
     &.@{ant-prefix}-table-default {
+      .ant-form-explain,
+      .ant-form-extra {
+        left: calc(100% + @table-padding-horizontal + 5px);
+      }
       tbody {
         > tr {
           &.@{ant-prefix}-table-expanded-row {
@@ -89,6 +110,10 @@
     }
 
     &.@{ant-prefix}-table-middle {
+      .ant-form-explain,
+      .ant-form-extra {
+        left: calc(100% + @table-padding-horizontal-md + 5px);
+      }
       tbody {
         > tr {
           &.@{ant-prefix}-table-expanded-row {
@@ -105,6 +130,10 @@
     }
 
     &.@{ant-prefix}-table-small {
+      .ant-form-explain,
+      .ant-form-extra {
+        left: calc(100% + @table-padding-horizontal-sm + 5px);
+      }
       tbody {
         > tr {
           &.@{ant-prefix}-table-expanded-row {
@@ -122,6 +151,67 @@
   }
 
   .@{ant-prefix}-table-vertical {
+    .ant-table:not(.ant-table-empty) {
+      &.ant-table-small > {
+        .ant-table-content .ant-table-placeholder,
+        .ant-table-content .ant-table-row:last-child td {
+          border-bottom: 1px solid #e8e8e8;
+        }
+      }
+    }
+
+    .show-help-enter.show-help-enter-active,
+    .show-help-appear.show-help-appear-active {
+      :local {
+        animation-name: antShowHelpIn;
+      }
+    }
+    .show-help-leave.show-help-leave-active {
+      :local {
+        animation-name: antShowHelpOut;
+      }
+    }
+
+    .ant-form-explain,
+    .ant-form-extra {
+      right: inherit;
+      bottom: inherit;
+      left: 100%;
+      top: 50%;
+      width: 100%;
+      transform: translateY(-50%);
+
+      &::after {
+        content: '';
+        right: inherit;
+        bottom: inherit;
+        top: 50%;
+        transform: translateY(-50%);
+        left: -5px;
+        border-width: 5px 5px 5px 0;
+        border-right-color: rgba(0, 0, 0, 0.75);
+        border-top-color: transparent;
+      }
+    }
+
+    .has-feedback > .ant-select .ant-select-arrow,
+    .has-feedback > .ant-select .ant-select-selection__clear,
+    .has-feedback :not(.ant-input-group-addon) > .ant-select .ant-select-arrow,
+    .has-feedback :not(.ant-input-group-addon) > .ant-select .ant-select-selection__clear {
+      right: 28px;
+    }
+
+    .has-feedback .ant-calendar-picker-icon,
+    .has-feedback .ant-time-picker-icon,
+    .has-feedback .ant-calendar-picker-clear,
+    .has-feedback .ant-time-picker-clear {
+      right: 28px;
+    }
+
+    .ant-input-number-handler-wrap {
+      z-index: 2;
+    }
+
     .@{ant-prefix}-table-row-indent {
       display: none;
     }

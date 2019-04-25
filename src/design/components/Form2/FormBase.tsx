@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import _, { chunk, omit } from 'lodash';
 import React, { PureComponent } from 'react';
 import { EVERY_EVENT_TYPE } from '../../utils';
-import { IFormBaseProps, IFormColDef, IFormTriggerCellValueChangeParams } from '../type';
+import { IFormBaseProps, IFormColDef } from '../type';
 import SwitchCell from './cells/SwitchCell';
-import { FORM_CELL_EDITING_CHANGED, FORM_CELL_VALUES_CHANGE } from './constants';
+import { FORM_CELL_EDITING_CHANGED } from './constants';
 import FormManager from './formManager';
 import './index.less';
 
@@ -65,6 +65,13 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     return rules;
   };
 
+  public save = (colIds?: string[]) => {
+    return _.forEach(this.formManager.cellNodes, item => {
+      if (colIds && colIds.indexOf(item.id) === -1) return;
+      item.node.saveCell();
+    });
+  };
+
   public getControlElement = (colDef: IFormColDef = {}, key?) => {
     const { form, dataSource } = this.props;
     return <SwitchCell key={key} colDef={colDef} form={form} record={dataSource} api={this} />;
@@ -79,6 +86,10 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
         domEvent,
       });
     });
+  };
+
+  public getColumnDefs = () => {
+    return this.props.columns || [];
   };
 
   public onReset = domEvent => {
@@ -115,10 +126,11 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
         <Button.Group>
           {!!submitable && (
             <Button
-              htmlType="submit"
+              // htmlType="submit"
               type="primary"
               {...this.props.submitButtonProps}
               loading={submitLoading}
+              onClick={this.onSubmit}
             >
               {submitText}
             </Button>
@@ -166,6 +178,20 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     return buttonItemLayout;
   };
 
+  public componentDidMount = () => {
+    window.addEventListener('click', this.onWindowClick, false);
+  };
+
+  public componentWillUnmount = () => {
+    window.removeEventListener('click', this.onWindowClick, false);
+  };
+
+  public onWindowClick = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    this.save();
+  };
+
   public render() {
     const {
       rowProps,
@@ -209,7 +235,6 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
         ])}
         className={classNames(`tongyu-form2`, className)}
         layout={layout}
-        onSubmit={this.onSubmit}
       >
         {layout === 'inline'
           ? columns.map((item, index) => this.getControlElement(item, index))
@@ -217,11 +242,17 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
               this.maxRowControlNumber =
                 cols.length > this.maxRowControlNumber ? cols.length : this.maxRowControlNumber;
 
+              const _rowProps = rowProps ? rowProps({ index: key }) : undefined;
               return (
                 <Row
                   gutter={16 + 8 * 2}
                   key={key}
-                  {...(rowProps ? rowProps({ index: key }) : undefined)}
+                  className={classNames(
+                    'tongyu-row',
+                    'tongyu-form-row',
+                    _rowProps && _rowProps.className
+                  )}
+                  {..._rowProps}
                 >
                   {cols.map((item, index) => {
                     const { dataIndex } = item;

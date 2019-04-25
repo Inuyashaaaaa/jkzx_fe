@@ -1,9 +1,9 @@
-import { Spin } from 'antd';
 import { FormItemProps } from 'antd/lib/form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
-import { omit } from 'lodash';
-import React, { FocusEvent, KeyboardEvent, PureComponent } from 'react';
+import _, { omit } from 'lodash';
+import React, { KeyboardEvent, PureComponent } from 'react';
+import { EMPTY_VALUE } from '../../constants';
 import { IFormCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
 import { FORM_CELL_EDITING_CHANGED } from '../constants';
@@ -15,17 +15,13 @@ class SwitchCell extends PureComponent<
   IFormCellProps,
   {
     editing: boolean;
-    loading: boolean;
   }
 > {
   public static defaultProps = {
-    prefix: 'form2-switch',
+    prefix: 'tongyu',
   };
 
-  public state = {
-    editing: false,
-    loading: false,
-  };
+  public oldValue: any = EMPTY_VALUE;
 
   public $cell: HTMLDivElement;
 
@@ -33,25 +29,29 @@ class SwitchCell extends PureComponent<
 
   public $renderingCell: RenderingCell;
 
-  constructor(props) {
+  public constructor(props) {
     super(props);
+    this.state = {
+      editing: _.get(props.colDef, 'defaultEditing', !props.colDef.editable),
+    };
   }
 
   public componentDidMount = () => {
     this.registeCell();
   };
 
-  public startLoading = (callback?) => {
-    this.setState({ loading: true }, callback);
-  };
-
-  public stopLoading = (callback?) => {
-    this.setState({ loading: false }, callback);
+  public componentWillUnmount = () => {
+    this.deleteCell();
   };
 
   public registeCell = () => {
     const { api } = this.props;
     api.formManager.registeCell(this.getDataIndex(), this);
+  };
+
+  public deleteCell = () => {
+    const { api } = this.props;
+    api.formManager.deleteCell(this.getDataIndex());
   };
 
   public getRef = node => {
@@ -69,14 +69,15 @@ class SwitchCell extends PureComponent<
   public getInlineCell = () => {
     const { colDef, form } = this.props;
     const { editable, dataIndex } = colDef;
-    const { editing } = this.state;
+    const editing = this.getEditing();
     const wrapedForm = wrapFormGetDecorator(dataIndex, form);
-    if (editable && editing) {
+    if (editing) {
       return React.createElement(EditingCell, {
         ...this.props,
         cellApi: this,
         form: wrapedForm,
         ref: this.getEditingCellRef,
+        colDef,
       });
     } else {
       return React.createElement(RenderingCell, {
@@ -84,30 +85,41 @@ class SwitchCell extends PureComponent<
         cellApi: this,
         form: wrapedForm,
         ref: this.getRenderingCellRef,
+        colDef,
       });
     }
   };
 
-  public renderElement = element => {
+  public renderElement = elements => {
     const { colDef, api } = this.props;
     const { title } = colDef;
+    return React.Children.toArray(elements).map(element => {
+      if (!React.isValidElement<FormItemProps & React.ReactNode>(element)) return element;
 
-    if (React.isValidElement<FormItemProps>(element) && element.type === FormItem) {
       return React.cloneElement(element, {
-        label: title,
+        ...(element.type === (FormItem.default || FormItem)
+          ? {
+              label: title,
+            }
+          : {}),
         ...api.getFormItemLayout(),
         ...element.props,
+        children: _.get(element, 'props.children', false)
+          ? this.renderElement(element.props.children)
+          : undefined,
       });
-    }
+    });
+  };
 
-    return element;
+  public getEditing = () => {
+    return _.get(this.props.colDef, 'editing', this.state.editing);
   };
 
   public startEditing = async () => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) {
+    if (!this.getEditing()) {
       return this.setState({
-        editing: !this.state.editing,
+        editing: !this.getEditing(),
       });
     }
   };
@@ -118,15 +130,15 @@ class SwitchCell extends PureComponent<
     return editable;
   };
 
-  public onCellClick = () => {
+  public onCellClick = event => {
+    event.stopPropagation();
+    this.props.api.save(
+      _.reject(
+        this.props.api.getColumnDefs().map(item => item.dataIndex),
+        item => item === this.props.colDef.dataIndex
+      )
+    );
     this.startEditing();
-  };
-
-  public onCellBlur = (e: FocusEvent<HTMLDivElement>) => {
-    if (!this.getEditable()) return;
-    if (this.state.editing) {
-      this.saveCell();
-    }
   };
 
   public getValue = () => {
@@ -141,7 +153,7 @@ class SwitchCell extends PureComponent<
 
   public saveCell = async (callback?) => {
     if (!this.getEditable()) return;
-    if (!this.state.editing) return;
+    if (!this.getEditing()) return;
     const dataIndex = this.getDataIndex();
     if (this.props.form.isFieldValidating(dataIndex)) return;
 
@@ -179,17 +191,19 @@ class SwitchCell extends PureComponent<
 
     // Enter
     if (e.keyCode === 13) {
-      if (!this.state.editing) {
+      if (!this.getEditing()) {
         this.startEditing();
         return;
       }
-      this.saveCell();
+      setTimeout(() => {
+        this.saveCell();
+      });
       return;
     }
 
     // Tab
     if (e.keyCode === 9) {
-      if (this.state.editing) {
+      if (this.getEditing()) {
         this.saveCell(() => {
           setTimeout(() => {
             this.nextCellStartEditing();
@@ -216,12 +230,7 @@ class SwitchCell extends PureComponent<
   };
 
   public isEditing = () => {
-    return !!this.state.editing;
-  };
-
-  public getLoading = () => {
-    const { colDef } = this.props;
-    return !!colDef.loading;
+    return !!this.getEditing();
   };
 
   public render() {
@@ -241,15 +250,14 @@ class SwitchCell extends PureComponent<
           '$$render',
         ])}
         onClick={this.onCellClick}
-        onBlur={this.onCellBlur}
         onKeyDown={this.onKeyDown}
-        className={classNames(`${this.props.prefix}-cell`, {
+        className={classNames(`${this.props.prefix}-cell`, `${this.props.prefix}-form-cell`, {
           editable: this.getEditable(),
-          editing: this.state.editing,
-          rendering: !this.state.editing,
+          editing: this.getEditing(),
+          rendering: !this.getEditing(),
         })}
       >
-        <Spin spinning={this.getLoading()}>{this.getInlineCell()}</Spin>
+        {this.getInlineCell()}
       </div>
     );
   }

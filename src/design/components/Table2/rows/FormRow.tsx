@@ -1,8 +1,9 @@
-import { isShallowEqual } from '@/design/utils';
 import { Dropdown, Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import classNames from 'classnames';
 import _, { omit } from 'lodash';
 import React from 'react';
+import { VALIDATE_MESSAGES } from '../../constants';
 import Form2 from '../../Form2';
 import {
   IFormField,
@@ -10,34 +11,65 @@ import {
   ITableTriggerCellFieldsChangeParams,
   ITableTriggerCellValueChangeParams,
 } from '../../type';
-import styles from '../cells/SwitchCell.less';
 import { TABLE_CELL_FIELDS_CHANGE, TABLE_CELL_VALUES_CHANGE } from '../constants/EVENT';
+// import schema from 'async-validator';
 
 const EditableContext = React.createContext<{ form?: WrappedFormUtils }>({});
 
 class EditableRow extends React.Component<ITableRowProps> {
-  public shouldComponentUpdate(nextProps) {
-    if (nextProps.getEditing()) {
-      nextProps.setEditing(false);
-      return true;
-    }
+  // public shouldComponentUpdate(nextProps) {
+  //   if (nextProps.getEditing()) {
+  //     nextProps.setEditing(false);
+  //     return true;
+  //   }
 
-    if (_.some(nextProps.editings, val => !!val)) {
-      return false;
-    }
+  //   if (_.some(nextProps.editings, val => !!val)) {
+  //     return false;
+  //   }
 
-    return !isShallowEqual(nextProps, this.props);
-  }
+  //   return !isShallowEqual(nextProps, this.props);
+  // }
 
   public componentDidMount = () => {
     const { record, getRowKey } = this.props;
     this.props.api.tableManager.registeRow(record[getRowKey()], this);
   };
 
-  public validate = async (options = {}, fieldNames = []) => {
-    return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      return this.props.form.validateFields(fieldNames, options, (error, values) => {
-        resolve({ error, values });
+  public componentWillUnmount = () => {
+    const { record, getRowKey } = this.props;
+    this.props.api.tableManager.deleteRow(record[getRowKey()]);
+  };
+
+  public validate = (options: any = {}, colIds = []) => {
+    const { silence } = options;
+    const { columns, record } = this.props;
+
+    return new Promise<{ errors: any; values: any }>((resolve, reject) => {
+      // if (silence) {
+      //   const fieldsProps = columns
+      //     .map(item => {
+      //       return item.dataIndex;
+      //     })
+      //     .reduce((obj, dataIndex) => {
+      //       obj[dataIndex] = this.props.form.getFieldProps(dataIndex);
+      //       return obj;
+      //     }, {});
+
+      //   const schemaConfig = _.mapValues(fieldsProps, (meta, dataIndex) => {
+      //     return meta['data-__meta'].rules || [];
+      //   });
+
+      //   const validator = new schema(schemaConfig);
+
+      //   const values = this.props.form.getFieldsValue();
+      //   validator.validate(values, errors => {
+      //     resolve({ errors, values });
+      //   });
+      //   return;
+      // }
+
+      return this.props.form.validateFields(colIds, options, (errors, values) => {
+        resolve({ errors, values });
       });
     });
   };
@@ -77,8 +109,9 @@ class EditableRow extends React.Component<ITableRowProps> {
           'getEditing',
           'setEditing',
           'editings',
+          'rowId',
         ])}
-        className={styles.row}
+        className={classNames('tongyu-row', 'tongyu-table-row', this.props.className)}
       />
     );
     const contextMenu = this.getContextMenu();
@@ -97,6 +130,7 @@ class EditableRow extends React.Component<ITableRowProps> {
 }
 
 const FormRow = Form.create({
+  validateMessages: VALIDATE_MESSAGES,
   onValuesChange(props: ITableRowProps, changedValues, allValues) {
     const { record, rowIndex, api, getRowKey } = props;
     const event: ITableTriggerCellValueChangeParams = {

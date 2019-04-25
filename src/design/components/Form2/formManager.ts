@@ -22,6 +22,13 @@ class FormManager {
     }
   }
 
+  public deleteCell(colId: string) {
+    const index = this.cellNodes.findIndex(item => item.id === colId);
+    if (index !== -1) {
+      this.cellNodes.splice(index, 1);
+    }
+  }
+
   public getNextCell(colId: string, isCur = false) {
     if (!this.cellNodes) return null;
     const cellIndex = this.cellNodes.findIndex(item => item.id === colId);
