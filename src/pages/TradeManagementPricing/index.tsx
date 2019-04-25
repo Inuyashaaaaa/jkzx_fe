@@ -8,13 +8,13 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import {
-  ComputedColDefs,
   COMPUTED_LEG_FIELDS,
+  ComputedColDefs,
 } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import {
+  TRADESCOL_FIELDS,
   TradesColDefs,
   TRADESCOLDEFS_LEG_FIELD_MAP,
-  TRADESCOL_FIELDS,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { PRICING_FROM_TAG } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
