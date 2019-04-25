@@ -231,26 +231,7 @@ export default {
       _.remove(state.columnDefs, (item: any) =>
         [...nextTradesColDefs, ...ComputedColDefs].find(iitem => iitem.field === item.field)
       );
-      const tradeColDefs = nextTradesColDefs.map(col => {
-        return {
-          ...col,
-          editable: col.editable
-            ? params => {
-                const { colDef, data } = params;
-                if (data[LEG_TYPE_FIELD] === 'FORWARD_UNANNUAL' && colDef.field === 'vol') {
-                  return false;
-                }
-                return true;
-              }
-            : false,
-          exsitable: params => {
-            const { colDef, data } = params;
-            if (data[LEG_TYPE_FIELD] === 'FORWARD_UNANNUAL' && colDef.field === 'vol') return false;
-            return true;
-          },
-        };
-      });
-      state.columnDefs = state.columnDefs.concat(tradeColDefs).concat(ComputedColDefs);
+      state.columnDefs = state.columnDefs.concat(nextTradesColDefs).concat(ComputedColDefs);
       state.dataSource.push(rowData);
     },
   },
