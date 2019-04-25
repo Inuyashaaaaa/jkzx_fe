@@ -1,4 +1,4 @@
-import { Dropdown, Icon, Menu, message } from 'antd';
+import { Divider, Dropdown, Icon, Menu, message } from 'antd';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
 const SubMenu = Menu.SubMenu;
@@ -75,17 +75,21 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
     });
   };
 
+  public handleBookEdit = () => {
+    router.push({
+      pathname: '/trade-management/book-edit',
+      query: {
+        id: this.props.record.tradeId,
+      },
+    });
+  };
+
   public onClick = ({ item, key, keyPath }) => {
     // console.log(item); //MenuItem
     // console.log(key); //key
     // console.log(keyPath); //['key']
     if (key === 'bookEdit') {
-      router.push({
-        pathname: '/trade-management/book-edit',
-        query: {
-          id: this.props.record.tradeId,
-        },
-      });
+      this.handleBookEdit();
     }
     if (key === 'searchLifeStyle') {
       this.setState(
@@ -311,10 +315,13 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
   public render() {
     return (
       <>
+        <a href="javascript:;" onClick={this.handleBookEdit}>
+          详情
+        </a>
+        <Divider type={'vertical'} />
         <Dropdown
           overlay={
             <Menu onClick={this.onClick}>
-              <MenuItem key="bookEdit">查看合约详情</MenuItem>
               <MenuItem key="searchLifeStyle">查看生命周期事件</MenuItem>
               <SubMenu key="carryListStyle" title={<span>执行生命周期事件</span>}>
                 {this.loadCommon()}
@@ -323,8 +330,8 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
             </Menu>
           }
         >
-          <a className="ant-dropdown-link">
-            操作
+          <a href="javascript:;">
+            更多操作
             <Icon type="down" />
           </a>
         </Dropdown>
