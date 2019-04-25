@@ -7,7 +7,7 @@ import {
   PRODUCTTYPE_ZHCH_MAP,
 } from '@/constants/common';
 import { IColumnDef } from '@/design/components/Table/types';
-import { Timeline } from 'antd';
+import { Timeline, Typography } from 'antd';
 import React from 'react';
 import Operations from './CommonModel/Operations';
 import styles from './index.less';
@@ -17,7 +17,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易ID',
     dataIndex: 'tradeId',
-    width: 100,
+    width: 250,
     fixed: 'left',
     onCell: record => {
       return {
@@ -32,17 +32,22 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
     render: (text, record, index) => {
       if (record.timeLineNumber) {
         return (
-          <div style={{ position: 'relative' }}>
+          <span style={{ position: 'relative' }}>
+            {record.tradeId}
             <Timeline
               style={{ position: 'absolute', left: '-20px', top: '5px' }}
               className={styles.timelines}
             >
               {record.positions.map((item, index) => {
-                return <TimelineItem style={{ marginBottom: '27px' }} key={index} />;
+                return (
+                  <TimelineItem
+                    style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 47 }}
+                    key={index}
+                  />
+                );
               })}
             </Timeline>
-            <span>{record.tradeId}</span>
-          </div>
+          </span>
         );
       }
       return <span>{record.tradeId}</span>;
@@ -51,12 +56,12 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '持仓ID',
     dataIndex: 'positionId',
-    width: 100,
+    width: 250,
   },
   {
     title: '交易簿',
     dataIndex: 'bookName',
-    width: 100,
+    width: 250,
   },
   {
     title: '标的物',
@@ -93,19 +98,17 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易日',
     dataIndex: 'tradeDate',
-    width: 100,
-    // width: 120,
+    width: 150,
   },
   {
     title: '到期日',
     dataIndex: 'expirationDate',
-    width: 100,
-    // width: 120,
+    width: 150,
   },
   {
     title: '持仓状态',
     dataIndex: 'lcmEventType',
-    width: 100,
+    width: 150,
     // width: 130,
     render: (text, record, index) => {
       return LCM_EVENT_TYPE_ZHCN_MAP[text];
@@ -114,24 +117,23 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '交易对手',
     dataIndex: 'counterPartyName',
-    width: 100,
+    width: 150,
   },
   {
     title: '销售',
     dataIndex: 'salesName',
-    width: 100,
-    // width: 100,
+    width: 150,
+    // width: 150,
   },
   {
     title: '所属投资组合',
     dataIndex: 'portfolioNames',
-    width: 100,
   },
   {
     title: '操作',
     fixed: 'right',
     dataIndex: 'action',
-    width: 100,
+    width: 150,
     render: (value, record, index) => {
       return <Operations record={record} onSearch={onSearch} />;
     },
