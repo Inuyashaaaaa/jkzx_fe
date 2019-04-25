@@ -49,10 +49,12 @@ import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
+import { PaymentType } from '../legFields/PaymentType';
+import { RebateType } from '../legFields/RebateType';
 
-export const VanillaAmerican: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
-  type: LEG_TYPE_MAP.VANILLA_AMERICAN,
+export const VanillaEuropean: ILeg = {
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_EUROPEAN],
+  type: LEG_TYPE_MAP.VANILLA_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     const commonFields = [
@@ -139,7 +141,7 @@ export const VanillaAmerican: ILeg = {
       'premiumPercent',
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;
+    nextPosition.productType = LEG_TYPE_MAP.VANILLA_EUROPEAN;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       ...COMPUTED_FIELDS,
@@ -160,7 +162,7 @@ export const VanillaAmerican: ILeg = {
     nextPosition.asset.settlementDate =
       nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
+    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
     return nextPosition;

@@ -4,18 +4,16 @@ import {
   LEG_ID_FIELD,
   LEG_NAME_FIELD,
   LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
-import { LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
 import { uuid } from '@/design/utils';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import { getLegByType } from '@/tools';
 import { ILeg } from '@/types/leg';
 import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
@@ -109,11 +107,10 @@ export const getAddLegItem = (leg: ILeg, dataSourceItem: any, isPricing = false)
 export const convertTradePositions = (tableDataSource, tableFormData, env) => {
   const positions: any[] = tableDataSource.map(dataSourceItem => {
     dataSourceItem = miniumlPercent(dataSourceItem);
+    const type = dataSourceItem[LEG_TYPE_FIELD];
+    const leg = getLegByType(type);
 
-    const productType = dataSourceItem[LEG_TYPE_FIELD];
-    const Leg = LEG_MAP[productType];
-
-    if (!Leg) {
+    if (!leg) {
       throw new Error('not found Leg type');
     }
 
@@ -125,7 +122,7 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       counterPartyAccountName: 'empty',
       counterPartyCode: tableFormData.counterPartyCode,
       counterPartyName: tableFormData.counterPartyCode,
-      ...Leg.getPosition(env, dataSourceItem, tableDataSource),
+      ...leg.getPosition(env, dataSourceItem, tableDataSource),
     };
   });
 

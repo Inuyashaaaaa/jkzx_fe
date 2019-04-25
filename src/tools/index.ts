@@ -1,12 +1,17 @@
 import {
+  EXERCISETYPE_MAP,
   LCM_EVENT_TYPE_MAP,
   LEG_ENV_FIELD,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
+  PRODUCT_TYPE_MAP,
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
+import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
+import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
+import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import _ from 'lodash';
 
 export const isModelXY = data => {
@@ -147,4 +152,19 @@ export const getFormEditingMeta = (status: string) => {
 
 export const getLegByType = (type: string) => {
   return TOTAL_LEGS.find(item => item.type === type);
+};
+
+export const getLegByProductType = (productType, exerciseType) => {
+  if (productType === PRODUCT_TYPE_MAP.DIGITAL) {
+    if (exerciseType === EXERCISETYPE_MAP.AMERICAN) {
+      return DigitalLegAmerican;
+    }
+  }
+  if (productType === PRODUCT_TYPE_MAP.VANILLA_AMERICAN) {
+    return VanillaAmerican;
+  }
+  if (productType === PRODUCT_TYPE_MAP.VANILLA_EUROPEAN) {
+    return VanillaEuropean;
+  }
+  throw new Error('not match productType!');
 };

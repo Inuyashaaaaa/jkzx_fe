@@ -4,6 +4,9 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
+  PAYMENT_TYPE_MAP,
+  OBSERVATION_TYPE_MAP,
+  REBATETYPE_TYPE_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
@@ -49,10 +52,14 @@ import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
+import { PaymentType } from '../legFields/PaymentType';
+import { Payment } from '../legFields/Payment';
+import { RebateType } from '../legFields/RebateType';
+import { ObservationType } from '../legFields/ObservationType';
 
-export const VanillaAmerican: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
-  type: LEG_TYPE_MAP.VANILLA_AMERICAN,
+export const DigitalLegAmerican: ILeg = {
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DIGITAL_AMERICAN],
+  type: LEG_TYPE_MAP.DIGITAL_AMERICAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     const commonFields = [
@@ -69,6 +76,10 @@ export const VanillaAmerican: ILeg = {
       Term,
       ExpirationDate,
       NotionalAmount,
+      PaymentType,
+      Payment,
+      RebateType,
+      ObservationType,
     ];
     if (env === LEG_ENV.PRICING) {
       return [...commonFields, ...TOTAL_TRADESCOL_FIELDS, ...TOTAL_COMPUTED_FIELDS];
@@ -120,11 +131,14 @@ export const VanillaAmerican: ILeg = {
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
+      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
       ...(env === LEG_ENV.PRICING
         ? {
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),
+      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.CONTINUOUS,
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
@@ -139,7 +153,7 @@ export const VanillaAmerican: ILeg = {
       'premiumPercent',
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;
+    nextPosition.productType = LEG_TYPE_MAP.DIGITAL;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       ...COMPUTED_FIELDS,

@@ -12,9 +12,11 @@ import { Q } from '@/domains/legFields/trades/Q';
 import { R } from '@/domains/legFields/trades/R';
 import { UnderlyerPrice } from '@/domains/legFields/trades/UnderlyerPrice';
 import { Vol } from '@/domains/legFields/trades/Vol';
-import { VanillaAmerican } from '@/domains/legs/vanillaAmerican';
+import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
+import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
+import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 
-export const TOTAL_LEGS = [VanillaAmerican];
+export const TOTAL_LEGS = [VanillaAmerican, VanillaEuropean, DigitalLegAmerican];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
 

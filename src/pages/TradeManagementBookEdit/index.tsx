@@ -1,11 +1,11 @@
-import { LEG_FIELD, LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
-import { Form2, Loading, Table2 } from '@/design/components';
+import MultiLegTable from '@/containers/MultiLegTable';
+import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
+import { Form2, Loading } from '@/design/components';
 import { ITableData } from '@/design/components/type';
-import { remove } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdTradeGet } from '@/services/general-service';
 import {
@@ -14,16 +14,14 @@ import {
   getTradeCreateModalData,
 } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import { getLegByRecord } from '@/tools';
-import { ILeg, ILegColDef } from '@/types/leg';
-import { Affix, Button, Divider, message, Row, Typography } from 'antd';
+import { getLegByRecord, getLegByProductType } from '@/tools';
+import { ILeg } from '@/types/leg';
+import { Divider, message, Typography } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
-import MultiLegTable from '@/containers/MultiLegTable';
-import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 
 const TradeManagementBooking = props => {
   const [tableData, setTableData] = useState([]);
@@ -42,7 +40,8 @@ const TradeManagementBooking = props => {
       pre.concat({
         ...createLegDataSourceItem(leg, LEG_ENV.EDITING),
         [LEG_ID_FIELD]: position.positionId,
-        lcmEventType: position.lcmEventType,
+        [LEG_FIELD.POSITION_ID]: Form2.createField(position.positionId),
+        [LEG_FIELD.LCM_EVENT_TYPE]: Form2.createField(position.lcmEventType),
         ...leg.getPageData(LEG_ENV.EDITING, position),
         ...Form2.createFields(
           backConvertPercent({
@@ -102,7 +101,7 @@ const TradeManagementBooking = props => {
 
   const mockAddLegItem = async (composePositions, tableFormData) => {
     composePositions.forEach(position => {
-      const leg = TOTAL_LEGS.find(it => it.type === position.productType);
+      const leg = getLegByProductType(position.productType, position.asset.exerciseType);
       addLeg(leg, position);
     });
   };
