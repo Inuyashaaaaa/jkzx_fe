@@ -1,4 +1,4 @@
-import { BIG_NUMBER_CONFIG, LEG_FIELD } from '@/constants/common';
+import { BIG_NUMBER_CONFIG, LEG_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import {
   COMPUTED_LEG_FIELD_MAP,
@@ -231,7 +231,26 @@ export default {
       _.remove(state.columnDefs, (item: any) =>
         [...nextTradesColDefs, ...ComputedColDefs].find(iitem => iitem.field === item.field)
       );
-      state.columnDefs = state.columnDefs.concat(nextTradesColDefs).concat(ComputedColDefs);
+      const tradeColDefs = nextTradesColDefs.map(col => {
+        return {
+          ...col,
+          editable: col.editable
+            ? params => {
+                const { colDef, data } = params;
+                if (data[LEG_TYPE_FIELD] === 'FORWARD_UNANNUAL' && colDef.field === 'vol') {
+                  return false;
+                }
+                return true;
+              }
+            : false,
+          exsitable: params => {
+            const { colDef, data } = params;
+            if (data[LEG_TYPE_FIELD] === 'FORWARD_UNANNUAL' && colDef.field === 'vol') return false;
+            return true;
+          },
+        };
+      });
+      state.columnDefs = state.columnDefs.concat(tradeColDefs).concat(ComputedColDefs);
       state.dataSource.push(rowData);
     },
   },

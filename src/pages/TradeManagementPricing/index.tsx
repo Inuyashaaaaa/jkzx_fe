@@ -1,6 +1,11 @@
-import { LEG_NAME_FIELD, LEG_PRICING_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
+import {
+  LEG_ANNUALIZED_FIELD,
+  LEG_NAME_FIELD,
+  LEG_PRICING_FIELD,
+  LEG_TYPE_FIELD,
+} from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { allLegTypes, allTryPricingLegTypes } from '@/constants/legColDefs';
+import { allLegTypes } from '@/constants/legColDefs';
 import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -22,7 +27,7 @@ import { convertTradePositions, createLegDataSourceItem, getAddLegItem } from '@
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { Button, Col, Input, message, notification, Row, Select } from 'antd';
+import { Button, Col, Input, message, Row, Select } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -59,6 +64,7 @@ class TradeManagementPricing extends PureComponent<any> {
     }));
 
     this.computedAllLegTypes = allLegTypes.map(item => {
+      if (!item) return;
       return {
         ...item,
         columnDefs: item
@@ -136,7 +142,6 @@ class TradeManagementPricing extends PureComponent<any> {
       }),
       true
     );
-
     this.addLegData(computedLeg, legData);
   };
 
@@ -256,7 +261,9 @@ class TradeManagementPricing extends PureComponent<any> {
           // pricingEnvironmentId,
           // valuationDateTime,
           // timezone,
-          positions: [item],
+          positions: [
+            item.productType === 'FORWARD' ? _.omit(item, 'asset.term', 'asset.annualized') : item,
+          ],
           ..._.mapValues(_.pick(tableDataSource[index], TRADESCOL_FIELDS), (val, key) => {
             if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
               return val;
@@ -358,10 +365,16 @@ class TradeManagementPricing extends PureComponent<any> {
       console.warn('val，q 等都为空才去获取默认值');
       return;
     }
-
     const { error, data = [] } = await prcTrialPositionsService({
       positions: convertTradePositions(
-        [_.omit(legData, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])],
+        [
+          _.omit(
+            legData[LEG_TYPE_FIELD] === 'FORWARD_UNANNUAL'
+              ? _.omit(legData, ['term', legData[LEG_ANNUALIZED_FIELD]])
+              : legData,
+            [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]
+          ),
+        ],
         {},
         true
       ),
