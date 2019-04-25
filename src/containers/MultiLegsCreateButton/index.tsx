@@ -15,6 +15,7 @@ export default class MultilLegCreateButton extends PureComponent<{
   public normalLegMenus = () => {
     const pricingUsedLegs = [...allLegTypes];
     const removeUsedLegs = _.remove(pricingUsedLegs, item => {
+      if (!item) return;
       return item.type === 'MODEL_XY_ANNUAL' || item.type === 'MODEL_XY_UNANNUAL';
     });
     const usedLegs = this.props.isPricing ? pricingUsedLegs : allLegTypes;

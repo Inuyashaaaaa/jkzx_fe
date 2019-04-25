@@ -118,7 +118,10 @@ class ExerciseModal extends PureComponent<
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
-      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+      eventType:
+        this.data.productType === 'FORWARD_UNANNUAL'
+          ? LCM_EVENT_TYPE_MAP.SETTLE
+          : LCM_EVENT_TYPE_MAP.EXERCISE,
       userLoginId: this.currentUser.userName,
       eventDetail: {
         underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
@@ -158,7 +161,10 @@ class ExerciseModal extends PureComponent<
         numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
         notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
-      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+      eventType:
+        this.data.productType === 'FORWARD_UNANNUAL'
+          ? LCM_EVENT_TYPE_MAP.SETTLE
+          : LCM_EVENT_TYPE_MAP.EXERCISE,
     });
     if (error) return;
     this.setState({
