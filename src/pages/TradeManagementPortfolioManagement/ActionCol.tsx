@@ -112,7 +112,7 @@ class ActionCol extends PureComponent<any, any> {
       }
       return val;
     });
-    let count = formatValues.tradeId.length;
+    const count = formatValues.tradeId.length;
     const results = await Promise.all(
       formatValues.tradeId.map(item => {
         return trdTradePortfolioCreateBatch({
