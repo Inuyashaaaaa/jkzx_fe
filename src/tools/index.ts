@@ -132,13 +132,14 @@ export const getLegEnvs = record => ({
   isEditing: legEnvIsEditing(record),
 });
 
-export const getFormEditingMeta = (status: string) => {
+export const getFormEditingMeta = (
+  status: 'EDITING_NO_CONVERT' | 'NO_EDITING_CAN_CONVERT' | 'SHOW'
+) => {
   if (status === FORM_EDITABLE_STATUS.EDITING_NO_CONVERT) {
     return {
       editable: false,
-      editing: true,
     };
-  } else if (status === FORM_EDITABLE_STATUS.EDITING_CAN_CONVERT) {
+  } else if (status === FORM_EDITABLE_STATUS.NO_EDITING_CAN_CONVERT) {
     return {
       editable: true,
     };
