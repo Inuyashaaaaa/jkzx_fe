@@ -344,7 +344,7 @@ const CustomModel = memo(() => {
         const ws = XLSX.utils.aoa_to_sheet(_data[index]);
         XLSX.utils.book_append_sheet(wb, ws, item);
       });
-      XLSX.writeFile(wb, '自定义模型表.xlsx');
+      XLSX.writeFile(wb, `${PRODUCTTYPE}_${currentTrade.tradeId}.xlsx`);
       return;
     }
     const _data = cols.map(tab => {
@@ -363,7 +363,7 @@ const CustomModel = memo(() => {
       const ws = XLSX.utils.aoa_to_sheet(_data[index]);
       XLSX.utils.book_append_sheet(wb, ws, item);
     });
-    XLSX.writeFile(wb, '自定义模型表.xlsx');
+    XLSX.writeFile(wb, `${PRODUCTTYPE}_${currentTrade.tradeId}.xlsx`);
   };
 
   return (
