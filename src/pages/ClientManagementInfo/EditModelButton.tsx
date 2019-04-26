@@ -15,14 +15,14 @@ import { createRefParty, refPartyGetByLegalName } from '@/services/reference-dat
 import { Button, Cascader, Icon, message, notification, Row, Spin, Steps, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 
 const TabPane = Tabs.TabPane;
 
 const useTableData = props => {
-  const { record } = props;
+  const { record, name } = props;
   const [loading, setLoading] = useState(false);
   const [baseFormData, setBaseFormData] = useState({});
   const [traderList, setTraderList] = useState([]);
@@ -33,6 +33,13 @@ const useTableData = props => {
     if (error) return;
     const newData = {};
     const authorizers = data.authorizers;
+    if (name !== '查看') {
+      data.salesName = [
+        data.subsidiaryName ? data.subsidiaryName : '',
+        data.branchName ? data.branchName : '',
+        data.salesName ? data.salesName : '',
+      ];
+    }
     Object.keys(data).forEach(async item => {
       newData[item] = {
         type: 'field',
@@ -59,10 +66,10 @@ const useTableData = props => {
     setBaseFormData(newData);
     const _traderList = (authorizers || []).map(item => {
       item = {
-        姓名: item.tradeAuthorizerName,
-        联系电话: item.tradeAuthorizerPhone,
-        证件有效期: item.tradeAuthorizerIdExpiryDate,
-        身份证号: item.tradeAuthorizerIdNumber,
+        name: item.tradeAuthorizerName,
+        phoneNumber: item.tradeAuthorizerPhone,
+        periodValidity: item.tradeAuthorizerIdExpiryDate,
+        IDNumber: item.tradeAuthorizerIdNumber,
       };
       Object.keys(item).forEach(async param => {
         item[param] = {
@@ -96,7 +103,7 @@ const EditModalButton = memo<any>(props => {
   const columns = [
     {
       title: '姓名',
-      dataIndex: '姓名',
+      dataIndex: 'name',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -106,14 +113,14 @@ const EditModalButton = memo<any>(props => {
                   required: false,
                 },
               ],
-            })(<Input disabled={disabled} />)}
+            })(<Input disabled={disabled} editing={editable} />)}
           </FormItem>
         );
       },
     },
     {
       title: '身份证号',
-      dataIndex: '身份证号',
+      dataIndex: 'IDNumber',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -123,14 +130,14 @@ const EditModalButton = memo<any>(props => {
                   required: false,
                 },
               ],
-            })(<Input disabled={disabled} />)}
+            })(<Input disabled={disabled} editing={editable} />)}
           </FormItem>
         );
       },
     },
     {
       title: '证件有效期',
-      dataIndex: '证件有效期',
+      dataIndex: 'periodValidity',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -140,14 +147,14 @@ const EditModalButton = memo<any>(props => {
                   required: false,
                 },
               ],
-            })(<DatePicker disabled={disabled} />)}
+            })(<DatePicker disabled={disabled} editing={editable} />)}
           </FormItem>
         );
       },
     },
     {
       title: '联系电话',
-      dataIndex: '联系电话',
+      dataIndex: 'phoneNumber',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -157,14 +164,14 @@ const EditModalButton = memo<any>(props => {
                   required: false,
                 },
               ],
-            })(<Input disabled={disabled} />)}
+            })(<Input disabled={disabled} editing={editable} />)}
           </FormItem>
         );
       },
     },
     {
       title: '操作',
-      dataIndex: '操作',
+      dataIndex: 'action',
       render: (val, record, index, { form, editing }) => {
         return (
           <a
@@ -197,18 +204,13 @@ const EditModalButton = memo<any>(props => {
 
   const tableEl = useRef<Table2>(null);
   let disabled = false;
+  let editable = true;
   const [modalVisible, setModalVisible] = useState(false);
-  // let disabled = null;
-  baseFormData._salesName = baseFormData.salesName;
   if (name === '查看') {
     disabled = true;
-  } else {
-    baseFormData._salesName = [
-      baseFormData.subsidiaryName ? baseFormData.subsidiaryName.value : '',
-      baseFormData.branchName ? baseFormData.branchName.value : '',
-      baseFormData.salesName ? baseFormData.salesName.value : '',
-    ];
+    editable = false;
   }
+
   if (disabled) {
     columns.pop();
   }
@@ -226,24 +228,27 @@ const EditModalButton = memo<any>(props => {
                   }}
                   onFieldsChange={(props, changedFields, allFields) => {
                     setBaseFormData({ ...baseFormData, ...changedFields });
-                    // setBaseFormData({...baseFormData, changedFields});
                   }}
                   dataSource={baseFormData}
                   style={{ paddingTop: 20 }}
                   footer={false}
-                  columnNumberOneRow={3}
-                  layout="vertical"
+                  columnNumberOneRow={editable ? 3 : 2}
+                  layout={editable ? 'vertical' : 'horizontal'}
+                  hideRequiredMark={!editable}
+                  wrapperCol={{ span: 12 }}
+                  labelCol={{ span: 12 }}
                   columns={[
                     {
                       title: (
                         <span>
-                          开户名称<span style={{ fontSize: 12 }}>（创建后不允许修改）</span>
+                          1开户名称
+                          <span style={{ fontSize: 12 }} />
                         </span>
                       ),
                       dataIndex: BASE_FORM_FIELDS.LEGALNAME,
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled ? true : false} help="创建后不允许修改">
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -251,7 +256,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={true} />)}
+                            })(<Input disabled={true} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -276,6 +281,7 @@ const EditModalButton = memo<any>(props => {
                               <Select
                                 style={{ width: '100%' }}
                                 disabled={disabled}
+                                editing={editable}
                                 options={[
                                   {
                                     label: '产品户',
@@ -308,6 +314,7 @@ const EditModalButton = memo<any>(props => {
                             })(
                               <Select
                                 disabled={disabled}
+                                editing={editable}
                                 options={[
                                   {
                                     label: ' 一般机构普通投资者',
@@ -345,7 +352,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -363,48 +370,45 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
                     },
                     {
                       title: '开户销售',
-                      dataIndex: '_salesName',
+                      dataIndex: 'salesName',
                       render: (val, record, index, { form }) => {
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(
-                              <span>
-                                {!disabled ? (
-                                  <Cascader
-                                    placeholder="请输入内容"
-                                    style={{ width: '100%' }}
-                                    options={salesCascaderList}
-                                    disabled={disabled}
-                                    defaultValue={val}
-                                    showSearch={{
-                                      filter: (inputValue, path) => {
-                                        return path.some(
-                                          option =>
-                                            option.label
-                                              .toLowerCase()
-                                              .indexOf(inputValue.toLowerCase()) > -1
-                                        );
-                                      },
-                                    }}
-                                  />
-                                ) : (
-                                  <Input disabled={true} value={val} />
-                                )}
-                              </span>
+                            {!disabled ? (
+                              form.getFieldDecorator({
+                                rules: [
+                                  {
+                                    required: true,
+                                    message: '必填',
+                                  },
+                                ],
+                              })(
+                                <Cascader
+                                  placeholder="请输入内容"
+                                  style={{ width: '100%' }}
+                                  options={salesCascaderList}
+                                  disabled={disabled}
+                                  showSearch={{
+                                    filter: (inputValue, path) => {
+                                      return path.some(
+                                        option =>
+                                          option.label
+                                            .toLowerCase()
+                                            .indexOf(inputValue.toLowerCase()) > -1
+                                      );
+                                    },
+                                  }}
+                                />
+                              )
+                            ) : (
+                              <Input editing={editable} value={val} />
                             )}
                           </FormItem>
                         );
@@ -423,7 +427,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -441,7 +445,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -459,7 +463,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -478,7 +482,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -496,7 +500,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -514,7 +518,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -532,7 +536,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -549,7 +553,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -566,7 +570,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<DatePicker disabled={disabled} />)}
+                            })(<DatePicker disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -583,7 +587,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -600,7 +604,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -617,7 +621,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<DatePicker disabled={disabled} />)}
+                            })(<DatePicker disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -632,13 +636,15 @@ const EditModalButton = memo<any>(props => {
                   }}
                   onFieldsChange={(props, changedFields, allFields) => {
                     setBaseFormData({ ...baseFormData, ...changedFields });
-                    // setBaseFormData({...baseFormData, changedFields});
                   }}
                   dataSource={baseFormData}
                   style={{ paddingTop: 20 }}
                   footer={false}
-                  columnNumberOneRow={3}
-                  layout="vertical"
+                  columnNumberOneRow={editable ? 3 : 2}
+                  layout={editable ? 'vertical' : 'horizontal'}
+                  hideRequiredMark={!editable}
+                  wrapperCol={{ span: 12 }}
+                  labelCol={{ span: 12 }}
                   columns={[
                     {
                       title: '产品名称',
@@ -652,7 +658,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -669,7 +675,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -686,7 +692,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -703,7 +709,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -720,7 +726,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<DatePicker disabled={disabled} />)}
+                            })(<DatePicker disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -737,7 +743,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<DatePicker disabled={disabled} />)}
+                            })(<DatePicker disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -754,7 +760,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -769,13 +775,15 @@ const EditModalButton = memo<any>(props => {
                   }}
                   onFieldsChange={(props, changedFields, allFields) => {
                     setBaseFormData({ ...baseFormData, ...changedFields });
-                    // setBaseFormData({...baseFormData, changedFields});
                   }}
                   dataSource={baseFormData}
                   style={{ paddingTop: 20 }}
                   footer={false}
-                  columnNumberOneRow={3}
-                  layout="vertical"
+                  columnNumberOneRow={editable ? 3 : 2}
+                  layout={editable ? 'vertical' : 'horizontal'}
+                  hideRequiredMark={!editable}
+                  wrapperCol={{ span: 12 }}
+                  labelCol={{ span: 12 }}
                   columns={[
                     {
                       title: '交易方向',
@@ -792,6 +800,7 @@ const EditModalButton = memo<any>(props => {
                             })(
                               <Select
                                 disabled={disabled}
+                                editing={editable}
                                 options={[
                                   {
                                     label: '买',
@@ -827,6 +836,7 @@ const EditModalButton = memo<any>(props => {
                             })(
                               <Select
                                 disabled={disabled}
+                                editing={editable}
                                 options={[
                                   {
                                     label: '交易',
@@ -859,7 +869,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<Input disabled={disabled} />)}
+                            })(<Input disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -889,6 +899,7 @@ const EditModalButton = memo<any>(props => {
                                   },
                                 ]}
                                 disabled={disabled}
+                                editing={editable}
                               />
                             )}
                           </FormItem>
@@ -911,7 +922,7 @@ const EditModalButton = memo<any>(props => {
                                   required: false,
                                 },
                               ],
-                            })(<InputNumber disabled={disabled} />)}
+                            })(<InputNumber disabled={disabled} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -941,7 +952,7 @@ const EditModalButton = memo<any>(props => {
                   }}
                   columns={columns}
                 />
-                {disabled ? (
+                {!disabled ? (
                   <Button
                     style={{ marginTop: 10 }}
                     onClick={() => {
@@ -961,13 +972,15 @@ const EditModalButton = memo<any>(props => {
                   }}
                   onFieldsChange={(props, changedFields, allFields) => {
                     setBaseFormData({ ...baseFormData, ...changedFields });
-                    // setBaseFormData({...baseFormData, changedFields});
                   }}
                   dataSource={baseFormData}
                   style={{ paddingTop: 20 }}
                   footer={false}
-                  columnNumberOneRow={3}
-                  layout="vertical"
+                  columnNumberOneRow={editable ? 3 : 2}
+                  layout={editable ? 'vertical' : 'horizontal'}
+                  hideRequiredMark={!editable}
+                  wrapperCol={{ span: 12 }}
+                  labelCol={{ span: 12 }}
                   columns={[
                     {
                       title: '主协议',
@@ -996,6 +1009,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 disabled={disabled}
+                                editing={editable}
                               />
                             )}
                           </FormItem>
@@ -1028,6 +1042,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1057,11 +1072,11 @@ const EditModalButton = memo<any>(props => {
                                 data={{
                                   method: PARTY_DOC_CREATE_OR_UPDATE,
                                   params: JSON.stringify({
-                                    name: '风险调查问卷',
+                                    name: '风险问卷调查',
                                   }),
                                 }}
-                                editing={!disabled}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1095,6 +1110,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1128,6 +1144,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1161,6 +1178,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1194,6 +1212,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1227,6 +1246,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1260,6 +1280,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1293,6 +1314,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1326,6 +1348,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                editing={editable}
                                 disabled={disabled}
                               />
                             )}
@@ -1369,7 +1392,6 @@ const EditModalButton = memo<any>(props => {
                   if (item.endsWith('Date') && baseData[item]) {
                     baseData[item] = baseData[item].split(' ')[0];
                   }
-                  // debugger
                   if (item.endsWith('Doc')) {
                     baseData[item] = baseFormData[item].value
                       .map(param => {
@@ -1386,10 +1408,10 @@ const EditModalButton = memo<any>(props => {
                 });
                 const tradeAuthorizer = traderList.map(item => {
                   return {
-                    tradeAuthorizerName: item.姓名.value,
-                    tradeAuthorizerIdNumber: item.身份证号.value,
-                    tradeAuthorizerIdExpiryDate: item.证件有效期.value.split(' ')[0],
-                    tradeAuthorizerPhone: item.联系电话.value,
+                    tradeAuthorizerName: item.name.value,
+                    tradeAuthorizerIdNumber: item.IDNumber.value,
+                    tradeAuthorizerIdExpiryDate: item.periodValidity.value.split(' ')[0],
+                    tradeAuthorizerPhone: item.phoneNumber.value,
                   };
                 });
                 if (Array.isArray(baseData.salesName)) {
