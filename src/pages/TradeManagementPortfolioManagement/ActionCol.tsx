@@ -332,6 +332,7 @@ class ActionCol extends PureComponent<any, any> {
                     <FormItem>
                       {form.getFieldDecorator({})(
                         <Select
+                          style={{ minWidth: 180 }}
                           placeholder="请输入交易ID查询"
                           allowClear={true}
                           showSearch={true}

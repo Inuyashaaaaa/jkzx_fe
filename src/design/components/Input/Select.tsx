@@ -113,7 +113,7 @@ class Select extends InputBase<
         onSearch={this.onSearch}
         notFoundContent={this.state.loading ? <Loading /> : undefined}
         {...omit(this.props, ['autoSelect', 'onValueChange', 'editing', 'defaultOpen'])}
-        style={{ width: '100%', minWidth: 180, ...this.props.style }}
+        style={{ width: '100%', ...this.props.style }}
         onChange={this.onChange}
         ref={this.getRef}
       >
