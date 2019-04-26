@@ -42,15 +42,21 @@ const TABLE_COL_DEFS = fetchTable => [
   },
   {
     title: '操作',
+    dataIndex: 'action',
     render: (val, record) => {
-      console.log(record);
       return <CashInsertModal record={record} fetchTable={fetchTable} />;
     },
   },
 ];
 
-const CashExportModal = memo<any>(props => {
+const CashExportModal = memo<{
+  visible: boolean;
+  trade: object;
+  convertVisible: any;
+  loadData?: any;
+}>(props => {
   const [dataSource, setDataSource] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(
     () => {
@@ -72,9 +78,11 @@ const CashExportModal = memo<any>(props => {
   };
 
   const fetchTable = async () => {
+    setLoading(true);
     const { error, data } = await cliUnProcessedTradeTaskListByTradeId({
       tradeId: props.trade.tradeId,
     });
+    setLoading(false);
     if (error) return;
     setDataSource(data);
   };
@@ -95,6 +103,7 @@ const CashExportModal = memo<any>(props => {
         footer={false}
       >
         <Table2
+          loading={loading}
           pagination={false}
           dataSource={dataSource}
           columns={TABLE_COL_DEFS(fetchTable)}

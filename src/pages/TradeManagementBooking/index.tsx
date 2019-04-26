@@ -1,44 +1,30 @@
+import { LEG_FIELD, LEG_ID_FIELD, PREMIUM_TYPE_MAP } from '@/constants/common';
 import {
-  LEG_FIELD,
-  LEG_ID_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_ZHCH_MAP,
-  PREMIUM_TYPE_MAP,
-} from '@/constants/common';
-import {
-  FORM_EDITABLE_STATUS,
-  TRADESCOL_FIELDS,
   COMPUTED_LEG_FIELDS,
   COMPUTED_LEG_FIELD_MAP,
+  FORM_EDITABLE_STATUS,
+  TRADESCOL_FIELDS,
 } from '@/constants/global';
-import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
-import {
-  LEG_ENV,
-  TOTAL_LEGS,
-  TOTAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
-} from '@/constants/legs';
+import { LEG_ENV } from '@/constants/legs';
+import { PRICING_FROM_TAG } from '@/constants/trade';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
+import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
-import { Form2, Loading, ModalButton, Table2 } from '@/design/components';
-import { VERTICAL_GUTTER } from '@/design/components/SourceTable';
-import { IFormField, ITableData } from '@/design/components/type';
+import MultiLegTable from '@/containers/MultiLegTable';
+import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
+import { Form2, ModalButton } from '@/design/components';
+import { IFormField } from '@/design/components/type';
 import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
-import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
 import { trdTradeCreate } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
-import { ILeg, ILegColDef } from '@/types/leg';
-import { Affix, Button, Divider, Menu, message, Modal, Row } from 'antd';
+import { ILeg } from '@/types/leg';
+import { Affix, Button, Divider, Menu, message, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import './index.less';
-import { PRICING_FROM_TAG } from '@/constants/trade';
-import { LEG_MAP } from '@/constants/legType';
-import MultiLegTable from '@/containers/MultiLegTable';
-import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 
 const ActionBar = memo<any>(props => {
   const { setTableData, tableData, tableEl, currentUser } = props;
@@ -48,8 +34,12 @@ const ActionBar = memo<any>(props => {
 
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
-  const [cashModalDataSource, setcashModalDataSource] = useState([]);
   const [cashModalVisible, setCashModalVisible] = useState(false);
+
+  const handleCancel = () => {
+    setCashModalVisible(false);
+    setCreateFormData({});
+  };
 
   return (
     <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
@@ -115,16 +105,7 @@ const ActionBar = memo<any>(props => {
 
                 setCreateModalVisible(false);
                 setTableData([]);
-                setCreateFormData({});
 
-                const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
-                  tradeId: trade.tradeId,
-                  legalName: Form2.getFieldValue(createFormData.counterPartyCode),
-                });
-
-                if (_error) return;
-
-                setcashModalDataSource(_data);
                 setCashModalVisible(true);
               },
               onCancel: () => setCreateModalVisible(false),
@@ -142,57 +123,11 @@ const ActionBar = memo<any>(props => {
         </Button.Group>
       </Row>
 
-      <Modal
+      <CashExportModal
         visible={cashModalVisible}
-        title="现金流管理"
-        width={900}
-        onCancel={() => setCashModalVisible(false)}
-        onOk={() => setCashModalVisible(false)}
-      >
-        <Table2
-          pagination={false}
-          dataSource={cashModalDataSource}
-          columns={[
-            {
-              title: '交易对手',
-              dataIndex: 'legalName',
-            },
-            {
-              title: '交易编号',
-              dataIndex: 'tradeId',
-            },
-            {
-              title: '账户编号',
-              dataIndex: 'accountId',
-            },
-            {
-              title: '现金流',
-              dataIndex: 'cashFlow',
-            },
-            {
-              title: '生命周期事件',
-              dataIndex: 'lcmEventType',
-            },
-            {
-              title: '处理状态',
-              dataIndex: 'processStatus',
-              render: value => {
-                if (value === 'PROCESSED') {
-                  return '已处理';
-                }
-                return '未处理';
-              },
-            },
-            {
-              title: '操作',
-              dataIndex: 'action',
-              render: (val, record) => {
-                return <a href="javascript:;">资金录入(等待接入新的资金窗口）</a>;
-              },
-            },
-          ]}
-        />
-      </Modal>
+        trade={Form2.getFieldsValue(createFormData)}
+        convertVisible={handleCancel}
+      />
     </Affix>
   );
 });
