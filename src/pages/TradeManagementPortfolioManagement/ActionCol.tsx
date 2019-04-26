@@ -40,13 +40,9 @@ class ActionCol extends PureComponent<any, any> {
       bookList: [],
       tableDataSource: [],
       portfolioName: props.params.data.portfolioName,
+      tradeIdsData: [],
     };
   }
-
-  public componentDidMount = () => {
-    // this.status = this.props.status;
-    // this.onTradeTableSearch();
-  };
 
   public onChange = async () => {
     const { error, data } = await trdPortfolioUpdate({
@@ -65,9 +61,6 @@ class ActionCol extends PureComponent<any, any> {
       portfolioName: params.data.portfolioName,
     });
     if (error) return;
-    // return () => {
-    //   this.props.reload();
-    // };
     this.props.reload();
   };
 
@@ -106,10 +99,12 @@ class ActionCol extends PureComponent<any, any> {
     });
   };
 
-  public onBatch = ({ domEvent }) => {
+  public onBatch = async ({ domEvent }) => {
     domEvent.preventDefault();
-    // this.onTradeTableSearch({ current: 1, pageSize: 10 });
-    // const { searchFormData, pagination } = this.state;
+    const { searchFormData } = this.state;
+    if (JSON.stringify(searchFormData) === '{}' || !searchFormData) {
+      return;
+    }
     const newFormData = this.getFormData();
     const formatValues = _.mapValues(newFormData, (val, key) => {
       if (isMoment(val)) {
@@ -117,23 +112,33 @@ class ActionCol extends PureComponent<any, any> {
       }
       return val;
     });
-    formatValues.tradeId.forEach(async item => {
-      const { error, data } = await trdTradePortfolioCreateBatch({
-        tradeId: item,
-        portfolioNames: [this.state.portfolio.portfolioName],
-      });
-      if (error) return message.error(`交易ID${item}加入投资组失败`);
-      message.success(`交易ID${item}加入投资组成功`);
-    });
+    let count = formatValues.tradeId.length;
+    const results = await Promise.all(
+      formatValues.tradeId.map(item => {
+        return trdTradePortfolioCreateBatch({
+          tradeId: item,
+          portfolioNames: [this.state.portfolio.portfolioName],
+        });
+      })
+    );
+    const errors = results.filter(item => item.error);
+    message.success(`${count - errors.length}笔加入投资组成功`);
     this.onTradeTableSearch({
       current: 1,
       pageSize: 10,
       portfolioNames: [this.state.portfolio.portfolioName],
     });
+    this.setState({
+      searchFormData: {},
+    });
   };
 
   public search = () => {
-    this.onTradeTableSearch();
+    this.onTradeTableSearch({
+      current: 1,
+      pageSize: 10,
+      portfolioNames: [this.state.portfolio.portfolioName],
+    });
   };
 
   public onReset = event => {
@@ -165,13 +170,6 @@ class ActionCol extends PureComponent<any, any> {
       loading: true,
     });
     const { searchFormData, pagination } = this.state;
-    // const newFormData = this.getFormData();
-    // const formatValues = _.mapValues(newFormData, (val, key) => {
-    //   if (isMoment(val)) {
-    //     return val.format('YYYY-MM-DD');
-    //   }
-    //   return val;
-    // });
 
     this.setState({ loading: true });
     const { error, data } = await trdTradeSearchIndexPaged({
@@ -209,8 +207,21 @@ class ActionCol extends PureComponent<any, any> {
       []
     );
 
+    const tradeIds = await trdTradeListBySimilarTradeId({
+      similarTradeId: '',
+    });
+    if (tradeIds.error) return [];
+    let tradeIdsData = tradeIds.data.map(item => ({
+      label: item,
+      value: item,
+    }));
+    tradeIdsData = tradeIdsData.filter(
+      item => !tableDataSource.map(t => t.tradeId).includes(item.value)
+    );
+
     this.setState({
       tableDataSource,
+      tradeIdsData,
       pagination: {
         ...pagination,
         ...paramsPagination,
@@ -266,21 +277,16 @@ class ActionCol extends PureComponent<any, any> {
   public render() {
     const { params } = this.props;
     return (
-      <Row type="flex" align="middle" style={{ height: params.context.rowHeight }}>
+      <Row type="flex" align="middle">
         <Button.Group>
           <Button type="primary" onClick={this.showModal}>
             查看/修改
           </Button>
-          <PopconfirmButton
-            type="danger"
-            size="small"
-            popconfirmProps={{
-              onConfirm: this.onRemove,
-              title: '确认删除?',
-            }}
-          >
-            删除
-          </PopconfirmButton>
+          <Popconfirm title="确认删除？" onConfirm={this.onRemove}>
+            <Button type="danger" style={{ marginLeft: '5px', border: '1px solid #ccc' }}>
+              删除
+            </Button>
+          </Popconfirm>
         </Button.Group>
         <Modal
           title="投资组合详情"
@@ -314,11 +320,9 @@ class ActionCol extends PureComponent<any, any> {
             ref={node => (this.$table2 = node)}
             layout="inline"
             dataSource={this.state.searchFormData}
-            // dataSource={this.state.tableDataSource}
             submitText="加入投资组合"
             resetable={false}
             onSubmitButtonClick={this.onBatch}
-            // onResetButtonClick={this.onReset}
             onFieldsChange={this.onFieldsChange}
             columns={[
               {
@@ -332,6 +336,7 @@ class ActionCol extends PureComponent<any, any> {
                           allowClear={true}
                           showSearch={true}
                           fetchOptionsOnSearch={true}
+                          style={{ minWidth: '200px' }}
                           mode="multiple"
                           options={
                             this.state.bookIdList.length
@@ -341,23 +346,7 @@ class ActionCol extends PureComponent<any, any> {
                                     value: item,
                                   };
                                 })
-                              : async (value: string = '') => {
-                                  const { data, error } = await trdTradeListBySimilarTradeId({
-                                    similarTradeId: value,
-                                  });
-                                  if (error) return [];
-                                  let _data = data.map(item => ({
-                                    label: item,
-                                    value: item,
-                                  }));
-                                  _data = _data.filter(
-                                    item =>
-                                      !this.state.tableDataSource
-                                        .map(t => t.tradeId)
-                                        .includes(item.value)
-                                  );
-                                  return _data;
-                                }
+                              : this.state.tradeIdsData
                           }
                         />
                       )}
@@ -372,8 +361,6 @@ class ActionCol extends PureComponent<any, any> {
               size="middle"
               pagination={{
                 position: 'bottom',
-                //   showSizeChanger: true,
-                //   onShowSizeChange: this.onShowSizeChange,
                 showQuickJumper: true,
                 current: this.state.pagination.current,
                 pageSize: this.state.pageSizeCurrent,
