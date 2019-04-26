@@ -4,6 +4,11 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
+  UNIT_ENUM_MAP,
+  REBATETYPE_UNIT_MAP,
+  REBATETYPE_TYPE_MAP,
+  KNOCK_DIRECTION_MAP,
+  OPTION_TYPE_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
 import {
@@ -54,10 +59,17 @@ import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
+import { Rebate } from '../legFields/Rebate';
+import { ObservationType } from '../legFields/ObservationType';
+import { KnockDirection } from '../legFields/KnockDirection';
+import { RebateUnit } from '../legFields/RebateUnit';
+import { RebateType } from '../legFields/RebateType';
+import { BarrierType } from '../legFields/BarrierType';
+import { Barrier } from '../legFields/Barrier';
 
-export const VanillaAmerican: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
-  type: LEG_TYPE_MAP.VANILLA_AMERICAN,
+export const BarrierLeg: ILeg = {
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.BARRIER],
+  type: LEG_TYPE_MAP.BARRIER,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
@@ -66,15 +78,20 @@ export const VanillaAmerican: ILeg = {
         Direction,
         NotionalAmountType,
         InitialSpot,
+        StrikeType,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
         OptionType,
-        ParticipationRate,
-        StrikeType,
         Strike,
+        Barrier,
+        Rebate,
         Term,
         ExpirationDate,
+        ParticipationRate,
         NotionalAmount,
+        ObservationType,
+        KnockDirection,
+        OptionType,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -83,25 +100,32 @@ export const VanillaAmerican: ILeg = {
       return [
         IsAnnual,
         Direction,
-        NotionalAmountType,
-        InitialSpot,
-        UnderlyerMultiplier,
-        UnderlyerInstrumentId,
         OptionType,
-        ParticipationRate,
+        UnderlyerInstrumentId,
+        UnderlyerMultiplier,
+        InitialSpot,
         StrikeType,
         Strike,
-        Term,
-        ExpirationDate,
-        NotionalAmount,
+        KnockDirection,
         SpecifiedPrice,
-        EffectiveDate,
+        Term,
         SettlementDate,
         DaysInYear,
+        ParticipationRate,
+        NotionalAmountType,
+        NotionalAmount,
+        EffectiveDate,
+        ExpirationDate,
+        RebateUnit,
+        RebateType,
+        Rebate,
+        BarrierType,
+        Barrier,
         PremiumType,
         Premium,
-        MinimumPremium,
         FrontPremium,
+        MinimumPremium,
+        ObservationType,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -109,25 +133,32 @@ export const VanillaAmerican: ILeg = {
       return [
         IsAnnual,
         Direction,
-        NotionalAmountType,
-        InitialSpot,
-        UnderlyerMultiplier,
-        UnderlyerInstrumentId,
         OptionType,
-        ParticipationRate,
+        UnderlyerInstrumentId,
+        UnderlyerMultiplier,
+        InitialSpot,
         StrikeType,
         Strike,
-        Term,
-        ExpirationDate,
-        NotionalAmount,
+        KnockDirection,
         SpecifiedPrice,
-        EffectiveDate,
+        Term,
         SettlementDate,
         DaysInYear,
+        ParticipationRate,
+        NotionalAmountType,
+        NotionalAmount,
+        EffectiveDate,
+        ExpirationDate,
+        RebateUnit,
+        RebateType,
+        Rebate,
+        BarrierType,
+        Barrier,
         PremiumType,
         Premium,
-        MinimumPremium,
         FrontPremium,
+        MinimumPremium,
+        ObservationType,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -143,9 +174,12 @@ export const VanillaAmerican: ILeg = {
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
+      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
+      [LEG_FIELD.REBATE_UNIT]: REBATETYPE_UNIT_MAP.PERCENT,
+      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-      [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       ...(env === LEG_ENV.PRICING
         ? {
@@ -166,7 +200,7 @@ export const VanillaAmerican: ILeg = {
       'premiumPercent',
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;
+    nextPosition.productType = LEG_TYPE_MAP.BARRIER;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       ...COMPUTED_FIELDS,
@@ -187,16 +221,11 @@ export const VanillaAmerican: ILeg = {
     nextPosition.asset.settlementDate =
       nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
     return nextPosition;
   },
-  getPageData: (env: string, position: any) => {
-    return Form2.createFields({
-      strikePercentAndNumber: position.asset.strike,
-    });
-  },
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
@@ -217,5 +246,29 @@ export const VanillaAmerican: ILeg = {
       setColValue,
       setTableData
     );
+
+    const { changedFields } = changeFieldsParams;
+
+    if (changedFields[LEG_FIELD.BARRIER] || changedFields[LEG_FIELD.STRIKE]) {
+      const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
+      const strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
+      if (barrier != null && strike != null) {
+        record[LEG_FIELD.KNOCK_DIRECTION] =
+          barrier > strike
+            ? Form2.createField(KNOCK_DIRECTION_MAP.UP)
+            : Form2.createField(KNOCK_DIRECTION_MAP.DOWN);
+      }
+    }
+
+    if (changedFields[LEG_FIELD.BARRIER] || changedFields[LEG_FIELD.STRIKE]) {
+      const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
+      const strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
+      if (barrier != null && strike != null) {
+        record[LEG_FIELD.OPTION_TYPE] =
+          barrier > strike
+            ? Form2.createField(OPTION_TYPE_MAP.CALL)
+            : Form2.createField(OPTION_TYPE_MAP.PUT);
+      }
+    }
   },
 };

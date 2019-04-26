@@ -6,6 +6,8 @@ import {
   RULES_REQUIRED,
   STRIKE_TYPES_MAP,
   REBATETYPE_TYPE_OPTIONS,
+  OBSERVATION_TYPE_OPTIONS,
+  REBATETYPE_UNIT_OPTIONS,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/design/components';
@@ -15,9 +17,9 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
 
-export const RebateType: ILegColDef = {
-  title: '补偿支付方式',
-  dataIndex: LEG_FIELD.REBATE_TYPE,
+export const HighRebate: ILegColDef = {
+  title: '高敲出补偿价',
+  dataIndex: LEG_FIELD.HIGH_REBATE,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -29,11 +31,13 @@ export const RebateType: ILegColDef = {
     return false;
   },
   render: (val, record, index, { form, editing, colDef }) => {
+    // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
+
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select defaultOpen={editing} editing={editing} options={REBATETYPE_TYPE_OPTIONS} />)}
+        })(<UnitInputNumber autoSelect={true} unit="%" editing={editing} />)}
       </FormItem>
     );
   },

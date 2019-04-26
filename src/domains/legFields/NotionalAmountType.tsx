@@ -6,27 +6,11 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
-
-const getSelectProps = record => {
-  return {
-    type: 'select',
-    options: [
-      {
-        label: '手数',
-        value: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
-      },
-      {
-        label: '人民币',
-        value: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
-      },
-    ],
-  };
-};
 
 export const NotionalAmountType: ILegColDef = {
   title: '名义本金类型',
@@ -36,26 +20,32 @@ export const NotionalAmountType: ILegColDef = {
       return false;
     }
 
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
+    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isBooking || isPricing) {
       return true;
     }
     return false;
   },
   render: (val, record, idnex, { form, editing, colDef }) => {
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
-
+    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(
           <Select
-            {...getSelectProps(record)}
             defaultOpen={isBooking || isPricing}
             editing={isBooking || isPricing ? editing : false}
+            options={[
+              {
+                label: '手数',
+                value: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
+              },
+              {
+                label: '人民币',
+                value: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
+              },
+            ]}
           />
         )}
       </FormItem>

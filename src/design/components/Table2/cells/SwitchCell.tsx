@@ -36,10 +36,19 @@ class SwitchCell extends PureComponent<
     const editable = getEditable(props.colDef.editable, colDef, record, rowIndex);
     const editableChanged = editable !== state.editable;
 
+    const defaultEditing =
+      typeof colDef.defaultEditing === 'function'
+        ? colDef.defaultEditing(record, rowIndex)
+        : colDef.defaultEditing;
+
     return {
       editableChanged,
       editable,
-      editing: editableChanged ? _.get(colDef, 'defaultEditing', !editable) : state.editing,
+      editing: editableChanged
+        ? defaultEditing == null
+          ? !editable
+          : defaultEditing
+        : state.editing,
     };
   };
 

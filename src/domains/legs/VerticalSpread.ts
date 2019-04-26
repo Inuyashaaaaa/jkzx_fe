@@ -54,10 +54,14 @@ import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
+import { PaymentType } from '../legFields/PaymentType';
+import { RebateType } from '../legFields/RebateType';
+import { LowStrike } from '../legFields/LowStrike';
+import { HighStrike } from '../legFields/HighStrike';
 
-export const VanillaAmerican: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
-  type: LEG_TYPE_MAP.VANILLA_AMERICAN,
+export const VerticalSpread: ILeg = {
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VERTICAL_SPREAD],
+  type: LEG_TYPE_MAP.VERTICAL_SPREAD,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
@@ -69,11 +73,12 @@ export const VanillaAmerican: ILeg = {
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
         OptionType,
-        ParticipationRate,
+        LowStrike,
         StrikeType,
-        Strike,
+        HighStrike,
         Term,
         ExpirationDate,
+        ParticipationRate,
         NotionalAmount,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
@@ -83,25 +88,24 @@ export const VanillaAmerican: ILeg = {
       return [
         IsAnnual,
         Direction,
-        NotionalAmountType,
-        InitialSpot,
-        UnderlyerMultiplier,
-        UnderlyerInstrumentId,
         OptionType,
-        ParticipationRate,
+        UnderlyerInstrumentId,
+        UnderlyerMultiplier,
+        InitialSpot,
         StrikeType,
-        Strike,
+        LowStrike,
+        HighStrike,
         Term,
-        ExpirationDate,
-        NotionalAmount,
-        SpecifiedPrice,
         EffectiveDate,
-        SettlementDate,
+        ExpirationDate,
+        SpecifiedPrice,
         DaysInYear,
+        SettlementDate,
+        ParticipationRate,
+        NotionalAmountType,
+        NotionalAmount,
         PremiumType,
         Premium,
-        MinimumPremium,
-        FrontPremium,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -109,25 +113,24 @@ export const VanillaAmerican: ILeg = {
       return [
         IsAnnual,
         Direction,
-        NotionalAmountType,
-        InitialSpot,
-        UnderlyerMultiplier,
-        UnderlyerInstrumentId,
         OptionType,
-        ParticipationRate,
+        UnderlyerInstrumentId,
+        UnderlyerMultiplier,
+        InitialSpot,
         StrikeType,
-        Strike,
+        LowStrike,
+        HighStrike,
         Term,
-        ExpirationDate,
-        NotionalAmount,
-        SpecifiedPrice,
         EffectiveDate,
-        SettlementDate,
+        ExpirationDate,
+        SpecifiedPrice,
         DaysInYear,
+        SettlementDate,
+        ParticipationRate,
+        NotionalAmountType,
+        NotionalAmount,
         PremiumType,
         Premium,
-        MinimumPremium,
-        FrontPremium,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -141,11 +144,9 @@ export const VanillaAmerican: ILeg = {
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.TERM]: DEFAULT_TERM,
-      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-      [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       ...(env === LEG_ENV.PRICING
         ? {
@@ -166,7 +167,7 @@ export const VanillaAmerican: ILeg = {
       'premiumPercent',
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;
+    nextPosition.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       ...COMPUTED_FIELDS,
@@ -187,7 +188,7 @@ export const VanillaAmerican: ILeg = {
     nextPosition.asset.settlementDate =
       nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
+    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
     return nextPosition;

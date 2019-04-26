@@ -15,8 +15,24 @@ import { Vol } from '@/domains/legFields/trades/Vol';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
+import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
+import { VerticalSpread } from '@/domains/legs/VerticalSpread';
+import { PositionId } from '@/domains/legFields/infos/PositionId';
+import { LcmEventType } from '@/domains/legFields/infos/LcmEventType';
+import { InitialNotionalAmount } from '@/domains/legFields/infos/InitialNotionalAmount';
+import { AlUnwindNotionalAmount } from '@/domains/legFields/infos/AlUnwindNotionalAmount';
+import { BarrierLeg } from '@/domains/legs/Barrier';
+import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 
-export const TOTAL_LEGS = [VanillaAmerican, VanillaEuropean, DigitalLegAmerican];
+export const TOTAL_LEGS = [
+  VanillaAmerican,
+  VanillaEuropean,
+  DigitalLegAmerican,
+  DigitalLegEuropean,
+  VerticalSpread,
+  BarrierLeg,
+  DoubleSharkFin,
+];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
 
@@ -31,6 +47,13 @@ export const TOTAL_COMPUTED_FIELDS = [
   StdDelta,
   Theta,
   Vega,
+];
+
+export const TOTAL_EDITING_FIELDS = [
+  PositionId,
+  LcmEventType,
+  InitialNotionalAmount,
+  AlUnwindNotionalAmount,
 ];
 
 export const LEG_ENV = {

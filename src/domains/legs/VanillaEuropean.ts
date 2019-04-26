@@ -6,7 +6,12 @@ import {
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
-import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
+import {
+  LEG_ENV,
+  TOTAL_COMPUTED_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
+  TOTAL_EDITING_FIELDS,
+} from '@/constants/legs';
 import { Form2 } from '@/design/components';
 import {
   IFormField,
@@ -57,27 +62,40 @@ export const VanillaEuropean: ILeg = {
   type: LEG_TYPE_MAP.VANILLA_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
-    const commonFields = [
-      IsAnnual,
-      Direction,
-      NotionalAmountType,
-      InitialSpot,
-      UnderlyerMultiplier,
-      UnderlyerInstrumentId,
-      OptionType,
-      ParticipationRate,
-      StrikeType,
-      Strike,
-      Term,
-      ExpirationDate,
-      NotionalAmount,
-    ];
     if (env === LEG_ENV.PRICING) {
-      return [...commonFields, ...TOTAL_TRADESCOL_FIELDS, ...TOTAL_COMPUTED_FIELDS];
+      return [
+        IsAnnual,
+        Direction,
+        NotionalAmountType,
+        InitialSpot,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        OptionType,
+        ParticipationRate,
+        StrikeType,
+        Strike,
+        Term,
+        ExpirationDate,
+        NotionalAmount,
+        ...TOTAL_TRADESCOL_FIELDS,
+        ...TOTAL_COMPUTED_FIELDS,
+      ];
     }
     if (env === LEG_ENV.EDITING) {
       return [
-        ...commonFields,
+        IsAnnual,
+        Direction,
+        NotionalAmountType,
+        InitialSpot,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        OptionType,
+        ParticipationRate,
+        StrikeType,
+        Strike,
+        Term,
+        ExpirationDate,
+        NotionalAmount,
         SpecifiedPrice,
         EffectiveDate,
         SettlementDate,
@@ -86,15 +104,24 @@ export const VanillaEuropean: ILeg = {
         Premium,
         MinimumPremium,
         FrontPremium,
-        PositionId,
-        LcmEventType,
-        InitialNotionalAmount,
-        AlUnwindNotionalAmount,
+        ...TOTAL_EDITING_FIELDS,
       ];
     }
     if (env === LEG_ENV.BOOKING) {
       return [
-        ...commonFields,
+        IsAnnual,
+        Direction,
+        NotionalAmountType,
+        InitialSpot,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        OptionType,
+        ParticipationRate,
+        StrikeType,
+        Strike,
+        Term,
+        ExpirationDate,
+        NotionalAmount,
         SpecifiedPrice,
         EffectiveDate,
         SettlementDate,

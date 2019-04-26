@@ -2,41 +2,45 @@ import {
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  OPTION_TYPE_OPTIONS,
+  PREMIUM_TYPE_MAP,
   RULES_REQUIRED,
+  STRIKE_TYPES_MAP,
+  REBATETYPE_TYPE_OPTIONS,
+  KNOCK_DIRECTION_OPTIONS,
 } from '@/constants/common';
-import { Select } from '@/design/components';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import { Form2, Select } from '@/design/components';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import { Tooltip, Icon } from 'antd';
 import React from 'react';
-import { Icon, Tooltip } from 'antd';
 
-const getProps = record => {};
-
-export const OptionType: ILegColDef = {
-  title: '类型',
-  dataIndex: LEG_FIELD.OPTION_TYPE,
+export const KnockDirection: ILegColDef = {
+  title: '敲出方向',
+  dataIndex: LEG_FIELD.KNOCK_DIRECTION,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER) {
+    if (isEditing) {
       return false;
     }
-    if (isEditing) {
+    if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.BARRIER) {
       return false;
     }
     return true;
   },
-  defaultEditing: () => false,
+  defaultEditing: record => {
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
-    // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     const showTip = record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER && !editing;
 
     return (
       <FormItem>
         {showTip ? (
           <Tooltip
-            title="行权价>障碍价为看涨;行权价>障碍价为看跌"
+            title="行权价>障碍价为向下;行权价>障碍价为向上"
             trigger="hover"
             placement="right"
             arrowPointAtCenter={true}
@@ -44,12 +48,7 @@ export const OptionType: ILegColDef = {
             {form.getFieldDecorator({
               rules: RULES_REQUIRED,
             })(
-              <Select
-                defaultOpen={editing}
-                editing={editing}
-                options={OPTION_TYPE_OPTIONS}
-                {...getProps(record)}
-              />
+              <Select defaultOpen={editing} editing={editing} options={KNOCK_DIRECTION_OPTIONS} />
             )}
             <Icon
               type="alert"
@@ -66,12 +65,9 @@ export const OptionType: ILegColDef = {
           form.getFieldDecorator({
             rules: RULES_REQUIRED,
           })(
-            <Select
-              defaultOpen={editing}
-              editing={editing}
-              options={OPTION_TYPE_OPTIONS}
-              {...getProps(record)}
-            />
+            form.getFieldDecorator({
+              rules: RULES_REQUIRED,
+            })(<Select defaultOpen={editing} editing={editing} options={KNOCK_DIRECTION_OPTIONS} />)
           )
         )}
       </FormItem>

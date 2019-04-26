@@ -13,6 +13,10 @@ import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import _ from 'lodash';
+import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
+import { VerticalSpread } from '@/domains/legs/VerticalSpread';
+import { BarrierLeg } from '@/domains/legs/Barrier';
+import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 
 export const isModelXY = data => {
   return (
@@ -160,12 +164,24 @@ export const getLegByProductType = (productType, exerciseType) => {
     if (exerciseType === EXERCISETYPE_MAP.AMERICAN) {
       return DigitalLegAmerican;
     }
+    if (exerciseType === EXERCISETYPE_MAP.EUROPEAN) {
+      return DigitalLegEuropean;
+    }
   }
   if (productType === PRODUCT_TYPE_MAP.VANILLA_AMERICAN) {
     return VanillaAmerican;
   }
   if (productType === PRODUCT_TYPE_MAP.VANILLA_EUROPEAN) {
     return VanillaEuropean;
+  }
+  if (productType === PRODUCT_TYPE_MAP.VERTICAL_SPREAD) {
+    return VerticalSpread;
+  }
+  if (productType === PRODUCT_TYPE_MAP.BARRIER) {
+    return BarrierLeg;
+  }
+  if (productType === PRODUCT_TYPE_MAP.DOUBLE_SHARK_FIN) {
+    return DoubleSharkFin;
   }
   throw new Error('not match productType!');
 };

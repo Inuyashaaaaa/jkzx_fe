@@ -6,6 +6,8 @@ import {
   RULES_REQUIRED,
   STRIKE_TYPES_MAP,
   REBATETYPE_TYPE_OPTIONS,
+  KNOCK_DIRECTION_OPTIONS,
+  UNIT_ENUM_OPTIONS,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/design/components';
@@ -15,9 +17,9 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
 
-export const RebateType: ILegColDef = {
-  title: '补偿支付方式',
-  dataIndex: LEG_FIELD.REBATE_TYPE,
+export const BarrierType: ILegColDef = {
+  title: '障碍类型',
+  dataIndex: LEG_FIELD.BARRIER_TYPE,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -33,7 +35,7 @@ export const RebateType: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select defaultOpen={editing} editing={editing} options={REBATETYPE_TYPE_OPTIONS} />)}
+        })(<Select defaultOpen={editing} editing={editing} options={UNIT_ENUM_OPTIONS} />)}
       </FormItem>
     );
   },

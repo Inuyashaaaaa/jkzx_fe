@@ -295,13 +295,13 @@ export const LCM_EVENT_TYPE_OPTIONS = convertOptions(LCM_EVENT_TYPE_MAP, LCM_EVE
 export const UNIT_ENUM_ZHCN_MAP = {
   CNY: '人民币',
   PERCENT: '百分比',
-  USD: '美元',
+  // USD: '美元',
 };
 
 export const UNIT_ENUM_MAP = {
   CNY: 'CNY',
   PERCENT: 'PERCENT',
-  USD: 'USD',
+  // USD: 'USD',
 };
 
 export const UNIT_ENUM_OPTIONS = Object.keys(UNIT_ENUM_MAP).map(key => ({
@@ -746,7 +746,7 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN]: '欧式二元',
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL]: '欧式二元 - 年化',
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL]: '欧式二元 - 非年化',
-  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '价差',
+  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '欧式价差',
   [LEG_TYPE_MAP.VERTICAL_SPREAD_UNANNUAL]: '欧式价差 - 非年化',
   [LEG_TYPE_MAP.VERTICAL_SPREAD_ANNUAL]: '欧式价差 - 年化',
   [LEG_TYPE_MAP.BARRIER]: '单鲨',

@@ -27,7 +27,7 @@ export const Vol: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber editing={editing} autoSelect={true} />)}
+        })(<UnitInputNumber unit="%" editing={editing} autoSelect={true} />)}
       </FormItem>
     );
   },
