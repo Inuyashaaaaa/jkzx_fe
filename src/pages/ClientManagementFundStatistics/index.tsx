@@ -7,6 +7,7 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { queryCompleteCompanys } from '@/services/sales';
+import { sortByCreateAt } from '@/services/sort';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { ADDRESS_CASCADER, SEARCH_FORM_CONTROLS, TABLE_COL_DEF } from './constants';
@@ -90,7 +91,7 @@ class ClientManagementFundStatistics extends PureComponent {
     if (error) return;
 
     this.setState({
-      tableDataSource: data,
+      tableDataSource: sortByCreateAt(data),
     });
   };
 
