@@ -2,7 +2,7 @@ import ImportExcelButton from '@/lib/components/_ImportExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mdlModelDataGet, mdlModelXYCreate } from '@/services/model';
-import { Button, Input, Modal, notification, Row, Select, Spin, Table, Tabs } from 'antd';
+import { Button, Input, Modal, notification, Row, Select, Spin, Table, Tabs, message } from 'antd';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
@@ -217,9 +217,7 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
-      return notification.error({
-        message: '没有模型数据',
-      });
+      return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane
     setImportBlock(false);
@@ -282,9 +280,7 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
-      return notification.error({
-        message: '没有模型数据',
-      });
+      return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane
     setImportBlock(false);
