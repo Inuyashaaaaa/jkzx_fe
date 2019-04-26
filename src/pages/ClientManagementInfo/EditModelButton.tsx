@@ -66,10 +66,10 @@ const useTableData = props => {
     setBaseFormData(newData);
     const _traderList = (authorizers || []).map(item => {
       item = {
-        姓名: item.tradeAuthorizerName,
-        联系电话: item.tradeAuthorizerPhone,
-        证件有效期: item.tradeAuthorizerIdExpiryDate,
-        身份证号: item.tradeAuthorizerIdNumber,
+        name: item.tradeAuthorizerName,
+        phoneNumber: item.tradeAuthorizerPhone,
+        periodValidity: item.tradeAuthorizerIdExpiryDate,
+        IDNumber: item.tradeAuthorizerIdNumber,
       };
       Object.keys(item).forEach(async param => {
         item[param] = {
@@ -103,7 +103,7 @@ const EditModalButton = memo<any>(props => {
   const columns = [
     {
       title: '姓名',
-      dataIndex: '姓名',
+      dataIndex: 'name',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -120,7 +120,7 @@ const EditModalButton = memo<any>(props => {
     },
     {
       title: '身份证号',
-      dataIndex: '身份证号',
+      dataIndex: 'IDNumber',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -137,7 +137,7 @@ const EditModalButton = memo<any>(props => {
     },
     {
       title: '证件有效期',
-      dataIndex: '证件有效期',
+      dataIndex: 'periodValidity',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -154,7 +154,7 @@ const EditModalButton = memo<any>(props => {
     },
     {
       title: '联系电话',
-      dataIndex: '联系电话',
+      dataIndex: 'phoneNumber',
       render: (val, record, index, { form, editing }) => {
         return (
           <FormItem hasFeedback={!disabled ? true : false}>
@@ -171,7 +171,7 @@ const EditModalButton = memo<any>(props => {
     },
     {
       title: '操作',
-      dataIndex: '操作',
+      dataIndex: 'action',
       render: (val, record, index, { form, editing }) => {
         return (
           <a
@@ -952,7 +952,7 @@ const EditModalButton = memo<any>(props => {
                   }}
                   columns={columns}
                 />
-                {disabled ? (
+                {!disabled ? (
                   <Button
                     style={{ marginTop: 10 }}
                     onClick={() => {
@@ -1408,10 +1408,10 @@ const EditModalButton = memo<any>(props => {
                 });
                 const tradeAuthorizer = traderList.map(item => {
                   return {
-                    tradeAuthorizerName: item.姓名.value,
-                    tradeAuthorizerIdNumber: item.身份证号.value,
-                    tradeAuthorizerIdExpiryDate: item.证件有效期.value.split(' ')[0],
-                    tradeAuthorizerPhone: item.联系电话.value,
+                    tradeAuthorizerName: item.name.value,
+                    tradeAuthorizerIdNumber: item.IDNumber.value,
+                    tradeAuthorizerIdExpiryDate: item.periodValidity.value.split(' ')[0],
+                    tradeAuthorizerPhone: item.phoneNumber.value,
                   };
                 });
                 if (Array.isArray(baseData.salesName)) {
