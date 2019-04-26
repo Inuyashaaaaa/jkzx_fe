@@ -19,6 +19,7 @@ export default class MultilLegCreateButton extends PureComponent<{
       return item.type === 'MODEL_XY_ANNUAL' || item.type === 'MODEL_XY_UNANNUAL';
     });
     const usedLegs = this.props.isPricing ? pricingUsedLegs : allLegTypes;
+    if (!usedLegs) return;
     return [
       {
         name: '年化',

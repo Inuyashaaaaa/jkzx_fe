@@ -229,14 +229,6 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
     }
 
     if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
-      if (legType === LEG_TYPE_MAP.FORWARD_UNANNUAL) {
-        return this.$exerciseModal.show(
-          this.activeRowData,
-          this.state.tableFormData,
-          this.props.currentUser,
-          () => this.props.onSearch(true)
-        );
-      }
       return this.$settleModal.show(
         this.activeRowData,
         this.state.tableFormData,
