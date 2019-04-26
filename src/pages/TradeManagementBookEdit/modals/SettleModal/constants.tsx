@@ -1,7 +1,12 @@
 import { INPUT_NUMBER_CURRENCY_CNY_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
+import { Button } from 'antd';
+import React from 'react';
 
-export const SETTLE_FORM_CONTROLS: IFormControl[] = [
+export const SETTLE_FORM_CONTROLS: (productType, handleSettleAmount) => IFormControl[] = (
+  productType,
+  handleSettleAmount
+) => [
   {
     field: 'NUM_OF_OPTIONS',
     control: {
@@ -52,7 +57,16 @@ export const SETTLE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '结算金额',
     },
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+    input: productType.includes('MODEL_XY')
+      ? INPUT_NUMBER_CURRENCY_CNY_CONFIG
+      : {
+          ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+          after: (
+            <Button key="upload" type="primary" onClick={handleSettleAmount}>
+              结算
+            </Button>
+          ),
+        },
     decorator: {
       rules: [
         {

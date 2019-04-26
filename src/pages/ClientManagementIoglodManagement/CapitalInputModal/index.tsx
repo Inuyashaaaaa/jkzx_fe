@@ -227,7 +227,7 @@ const ClientManagementInsert = memo<any>(props => {
   return (
     <>
       <Modal
-        title="台账资金录入(由生命周期事件引起)"
+        title="台账资金录入"
         onOk={handleConfirm}
         onCancel={handleCancel}
         okText="录入"
