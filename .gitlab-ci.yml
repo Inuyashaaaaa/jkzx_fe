@@ -57,7 +57,7 @@ Deploy-Release:
   script:
     - yarn run deploy:release
   only:
-    - release/*
+    - /release.*/
 
 Deploy-Test:
   stage: deploy
