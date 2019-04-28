@@ -4,7 +4,8 @@ const mkdirp = require('mkdirp');
 const fs = require('fs');
 
 const TEST_CONTAINER = 'FE-test';
-const PROD_CONTAINER = 'FE-release';
+const PROD_CONTAINER = 'FE-prod';
+const RELEASE_CONTAINER = 'FE-release';
 const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 
@@ -65,6 +66,20 @@ function test() {
   last(prodContainerPath);
 }
 
+function release() {
+  const prodContainerPath = path.join(USER_PATH, RELEASE_CONTAINER);
+  // 检测目标容器
+  // @todo 获取当前 master 的标签作为文件名
+  const filename = new Date().toISOString();
+  console.log(`文件名：${filename}`);
+
+  // 拷贝文件到目标位置
+  cp(path.join(__dirname, '../dist/*'), path.join(prodContainerPath, filename));
+
+  // 更新 last
+  last(prodContainerPath);
+}
+
 function doc() {
   const prodContainerPath = path.join(USER_PATH, DOC_CONTAINER);
 
@@ -79,6 +94,10 @@ console.log(`发布环境：${denv}`);
 
 if (denv === 'prod') {
   prod();
+}
+
+if (denv === 'release') {
+  release();
 }
 
 if (denv === 'test') {

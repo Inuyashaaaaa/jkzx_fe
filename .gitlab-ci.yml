@@ -27,7 +27,6 @@ Install:
   only:
     - master
     - master-staging
-    - zz-master-staging
 
 Lint:
   stage: test
@@ -36,7 +35,6 @@ Lint:
   only:
     - master
     - master-staging
-    - zz-master-staging
 
 Test:
   stage: test
@@ -45,7 +43,6 @@ Test:
   only:
     - master
     - master-staging
-    - zz-master-staging
 
 Build:
   stage: build
@@ -54,7 +51,13 @@ Build:
   only:
     - master
     - master-staging
-    - zz-master-staging
+
+Deploy-Release:
+  stage: deploy
+  script:
+    - yarn run deploy:release
+  only:
+    - release/*
 
 Deploy-Test:
   stage: deploy
@@ -62,20 +65,19 @@ Deploy-Test:
     - yarn run deploy:test
   only:
     - master-staging
-    - zz-master-staging
-
-Deploy-Doc:
-  stage: deploy
-  script:
-    - yarn run deploy:doc
-  when: manual
-  only:
-    - master
 
 Deploy-Prod:
   stage: deploy
   script:
     - yarn run deploy:prod
+  when: manual
+  only:
+    - master
+
+Deploy-Doc:
+  stage: deploy
+  script:
+    - yarn run deploy:doc
   when: manual
   only:
     - master
