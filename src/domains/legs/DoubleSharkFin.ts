@@ -261,7 +261,10 @@ export const DoubleSharkFin: ILeg = {
 
     const { changedFields } = changeFieldsParams;
 
-    if (changedFields[LEG_FIELD.BARRIER] || changedFields[LEG_FIELD.STRIKE]) {
+    if (
+      Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.STRIKE, changedFields)
+    ) {
       const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
       const strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
       if (barrier != null && strike != null) {
@@ -272,7 +275,10 @@ export const DoubleSharkFin: ILeg = {
       }
     }
 
-    if (changedFields[LEG_FIELD.BARRIER] || changedFields[LEG_FIELD.STRIKE]) {
+    if (
+      Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.STRIKE, changedFields)
+    ) {
       const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
       const strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
       if (barrier != null && strike != null) {

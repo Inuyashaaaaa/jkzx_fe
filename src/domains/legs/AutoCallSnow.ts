@@ -1,21 +1,20 @@
 import {
   ASSET_CLASS_MAP,
-  EXERCISETYPE_MAP,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
+  FREQUENCY_TYPE_MAP,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
-  UNIT_ENUM_MAP,
-  REBATETYPE_UNIT_MAP,
-  REBATETYPE_TYPE_MAP,
-  KNOCK_DIRECTION_MAP,
-  OPTION_TYPE_MAP,
+  OB_DAY_FIELD,
+  PAYMENT_TYPE_MAP,
+  UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/design/components';
 import {
@@ -31,134 +30,130 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
-  STRIKE_TYPES_MAP,
 } from '../../constants/common';
 import { Direction } from '../legFields';
+import { AutoCallStrike } from '../legFields/AutoCallStrike';
+import { AutoCallStrikeUnit } from '../legFields/AutoCallStrikeUnit';
+import { CouponEarnings } from '../legFields/CouponEarnings';
 import { DaysInYear } from '../legFields/DaysInYear';
 import { EffectiveDate } from '../legFields/EffectiveDate';
 import { ExpirationDate } from '../legFields/ExpirationDate';
+import { ExpireNoBarrierObserveDay } from '../legFields/ExpireNoBarrierObserveDay';
+import { ExpireNoBarrierPremium } from '../legFields/ExpireNoBarrierPremium';
+import { ExpireNoBarrierPremiumType } from '../legFields/ExpireNoBarrierPremiumType';
 import { FrontPremium } from '../legFields/FrontPremium';
-import { AlUnwindNotionalAmount } from '../legFields/infos/AlUnwindNotionalAmount';
-import { InitialNotionalAmount } from '../legFields/infos/InitialNotionalAmount';
-import { LcmEventType } from '../legFields/infos/LcmEventType';
-import { PositionId } from '../legFields/infos/PositionId';
 import { InitialSpot } from '../legFields/InitialSpot';
-import { IsAnnual } from '../legFields/IsAnnual';
+import { KnockDirection } from '../legFields/KnockDirection';
 import { MinimumPremium } from '../legFields/MinimumPremium';
 import { NotionalAmount } from '../legFields/NotionalAmount';
 import { NotionalAmountType } from '../legFields/NotionalAmountType';
-import { OptionType } from '../legFields/OptionType';
 import { ParticipationRate } from '../legFields/ParticipationRate';
 import { Premium } from '../legFields/Premium';
 import { PremiumType } from '../legFields/PremiumType';
 import { SettlementDate } from '../legFields/SettlementDate';
 import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
-import { Strike } from '../legFields/Strike';
-import { StrikeType } from '../legFields/StrikeType';
+import { Step } from '../legFields/Step';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
+import { UpBarrier } from '../legFields/UpBarrier';
+import { UpBarrierType } from '../legFields/UpBarrierType';
+import { UpObservationStep } from '../legFields/UpObservationStep';
 import { commonLinkage } from '../tools';
-import { Rebate } from '../legFields/Rebate';
-import { ObservationType } from '../legFields/ObservationType';
-import { KnockDirection } from '../legFields/KnockDirection';
-import { RebateUnit } from '../legFields/RebateUnit';
-import { RebateType } from '../legFields/RebateType';
-import { BarrierType } from '../legFields/BarrierType';
-import { Barrier } from '../legFields/Barrier';
 
-export const BarrierLeg: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.BARRIER],
-  type: LEG_TYPE_MAP.BARRIER,
+export const AutoCallSnow: ILeg = {
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL],
+  type: LEG_TYPE_MAP.AUTOCALL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
       return [
-        IsAnnual,
         Direction,
-        NotionalAmountType,
-        InitialSpot,
-        StrikeType,
-        UnderlyerMultiplier,
         UnderlyerInstrumentId,
-        OptionType,
-        Strike,
-        Barrier,
-        Rebate,
+        UnderlyerMultiplier,
+        InitialSpot,
+        ParticipationRate,
         Term,
         ExpirationDate,
-        ParticipationRate,
+        NotionalAmountType,
         NotionalAmount,
-        ObservationType,
         KnockDirection,
-        OptionType,
+        UpBarrierType,
+        UpBarrier,
+        Step,
+        CouponEarnings,
+        ExpireNoBarrierPremiumType,
+        ExpireNoBarrierPremium,
+        AutoCallStrikeUnit,
+        AutoCallStrike,
+        ExpireNoBarrierObserveDay,
+        UpObservationStep,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
     }
     if (env === LEG_ENV.EDITING) {
       return [
-        IsAnnual,
+        SpecifiedPrice,
         Direction,
-        OptionType,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
         InitialSpot,
-        StrikeType,
-        Strike,
-        KnockDirection,
-        SpecifiedPrice,
-        Term,
-        SettlementDate,
-        DaysInYear,
         ParticipationRate,
-        NotionalAmountType,
-        NotionalAmount,
+        Term,
         EffectiveDate,
         ExpirationDate,
-        RebateUnit,
-        RebateType,
-        Rebate,
-        BarrierType,
-        Barrier,
+        SettlementDate,
+        DaysInYear,
         PremiumType,
         Premium,
-        FrontPremium,
         MinimumPremium,
-        ObservationType,
+        FrontPremium,
+        NotionalAmountType,
+        NotionalAmount,
+        KnockDirection,
+        UpBarrierType,
+        UpBarrier,
+        Step,
+        CouponEarnings,
+        ExpireNoBarrierPremiumType,
+        ExpireNoBarrierPremium,
+        AutoCallStrikeUnit,
+        AutoCallStrike,
+        ExpireNoBarrierObserveDay,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
     if (env === LEG_ENV.BOOKING) {
       return [
-        IsAnnual,
+        SpecifiedPrice,
         Direction,
-        OptionType,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
         InitialSpot,
-        StrikeType,
-        Strike,
-        KnockDirection,
-        SpecifiedPrice,
-        Term,
-        SettlementDate,
-        DaysInYear,
         ParticipationRate,
-        NotionalAmountType,
-        NotionalAmount,
+        Term,
         EffectiveDate,
         ExpirationDate,
-        RebateUnit,
-        RebateType,
-        Rebate,
-        BarrierType,
-        Barrier,
+        SettlementDate,
+        DaysInYear,
         PremiumType,
         Premium,
-        FrontPremium,
         MinimumPremium,
-        ObservationType,
+        FrontPremium,
+        NotionalAmountType,
+        NotionalAmount,
+        KnockDirection,
+        UpBarrierType,
+        UpBarrier,
+        Step,
+        CouponEarnings,
+        ExpireNoBarrierPremiumType,
+        ExpireNoBarrierPremium,
+        AutoCallStrikeUnit,
+        AutoCallStrike,
+        ExpireNoBarrierObserveDay,
+        UpObservationStep,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -166,21 +161,21 @@ export const BarrierLeg: ILeg = {
   getDefaultData: env => {
     return Form2.createFields({
       // expirationTime: '15:00:00',
-      [IsAnnual.dataIndex]: true,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.IS_ANNUAL]: true,
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
-      [LEG_FIELD.REBATE_UNIT]: REBATETYPE_UNIT_MAP.PERCENT,
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
-      [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
+      [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
+      [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
+      [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
+      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
+      [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],
+      [LEG_FIELD.STEP]: 0,
       ...(env === LEG_ENV.PRICING
         ? {
             [LEG_FIELD.TERM]: DEFAULT_TERM,
@@ -191,28 +186,33 @@ export const BarrierLeg: ILeg = {
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
     const COMPUTED_FIELDS = [
-      'numOfOptions',
-      'strikePercent',
-      'numOfUnderlyerContracts',
-      'premiumPerUnit',
-      'trigger',
-      'notional',
-      'premiumPercent',
+      LEG_FIELD.UP_BARRIER,
+      LEG_FIELD.UP_BARRIER_TYPE,
+      UpObservationStep.dataIndex,
+      ExpireNoBarrierObserveDay.dataIndex,
+      LEG_FIELD.IS_ANNUAL,
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.BARRIER;
-    nextPosition.asset = _.omit(dataItem, [
-      ...LEG_INJECT_FIELDS,
-      ...COMPUTED_FIELDS,
-      ...(dataItem[LEG_FIELD.IS_ANNUAL]
-        ? []
-        : [
-            LEG_FIELD.TERM,
-            LEG_FIELD.DAYS_IN_YEAR,
-            MinimumPremium.dataIndex,
-            FrontPremium.dataIndex,
-          ]),
-    ]);
+    nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
+    nextPosition.asset = _.omit(dataItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+    nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
+
+    if (
+      nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+      EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+    ) {
+      nextPosition.asset[LEG_FIELD.AUTO_CALL_STRIKE_UNIT] = undefined;
+      nextPosition.asset[LEG_FIELD.AUTO_CALL_STRIKE] = undefined;
+    } else {
+      nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
+    }
+
+    nextPosition.asset.observationDates = dataItem[ExpireNoBarrierObserveDay.dataIndex].map(
+      item => item[OB_DAY_FIELD]
+    );
+
+    nextPosition.asset.barrier = dataItem[LEG_FIELD.UP_BARRIER];
+    nextPosition.asset.barrierType = dataItem[LEG_FIELD.UP_BARRIER_TYPE];
 
     nextPosition.asset.effectiveDate =
       nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
@@ -221,11 +221,24 @@ export const BarrierLeg: ILeg = {
     nextPosition.asset.settlementDate =
       nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.settlementDate =
+      env === LEG_ENV.PRICING
+        ? nextPosition.asset.expirationDate
+        : nextPosition.asset.settlementDate;
+
+    nextPosition.asset.annualized = true;
 
     return nextPosition;
   },
-  getPageData: (env: string, position: any) => {},
+  getPageData: (env: string, position: any) => {
+    return Form2.createFields({
+      [ExpireNoBarrierObserveDay.dataIndex]: (position.asset.observationDates || []).map(item => ({
+        [OB_DAY_FIELD]: item,
+      })),
+      [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
+      [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
+    });
+  },
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
@@ -246,35 +259,5 @@ export const BarrierLeg: ILeg = {
       setColValue,
       setTableData
     );
-
-    const { changedFields } = changeFieldsParams;
-
-    if (
-      Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.STRIKE, changedFields)
-    ) {
-      const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
-      const strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
-      if (barrier != null && strike != null) {
-        record[LEG_FIELD.KNOCK_DIRECTION] =
-          barrier > strike
-            ? Form2.createField(KNOCK_DIRECTION_MAP.UP)
-            : Form2.createField(KNOCK_DIRECTION_MAP.DOWN);
-      }
-    }
-
-    if (
-      Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.STRIKE, changedFields)
-    ) {
-      const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
-      const strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
-      if (barrier != null && strike != null) {
-        record[LEG_FIELD.OPTION_TYPE] =
-          barrier > strike
-            ? Form2.createField(OPTION_TYPE_MAP.CALL)
-            : Form2.createField(OPTION_TYPE_MAP.PUT);
-      }
-    }
   },
 };
