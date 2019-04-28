@@ -14,6 +14,7 @@ import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
@@ -185,6 +186,9 @@ export const getLegByProductType = (productType, exerciseType) => {
   }
   if (productType === PRODUCT_TYPE_MAP.DOUBLE_SHARK_FIN) {
     return DoubleSharkFin;
+  }
+  if (productType === PRODUCT_TYPE_MAP.EAGLE) {
+    return Eagle;
   }
   if (productType === PRODUCT_TYPE_MAP.RANGE_ACCRUALS) {
     return RangeAccruals;
