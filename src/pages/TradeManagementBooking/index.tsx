@@ -108,9 +108,9 @@ class BookCreate extends PureComponent<any> {
     }
     return {
       [LEG_FIELD.PREMIUM]: Math.abs(
-        defaultData[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT
+        (defaultData[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT
           ? pricingData[COMPUTED_LEG_FIELD_MAP.PRICE_PER]
-          : pricingData[COMPUTED_LEG_FIELD_MAP.PRICE]
+          : pricingData[COMPUTED_LEG_FIELD_MAP.PRICE]) || 0
       ),
     };
   };
@@ -122,7 +122,7 @@ class BookCreate extends PureComponent<any> {
     if (from === PRICING_FROM_TAG) {
       const dataSource = this.props.pricingData.dataSource.map(item => {
         const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
-        const defaultData = leg.getDefault({}, false);
+        const defaultData = createLegDataSourceItem(leg, leg.getDefault({}, false));
         const pricingColumnDefs = leg.getColumnDefs('pricing');
         const bookColumnDefs = leg.getColumnDefs('booking');
         const differenceColumnDefs = _.differenceBy(
@@ -142,11 +142,13 @@ class BookCreate extends PureComponent<any> {
       this.setState({
         dataSource,
         columnDefs: orderLegColDefs(
-          _.unionBy(
-            dataSource.reduce((container, item) => {
-              const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
-              return container.concat(leg.getColumnDefs('booking'));
-            }, []),
+          _.unionBy<IColDef>(
+            this.chainColumnsDefs(
+              dataSource.reduce((container, item) => {
+                const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
+                return container.concat(leg.getColumnDefs('booking'));
+              }, [])
+            ),
             item => item.field
           )
         ),
@@ -200,40 +202,42 @@ class BookCreate extends PureComponent<any> {
     return this.judgeLegTypeExsit(colDef, data);
   };
 
+  public chainColumnsDefs = (columnDefs: IColDef[]): IColDef[] => {
+    return columnDefs.map<IColDef>(col => {
+      return {
+        ...col,
+        suppressMenu: true,
+        editable: col.editable
+          ? params => {
+              if (typeof col.editable === 'function') {
+                if (col.editable(params)) {
+                  return this.handleJudge(params);
+                } else {
+                  return false;
+                }
+              }
+              return this.handleJudge(params);
+            }
+          : false,
+        exsitable: params => {
+          const legExsitable = this.handleJudge(params);
+          if (!legExsitable) return false;
+          if (typeof col.exsitable === 'function') {
+            return col.exsitable(params);
+          }
+          return col.exsitable === undefined ? true : col.exsitable;
+        },
+      };
+    });
+  };
+
   public addLegData = (leg, rowData) => {
     this.setState(
       produce((state: any) => {
         if (this.cacheTyeps.indexOf(leg.type) !== -1) {
           state.columnDefs = orderLegColDefs(
             _.unionBy<IColDef>(
-              state.columnDefs.concat(
-                leg.getColumnDefs().map(col => {
-                  return {
-                    ...col,
-                    suppressMenu: true,
-                    editable: col.editable
-                      ? params => {
-                          if (typeof col.editable === 'function') {
-                            if (col.editable(params)) {
-                              return this.handleJudge(params);
-                            } else {
-                              return false;
-                            }
-                          }
-                          return this.handleJudge(params);
-                        }
-                      : false,
-                    exsitable: params => {
-                      const legExsitable = this.handleJudge(params);
-                      if (!legExsitable) return false;
-                      if (typeof col.exsitable === 'function') {
-                        return col.exsitable(params);
-                      }
-                      return col.exsitable === undefined ? true : col.exsitable;
-                    },
-                  };
-                })
-              ),
+              state.columnDefs.concat(this.chainColumnsDefs(leg.getColumnDefs())),
               item => item.field
             )
           );
