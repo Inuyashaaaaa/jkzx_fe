@@ -18,6 +18,7 @@ import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { Concava } from '@/domains/legs/Concava';
+import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 
 export const isModelXY = data => {
   return (
@@ -186,6 +187,9 @@ export const getLegByProductType = (productType, exerciseType) => {
   }
   if (productType === PRODUCT_TYPE_MAP.DOUBLE_SHARK_FIN) {
     return DoubleSharkFin;
+  }
+  if (productType === PRODUCT_TYPE_MAP.RANGE_ACCRUALS) {
+    return RangeAccruals;
   }
   throw new Error('not match productType!');
 };
