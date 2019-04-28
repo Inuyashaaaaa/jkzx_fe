@@ -106,7 +106,7 @@ export const commonLinkage = (
   setTableData: (newData: ITableData[]) => void
 ) => {
   const { changedFields } = changeFieldsParams;
-  if (Form2.fieldIsEffective(changedFields[LEG_FIELD.UNDERLYER_INSTRUMENT_ID])) {
+  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
     fetchUnderlyerMultiplier(
       env,
       changeFieldsParams,
@@ -119,7 +119,7 @@ export const commonLinkage = (
     );
   }
 
-  if (Form2.fieldIsEffective(changedFields[LEG_FIELD.UNDERLYER_INSTRUMENT_ID])) {
+  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
     fetchInitialSpot(
       env,
       changeFieldsParams,
@@ -132,7 +132,10 @@ export const commonLinkage = (
     );
   }
 
-  if (changedFields[LEG_FIELD.TERM] || changedFields[LEG_FIELD.EFFECTIVE_DATE]) {
+  if (
+    Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
+    Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)
+  ) {
     const term = Form2.getFieldValue(record[LEG_FIELD.TERM]);
     const effectiveDate = Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE]);
     if (term !== undefined && effectiveDate !== undefined) {
@@ -145,7 +148,10 @@ export const commonLinkage = (
     }
   }
 
-  if (changedFields[LEG_FIELD.PREMIUM] || changedFields[LEG_FIELD.MINIMUM_PREMIUM]) {
+  if (
+    Form2.fieldValueIsChange(LEG_FIELD.PREMIUM, changedFields) ||
+    Form2.fieldValueIsChange(LEG_FIELD.MINIMUM_PREMIUM, changedFields)
+  ) {
     const permium = Form2.getFieldValue(record[LEG_FIELD.PREMIUM], 0);
     const miniumPermium = Form2.getFieldValue(record[LEG_FIELD.MINIMUM_PREMIUM], 0);
     record[LEG_FIELD.FRONT_PREMIUM] = Form2.createField(
@@ -156,7 +162,7 @@ export const commonLinkage = (
     );
   }
 
-  if (changedFields[LEG_FIELD.PREMIUM_TYPE]) {
+  if (Form2.fieldValueIsChange(LEG_FIELD.PREMIUM_TYPE, changedFields)) {
     const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
     record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
       permiumType === PREMIUM_TYPE_MAP.PERCENT
@@ -164,7 +170,7 @@ export const commonLinkage = (
         : Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.LOT);
   }
 
-  if (changedFields[LEG_FIELD.IS_ANNUAL]) {
+  if (Form2.fieldValueIsChange(LEG_FIELD.IS_ANNUAL, changedFields)) {
     const isAnnual = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]);
     record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] = Form2.createField(
       isAnnual ? NOTIONAL_AMOUNT_TYPE_MAP.CNY : NOTIONAL_AMOUNT_TYPE_MAP.LOT
@@ -173,17 +179,16 @@ export const commonLinkage = (
 
   if (env === LEG_ENV.PRICING) {
     if (!Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL])) {
-      if (changedFields[LEG_FIELD.EXPIRATION_DATE]) {
+      if (Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields)) {
         record[LEG_FIELD.TERM] = Form2.createField(
-          getMoment(Form2.getFieldValue(changedFields[LEG_FIELD.EXPIRATION_DATE])).diff(
-            getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])),
-            'days'
-          )
+          getMoment(
+            Form2.getFieldValue(Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields))
+          ).diff(getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])), 'days')
         );
       }
     }
 
-    if (changedFields[LEG_FIELD.INITIAL_SPOT]) {
+    if (Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)) {
       const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
       record[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE] = Form2.createField(initialSpot);
     }

@@ -41,8 +41,17 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     return _.mapValues(fields, val => Form.getFieldValue(val));
   };
 
-  public static fieldIsEffective = (field: any) => {
+  public static fieldValueIsEffective = (field: any) => {
     return field && !_.get(field, 'validating') && !_.get(field, 'errors');
+  };
+
+  public static fieldValueIsChange = (dataIndex: string, changedFields: any[]) => {
+    if (Object.keys(changedFields).length > 1) {
+      // form validate 会触发大量的修改，暂时根据数量判断
+      return false;
+    }
+
+    return Form.fieldValueIsEffective(changedFields[dataIndex]);
   };
 
   public DecoratorForm: ComponentClass<IFormBaseProps>;
