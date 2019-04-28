@@ -2,6 +2,8 @@ import { AllInputProps } from '@/lib/components/_Form2/Input';
 import { convertOptions } from '@/utils';
 import { COMPUTED_LEG_FIELD_MAP, TRADESCOLDEFS_LEG_FIELD_MAP } from './global';
 
+export const OB_PRICE_FIELD = 'price';
+
 export const OB_DAY_FIELD = 'obDay';
 
 export const BOOK_NAME_FIELD = 'bookName';
