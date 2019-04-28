@@ -24,6 +24,7 @@ import { AlUnwindNotionalAmount } from '@/domains/legFields/infos/AlUnwindNotion
 import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { Eagle } from '@/domains/legs/Eagle';
+import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -34,6 +35,7 @@ export const TOTAL_LEGS = [
   BarrierLeg,
   DoubleSharkFin,
   Eagle,
+  RangeAccruals,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
