@@ -25,6 +25,7 @@ import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { TripleDigital } from '@/domains/legs/TripleDigital';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -36,6 +37,7 @@ export const TOTAL_LEGS = [
   DoubleSharkFin,
   Eagle,
   RangeAccruals,
+  TripleDigital,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];

@@ -19,6 +19,7 @@ import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { TripleDigital } from '@/domains/legs/TripleDigital';
 
 export const isModelXY = data => {
   return (
@@ -190,6 +191,9 @@ export const getLegByProductType = (productType, exerciseType) => {
   }
   if (productType === PRODUCT_TYPE_MAP.RANGE_ACCRUALS) {
     return RangeAccruals;
+  }
+  if (productType === PRODUCT_TYPE_MAP.TRIPLE_DIGITAL) {
+    return TripleDigital;
   }
   throw new Error('not match productType!');
 };

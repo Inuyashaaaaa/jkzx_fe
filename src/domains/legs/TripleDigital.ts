@@ -1,11 +1,11 @@
 import {
   ASSET_CLASS_MAP,
-  BIG_NUMBER_CONFIG,
   LEG_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
@@ -24,7 +24,6 @@ import {
   ITableTriggerCellFieldsChangeParams,
 } from '@/design/components/type';
 import { ILeg } from '@/types/leg';
-import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import { Direction } from '../legFields';
@@ -37,8 +36,12 @@ import { IsAnnual } from '../legFields/IsAnnual';
 import { MinimumPremium } from '../legFields/MinimumPremium';
 import { NotionalAmount } from '../legFields/NotionalAmount';
 import { NotionalAmountType } from '../legFields/NotionalAmountType';
-import { ParticipationRate1 } from '../legFields/ParticipationRate1';
-import { ParticipationRate2 } from '../legFields/ParticipationRate2';
+import { OptionType } from '../legFields/OptionType';
+import { ParticipationRate } from '../legFields/ParticipationRate';
+import { PaymentType } from '../legFields/PaymentType';
+import { Payment1 } from '../legFields/Payment1';
+import { Payment2 } from '../legFields/Payment2';
+import { Payment3 } from '../legFields/Payment3';
 import { Premium } from '../legFields/Premium';
 import { PremiumType } from '../legFields/PremiumType';
 import { SettlementDate } from '../legFields/SettlementDate';
@@ -46,16 +49,15 @@ import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
 import { Strike1 } from '../legFields/Strike1';
 import { Strike2 } from '../legFields/Strike2';
 import { Strike3 } from '../legFields/Strike3';
-import { Strike4 } from '../legFields/Strike4';
 import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
 
-export const Eagle: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.EAGLE],
-  type: LEG_TYPE_MAP.EAGLE,
+export const TripleDigital: ILeg = {
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.TRIPLE_DIGITAL],
+  type: LEG_TYPE_MAP.TRIPLE_DIGITAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
@@ -64,18 +66,21 @@ export const Eagle: ILeg = {
         Direction,
         NotionalAmountType,
         InitialSpot,
-        StrikeType,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
+        OptionType,
+        StrikeType,
+        ParticipationRate,
         Strike1,
         Strike2,
         Strike3,
-        Strike4,
         Term,
-        ParticipationRate1,
-        ParticipationRate2,
         ExpirationDate,
         NotionalAmount,
+        PaymentType,
+        Payment1,
+        Payment2,
+        Payment3,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -84,27 +89,31 @@ export const Eagle: ILeg = {
       return [
         IsAnnual,
         Direction,
-        DaysInYear,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
         InitialSpot,
         SpecifiedPrice,
         SettlementDate,
-        ParticipationRate1,
-        ParticipationRate2,
+        Term,
+        DaysInYear,
+        ParticipationRate,
         NotionalAmount,
         NotionalAmountType,
         EffectiveDate,
         ExpirationDate,
-        StrikeType,
-        Strike1,
-        Strike2,
-        Strike3,
-        Strike4,
+        PaymentType,
         PremiumType,
         Premium,
         FrontPremium,
         MinimumPremium,
+        OptionType,
+        StrikeType,
+        Strike1,
+        Strike2,
+        Strike3,
+        Payment1,
+        Payment2,
+        Payment3,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -112,27 +121,31 @@ export const Eagle: ILeg = {
       return [
         IsAnnual,
         Direction,
-        DaysInYear,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
         InitialSpot,
         SpecifiedPrice,
         SettlementDate,
-        ParticipationRate1,
-        ParticipationRate2,
+        Term,
+        DaysInYear,
+        ParticipationRate,
         NotionalAmount,
         NotionalAmountType,
         EffectiveDate,
         ExpirationDate,
-        StrikeType,
-        Strike1,
-        Strike2,
-        Strike3,
-        Strike4,
+        PaymentType,
         PremiumType,
         Premium,
         FrontPremium,
         MinimumPremium,
+        OptionType,
+        StrikeType,
+        Strike1,
+        Strike2,
+        Strike3,
+        Payment1,
+        Payment2,
+        Payment3,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -145,9 +158,9 @@ export const Eagle: ILeg = {
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
-      [LEG_FIELD.PARTICIPATION_RATE1]: 100,
-      [LEG_FIELD.PARTICIPATION_RATE2]: 100,
+      [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
+      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
@@ -171,7 +184,7 @@ export const Eagle: ILeg = {
       'premiumPercent',
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.EAGLE;
+    nextPosition.productType = LEG_TYPE_MAP.TRIPLE_DIGITAL;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       ...COMPUTED_FIELDS,
@@ -217,32 +230,5 @@ export const Eagle: ILeg = {
       setColValue,
       setTableData
     );
-
-    const { changedFields } = changeFieldsParams;
-
-    if (
-      changedFields[LEG_FIELD.PARTICIPATION_RATE1] ||
-      changedFields[LEG_FIELD.PARTICIPATION_RATE2] ||
-      changedFields[LEG_FIELD.STRIKE1] ||
-      changedFields[LEG_FIELD.STRIKE2] ||
-      changedFields[LEG_FIELD.STRIKE3]
-    ) {
-      const participationRate1 = Form2.getFieldValue(record[LEG_FIELD.PARTICIPATION_RATE1]);
-      const participationRate2 = Form2.getFieldValue(record[LEG_FIELD.PARTICIPATION_RATE2]);
-      const strike1 = Form2.getFieldValue(record[LEG_FIELD.STRIKE1]);
-      const strike2 = Form2.getFieldValue(record[LEG_FIELD.STRIKE2]);
-      const strike3 = Form2.getFieldValue(record[LEG_FIELD.STRIKE3]);
-
-      if (participationRate1 && participationRate2 && strike1 && strike2 && strike3) {
-        record[LEG_FIELD.STRIKE4] = Form2.createField(
-          new BigNumber(participationRate1)
-            .dividedBy(participationRate2)
-            .multipliedBy(new BigNumber(strike2).minus(strike1))
-            .plus(strike3)
-            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-            .toNumber()
-        );
-      }
-    }
   },
 };
