@@ -154,7 +154,7 @@ export const getLegByType = (type: string) => {
   return TOTAL_LEGS.find(item => item.type === type);
 };
 
-export const getLegByProductType = (productType, exerciseType) => {
+export const getLegByProductType = (productType, exerciseType?) => {
   if (productType === PRODUCT_TYPE_MAP.DIGITAL) {
     if (exerciseType === EXERCISETYPE_MAP.AMERICAN) {
       return DigitalLegAmerican;

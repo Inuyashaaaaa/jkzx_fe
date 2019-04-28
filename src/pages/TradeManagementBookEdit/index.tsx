@@ -1,4 +1,9 @@
-import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import {
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  LCM_EVENT_TYPE_ZHCN_MAP,
+  LEG_TYPE_FIELD,
+} from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
@@ -16,12 +21,13 @@ import {
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { getLegByRecord, getLegByProductType } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, message, Typography } from 'antd';
+import { Divider, message, Typography, Menu } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
+import LcmEventModal from '@/containers/LcmEventModal';
 
 const TradeManagementBooking = props => {
   const [tableData, setTableData] = useState([]);
@@ -30,6 +36,9 @@ const TradeManagementBooking = props => {
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [eventTypes, setEventTypes] = useState({});
+
+  const [eventType, setEventType] = useState('');
+  const [rowData, setRowData] = useState({});
 
   const addLeg = (leg: ILeg, position) => {
     if (!leg) return;
@@ -121,6 +130,31 @@ const TradeManagementBooking = props => {
     });
   };
 
+  const getContextMenu = params => {
+    const menuItem =
+      eventTypes[params.record.id] &&
+      eventTypes[params.record.id].map(eventType => {
+        return { key: eventType, value: LCM_EVENT_TYPE_ZHCN_MAP[eventType] };
+      });
+    if (!menuItem) return;
+    return (
+      <Menu onClick={({ key }) => bindEventAction(key, params)}>
+        {menuItem.map(item => {
+          return <Menu.Item key={item.key}>{item.value}</Menu.Item>;
+        })}
+      </Menu>
+    );
+  };
+
+  const bindEventAction = (eventType, params) => {
+    const legType = params.record[LEG_TYPE_FIELD];
+
+    // 每次操作后及时更新，并保证数据一致性
+    const activeRowData = params.record;
+    setEventType(eventType);
+    setRowData(params.record);
+  };
+
   useLifecycles(() => {
     loadTableData();
   });
@@ -189,32 +223,14 @@ const TradeManagementBooking = props => {
           });
         }}
         dataSource={tableData}
-        // getContextMenu={params => {
-        //   return (
-        //     <Menu
-        //       onClick={event => {
-        //         if (event.key === 'copy') {
-        //           setTableData(pre => {
-        //             const next = insert(pre, params.rowIndex, {
-        //               ..._.cloneDeep(params.record),
-        //               [LEG_ID_FIELD]: uuid(),
-        //             });
-        //             return next;
-        //           });
-        //         }
-        //         if (event.key === 'remove') {
-        //           setTableData(pre => {
-        //             const next = remove(pre, params.rowIndex);
-        //             return next;
-        //           });
-        //         }
-        //       }}
-        //     >
-        //       <Menu.Item key="copy">复制</Menu.Item>
-        //       <Menu.Item key="remove">删除</Menu.Item>
-        //     </Menu>
-        //   );
-        // }}
+        getContextMenu={getContextMenu}
+      />
+      <LcmEventModal
+        eventType={eventType}
+        rowData={rowData}
+        createFormData={createFormData}
+        currentUser={props.currentUser}
+        loadData={loadTableData}
       />
     </PageHeaderWrapper>
   );
