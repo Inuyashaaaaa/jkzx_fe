@@ -35,7 +35,7 @@ export const BarrierType: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select defaultOpen={editing} editing={editing} options={UNIT_ENUM_OPTIONS} />)}
+        })(<Select defaultOpen={true} editing={editing} options={UNIT_ENUM_OPTIONS} />)}
       </FormItem>
     );
   },
