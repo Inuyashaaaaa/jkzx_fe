@@ -123,10 +123,18 @@ class BookCreate extends PureComponent<any> {
       const dataSource = this.props.pricingData.dataSource.map(item => {
         const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
         const defaultData = leg.getDefault({}, false);
+        const pricingColumnDefs = leg.getColumnDefs('pricing');
+        const bookColumnDefs = leg.getColumnDefs('booking');
+        const differenceColumnDefs = _.differenceBy(
+          pricingColumnDefs,
+          bookColumnDefs,
+          item => item.field
+        );
+        const differenceColumnFields = differenceColumnDefs.map(item => item.field);
 
         return {
           ...defaultData,
-          ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
+          ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS, ...differenceColumnFields]),
           ...this.getConvertPremium(leg, defaultData, item),
           [LEG_PRICING_FIELD]: false,
         };
@@ -135,16 +143,10 @@ class BookCreate extends PureComponent<any> {
         dataSource,
         columnDefs: orderLegColDefs(
           _.unionBy(
-            _.reject(
-              this.props.pricingData.columnDefs,
-              item =>
-                !![...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS].find(key => item.field === key)
-            ).concat(
-              dataSource.reduce((container, item) => {
-                const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
-                return container.concat(leg.getColumnDefs());
-              }, [])
-            ),
+            dataSource.reduce((container, item) => {
+              const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
+              return container.concat(leg.getColumnDefs('booking'));
+            }, []),
             item => item.field
           )
         ),
