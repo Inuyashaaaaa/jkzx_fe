@@ -18,6 +18,7 @@ import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { Concava } from '@/domains/legs/Concava';
+import { Convex } from '@/domains/legs/Convex';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 
 export const isModelXY = data => {
@@ -169,6 +170,9 @@ export const getLegByProductType = (productType, exerciseType) => {
     if (exerciseType === EXERCISETYPE_MAP.EUROPEAN) {
       return DigitalLegEuropean;
     }
+  }
+  if (productType === PRODUCT_TYPE_MAP.CONVEX) {
+    return Convex;
   }
   if (productType === PRODUCT_TYPE_MAP.CONCAVA) {
     return Concava;

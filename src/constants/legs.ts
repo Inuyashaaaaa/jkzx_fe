@@ -24,6 +24,7 @@ import { AlUnwindNotionalAmount } from '@/domains/legFields/infos/AlUnwindNotion
 import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { Concava } from '@/domains/legs/Concava';
+import { Convex } from '@/domains/legs/Convex';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 
 export const TOTAL_LEGS = [
@@ -35,6 +36,7 @@ export const TOTAL_LEGS = [
   BarrierLeg,
   DoubleSharkFin,
   Concava,
+  Convex,
   RangeAccruals,
 ];
 
