@@ -84,12 +84,14 @@ class TradeManagementMarketManagement extends PureComponent {
 
   public composeInstrumentInfo = modalFormData => {
     const instrumentInfoFields = ['multiplier', 'name', 'exchange', 'maturity'];
-
+    let instrumentInfoSomeFields = ['multiplier', 'name', 'exchange', 'maturity'];
+    if (modalFormData.instrumentType === 'INDEX') {
+      instrumentInfoSomeFields = ['name', 'exchange'];
+    }
     const params = {
       ..._.omit(modalFormData, instrumentInfoFields),
-      instrumentInfo: this.omitNull(_.pick(modalFormData, instrumentInfoFields)),
+      instrumentInfo: this.omitNull(_.pick(modalFormData, instrumentInfoSomeFields)),
     };
-
     return this.omitNull(params);
   };
 
