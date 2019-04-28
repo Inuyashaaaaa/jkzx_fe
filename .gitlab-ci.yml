@@ -27,6 +27,7 @@ Install:
   only:
     - master
     - master-staging
+    - /release.*/
 
 Lint:
   stage: test
@@ -35,6 +36,7 @@ Lint:
   only:
     - master
     - master-staging
+    - /release.*/
 
 Test:
   stage: test
@@ -43,6 +45,7 @@ Test:
   only:
     - master
     - master-staging
+    - /release.*/
 
 Build:
   stage: build
@@ -51,6 +54,7 @@ Build:
   only:
     - master
     - master-staging
+    - /release.*/
 
 Deploy-Release:
   stage: deploy
