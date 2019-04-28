@@ -23,6 +23,8 @@ import { InitialNotionalAmount } from '@/domains/legFields/infos/InitialNotional
 import { AlUnwindNotionalAmount } from '@/domains/legFields/infos/AlUnwindNotionalAmount';
 import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { DoubleTouch } from '@/domains/legs/DoubleTouch';
+import { DoubleNoTouch } from '@/domains/legs/DoubleNoTouch';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -32,6 +34,8 @@ export const TOTAL_LEGS = [
   VerticalSpread,
   BarrierLeg,
   DoubleSharkFin,
+  DoubleTouch,
+  DoubleNoTouch,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
