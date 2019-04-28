@@ -17,6 +17,7 @@ import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { Concava } from '@/domains/legs/Concava';
 
 export const isModelXY = data => {
   return (
@@ -167,6 +168,9 @@ export const getLegByProductType = (productType, exerciseType) => {
     if (exerciseType === EXERCISETYPE_MAP.EUROPEAN) {
       return DigitalLegEuropean;
     }
+  }
+  if (productType === PRODUCT_TYPE_MAP.CONCAVA) {
+    return Concava;
   }
   if (productType === PRODUCT_TYPE_MAP.VANILLA_AMERICAN) {
     return VanillaAmerican;
