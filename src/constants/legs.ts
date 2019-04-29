@@ -25,6 +25,7 @@ import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { ModelXy } from '@/domains/legs/ModelXy';
 import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 
@@ -38,6 +39,7 @@ export const TOTAL_LEGS = [
   DoubleSharkFin,
   Eagle,
   RangeAccruals,
+  ModelXy,
   AutoCallSnow,
   AutoCallPhoenix,
 ];
