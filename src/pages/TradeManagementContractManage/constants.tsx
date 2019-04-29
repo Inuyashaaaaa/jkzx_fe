@@ -128,6 +128,9 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   {
     title: '所属投资组合',
     dataIndex: 'portfolioNames',
+    render: (text, record, index) => {
+      return text.join(', ');
+    },
   },
   {
     title: '操作',
