@@ -636,13 +636,7 @@ export const EXERCISETYPE_MAP = {
 
 export const EXTRA_FIELDS = ['positionId', 'quantity', 'lcmEventType', 'productType'];
 
-export const LEG_INJECT_FIELDS = [
-  LEG_ID_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_NAME_FIELD,
-  LEG_FIELD.IS_ANNUAL,
-  LEG_ENV_FIELD,
-];
+export const LEG_INJECT_FIELDS = [LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_NAME_FIELD, LEG_ENV_FIELD];
 
 export const BIG_NUMBER_CONFIG = {
   DECIMAL_PLACES: 4,

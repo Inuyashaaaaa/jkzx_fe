@@ -6,7 +6,7 @@ import {
   TRADESCOL_FIELDS,
 } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
-import { PRICING_FROM_TAG } from '@/constants/trade';
+import { BOOKING_FROM_PRICING } from '@/constants/trade';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
@@ -138,7 +138,7 @@ const TradeManagementBooking = props => {
   const { from } = query;
 
   const [tableData, setTableData] = useState(
-    from === PRICING_FROM_TAG
+    from === BOOKING_FROM_PRICING
       ? (props.pricingData.tableData || []).map(item => {
           const permium = Math.abs(
             Form2.getFieldValue(

@@ -220,7 +220,11 @@ export const AutoCallPhoenix: ILeg = {
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL_PHOENIX;
-    nextPosition.asset = _.omit(dataItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+    nextPosition.asset = _.omit(dataItem, [
+      ...LEG_INJECT_FIELDS,
+      LEG_FIELD.IS_ANNUAL,
+      ...COMPUTED_FIELDS,
+    ]);
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     if (!dataItem[AlreadyBarrier.dataIndex]) {
@@ -231,11 +235,14 @@ export const AutoCallPhoenix: ILeg = {
     nextPosition.asset.barrierType = dataItem[LEG_FIELD.UP_BARRIER_TYPE];
 
     nextPosition.asset.effectiveDate =
-      nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.effectiveDate &&
+      getMoment(nextPosition.asset.effectiveDate).format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
-      nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate &&
+      getMoment(nextPosition.asset.expirationDate).format('YYYY-MM-DD');
     nextPosition.asset.settlementDate =
-      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate &&
+      getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE] = getMoment(
       nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE]

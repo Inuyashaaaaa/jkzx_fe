@@ -40,7 +40,7 @@ export const KnockDirection: ILegColDef = {
       <FormItem>
         {showTip ? (
           <Tooltip
-            title="行权价>障碍价为向下;行权价>障碍价为向上"
+            title="行权价 < 障碍价为向上; 行权价 > 障碍价为向下"
             trigger="hover"
             placement="right"
             arrowPointAtCenter={true}

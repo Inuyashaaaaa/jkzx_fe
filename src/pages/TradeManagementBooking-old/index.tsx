@@ -5,7 +5,7 @@ import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import { COMPUTED_LEG_FIELDS } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import { TRADESCOL_FIELDS } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { LEG_MAP } from '@/constants/legType';
-import { PRICING_FROM_TAG } from '@/constants/trade';
+import { BOOKING_FROM_PRICING } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
@@ -94,7 +94,7 @@ class BookCreate extends PureComponent<any> {
     const { location } = this.props;
     const { query } = location;
     const { from } = query;
-    if (from === PRICING_FROM_TAG) {
+    if (from === BOOKING_FROM_PRICING) {
       const dataSource = this.props.pricingData.dataSource.map(item => {
         const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
         return {

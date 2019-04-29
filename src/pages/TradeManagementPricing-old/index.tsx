@@ -11,7 +11,7 @@ import {
   TradesColDefs,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { PRICING_FROM_TAG } from '@/constants/trade';
+import { BOOKING_FROM_PRICING } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
@@ -335,7 +335,7 @@ class TradeManagementPricing extends PureComponent<any> {
     router.push({
       pathname: '/trade-management/booking',
       query: {
-        from: PRICING_FROM_TAG,
+        from: BOOKING_FROM_PRICING,
       },
     });
   };

@@ -1,6 +1,6 @@
 import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
+import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
@@ -14,19 +14,27 @@ import {
   getTradeCreateModalData,
 } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import { getLegByRecord, getLegByProductType } from '@/tools';
+import { getLegByProductType, getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
 import { Divider, message, Typography } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import ActionBar from './ActionBar';
 import './index.less';
 
 const TradeManagementBooking = props => {
-  const [tableData, setTableData] = useState([]);
-  const [tableLoading, setTableLoading] = useState(false);
+  const { tradeManagementBookEditPageData, dispatch } = props;
+  const { tableData } = tradeManagementBookEditPageData;
+  const setTableData = payload => {
+    dispatch({
+      type: 'tradeManagementBookEdit/setTableData',
+      payload,
+    });
+  };
 
+  const [tableLoading, setTableLoading] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [eventTypes, setEventTypes] = useState({});
@@ -58,6 +66,9 @@ const TradeManagementBooking = props => {
   };
 
   const loadTableData = async () => {
+    setTableData([]);
+    setCreateFormData([]);
+
     if (!props.location.query.id) {
       return message.warn('查看 id 不存在');
     }
@@ -217,6 +228,7 @@ const TradeManagementBooking = props => {
         //   );
         // }}
       />
+      <ActionBar />
     </PageHeaderWrapper>
   );
 };
@@ -224,6 +236,6 @@ const TradeManagementBooking = props => {
 export default memo(
   connect(state => ({
     currentUser: (state.user as any).currentUser,
-    pricingData: state.pricingData,
+    tradeManagementBookEditPageData: state.tradeManagementBookEdit,
   }))(TradeManagementBooking)
 );

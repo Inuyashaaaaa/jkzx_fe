@@ -215,6 +215,7 @@ export const Asia: ILeg = {
 
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
+      LEG_FIELD.IS_ANNUAL,
       LEG_FIELD.OBSERVE_START_DAY,
       LEG_FIELD.OBSERVE_END_DAY,
       LEG_FIELD.OBSERVATION_DATES,

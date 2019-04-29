@@ -1,3 +1,4 @@
+import { getMoment } from '@/utils';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -203,6 +204,7 @@ export const BarrierLeg: ILeg = {
     nextPosition.productType = LEG_TYPE_MAP.BARRIER;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
+      LEG_FIELD.IS_ANNUAL,
       ...COMPUTED_FIELDS,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
@@ -215,11 +217,14 @@ export const BarrierLeg: ILeg = {
     ]);
 
     nextPosition.asset.effectiveDate =
-      nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.effectiveDate &&
+      getMoment(nextPosition.asset.effectiveDate).format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
-      nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate &&
+      getMoment(nextPosition.asset.expirationDate).format('YYYY-MM-DD');
     nextPosition.asset.settlementDate =
-      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate &&
+      getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 

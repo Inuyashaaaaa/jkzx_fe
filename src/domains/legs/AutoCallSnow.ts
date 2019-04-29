@@ -60,6 +60,7 @@ import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
 import { commonLinkage } from '../tools';
+import { getMoment } from '@/utils';
 
 export const AutoCallSnow: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL],
@@ -194,7 +195,11 @@ export const AutoCallSnow: ILeg = {
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
-    nextPosition.asset = _.omit(dataItem, [...LEG_INJECT_FIELDS, ...COMPUTED_FIELDS]);
+    nextPosition.asset = _.omit(dataItem, [
+      ...LEG_INJECT_FIELDS,
+      LEG_FIELD.IS_ANNUAL,
+      ...COMPUTED_FIELDS,
+    ]);
     nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     if (
@@ -215,11 +220,14 @@ export const AutoCallSnow: ILeg = {
     nextPosition.asset.barrierType = dataItem[LEG_FIELD.UP_BARRIER_TYPE];
 
     nextPosition.asset.effectiveDate =
-      nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.effectiveDate &&
+      getMoment(nextPosition.asset.effectiveDate).format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
-      nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate &&
+      getMoment(nextPosition.asset.expirationDate).format('YYYY-MM-DD');
     nextPosition.asset.settlementDate =
-      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate &&
+      getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.settlementDate =
       env === LEG_ENV.PRICING

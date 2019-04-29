@@ -1,3 +1,4 @@
+import { getMoment } from '@/utils';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -170,6 +171,7 @@ export const VerticalSpread: ILeg = {
     nextPosition.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
+      LEG_FIELD.IS_ANNUAL,
       ...COMPUTED_FIELDS,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
@@ -182,22 +184,21 @@ export const VerticalSpread: ILeg = {
     ]);
 
     nextPosition.asset.effectiveDate =
-      nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.effectiveDate &&
+      getMoment(nextPosition.asset.effectiveDate).format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
-      nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate &&
+      getMoment(nextPosition.asset.expirationDate).format('YYYY-MM-DD');
     nextPosition.asset.settlementDate =
-      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate &&
+      getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
     return nextPosition;
   },
-  getPageData: (env: string, position: any) => {
-    return Form2.createFields({
-      strikePercentAndNumber: position.asset.strike,
-    });
-  },
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
