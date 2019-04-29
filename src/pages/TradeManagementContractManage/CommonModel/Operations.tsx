@@ -303,9 +303,7 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
         message.success('展期成功');
         // this.loadData(true);
       }, 100);
-      this.setState({
-        visible: true,
-      });
+      this.props.onSearch();
       return {
         formData: {},
       };

@@ -465,9 +465,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         message.success(this.handleEventType(params.extra.eventType));
         // this.loadData(true);
       }, 100);
-      this.setState({
-        visible: true,
-      });
       return {
         formData: {},
       };
@@ -687,12 +684,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         />
         <ExpirationModal ref={node => (this.$expirationModal = node)} />
         <KnockOutModal ref={node => (this.$knockOutModal = node)} />
-        <ExportModal
-          visible={this.state.visible}
-          trade={this.state.tableFormData}
-          convertVisible={this.convertVisible}
-          loadData={this.loadData}
-        />
         <FixingModal
           ref={node => {
             this.$fixingModal = node;
