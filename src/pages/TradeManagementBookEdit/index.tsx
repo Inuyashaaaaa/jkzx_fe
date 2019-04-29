@@ -171,7 +171,12 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   public loadCommon = (tableDataSource, tableFormData, reset) => {
     // 找到每条腿有的生命周期事件
     tableDataSource.forEach(item => {
-      const leg = allLegTypes.find(it => it.type === item.productType);
+      const leg = allLegTypes.find(it => {
+        if (!it) {
+          return false;
+        }
+        return it.type === item.productType;
+      });
       trdPositionLCMEventTypes({
         positionId: item.id,
       }).then(rsp => {
@@ -266,7 +271,12 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public judgeLegTypeExsit = (colDef, data) => {
-    const legType = allLegTypes.find(item => item.type === data[LEG_TYPE_FIELD]);
+    const legType = allLegTypes.find(it => {
+      if (!it) {
+        return false;
+      }
+      return it.type === data[LEG_TYPE_FIELD];
+    });
 
     if (!legType) return false;
 
