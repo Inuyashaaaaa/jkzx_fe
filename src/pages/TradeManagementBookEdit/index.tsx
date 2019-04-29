@@ -36,13 +36,12 @@ const TradeManagementBooking = props => {
 
     const isAnnualized = position.asset.annualized;
 
-    setTableData(pre =>
-      pre.concat({
+    setTableData(pre => {
+      const next = {
         ...createLegDataSourceItem(leg, LEG_ENV.EDITING),
         [LEG_ID_FIELD]: position.positionId,
         [LEG_FIELD.POSITION_ID]: Form2.createField(position.positionId),
         [LEG_FIELD.LCM_EVENT_TYPE]: Form2.createField(position.lcmEventType),
-        ...leg.getPageData(LEG_ENV.EDITING, position),
         ...Form2.createFields(
           backConvertPercent({
             ..._.omitBy(
@@ -52,8 +51,10 @@ const TradeManagementBooking = props => {
             [LEG_FIELD.IS_ANNUAL]: isAnnualized,
           })
         ),
-      })
-    );
+        ...leg.getPageData(LEG_ENV.EDITING, position),
+      };
+      return pre.concat(next);
+    });
   };
 
   const loadTableData = async () => {
