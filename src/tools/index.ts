@@ -27,6 +27,7 @@ import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
+import { Straddle } from '@/domains/legs/Straddle';
 
 export const isModelXY = data => {
   return (
@@ -177,6 +178,9 @@ export const getLegByProductType = (productType, exerciseType) => {
     if (exerciseType === EXERCISETYPE_MAP.EUROPEAN) {
       return DigitalLegEuropean;
     }
+  }
+  if (productType === PRODUCT_TYPE_MAP.STRADDLE) {
+    return Straddle;
   }
   if (productType === PRODUCT_TYPE_MAP.DOUBLE_TOUCH) {
     return DoubleTouch;

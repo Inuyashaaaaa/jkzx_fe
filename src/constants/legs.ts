@@ -29,6 +29,7 @@ import { Concava } from '@/domains/legs/Concava';
 import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
 import { ModelXy } from '@/domains/legs/ModelXy';
+import { Straddle } from '@/domains/legs/Straddle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
@@ -52,6 +53,7 @@ export const TOTAL_LEGS = [
   ModelXy,
   AutoCallSnow,
   AutoCallPhoenix,
+  Straddle,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
