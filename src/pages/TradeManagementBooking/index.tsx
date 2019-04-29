@@ -1,4 +1,4 @@
-import { LEG_FIELD, LEG_ID_FIELD, PREMIUM_TYPE_MAP } from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD, PREMIUM_TYPE_MAP, LEG_INJECT_FIELDS } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
   COMPUTED_LEG_FIELD_MAP,
@@ -140,6 +140,13 @@ const TradeManagementBooking = props => {
   const [tableData, setTableData] = useState(
     from === BOOKING_FROM_PRICING
       ? (props.pricingData.tableData || []).map(item => {
+          const leg = getLegByRecord(item);
+          if (!leg) return item;
+          const omits = _.difference(
+            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.BOOKING).map(item => item.dataIndex)
+          );
+
           const permium = Math.abs(
             Form2.getFieldValue(
               item[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY
@@ -149,7 +156,9 @@ const TradeManagementBooking = props => {
             )
           );
           return {
-            ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
+            ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
+            ...leg.getDefaultData(LEG_ENV.BOOKING),
+            ..._.omit(item, [...omits, ...LEG_INJECT_FIELDS]),
             [LEG_FIELD.PREMIUM]: Form2.createField(permium),
           };
         })
