@@ -20,8 +20,6 @@ export const HighPayment: ILegColDef = {
     return false;
   },
   render: (val, record, index, { form, editing, colDef }) => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
     const getUnit = () => {
       if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
         return '¥';
