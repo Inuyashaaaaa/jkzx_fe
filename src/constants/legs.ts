@@ -31,6 +31,7 @@ import { DoubleTouch } from '@/domains/legs/DoubleTouch';
 import { Eagle } from '@/domains/legs/Eagle';
 import { ModelXy } from '@/domains/legs/ModelXy';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { TripleDigital } from '@/domains/legs/TripleDigital';
 import { Straddle } from '@/domains/legs/Straddle';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
@@ -51,6 +52,7 @@ export const TOTAL_LEGS = [
   Convex,
   Eagle,
   RangeAccruals,
+  TripleDigital,
   ModelXy,
   AutoCallSnow,
   AutoCallPhoenix,
