@@ -6,9 +6,9 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
-export const Payment: ILegColDef = {
-  title: '行权收益',
-  dataIndex: LEG_FIELD.PAYMENT,
+export const LowPayment: ILegColDef = {
+  title: '低行权收益',
+  dataIndex: LEG_FIELD.LOW_PAYMENT,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -16,10 +16,10 @@ export const Payment: ILegColDef = {
     }
     return true;
   },
-  defaultEditing: false,
+  defaultEditing: record => {
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
-    // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
     const getUnit = () => {
       if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
         return '¥';

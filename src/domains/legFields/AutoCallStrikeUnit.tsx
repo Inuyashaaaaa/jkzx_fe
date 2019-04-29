@@ -5,18 +5,21 @@ import {
   PREMIUM_TYPE_MAP,
   RULES_REQUIRED,
   STRIKE_TYPES_MAP,
+  REBATETYPE_TYPE_OPTIONS,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
+  UNIT_ENUM_OPTIONS2,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2 } from '@/design/components';
+import { Form2, Select } from '@/design/components';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
 
-export const Payment1: ILegColDef = {
-  title: '行权收益1',
-  dataIndex: LEG_FIELD.PAYMENT1,
+export const AutoCallStrikeUnit: ILegColDef = {
+  title: '到期未敲出行权价类型',
+  dataIndex: LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -27,19 +30,20 @@ export const Payment1: ILegColDef = {
   defaultEditing: record => {
     return false;
   },
+  exsitable: record => {
+    return (
+      Form2.getFieldValue(record[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]) ===
+        EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.CALL ||
+      Form2.getFieldValue(record[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]) ===
+        EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.PUT
+    );
+  },
   render: (val, record, index, { form, editing, colDef }) => {
-    const getUnit = () => {
-      if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
-        return '¥';
-      }
-      return '%';
-    };
-
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
+        })(<Select defaultOpen={editing} editing={editing} options={UNIT_ENUM_OPTIONS2} />)}
       </FormItem>
     );
   },

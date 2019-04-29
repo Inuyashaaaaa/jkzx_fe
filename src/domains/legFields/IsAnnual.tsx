@@ -16,19 +16,13 @@ export const IsAnnual: ILegColDef = {
     }
     return false;
   },
+  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(
-          <Checkbox
-            editing={isBooking || isPricing ? editing : false}
-            renderingLabels={['年化', '非年化']}
-          />
-        )}
+        })(<Checkbox editing={editing} renderingLabels={['年化', '非年化']} />)}
       </FormItem>
     );
   },

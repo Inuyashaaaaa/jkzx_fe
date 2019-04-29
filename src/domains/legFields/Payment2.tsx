@@ -17,32 +17,15 @@ export const Payment2: ILegColDef = {
     }
     return true;
   },
+  defaultEditing: record => {
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
-    const getAutoSelect = () => {
-      if (isEditing) {
-        return false;
-      }
-      return true;
-    };
-
-    const getEditing = () => {
-      if (isEditing) {
-        return false;
-      }
-      return editing;
-    };
-
     const getUnit = () => {
       if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
         return '¥';
       }
       return '%';
-    };
-
-    const getProps = () => {
-      return { unit: getUnit(), autoSelect: getAutoSelect(), editing: getEditing() };
     };
 
     const getRules = () => {
@@ -75,7 +58,7 @@ export const Payment2: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: getRules(),
-        })(<UnitInputNumber {...getProps()} />)}
+        })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
       </FormItem>
     );
   },
