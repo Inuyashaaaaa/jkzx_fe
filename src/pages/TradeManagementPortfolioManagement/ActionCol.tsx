@@ -269,7 +269,11 @@ class ActionCol extends PureComponent<any, any> {
         },
       },
       () => {
-        this.onTradeTableSearch({ current, pageSize });
+        this.onTradeTableSearch({
+          current,
+          pageSize,
+          portfolioNames: [this.state.portfolio.portfolioName],
+        });
       }
     );
   };
@@ -294,6 +298,7 @@ class ActionCol extends PureComponent<any, any> {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           width={1200}
+          footer={null}
         >
           {!this.state.editabled ? (
             <p>
