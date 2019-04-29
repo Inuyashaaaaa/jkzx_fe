@@ -23,6 +23,8 @@ import { InitialNotionalAmount } from '@/domains/legFields/infos/InitialNotional
 import { AlUnwindNotionalAmount } from '@/domains/legFields/infos/AlUnwindNotionalAmount';
 import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { Concava } from '@/domains/legs/Concava';
+import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { ModelXy } from '@/domains/legs/ModelXy';
@@ -37,6 +39,8 @@ export const TOTAL_LEGS = [
   VerticalSpread,
   BarrierLeg,
   DoubleSharkFin,
+  Concava,
+  Convex,
   Eagle,
   RangeAccruals,
   ModelXy,
