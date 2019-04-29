@@ -64,11 +64,7 @@ export const KnockDirection: ILegColDef = {
         ) : (
           form.getFieldDecorator({
             rules: RULES_REQUIRED,
-          })(
-            form.getFieldDecorator({
-              rules: RULES_REQUIRED,
-            })(<Select defaultOpen={editing} editing={editing} options={KNOCK_DIRECTION_OPTIONS} />)
-          )
+          })(<Select defaultOpen={editing} editing={editing} options={KNOCK_DIRECTION_OPTIONS} />)
         )}
       </FormItem>
     );

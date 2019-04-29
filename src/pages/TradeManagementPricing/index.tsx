@@ -74,7 +74,7 @@ const ActionBar = memo<any>(props => {
         <Row type="flex" align="middle">
           <Col>
             <MultilLegCreateButton
-              isPricing={false}
+              isPricing={true}
               key="create"
               handleAddLeg={(leg: ILeg) => {
                 if (!leg) return;

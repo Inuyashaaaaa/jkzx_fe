@@ -5,9 +5,9 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 import { getLegEnvs } from '@/tools';
 
-export const PaymentType: ILegColDef = {
-  title: '行权支付类型',
-  dataIndex: LEG_FIELD.PAYMENT_TYPE,
+export const DownBarrierOptionsStrikeType: ILegColDef = {
+  title: '敲入期权行权价类型',
+  dataIndex: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -15,6 +15,7 @@ export const PaymentType: ILegColDef = {
     }
     return true;
   },
+  defaultEditing: false,
   render: (val, record, dataIndex, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     return (

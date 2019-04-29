@@ -1,14 +1,13 @@
-import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2 } from '@/design/components';
+import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
+import { Input } from '@/design/components/Input';
 import { getLegEnvs } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
-export const Payment: ILegColDef = {
-  title: '行权收益',
-  dataIndex: LEG_FIELD.PAYMENT,
+export const Comment: ILegColDef = {
+  title: '备注',
+  dataIndex: LEG_FIELD.COMMENT,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -16,22 +15,17 @@ export const Payment: ILegColDef = {
     }
     return true;
   },
-  defaultEditing: false,
+  defaultEditing: record => {
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
-    const getUnit = () => {
-      if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
-        return '¥';
-      }
-      return '%';
-    };
 
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
+        })(<Input autoSelect={true} editing={editing} />)}
       </FormItem>
     );
   },

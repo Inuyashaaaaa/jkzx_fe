@@ -139,13 +139,20 @@ const TradeManagementBooking = props => {
 
   const [tableData, setTableData] = useState(
     from === PRICING_FROM_TAG
-      ? (props.pricingData.tableData || []).map(item => ({
-          ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
-          [LEG_FIELD.PREMIUM]:
-            item[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY
-              ? item[COMPUTED_LEG_FIELD_MAP.PRICE]
-              : item[COMPUTED_LEG_FIELD_MAP.PRICE_PER],
-        }))
+      ? (props.pricingData.tableData || []).map(item => {
+          const permium = Math.abs(
+            Form2.getFieldValue(
+              item[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY
+                ? item[COMPUTED_LEG_FIELD_MAP.PRICE]
+                : item[COMPUTED_LEG_FIELD_MAP.PRICE_PER],
+              0
+            )
+          );
+          return {
+            ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]),
+            [LEG_FIELD.PREMIUM]: Form2.createField(permium),
+          };
+        })
       : []
   );
 
