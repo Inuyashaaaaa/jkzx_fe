@@ -25,7 +25,13 @@ import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { DoubleTouch } from '@/domains/legs/DoubleTouch';
 import { DoubleNoTouch } from '@/domains/legs/DoubleNoTouch';
+import { Concava } from '@/domains/legs/Concava';
+import { Convex } from '@/domains/legs/Convex';
+import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { ModelXy } from '@/domains/legs/ModelXy';
+import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
+import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -37,7 +43,13 @@ export const TOTAL_LEGS = [
   DoubleSharkFin,
   DoubleTouch,
   DoubleNoTouch,
+  Concava,
+  Convex,
+  Eagle,
   RangeAccruals,
+  ModelXy,
+  AutoCallSnow,
+  AutoCallPhoenix,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];

@@ -73,38 +73,6 @@ class ObserveModalInput extends InputBase<{
       });
     }
 
-    if (this.isAutoCallPhoenix() || this.isAutoCallSnow()) {
-      const { record } = this.props;
-      const upBarrier = record[LEG_FIELD.UP_BARRIER];
-      const upBarrierType = record[LEG_FIELD.UP_BARRIER_TYPE];
-      const step = record[LEG_FIELD.STEP];
-      const initialSpot = record[LEG_FIELD.INITIAL_SPOT];
-
-      const barrierVal =
-        upBarrierType === UP_BARRIER_TYPE_MAP.PERCENT
-          ? new BigNumber(initialSpot).multipliedBy(new BigNumber(upBarrier).div(100)).toNumber()
-          : upBarrier;
-
-      dataSource = dataSource.map((item, index) => {
-        return {
-          ...item,
-          payDay: item[OB_DAY_FIELD],
-          ...(this.isAutoCallSnow()
-            ? {
-                price: new BigNumber(barrierVal)
-                  .plus(
-                    new BigNumber(index + 1)
-                      .multipliedBy(new BigNumber(step).div(100))
-                      .multipliedBy(initialSpot)
-                  )
-                  .decimalPlaces(4)
-                  .toNumber(),
-              }
-            : null),
-        };
-      });
-    }
-
     return dataSource;
   };
 
@@ -194,17 +162,6 @@ class ObserveModalInput extends InputBase<{
         'YYYY-MM-DD'
       );
       const freq = Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_STEP]);
-      return { start, end, freq };
-    }
-
-    if (isAutocallSnow(record) || isAutocallPhoenix(record)) {
-      const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).format(
-        'YYYY-MM-DD'
-      );
-      const end = getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).format(
-        'YYYY-MM-DD'
-      );
-      const freq = Form2.getFieldValue(record[LEG_FIELD.UP_OBSERVATION_STEP]);
       return { start, end, freq };
     }
 

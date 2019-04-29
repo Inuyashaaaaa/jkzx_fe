@@ -1,14 +1,15 @@
 import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2 } from '@/design/components';
-import { getLegEnvs } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
 import React from 'react';
+import { Form2 } from '@/design/components';
 
-export const Payment: ILegColDef = {
-  title: '行权收益',
-  dataIndex: LEG_FIELD.PAYMENT,
+export const DownBarrierOptionsStrike: ILegColDef = {
+  title: '敲入期权行权价',
+  dataIndex: LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -19,10 +20,13 @@ export const Payment: ILegColDef = {
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
     const getUnit = () => {
-      if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
+      const val = Form2.getFieldValue(record[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE]);
+      if (val === STRIKE_TYPES_MAP.CNY) {
         return '¥';
+      }
+      if (val === STRIKE_TYPES_MAP.PERCENT) {
+        return '%';
       }
       return '%';
     };
