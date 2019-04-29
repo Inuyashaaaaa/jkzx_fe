@@ -43,7 +43,7 @@ import { Button, Col, message, Row } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
 import ExportModal from './ExportModal';
@@ -431,6 +431,10 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         () => this.loadData(true)
       );
     }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.AMEND) {
+      this.handleEditable(this.activeRowData);
+    }
   };
 
   public handleEventType = eventType => {
@@ -573,8 +577,18 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public saveModify = async () => {
-    const modifyData = this.state.dataSource.filter(item => {
+    const actionData = this.state.dataSource.filter(item => {
       return item.positionId === this.state.editablePositionId;
+    });
+    const date = ['settlementDate', 'effectiveDate', 'expirationDate'];
+    const modifyData = _.mapValues(actionData[0], (value, key) => {
+      if (date.some(item => item === key)) {
+        if (isMoment(value)) {
+          return value;
+        }
+        return moment(value);
+      }
+      return value;
     });
     const tableFormData = {
       ...this.state.tableFormData,
@@ -582,13 +596,13 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     };
 
     const trade = convertTradePageData2ApiData(
-      modifyData,
+      [modifyData],
       tableFormData,
       this.props.currentUser.userName
     );
 
     const { error, data } = await trdTradeLCMEventProcess({
-      positionId: modifyData[0].positionId,
+      positionId: modifyData.positionId,
       tradeId: trade.tradeId,
       eventType: 'AMEND',
       userLoginId: this.props.currentUser.userName,
