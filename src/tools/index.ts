@@ -14,6 +14,8 @@ import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { Concava } from '@/domains/legs/Concava';
+import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { DoubleDigital } from '@/domains/legs/DoubleDigital';
@@ -173,6 +175,12 @@ export const getLegByProductType = (productType, exerciseType) => {
     if (exerciseType === EXERCISETYPE_MAP.EUROPEAN) {
       return DigitalLegEuropean;
     }
+  }
+  if (productType === PRODUCT_TYPE_MAP.CONVEX) {
+    return Convex;
+  }
+  if (productType === PRODUCT_TYPE_MAP.CONCAVA) {
+    return Concava;
   }
   if (productType === PRODUCT_TYPE_MAP.VANILLA_AMERICAN) {
     return VanillaAmerican;
