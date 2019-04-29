@@ -81,7 +81,6 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
           InitialSpot,
           SpecifiedPrice,
           SettlementDate,
-          Term,
           ParticipationRate,
           NotionalAmount,
           NotionalAmountType,
