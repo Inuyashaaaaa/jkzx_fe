@@ -13,7 +13,7 @@ import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
-import { Button, message, Modal } from 'antd';
+import { Alert, Button, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
@@ -41,6 +41,8 @@ class ExpirationModal extends PureComponent<
   public $expirationFixedModal: Form;
 
   public $expirationCallModal: Form;
+
+  public $autocallPhoenix: Form;
 
   public data: any = {};
 
@@ -208,6 +210,22 @@ class ExpirationModal extends PureComponent<
   };
 
   public onConfirm = async () => {
+    let rsp;
+    if (isAutocallPhoenix(this.data)) {
+      rsp = await this.$autocallPhoenix.validate();
+    } else {
+      if (
+        isAutocallSnow(this.data) &&
+        this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+      ) {
+        rsp = await this.$expirationFixedModal.validate();
+      } else if (isAutocallSnow(this.data)) {
+        rsp = await this.$expirationCallModal.validate();
+      } else {
+        rsp = 'expiration';
+      }
+    }
+    if (rsp.error) return;
     const usedFormData = this.getUsedFormData();
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
@@ -251,6 +269,12 @@ class ExpirationModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.callPutDataSource;
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -302,6 +326,9 @@ class ExpirationModal extends PureComponent<
         <Form
           dataSource={this.state.formData}
           onValueChange={this.onFormValueChange}
+          ref={node => {
+            this.$autocallPhoenix = node;
+          }}
           controlNumberOneRow={1}
           footer={false}
           controls={[
@@ -393,7 +420,7 @@ class ExpirationModal extends PureComponent<
     if (isAutocallSnow(this.data)) {
       return this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED ? (
         <Form
-          wrappedComponentRef={node => {
+          ref={node => {
             this.$expirationFixedModal = node;
           }}
           dataSource={this.state.fixedDataSource}
@@ -405,7 +432,7 @@ class ExpirationModal extends PureComponent<
       ) : (
         <>
           <Form
-            wrappedComponentRef={node => {
+            ref={node => {
               this.$expirationCallModal = node;
             }}
             dataSource={this.state.callPutDataSource}
@@ -449,6 +476,17 @@ class ExpirationModal extends PureComponent<
           }
         >
           {this.getForm()}
+          {isAutocallPhoenix(this.data) ? (
+            <Alert
+              message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
+              type="info"
+            />
+          ) : isAutocallSnow(this.data) ? (
+            <Alert
+              message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
+              type="info"
+            />
+          ) : null}
         </Modal>
       </>
     );

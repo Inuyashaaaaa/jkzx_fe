@@ -170,6 +170,7 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
 
   public loadCommon = (tableDataSource, tableFormData, reset) => {
     // 找到每条腿有的生命周期事件
+    if (!allLegTypes.length) return;
     tableDataSource.forEach(item => {
       const leg = allLegTypes.find(it => {
         if (!it) {

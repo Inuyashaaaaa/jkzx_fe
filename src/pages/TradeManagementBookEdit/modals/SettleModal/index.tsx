@@ -2,7 +2,7 @@ import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/const
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { message, Modal } from 'antd';
+import { Alert, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
 import {
@@ -94,6 +94,8 @@ class ExerciseModal extends PureComponent<
   };
 
   public onConfirm = async () => {
+    const rsp = await this.$settleForm.validate();
+    if (rsp.error) return;
     const dataSource = this.state.dataSource;
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
@@ -132,6 +134,12 @@ class ExerciseModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.dataSource;
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -173,7 +181,7 @@ class ExerciseModal extends PureComponent<
           title={'结算: (自定义产品)'}
         >
           <Form
-            wrappedComponentRef={node => {
+            ref={node => {
               this.$settleForm = node;
             }}
             dataSource={this.state.dataSource}
@@ -181,6 +189,10 @@ class ExerciseModal extends PureComponent<
             controlNumberOneRow={1}
             footer={false}
             controls={SETTLE_FORM_CONTROLS(this.state.productType, this.handleSettleAmount)}
+          />
+          <Alert
+            message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
+            type="info"
           />
         </Modal>
       </>
