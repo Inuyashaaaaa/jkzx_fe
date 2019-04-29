@@ -1,14 +1,14 @@
-import SourceTable from '@/lib/components/_SourceTable';
-import Table from '@/lib/components/_Table2';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import Form from '@/design/components/Form';
+import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { queryAuthDepartmentList } from '@/services/department';
 import {
   addNonGroupResource,
-  deleteNonGroupResource,
   queryNonGroupResource,
   updateNonGroupResource,
 } from '@/services/tradeBooks';
-import { notification } from 'antd';
+import { Button, Modal } from 'antd';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS } from './constants';
 
@@ -35,18 +35,17 @@ function findDepartment(departs, departId) {
 }
 
 class SystemSettingsTradeBooks extends PureComponent {
-  public $table: Table = null;
+  public $table: SourceTable = null;
 
   public initialFetchTableData = null;
 
   public state = {
-    formData: {},
     rowData: [],
     loading: false,
-    canSave: false,
-    saveLoading: false,
-    loading: false,
     books: [],
+    visible: false,
+    createFormData: {},
+    confirmLoading: false,
   };
 
   public componentDidMount() {
@@ -57,8 +56,6 @@ class SystemSettingsTradeBooks extends PureComponent {
     this.setState({
       loading: true,
     });
-    // const data = await queryNonGroupResource({});
-    // const departments = await queryAuthDepartmentList({});
     const requests = () => Promise.all([queryNonGroupResource(), queryAuthDepartmentList()]);
     const [tradeBooks, departments] = await requests();
     if (tradeBooks.error || departments.error) {
@@ -79,33 +76,20 @@ class SystemSettingsTradeBooks extends PureComponent {
     });
   };
 
-  public onRemove = async id => {
-    // console.log(id);
-    const { rowData } = id;
-    const res = await deleteNonGroupResource({
-      resourceType: rowData.resourceType,
-      resourceName: rowData.resourceName,
+  public onCreateBook = async () => {
+    this.setState({ confirmLoading: true });
+    const createFormData = this.state.createFormData;
+    const params = { resourceType: 'BOOK', ...createFormData };
+    const { error, data } = await addNonGroupResource(params);
+    this.setState({ confirmLoading: false });
+    if (error) return;
+    this.setState({
+      visible: false,
+      createFormData: {},
     });
-    if (res.error) {
-      return false;
-    } else {
-      notification.success({
-        message: '删除成功',
-      });
-      this.fetchTable();
-    }
-    return true;
+    this.fetchTable();
   };
 
-  public onCreateBook = event => {
-    const { createFormData } = event;
-    const params = { resourceType: 'BOOK', ...createFormData };
-    return addNonGroupResource(params).then(rp => {
-      if (rp.error) return false;
-      this.fetchTable();
-      return true;
-    });
-  };
   public handleCellValueChanged = async e => {
     const { data, newValue, oldValue } = e;
     const params = {
@@ -116,28 +100,54 @@ class SystemSettingsTradeBooks extends PureComponent {
     const res = await updateNonGroupResource(params);
   };
 
+  public switchModal = () => {
+    this.setState({
+      visible: !this.state.visible,
+      createFormData: {},
+    });
+  };
+
+  public onValueChange = params => {
+    this.setState({
+      createFormData: params.values,
+    });
+  };
+
   public render() {
     const { books, loading } = this.state;
     return (
       <PageHeaderWrapper>
         <SourceTable
           loading={loading}
-          searchable={false}
-          removeable={true}
-          saveDisabled={true}
           rowKey={'id'}
           dataSource={books}
-          tableColumnDefs={PAGE_TABLE_COL_DEFS}
-          onCreate={this.onCreateBook}
-          onSave={this.onSave}
-          createFormControls={CREATE_FORM_CONTROLS}
-          createText="新建交易簿"
-          tableProps={{
-            autoSizeColumnsToFit: true,
-            onCellValueChanged: this.handleCellValueChanged,
-          }}
-          onRemove={this.onRemove}
+          columnDefs={PAGE_TABLE_COL_DEFS(this.fetchTable)}
+          onCellValueChanged={this.handleCellValueChanged}
+          header={
+            <Button
+              type="primary"
+              style={{ marginBottom: VERTICAL_GUTTER }}
+              onClick={this.switchModal}
+            >
+              新建交易簿
+            </Button>
+          }
         />
+        <Modal
+          title="新建交易簿"
+          onOk={this.onCreateBook}
+          onCancel={this.switchModal}
+          visible={this.state.visible}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <Form
+            footer={false}
+            controlNumberOneRow={1}
+            dataSource={this.state.createFormData}
+            controls={CREATE_FORM_CONTROLS}
+            onValueChange={this.onValueChange}
+          />
+        </Modal>
       </PageHeaderWrapper>
     );
   }
