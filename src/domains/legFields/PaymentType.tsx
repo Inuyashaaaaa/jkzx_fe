@@ -15,6 +15,7 @@ export const PaymentType: ILegColDef = {
     }
     return true;
   },
+  defaultEditing: false,
   render: (val, record, dataIndex, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     return (
