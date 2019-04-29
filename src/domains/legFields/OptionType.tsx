@@ -36,7 +36,7 @@ export const OptionType: ILegColDef = {
       <FormItem>
         {showTip ? (
           <Tooltip
-            title="行权价>障碍价为看涨;行权价>障碍价为看跌"
+            title="行权价 < 障碍价时为看涨；行权价 > 障碍价时为看跌"
             trigger="hover"
             placement="right"
             arrowPointAtCenter={true}
