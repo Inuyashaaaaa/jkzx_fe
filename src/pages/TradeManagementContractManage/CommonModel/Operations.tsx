@@ -108,12 +108,16 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
     }
     if (keyPath.length === 2) {
       const { tableDataSource, tableFormData } = convertTradeApiData2PageData(this.props.record);
+      console.log(this.props.record);
+      const rowData = tableDataSource.find(item => {
+        return item.positionId === this.props.record.positionId;
+      });
       this.setState(
         {
           tableFormData,
         },
         () => {
-          this.bindEventAction(key, { rowData: tableDataSource[0] });
+          this.bindEventAction(key, { rowData });
         }
       );
     }
