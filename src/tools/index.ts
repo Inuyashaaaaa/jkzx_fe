@@ -20,6 +20,7 @@ import { Concava } from '@/domains/legs/Concava';
 import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { DoubleDigital } from '@/domains/legs/DoubleDigital';
 import { ModelXy } from '@/domains/legs/ModelXy';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
@@ -209,6 +210,9 @@ export const getLegByProductType = (productType, exerciseType) => {
   }
   if (productType === PRODUCT_TYPE_MAP.RANGE_ACCRUALS) {
     return RangeAccruals;
+  }
+  if (productType === PRODUCT_TYPE_MAP.DOUBLE_DIGITAL) {
+    return DoubleDigital;
   }
   if (productType === PRODUCT_TYPE_MAP.MODEL_XY) {
     return ModelXy;
