@@ -32,6 +32,7 @@ import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { ModelXy } from '@/domains/legs/ModelXy';
 import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
+import { Straddle } from '@/domains/legs/Straddle';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -50,6 +51,7 @@ export const TOTAL_LEGS = [
   ModelXy,
   AutoCallSnow,
   AutoCallPhoenix,
+  Straddle,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
