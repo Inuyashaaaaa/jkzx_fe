@@ -16,21 +16,23 @@ import { Q } from '@/domains/legFields/trades/Q';
 import { R } from '@/domains/legFields/trades/R';
 import { UnderlyerPrice } from '@/domains/legFields/trades/UnderlyerPrice';
 import { Vol } from '@/domains/legFields/trades/Vol';
+import { Asia } from '@/domains/legs/Asia';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
 import { BarrierLeg } from '@/domains/legs/Barrier';
+import { Concava } from '@/domains/legs/Concava';
+import { Convex } from '@/domains/legs/Convex';
 import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
 import { DoubleDigital } from '@/domains/legs/DoubleDigital';
+import { DoubleNoTouch } from '@/domains/legs/DoubleNoTouch';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { DoubleTouch } from '@/domains/legs/DoubleTouch';
-import { DoubleNoTouch } from '@/domains/legs/DoubleNoTouch';
-import { Concava } from '@/domains/legs/Concava';
-import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
 import { ModelXy } from '@/domains/legs/ModelXy';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { TripleDigital } from '@/domains/legs/TripleDigital';
+import { Straddle } from '@/domains/legs/Straddle';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
@@ -54,6 +56,8 @@ export const TOTAL_LEGS = [
   ModelXy,
   AutoCallSnow,
   AutoCallPhoenix,
+  Asia,
+  Straddle,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];

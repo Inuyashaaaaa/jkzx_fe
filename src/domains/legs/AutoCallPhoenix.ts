@@ -69,7 +69,7 @@ import { DownBarrierOptionsType } from '../legFields/DownBarrierOptionsType';
 import { DownObservationStep } from '../legFields/DownObservationStep';
 import { AlreadyBarrier } from '../legFields/AlreadyBarrier';
 import { DownBarrierDate } from '../legFields/DownBarrierDate';
-import { DownBarrier } from '../legFields/HighBarrier.1';
+import { DownBarrier } from '../legFields/DownBarrier';
 import { getMoment } from '@/utils';
 
 export const AutoCallPhoenix: ILeg = {

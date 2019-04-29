@@ -1,4 +1,4 @@
-import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
+import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP, OPTION_TYPE_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/design/components';
 import { getLegEnvs } from '@/tools';
@@ -29,7 +29,7 @@ export const Payment3: ILegColDef = {
     };
 
     const getRules = () => {
-      return Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === 'CALL'
+      return Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL
         ? ([
             {
               message: '必须满足条件(行权收益1<行权收益2<行权收益3)',
