@@ -1,5 +1,6 @@
 // import Table from '@/lib/components/_Table2';
-import SourceTable from '@/lib/components/_SourceTable';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
   addVolSpecialDates,
@@ -123,7 +124,7 @@ class VolatilityCalendar extends PureComponent {
     });
   };
 
-  public showModal = (action, record) => {
+  public showModal = (action, record?) => {
     this.editDate = record;
     const title = action === 'create' ? '新增特殊日期' : '编辑特殊日期';
     this.setState({
@@ -298,27 +299,21 @@ class VolatilityCalendar extends PureComponent {
                   确定
                 </Button>
               </div>
-              <Button
-                style={{ marginTop: 10 }}
-                key="edit"
-                type="primary"
-                onClick={() => this.showModal('create')}
-              >
-                新增特殊日期
-              </Button>
               <SourceTable
                 loading={loading}
-                searchable={false}
-                removeable={true}
-                saveDisabled={true}
                 rowKey="uuid"
                 dataSource={dates}
-                tableColumnDefs={PAGE_TABLE_COL_DEFS}
-                rowActions={this.getRowActions}
-                tableProps={{
-                  autoSizeColumnsToFit: true,
-                }}
-                onRemove={this.onRemove}
+                columnDefs={PAGE_TABLE_COL_DEFS(this.fetchData, this.showModal)}
+                header={
+                  <Button
+                    style={{ marginTop: VERTICAL_GUTTER, marginBottom: VERTICAL_GUTTER }}
+                    key="edit"
+                    type="primary"
+                    onClick={() => this.showModal('create')}
+                  >
+                    新增特殊日期
+                  </Button>
+                }
               />
             </div>
           </Col>

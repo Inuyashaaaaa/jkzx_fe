@@ -1,6 +1,11 @@
-import { IColumnDef } from '@/lib/components/_Table2';
+import { IColumnDef } from '@/design/components/SourceTable/types';
+import React from 'react';
+import Operation from './Operation';
 
-export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
+export const PAGE_TABLE_COL_DEFS: (fetchTable, showModal) => IColumnDef[] = (
+  fetchTable,
+  showModal
+) => [
   {
     headerName: '特殊日期',
     field: 'specialDate',
@@ -12,5 +17,12 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
   {
     headerName: '备注',
     field: 'note',
+  },
+  {
+    headerName: '操作',
+    field: 'action',
+    render: params => {
+      return <Operation record={params.data} fetchTable={fetchTable} showModal={showModal} />;
+    },
   },
 ];
