@@ -73,7 +73,7 @@ export const OptionType: IColDef = {
         type: 'select',
         defaultOpen: true,
         options: OPTION_TYPE_OPTIONS,
-        prompt: '行权价>障碍价为看涨;行权价>障碍价为看跌',
+        prompt: '行权价 < 障碍价时为看涨；行权价 > 障碍价时为看跌',
       };
     }
     return {
