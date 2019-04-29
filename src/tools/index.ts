@@ -26,6 +26,7 @@ import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
+import { Asia } from '@/domains/legs/Asia';
 
 export const isModelXY = data => {
   return (
@@ -218,6 +219,9 @@ export const getLegByProductType = (productType, exerciseType) => {
   }
   if (productType === PRODUCT_TYPE_MAP.AUTOCALL_PHOENIX) {
     return AutoCallPhoenix;
+  }
+  if (productType === PRODUCT_TYPE_MAP.ASIAN) {
+    return Asia;
   }
   throw new Error('not match productType!');
 };
