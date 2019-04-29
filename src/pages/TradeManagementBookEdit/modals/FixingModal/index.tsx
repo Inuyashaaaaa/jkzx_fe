@@ -24,6 +24,8 @@ import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../../constants';
 import { getObservertionFieldData } from '../../tools';
 import { countAvg, filterObDays } from '../../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
+import ExpirationModal from '../ExpirationModal';
+import KnockOutModal from '../KnockOutModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 class FixingModal extends PureComponent<
@@ -34,6 +36,10 @@ class FixingModal extends PureComponent<
   any
 > {
   public $asianExerciseModal: AsianExerciseModal;
+
+  public $expirationModal: ExpirationModal;
+
+  public $knockOutModal: KnockOutModal;
 
   public $exerciseForm: Form;
 
@@ -98,21 +104,25 @@ class FixingModal extends PureComponent<
   };
 
   public onConfirm = async () => {
-    if (this.$asianExerciseModal) {
-      this.setState(
-        {
-          visible: false,
-        },
-        () => {
-          this.$asianExerciseModal.show(
-            this.data,
-            this.tableFormData,
-            this.currentUser,
-            this.reload
-          );
-        }
-      );
-    }
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.$expirationModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+      }
+    );
+  };
+
+  public onKnockOutConfirm = async () => {
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.$knockOutModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+      }
+    );
   };
 
   public convertVisible = () => {
@@ -295,7 +305,7 @@ class FixingModal extends PureComponent<
             <Button
               disabled={!this.canBarrier()}
               style={{ marginLeft: VERTICAL_GUTTER }}
-              onClick={this.onConfirm}
+              onClick={this.onKnockOutConfirm}
               loading={this.state.modalConfirmLoading}
             >
               敲出
@@ -339,7 +349,8 @@ class FixingModal extends PureComponent<
     const { visible } = this.state;
     return (
       <>
-        <AsianExerciseModal ref={node => (this.$asianExerciseModal = node)} />
+        <ExpirationModal ref={node => (this.$expirationModal = node)} />
+        <KnockOutModal ref={node => (this.$knockOutModal = node)} />
         <Modal
           onCancel={this.switchModal}
           destroyOnClose={true}
