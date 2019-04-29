@@ -71,7 +71,9 @@ class SystemSettingsTradeBooks extends PureComponent {
       return { departmentName: result.departmentName, ...book };
     });
     this.setState({
-      books: currentBooks,
+      books: currentBooks.sort((a, b) => {
+        return a.resourceName.localeCompare(b.resourceName);
+      }),
       loading: false,
     });
   };
