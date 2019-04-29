@@ -101,7 +101,6 @@ export const RangeAccrualsAnnual: ILegType = pipeLeg({
         HighBarrier,
         LowBarrier,
         ObservationDates,
-        // ObservationStep,
       ];
     }
     return [
