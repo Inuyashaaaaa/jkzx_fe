@@ -20,12 +20,20 @@ import { convertObservetions } from '@/services/common';
 import { Form2 } from '@/design/components';
 import _ from 'lodash';
 
-const LcmEventModal = memo<{
+export interface ILcmEventModalEventParams {
   eventType: string;
-  rowData: object;
-  createFormData: object;
-  currentUser: object;
-  loadData: any;
+  record: any;
+  createFormData: any;
+  currentUser: any;
+  loadData: () => void;
+}
+
+export interface ILcmEventModalEl {
+  show: (event: ILcmEventModalEventParams) => void;
+}
+
+const LcmEventModal = memo<{
+  current: (node: ILcmEventModalEl) => void;
 }>(props => {
   const $unwindModal = useRef<UnwindModal>(null);
   const $asianExerciseModal = useRef<AsianExerciseModal>(null);
@@ -36,65 +44,66 @@ const LcmEventModal = memo<{
   const $knockOutModal = useRef<KnockOutModal>(null);
   const $rollModal = useRef<RollModal>(null);
 
-  const { eventType, rowData, createFormData, currentUser, loadData } = props;
+  const { current } = props;
 
-  useEffect(() => {
-    bindLcmModal();
-  });
-
-  const bindLcmModal = () => {
-    const legType = rowData[LEG_TYPE_FIELD];
-    const data = _.mapValues(rowData, item => {
-      if (Form2.isField(item)) {
-        return Form2.getFieldValue(item);
-      }
-      return item;
-    });
-    const tableFormData = Form2.getFieldsValue(createFormData);
-    if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
-      return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_IN) {
-      return $barrierIn.current.show(data, tableFormData, currentUser, loadData);
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.OBSERVE) {
-      return $fixingModal.current.show(data, tableFormData, currentUser, loadData);
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-      if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
-        const convertedData = filterObDays(convertObservetions(data));
-        if (convertedData.some(item => !item.price)) {
-          return message.warn('请先完善观察日价格');
+  const meta: ILcmEventModalEl = {
+    show: (event: ILcmEventModalEventParams) => {
+      const { eventType, record, createFormData, currentUser, loadData } = event;
+      const legType = record[LEG_TYPE_FIELD];
+      const data = _.mapValues(record, item => {
+        if (Form2.isField(item)) {
+          return Form2.getFieldValue(item);
         }
-        return $asianExerciseModal.current.show(data, tableFormData, currentUser, loadData);
+        return item;
+      });
+      const tableFormData = Form2.getFieldsValue(createFormData);
+      if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
+        return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
       }
-      return $exerciseModal.current.show(data, tableFormData, currentUser, loadData);
-    }
 
-    if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
-      if (rowData[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
-        return message.warn(
-          `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
-        );
+      if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_IN) {
+        return $barrierIn.current.show(data, tableFormData, currentUser, loadData);
       }
-      return $unwindModal.current.show(data, tableFormData, currentUser, loadData);
-    }
 
-    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_OUT) {
-      return $knockOutModal.current.show(data, tableFormData, currentUser, loadData);
-    }
+      if (eventType === LCM_EVENT_TYPE_MAP.OBSERVE) {
+        return $fixingModal.current.show(data, tableFormData, currentUser, loadData);
+      }
 
-    if (eventType === LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE) {
-      return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
-    }
+      if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
+        if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
+          const convertedData = filterObDays(convertObservetions(data));
+          if (convertedData.some(item => !item.price)) {
+            return message.warn('请先完善观察日价格');
+          }
+          return $asianExerciseModal.current.show(data, tableFormData, currentUser, loadData);
+        }
+        return $exerciseModal.current.show(data, tableFormData, currentUser, loadData);
+      }
 
-    if (eventType === LCM_EVENT_TYPE_MAP.ROLL) {
-      return $rollModal.current.show(data, tableFormData, currentUser, loadData);
-    }
+      if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
+        if (record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
+          return message.warn(
+            `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
+          );
+        }
+        return $unwindModal.current.show(data, tableFormData, currentUser, loadData);
+      }
+
+      if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_OUT) {
+        return $knockOutModal.current.show(data, tableFormData, currentUser, loadData);
+      }
+
+      if (eventType === LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE) {
+        return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
+      }
+
+      if (eventType === LCM_EVENT_TYPE_MAP.ROLL) {
+        return $rollModal.current.show(data, tableFormData, currentUser, loadData);
+      }
+    },
   };
+
+  current(meta);
 
   return (
     <>

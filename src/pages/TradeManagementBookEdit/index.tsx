@@ -27,18 +27,16 @@ import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
-import LcmEventModal from '@/containers/LcmEventModal';
+import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 
 const TradeManagementBooking = props => {
+  const { currentUser } = props;
   const [tableData, setTableData] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
 
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [eventTypes, setEventTypes] = useState({});
-
-  const [eventType, setEventType] = useState('');
-  const [rowData, setRowData] = useState({});
 
   const addLeg = (leg: ILeg, position) => {
     if (!leg) return;
@@ -138,7 +136,7 @@ const TradeManagementBooking = props => {
       });
     if (!menuItem) return;
     return (
-      <Menu onClick={({ key }) => bindEventAction(key, params)}>
+      <Menu onClick={({ key }) => handleEventAction(key, params)}>
         {menuItem.map(item => {
           return <Menu.Item key={item.key}>{item.value}</Menu.Item>;
         })}
@@ -146,18 +144,21 @@ const TradeManagementBooking = props => {
     );
   };
 
-  const bindEventAction = (eventType, params) => {
-    const legType = params.record[LEG_TYPE_FIELD];
-
-    // 每次操作后及时更新，并保证数据一致性
-    const activeRowData = params.record;
-    setEventType(eventType);
-    setRowData(params.record);
+  const handleEventAction = (eventType, params) => {
+    lcmEventModalEl.current.show({
+      eventType,
+      record: params.record,
+      createFormData,
+      currentUser,
+      loadData: loadTableData,
+    });
   };
 
   useLifecycles(() => {
     loadTableData();
   });
+
+  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
     <PageHeaderWrapper>
@@ -225,13 +226,7 @@ const TradeManagementBooking = props => {
         dataSource={tableData}
         getContextMenu={getContextMenu}
       />
-      <LcmEventModal
-        eventType={eventType}
-        rowData={rowData}
-        createFormData={createFormData}
-        currentUser={props.currentUser}
-        loadData={loadTableData}
-      />
+      <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
     </PageHeaderWrapper>
   );
 };
