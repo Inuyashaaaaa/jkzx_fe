@@ -23,6 +23,8 @@ import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
 import { DoubleDigital } from '@/domains/legs/DoubleDigital';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { DoubleTouch } from '@/domains/legs/DoubleTouch';
+import { DoubleNoTouch } from '@/domains/legs/DoubleNoTouch';
 import { Concava } from '@/domains/legs/Concava';
 import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
@@ -41,6 +43,8 @@ export const TOTAL_LEGS = [
   BarrierLeg,
   DoubleSharkFin,
   DoubleDigital,
+  DoubleTouch,
+  DoubleNoTouch,
   Concava,
   Convex,
   Eagle,
