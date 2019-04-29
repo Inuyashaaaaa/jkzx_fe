@@ -8,31 +8,32 @@ import { RhoR } from '@/domains/legFields/computed/RhoR';
 import { StdDelta } from '@/domains/legFields/computed/StdDelta';
 import { Theta } from '@/domains/legFields/computed/Theta';
 import { Vega } from '@/domains/legFields/computed/Vega';
+import { AlUnwindNotionalAmount } from '@/domains/legFields/infos/AlUnwindNotionalAmount';
+import { InitialNotionalAmount } from '@/domains/legFields/infos/InitialNotionalAmount';
+import { LcmEventType } from '@/domains/legFields/infos/LcmEventType';
+import { PositionId } from '@/domains/legFields/infos/PositionId';
 import { Q } from '@/domains/legFields/trades/Q';
 import { R } from '@/domains/legFields/trades/R';
 import { UnderlyerPrice } from '@/domains/legFields/trades/UnderlyerPrice';
 import { Vol } from '@/domains/legFields/trades/Vol';
-import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
-import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
+import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
+import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
+import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
-import { VerticalSpread } from '@/domains/legs/VerticalSpread';
-import { PositionId } from '@/domains/legFields/infos/PositionId';
-import { LcmEventType } from '@/domains/legFields/infos/LcmEventType';
-import { InitialNotionalAmount } from '@/domains/legFields/infos/InitialNotionalAmount';
-import { AlUnwindNotionalAmount } from '@/domains/legFields/infos/AlUnwindNotionalAmount';
-import { BarrierLeg } from '@/domains/legs/Barrier';
+import { DoubleDigital } from '@/domains/legs/DoubleDigital';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
 import { DoubleTouch } from '@/domains/legs/DoubleTouch';
 import { DoubleNoTouch } from '@/domains/legs/DoubleNoTouch';
 import { Concava } from '@/domains/legs/Concava';
 import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
-import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { ModelXy } from '@/domains/legs/ModelXy';
-import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
-import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Straddle } from '@/domains/legs/Straddle';
+import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
+import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
+import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -42,6 +43,7 @@ export const TOTAL_LEGS = [
   VerticalSpread,
   BarrierLeg,
   DoubleSharkFin,
+  DoubleDigital,
   DoubleTouch,
   DoubleNoTouch,
   Concava,
