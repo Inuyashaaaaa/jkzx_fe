@@ -5,6 +5,15 @@ import {
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   UNIT_ENUM_MAP,
+  REBATETYPE_UNIT_MAP,
+  REBATETYPE_TYPE_MAP,
+  KNOCK_DIRECTION_MAP,
+  OPTION_TYPE_MAP,
+  LEG_FIELD,
+  NOTIONAL_AMOUNT_TYPE_MAP,
+  PREMIUM_TYPE_MAP,
+  SPECIFIED_PRICE_MAP,
+  STRIKE_TYPES_MAP,
   PAYMENT_TYPE_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
@@ -23,22 +32,12 @@ import {
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
-import {
-  LEG_FIELD,
-  NOTIONAL_AMOUNT_TYPE_MAP,
-  PREMIUM_TYPE_MAP,
-  SPECIFIED_PRICE_MAP,
-  STRIKE_TYPES_MAP,
-} from '../../constants/common';
 import { Direction } from '../legFields';
 import { DaysInYear } from '../legFields/DaysInYear';
 import { EffectiveDate } from '../legFields/EffectiveDate';
 import { ExpirationDate } from '../legFields/ExpirationDate';
+import { SettlementDate } from '../legFields/SettlementDate';
 import { FrontPremium } from '../legFields/FrontPremium';
-import { AlUnwindNotionalAmount } from '../legFields/infos/AlUnwindNotionalAmount';
-import { InitialNotionalAmount } from '../legFields/infos/InitialNotionalAmount';
-import { LcmEventType } from '../legFields/infos/LcmEventType';
-import { PositionId } from '../legFields/infos/PositionId';
 import { InitialSpot } from '../legFields/InitialSpot';
 import { IsAnnual } from '../legFields/IsAnnual';
 import { MinimumPremium } from '../legFields/MinimumPremium';
@@ -48,22 +47,36 @@ import { OptionType } from '../legFields/OptionType';
 import { ParticipationRate } from '../legFields/ParticipationRate';
 import { Premium } from '../legFields/Premium';
 import { PremiumType } from '../legFields/PremiumType';
-import { SettlementDate } from '../legFields/SettlementDate';
+
 import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
 import { Strike } from '../legFields/Strike';
-import { HighBarrier } from '../legFields/HighBarrier';
+import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
-import { PaymentType } from '../legFields/PaymentType';
-import { Payment } from '../legFields/Payment';
+import { Rebate } from '../legFields/Rebate';
+import { ObservationType } from '../legFields/ObservationType';
+import { KnockDirection } from '../legFields/KnockDirection';
+import { RebateUnit } from '../legFields/RebateUnit';
+import { RebateType } from '../legFields/RebateType';
 import { BarrierType } from '../legFields/BarrierType';
+import { Barrier } from '../legFields/Barrier';
+import { LowStrike } from '../legFields/LowStrike';
+import { HighStrike } from '../legFields/HighStrike';
+import { LowParticipationRate } from '../legFields/LowParticipationRate';
+import { HighParticipationRate } from '../legFields/HighParticipationRate';
+import { LowRebate } from '../legFields/LowRebate';
+import { HighRebate } from '../legFields/HighRebate';
 import { LowBarrier } from '../legFields/LowBarrier';
+import { HighBarrier } from '../legFields/HighBarrier';
+import { PaymentType } from '../legFields/PaymentType';
+import { HighPayment } from '../legFields/HighPayment';
+import { LowPayment } from '../legFields/LowPayment';
 
-export const Convex: ILeg = {
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.CONVEX],
-  type: LEG_TYPE_MAP.CONVEX,
+export const DoubleDigital: ILeg = {
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_DIGITAL],
+  type: LEG_TYPE_MAP.DOUBLE_DIGITAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
@@ -74,15 +87,17 @@ export const Convex: ILeg = {
         InitialSpot,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
+        OptionType,
+        StrikeType,
+        LowStrike,
+        HighStrike,
         Term,
+        NotionalAmount,
         ExpirationDate,
         ParticipationRate,
-        NotionalAmount,
         PaymentType,
-        Payment,
-        BarrierType,
-        LowBarrier,
-        HighBarrier,
+        LowPayment,
+        HighPayment,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -91,27 +106,28 @@ export const Convex: ILeg = {
       return [
         IsAnnual,
         Direction,
-        UnderlyerMultiplier,
-        UnderlyerInstrumentId,
-        InitialSpot,
-        SpecifiedPrice,
-        SettlementDate,
-        Term,
-        DaysInYear,
-        ParticipationRate,
-        NotionalAmount,
-        NotionalAmountType,
         EffectiveDate,
         ExpirationDate,
-        BarrierType,
-        LowBarrier,
-        HighBarrier,
-        PaymentType,
-        Payment,
-        PremiumType,
-        Premium,
         FrontPremium,
+        HighPayment,
+        HighStrike,
+        InitialSpot,
+        LowPayment,
+        LowStrike,
         MinimumPremium,
+        NotionalAmount,
+        NotionalAmountType,
+        OptionType,
+        ParticipationRate,
+        PaymentType,
+        Premium,
+        PremiumType,
+        SettlementDate,
+        SpecifiedPrice,
+        StrikeType,
+        Term,
+        UnderlyerInstrumentId,
+        UnderlyerMultiplier,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -119,58 +135,67 @@ export const Convex: ILeg = {
       return [
         IsAnnual,
         Direction,
-        UnderlyerMultiplier,
-        UnderlyerInstrumentId,
-        InitialSpot,
-        SpecifiedPrice,
-        SettlementDate,
-        Term,
-        DaysInYear,
-        ParticipationRate,
-        NotionalAmount,
-        NotionalAmountType,
         EffectiveDate,
         ExpirationDate,
-        BarrierType,
-        LowBarrier,
-        HighBarrier,
-        PaymentType,
-        Payment,
-        PremiumType,
-        Premium,
         FrontPremium,
+        HighPayment,
+        HighStrike,
+        InitialSpot,
+        LowPayment,
+        LowStrike,
         MinimumPremium,
+        NotionalAmount,
+        NotionalAmountType,
+        OptionType,
+        ParticipationRate,
+        PaymentType,
+        Premium,
+        PremiumType,
+        SettlementDate,
+        SpecifiedPrice,
+        StrikeType,
+        Term,
+        UnderlyerInstrumentId,
+        UnderlyerMultiplier,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
     return Form2.createFields({
+      // expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
+      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
-      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
       [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
+      [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
+      [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-      ...(env === LEG_ENV.PRICING ? {} : {}),
+      ...(env === LEG_ENV.PRICING
+        ? {
+            [LEG_FIELD.TERM]: DEFAULT_TERM,
+          }
+        : null),
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [];
+    const COMPUTED_FIELDS = [
+      'numOfOptions',
+      'strikePercent',
+      'numOfUnderlyerContracts',
+      'premiumPerUnit',
+      'trigger',
+      'notional',
+      'premiumPercent',
+    ];
 
-    nextPosition.productType = LEG_TYPE_MAP.CONVEX;
-    nextPosition.lcmEventType = 'OPEN';
-    nextPosition.positionAccountCode = 'empty';
-    nextPosition.positionAccountName = 'empty';
-    nextPosition.counterPartyAccountCode = 'empty';
-    nextPosition.counterPartyAccountName = 'empty';
+    nextPosition.productType = LEG_TYPE_MAP.DOUBLE_DIGITAL;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       ...COMPUTED_FIELDS,
@@ -183,6 +208,7 @@ export const Convex: ILeg = {
             FrontPremium.dataIndex,
           ]),
     ]);
+
     nextPosition.asset.effectiveDate =
       nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
@@ -190,13 +216,11 @@ export const Convex: ILeg = {
     nextPosition.asset.settlementDate =
       nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = true;
-    nextPosition.asset.concavaed = false;
+    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+
     return nextPosition;
   },
-  getPageData: (nextDataSourceItem, position) => {
-    return nextDataSourceItem;
-  },
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
@@ -217,5 +241,7 @@ export const Convex: ILeg = {
       setColValue,
       setTableData
     );
+
+    const { changedFields } = changeFieldsParams;
   },
 };

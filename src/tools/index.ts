@@ -20,6 +20,7 @@ import { Concava } from '@/domains/legs/Concava';
 import { Convex } from '@/domains/legs/Convex';
 import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { DoubleDigital } from '@/domains/legs/DoubleDigital';
 import { ModelXy } from '@/domains/legs/ModelXy';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
@@ -27,6 +28,7 @@ import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Asia } from '@/domains/legs/Asia';
+import { Straddle } from '@/domains/legs/Straddle';
 
 export const isModelXY = data => {
   return (
@@ -178,6 +180,9 @@ export const getLegByProductType = (productType, exerciseType) => {
       return DigitalLegEuropean;
     }
   }
+  if (productType === PRODUCT_TYPE_MAP.STRADDLE) {
+    return Straddle;
+  }
   if (productType === PRODUCT_TYPE_MAP.DOUBLE_TOUCH) {
     return DoubleTouch;
   }
@@ -210,6 +215,9 @@ export const getLegByProductType = (productType, exerciseType) => {
   }
   if (productType === PRODUCT_TYPE_MAP.RANGE_ACCRUALS) {
     return RangeAccruals;
+  }
+  if (productType === PRODUCT_TYPE_MAP.DOUBLE_DIGITAL) {
+    return DoubleDigital;
   }
   if (productType === PRODUCT_TYPE_MAP.MODEL_XY) {
     return ModelXy;
