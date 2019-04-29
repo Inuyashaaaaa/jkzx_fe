@@ -1,4 +1,10 @@
-import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
+import {
+  LEG_FIELD,
+  RULES_REQUIRED,
+  STRIKE_TYPES_MAP,
+  UP_BARRIER_TYPE_MAP,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
+} from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/design/components';
 import { getLegEnvs } from '@/tools';
@@ -6,9 +12,9 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
-export const Payment: ILegColDef = {
-  title: '行权收益',
-  dataIndex: LEG_FIELD.PAYMENT,
+export const ExpireNoBarrierPremium: ILegColDef = {
+  title: '到期未敲出固定收益',
+  dataIndex: LEG_FIELD.EXPIRE_NOBARRIERPREMIUM,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -16,14 +22,17 @@ export const Payment: ILegColDef = {
     }
     return true;
   },
+  exsitable: record => {
+    return (
+      Form2.getFieldValue(record[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]) ===
+      EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+    );
+  },
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
 
     const getUnit = () => {
-      if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
-        return '¥';
-      }
       return '%';
     };
 

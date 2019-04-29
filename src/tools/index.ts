@@ -9,16 +9,19 @@ import {
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
-import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
-import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
-import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
-import _ from 'lodash';
-import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
-import { VerticalSpread } from '@/domains/legs/VerticalSpread';
+import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
 import { BarrierLeg } from '@/domains/legs/Barrier';
+import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
+import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
 import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { ModelXy } from '@/domains/legs/ModelXy';
+import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
+import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
+import { VerticalSpread } from '@/domains/legs/VerticalSpread';
+import _ from 'lodash';
+import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 
 export const isModelXY = data => {
   return (
@@ -185,11 +188,20 @@ export const getLegByProductType = (productType, exerciseType) => {
   if (productType === PRODUCT_TYPE_MAP.DOUBLE_SHARK_FIN) {
     return DoubleSharkFin;
   }
+  if (productType === PRODUCT_TYPE_MAP.EAGLE) {
+    return Eagle;
+  }
   if (productType === PRODUCT_TYPE_MAP.RANGE_ACCRUALS) {
     return RangeAccruals;
   }
   if (productType === PRODUCT_TYPE_MAP.MODEL_XY) {
     return ModelXy;
+  }
+  if (productType === PRODUCT_TYPE_MAP.AUTOCALL) {
+    return AutoCallSnow;
+  }
+  if (productType === PRODUCT_TYPE_MAP.AUTOCALL_PHOENIX) {
+    return AutoCallPhoenix;
   }
   throw new Error('not match productType!');
 };
