@@ -1,13 +1,16 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
+import { Form2, Select } from '@/design/components';
+import FormItem from 'antd/lib/form/FormItem';
 import { IFormControl } from '@/design/components/Form/types';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdPortfolioCreate, trdPortfolioSearch } from '@/services/trade-service';
-import { Button, Row } from 'antd';
+import { Button, Row, Table, Divider, Input } from 'antd';
 import React, { PureComponent } from 'react';
 import ActionCol from './ActionCol';
+import _ from 'lodash';
 
 export const RESOURCE_FORM_CONTROLS: IFormControl[] = [
   {
@@ -27,8 +30,8 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     dataSource: [],
     loading: false,
     pagination: {
-      current: 1,
-      pageSize: 10,
+      showSizeChanger: true,
+      showQuickJumper: true,
     },
     searchFormData: {},
     createFormData: {},
@@ -42,14 +45,19 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     this.search();
   };
 
+  public getFormData = () => {
+    return _.mapValues(this.state.searchFormData, item => {
+      return _.get(item, 'value');
+    });
+  };
+
   public search = async (paramsPagination?) => {
     this.setState({
       loading: true,
     });
+    const searchFormData = this.getFormData();
     const { error, data } = await trdPortfolioSearch({
-      portfolioName: this.state.searchFormData.portfolioName
-        ? this.state.searchFormData.portfolioName
-        : '',
+      portfolioName: searchFormData.portfolioName ? searchFormData.portfolioName : '',
     });
     this.setState({
       loading: false,
@@ -103,60 +111,72 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     });
   };
 
+  public onFieldsChange = (props, changedFields, allFields) => {
+    this.setState({
+      searchFormData: allFields,
+    });
+  };
+
   public render() {
     return (
       <PageHeaderWrapper title="投资组合管理">
-        <SourceTable
-          onSearchButtonClick={this.onSearchButtonClick}
-          searchable={true}
-          searchFormControls={[
-            {
-              control: {
-                label: '投资组合名称',
-              },
-              field: 'portfolioName',
-            },
-          ]}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
+        <Form2
           ref={node => (this.$sourceTable = node)}
-          rowKey="uuid"
-          loading={this.state.loading}
-          columnDefs={[
+          layout="inline"
+          dataSource={this.state.searchFormData}
+          submitText="搜索"
+          submitButtonProps={{
+            icon: 'reload',
+          }}
+          onSubmitButtonClick={this.onSearchButtonClick}
+          onFieldsChange={this.onFieldsChange}
+          resetable={false}
+          columns={[
             {
-              headerName: '投资组合名称',
-              field: 'portfolioName',
-            },
-            {
-              pinned: 'right',
-              width: 200,
-              headerName: '操作',
-              render: params => {
-                return <ActionCol params={params} reload={this.search} />;
+              title: '投资组合名称',
+              dataIndex: 'portfolioName',
+              render: (value, record, index, { form, editing }) => {
+                return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
               },
             },
           ]}
+        />
+        <Divider type="horizontal" />
+        <Row style={{ marginBottom: VERTICAL_GUTTER }} type="flex" justify="start">
+          <ModalButton
+            type="primary"
+            content={
+              <Form
+                footer={false}
+                controls={RESOURCE_FORM_CONTROLS}
+                dataSource={this.state.createFormData}
+                onValueChange={this.onCreateFormDataChange}
+              />
+            }
+            modalProps={{
+              onOk: this.onCreate,
+            }}
+          >
+            新建
+          </ModalButton>
+        </Row>
+        <Table
           dataSource={this.state.dataSource}
-          header={
-            <Row style={{ marginBottom: VERTICAL_GUTTER }} type="flex" justify="start">
-              <ModalButton
-                type="primary"
-                content={
-                  <Form
-                    footer={false}
-                    controls={RESOURCE_FORM_CONTROLS}
-                    dataSource={this.state.createFormData}
-                    onValueChange={this.onCreateFormDataChange}
-                  />
-                }
-                modalProps={{
-                  onOk: this.onCreate,
-                }}
-              >
-                新建
-              </ModalButton>
-            </Row>
-          }
+          columns={[
+            {
+              title: '投资组合名称',
+              dataIndex: 'portfolioName',
+            },
+            {
+              title: '操作',
+              dataIndex: '操作',
+              render: (text, record, index) => {
+                return <ActionCol params={{ data: record }} reload={this.search} />;
+              },
+            },
+          ]}
+          pagination={this.state.pagination}
+          loading={this.state.loading}
         />
       </PageHeaderWrapper>
     );
