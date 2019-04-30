@@ -118,24 +118,16 @@ const CashInsertModal = memo<any>(props => {
       rsp = await clientNewTrade({
         accountId: values.accountId,
         tradeId: values.tradeId,
-        premium:
-          fundType === 'BUYER_START_TRADE'
-            ? values.premium
-            : new BigNumber(values.premium).negated().toNumber(),
+        premium: values.premium,
         information: '',
       });
     }
     if (fundType.includes('UNWIND_TRADE')) {
       rsp = await clientSettleTrade({
         accountId: values.accountId,
-        amount: 'BUYER_UNWIND_TRADE'
-          ? values.cashFlow
-          : new BigNumber(values.cashFlow).negated().toNumber(),
+        amount: values.cashFlow,
         accountEvent: 'UNWIND_TRADE',
-        premium:
-          fundType === 'BUYER_UNWIND_TRADE'
-            ? new BigNumber(values.premium).negated().toNumber()
-            : values.premium,
+        premium: values.premium,
         information: '',
         tradeId: values.tradeId,
       });
@@ -143,14 +135,9 @@ const CashInsertModal = memo<any>(props => {
     if (fundType.includes('SETTLE_TRADE')) {
       rsp = await clientSettleTrade({
         accountId: values.accountId,
-        amount:
-          fundType === 'BUYER_SETTLE_TRADE'
-            ? values.cashFlow
-            : new BigNumber(values.cashFlow).negated().toNumber(),
+        amount: values.cashFlow,
         accountEvent: 'SETTLE_TRADE',
-        premium: 'BUYER_SETTLE_TRADE'
-          ? new BigNumber(values.premium).negated().toNumber()
-          : values.premium,
+        premium: values.premium,
         information: '',
         tradeId: values.tradeId,
       });

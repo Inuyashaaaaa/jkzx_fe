@@ -13,7 +13,7 @@ import Form from '@/design/components/Form';
 import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMoment } from '@/utils';
-import { Button, Col, message, Modal, Row } from 'antd';
+import { Alert, Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -263,6 +263,10 @@ class AsianExerciseModal extends PureComponent<
                 },
               },
             ]}
+          />
+          <Alert
+            message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
+            type="info"
           />
         </Modal>
       </>
