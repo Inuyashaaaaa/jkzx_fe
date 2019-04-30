@@ -5,7 +5,7 @@ import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdPortfolioCreate, trdPortfolioSearch } from '@/services/trade-service';
-import { Row } from 'antd';
+import { Button, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import ActionCol from './ActionCol';
 

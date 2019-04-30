@@ -224,7 +224,7 @@ class ExpirationModal extends PureComponent<
 
     this.switchConfirmLoading();
     if (error) return;
-    message.success('行权成功');
+    message.success('操作成功');
     this.setState({
       visible: false,
       exportVisible: true,

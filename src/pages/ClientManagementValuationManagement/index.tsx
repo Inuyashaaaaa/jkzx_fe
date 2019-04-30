@@ -202,6 +202,7 @@ class ClientManagementValuationManagement extends PureComponent {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -230,6 +231,7 @@ class ClientManagementValuationManagement extends PureComponent {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}

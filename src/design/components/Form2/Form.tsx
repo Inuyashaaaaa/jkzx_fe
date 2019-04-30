@@ -26,8 +26,11 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     };
   };
 
-  public static createFields = (data: any) => {
-    return _.mapValues(data, val => Form.createField(val));
+  public static createFields = (data: any, omits?: string[]) => {
+    return _.mapValues(data, (val, key) => {
+      if (omits && Array.isArray(omits) && omits.indexOf(key) !== -1) return val;
+      return Form.createField(val);
+    });
   };
 
   public static getFieldValue = (field: any, defaultVal?: any) => {

@@ -26,67 +26,14 @@ export const ExpirationDate: ILegColDef = {
     }
     throw new Error('env not match!');
   },
+  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-    const isAnnual = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]);
-
-    const getProps = () => {
-      const commonProps = {
-        defaultOpen: true,
-        format: 'YYYY-MM-DD',
-      };
-
-      if (isPricing) {
-        if (isAnnual) {
-          return {
-            ...commonProps,
-            defaultOpen: false,
-            editing: false,
-          };
-        } else {
-          return {
-            ...commonProps,
-            defaultOpen: true,
-            editing,
-          };
-        }
-      }
-
-      if (isBooking) {
-        return {
-          ...commonProps,
-          editing,
-        };
-      }
-
-      if (isEditing) {
-        return {
-          ...commonProps,
-          defaultOpen: false,
-          editing: false,
-        };
-      }
-
-      throw new Error('env not match!');
-    };
-
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<DatePicker {...getProps()} />)}
+        })(<DatePicker defaultOpen={true} editing={editing} format={'YYYY-MM-DD'} />)}
       </FormItem>
     );
   },
-  //   getValue: {
-  //     depends: [LEG_FIELD.TERM, LEG_FIELD.EFFECTIVE_DATE],
-  //     value: record => {
-  //       const effectiveDate = record[LEG_FIELD.EFFECTIVE_DATE];
-  //       const term = record[LEG_FIELD.TERM];
-  //       if (record[LEG_FIELD.TERM] !== undefined && effectiveDate !== undefined) {
-  //         return getMoment(effectiveDate, true).add(term, 'days');
-  //       }
-  //       return record[LEG_FIELD.EXPIRATION_DATE];
-  //     },
-  //   },
 };

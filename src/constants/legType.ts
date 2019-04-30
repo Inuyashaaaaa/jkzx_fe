@@ -32,6 +32,7 @@ import { DoubleTouchAnnual } from './legColDefs/DoubleTouchAnnual';
 import { DoubleTouchUnAnnual } from './legColDefs/DoubleTouchUnAnnual';
 import { EagleAnnual } from './legColDefs/EagleAnnual';
 import { EagleUnAnnual } from './legColDefs/EagleUnAnnual';
+import { ForwardUnAnnual } from './legColDefs/ForwardUnAnnual';
 import { ModelXYAnnual } from './legColDefs/ModelXYAnnual';
 import { ModelXYUnAnnual } from './legColDefs/ModelXYUnAnnual';
 import { RangeAccrualsAnnual } from './legColDefs/RangeAccrualsAnnual';
@@ -158,4 +159,6 @@ export const LEG_MAP: {
   [LEG_TYPE_MAP.MODEL_XY_ANNUAL]: ModelXYAnnual,
   // 自定义产品非年化
   [LEG_TYPE_MAP.MODEL_XY_UNANNUAL]: ModelXYUnAnnual,
+  // 远期非年化
+  [LEG_TYPE_MAP.FORWARD_UNANNUAL]: ForwardUnAnnual,
 };

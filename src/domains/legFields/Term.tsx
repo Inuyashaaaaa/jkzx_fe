@@ -42,6 +42,7 @@ export const Term: ILegColDef = {
 
     throw new Error('env not match!');
   },
+  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
 
@@ -93,8 +94,8 @@ export const Term: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <UnitInputNumber
-            autoSelect={isBooking || isPricing}
-            editing={isBooking || isPricing ? editing : false}
+            autoSelect={true}
+            editing={editing}
             unit="天"
             precision={0}
             {...getProps()}

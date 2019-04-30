@@ -2,7 +2,7 @@ import ImportExcelButton from '@/lib/components/_ImportExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mdlModelDataGet, mdlModelXYCreate } from '@/services/model';
-import { Button, Input, Modal, notification, Row, Select, Spin, Table, Tabs } from 'antd';
+import { Button, Input, message, Modal, notification, Row, Select, Spin, Table, Tabs } from 'antd';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
@@ -217,9 +217,7 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
-      return notification.error({
-        message: '没有模型数据',
-      });
+      return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane
     setImportBlock(false);
@@ -282,9 +280,7 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
-      return notification.error({
-        message: '没有模型数据',
-      });
+      return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane
     setImportBlock(false);
@@ -348,7 +344,7 @@ const CustomModel = memo(() => {
         const ws = XLSX.utils.aoa_to_sheet(_data[index]);
         XLSX.utils.book_append_sheet(wb, ws, item);
       });
-      XLSX.writeFile(wb, '自定义模型表.xlsx');
+      XLSX.writeFile(wb, `${PRODUCTTYPE}_${currentTrade.tradeId}.xlsx`);
       return;
     }
     const _data = cols.map(tab => {
@@ -367,7 +363,7 @@ const CustomModel = memo(() => {
       const ws = XLSX.utils.aoa_to_sheet(_data[index]);
       XLSX.utils.book_append_sheet(wb, ws, item);
     });
-    XLSX.writeFile(wb, '自定义模型表.xlsx');
+    XLSX.writeFile(wb, `${PRODUCTTYPE}_${currentTrade.tradeId}.xlsx`);
   };
 
   return (

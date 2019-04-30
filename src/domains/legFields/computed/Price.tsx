@@ -15,6 +15,12 @@ export const Price: ILegColDef = {
     };
   },
   render: (value, record, index, { form, editing, colDef }) => {
-    return <FormItem>{form.getFieldDecorator()(<Input editing={false} />)}</FormItem>;
+    return (
+      <FormItem>
+        {form.getFieldDecorator()(
+          <Input editing={false} formatter={val => (val !== undefined ? Math.abs(val) : val)} />
+        )}
+      </FormItem>
+    );
   },
 };

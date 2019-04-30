@@ -10,6 +10,7 @@ export const UnderlyerMultiplier: ILegColDef = {
   editable: record => {
     return false;
   },
+  defaultEditing: false,
   render: (val, record, dataIndex, { form, editing, colDef }) => {
     return (
       <FormItem>
