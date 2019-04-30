@@ -36,6 +36,7 @@ class ExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     exportVisible: false,
+    notionalType: null,
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -47,6 +48,7 @@ class ExerciseModal extends PureComponent<
     const direction = this.data.direction;
     this.setState({
       visible: true,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       direction,
       ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
         ? {
@@ -204,7 +206,7 @@ class ExerciseModal extends PureComponent<
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={EXERCISE_FORM_CONTROLS(this.handleSettleAmount)}
+            controls={EXERCISE_FORM_CONTROLS(this.state.notionalType, this.handleSettleAmount)}
           />
           <Alert
             message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"

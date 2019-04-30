@@ -7,6 +7,7 @@ import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  NOTION_ENUM_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
@@ -53,6 +54,7 @@ class AsianExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     formData: {},
+    notionalType: null,
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -63,6 +65,7 @@ class AsianExerciseModal extends PureComponent<
 
     this.setState({
       visible: true,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       formData: this.getDefaultFormData(),
     });
   };
@@ -212,7 +215,10 @@ class AsianExerciseModal extends PureComponent<
               {
                 field: LEG_FIELD.NOTIONAL_AMOUNT,
                 control: {
-                  label: '名义金额',
+                  label:
+                    this.state.notionalType === NOTION_ENUM_MAP.CNY
+                      ? '名义金额 (￥)'
+                      : '名义金额 (手)',
                 },
                 input: {
                   ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,

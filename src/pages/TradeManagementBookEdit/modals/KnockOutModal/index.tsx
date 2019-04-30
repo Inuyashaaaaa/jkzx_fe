@@ -41,6 +41,7 @@ class ExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     exportVisible: false,
+    notionalType: null,
   };
 
   public getInitialKnockOutDate = data => {
@@ -65,6 +66,7 @@ class ExerciseModal extends PureComponent<
     this.reload = reload;
     this.setState({
       visible: true,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       dataSource: {
         [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
         [KNOCK_OUT_DATE]: this.getInitialKnockOutDate(this.data),
@@ -174,7 +176,7 @@ class ExerciseModal extends PureComponent<
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={KNOCKOUT_FORM_CONTROLS(this.handleSettleAmount)}
+            controls={KNOCKOUT_FORM_CONTROLS(this.state.notionalType, this.handleSettleAmount)}
           />
           <Alert
             message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
