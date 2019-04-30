@@ -2,8 +2,8 @@ import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
   INPUT_NUMBER_PERCENTAGE_DECIMAL_CONFIG,
-  UNIT_ENUM_MAP,
   NOTION_ENUM_MAP,
+  UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { Button } from 'antd';

@@ -6,8 +6,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
-  NOTIONAL_AMOUNT_TYPE_MAP,
   NOTION_ENUM_MAP,
+  NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
