@@ -4,6 +4,7 @@ import React from 'react';
 import Operation from './Operation';
 export const ADDRESS_CASCADER = 'ADDRESS_CASCADER';
 import { CascaderOptionType } from 'antd/lib/cascader';
+import { getMoment } from '@/utils';
 
 export const TABLE_COL_DEF: (branchSalesList, fetchTable) => IColumnDef[] = (
   branchSalesList,
@@ -24,6 +25,9 @@ export const TABLE_COL_DEF: (branchSalesList, fetchTable) => IColumnDef[] = (
   {
     headerName: '创建时间',
     field: 'createdAt',
+    render: params => {
+      return getMoment(params.value).format('YYYY-MM-DD HH:mm:ss');
+    },
   },
   {
     headerName: '操作',
