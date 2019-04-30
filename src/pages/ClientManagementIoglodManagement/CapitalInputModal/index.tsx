@@ -75,8 +75,8 @@ const ClientManagementInsert = memo<any>(props => {
 
   const handleFundChange = (accountId, fundType, partyData, counterPartyData) => {
     let event;
-    if (fundType.includes('START_TRADE')) {
-      event = 'START_TRADE';
+    if (fundType.includes('CHANGE_PREMIUM')) {
+      event = 'CHANGE_PREMIUM';
     } else if (fundType.includes('UNWIND_TRADE')) {
       event = 'UNWIND_TRADE';
     } else if (fundType.includes('SETTLE_TRADE')) {
@@ -131,81 +131,6 @@ const ClientManagementInsert = memo<any>(props => {
       })
     );
     setVisible(true);
-  };
-
-  const getFundFormData = async fundType => {
-    let rsp;
-    const values = props.record;
-    if (fundType.includes('START_TRADE')) {
-      rsp = await clientNewTrade({
-        accountId: values.accountId,
-        tradeId: values.tradeId,
-        premium:
-          fundType === 'BUYER_START_TRADE'
-            ? values.premium
-            : new BigNumber(values.premium).negated().toNumber(),
-        information: '',
-      });
-    }
-    if (fundType.includes('UNWIND_TRADE')) {
-      rsp = await clientSettleTrade({
-        accountId: values.accountId,
-        amount: 'BUYER_UNWIND_TRADE'
-          ? values.cashFlow
-          : new BigNumber(values.cashFlow).negated().toNumber(),
-        accountEvent: 'UNWIND_TRADE',
-        premium:
-          fundType === 'BUYER_UNWIND_TRADE'
-            ? new BigNumber(values.premium).negated().toNumber()
-            : values.premium,
-        information: '',
-        tradeId: values.tradeId,
-      });
-    }
-    if (fundType.includes('SETTLE_TRADE')) {
-      rsp = await clientSettleTrade({
-        accountId: values.accountId,
-        amount:
-          fundType === 'BUYER_SETTLE_TRADE'
-            ? values.cashFlow
-            : new BigNumber(values.cashFlow).negated().toNumber(),
-        accountEvent: 'SETTLE_TRADE',
-        premium: 'BUYER_SETTLE_TRADE'
-          ? new BigNumber(values.premium).negated().toNumber()
-          : values.premium,
-        information: '',
-        tradeId: values.tradeId,
-      });
-    }
-    if (rsp.error) return;
-    setPartyFormData(
-      Form2.createFields(
-        _.pick(rsp.data, ['cashChange', 'creditChange', 'debtChange', 'premiumChange'])
-      )
-    );
-    setCounterPartyFormData(
-      Form2.createFields(_.pick(rsp.data, ['counterPartyFundChange', 'counterPartyCreditChange']))
-    );
-  };
-
-  const handleFundEventType = (direction, lcmEventType) => {
-    if (direction === 'BUYER') {
-      if (lcmEventType === 'OPEN') {
-        return 'BUYER_START_TRADE';
-      }
-      if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
-        return 'BUYER_UNWIND_TRADE';
-      }
-      return 'BUYER_SETTLE_TRADE';
-    } else {
-      if (lcmEventType === 'OPEN') {
-        return 'SELLER_START_TRADE';
-      }
-      if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
-        return 'SELLER_UNWIND_TRADE';
-      }
-      return 'SELLER_SETTLE_TRADE';
-    }
   };
 
   const partyFormChange = (props, changedFields, allFields) => {
