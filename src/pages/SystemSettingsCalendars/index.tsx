@@ -64,6 +64,8 @@ class SystemTradeDate extends PureComponent<any, any> {
   };
 
   public onCreate = async () => {
+    const _data = Form.getFieldsValue(this.state.createFormData);
+
     const { createFormData, holidays: tableDataSource } = this.state;
 
     const { error } = await createCalendar({
