@@ -378,6 +378,16 @@ class ClientManagementSalesManagement extends PureComponent {
       message.error(this.state.editSub ? '更新失败' : '创建失败');
       return;
     }
+    // 在创建分公司时，自动在分公司下创建一个同名的运营部。
+    if (!_data.branchId) {
+      const { data: bdata, error: berror } = await refBranchCreate({
+        subsidiaryId: _data.subsidiaryId,
+        branchName: this.state.subFormData.subsidiaryName.value,
+      });
+      if (berror) {
+        message.error('分公司下创建同名的运营部失败');
+      }
+    }
     this.handleTreeNode();
     this.setState({
       subModalVisible: false,
