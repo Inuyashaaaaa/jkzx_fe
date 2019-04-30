@@ -8,6 +8,7 @@ import {
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
+  NOTION_ENUM_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
@@ -56,6 +57,7 @@ class AsianExerciseModal extends PureComponent<
     dataSource: {},
     formData: {},
     productType: 'ASIAN_ANNUAL',
+    notionalType: null,
   };
 
   public show = (data, tableFormData, currentUser, reload) => {
@@ -66,6 +68,7 @@ class AsianExerciseModal extends PureComponent<
     this.setState({
       visible: true,
       productType: this.data[LEG_TYPE_FIELD],
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       formData: this.getDefaultFormData(),
     });
   };
@@ -135,7 +138,7 @@ class AsianExerciseModal extends PureComponent<
   public getTitle = () => {
     // @todo xxxx
     if (this.isRange()) {
-      return '到期结算'
+      return '到期结算';
     }
     return this.data[LEG_FIELD.DIRECTION] === DIRECTION_TYPE_MAP.BUYER ? '我方行权' : '对方行权';
   };
@@ -173,9 +176,11 @@ class AsianExerciseModal extends PureComponent<
   };
 
   public isRange = () => {
-    return this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
-    this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL
-  }
+    return (
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL
+    );
+  };
 
   public render() {
     const { visible } = this.state;
@@ -224,7 +229,10 @@ class AsianExerciseModal extends PureComponent<
               {
                 field: LEG_FIELD.NOTIONAL_AMOUNT,
                 control: {
-                  label: '名义金额',
+                  label:
+                    this.state.notionalType === NOTION_ENUM_MAP.CNY
+                      ? '名义金额 (￥)'
+                      : '名义金额 (手)',
                 },
                 input: {
                   ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,

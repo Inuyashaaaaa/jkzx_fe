@@ -1,18 +1,23 @@
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG } from '@/constants/common';
+import {
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
+  NOTION_ENUM_MAP,
+} from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { Button } from 'antd';
 import React from 'react';
 
-export const SETTLE_FORM_CONTROLS: (productType, handleSettleAmount) => IFormControl[] = (
+export const SETTLE_FORM_CONTROLS: (
+  notionalType,
   productType,
   handleSettleAmount
-) => [
+) => IFormControl[] = (notionalType, productType, handleSettleAmount) => [
   {
     field: 'NUM_OF_OPTIONS',
     control: {
       label: '期权数量 (手)',
     },
-    input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
+    input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
     decorator: {
       rules: [
         {
@@ -25,7 +30,7 @@ export const SETTLE_FORM_CONTROLS: (productType, handleSettleAmount) => IFormCon
   {
     field: 'NOTIONAL_AMOUNT',
     control: {
-      label: '名义金额',
+      label: notionalType === NOTION_ENUM_MAP.CNY ? '名义本金 (￥)' : '名义本金 (手)',
     },
     input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
     decorator: {

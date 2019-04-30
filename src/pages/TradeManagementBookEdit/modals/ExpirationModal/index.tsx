@@ -2,10 +2,12 @@ import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
+  NOTION_ENUM_MAP,
   OB_DAY_FIELD,
   OPTION_TYPE_OPTIONS,
 } from '@/constants/common';
@@ -63,6 +65,7 @@ class ExpirationModal extends PureComponent<
     callPutDataSource: {},
     premiumType: null,
     formData: {},
+    notionalType: '',
   };
 
   public autocalPhoenixInitial = () => {
@@ -121,6 +124,7 @@ class ExpirationModal extends PureComponent<
       visible: true,
       autoCallPaymentType,
       premiumType,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       ...(this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
       EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
         ? {
@@ -335,9 +339,12 @@ class ExpirationModal extends PureComponent<
             {
               field: LEG_FIELD.NOTIONAL_AMOUNT,
               control: {
-                label: '名义金额',
+                label:
+                  this.state.notionalType === NOTION_ENUM_MAP.CNY
+                    ? '名义本金 (￥)'
+                    : '名义本金 (手)',
               },
-              input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
+              input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
               decorator: {
                 rules: [getRequiredRule(), getMinRule()],
               },
@@ -427,7 +434,7 @@ class ExpirationModal extends PureComponent<
           onValueChange={this.onFixedValueChange}
           controlNumberOneRow={1}
           footer={false}
-          controls={EXPIRATION_FIXED_FORM_CONTROLS}
+          controls={EXPIRATION_FIXED_FORM_CONTROLS(this.state.notionalType)}
         />
       ) : (
         <>
@@ -440,6 +447,7 @@ class ExpirationModal extends PureComponent<
             controlNumberOneRow={1}
             footer={false}
             controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
+              this.state.notionalType,
               this.state.premiumType,
               this.handleSettleAmount
             )}

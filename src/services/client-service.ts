@@ -1,11 +1,11 @@
 import { HOST_TEST } from '@/constants/global';
 import request from '@/lib/utils/request';
 
-export async function clientNewTrade(params = {}) {
+export async function clientChangePremium(params = {}) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'clientNewTrade',
+      method: 'clientChangePremium',
       params,
     },
   });
