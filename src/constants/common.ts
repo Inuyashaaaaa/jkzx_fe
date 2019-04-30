@@ -2,6 +2,8 @@ import { AllInputProps } from '@/lib/components/_Form2/Input';
 import { convertOptions } from '@/utils';
 import { COMPUTED_LEG_FIELD_MAP, TRADESCOLDEFS_LEG_FIELD_MAP } from './global';
 
+export const OB_PRICE_FIELD = 'price';
+
 export const OB_DAY_FIELD = 'obDay';
 
 export const BOOK_NAME_FIELD = 'bookName';
@@ -295,13 +297,13 @@ export const LCM_EVENT_TYPE_OPTIONS = convertOptions(LCM_EVENT_TYPE_MAP, LCM_EVE
 export const UNIT_ENUM_ZHCN_MAP = {
   CNY: '人民币',
   PERCENT: '百分比',
-  USD: '美元',
+  // USD: '美元',
 };
 
 export const UNIT_ENUM_MAP = {
   CNY: 'CNY',
   PERCENT: 'PERCENT',
-  USD: 'USD',
+  // USD: 'USD',
 };
 
 export const UNIT_ENUM_OPTIONS = Object.keys(UNIT_ENUM_MAP).map(key => ({
@@ -634,13 +636,7 @@ export const EXERCISETYPE_MAP = {
 
 export const EXTRA_FIELDS = ['positionId', 'quantity', 'lcmEventType', 'productType'];
 
-export const LEG_INJECT_FIELDS = [
-  LEG_ID_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_NAME_FIELD,
-  LEG_FIELD.IS_ANNUAL,
-  LEG_ENV_FIELD,
-];
+export const LEG_INJECT_FIELDS = [LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_NAME_FIELD, LEG_ENV_FIELD];
 
 export const BIG_NUMBER_CONFIG = {
   DECIMAL_PLACES: 4,
@@ -727,7 +723,7 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL]: '凤凰式AutoCall - 年化',
   [LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL]: '雪球式AutoCall - 非年化',
   [LEG_TYPE_MAP.AUTOCALL_UNANNUAL]: '凤凰式AutoCall - 年化',
-  [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
+  [LEG_TYPE_MAP.AUTOCALL]: '雪球式AutoCall',
   [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: '雪球式AutoCall - 年化',
   [LEG_TYPE_MAP.AUTOCALL_UNANNUAL]: '凤凰式AutoCall - 年化',
   [LEG_TYPE_MAP.GENERIC_SINGLE_ASSET_OPTION]: '其他单资产期权',
@@ -737,7 +733,6 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.VANILLA_AMERICAN]: '美式',
   [LEG_TYPE_MAP.VANILLA_AMERICAN_ANNUAL]: '美式 - 年化',
   [LEG_TYPE_MAP.VANILLA_AMERICAN_UNANNUAL]: '美式 - 非年化',
-  [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
   [LEG_TYPE_MAP.DIGITAL]: '二元',
   [LEG_TYPE_MAP.CALL_SPREAD]: '价差',
   [LEG_TYPE_MAP.DIGITAL_AMERICAN]: '一触即付',
@@ -746,7 +741,7 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN]: '欧式二元',
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL]: '欧式二元 - 年化',
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL]: '欧式二元 - 非年化',
-  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '价差',
+  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '欧式价差',
   [LEG_TYPE_MAP.VERTICAL_SPREAD_UNANNUAL]: '欧式价差 - 非年化',
   [LEG_TYPE_MAP.VERTICAL_SPREAD_ANNUAL]: '欧式价差 - 年化',
   [LEG_TYPE_MAP.BARRIER]: '单鲨',

@@ -243,7 +243,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                     <Select
                       {...{
                         editing,
-                        defaultOpen: formEditingMeta.editing ? false : true,
+                        defaultOpen: editing ? false : true,
                         showSearch: true,
                         fetchOptionsOnSearch: true,
                         placeholder: '请输入内容搜索',
@@ -272,7 +272,7 @@ const BookingBaseInfoForm = memo<any>(props => {
               return (
                 <FormItem>
                   {form.getFieldDecorator()(
-                    <Input editing={editing} autoSelect={formEditingMeta.editing ? false : true} />
+                    <Input editing={editing} autoSelect={editing ? false : true} />
                   )}
                 </FormItem>
               );
@@ -294,7 +294,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                               style: {
                                 width: '60%',
                               },
-                              defaultOpen: formEditingMeta.editing ? false : true,
+                              defaultOpen: editing ? false : true,
                               editing,
                               fetchOptionsOnSearch: true,
                               showSearch: true,
@@ -361,7 +361,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                     <DatePicker
                       editing={editing}
                       format="YYYY-MM-DD"
-                      defaultOpen={formEditingMeta.editing ? false : true}
+                      defaultOpen={editing ? false : true}
                     />
                   )}
                 </FormItem>

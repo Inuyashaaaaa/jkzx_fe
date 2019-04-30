@@ -9,10 +9,27 @@ import {
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
+import { AutoCallSnow } from '@/domains/legs/AutoCallSnow';
+import { BarrierLeg } from '@/domains/legs/Barrier';
 import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
+import { DigitalLegEuropean } from '@/domains/legs/DigitalLegEuropean';
+import { DoubleSharkFin } from '@/domains/legs/DoubleSharkFin';
+import { DoubleTouch } from '@/domains/legs/DoubleTouch';
+import { DoubleNoTouch } from '@/domains/legs/DoubleNoTouch';
+import { Concava } from '@/domains/legs/Concava';
+import { Convex } from '@/domains/legs/Convex';
+import { Eagle } from '@/domains/legs/Eagle';
+import { RangeAccruals } from '@/domains/legs/RangeAccruals';
+import { TripleDigital } from '@/domains/legs/TripleDigital';
+import { DoubleDigital } from '@/domains/legs/DoubleDigital';
+import { ModelXy } from '@/domains/legs/ModelXy';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
+import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import _ from 'lodash';
+import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
+import { Asia } from '@/domains/legs/Asia';
+import { Straddle } from '@/domains/legs/Straddle';
 
 export const isModelXY = data => {
   return (
@@ -132,13 +149,14 @@ export const getLegEnvs = record => ({
   isEditing: legEnvIsEditing(record),
 });
 
-export const getFormEditingMeta = (status: string) => {
+export const getFormEditingMeta = (
+  status: 'EDITING_NO_CONVERT' | 'NO_EDITING_CAN_CONVERT' | 'SHOW'
+) => {
   if (status === FORM_EDITABLE_STATUS.EDITING_NO_CONVERT) {
     return {
       editable: false,
-      editing: true,
     };
-  } else if (status === FORM_EDITABLE_STATUS.EDITING_CAN_CONVERT) {
+  } else if (status === FORM_EDITABLE_STATUS.NO_EDITING_CAN_CONVERT) {
     return {
       editable: true,
     };
@@ -159,12 +177,63 @@ export const getLegByProductType = (productType, exerciseType?) => {
     if (exerciseType === EXERCISETYPE_MAP.AMERICAN) {
       return DigitalLegAmerican;
     }
+    if (exerciseType === EXERCISETYPE_MAP.EUROPEAN) {
+      return DigitalLegEuropean;
+    }
+  }
+  if (productType === PRODUCT_TYPE_MAP.STRADDLE) {
+    return Straddle;
+  }
+  if (productType === PRODUCT_TYPE_MAP.DOUBLE_TOUCH) {
+    return DoubleTouch;
+  }
+  if (productType === PRODUCT_TYPE_MAP.DOUBLE_NO_TOUCH) {
+    return DoubleNoTouch;
+  }
+  if (productType === PRODUCT_TYPE_MAP.CONVEX) {
+    return Convex;
+  }
+  if (productType === PRODUCT_TYPE_MAP.CONCAVA) {
+    return Concava;
   }
   if (productType === PRODUCT_TYPE_MAP.VANILLA_AMERICAN) {
     return VanillaAmerican;
   }
   if (productType === PRODUCT_TYPE_MAP.VANILLA_EUROPEAN) {
     return VanillaEuropean;
+  }
+  if (productType === PRODUCT_TYPE_MAP.VERTICAL_SPREAD) {
+    return VerticalSpread;
+  }
+  if (productType === PRODUCT_TYPE_MAP.BARRIER) {
+    return BarrierLeg;
+  }
+  if (productType === PRODUCT_TYPE_MAP.DOUBLE_SHARK_FIN) {
+    return DoubleSharkFin;
+  }
+  if (productType === PRODUCT_TYPE_MAP.EAGLE) {
+    return Eagle;
+  }
+  if (productType === PRODUCT_TYPE_MAP.RANGE_ACCRUALS) {
+    return RangeAccruals;
+  }
+  if (productType === PRODUCT_TYPE_MAP.TRIPLE_DIGITAL) {
+    return TripleDigital;
+  }
+  if (productType === PRODUCT_TYPE_MAP.DOUBLE_DIGITAL) {
+    return DoubleDigital;
+  }
+  if (productType === PRODUCT_TYPE_MAP.MODEL_XY) {
+    return ModelXy;
+  }
+  if (productType === PRODUCT_TYPE_MAP.AUTOCALL) {
+    return AutoCallSnow;
+  }
+  if (productType === PRODUCT_TYPE_MAP.AUTOCALL_PHOENIX) {
+    return AutoCallPhoenix;
+  }
+  if (productType === PRODUCT_TYPE_MAP.ASIAN) {
+    return Asia;
   }
   throw new Error('not match productType!');
 };

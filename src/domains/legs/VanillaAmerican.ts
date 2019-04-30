@@ -1,3 +1,4 @@
+import { getMoment } from '@/utils';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -6,7 +7,12 @@ import {
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
-import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
+import {
+  LEG_ENV,
+  TOTAL_COMPUTED_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
+  TOTAL_EDITING_FIELDS,
+} from '@/constants/legs';
 import { Form2 } from '@/design/components';
 import {
   IFormField,
@@ -55,27 +61,40 @@ export const VanillaAmerican: ILeg = {
   type: LEG_TYPE_MAP.VANILLA_AMERICAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
-    const commonFields = [
-      IsAnnual,
-      Direction,
-      NotionalAmountType,
-      InitialSpot,
-      UnderlyerMultiplier,
-      UnderlyerInstrumentId,
-      OptionType,
-      ParticipationRate,
-      StrikeType,
-      Strike,
-      Term,
-      ExpirationDate,
-      NotionalAmount,
-    ];
     if (env === LEG_ENV.PRICING) {
-      return [...commonFields, ...TOTAL_TRADESCOL_FIELDS, ...TOTAL_COMPUTED_FIELDS];
+      return [
+        IsAnnual,
+        Direction,
+        NotionalAmountType,
+        InitialSpot,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        OptionType,
+        ParticipationRate,
+        StrikeType,
+        Strike,
+        Term,
+        ExpirationDate,
+        NotionalAmount,
+        ...TOTAL_TRADESCOL_FIELDS,
+        ...TOTAL_COMPUTED_FIELDS,
+      ];
     }
     if (env === LEG_ENV.EDITING) {
       return [
-        ...commonFields,
+        IsAnnual,
+        Direction,
+        NotionalAmountType,
+        InitialSpot,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        OptionType,
+        ParticipationRate,
+        StrikeType,
+        Strike,
+        Term,
+        ExpirationDate,
+        NotionalAmount,
         SpecifiedPrice,
         EffectiveDate,
         SettlementDate,
@@ -84,15 +103,24 @@ export const VanillaAmerican: ILeg = {
         Premium,
         MinimumPremium,
         FrontPremium,
-        PositionId,
-        LcmEventType,
-        InitialNotionalAmount,
-        AlUnwindNotionalAmount,
+        ...TOTAL_EDITING_FIELDS,
       ];
     }
     if (env === LEG_ENV.BOOKING) {
       return [
-        ...commonFields,
+        IsAnnual,
+        Direction,
+        NotionalAmountType,
+        InitialSpot,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        OptionType,
+        ParticipationRate,
+        StrikeType,
+        Strike,
+        Term,
+        ExpirationDate,
+        NotionalAmount,
         SpecifiedPrice,
         EffectiveDate,
         SettlementDate,
@@ -142,6 +170,7 @@ export const VanillaAmerican: ILeg = {
     nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
+      LEG_FIELD.IS_ANNUAL,
       ...COMPUTED_FIELDS,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
@@ -154,22 +183,21 @@ export const VanillaAmerican: ILeg = {
     ]);
 
     nextPosition.asset.effectiveDate =
-      nextPosition.asset.effectiveDate && nextPosition.asset.effectiveDate.format('YYYY-MM-DD');
+      nextPosition.asset.effectiveDate &&
+      getMoment(nextPosition.asset.effectiveDate).format('YYYY-MM-DD');
     nextPosition.asset.expirationDate =
-      nextPosition.asset.expirationDate && nextPosition.asset.expirationDate.format('YYYY-MM-DD');
+      nextPosition.asset.expirationDate &&
+      getMoment(nextPosition.asset.expirationDate).format('YYYY-MM-DD');
     nextPosition.asset.settlementDate =
-      nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
+      nextPosition.asset.settlementDate &&
+      getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
     return nextPosition;
   },
-  getPageData: (env: string, position: any) => {
-    return Form2.createFields({
-      strikePercentAndNumber: position.asset.strike,
-    });
-  },
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,

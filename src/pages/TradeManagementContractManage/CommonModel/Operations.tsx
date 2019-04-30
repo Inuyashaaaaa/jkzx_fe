@@ -1,8 +1,3 @@
-import { Divider, Dropdown, Icon, Menu, message } from 'antd';
-import React, { PureComponent } from 'react';
-import router from 'umi/router';
-const SubMenu = Menu.SubMenu;
-const MenuItem = Menu.Item;
 import {
   LCM_EVENT_TYPE_MAP,
   LCM_EVENT_TYPE_ZHCN_MAP,
@@ -10,7 +5,6 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
 } from '@/constants/common';
-import { allLegTypes } from '@/constants/legColDefs';
 import ModalButton from '@/lib/components/_ModalButton2';
 import AsianExerciseModal from '@/pages/TradeManagementBookEdit/modals/AsianExerciseModal';
 import BarrierIn from '@/pages/TradeManagementBookEdit/modals/BarrierIn';
@@ -25,12 +19,16 @@ import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
 import { trdTradeLCMEventList } from '@/services/general-service';
 import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMEventProcess } from '@/services/trade-service';
+import { Divider, Dropdown, Icon, Menu, message } from 'antd';
 import { connect } from 'dva';
-import _ from 'lodash';
 import moment from 'moment';
+import React, { PureComponent } from 'react';
+import router from 'umi/router';
 import uuidv4 from 'uuid';
 import LifeModalTable from '../LifeModalTable';
 import PortfolioModalTable from '../PortfolioModalTable';
+const SubMenu = Menu.SubMenu;
+const MenuItem = Menu.Item;
 
 class Operations extends PureComponent<{ record: any; onSearch: any }> {
   public $unwindModal: UnwindModal;

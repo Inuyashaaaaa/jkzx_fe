@@ -2,6 +2,9 @@ import { TOTAL_LEGS } from '@/constants/legs';
 import { ILeg } from '@/types/leg';
 import { Button, Dropdown, Menu } from 'antd';
 import React, { PureComponent } from 'react';
+import { getLegByType } from '@/tools';
+import { LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import _ from 'lodash';
 
 export default class MultilLegCreateButton extends PureComponent<{
   handleAddLeg?: (leg: ILeg) => void;
@@ -12,7 +15,12 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const usedLegs = TOTAL_LEGS;
+    const pricingUsedLegs = [...TOTAL_LEGS];
+    const removeUsedLegs = _.remove(pricingUsedLegs, item => {
+      if (!item) return;
+      return item.type === LEG_TYPE_MAP.MODEL_XY;
+    });
+    const usedLegs = this.props.isPricing ? pricingUsedLegs : TOTAL_LEGS;
     return usedLegs;
   };
 
@@ -36,10 +44,9 @@ export default class MultilLegCreateButton extends PureComponent<{
         overlay={
           <Menu
             onClick={event => {
-              const leg = TOTAL_LEGS.find(item => item.type === event.key);
+              const leg = getLegByType(event.key);
               this.props.handleAddLeg(leg);
             }}
-            style={{ display: 'flex', justifyContent: 'start' }}
           >
             {this.getLegMenuNodes(this.normalLegMenus())}
           </Menu>

@@ -16,6 +16,7 @@ export const EffectiveDate: ILegColDef = {
     }
     return false;
   },
+  defaultEditing: false,
   render: (value, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -25,8 +26,8 @@ export const EffectiveDate: ILegColDef = {
           rules: RULES_REQUIRED,
         })(
           <DatePicker
-            defaultOpen={isBooking || isPricing}
-            editing={isBooking || isPricing ? editing : false}
+            defaultOpen={true}
+            editing={editing}
             {...{
               format: 'YYYY-MM-DD',
             }}

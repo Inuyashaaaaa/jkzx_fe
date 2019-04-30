@@ -15,25 +15,14 @@ export const PaymentType: ILegColDef = {
     }
     return true;
   },
+  defaultEditing: false,
   render: (val, record, dataIndex, { form, editing, colDef }) => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-    const getProps = () => {
-      if (isEditing) {
-        return {
-          defaultOpen: true,
-          editing: false,
-        };
-      }
-      return {
-        defaultOpen: true,
-        editing,
-      };
-    };
+    // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select {...getProps()} options={UNIT_ENUM_OPTIONS2} />)}
+        })(<Select defaultOpen={true} editing={editing} options={UNIT_ENUM_OPTIONS2} />)}
       </FormItem>
     );
   },

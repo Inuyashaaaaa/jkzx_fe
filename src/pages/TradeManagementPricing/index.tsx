@@ -1,4 +1,10 @@
-import { BIG_NUMBER_CONFIG, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import {
+  BIG_NUMBER_CONFIG,
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  LEG_ENV_FIELD,
+  LEG_INJECT_FIELDS,
+} from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
   TRADESCOLDEFS_LEG_FIELD_MAP,
@@ -6,11 +12,11 @@ import {
 } from '@/constants/global';
 import { COMPUTED_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
-import { PRICING_FROM_TAG } from '@/constants/trade';
+import { BOOKING_FROM_PRICING, PRICING_FROM_EDITING } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2 } from '@/design/components';
+import { Form2, Loading } from '@/design/components';
 import { IFormField } from '@/design/components/type';
 import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
@@ -32,11 +38,23 @@ import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
 import { getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Affix, Button, Col, Divider, Input, Menu, message, notification, Row, Select } from 'antd';
+import {
+  Affix,
+  Button,
+  Col,
+  Divider,
+  Input,
+  Menu,
+  message,
+  notification,
+  Row,
+  Select,
+  Icon,
+} from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef, useState, useEffect } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import router from 'umi/router';
 import './index.less';
@@ -74,7 +92,7 @@ const ActionBar = memo<any>(props => {
         <Row type="flex" align="middle">
           <Col>
             <MultilLegCreateButton
-              isPricing={false}
+              isPricing={true}
               key="create"
               handleAddLeg={(leg: ILeg) => {
                 if (!leg) return;
@@ -92,6 +110,7 @@ const ActionBar = memo<any>(props => {
           <Col style={{ marginLeft: 10, width: 400 }}>
             <Input.Group compact={true}>
               <Select
+                loading={curPricingEnv === null}
                 onChange={onPricingEnvSelectChange}
                 value={curPricingEnv}
                 style={{ width: 200 }}
@@ -117,7 +136,7 @@ const ActionBar = memo<any>(props => {
             router.push({
               pathname: '/trade-management/booking',
               query: {
-                from: PRICING_FROM_TAG,
+                from: BOOKING_FROM_PRICING,
               },
             });
           }}
@@ -131,6 +150,9 @@ const ActionBar = memo<any>(props => {
 
 const TradeManagementBooking = props => {
   const tableData = props.pricingData.tableData;
+  const { location, tradeManagementBookEditPageData } = props;
+  const tableEl = useRef<IMultiLegTableEl>(null);
+  const [curPricingEnv, setCurPricingEnv] = useState(null);
 
   const setTableData = payload => {
     props.dispatch({
@@ -139,8 +161,45 @@ const TradeManagementBooking = props => {
     });
   };
 
-  const tableEl = useRef<IMultiLegTableEl>(null);
-  const [curPricingEnv, setCurPricingEnv] = useState(null);
+  const { query } = location;
+  const { from } = query;
+
+  useLifecycles(() => {
+    const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
+
+    if (from === PRICING_FROM_EDITING) {
+      const next = editingTableData.map(record => {
+        const leg = getLegByRecord(record);
+        if (!leg) return record;
+        const omits = _.difference(
+          leg.getColumns(LEG_ENV.EDITING).map(item => item.dataIndex),
+          leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex)
+        );
+        return {
+          ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+          ...leg.getDefaultData(LEG_ENV.PRICING),
+          ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
+          [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
+        };
+      });
+      setTableData(next);
+    }
+  });
+
+  const [fetched, setFetched] = useState(false);
+
+  useEffect(
+    () => {
+      if (from === PRICING_FROM_EDITING) {
+        if (fetched) return;
+        if (!curPricingEnv || !curPricingEnv.length) return;
+        if (_.isEmpty(tableData)) return;
+        tableData.forEach(record => fetchDefaultPricingEnvData(record));
+        setFetched(true);
+      }
+    },
+    [tableData, curPricingEnv]
+  );
 
   const judgeLegColumnsHasError = record => {
     const leg = getLegByRecord(record);
@@ -486,5 +545,6 @@ export default memo(
   connect(state => ({
     currentUser: (state.user as any).currentUser,
     pricingData: state.pricingData,
+    tradeManagementBookEditPageData: state.tradeManagementBookEdit,
   }))(TradeManagementBooking)
 );

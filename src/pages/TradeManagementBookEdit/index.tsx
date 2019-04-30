@@ -5,7 +5,7 @@ import {
   LEG_TYPE_FIELD,
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
+import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
@@ -19,21 +19,29 @@ import {
   getTradeCreateModalData,
 } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import { getLegByRecord, getLegByProductType } from '@/tools';
+import { getLegByProductType, getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
 import { Divider, message, Typography, Menu } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import ActionBar from './ActionBar';
 import './index.less';
 import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
-  const [tableData, setTableData] = useState([]);
-  const [tableLoading, setTableLoading] = useState(false);
+  const { tradeManagementBookEditPageData, dispatch } = props;
+  const { tableData } = tradeManagementBookEditPageData;
+  const setTableData = payload => {
+    dispatch({
+      type: 'tradeManagementBookEdit/setTableData',
+      payload,
+    });
+  };
 
+  const [tableLoading, setTableLoading] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [eventTypes, setEventTypes] = useState({});
@@ -43,13 +51,12 @@ const TradeManagementBooking = props => {
 
     const isAnnualized = position.asset.annualized;
 
-    setTableData(pre =>
-      pre.concat({
+    setTableData(pre => {
+      const next = {
         ...createLegDataSourceItem(leg, LEG_ENV.EDITING),
         [LEG_ID_FIELD]: position.positionId,
         [LEG_FIELD.POSITION_ID]: Form2.createField(position.positionId),
         [LEG_FIELD.LCM_EVENT_TYPE]: Form2.createField(position.lcmEventType),
-        ...leg.getPageData(LEG_ENV.EDITING, position),
         ...Form2.createFields(
           backConvertPercent({
             ..._.omitBy(
@@ -59,11 +66,16 @@ const TradeManagementBooking = props => {
             [LEG_FIELD.IS_ANNUAL]: isAnnualized,
           })
         ),
-      })
-    );
+        ...leg.getPageData(LEG_ENV.EDITING, position),
+      };
+      return pre.concat(next);
+    });
   };
 
   const loadTableData = async () => {
+    setTableData([]);
+    setCreateFormData([]);
+
     if (!props.location.query.id) {
       return message.warn('查看 id 不存在');
     }
@@ -227,6 +239,7 @@ const TradeManagementBooking = props => {
         getContextMenu={getContextMenu}
       />
       <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
+      <ActionBar />
     </PageHeaderWrapper>
   );
 };
@@ -234,6 +247,6 @@ const TradeManagementBooking = props => {
 export default memo(
   connect(state => ({
     currentUser: (state.user as any).currentUser,
-    pricingData: state.pricingData,
+    tradeManagementBookEditPageData: state.tradeManagementBookEdit,
   }))(TradeManagementBooking)
 );

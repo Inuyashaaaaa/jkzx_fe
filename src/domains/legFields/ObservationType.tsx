@@ -32,37 +32,27 @@ export const ObservationType: ILegColDef = {
     }
     return true;
   },
+  defaultEditing: record => {
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
-    const getEditable = () =>
-      typeof colDef.editable === 'function'
-        ? colDef.editable(record, index, { colDef })
-        : colDef.editable;
+    // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
 
     const getDefaultOpen = () => {
-      return getEditable();
-    };
-
-    const getEditing = () => {
-      if (!getEditable()) {
-        return false;
-      }
       return editing;
-    };
-
-    const getProps = () => {
-      return {
-        defaultOpen: getDefaultOpen(),
-        editing: getEditing(),
-      };
     };
 
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select {...getProps()} options={OBSERVATION_TYPE_OPTIONS} />)}
+        })(
+          <Select
+            defaultOpen={getDefaultOpen()}
+            editing={editing}
+            options={OBSERVATION_TYPE_OPTIONS}
+          />
+        )}
       </FormItem>
     );
   },

@@ -6,7 +6,7 @@ import { ITableProps } from '@/design/components/type';
 import { remove } from '@/design/utils';
 import { getLegByRecord } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { Tag } from 'antd';
+import { Tag, Affix } from 'antd';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 
@@ -102,7 +102,7 @@ const MultiLegTable = memo<
         onCell(record, index, { colDef }) {
           if (cellIsEmpty(record, colDef)) {
             return {
-              style: { backgroundColor: '#e8e8e8' },
+              style: { backgroundColor: '#fafafa' },
               ...(item.onCell ? item.onCell.apply(this, arguments) : null),
             };
           }

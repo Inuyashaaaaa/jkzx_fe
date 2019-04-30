@@ -25,35 +25,15 @@ export const RebateType: ILegColDef = {
     }
     return true;
   },
+  defaultEditing: record => {
+    return false;
+  },
   render: (val, record, index, { form, editing, colDef }) => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
-    const getDefaultOpen = () => {
-      if (isEditing) {
-        return false;
-      }
-      return true;
-    };
-
-    const getEditing = () => {
-      if (isEditing) {
-        return false;
-      }
-      return editing;
-    };
-
-    const getProps = () => {
-      return {
-        defaultOpen: getDefaultOpen(),
-        editing: getEditing(),
-      };
-    };
-
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<Select {...getProps()} options={REBATETYPE_TYPE_OPTIONS} />)}
+        })(<Select defaultOpen={editing} editing={editing} options={REBATETYPE_TYPE_OPTIONS} />)}
       </FormItem>
     );
   },
