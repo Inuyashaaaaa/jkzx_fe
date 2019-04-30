@@ -24,13 +24,13 @@ export default class MultilLegCreateButton extends PureComponent<{
       {
         name: '年化',
         children: usedLegs
-          .filter(leg => leg.isAnnualized)
+          .filter(leg => (leg ? leg.isAnnualized : false))
           .map(item => ({ ...item, name: item.name.replace(' - 年化', '') })),
       },
       {
         name: '非年化',
         children: usedLegs
-          .filter(leg => !leg.isAnnualized)
+          .filter(leg => (leg ? leg.isAnnualized : false))
           .map(item => ({ ...item, name: item.name.replace(' - 非年化', '') })),
       },
     ];
