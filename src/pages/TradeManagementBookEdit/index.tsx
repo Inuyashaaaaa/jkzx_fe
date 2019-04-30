@@ -355,12 +355,16 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     }
 
     if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-      if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
+      if (
+        legType === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+        legType === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+        legType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+        legType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+      ) {
         const convertedData = filterObDays(convertObservetions(params.rowData));
         if (convertedData.some(item => !item.price)) {
           return message.warn('请先完善观察日价格');
         }
-
         return this.$asianExerciseModal.show(
           this.activeRowData,
           this.state.tableFormData,
