@@ -30,6 +30,7 @@ import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Asia } from '@/domains/legs/Asia';
 import { Straddle } from '@/domains/legs/Straddle';
+import { Forward } from '@/domains/legs/Forward';
 
 export const isModelXY = data => {
   return (
@@ -234,6 +235,9 @@ export const getLegByProductType = (productType, exerciseType) => {
   }
   if (productType === PRODUCT_TYPE_MAP.ASIAN) {
     return Asia;
+  }
+  if (productType === PRODUCT_TYPE_MAP.FORWARD) {
+    return Forward;
   }
   throw new Error('not match productType!');
 };
