@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { Tabs, Skeleton } from 'antd';
 import classNames from 'classnames';
 import styles from './index.less';
-import BreadcrumbView from './breadcrumb';
+// import BreadcrumbView from './breadcrumb';
 
 const { TabPane } = Tabs;
 export default class PageHeader extends PureComponent {
@@ -29,10 +29,12 @@ export default class PageHeader extends PureComponent {
       onTabEdit,
       loading = false,
       wide = false,
-      hiddenBreadcrumb = false,
+      // hiddenBreadcrumb = false,
     } = this.props;
 
-    const clsString = classNames(styles.pageHeader, className);
+    const clsString = classNames(styles.pageHeader, className, {
+      [styles.noPadding]: !title,
+    });
     const activeKeyProps = {};
     if (tabDefaultActiveKey !== undefined) {
       activeKeyProps.defaultActiveKey = tabDefaultActiveKey;
@@ -50,7 +52,7 @@ export default class PageHeader extends PureComponent {
             paragraph={{ rows: 3 }}
             avatar={{ size: 'large', shape: 'circle' }}
           >
-            {hiddenBreadcrumb ? null : <BreadcrumbView {...this.props} />}
+            {/* {hiddenBreadcrumb ? null : <BreadcrumbView {...this.props} />} */}
             <div className={styles.detail}>
               {logo && <div className={styles.logo}>{logo}</div>}
               <div className={styles.main}>
