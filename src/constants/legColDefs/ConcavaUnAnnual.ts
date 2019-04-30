@@ -17,7 +17,6 @@ import {
 import {
   BarrierType,
   DaysInYear,
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -76,7 +75,6 @@ export const ConcavaUnAnnual: ILegType = pipeLeg({
           ExpirationDate,
           HighBarrier,
           InitialSpot,
-          DaysInYear,
           LowBarrier,
           NotionalAmount,
           NotionalAmountType,

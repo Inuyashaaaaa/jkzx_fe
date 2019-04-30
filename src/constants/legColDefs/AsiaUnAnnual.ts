@@ -16,7 +16,6 @@ import {
   STRIKE_TYPES_MAP,
 } from '../common';
 import {
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -72,7 +71,6 @@ export const AsiaUnAnnual: ILegType = pipeLeg({
         ]
       : [
           Direction,
-          DaysInYear,
           OptionType,
           UnderlyerInstrumentId,
           UnderlyerMultiplier,

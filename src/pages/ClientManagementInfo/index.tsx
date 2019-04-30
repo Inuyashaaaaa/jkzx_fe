@@ -240,10 +240,6 @@ const ClientManagementInfo = memo(() => {
               dataIndex: 'legalName',
             },
             {
-              title: '账户编号',
-              dataIndex: 'accountId',
-            },
-            {
               title: '开户销售',
               dataIndex: 'salesName',
             },

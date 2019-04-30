@@ -149,7 +149,7 @@ export const MIDDLE_FORM_CONTROLS = [
       return (
         <FormItem>
           {form.getFieldDecorator({ rules: RULES_REQUIRED })(
-            <Select options={ACCOUNT_EVENT_TYPE_OPTIONS} />
+            <Select style={{ minWidth: 180 }} options={ACCOUNT_EVENT_TYPE_OPTIONS} />
           )}
         </FormItem>
       );

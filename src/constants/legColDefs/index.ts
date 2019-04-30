@@ -29,6 +29,7 @@ import { DoubleTouchAnnual } from './DoubleTouchAnnual';
 import { DoubleTouchUnAnnual } from './DoubleTouchUnAnnual';
 import { EagleAnnual } from './EagleAnnual';
 import { EagleUnAnnual } from './EagleUnAnnual';
+import { ForwardUnAnnual } from './ForwardUnAnnual';
 import { ModelXYAnnual } from './ModelXYAnnual';
 import { ModelXYUnAnnual } from './ModelXYUnAnnual';
 import { RangeAccrualsAnnual } from './RangeAccrualsAnnual';
@@ -93,6 +94,7 @@ export const allLegTypes: ILegType[] = [
   AutoCallPhoenixAnnual,
   ModelXYAnnual,
   ModelXYUnAnnual,
+  ForwardUnAnnual,
 ];
 
 export const allTryPricingLegTypes: ILegType[] = allLegTypes;

@@ -2,6 +2,8 @@ import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_PERCENTAGE_CONFIG,
   LEG_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import { IColDef } from '@/design/components/Table/types';
 import _ from 'lodash';
@@ -35,11 +37,24 @@ export const TradesColDefs: IColDef[] = [
     },
   },
   {
-    editable: true,
     headerName: '波动率',
     field: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
     input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     cellStyle: CELL_STYLE,
+    editable: params => {
+      const { colDef, data } = params;
+      if (data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.FORWARD_UNANNUAL && colDef.field === 'vol') {
+        return false;
+      }
+      return true;
+    },
+    exsitable: params => {
+      const { colDef, data } = params;
+      if (data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.FORWARD_UNANNUAL && colDef.field === 'vol') {
+        return false;
+      }
+      return true;
+    },
   },
   {
     editable: true,

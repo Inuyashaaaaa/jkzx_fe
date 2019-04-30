@@ -1,6 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import SourceTable from '@/design/components/SourceTable';
 import { cliTradeTaskSearch } from '@/services/reference-data-service';
+import { sortByCreateAt } from '@/services/sort';
 import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
 import { PROCESSED_COL_DEFS, PROCESSED_FORM_CONTROLS } from './constants';
@@ -26,7 +27,7 @@ class Processed extends PureComponent {
     });
     if (error) return;
     this.setState({
-      dataSource: data,
+      dataSource: sortByCreateAt(data),
     });
   };
 

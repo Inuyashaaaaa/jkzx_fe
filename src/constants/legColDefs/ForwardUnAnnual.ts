@@ -3,42 +3,35 @@ import {
   LEG_INJECT_FIELDS,
   NOTIONAL_AMOUNT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
-  REBATETYPE_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
-  UNIT_ENUM_MAP,
+  STRIKE_TYPES_MAP,
 } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
 import _ from 'lodash';
 import moment from 'moment';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP, LEG_TYPE_ZHCH_MAP } from '../common';
 import {
-  BarrierType,
   Direction,
   EffectiveDate,
   ExpirationDate,
-  HighBarrier,
   InitialSpot,
-  LowBarrier,
   NotionalAmount,
   NotionalAmountType,
-  ParticipationRate,
-  Payment,
-  PaymentType,
   Premium,
   PremiumType,
-  PricingExpirationDate,
   PricingTerm,
-  RebateType,
   SettlementDate,
   SpecifiedPrice,
+  Strike,
+  StrikeType,
   UnderlyerInstrumentId,
   UnderlyerMultiplier,
 } from './common/common';
 import { pipeLeg } from './common/pipeLeg';
 
-export const DoubleTouchUnAnnual = pipeLeg({
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_TOUCH_UNANNUAL],
-  type: LEG_TYPE_MAP.DOUBLE_TOUCH_UNANNUAL,
+export const ForwardUnAnnual = pipeLeg({
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.FORWARD_UNANNUAL],
+  type: LEG_TYPE_MAP.FORWARD_UNANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: false,
 
@@ -49,14 +42,13 @@ export const DoubleTouchUnAnnual = pipeLeg({
           NotionalAmountType,
           InitialSpot,
           UnderlyerMultiplier,
-          UnderlyerInstrumentId,
-          LowBarrier,
-          HighBarrier,
-          Payment,
-          PaymentType,
+          StrikeType,
+          Strike,
+          SpecifiedPrice,
           PricingTerm,
-          PricingExpirationDate,
+          UnderlyerInstrumentId,
           NotionalAmount,
+          ExpirationDate,
         ]
       : [
           Direction,
@@ -65,32 +57,25 @@ export const DoubleTouchUnAnnual = pipeLeg({
           InitialSpot,
           SpecifiedPrice,
           SettlementDate,
-          ParticipationRate,
           NotionalAmount,
           NotionalAmountType,
           EffectiveDate,
           ExpirationDate,
-          BarrierType,
-          LowBarrier,
-          HighBarrier,
-          RebateType,
+          StrikeType,
           PremiumType,
           Premium,
-          PaymentType,
-          Payment,
+          Strike,
         ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
       ...nextDataSourceItem,
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      // expirationTime: '15:00:00',
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.LOT,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
-      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       ...(isPricing
         ? {
             [LEG_FIELD.TERM]: DEFAULT_TERM,
@@ -102,7 +87,7 @@ export const DoubleTouchUnAnnual = pipeLeg({
   getPosition: (nextPosition, dataSourceItem, tableDataSource, isPricing) => {
     const COMPUTED_FIELDS = [];
 
-    nextPosition.productType = LEG_TYPE_MAP.DOUBLE_TOUCH;
+    nextPosition.productType = LEG_TYPE_MAP.FORWARD;
     nextPosition.lcmEventType = 'OPEN';
     nextPosition.positionAccountCode = 'empty';
     nextPosition.positionAccountName = 'empty';
@@ -117,7 +102,6 @@ export const DoubleTouchUnAnnual = pipeLeg({
       nextPosition.asset.settlementDate && nextPosition.asset.settlementDate.format('YYYY-MM-DD');
 
     nextPosition.asset.annualized = false;
-    nextPosition.asset.touched = true;
     return nextPosition;
   },
   getPageData: (nextDataSourceItem, position) => {

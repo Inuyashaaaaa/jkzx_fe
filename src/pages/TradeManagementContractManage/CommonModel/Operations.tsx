@@ -227,11 +227,11 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
     }
 
     if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
-      this.$settleModal.show(
+      return this.$settleModal.show(
         this.activeRowData,
         this.state.tableFormData,
         this.props.currentUser,
-        () => this.props.onSearch()
+        () => this.props.onSearch(true)
       );
     }
   };

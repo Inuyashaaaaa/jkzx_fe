@@ -16,7 +16,6 @@ import _ from 'lodash';
 import moment from 'moment';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
 import {
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -88,7 +87,6 @@ export const DigitalLegAmericanUnAnnual = pipeLeg({
           EffectiveDate,
           ObservationType,
           RebateType,
-          DaysInYear,
         ],
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
