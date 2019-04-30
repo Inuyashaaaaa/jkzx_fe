@@ -19,6 +19,7 @@ import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
 import { convertObservetions } from '@/services/common';
 import { Form2 } from '@/design/components';
 import _ from 'lodash';
+import AmendModal, { IAmendModalEl } from './AmendModal';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -43,6 +44,7 @@ const LcmEventModal = memo<{
   const $fixingModal = useRef<FixingModal>(null);
   const $knockOutModal = useRef<KnockOutModal>(null);
   const $rollModal = useRef<RollModal>(null);
+  const $amend = useRef<IAmendModalEl>(null);
 
   const { current } = props;
 
@@ -50,12 +52,8 @@ const LcmEventModal = memo<{
     show: (event: ILcmEventModalEventParams) => {
       const { eventType, record, createFormData, currentUser, loadData } = event;
       const legType = record[LEG_TYPE_FIELD];
-      const data = _.mapValues(record, item => {
-        if (Form2.isField(item)) {
-          return Form2.getFieldValue(item);
-        }
-        return item;
-      });
+      const data = Form2.getFieldsValue(record);
+
       const tableFormData = Form2.getFieldsValue(createFormData);
       if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
         return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
@@ -100,6 +98,10 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.ROLL) {
         return $rollModal.current.show(data, tableFormData, currentUser, loadData);
       }
+
+      if (eventType === LCM_EVENT_TYPE_MAP.AMEND) {
+        return $amend.current.show(record, tableFormData, currentUser, loadData);
+      }
     },
   };
 
@@ -133,6 +135,11 @@ const LcmEventModal = memo<{
       <RollModal
         ref={node => {
           $rollModal.current = node;
+        }}
+      />
+      <AmendModal
+        current={node => {
+          $amend.current = node;
         }}
       />
     </>

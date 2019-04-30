@@ -6,6 +6,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   PRODUCT_TYPE_MAP,
+  LEG_INJECT_FIELDS,
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
@@ -30,6 +31,9 @@ import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Asia } from '@/domains/legs/Asia';
 import { Straddle } from '@/domains/legs/Straddle';
+import { createLegDataSourceItem } from '@/services/pages';
+import { Form2 } from '@/design/components';
+import { ITableData } from '@/design/components/type';
 
 export const isModelXY = data => {
   return (
@@ -236,4 +240,18 @@ export const getLegByProductType = (productType, exerciseType?) => {
     return Asia;
   }
   throw new Error('not match productType!');
+};
+
+export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
+  const leg = getLegByRecord(record);
+  if (!leg) return record;
+  const omits = _.difference(
+    leg.getColumns(record[LEG_ENV_FIELD]).map(record => record.dataIndex),
+    leg.getColumns(toEnv).map(record => record.dataIndex)
+  );
+  return {
+    ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
+    ...leg.getDefaultData(LEG_ENV.BOOKING),
+    ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
+  };
 };

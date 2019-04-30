@@ -461,6 +461,8 @@ const TradeManagementBooking = props => {
       />
       <Divider />
       <MultiLegTable
+        totalColumnIds={COMPUTED_LEG_FIELDS}
+        totalable={true}
         env={LEG_ENV.PRICING}
         tableEl={tableEl}
         onCellFieldsChange={params => {

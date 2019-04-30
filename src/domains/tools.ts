@@ -181,9 +181,10 @@ export const commonLinkage = (
     if (!Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL])) {
       if (Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields)) {
         record[LEG_FIELD.TERM] = Form2.createField(
-          getMoment(
-            Form2.getFieldValue(Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields))
-          ).diff(getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])), 'days')
+          getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).diff(
+            getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])),
+            'days'
+          )
         );
       }
     }

@@ -6,13 +6,6 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
 
-const getProps = record => {
-  if (_.get(record, [LEG_FIELD.NOTIONAL_AMOUNT_TYPE, 'value']) === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
-    return { unit: '¥' };
-  }
-  return { unit: '手' };
-};
-
 export const NotionalAmount: ILegColDef = {
   title: '名义本金',
   dataIndex: LEG_FIELD.NOTIONAL_AMOUNT,
@@ -24,20 +17,22 @@ export const NotionalAmount: ILegColDef = {
     }
     return false;
   },
+  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
+    const getUnit = () => {
+      if (
+        _.get(record, [LEG_FIELD.NOTIONAL_AMOUNT_TYPE, 'value']) === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+      ) {
+        return '¥';
+      }
+      return '手';
+    };
+
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(
-          <UnitInputNumber
-            autoSelect={isBooking || isPricing}
-            editing={isBooking || isPricing ? editing : false}
-            {...getProps(record)}
-          />
-        )}
+        })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
       </FormItem>
     );
   },
