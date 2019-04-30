@@ -1111,6 +1111,7 @@ export const AlreadyBarrier: IColDef = {
   editable: true,
   input: {
     type: 'checkbox',
+    emptyFormatWhenNullValue: true,
   },
   rules: RULES_REQUIRED,
 };
