@@ -66,10 +66,10 @@ class Input extends InputBase<IUploadProps> {
 
   public renderRendering() {
     const { value: fileList = [] } = this.props;
-    return fileList.map((item, index) => (
-      <span key={index} style={{ display: 'inline-block', width: '100%' }}>
+    return (fileList || []).map((item, index) => (
+      <a href={item.url} key={index} style={{ display: 'inline-block', width: '100%' }}>
         {item.name || item.fileName}
-      </span>
+      </a>
     ));
   }
 }

@@ -1,4 +1,9 @@
-import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import {
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  LCM_EVENT_TYPE_ZHCN_MAP,
+  LEG_TYPE_FIELD,
+} from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
@@ -14,17 +19,19 @@ import {
   getTradeCreateModalData,
 } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import { getLegByProductType, getLegByRecord } from '@/tools';
+import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, message, Typography } from 'antd';
+import { Divider, message, Typography, Menu } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import './index.less';
+import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 
 const TradeManagementBooking = props => {
+  const { currentUser } = props;
   const { tradeManagementBookEditPageData, dispatch } = props;
   const { tableData } = tradeManagementBookEditPageData;
   const setTableData = payload => {
@@ -42,24 +49,11 @@ const TradeManagementBooking = props => {
   const addLeg = (leg: ILeg, position) => {
     if (!leg) return;
 
-    const isAnnualized = position.asset.annualized;
-
     setTableData(pre => {
       const next = {
-        ...createLegDataSourceItem(leg, LEG_ENV.EDITING),
-        [LEG_ID_FIELD]: position.positionId,
+        ...createLegRecordByPosition(leg, position, LEG_ENV.EDITING),
         [LEG_FIELD.POSITION_ID]: Form2.createField(position.positionId),
         [LEG_FIELD.LCM_EVENT_TYPE]: Form2.createField(position.lcmEventType),
-        ...Form2.createFields(
-          backConvertPercent({
-            ..._.omitBy(
-              _.omit(position.asset, ['counterpartyCode', 'annualized', 'exerciseType']),
-              _.isNull
-            ),
-            [LEG_FIELD.IS_ANNUAL]: isAnnualized,
-          })
-        ),
-        ...leg.getPageData(LEG_ENV.EDITING, position),
       };
       return pre.concat(next);
     });
@@ -133,9 +127,37 @@ const TradeManagementBooking = props => {
     });
   };
 
+  const getContextMenu = params => {
+    const menuItem =
+      eventTypes[params.record.id] &&
+      eventTypes[params.record.id].map(eventType => {
+        return { key: eventType, value: LCM_EVENT_TYPE_ZHCN_MAP[eventType] };
+      });
+    if (!menuItem) return;
+    return (
+      <Menu onClick={({ key }) => handleEventAction(key, params)}>
+        {menuItem.map(item => {
+          return <Menu.Item key={item.key}>{item.value}</Menu.Item>;
+        })}
+      </Menu>
+    );
+  };
+
+  const handleEventAction = (eventType, params) => {
+    lcmEventModalEl.current.show({
+      eventType,
+      record: params.record,
+      createFormData,
+      currentUser,
+      loadData: loadTableData,
+    });
+  };
+
   useLifecycles(() => {
     loadTableData();
   });
+
+  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
     <PageHeaderWrapper>
@@ -201,33 +223,9 @@ const TradeManagementBooking = props => {
           });
         }}
         dataSource={tableData}
-        // getContextMenu={params => {
-        //   return (
-        //     <Menu
-        //       onClick={event => {
-        //         if (event.key === 'copy') {
-        //           setTableData(pre => {
-        //             const next = insert(pre, params.rowIndex, {
-        //               ..._.cloneDeep(params.record),
-        //               [LEG_ID_FIELD]: uuid(),
-        //             });
-        //             return next;
-        //           });
-        //         }
-        //         if (event.key === 'remove') {
-        //           setTableData(pre => {
-        //             const next = remove(pre, params.rowIndex);
-        //             return next;
-        //           });
-        //         }
-        //       }}
-        //     >
-        //       <Menu.Item key="copy">复制</Menu.Item>
-        //       <Menu.Item key="remove">删除</Menu.Item>
-        //     </Menu>
-        //   );
-        // }}
+        getContextMenu={getContextMenu}
       />
+      <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
       <ActionBar />
     </PageHeaderWrapper>
   );

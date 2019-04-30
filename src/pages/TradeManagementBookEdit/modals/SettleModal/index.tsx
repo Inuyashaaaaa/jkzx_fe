@@ -1,7 +1,7 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
-import { trdTradeLCMEventProcess } from '@/services/trade-service';
+import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
@@ -35,6 +35,7 @@ class ExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     exportVisible: false,
+    productType: 'MODEL_XY',
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -45,6 +46,7 @@ class ExerciseModal extends PureComponent<
 
     this.setState({
       visible: true,
+      productType: this.data.productType,
       ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
         ? {
             dataSource: this.computeLotDataSource({
@@ -128,6 +130,29 @@ class ExerciseModal extends PureComponent<
     });
   };
 
+  public handleSettleAmount = async () => {
+    const dataSource = this.state.dataSource;
+    const { error, data } = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventDetail: {
+        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+      },
+      eventType:
+        this.data.productType === 'FORWARD_UNANNUAL'
+          ? LCM_EVENT_TYPE_MAP.SETTLE
+          : LCM_EVENT_TYPE_MAP.EXERCISE,
+    });
+    if (error) return;
+    this.setState({
+      dataSource: {
+        ...dataSource,
+        [SETTLE_AMOUNT]: data,
+      },
+    });
+  };
+
   public render() {
     const { visible } = this.state;
     return (
@@ -155,7 +180,7 @@ class ExerciseModal extends PureComponent<
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={SETTLE_FORM_CONTROLS}
+            controls={SETTLE_FORM_CONTROLS(this.state.productType, this.handleSettleAmount)}
           />
         </Modal>
       </>

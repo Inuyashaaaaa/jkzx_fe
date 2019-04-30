@@ -13,7 +13,6 @@ import moment from 'moment';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP, LEG_TYPE_ZHCH_MAP } from '../common';
 import {
   BarrierType,
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -60,7 +59,6 @@ export const DoubleNoTouchUnAnnual = pipeLeg({
         ]
       : [
           Direction,
-          DaysInYear,
           UnderlyerMultiplier,
           UnderlyerInstrumentId,
           InitialSpot,

@@ -14,7 +14,6 @@ import { DEFAULT_DAYS_IN_YEAR } from '.';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
 import {
   DaysInYear,
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -71,7 +70,6 @@ export const StraddleUnAnnual: ILegType = pipeLeg({
           UnderlyerInstrumentId,
           InitialSpot,
           SpecifiedPrice,
-          DaysInYear,
           SettlementDate,
           Term,
           DaysInYear,

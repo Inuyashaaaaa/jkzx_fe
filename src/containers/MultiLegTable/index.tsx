@@ -1,22 +1,42 @@
-import { LEG_FIELD, LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
+import {
+  BIG_NUMBER_CONFIG,
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_ZHCH_MAP,
+} from '@/constants/common';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { TOTAL_LEGS } from '@/constants/legs';
-import { Loading, Table2 } from '@/design/components';
+import { Form2, Loading, Table2 } from '@/design/components';
 import { ITableProps } from '@/design/components/type';
 import { remove } from '@/design/utils';
 import { getLegByRecord } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { Tag, Affix } from 'antd';
+import { Tag } from 'antd';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 
+const TOTAL_FIELD = 'TOTAL_FIELD';
+
 const MultiLegTable = memo<
   {
-    tableEl: any;
+    tableEl?: any;
     env: string;
+    chainColumns?: (columns: ILegColDef[]) => ILegColDef[];
+    totalable?: boolean;
+    totalColumnIds?: string[];
   } & ITableProps
 >(props => {
-  const { tableEl = useRef<Table2>(null), dataSource, env, ...tableProps } = props;
+  const {
+    tableEl = useRef<Table2>(null),
+    dataSource,
+    env,
+    chainColumns,
+    totalable = false,
+    totalColumnIds = [],
+    ...tableProps
+  } = props;
 
   const [columns, setColumns] = useState([]);
   const [loadingsByRow, setLoadingsByRow] = useState({});
@@ -71,18 +91,25 @@ const MultiLegTable = memo<
     return TOTAL_LEGS.find(item => item.type === type);
   };
 
-  const cellIsEmpty = (record, colDef) => {
-    const legBelongByRecord = getLegByType(record[LEG_TYPE_FIELD]);
+  const cellIsTotal = record => {
+    return record[TOTAL_FIELD];
+  };
 
-    if (
-      (colDef.exsitable && !colDef.exsitable(record)) ||
-      !(
-        legBelongByRecord &&
-        legBelongByRecord.getColumns(env).find(item => item.dataIndex === colDef.dataIndex)
-      )
-    ) {
+  const cellIsEmpty = (record, colDef) => {
+    const leg = getLegByType(record[LEG_TYPE_FIELD]);
+
+    if (colDef.dataIndex === LEG_FIELD.LEG_META) {
+      return false;
+    }
+
+    if (!(leg && leg.getColumns(env).find(item => item.dataIndex === colDef.dataIndex))) {
       return true;
     }
+
+    if (colDef.exsitable && !colDef.exsitable(record)) {
+      return true;
+    }
+
     return false;
   };
 
@@ -91,6 +118,9 @@ const MultiLegTable = memo<
       return {
         ...item,
         editable(record, index, { colDef }) {
+          if (cellIsTotal(record)) {
+            return false;
+          }
           if (cellIsEmpty(record, colDef)) {
             return false;
           }
@@ -100,6 +130,9 @@ const MultiLegTable = memo<
           return !!item.editable;
         },
         onCell(record, index, { colDef }) {
+          if (cellIsTotal(record)) {
+            return {};
+          }
           if (cellIsEmpty(record, colDef)) {
             return {
               style: { backgroundColor: '#fafafa' },
@@ -108,10 +141,12 @@ const MultiLegTable = memo<
           }
         },
         render(val, record, index, { colDef }) {
+          if (cellIsTotal(record)) {
+            return val;
+          }
           if (cellIsEmpty(record, colDef)) {
             return null;
           }
-
           return item.render.apply(this, arguments);
         },
       };
@@ -159,10 +194,42 @@ const MultiLegTable = memo<
     ];
   };
 
+  const getChainColumns = next => {
+    return chainColumns ? chainColumns(next) : next;
+  };
+
   const chainLegColumns = nextUnion => {
-    return getTitleColumns(
-      getLoadingsColumns(getWidthColumns(getEmptyRenderLegColumns(getOrderLegColumns(nextUnion))))
+    const next = getWidthColumns(
+      getLoadingsColumns(getEmptyRenderLegColumns(getTitleColumns(getOrderLegColumns(nextUnion))))
     );
+    return getChainColumns(next);
+  };
+
+  const injectTotalRecord = () => {
+    if (totalable && !_.isEmpty(dataSource)) {
+      const totalRecord = _.reduce(
+        dataSource,
+        (totalItem, record) => {
+          return {
+            ...totalItem,
+            ..._.mapValues(record, (val, key) => {
+              const origin = Form2.getFieldValue(totalItem[key]);
+              if (!_.isNumber(Form2.getFieldValue(val)) || totalColumnIds.indexOf(key) === -1)
+                return origin;
+              return new BigNumber(origin || 0)
+                .plus(Form2.getFieldValue(val) || 0)
+                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                .toNumber();
+            }),
+          };
+        },
+        {
+          [TOTAL_FIELD]: true,
+        }
+      );
+      return dataSource.concat(totalRecord);
+    }
+    return dataSource;
   };
 
   return (
@@ -172,7 +239,7 @@ const MultiLegTable = memo<
       pagination={false}
       vertical={true}
       {...tableProps}
-      dataSource={dataSource}
+      dataSource={injectTotalRecord()}
       columns={columns}
       ref={node =>
         (tableEl.current = {

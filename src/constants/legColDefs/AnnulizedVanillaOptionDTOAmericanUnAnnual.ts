@@ -14,7 +14,6 @@ import {
   STRIKE_TYPES_MAP,
 } from '../common';
 import {
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -60,7 +59,6 @@ export const AnnulizedVanillaOptionDTOAmericanUnAnnual = pipeLeg({
         ]
       : [
           Direction,
-          DaysInYear,
           OptionType,
           UnderlyerInstrumentId,
           UnderlyerMultiplier,

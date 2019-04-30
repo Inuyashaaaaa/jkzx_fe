@@ -17,7 +17,6 @@ import {
 } from '../common';
 import {
   BarrierType,
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -88,7 +87,6 @@ export const DoubleSharkFinUnAnnual = pipeLeg({
           LowParticipationRate,
           HighParticipationRate,
           NotionalAmount,
-          DaysInYear,
           NotionalAmountType,
           EffectiveDate,
           ExpirationDate,

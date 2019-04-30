@@ -2,7 +2,7 @@ import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@
 import { IFormControl } from '@/lib/components/_Form2';
 import { IColumnDef } from '@/lib/components/_Table2';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-
+import { getDate, getUnit } from '@/tools/format';
 export const TABLE_COLUMN_DEFS: IColumnDef[] = [
   {
     headerName: '标的物代码',
@@ -129,4 +129,94 @@ export const searchFormControls: (markets) => IFormControl[] = markets => [
   //     ],
   //   },
   // },
+];
+
+export const columns: IColumnDef[] = [
+  {
+    title: '标的物代码',
+    dataIndex: 'instrumentId',
+    key: 1,
+    fixed: 'left',
+  },
+  {
+    title: '标的物名称',
+    dataIndex: 'instrumentName',
+    key: 2,
+  },
+  {
+    title: '买价',
+    dataIndex: 'bid',
+    key: 3,
+    render: (text, record, index) => {
+      return getUnit('￥', text);
+    },
+  },
+  {
+    title: '卖价',
+    dataIndex: 'ask',
+    key: 4,
+    render: (text, record, index) => {
+      return getUnit('￥', text);
+    },
+  },
+  {
+    title: '最新成交价',
+    dataIndex: 'last',
+    key: 5,
+    render: (text, record, index) => {
+      return getUnit('￥', text);
+    },
+  },
+  {
+    title: '时间戳',
+    dataIndex: 'intradayQuoteTimestamp',
+    key: 6,
+    render: (text, record, index) => {
+      return getDate(text);
+    },
+  },
+  {
+    title: '今收',
+    dataIndex: 'close',
+    key: 7,
+    render: (text, record, index) => {
+      return getUnit('￥', text);
+    },
+  },
+  {
+    title: '昨收',
+    dataIndex: 'yesterdayClose',
+    key: 8,
+    render: (text, record, index) => {
+      return getUnit('￥', text);
+    },
+  },
+  {
+    title: '交易所',
+    dataIndex: 'exchange',
+    key: 9,
+  },
+  {
+    title: '合约乘数',
+    dataIndex: 'multiplier',
+    key: 10,
+    render: (text, record, index) => {
+      return getUnit(' ', text);
+    },
+  },
+  {
+    title: '资产类别',
+    dataIndex: 'assetClass',
+    key: 11,
+  },
+  {
+    title: '合约类型',
+    dataIndex: 'instrumentType',
+    key: 12,
+  },
+  {
+    title: '合约到期日',
+    dataIndex: 'maturity',
+    key: 13,
+  },
 ];
