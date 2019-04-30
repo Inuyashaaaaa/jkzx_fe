@@ -15,11 +15,11 @@ export const TABLE_COL_DEF: (branchSalesList, fetchTable) => IColumnDef[] = (
   },
   {
     headerName: '营业部',
-    field: 'subsidiaryName',
+    field: 'branchName',
   },
   {
     headerName: '分公司',
-    field: 'branchName',
+    field: 'subsidiaryName',
   },
   {
     headerName: '创建时间',
