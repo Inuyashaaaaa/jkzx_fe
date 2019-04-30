@@ -301,6 +301,11 @@ export const UNIT_ENUM_MAP = {
   USD: 'USD',
 };
 
+export const NOTION_ENUM_MAP = {
+  CNY: 'CNY',
+  LOT: 'LOT',
+};
+
 export const UNIT_ENUM_OPTIONS = Object.keys(UNIT_ENUM_MAP).map(key => ({
   label: UNIT_ENUM_ZHCN_MAP[key],
   value: UNIT_ENUM_MAP[key],
