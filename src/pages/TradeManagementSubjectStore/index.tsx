@@ -19,6 +19,17 @@ class TradeManagementMarketManagement extends PureComponent {
     searchFormData: {},
   };
 
+  public onReset = event => {
+    this.setState(
+      {
+        searchFormData: {},
+      },
+      () => {
+        this.$sourceTable.search();
+      }
+    );
+  };
+
   public fetchTable = event => {
     return mktInstrumentsListPaged({
       page: event.pagination.current - 1,
@@ -159,6 +170,7 @@ class TradeManagementMarketManagement extends PureComponent {
           createModalProps={{
             visible: this.state.visible,
           }}
+          onReset={this.onReset}
           rowActions={[
             <ModalButton
               key="edit"
