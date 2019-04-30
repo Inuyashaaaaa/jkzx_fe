@@ -220,8 +220,18 @@ const ClientManagementInsert = memo<any>(props => {
     setTradeFormData(allFields);
   };
 
-  const legalFormChange = (props, changedFields, allFields) => {
+  const legalFormChange = async (props, changedFields, allFields) => {
     setLegalFormData(allFields);
+    setConfirmLoading(true);
+    const { error: _error, data: _data } = await clientAccountGetByLegalName({
+      legalName: allFields.legalName.value,
+    });
+    if (_error) {
+      setConfirmLoading(false);
+      return;
+    }
+    setTableDataSource([_data]);
+    setLegalFormData(Form2.createFields({ normalStatus: _data.normalStatus ? '正常' : '异常' }));
   };
 
   return (
