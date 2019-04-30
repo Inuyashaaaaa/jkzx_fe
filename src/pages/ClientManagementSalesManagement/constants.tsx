@@ -3,8 +3,8 @@ import { IColumnDef } from '@/design/components/Table/types';
 import React from 'react';
 import Operation from './Operation';
 export const ADDRESS_CASCADER = 'ADDRESS_CASCADER';
-import { CascaderOptionType } from 'antd/lib/cascader';
 import { getMoment } from '@/utils';
+import { CascaderOptionType } from 'antd/lib/cascader';
 
 export const TABLE_COL_DEF: (branchSalesList, fetchTable) => IColumnDef[] = (
   branchSalesList,
