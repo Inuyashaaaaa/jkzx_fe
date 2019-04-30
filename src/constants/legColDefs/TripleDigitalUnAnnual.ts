@@ -80,8 +80,6 @@ export const TripleDigitalUnAnnual: ILegType = pipeLeg({
           InitialSpot,
           SpecifiedPrice,
           SettlementDate,
-          Term,
-          DaysInYear,
           ParticipationRate,
           NotionalAmount,
           NotionalAmountType,

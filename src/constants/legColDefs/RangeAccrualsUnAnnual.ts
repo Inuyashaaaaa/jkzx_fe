@@ -50,7 +50,6 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
   type: LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: false,
-
   getColumnDefs: (env = 'booking') => {
     if (env === 'pricing') {
       return [
@@ -83,7 +82,6 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
         InitialSpot,
         SpecifiedPrice,
         SettlementDate,
-        Term,
         ParticipationRate,
         NotionalAmount,
         NotionalAmountType,
@@ -106,7 +104,6 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
       InitialSpot,
       SpecifiedPrice,
       SettlementDate,
-      Term,
       ParticipationRate,
       NotionalAmount,
       NotionalAmountType,

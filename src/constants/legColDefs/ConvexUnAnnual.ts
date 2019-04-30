@@ -73,8 +73,6 @@ export const ConvexUnAnnual: ILegType = pipeLeg({
           InitialSpot,
           SpecifiedPrice,
           SettlementDate,
-          Term,
-          DaysInYear,
           ParticipationRate,
           NotionalAmount,
           NotionalAmountType,

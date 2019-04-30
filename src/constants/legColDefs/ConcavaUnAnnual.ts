@@ -69,7 +69,6 @@ export const ConcavaUnAnnual: ILegType = pipeLeg({
         ]
       : [
           BarrierType,
-          DaysInYear,
           Direction,
           EffectiveDate,
           ExpirationDate,
@@ -85,7 +84,6 @@ export const ConcavaUnAnnual: ILegType = pipeLeg({
           PremiumType,
           SettlementDate,
           SpecifiedPrice,
-          Term,
           UnderlyerInstrumentId,
           UnderlyerMultiplier,
         ],
