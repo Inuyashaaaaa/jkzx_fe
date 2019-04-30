@@ -36,6 +36,7 @@ import { Straddle } from '@/domains/legs/Straddle';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
+import { Forward } from '@/domains/legs/Forward';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -58,6 +59,7 @@ export const TOTAL_LEGS = [
   AutoCallPhoenix,
   Asia,
   Straddle,
+  Forward,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];

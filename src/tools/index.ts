@@ -32,6 +32,7 @@ import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Asia } from '@/domains/legs/Asia';
 import { Straddle } from '@/domains/legs/Straddle';
+import { Forward } from '@/domains/legs/Forward';
 import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { Form2 } from '@/design/components';
 import { ITableData } from '@/design/components/type';
@@ -240,6 +241,9 @@ export const getLegByProductType = (productType, exerciseType?) => {
   }
   if (productType === PRODUCT_TYPE_MAP.ASIAN) {
     return Asia;
+  }
+  if (productType === PRODUCT_TYPE_MAP.FORWARD) {
+    return Forward;
   }
   throw new Error('not match productType!');
 };
