@@ -221,6 +221,17 @@ export async function clientSaveAccountOpRecord(params = {}) {
   });
 }
 
+// 调整授信额度
+export async function clientUpdateCredit(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientUpdateCredit',
+      params,
+    },
+  });
+}
+
 export async function cliTradeTaskListByLegalNames(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,

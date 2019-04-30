@@ -1,6 +1,6 @@
 import { DIRECTION_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import { Form2, Input } from '@/design/components';
-import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
+import { clientChangePremium, clientSettleTrade } from '@/services/client-service';
 import {
   clientAccountGetByLegalName,
   clientSaveAccountOpRecord,
@@ -65,8 +65,8 @@ const CashInsertModal = memo<any>(props => {
 
   const handleFundChange = (fundType, partyData, counterPartyData) => {
     let event;
-    if (fundType.includes('START_TRADE')) {
-      event = 'START_TRADE';
+    if (fundType.includes('CHANGE_PREMIUM')) {
+      event = 'CHANGE_PREMIUM';
     } else if (fundType.includes('UNWIND_TRADE')) {
       event = 'UNWIND_TRADE';
     } else if (fundType.includes('SETTLE_TRADE')) {
@@ -114,12 +114,11 @@ const CashInsertModal = memo<any>(props => {
   const getFundFormData = async fundType => {
     let rsp;
     const values = props.record;
-    if (fundType.includes('START_TRADE')) {
-      rsp = await clientNewTrade({
+    if (fundType.includes('CHANGE_PREMIUM')) {
+      rsp = await clientChangePremium({
         accountId: values.accountId,
         tradeId: values.tradeId,
         premium: values.premium,
-        information: '',
       });
     }
     if (fundType.includes('UNWIND_TRADE')) {
@@ -145,18 +144,20 @@ const CashInsertModal = memo<any>(props => {
     if (rsp.error) return;
     setPartyFormData(
       Form2.createFields(
-        _.pick(rsp.data, ['cashChange', 'creditChange', 'debtChange', 'premiumChange'])
+        _.pick(rsp.data, ['cashChange', 'creditBalanceChange', 'debtChange', 'premiumChange'])
       )
     );
     setCounterPartyFormData(
-      Form2.createFields(_.pick(rsp.data, ['counterPartyFundChange', 'counterPartyCreditChange']))
+      Form2.createFields(
+        _.pick(rsp.data, ['counterPartyFundChange', 'counterPartyCreditBalanceChange'])
+      )
     );
   };
 
   const handleFundEventType = (direction, lcmEventType) => {
     if (direction === 'BUYER') {
       if (lcmEventType === 'OPEN') {
-        return 'BUYER_START_TRADE';
+        return 'BUYER_CHANGE_PREMIUM';
       }
       if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
         return 'BUYER_UNWIND_TRADE';
@@ -164,7 +165,7 @@ const CashInsertModal = memo<any>(props => {
       return 'BUYER_SETTLE_TRADE';
     } else {
       if (lcmEventType === 'OPEN') {
-        return 'SELLER_START_TRADE';
+        return 'SELLER_CHANGE_PREMIUM';
       }
       if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
         return 'SELLER_UNWIND_TRADE';

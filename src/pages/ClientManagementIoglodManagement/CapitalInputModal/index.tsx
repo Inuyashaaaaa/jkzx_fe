@@ -46,21 +46,21 @@ const ClientManagementInsert = memo<any>(props => {
       counterPartyForm.current.validate(),
     ]);
     if (rsp.some(item => item.error)) return;
-    setConfirmLoading(true);
     handlePageData2apiData();
   };
 
   const handlePageData2apiData = async () => {
+    setConfirmLoading(true);
     const fundType = Form2.getFieldsValue(tradeFormData).event;
     const partyData = Form2.getFieldsValue(partyFormData);
     const counterPartyData = Form2.getFieldsValue(counterPartyFormData);
     const { error: _error, data: _data } = await clientAccountGetByLegalName({
       legalName: Form2.getFieldsValue(legalFormData).legalName,
     });
-    if (_error) {
-      setConfirmLoading(false);
-      return;
-    }
+
+    setConfirmLoading(false);
+    if (_error) return;
+
     const params = handleFundChange(_data.accountId, fundType, partyData, counterPartyData);
     const { error, data } = await clientSaveAccountOpRecord(params);
     setVisible(false);

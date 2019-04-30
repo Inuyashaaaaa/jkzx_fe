@@ -1,5 +1,5 @@
 import { Form2, InputNumber } from '@/design/components';
-import { clientSaveAccountOpRecord } from '@/services/reference-data-service';
+import { clientUpdateCredit } from '@/services/reference-data-service';
 import { Button, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -11,11 +11,11 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public state = {
     visible: false,
     formData: {
-      counterPartyCreditChange: {
+      counterPartyCredit: {
         type: 'field',
         value: this.props.record.counterPartyCredit,
       },
-      creditChange: {
+      credit: {
         type: 'field',
         value: this.props.record.credit,
       },
@@ -32,12 +32,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     const { error: _error } = await this.$form.validate();
     if (_error) return;
     const params = _.mapValues(this.state.formData, item => _.get(item, 'value'));
-    const { error, data } = await clientSaveAccountOpRecord({
-      accountOpRecord: {
-        ...params,
-        accountId: this.props.record.accountId,
-        event: 'CHANGE_CREDIT',
-      },
+    const { error, data } = await clientUpdateCredit({
+      ...params,
+      accountId: this.props.record.accountId,
     });
     this.setState({
       visible: false,
@@ -78,7 +75,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
             columns={[
               {
                 title: '我方授信总额',
-                dataIndex: 'counterPartyCreditChange',
+                dataIndex: 'counterPartyCredit',
                 render: (value, record, index, { form, editing }) => {
                   return (
                     <FormItem>
@@ -96,7 +93,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
               },
               {
                 title: '客户授信总额',
-                dataIndex: 'creditChange',
+                dataIndex: 'credit',
                 render: (value, record, index, { form, editing }) => {
                   return (
                     <FormItem>
