@@ -19,7 +19,7 @@ import {
   getTradeCreateModalData,
 } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import { getLegByProductType, getLegByRecord } from '@/tools';
+import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
 import { ILeg } from '@/types/leg';
 import { Divider, message, Typography, Menu } from 'antd';
 import { connect } from 'dva';
@@ -49,24 +49,11 @@ const TradeManagementBooking = props => {
   const addLeg = (leg: ILeg, position) => {
     if (!leg) return;
 
-    const isAnnualized = position.asset.annualized;
-
     setTableData(pre => {
       const next = {
-        ...createLegDataSourceItem(leg, LEG_ENV.EDITING),
-        [LEG_ID_FIELD]: position.positionId,
+        ...createLegRecordByPosition(leg, position, LEG_ENV.EDITING),
         [LEG_FIELD.POSITION_ID]: Form2.createField(position.positionId),
         [LEG_FIELD.LCM_EVENT_TYPE]: Form2.createField(position.lcmEventType),
-        ...Form2.createFields(
-          backConvertPercent({
-            ..._.omitBy(
-              _.omit(position.asset, ['counterpartyCode', 'annualized', 'exerciseType']),
-              _.isNull
-            ),
-            [LEG_FIELD.IS_ANNUAL]: isAnnualized,
-          })
-        ),
-        ...leg.getPageData(LEG_ENV.EDITING, position),
       };
       return pre.concat(next);
     });

@@ -1,25 +1,25 @@
-import React, { memo, useState, useEffect, useRef } from 'react';
-import UnwindModal from './UnwindModal';
-import ExerciseModal from './ExerciseModal';
-import ExpirationModal from './ExpirationModal';
-import KnockOutModal from './KnockOutModal';
-import FixingModal from './FixingModal';
-import AsianExerciseModal from './AsianExerciseModal';
-import BarrierIn from './BarrierIn';
-import RollModal from './RollModal';
 import {
-  LEG_TYPE_FIELD,
   LCM_EVENT_TYPE_MAP,
-  LEG_TYPE_MAP,
-  LEG_FIELD,
   LCM_EVENT_TYPE_ZHCN_MAP,
+  LEG_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
-import { message } from 'antd';
+import { Form2 } from '@/design/components';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
 import { convertObservetions } from '@/services/common';
-import { Form2 } from '@/design/components';
-import _ from 'lodash';
+import { message } from 'antd';
+import React, { memo, useRef } from 'react';
 import AmendModal, { IAmendModalEl } from './AmendModal';
+import AsianExerciseModal from './AsianExerciseModal';
+import BarrierIn from './BarrierIn';
+import ExerciseModal from './ExerciseModal';
+import ExpirationModal from './ExpirationModal';
+import FixingModal from './FixingModal';
+import KnockOutModal from './KnockOutModal';
+import RollModal from './RollModal';
+import SettleModal from './SettleModal';
+import UnwindModal from './UnwindModal';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -45,6 +45,7 @@ const LcmEventModal = memo<{
   const $knockOutModal = useRef<KnockOutModal>(null);
   const $rollModal = useRef<RollModal>(null);
   const $amend = useRef<IAmendModalEl>(null);
+  const $settleModal = useRef<SettleModal>(null);
 
   const { current } = props;
 
@@ -102,6 +103,10 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.AMEND) {
         return $amend.current.show(record, tableFormData, currentUser, loadData);
       }
+
+      if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+        return this.$settleModal.show(data, tableFormData, currentUser, loadData);
+      }
     },
   };
 
@@ -120,6 +125,11 @@ const LcmEventModal = memo<{
       <FixingModal
         ref={node => {
           $fixingModal.current = node;
+        }}
+      />
+      <SettleModal
+        ref={node => {
+          $settleModal.current = node;
         }}
       />
       <AsianExerciseModal

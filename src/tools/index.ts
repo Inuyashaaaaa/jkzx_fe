@@ -7,6 +7,7 @@ import {
   LEG_TYPE_MAP,
   PRODUCT_TYPE_MAP,
   LEG_INJECT_FIELDS,
+  LEG_ID_FIELD,
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_LEGS } from '@/constants/legs';
@@ -31,9 +32,10 @@ import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Asia } from '@/domains/legs/Asia';
 import { Straddle } from '@/domains/legs/Straddle';
-import { createLegDataSourceItem } from '@/services/pages';
+import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { Form2 } from '@/design/components';
 import { ITableData } from '@/design/components/type';
+import { ILeg } from '@/types/leg';
 
 export const isModelXY = data => {
   return (
@@ -253,5 +255,24 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
     ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
     ...leg.getDefaultData(LEG_ENV.BOOKING),
     ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
+  };
+};
+
+export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
+  const isAnnualized = position.asset.annualized;
+
+  return {
+    ...createLegDataSourceItem(leg, env),
+    [LEG_ID_FIELD]: position.positionId,
+    ...Form2.createFields(
+      backConvertPercent({
+        ..._.omitBy(
+          _.omit(position.asset, ['counterpartyCode', 'annualized', 'exerciseType']),
+          _.isNull
+        ),
+        [LEG_FIELD.IS_ANNUAL]: isAnnualized,
+      })
+    ),
+    ...leg.getPageData(env, position),
   };
 };

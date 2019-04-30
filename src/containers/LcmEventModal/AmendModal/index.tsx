@@ -2,13 +2,15 @@ import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common'
 import { LEG_ENV } from '@/constants/legs';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { convertLegDataByEnv } from '@/tools';
+import { convertLegDataByEnv, getLegByRecord } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Modal, message } from 'antd';
 import _ from 'lodash';
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import { convertTradePositions } from '@/services/pages';
 import { Form2 } from '@/design/components';
+import { ITableData } from '@/design/components/type';
+import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 
 const UN_EDITDIR = [
   LEG_FIELD.UNDERLYER_MULTIPLIER,
@@ -53,6 +55,7 @@ const AmendModal = memo<IAmendModal>(props => {
   });
 
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const tableEl = useRef<IMultiLegTableEl>(null);
 
   return (
     <Modal
@@ -89,16 +92,48 @@ const AmendModal = memo<IAmendModal>(props => {
       confirmLoading={confirmLoading}
     >
       <MultiLegTable
+        tableEl={tableEl}
         env={LEG_ENV.BOOKING}
         dataSource={tableData}
         onCellFieldsChange={params => {
+          const { record } = params;
+          const leg = getLegByRecord(record);
+
           setTableData(pre => {
-            return [
+            const newData = [
               {
                 ..._.get(pre, '[0]'),
                 ...params.changedFields,
               },
             ];
+
+            if (leg.onDataChange) {
+              leg.onDataChange(
+                LEG_ENV.EDITING,
+                params,
+                newData[params.rowIndex],
+                newData,
+                (colId: string, loading: boolean) => {
+                  tableEl.current.setLoadings(params.rowId, colId, loading);
+                },
+                tableEl.current.setLoadingsByRow,
+                (colId: string, newVal: ITableData) => {
+                  setTableData(pre =>
+                    pre.map(item => {
+                      if (item[LEG_ID_FIELD] === params.rowId) {
+                        return {
+                          ...item,
+                          [colId]: newVal,
+                        };
+                      }
+                      return item;
+                    })
+                  );
+                },
+                setTableData
+              );
+            }
+            return newData;
           });
         }}
         chainColumns={(columns: ILegColDef[]) => {
