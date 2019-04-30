@@ -202,7 +202,7 @@ class Operation extends PureComponent {
     const { data, filterItem } = this.state;
     let dataSource = data;
     dataSource = data.filter(item => {
-      return item[filterItem].indexOf(this.state[filterItem]) >= 0;
+      return this.state[filterItem] ? item[filterItem].indexOf(this.state[filterItem]) >= 0 : true;
     });
     this.setState({
       dataSource,
@@ -269,12 +269,17 @@ class Operation extends PureComponent {
   };
 
   public onReset = e => {
-    this.setState({
-      filterItem: 'user',
-      username: null,
-      roleName: null,
-      departmentId: null,
-    });
+    this.setState(
+      {
+        filterItem: 'username',
+        username: null,
+        roleName: null,
+        departmentId: null,
+      },
+      () => {
+        this.onSearch();
+      }
+    );
   };
 
   public render() {
@@ -296,7 +301,7 @@ class Operation extends PureComponent {
             <Form style={{ marginBottom: '15px' }} layout="inline">
               <Form.Item {...formItemLayout}>
                 <Select
-                  defaultValue={this.state.filterItem}
+                  value={this.state.filterItem}
                   onChange={this.handleChange}
                   style={{ width: '150px' }}
                 >
