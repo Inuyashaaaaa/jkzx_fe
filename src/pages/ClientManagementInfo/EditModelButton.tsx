@@ -241,7 +241,7 @@ const EditModalButton = memo<any>(props => {
                     {
                       title: (
                         <span>
-                          1开户名称
+                          开户名称
                           <span style={{ fontSize: 12 }} />
                         </span>
                       ),
