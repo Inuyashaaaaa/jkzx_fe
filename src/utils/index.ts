@@ -7,6 +7,7 @@ export const convertOptions = (maps, zhcn) => {
   }));
 };
 
+// NOTE: 如果 val 是空，则返回当前时间
 export const getMoment = (val, clone = false) => {
   return isMoment(val) ? (clone ? val.clone() : val) : !!val ? moment(val) : moment();
 };
