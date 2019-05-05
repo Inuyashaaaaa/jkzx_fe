@@ -281,13 +281,17 @@ class Action extends PureComponent<any, any> {
   public render() {
     const { params } = this.props;
     return (
-      <Row type="flex" align="middle">
+      <Row type="flex" align="middle" style={{ height: params.node.rowHeight }}>
         <Button.Group>
-          <Button type="primary" onClick={this.showModal}>
+          <Button size="small" type="primary" onClick={this.showModal}>
             查看/修改
           </Button>
           <Popconfirm title="确认删除？" onConfirm={this.onRemove}>
-            <Button type="danger" style={{ marginLeft: '5px', border: '1px solid #ccc' }}>
+            <Button
+              size="small"
+              type="danger"
+              style={{ marginLeft: '5px', border: '1px solid #ccc' }}
+            >
               删除
             </Button>
           </Popconfirm>

@@ -5,8 +5,12 @@ import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IFormColDef } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { trdPortfolioCreate, trdPortfolioSearch } from '@/services/trade-service';
-import { Button, message, Row } from 'antd';
+import {
+  trdPortfolioCreate,
+  trdPortfolioListBySimilarPortfolioName,
+  trdPortfolioSearch,
+} from '@/services/trade-service';
+import { message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import ActionCol from './Action';
@@ -149,6 +153,22 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
                 label: '投资组合名称',
               },
               field: 'portfolioName',
+              input: {
+                placeholder: '请输入内容搜索',
+                allowClear: true,
+                type: 'select',
+                showSearch: true,
+                options: async (value: string) => {
+                  const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+                    similarPortfolioName: value,
+                  });
+                  if (error) return [];
+                  return data.map(item => ({
+                    label: item,
+                    value: item,
+                  }));
+                },
+              },
             },
           ]}
           searchFormData={this.state.searchFormData}
