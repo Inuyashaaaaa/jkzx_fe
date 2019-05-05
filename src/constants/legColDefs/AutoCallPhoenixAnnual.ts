@@ -160,11 +160,12 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
       AlreadyBarrier.field,
       UpObservationStep.field,
     ]);
-
-    if (dataSourceItem[AlreadyBarrier.field]) {
+    if (!dataSourceItem[AlreadyBarrier.field]) {
       nextPosition.asset[DownBarrierDate.field] = undefined;
+      nextPosition.lcmEventType = 'OPEN';
+    } else {
+      nextPosition.lcmEventType = 'KNOCK_IN';
     }
-
     nextPosition.asset.barrier = dataSourceItem[LEG_FIELD.UP_BARRIER];
     nextPosition.asset.barrierType = dataSourceItem[LEG_FIELD.UP_BARRIER_TYPE];
     nextPosition.asset.effectiveDate =
@@ -196,7 +197,6 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
   getPageData: (nextDataSourceItem, position) => {
     nextDataSourceItem[LEG_FIELD.UP_BARRIER] = nextDataSourceItem.barrier;
     nextDataSourceItem[LEG_FIELD.UP_BARRIER_TYPE] = position.asset.barrierType;
-
     const data = position.asset.fixingObservations || [];
 
     nextDataSourceItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] = Object.keys(data).map(key => {
@@ -205,7 +205,8 @@ export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
         price: data[key],
       };
     });
-
+    nextDataSourceItem[LEG_FIELD.ALREADY_BARRIER] =
+      position.lcmEventType === 'KNOCK_IN' ? true : false;
     const data2 = position.asset.knockInObservationDates || [];
 
     nextDataSourceItem[LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY] = data2.map(key => {
