@@ -837,6 +837,7 @@ export const IOGLOD_EVENT_TYPE_ZHCN_MAP = {
   CHANGE_CREDIT: '授信变更',
   DEPOSIT: '入金',
   WITHDRAW: '出金',
+  CHANGE_PREMIUM: '权利金变更',
 };
 
 export const IOGLOD_EVENT_TYPE_MAP = {
@@ -847,6 +848,7 @@ export const IOGLOD_EVENT_TYPE_MAP = {
   CHANGE_CREDIT: 'CHANGE_CREDIT',
   DEPOSIT: 'DEPOSIT',
   WITHDRAW: 'WITHDRAW',
+  CHANGE_PREMIUM: 'CHANGE_PREMIUM',
 };
 
 export const IOGLOD_EVENT_TYPE_OPTIONS = convertOptions(

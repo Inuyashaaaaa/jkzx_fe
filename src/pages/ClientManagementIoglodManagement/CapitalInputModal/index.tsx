@@ -10,6 +10,7 @@ import {
   clientAccountGetByLegalName,
   clientSaveAccountOpRecord,
   refSimilarLegalNameList,
+  trdTradeIdListByCounterPartyName,
 } from '@/services/reference-data-service';
 import { Button, Card, Col, message, Modal, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -37,6 +38,7 @@ const ClientManagementInsert = memo<any>(props => {
   const [tradeFormData, setTradeFormData] = useState({});
   const [partyFormData, setPartyFormData] = useState({});
   const [counterPartyFormData, setCounterPartyFormData] = useState({});
+  const [tradeIds, setTradeIds] = useState([]);
 
   const handleConfirm = async () => {
     const rsp = await Promise.all([
@@ -111,6 +113,7 @@ const ClientManagementInsert = memo<any>(props => {
         counterPartyCredit: '-',
         counterPartyFund: '-',
         counterPartyMargin: '-',
+        use: '-',
       },
     ]);
     setLegalFormData(Form2.createFields({ normalStatus: '-' }));
@@ -147,11 +150,10 @@ const ClientManagementInsert = memo<any>(props => {
 
   const legalFormChange = async (props, changedFields, allFields) => {
     setLegalFormData(allFields);
-    setConfirmLoading(true);
+
     const { error: _error, data: _data } = await clientAccountGetByLegalName({
       legalName: allFields.legalName.value,
     });
-    setConfirmLoading(false);
 
     if (_error) {
       return;
@@ -165,6 +167,23 @@ const ClientManagementInsert = memo<any>(props => {
         normalStatus: _data.normalStatus ? '正常' : '异常',
       })
     );
+  };
+
+  const legalFormValueChange = async (props, changedValues, allValues) => {
+    if (changedValues.legalName) {
+      setTradeIds([]);
+    }
+    const { error, data } = await trdTradeIdListByCounterPartyName({
+      counterPartyName: changedValues.legalName,
+    });
+    if (error) return;
+    const tradeIds = data.map(item => {
+      return {
+        label: item,
+        value: item,
+      };
+    });
+    setTradeIds(tradeIds);
   };
 
   return (
@@ -186,6 +205,7 @@ const ClientManagementInsert = memo<any>(props => {
           dataSource={legalFormData}
           columns={LEGAL_FORM_CONTROLS}
           onFieldsChange={legalFormChange}
+          onValuesChange={legalFormValueChange}
         />
         <Table
           rowKey="id"
@@ -200,7 +220,7 @@ const ClientManagementInsert = memo<any>(props => {
           footer={false}
           columnNumberOneRow={3}
           dataSource={tradeFormData}
-          columns={MIDDLE_FORM_CONTROLS}
+          columns={MIDDLE_FORM_CONTROLS(tradeIds)}
           onFieldsChange={tableFormChange}
         />
         <Row type="flex" justify="space-around">

@@ -1,7 +1,7 @@
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import { getMoment } from '@/utils';
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   FREQUENCY_TYPE_MAP,
@@ -41,7 +41,6 @@ import {
   UnderlyerMultiplier,
 } from './common/common';
 import { pipeLeg } from './common/pipeLeg';
-import { DEFAULT_TERM, ILegType } from './index';
 
 export const AsiaUnAnnual: ILegType = pipeLeg({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.ASIAN_UNANNUAL],

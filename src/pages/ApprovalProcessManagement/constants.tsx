@@ -12,12 +12,13 @@ const processNum = {
 const processName = {
   field: 'processName',
   headerName: '审批类型',
+  width: 250,
 };
 
 const initiatorName = {
   field: 'initiatorName',
   headerName: '发起人',
-  width: 150,
+  width: 200,
 };
 
 const operatorName = {
@@ -92,7 +93,7 @@ export const PENDING_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   ...pendingCol,
   {
     headerName: '操作',
-    width: 340,
+    width: 440,
     pinned: 'right',
     render: params => {
       return <Operation formData={params.data} status="pending" fetchTable={fetchTable} />;
@@ -134,7 +135,7 @@ export const RELATED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   },
   {
     headerName: '操作',
-    width: 200,
+    width: 340,
     pinned: 'right',
     render: params => {
       return <Operation formData={params.data} status="related" fetchTable={fetchTable} />;
