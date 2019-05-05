@@ -128,7 +128,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     data = await this.injectMarketValue(data);
 
     const finalData = data.map(d => {
-      const obj = Object.assign({}, d);
+      const obj = { ...d };
       if (isFlow) {
         obj.openClose = obj.openClose
           ? obj.openClose.toLowerCase() === 'open'
@@ -220,7 +220,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
           target[item] = tValue + dValue;
         });
       } else {
-        obj[id] = Object.assign({}, d);
+        obj[id] = { ...d };
       }
     });
 
@@ -572,7 +572,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               rowKey="uuid"
               dataSource={flowData}
               columnDefs={flowColumns}
-              autoSizeColumnsToFit
+              autoSizeColumnsToFit={true}
             />
           </TabPane>
           <TabPane tab="场内持仓统计" key="2">
@@ -617,7 +617,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 rowKey="uuid"
                 dataSource={positionData}
                 columnDefs={detailColumns}
-                autoSizeColumnsToFit
+                autoSizeColumnsToFit={true}
               />
             )}
             {positionMode === 'summary' && (
@@ -629,7 +629,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 rowKey="uuid"
                 dataSource={positionData}
                 columnDefs={summaryColumns}
-                autoSizeColumnsToFit
+                autoSizeColumnsToFit={true}
               />
             )}
           </TabPane>
