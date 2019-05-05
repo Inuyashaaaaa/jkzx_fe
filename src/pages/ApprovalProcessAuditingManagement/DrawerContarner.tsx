@@ -2,7 +2,17 @@ import SourceTable from '@/design/components/SourceTable';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
 import { authUserList } from '@/services/user';
-import { Button, Form, Input, notification, Row, Select, Table, TreeSelect } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  notification,
+  Row,
+  Select,
+  Table,
+  TreeSelect,
+  Popconfirm,
+} from 'antd';
 import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -76,7 +86,6 @@ class Operation extends PureComponent {
       Promise.all([authRolesList(), authUserList(), queryAuthDepartmentList({})]);
     const res = await requests();
     const [roles, users, departmentsRes] = res;
-
     const departments = departmentsRes.data || {};
     const departmentTree = [];
     departmentTree.push(departments);
@@ -110,7 +119,6 @@ class Operation extends PureComponent {
     });
 
     const data = dataSource;
-
     this.setState({
       loading: false,
       dataSource,
@@ -140,7 +148,6 @@ class Operation extends PureComponent {
     });
     this.setState({
       dataSource,
-      data: dataSource,
     });
   };
 
