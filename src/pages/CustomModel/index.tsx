@@ -74,6 +74,9 @@ const useList = () => {
     });
     setLoading(false);
     let positions = [];
+    if (error) {
+      return setTradeList(positions);
+    }
     const page = JSON.parse(JSON.stringify(data.page || []));
     page.forEach(item => {
       item.positions.forEach(param => {
@@ -252,13 +255,16 @@ const CustomModel = memo(() => {
     setInstrumentId(e);
     setLoading(true);
     const { data, error } = await trdTradeSearchIndexPaged({
-      instrumentId: e,
+      tradeId: e,
       page: 0,
       pageSize: 20,
       productType: PRODUCTTYPE,
     });
     setLoading(false);
     let positions = [];
+    if (error) {
+      return setTradeList(positions);
+    }
     const page = JSON.parse(JSON.stringify(data.page || []));
     page.forEach(item => {
       item.positions.forEach(param => {
@@ -372,7 +378,7 @@ const CustomModel = memo(() => {
         <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
           <p>
             <Search
-              placeholder="输入标的物代码查询"
+              placeholder="输入交易编号查询"
               onSearch={handleSearch}
               style={{ width: '100%' }}
             />
