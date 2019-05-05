@@ -191,7 +191,7 @@ class SystemSettingsRoleManagement extends PureComponent {
       return;
     } else {
       notification.success({
-        message: `加入成功`,
+        message: `${param.length}个用户成功加入审批组`,
       });
     }
 
