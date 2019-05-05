@@ -126,6 +126,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
           accountDirection: 'PARTY',
         };
         state.modalVisible = false;
+        state.createFormData = {};
       }),
       () => {
         message.success(data.processInstanceId ? '已进入流程' : '资金录入成功');
