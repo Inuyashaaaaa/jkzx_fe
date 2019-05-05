@@ -323,39 +323,19 @@ class SourceList extends PureComponent<SourceListProps> {
       }
     }
 
-    if (!this.props.dataSource) {
-      const reg = new RegExp(value);
-
-      const searchedDataSource = this.getDataSource().filter(item =>
-        reg.test(item[this.props.rowKey])
-      );
-      this.setState(
-        {
-          searchedDataSource,
-        },
-        () => {
-          this.state.selectedRowKeys.forEach(rowId => {
-            this.onSelectRow(rowId);
-          });
-        }
-      );
-    } else {
-      const reg = new RegExp(value);
-
-      const searchedDataSource = this.props.dataSource.filter(item =>
-        reg.test(item[this.props.rowKey])
-      );
-      this.setState(
-        {
-          searchedDataSource,
-        },
-        () => {
-          this.state.selectedRowKeys.forEach(rowId => {
-            this.onSelectRow(rowId);
-          });
-        }
-      );
-    }
+    const reg = new RegExp(value);
+    const _data = this.props.dataSource ? this.props.dataSource : this.getDataSource();
+    const searchedDataSource = _data.filter(item => reg.test(item[this.props.rowKey]));
+    this.setState(
+      {
+        searchedDataSource,
+      },
+      () => {
+        this.state.selectedRowKeys.forEach(rowId => {
+          this.onSelectRow(rowId);
+        });
+      }
+    );
   };
 
   public getSelectedPanel = (selectedKey, dataSource) => {
