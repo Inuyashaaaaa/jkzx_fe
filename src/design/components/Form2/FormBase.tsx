@@ -187,8 +187,6 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
   };
 
   public onWindowClick = (event: Event) => {
-    event.preventDefault();
-    event.stopPropagation();
     this.save();
   };
 

@@ -1,9 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Select, Table2 } from '@/design/components';
 import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay, mockData } from '@/lib/utils';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
@@ -14,7 +12,7 @@ import { Divider, message, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { SEARCH_FORM_CONTROLS, VALUATION_COL_DEFS } from './constants';
+import { VALUATION_COL_DEFS } from './constants';
 
 class ClientManagementValuationManagement extends PureComponent {
   public $sourceTable: Table2 = null;
