@@ -375,9 +375,9 @@ class Operation extends PureComponent {
             </Form>
           </Row>
           <Row style={{ marginBottom: '15px' }}>
-            <Button type="primary" onClick={this.onBatchAdd}>
-              批量加入
-            </Button>
+            <Popconfirm title="确认操作?" onConfirm={this.onBatchAdd}>
+              <Button type="primary">批量加入</Button>
+            </Popconfirm>
           </Row>
           <Table
             rowSelection={rowSelection}
