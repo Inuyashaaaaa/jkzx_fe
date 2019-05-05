@@ -211,11 +211,11 @@ class Action extends PureComponent<any, any> {
       similarTradeId: '',
     });
     if (tradeIds.error) return [];
-    let tradeIdsData = tradeIds.data.map(item => ({
+    const tableDataTrade = tradeIds.data.map(item => ({
       label: item,
       value: item,
     }));
-    tradeIdsData = tradeIdsData.filter(
+    const tradeIdsData = tableDataTrade.filter(
       item => !tableDataSource.map(t => t.tradeId).includes(item.value)
     );
 
