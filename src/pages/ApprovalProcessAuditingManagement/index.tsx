@@ -10,7 +10,7 @@ import React, { PureComponent } from 'react';
 import AuditGourpLists from './AuditGourpLists';
 import styles from './AuditGourpLists.less';
 import DrawerContarner from './DrawerContarner';
-
+import _ from 'lodash';
 class SystemSettingsRoleManagement extends PureComponent {
   public $drawer: DrawerContarner = null;
 
@@ -172,6 +172,15 @@ class SystemSettingsRoleManagement extends PureComponent {
 
   public onBatchAdd = async (param, batchBool) => {
     const { currentGroup } = this.state;
+    const _d = _.intersection(
+      param.map(p => p.department_id),
+      (this.state.currentGroup.userList || []).map(p => p.departmentId)
+    );
+    if (_d.length > 0) {
+      return notification.success({
+        message: '该用户已在审批组中',
+      });
+    }
     currentGroup.userList = currentGroup.userList.concat(param);
     currentGroup.userList.forEach(item => {
       if (!item.department_id) {
