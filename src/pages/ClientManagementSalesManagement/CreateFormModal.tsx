@@ -3,6 +3,24 @@ import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS } from './constants';
 
 class CreateFormModal extends PureComponent {
+  // public state = {
+  //   dataSource: {},
+  // };
+  // public componentDidMount = () => {
+  //   debugger;
+  //   this.setState(
+  //     {
+  //       dataSource: {
+  //         salesName: this.props.dataSource.salesName,
+  //         cascSubBranch: [this.props.dataSource.subsidiaryName, this.props.dataSource.branchName],
+  //       },
+  //     },
+  //     () => {
+  //       console.log(this.state.dataSource.cascSubBranch);
+  //       debugger;
+  //     }
+  //   );
+  // };
   public onValueChange = params => {
     this.props.handleValueChange(params);
   };

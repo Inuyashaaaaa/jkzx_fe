@@ -143,7 +143,6 @@ export const DigitalLegAmericanAnnual = pipeLeg({
     return nextPosition;
   },
   getPageData: (nextDataSourceItem, position) => {
-    nextDataSourceItem.strikePercentAndNumber = position.asset.strike;
     return nextDataSourceItem;
   },
 });

@@ -16,7 +16,10 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
 
   public componentDidMount = () => {
     this.setState({
-      editFormData: this.props.record,
+      editFormData: {
+        ...this.props.record,
+        cascSubBranch: [this.props.record.subsidiaryId, this.props.record.branchId],
+      },
     });
   };
 
@@ -104,7 +107,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
             size="small"
             onClick={this.switchModal}
             modalProps={{
-              title: '新建销售',
+              title: '编辑销售',
               visible: this.state.visible,
               comfirmLoading: this.state.confirmLoading,
               onCancel: this.onCancel,
