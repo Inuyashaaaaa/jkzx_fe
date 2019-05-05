@@ -329,7 +329,22 @@ class SourceList extends PureComponent<SourceListProps> {
       const searchedDataSource = this.getDataSource().filter(item =>
         reg.test(item[this.props.rowKey])
       );
+      this.setState(
+        {
+          searchedDataSource,
+        },
+        () => {
+          this.state.selectedRowKeys.forEach(rowId => {
+            this.onSelectRow(rowId);
+          });
+        }
+      );
+    } else {
+      const reg = new RegExp(value);
 
+      const searchedDataSource = this.props.dataSource.filter(item =>
+        reg.test(item[this.props.rowKey])
+      );
       this.setState(
         {
           searchedDataSource,
