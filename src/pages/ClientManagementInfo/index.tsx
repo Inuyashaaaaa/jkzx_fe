@@ -261,14 +261,14 @@ const ClientManagementInfo = memo(() => {
               title: '创建时间',
               dataIndex: 'createdAt',
               render: (value, record, index) => {
-                return getMoment(value).format('YYYY-MM-DD HH:mm:ss');
+                return value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : '';
               },
             },
             {
               title: '更新时间',
               dataIndex: 'updatedAt',
               render: (value, record, index) => {
-                return getMoment(value).format('YYYY-MM-DD HH:mm:ss');
+                return value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : '';
               },
             },
             {
