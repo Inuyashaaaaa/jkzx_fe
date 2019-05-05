@@ -1,7 +1,7 @@
-import { DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
+
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   LEG_FIELD,
@@ -16,7 +16,6 @@ import {
 } from '../common';
 import {
   BarrierType,
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -25,7 +24,6 @@ import {
   LowBarrier,
   NotionalAmount,
   NotionalAmountType,
-  OptionType,
   ParticipationRate,
   Payment,
   PaymentType,
@@ -35,9 +33,6 @@ import {
   PricingTerm,
   SettlementDate,
   SpecifiedPrice,
-  Strike,
-  StrikeType,
-  Term,
   UnderlyerInstrumentId,
   UnderlyerMultiplier,
 } from './common/common';
