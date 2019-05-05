@@ -10,7 +10,7 @@ import { IColumnDef } from '@/design/components/Table/types';
 import { trdTradePortfolioDelete } from '@/services/trade-service';
 import { message, Popconfirm, Timeline } from 'antd';
 import React from 'react';
-import styles from './actionCol.less';
+import styles from './Action.less';
 const TimelineItem = Timeline.Item;
 
 export const BOOKING_TABLE_COLUMN_DEFS = (portfolioName, onSearch) => [
