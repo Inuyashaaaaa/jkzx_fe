@@ -60,7 +60,11 @@ class ActionCol extends PureComponent<any, any> {
     const { error, data } = await trdPortfolioDelete({
       portfolioName: params.data.portfolioName,
     });
-    if (error) return;
+    if (error) {
+      message.error('删除失败');
+      return;
+    }
+    message.success('删除成功');
     this.props.reload();
   };
 

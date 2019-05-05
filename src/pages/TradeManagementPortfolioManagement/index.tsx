@@ -5,7 +5,7 @@ import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdPortfolioCreate, trdPortfolioSearch } from '@/services/trade-service';
-import { Button, Row } from 'antd';
+import { Button, message, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import ActionCol from './ActionCol';
 
@@ -74,11 +74,15 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
 
   public onCreate = async () => {
     const { error } = await trdPortfolioCreate(this.state.createFormData);
-    if (error) return;
+    if (error) {
+      message.error('新建失败');
+      return;
+    }
     return () => {
       this.setState({
         createFormData: {},
       });
+      message.success('新建成功');
       this.search();
     };
   };
@@ -151,6 +155,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
                 }
                 modalProps={{
                   onOk: this.onCreate,
+                  closable: false,
                 }}
               >
                 新建
