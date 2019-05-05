@@ -1,86 +1,20 @@
-import { InputBase } from '@/design/components/type';
-import { Button, Upload as AntdUpload } from 'antd';
-import { UploadChangeParam, UploadProps } from 'antd/lib/upload';
-import _, { omit } from 'lodash';
+import _ from 'lodash';
 import React from 'react';
-
-export interface IUploadProps extends UploadProps {
-  maxLen?: number;
-}
-
-class Input extends InputBase<IUploadProps> {
-  public static defaultProps = {
-    maxLen: 1,
-  };
-
-  //   public getRef = node => {
-  //     if (this.props.autoSelect && node) {
-  //       node.select();
-  //     }
-  //   };
-
-  public handleFileList = fileList => {
-    const maxLen = this.props.maxLen;
-
-    if (maxLen) {
-      fileList = fileList.slice(-maxLen);
-    }
-
-    fileList = fileList.map(file => {
-      if (file.response) {
-        // Component will show file.url as link
-        file.url = file.response.url;
-      }
-      return file;
-    });
-
-    return fileList;
-  };
-
-  public onChange = (info: UploadChangeParam) => {
-    info = {
-      ...info,
-      fileList: this.handleFileList(info.fileList),
-    };
-
-    if (this.props.onChange) {
-      this.props.onChange(info.fileList, info);
-    }
-
-    if (this.props.onValueChange) {
-      this.props.onValueChange(info.fileList, info);
-    }
-  };
-
-  public renderEditing() {
-    return (
-      <AntdUpload
-        {...omit(this.props, ['autoSelect', 'onValueChange', 'editing'])}
-        fileList={this.props.value}
-        onChange={this.onChange}
-      >
-        {this.props.children || <Button icon="upload">上传</Button>}
-      </AntdUpload>
-    );
-  }
-
+import { Upload } from '@/design/components';
+class YangInput extends Upload {
   public renderRendering() {
-    let { value: fileList = [] } = this.props;
-    if (_.isString(fileList)) {
-      fileList = [
+    let { value } = this.props;
+    if (_.isString(value)) {
+      value = [
         {
-          id: fileList,
-          name: fileList,
-          uid: fileList,
+          id: value,
+          name: value,
+          uid: value,
         },
       ];
     }
-    return (fileList || []).map((item, index) => (
-      <a href={item.url} key={index} style={{ display: 'inline-block', width: '100%' }}>
-        {item.name || item.fileName}
-      </a>
-    ));
+    return <Upload {...this.props} value={value} />;
   }
 }
 
-export default Input;
+export default YangInput;
