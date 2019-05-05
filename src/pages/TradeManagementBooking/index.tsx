@@ -186,7 +186,7 @@ class BookCreate extends PureComponent<any> {
   };
 
   public handleAddLeg = event => {
-    const leg = allLegTypes.find(item => item.type === event.key);
+    const leg = allLegTypes.find(item => (item ? item.type === event.key : null));
 
     if (!leg) return;
 
