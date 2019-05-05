@@ -4,7 +4,7 @@ import AuthTable from './AuthTable';
 
 import CommonTree from '../SystemSettingDepartment/components/CommonTree';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { RESOURCE_ENUM } from './staticData';
+import { RESOURCE_ENUM } from './constants';
 import {
   modifyResource,
   createResource,
