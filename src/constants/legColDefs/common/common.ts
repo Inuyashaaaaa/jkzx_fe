@@ -1111,7 +1111,7 @@ export const AlreadyBarrier: IColDef = {
   editable: true,
   input: {
     type: 'checkbox',
-    emptyFormatWhenNullValue: true,
+    emptyFormatWhenNullValue: false,
   },
   rules: RULES_REQUIRED,
 };
@@ -1311,8 +1311,6 @@ export const StrikeType: IColDef = {
   field: LEG_FIELD.STRIKE_TYPE,
   input: record => {
     if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_ANNUAL ||
       record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_UNANNUAL
     ) {

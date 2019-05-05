@@ -412,7 +412,7 @@ class ClientManagementSalesManagement extends PureComponent {
       ...params,
     });
     if (_error) {
-      message.error(this.state.branchEdit ? '更新成功' : '创建成功');
+      message.error(this.state.branchEdit ? '更新失败' : '创建失败');
       return;
     }
     this.handleTreeNode();
