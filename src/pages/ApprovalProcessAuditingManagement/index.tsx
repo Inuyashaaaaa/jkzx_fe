@@ -170,7 +170,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     });
   };
 
-  public onBatchAdd = async param => {
+  public onBatchAdd = async (param, batchBool) => {
     const { currentGroup } = this.state;
     currentGroup.userList = currentGroup.userList.concat(param);
     currentGroup.userList.forEach(item => {
@@ -191,7 +191,9 @@ class SystemSettingsRoleManagement extends PureComponent {
       return;
     } else {
       notification.success({
-        message: `加入成功`,
+        message: batchBool
+          ? `${param.length}个用户成功加入审批组,${currentGroup.userList.length}个用户已在审批组中`
+          : '成功加入审批组',
       });
     }
 
@@ -291,7 +293,7 @@ class SystemSettingsRoleManagement extends PureComponent {
             >
               <DrawerContarner
                 ref={node => (this.$drawer = node)}
-                onBatchAdd={param => this.onBatchAdd(param)}
+                onBatchAdd={(param, bool) => this.onBatchAdd(param, bool)}
                 currentGroup={this.state.currentGroup}
               />
             </Drawer>
