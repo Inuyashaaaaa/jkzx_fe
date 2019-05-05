@@ -1,8 +1,5 @@
-import LoadingButton from '@/components/LoadingButton';
-import PopconfirmButton from '@/components/PopconfirmButton';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Select, Table2 } from '@/design/components';
-import ModalButton from '@/design/components/ModalButton';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import {
   trdPortfolioDelete,
@@ -14,11 +11,10 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
-import { RESOURCE_FORM_CONTROLS } from '.';
-import styles from './actionCol.less';
+import styles from './Action.less';
 import { BOOKING_TABLE_COLUMN_DEFS } from './constants';
 
-class ActionCol extends PureComponent<any, any> {
+class Action extends PureComponent<any, any> {
   public $table2: Table2 = null;
   public status: any;
 
@@ -389,4 +385,4 @@ class ActionCol extends PureComponent<any, any> {
   }
 }
 
-export default ActionCol;
+export default Action;
