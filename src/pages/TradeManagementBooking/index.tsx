@@ -5,8 +5,8 @@ import {
   LEG_TYPE_FIELD,
   PREMIUM_TYPE_MAP,
 } from '@/constants/common';
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { allLegTypes, ILegType } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType, VERTICAL_GUTTER } from '@/constants/global';
+import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
 import {
   COMPUTED_LEG_FIELD_MAP,

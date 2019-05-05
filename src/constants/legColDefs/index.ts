@@ -1,3 +1,4 @@
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import { IColDef } from '@/design/components/Table/types';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanAnnual } from './AnnualizedVerticalSpreadOptionDTOEuropeanAnnual';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual } from './AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual';
@@ -38,22 +39,6 @@ import { StraddleAnnual } from './StraddleAnnual';
 import { StraddleUnAnnual } from './StraddleUnAnnual';
 import { TripleDigitalAnnual } from './TripleDigitalAnnual';
 import { TripleDigitalUnAnnual } from './TripleDigitalUnAnnual';
-
-export const DEFAULT_TERM = 30;
-
-export const DEFAULT_DAYS_IN_YEAR = 365;
-
-export interface ILegType {
-  type: string;
-  name: string;
-  assetClass: string;
-  getColumnDefs: (env?: string) => IColDef[];
-  getPricingColumnDefs?: () => any[];
-  isAnnualized: boolean;
-  getDefault?: any;
-  getPosition?: any;
-  getPageData?: any;
-}
 
 export const allLegTypes: ILegType[] = [
   AnnulizedVanillaOptionDTOAmericanAnnual,

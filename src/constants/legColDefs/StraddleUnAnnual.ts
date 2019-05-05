@@ -7,10 +7,10 @@ import {
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
-import { DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
+
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_DAYS_IN_YEAR } from '.';
 import { ASSET_CLASS_MAP, LEG_TYPE_MAP } from '../common';
 import {
   DaysInYear,

@@ -10,7 +10,7 @@ import {
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { ILegType } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import { LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';

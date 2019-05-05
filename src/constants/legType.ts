@@ -1,5 +1,5 @@
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import { LEG_TYPE_MAP } from './common';
-import { ILegType } from './legColDefs';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanAnnual';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual';
 import { AnnulizedVanillaOptionDTOAmericanAnnual } from './legColDefs/AnnulizedVanillaOptionDTOAmericanAnnual';

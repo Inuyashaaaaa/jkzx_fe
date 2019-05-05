@@ -52,7 +52,8 @@ import {
   UpObservationStep,
 } from './common/common';
 import { pipeLeg } from './common/pipeLeg';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from './index';
+
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 
 export const AutoCallPhoenixAnnual: ILegType = pipeLeg({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL],
