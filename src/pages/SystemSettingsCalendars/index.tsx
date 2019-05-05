@@ -1,10 +1,12 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2 } from '@/design/components';
 import Form from '@/design/components/Form';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { delay } from '@/lib/utils';
 import { createCalendar, queryCalendar, removeCalendar } from '@/services/calendars';
+import { getMoment } from '@/utils';
 import { Button, Col, DatePicker, message, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
@@ -13,8 +15,6 @@ import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import { DEFAULT_CALENDAR, HOLIDAY_FORMAT, TABLE_COLUMN_DEFS } from './constants';
 import { createFormControls } from './services';
-import { Form2 } from '@/design/components';
-import { getMoment } from '@/utils';
 const { RangePicker } = DatePicker;
 
 class SystemTradeDate extends PureComponent<any, any> {

@@ -1,10 +1,10 @@
 import { DatePicker, Input } from '@/design/components';
 import { IFormColDef } from '@/design/components/type';
+import { getMoment } from '@/utils';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
 import { HOLIDAY_FORMAT } from './constants';
-import { getMoment } from '@/utils';
 
 export const createFormControls: (data: any[]) => IFormColDef[] = tableDataSource => [
   {
