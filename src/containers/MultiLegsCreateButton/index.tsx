@@ -13,11 +13,11 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const removeUsedLegs = _.reject(allLegTypes, item => {
-      if (!item) return;
+    const filterLegs = _.reject(allLegTypes, item => {
+      if (!item) return true;
       return item.type === 'MODEL_XY_ANNUAL' || item.type === 'MODEL_XY_UNANNUAL';
     });
-    const usedLegs = this.props.isPricing ? removeUsedLegs : allLegTypes;
+    const usedLegs = this.props.isPricing ? filterLegs : allLegTypes;
     if (!usedLegs) return;
     const items = [
       {

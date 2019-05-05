@@ -38,7 +38,7 @@ const tabPaneData = [
 
 const columnsData = [
   {
-    title: '价格',
+    title: '标的物价格',
     dataIndex: 's',
   },
   {
@@ -220,6 +220,13 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
+      const _data = tabPaneData.map(tab => {
+        const columns = _.cloneDeep(columnsData);
+        tab.columns = columns;
+        tab.dataSource = [];
+        return tab;
+      });
+      setTabPane(_data);
       return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane
@@ -286,6 +293,13 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
+      const _data = tabPaneData.map(tab => {
+        const columns = _.cloneDeep(columnsData);
+        tab.columns = columns;
+        tab.dataSource = [];
+        return tab;
+      });
+      setTabPane(_data);
       return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane

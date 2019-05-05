@@ -6,7 +6,7 @@ import SourceTable from '@/design/components/SourceTable';
 import { IFormColDef } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdPortfolioCreate, trdPortfolioSearch } from '@/services/trade-service';
-import { Row } from 'antd';
+import { Button, message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import ActionCol from './Action';
@@ -100,12 +100,16 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     if (result.error) return;
 
     const { error } = await trdPortfolioCreate(Form2.getFieldsValue(this.state.createFormData));
-    if (error) return;
+    if (error) {
+      message.error('新建失败');
+      return;
+    }
 
     this.switchModal(() => {
       this.setState({
         createFormData: {},
       });
+      message.success('新建成功');
       this.search();
     });
   };
@@ -183,6 +187,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
                 }
                 modalProps={{
                   onOk: this.onCreate,
+                  closable: false,
                   onCancel: this.switchModal,
                   title: '新建投资组合',
                   visible: this.state.visible,

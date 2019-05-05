@@ -1,7 +1,7 @@
-import { DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
+
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   LEG_FIELD,
@@ -15,7 +15,6 @@ import {
   STRIKE_TYPES_MAP,
 } from '../common';
 import {
-  DaysInYear,
   Direction,
   EffectiveDate,
   ExpirationDate,
@@ -34,12 +33,10 @@ import {
   PricingTerm,
   SettlementDate,
   SpecifiedPrice,
-  Strike,
   Strike1,
   Strike2,
   Strike3,
   StrikeType,
-  Term,
   UnderlyerInstrumentId,
   UnderlyerMultiplier,
 } from './common/common';
