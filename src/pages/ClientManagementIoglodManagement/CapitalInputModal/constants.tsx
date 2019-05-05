@@ -134,12 +134,16 @@ export const COUNTER_PARTY_FORM_CONTROLS = [
   },
 ];
 
-export const MIDDLE_FORM_CONTROLS = [
+export const MIDDLE_FORM_CONTROLS = tradeIds => [
   {
     title: '交易编号',
     dataIndex: 'tradeId',
     render: (value, record, index, { form, editing }) => {
-      return <FormItem>{form.getFieldDecorator({})(<Input type="input" />)}</FormItem>;
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(<Select style={{ minWidth: 180 }} options={tradeIds} />)}
+        </FormItem>
+      );
     },
   },
   {

@@ -8,7 +8,7 @@ import {
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { message, Modal } from 'antd';
+import { message, Modal, Alert } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -245,7 +245,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: CAN_UNWIND_PRICE,
                   control: {
-                    label: '可平仓金额',
+                    label: '可平仓名义本金',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -255,7 +255,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: CAN_UNWIND_NUM,
                   control: {
-                    label: '可平仓数量（手）',
+                    label: '可平仓手数',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -265,7 +265,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: UNWIND_PRICE,
                   control: {
-                    label: '平仓金额',
+                    label: '平仓名义本金',
                   },
                   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
                   decorator: {
@@ -284,7 +284,7 @@ class UnwindModal extends PureComponent<
                         required: true,
                       },
                       {
-                        message: '必须小于等于可平仓金额',
+                        message: '必须小于等于可平仓名义本金',
                         validator: (rule, value, callback) => {
                           if (value > this.state.cnyFormData[CAN_UNWIND_PRICE]) {
                             return callback(true);
@@ -298,7 +298,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: UNWIND_NUM,
                   control: {
-                    label: '平仓数量（手）',
+                    label: '平仓手数',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -308,7 +308,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: LEFT_PRICE,
                   control: {
-                    label: '剩余金额',
+                    label: '剩余名义本金',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -318,7 +318,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: LEFT_NUM,
                   control: {
-                    label: '剩余数量（手）',
+                    label: '剩余手数',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -328,22 +328,13 @@ class UnwindModal extends PureComponent<
                 {
                   field: UNWIND_TOTAL,
                   control: {
-                    label: '平仓总价',
+                    label: '平仓金额',
                   },
                   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
                   decorator: {
                     rules: [
                       {
-                        message: '数值必须大于0',
-                        validator: (rule, value, callback) => {
-                          if (value < 0) {
-                            return callback(true);
-                          }
-                          callback();
-                        },
-                      },
-                      {
-                        message: '平仓总价为必填项',
+                        message: '平仓金额为必填项',
                         required: true,
                       },
                     ],
@@ -372,7 +363,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: CAN_UNWIND_PRICE,
                   control: {
-                    label: '可平仓金额',
+                    label: '可平仓名义本金',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -382,7 +373,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: CAN_UNWIND_NUM,
                   control: {
-                    label: '可平仓数量（手）',
+                    label: '可平仓手数',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -392,14 +383,14 @@ class UnwindModal extends PureComponent<
                 {
                   field: UNWIND_PRICE,
                   control: {
-                    label: '平仓金额',
+                    label: '平仓名义本金',
                   },
                   input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
                 },
                 {
                   field: UNWIND_NUM,
                   control: {
-                    label: '平仓数量（手）',
+                    label: '平仓手数',
                   },
                   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
                   decorator: {
@@ -432,7 +423,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: LEFT_PRICE,
                   control: {
-                    label: '剩余金额',
+                    label: '剩余名义本金',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -442,7 +433,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: LEFT_NUM,
                   control: {
-                    label: '剩余数量（手）',
+                    label: '剩余手数',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -452,7 +443,7 @@ class UnwindModal extends PureComponent<
                 {
                   field: UNWIND_TOTAL,
                   control: {
-                    label: '平仓总价',
+                    label: '平仓金额',
                   },
                   input: {
                     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -486,6 +477,7 @@ class UnwindModal extends PureComponent<
               ]}
             />
           )}
+          <Alert message="平仓金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>
     );

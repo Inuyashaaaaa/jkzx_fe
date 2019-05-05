@@ -196,10 +196,7 @@ class ExerciseModal extends PureComponent<
               this.handleSettleAmount
             )}
           />
-          <Alert
-            message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
-            type="info"
-          />
+          <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>
     );

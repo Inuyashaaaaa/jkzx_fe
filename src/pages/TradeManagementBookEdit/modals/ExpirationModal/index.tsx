@@ -485,15 +485,9 @@ class ExpirationModal extends PureComponent<
         >
           {this.getForm()}
           {isAutocallPhoenix(this.data) ? (
-            <Alert
-              message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
-              type="info"
-            />
+            <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
           ) : isAutocallSnow(this.data) ? (
-            <Alert
-              message="结算金额为正时代表客户资金收入，金额为负时代表客户资金支出。"
-              type="info"
-            />
+            <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
           ) : null}
         </Modal>
       </>

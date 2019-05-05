@@ -184,15 +184,26 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     return finalData.map(item => {
       const findItem = page.find(iitem => iitem.instrumentId === item.instrumentId);
       if (findItem) {
-        const { longPosition = 0, shortPosition = 0 } = item;
+        const {
+          longPosition = 0,
+          shortPosition = 0,
+          historySellAmount = 0,
+          historyBuyAmount = 0,
+        } = item;
         const { last = 0, multiplier = 1 } = findItem;
+        const marketValue = new BigNumber(new BigNumber(longPosition).minus(shortPosition))
+          .multipliedBy(last)
+          .multipliedBy(multiplier)
+          .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+          .toNumber();
+        const totalPnl = new BigNumber(marketValue)
+          .plus(historySellAmount)
+          .minus(historyBuyAmount)
+          .toNumber();
         return {
           ...item,
-          marketValue: new BigNumber(new BigNumber(longPosition).minus(shortPosition))
-            .multipliedBy(last)
-            .multipliedBy(multiplier)
-            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-            .toNumber(),
+          marketValue,
+          totalPnl,
         };
       }
       return item;
