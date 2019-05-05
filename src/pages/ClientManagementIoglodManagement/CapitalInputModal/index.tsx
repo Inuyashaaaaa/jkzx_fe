@@ -148,7 +148,7 @@ const ClientManagementInsert = memo<any>(props => {
   const legalFormChange = async (props, changedFields, allFields) => {
     setLegalFormData(allFields);
     setConfirmLoading(true);
-    let { error: _error, data: _data } = await clientAccountGetByLegalName({
+    const { error: _error, data: _data } = await clientAccountGetByLegalName({
       legalName: allFields.legalName.value,
     });
     setConfirmLoading(false);
