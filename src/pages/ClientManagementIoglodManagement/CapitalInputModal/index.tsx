@@ -113,6 +113,7 @@ const ClientManagementInsert = memo<any>(props => {
         counterPartyCredit: '-',
         counterPartyFund: '-',
         counterPartyMargin: '-',
+        use: '-',
       },
     ]);
     setLegalFormData(Form2.createFields({ normalStatus: '-' }));
@@ -148,12 +149,32 @@ const ClientManagementInsert = memo<any>(props => {
   };
 
   const legalFormChange = async (props, changedFields, allFields) => {
-    if (changedFields.legalName) {
+    setLegalFormData(allFields);
+
+    const { error: _error, data: _data } = await clientAccountGetByLegalName({
+      legalName: allFields.legalName.value,
+    });
+
+    if (_error) {
+      return;
+    }
+
+    _data.use = (_data.credit - _data.creditUsed).toFixed(4);
+    setTableDataSource([_data]);
+    setLegalFormData(
+      Form2.createFields({
+        legalName: allFields.legalName.value,
+        normalStatus: _data.normalStatus ? '正常' : '异常',
+      })
+    );
+  };
+
+  const legalFormValueChange = async (props, changedValues, allValues) => {
+    if (changedValues.legalName) {
       setTradeIds([]);
     }
-    setLegalFormData(allFields);
     const { error, data } = await trdTradeIdListByCounterPartyName({
-      counterPartyName: Form2.getFieldsValue(allFields).legalName,
+      counterPartyName: changedValues.legalName,
     });
     if (error) return;
     const tradeIds = data.map(item => {
@@ -184,6 +205,7 @@ const ClientManagementInsert = memo<any>(props => {
           dataSource={legalFormData}
           columns={LEGAL_FORM_CONTROLS}
           onFieldsChange={legalFormChange}
+          onValuesChange={legalFormValueChange}
         />
         <Table
           rowKey="id"

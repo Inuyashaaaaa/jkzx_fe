@@ -8,7 +8,7 @@ import {
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { message, Modal, Alert } from 'antd';
+import { Alert, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';

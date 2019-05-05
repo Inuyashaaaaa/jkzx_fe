@@ -20,7 +20,7 @@ export const TABLE_COL_DEF = [
   },
   {
     title: '可用授信 (¥)',
-    dataIndex: 'credit',
+    dataIndex: 'use',
   },
   {
     title: '当前负债 (¥)',
@@ -141,7 +141,9 @@ export const MIDDLE_FORM_CONTROLS = tradeIds => [
     render: (value, record, index, { form, editing }) => {
       return (
         <FormItem>
-          {form.getFieldDecorator({})(<Select style={{ minWidth: 180 }} options={tradeIds} />)}
+          {form.getFieldDecorator({})(
+            <Select style={{ minWidth: 180 }} options={tradeIds} allowClear={true} />
+          )}
         </FormItem>
       );
     },
@@ -153,7 +155,11 @@ export const MIDDLE_FORM_CONTROLS = tradeIds => [
       return (
         <FormItem>
           {form.getFieldDecorator({ rules: RULES_REQUIRED })(
-            <Select style={{ minWidth: 180 }} options={ACCOUNT_EVENT_TYPE_OPTIONS} />
+            <Select
+              style={{ minWidth: 180 }}
+              options={ACCOUNT_EVENT_TYPE_OPTIONS}
+              allowClear={true}
+            />
           )}
         </FormItem>
       );
