@@ -1,6 +1,6 @@
+import { Upload } from '@/design/components';
 import _ from 'lodash';
 import React from 'react';
-import { Upload } from '@/design/components';
 class YangInput extends Upload {
   public renderRendering() {
     let { value } = this.props;
