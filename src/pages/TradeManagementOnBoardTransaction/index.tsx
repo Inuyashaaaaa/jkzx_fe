@@ -3,9 +3,10 @@ import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import {
-  mktInstrumentSearch,
-  mktQuotesListPaged,
   mktInstrumentInfo,
+  mktInstrumentSearch,
+  mktInstrumentWhitelistSearch,
+  mktQuotesListPaged,
 } from '@/services/market-data-service';
 import {
   exeTradeRecordSave,
@@ -19,6 +20,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
+import XLSX from 'xlsx';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import RowForm from './components/RowForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
@@ -53,18 +55,17 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       createModalDataSource: {
         dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
       },
+      searchFormDataFlow: { date: [moment().subtract(1, 'days'), moment()] },
+      searchFormDataPosition: { searchDate: moment().subtract(1, 'days') },
     };
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this.queryInstrumentId();
-    this.queryRecords({
-      startDate: moment().subtract(1, 'days'),
-      endDate: moment(),
-    });
+    this.queryRecords();
   }
 
-  queryInstrumentId = async () => {
+  public queryInstrumentId = async () => {
     const ids = await mktInstrumentSearch({
       instrumentIdPart: '',
     });
@@ -77,32 +78,33 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  queryRecords = async data => {
+  public queryRecords = async () => {
+    const data = { ...this.state.searchFormDataFlow };
     const params = {
-      instrumentIds: data.code,
-      startTime: `${data.startDate.format('YYYY-MM-DD')}T00:00:00`,
-      endTime: `${data.endDate.format('YYYY-MM-DD')}T23:59:59`,
+      instrumentIds: data.instrumentId,
+      startTime: `${data.date[0].format('YYYY-MM-DD')}T00:00:00`,
+      endTime: `${data.date[1].format('YYYY-MM-DD')}T23:59:59`,
     };
     this.fetchData(params, 'flow');
   };
 
-  queryDetail = async data => {
+  public queryDetail = async () => {
+    const data = { ...this.state.searchFormDataPosition };
     const params = {
-      searchDate: data.date.format('YYYY-MM-DD'),
+      searchDate: data.searchDate.format('YYYY-MM-DD'),
     };
-    // const params = {};
     this.fetchData(params, 'position', 'detail');
   };
 
-  querySummary = async data => {
+  public querySummary = async () => {
+    const data = { ...this.state.searchFormDataPosition };
     const params = {
-      searchDate: data.date.format('YYYY-MM-DD'),
+      searchDate: data.searchDate.format('YYYY-MM-DD'),
     };
-    // const params = {};
     this.fetchData(params, 'position', 'summary');
   };
 
-  fetchData = async (params, type, positionMode) => {
+  public fetchData = async (params, type, positionMode) => {
     const isFlow = type === 'flow';
 
     this.setState({
@@ -126,7 +128,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     data = await this.injectMarketValue(data);
 
     const finalData = data.map(d => {
-      const obj = Object.assign({}, d);
+      const obj = { ...d };
       if (isFlow) {
         obj.openClose = obj.openClose
           ? obj.openClose.toLowerCase() === 'open'
@@ -144,11 +146,19 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       return obj;
     });
 
-    finalData.sort((a, b) => {
-      const aStr = a.bookId + a.instrumentId;
-      const bStr = b.bookId + b.instrumentId;
-      return aStr.localeCompare(bStr);
-    });
+    if (!isFlow && positionMode === 'summary') {
+      finalData.sort((a, b) => {
+        const aStr = a.instrumentId;
+        const bStr = b.instrumentId;
+        return aStr.localeCompare(bStr);
+      });
+    } else {
+      finalData.sort((a, b) => {
+        const aStr = a.bookId + a.instrumentId;
+        const bStr = b.bookId + b.instrumentId;
+        return aStr.localeCompare(bStr);
+      });
+    }
 
     const nextState = isFlow ? { flowData: finalData } : { positionData: finalData };
     if (isFlow) {
@@ -162,7 +172,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  injectMarketValue = async finalData => {
+  public injectMarketValue = async finalData => {
     const { data = {}, error } = await mktQuotesListPaged({
       instrumentIds: finalData.map(item => item.instrumentId),
     });
@@ -189,7 +199,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  generateSummary = data => {
+  public generateSummary = data => {
     const obj = {};
     const plusItems = [
       'netPosition',
@@ -210,7 +220,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
           target[item] = tValue + dValue;
         });
       } else {
-        obj[id] = Object.assign({}, d);
+        obj[id] = { ...d };
       }
     });
 
@@ -227,7 +237,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     return finalData;
   };
 
-  formatFormItems = () => {
+  public formatFormItems = () => {
     const uploadAttachData = {
       url: uploadUrl,
       mimeTypes: ['CSV'],
@@ -248,7 +258,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     return [documentUp];
   };
 
-  hideModal = () => {
+  public hideModal = () => {
     this.editDate = {};
     this.setState({
       modalVisible: false,
@@ -257,7 +267,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  showModal = () => {
+  public showModal = () => {
     this.setState({
       modalVisible: true,
       modalTitle: '导入场内流水',
@@ -265,42 +275,29 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  changeTab = tab => {
+  public changeTab = tab => {
     const type = tab === '1' ? 'flow' : 'position';
     const { positionMode } = this.state;
     if (type === 'position') {
       if (positionMode === 'detail') {
-        this.queryDetail({
-          date: moment().subtract(1, 'days'),
-        });
+        this.queryDetail();
       } else {
-        this.querySummary({
-          date: moment().subtract(1, 'days'),
-        });
+        this.querySummary();
       }
     } else {
-      this.queryRecords({
-        startDate: moment().subtract(1, 'days'),
-        endDate: moment(),
-      });
+      this.queryRecords();
     }
   };
 
-  changePosition = e => {
+  public changePosition = e => {
     const { value } = e.target;
     this.setState({
       positionMode: value === 'a' ? 'detail' : 'summary',
     });
-    value === 'a'
-      ? this.queryDetail({
-          date: moment().subtract(1, 'days'),
-        })
-      : this.querySummary({
-          date: moment().subtract(1, 'days'),
-        });
+    value === 'a' ? this.queryDetail() : this.querySummary();
   };
 
-  handleFormData = action => {
+  public handleFormData = action => {
     if (action === 'uploading') {
       this.setState({
         modalLoading: true,
@@ -316,19 +313,19 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     }
   };
 
-  createFormModal = () => {
+  public createFormModal = () => {
     this.setState({
       createFormVisible: true,
     });
   };
 
-  hideCreateForm = () => {
+  public hideCreateForm = () => {
     this.setState({
       createFormVisible: false,
     });
   };
 
-  handleCreateForm = async () => {
+  public handleCreateForm = async () => {
     this.setState({
       createFormVisible: false,
     });
@@ -377,13 +374,120 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  onValueChange = params => {
+  public onValueChange = params => {
     this.setState({
       createModalDataSource: params.values,
     });
   };
 
-  render() {
+  public downloadFormModal = () => {
+    const cols = ['sheet'];
+    const colData = cols.map(() => {
+      const tabData = [
+        [
+          'book1',
+          'trade1',
+          'account1',
+          'instrument1',
+          '100',
+          '100',
+          'OPEN',
+          'BUYER',
+          '2018-10-10T01:10:10',
+        ],
+        [
+          'book2',
+          'trade2',
+          'account2',
+          'instrument2',
+          '100',
+          '100',
+          'CLOSE',
+          'SELLER',
+          '2018-10-10T01:10:10',
+        ],
+        [
+          'book3',
+          'trade3',
+          'account3',
+          'instrument3',
+          '100',
+          '100',
+          'OPEN',
+          'BUYER',
+          '2018-10-10T01:10:10',
+        ],
+        [
+          'book4',
+          'trade4',
+          'account4',
+          'instrument4',
+          '100',
+          '100',
+          'OPEN',
+          'BUYER',
+          '2018-10-10T01:10:10',
+        ],
+        [
+          '推荐使用MS Excel编辑本模板，保存时请选择CSV格式。编辑时请务必删除以下备注文字（包括本行）：',
+        ],
+        [
+          '交易簿',
+          '成交ID',
+          '交易账号',
+          '合约代码',
+          '手数股数',
+          '价格',
+          'OPEN/CLOSE',
+          'BUYER/SELLER',
+          '交易时间',
+        ],
+      ];
+      return tabData;
+    });
+    const wb = XLSX.utils.book_new();
+    cols.forEach((item, index) => {
+      const ws = XLSX.utils.aoa_to_sheet(colData[index]);
+      XLSX.utils.book_append_sheet(wb, ws, item);
+    });
+    XLSX.writeFile(wb, `导入场内场内流水模板.csv`);
+  };
+
+  public handleFlowChange = value => {
+    this.setState({
+      searchFormDataFlow: value.values,
+    });
+  };
+
+  public onReset = () => {
+    this.setState(
+      {
+        searchFormDataFlow: { date: [moment().subtract(1, 'days'), moment()] },
+      },
+      () => {
+        this.queryRecords();
+      }
+    );
+  };
+
+  public onResetPosition = () => {
+    this.setState(
+      {
+        searchFormDataPosition: { searchDate: moment().subtract(1, 'days') },
+      },
+      () => {
+        this.state.positionMode === 'detail' ? this.queryDetail() : this.querySummary();
+      }
+    );
+  };
+
+  public handlePositionChange = value => {
+    this.setState({
+      searchFormDataPosition: value.values,
+    });
+  };
+
+  public render() {
     const {
       modalTitle,
       modalVisible,
@@ -396,6 +500,8 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       positionMode,
       createFormVisible,
       createModalDataSource,
+      searchFormDataFlow,
+      searchFormDataPosition,
     } = this.state;
     const flowColumns = generateColumns('flow');
     const detailColumns = generateColumns('detail');
@@ -404,10 +510,55 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       <PageHeaderWrapper>
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
           <TabPane tab="场内流水" key="1">
-            <RowForm mode="flow" codeOptions={instrumentIds} handleQuery={this.queryRecords} />
+            {/* <RowForm mode="flow" codeOptions={instrumentIds} handleQuery={this.queryRecords} /> */}
+            <Form
+              submitText="查询"
+              dataSource={searchFormDataFlow}
+              onSubmitButtonClick={this.queryRecords}
+              onResetButtonClick={this.onReset}
+              controls={[
+                {
+                  field: 'date',
+                  control: {
+                    label: '选择日期',
+                  },
+                  input: {
+                    type: 'date',
+                    range: 'range',
+                  },
+                },
+                {
+                  field: 'instrumentId',
+                  control: {
+                    label: '合约代码',
+                  },
+                  input: {
+                    type: 'select',
+                    mode: 'multiple',
+                    allowClear: true,
+                    placeholder: '请输入内容搜索',
+                    options: async value => {
+                      const { data, error } = await mktInstrumentWhitelistSearch({
+                        instrumentIdPart: value,
+                      });
+                      if (error) return [];
+                      return data.map(item => ({
+                        label: item,
+                        value: item,
+                      }));
+                    },
+                  },
+                },
+              ]}
+              onValueChange={this.handleFlowChange}
+              layout="inline"
+            />
             <div style={{ marginBottom: '20px' }}>
               <Button onClick={this.showModal} type="primary" style={{ marginTop: 10 }}>
                 导入场内流水
+              </Button>
+              <Button onClick={this.downloadFormModal} type="default" style={{ marginTop: 10 }}>
+                下载导入模板
               </Button>
               <Button onClick={this.createFormModal} type="default" style={{ marginTop: 10 }}>
                 新建
@@ -421,18 +572,38 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               rowKey="uuid"
               dataSource={flowData}
               columnDefs={flowColumns}
-              autoSizeColumnsToFit
+              autoSizeColumnsToFit={true}
             />
           </TabPane>
           <TabPane tab="场内持仓统计" key="2">
-            <RowForm
+            {/* <RowForm
               mode="position"
               handleQuery={positionMode === 'detail' ? this.queryDetail : this.querySummary}
+            /> */}
+            <Form
+              submitText="查询"
+              dataSource={searchFormDataPosition}
+              onSubmitButtonClick={positionMode === 'detail' ? this.queryDetail : this.querySummary}
+              onResetButtonClick={this.onResetPosition}
+              controls={[
+                {
+                  field: 'searchDate',
+                  control: {
+                    label: '选择日期',
+                  },
+                  input: {
+                    type: 'date',
+                    range: 'day',
+                  },
+                },
+              ]}
+              onValueChange={this.handlePositionChange}
+              layout="inline"
             />
             <RadioGroup
               onChange={this.changePosition}
               defaultValue="a"
-              style={{ marginBottom: '20px' }}
+              style={{ marginBottom: '20px', marginTop: '20px' }}
             >
               <RadioButton value="a">按明细统计</RadioButton>
               <RadioButton value="b">按合约代码统计</RadioButton>
@@ -446,7 +617,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 rowKey="uuid"
                 dataSource={positionData}
                 columnDefs={detailColumns}
-                autoSizeColumnsToFit
+                autoSizeColumnsToFit={true}
               />
             )}
             {positionMode === 'summary' && (
@@ -458,7 +629,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 rowKey="uuid"
                 dataSource={positionData}
                 columnDefs={summaryColumns}
-                autoSizeColumnsToFit
+                autoSizeColumnsToFit={true}
               />
             )}
           </TabPane>
