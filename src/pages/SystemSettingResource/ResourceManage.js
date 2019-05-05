@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react';
 import { Tree, Button, Modal, notification } from 'antd';
-import AuthTable from './Auth_table';
+import AuthTable from './AuthTable';
 
 import CommonTree from '../SystemSettingDepartment/components/CommonTree';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { RESOURCE_ENUM } from './static_data';
+import { RESOURCE_ENUM } from './staticData';
 import {
   modifyResource,
   createResource,
