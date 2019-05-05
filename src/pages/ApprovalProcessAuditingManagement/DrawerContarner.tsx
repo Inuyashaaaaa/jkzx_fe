@@ -7,11 +7,11 @@ import {
   Form,
   Input,
   notification,
+  Popconfirm,
   Row,
   Select,
   Table,
   TreeSelect,
-  Popconfirm,
 } from 'antd';
 import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
@@ -222,7 +222,7 @@ class Operation extends PureComponent {
         message: `请选择一个成员`,
       });
     }
-    this.props.onBatchAdd(this.state.selectArray);
+    this.props.onBatchAdd(this.state.selectArray, true);
     this.setState({
       selectArray: [],
       selectedRowKeys: [],
@@ -240,7 +240,7 @@ class Operation extends PureComponent {
         nick_name: item.nickName,
       };
     });
-    this.props.onBatchAdd(selectArray);
+    this.props.onBatchAdd(selectArray, false);
   };
 
   public onSelectChange = (selectedRowKeys, selectedRow) => {

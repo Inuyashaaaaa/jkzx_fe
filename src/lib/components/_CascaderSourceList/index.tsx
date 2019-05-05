@@ -28,7 +28,7 @@ export interface CascaderSourceListProps {
   onChange?: (value: string[][]) => void;
   createable?: boolean;
   removeable?: boolean;
-  onSearch?: (value: any, index: number) => void;
+  onSearch?: (value: any, index: number, dataSourceItem: any) => void;
   sort?: boolean;
 }
 
@@ -154,7 +154,7 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
 
   public bindSearch = (index, dataSourceItem) => value => {
     if (this.props.onSearch) {
-      const dataSource = this.props.onSearch(value, index);
+      const dataSource = this.props.onSearch(value, index, dataSourceItem);
       if (Array.isArray(dataSource)) {
         return this.setState(
           produce(
