@@ -2,7 +2,17 @@ import SourceTable from '@/design/components/SourceTable';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
 import { authUserList } from '@/services/user';
-import { Button, Form, Input, notification, Row, Select, Table, TreeSelect } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  notification,
+  Popconfirm,
+  Row,
+  Select,
+  Table,
+  TreeSelect,
+} from 'antd';
 import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -215,7 +225,7 @@ class Operation extends PureComponent {
         message: `请选择一个成员`,
       });
     }
-    this.props.onBatchAdd(this.state.selectArray);
+    this.props.onBatchAdd(this.state.selectArray, true);
     this.setState({
       selectArray: [],
       selectedRowKeys: [],
@@ -233,7 +243,7 @@ class Operation extends PureComponent {
         nick_name: item.nickName,
       };
     });
-    this.props.onBatchAdd(selectArray);
+    this.props.onBatchAdd(selectArray, false);
   };
 
   public onSelectChange = (selectedRowKeys, selectedRow) => {
@@ -368,9 +378,9 @@ class Operation extends PureComponent {
             </Form>
           </Row>
           <Row style={{ marginBottom: '15px' }}>
-            <Button type="primary" onClick={this.onBatchAdd}>
-              批量加入
-            </Button>
+            <Popconfirm title="确认操作?" onConfirm={this.onBatchAdd}>
+              <Button type="primary">批量加入</Button>
+            </Popconfirm>
           </Row>
           <Table
             rowSelection={rowSelection}
