@@ -1,7 +1,7 @@
 import { Upload } from '@/design/components';
 import _ from 'lodash';
 import React from 'react';
-class YangInput extends Upload {
+class SaveUpload extends Upload {
   public renderRendering() {
     let { value } = this.props;
     if (_.isString(value)) {
@@ -17,4 +17,4 @@ class YangInput extends Upload {
   }
 }
 
-export default YangInput;
+export default SaveUpload;
