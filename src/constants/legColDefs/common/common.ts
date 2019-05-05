@@ -89,10 +89,28 @@ export const OptionType: IColDef = {
       params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
-        depends: [LEG_FIELD.BARRIER, LEG_FIELD.STRIKE],
+        depends: [
+          LEG_FIELD.BARRIER,
+          LEG_FIELD.STRIKE,
+          LEG_FIELD.BARRIER_TYPE,
+          LEG_FIELD.STRIKE_TYPE,
+        ],
         value(record) {
           if (record[LEG_FIELD.BARRIER] !== undefined && record[LEG_FIELD.STRIKE] !== undefined) {
-            if (record[LEG_FIELD.BARRIER] > record[LEG_FIELD.STRIKE]) {
+            let barrier = record[LEG_FIELD.BARRIER];
+            let strike = record[LEG_FIELD.STRIKE];
+            if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              barrier = new BigNumber(barrier)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+            if (record[LEG_FIELD.STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              strike = new BigNumber(strike)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+
+            if (barrier > strike) {
               return OPTION_TYPE_MAP.CALL;
             }
             return OPTION_TYPE_MAP.PUT;
@@ -723,13 +741,6 @@ export const Barrier: IColDef = {
       return {
         depends: [LEG_FIELD.BARRIER_TYPE],
         value: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-      };
-    }
-
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.USD) {
-      return {
-        depends: [LEG_FIELD.BARRIER_TYPE],
-        value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
       };
     }
 
@@ -1877,10 +1888,28 @@ export const KnockDirection: IColDef = {
       params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
-        depends: [LEG_FIELD.BARRIER, LEG_FIELD.STRIKE],
+        depends: [
+          LEG_FIELD.BARRIER,
+          LEG_FIELD.STRIKE,
+          LEG_FIELD.BARRIER_TYPE,
+          LEG_FIELD.STRIKE_TYPE,
+        ],
         value(data) {
           if (data[LEG_FIELD.BARRIER] !== undefined && data[LEG_FIELD.STRIKE] !== undefined) {
-            if (data[LEG_FIELD.BARRIER] > data[LEG_FIELD.STRIKE]) {
+            let barrier = data[LEG_FIELD.BARRIER];
+            let strike = data[LEG_FIELD.STRIKE];
+            if (data[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              barrier = new BigNumber(barrier)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+            if (data[LEG_FIELD.STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              strike = new BigNumber(strike)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+
+            if (barrier > strike) {
               return KNOCK_DIRECTION_MAP.UP;
             }
             return KNOCK_DIRECTION_MAP.DOWN;
