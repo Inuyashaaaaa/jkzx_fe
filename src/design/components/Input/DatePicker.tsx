@@ -29,14 +29,23 @@ class DatePicker extends InputBase<IDatePickerProps> {
     }
   };
 
+  public isM = () => {
+    if (this.props.value == null) {
+      return true;
+    }
+    if (isMoment(this.props.value)) {
+      return true;
+    }
+    return false;
+  };
+
   public onChange = (date: moment.Moment, dateString: string) => {
-    const isM = isMoment(this.props.value);
     if (this.props.onChange) {
-      this.props.onChange(isM ? date : dateString);
+      this.props.onChange(this.isM() ? date : dateString);
     }
 
     if (this.props.onValueChange) {
-      this.props.onValueChange(isM ? date : dateString);
+      this.props.onValueChange(this.isM() ? date : dateString);
     }
   };
 
