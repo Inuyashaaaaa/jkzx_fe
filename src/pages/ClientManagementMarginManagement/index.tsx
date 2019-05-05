@@ -111,9 +111,10 @@ class ClientManagementMarginManagement extends PureComponent {
               }}
               type="primary"
               onImport={data => {
+                const _data = data.data[0][Object.keys(data.data[0])[0]];
                 this.setState({
                   excelVisible: true,
-                  excelData: data.data.slice(1).map(item => {
+                  excelData: _data.map(item => {
                     return {
                       uuid: uuidv4(),
                       legalName: item[0],
