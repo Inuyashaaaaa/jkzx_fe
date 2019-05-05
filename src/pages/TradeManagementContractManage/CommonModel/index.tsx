@@ -107,7 +107,6 @@ class CommonModel extends PureComponent<{ status: any }> {
       },
       []
     );
-
     this.setState({
       tableDataSource,
       pagination: {
@@ -115,7 +114,7 @@ class CommonModel extends PureComponent<{ status: any }> {
         ...paramsPagination,
         total: data.totalCount,
       },
-      pageSizeCurrent: tableDataSource.length,
+      pageSizeCurrent: (paramsPagination || pagination).pageSize,
     });
   };
 
