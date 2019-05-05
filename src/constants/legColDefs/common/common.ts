@@ -1310,29 +1310,29 @@ export const StrikeType: IColDef = {
   editable: true,
   field: LEG_FIELD.STRIKE_TYPE,
   input: record => {
-    if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_UNANNUAL
-    ) {
-      return {
-        defaultOpen: true,
-        type: 'select',
-        options: [
-          {
-            label: '人民币',
-            value: STRIKE_TYPES_MAP.CNY,
-          },
-          {
-            label: '百分比',
-            value: STRIKE_TYPES_MAP.PERCENT,
-          },
-          {
-            label: '美元',
-            value: STRIKE_TYPES_MAP.USD,
-          },
-        ],
-      };
-    }
+    // if (
+    //   record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_ANNUAL ||
+    //   record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_UNANNUAL
+    // ) {
+    //   return {
+    //     defaultOpen: true,
+    //     type: 'select',
+    //     options: [
+    //       {
+    //         label: '人民币',
+    //         value: STRIKE_TYPES_MAP.CNY,
+    //       },
+    //       {
+    //         label: '百分比',
+    //         value: STRIKE_TYPES_MAP.PERCENT,
+    //       },
+    //       {
+    //         label: '美元',
+    //         value: STRIKE_TYPES_MAP.USD,
+    //       },
+    //     ],
+    //   };
+    // }
 
     return {
       defaultOpen: true,

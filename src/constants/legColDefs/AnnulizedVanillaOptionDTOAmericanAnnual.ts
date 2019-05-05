@@ -129,7 +129,6 @@ export const AnnulizedVanillaOptionDTOAmericanAnnual = pipeLeg({
     return nextPosition;
   },
   getPageData: (nextDataSourceItem, position) => {
-    nextDataSourceItem.strikePercentAndNumber = position.asset.strike;
     return nextDataSourceItem;
   },
 });
