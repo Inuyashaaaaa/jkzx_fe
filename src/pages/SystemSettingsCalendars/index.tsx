@@ -13,10 +13,14 @@ import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import { DEFAULT_CALENDAR, HOLIDAY_FORMAT, TABLE_COLUMN_DEFS } from './constants';
 import { createFormControls } from './services';
+import { Form2 } from '@/design/components';
+import { getMoment } from '@/utils';
 const { RangePicker } = DatePicker;
 
 class SystemTradeDate extends PureComponent<any, any> {
   public $sourceTable: SourceTable = null;
+
+  public $createForm: Form2 = null;
 
   public state = {
     loading: false,
@@ -64,22 +68,27 @@ class SystemTradeDate extends PureComponent<any, any> {
   };
 
   public onCreate = async () => {
-    const _data = Form.getFieldsValue(this.state.createFormData);
-
+    if (this.$createForm) {
+      const result = await this.$createForm.validate();
+      if (result.error) return;
+    }
     const { createFormData, holidays: tableDataSource } = this.state;
+
+    const createFormDataValues = Form2.getFieldsValue(createFormData);
 
     const { error } = await createCalendar({
       calendarId: DEFAULT_CALENDAR,
-      holidays: [createFormData],
+      holidays: [createFormDataValues],
     });
+
     if (error) {
       message.error('创建失败');
-      return false;
+      return;
     }
 
     const newOne = {
-      ...createFormData,
-      holiday: createFormData.holiday.format(HOLIDAY_FORMAT),
+      ...createFormDataValues,
+      holiday: getMoment(createFormDataValues.holiday).format(HOLIDAY_FORMAT),
       uuid: uuidv4(),
     };
     const holidays = this.getSortedTableData(tableDataSource.concat(newOne));
@@ -156,9 +165,12 @@ class SystemTradeDate extends PureComponent<any, any> {
     );
   };
 
-  public onCreateFormChange = params => {
+  public onCreateFormChange = (props, changedFields) => {
     this.setState({
-      createFormData: params.values,
+      createFormData: {
+        ...this.state.createFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -198,14 +210,16 @@ class SystemTradeDate extends PureComponent<any, any> {
                       visible: this.state.visible,
                       onCancel: this.onCloseCreateModal,
                       onOk: this.onCreate,
+                      title: '创建交易日',
                     }}
                     content={
-                      <Form
-                        onValueChange={this.onCreateFormChange}
+                      <Form2
+                        ref={node => (this.$createForm = node)}
+                        onFieldsChange={this.onCreateFormChange}
                         dataSource={this.state.createFormData}
                         footer={false}
-                        controlNumberOneRow={1}
-                        controls={createFormControls(this.state.holidays)}
+                        columnNumberOneRow={1}
+                        columns={createFormControls(this.state.holidays)}
                       />
                     }
                   >
