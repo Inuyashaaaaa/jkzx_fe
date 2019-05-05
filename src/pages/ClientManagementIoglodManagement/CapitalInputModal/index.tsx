@@ -148,15 +148,23 @@ const ClientManagementInsert = memo<any>(props => {
   const legalFormChange = async (props, changedFields, allFields) => {
     setLegalFormData(allFields);
     setConfirmLoading(true);
-    const { error: _error, data: _data } = await clientAccountGetByLegalName({
+    let { error: _error, data: _data } = await clientAccountGetByLegalName({
       legalName: allFields.legalName.value,
     });
+    setConfirmLoading(false);
+
     if (_error) {
-      setConfirmLoading(false);
       return;
     }
+
+    _data.use = (_data.credit - _data.creditUsed).toFixed(4);
     setTableDataSource([_data]);
-    setLegalFormData(Form2.createFields({ normalStatus: _data.normalStatus ? '正常' : '异常' }));
+    setLegalFormData(
+      Form2.createFields({
+        legalName: allFields.legalName.value,
+        normalStatus: _data.normalStatus ? '正常' : '异常',
+      })
+    );
   };
 
   return (

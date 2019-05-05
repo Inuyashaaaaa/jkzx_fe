@@ -20,7 +20,7 @@ export const TABLE_COL_DEF = [
   },
   {
     title: '可用授信 (¥)',
-    dataIndex: 'credit',
+    dataIndex: 'use',
   },
   {
     title: '当前负债 (¥)',
