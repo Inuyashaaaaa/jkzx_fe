@@ -35,25 +35,28 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
   };
 
   public getOptions = memo(nodes => {
-    const data = JSON.parse(JSON.stringify(nodes)).map(item => {
-      item.positionShow = (
-        <div>
-          PositionId: {item.positionId}
-          <br />
-          到期日: {item.expiry}
-          <br />
-          基础合约: {item.baseContractId ? item.baseContractId : '-'}
-          <br />
-          对冲合约: {item.hedgingContractId ? item.hedgingContractId : '-'}
-        </div>
-      );
-      return item;
+    const data = nodes.map(item => {
+      return {
+        ...item,
+        positionShow: (
+          <div>
+            PositionId: {item.positionId}
+            <br />
+            到期日: {item.expiry}
+            <br />
+            基础合约: {item.baseContractId ? item.baseContractId : '-'}
+            <br />
+            对冲合约: {item.hedgingContractId ? item.hedgingContractId : '-'}
+          </div>
+        ),
+      };
     });
-    return arr2treeOptions(
+    const datas = arr2treeOptions(
       data,
       [INSTRUMENT_KEY, EXPIRY_KEY, POSITION_KEY],
       [INSTRUMENT_KEY, EXPIRY_KEY, POSITION_SHOW_KEY]
     );
+    return datas;
   });
 
   public getSelectedNodes = memo((nodes, selectedPositions, bol) => {
@@ -157,10 +160,11 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
             hedgingContractIdForceEditing: false,
           })
         );
+
+        notification.success({
+          message: `保存成功`,
+        });
       }
-      notification.success({
-        message: `保存成功`,
-      });
 
       return !rsp.error;
     });
@@ -189,12 +193,16 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
     }
   };
 
-  public onSearch = (value, index) => {
+  public onSearch = (value, index, dataSourceItem) => {
     this.setState(
       produce((state: any) => {
         state.listValue[index] = [];
       })
     );
+    // position
+    if (index === 2) {
+      return dataSourceItem.filter(item => new RegExp(value).test(item.value));
+    }
   };
 
   public showModal = formValues => {
