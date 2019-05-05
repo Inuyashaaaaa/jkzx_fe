@@ -292,13 +292,13 @@ export const LCM_EVENT_TYPE_OPTIONS = convertOptions(LCM_EVENT_TYPE_MAP, LCM_EVE
 export const UNIT_ENUM_ZHCN_MAP = {
   CNY: '人民币',
   PERCENT: '百分比',
-  USD: '美元',
+  // USD: '美元',
 };
 
 export const UNIT_ENUM_MAP = {
   CNY: 'CNY',
   PERCENT: 'PERCENT',
-  USD: 'USD',
+  // USD: 'USD',
 };
 
 export const NOTION_ENUM_MAP = {
