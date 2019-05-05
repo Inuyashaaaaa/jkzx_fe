@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Checkbox, Button, Input, Popconfirm } from 'antd';
 
-import AUTHES from './static_data';
+import AUTHES from './constants';
 
 const { Search } = Input;
 
