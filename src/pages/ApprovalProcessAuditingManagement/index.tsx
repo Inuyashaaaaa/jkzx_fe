@@ -72,10 +72,10 @@ class SystemSettingsRoleManagement extends PureComponent {
     userList = userList.filter(item => item.userApproveGroupId !== key);
 
     currentGroup.userList = userList;
-    const { data, error } = await wkApproveGroupModify({
+    const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
-      description: currentGroup.description,
       approveGroupName: currentGroup.approveGroupName,
+      userList,
     });
     const { message } = error;
     if (error) {
