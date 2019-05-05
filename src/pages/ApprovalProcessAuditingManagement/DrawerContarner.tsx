@@ -76,7 +76,6 @@ class Operation extends PureComponent {
       Promise.all([authRolesList(), authUserList(), queryAuthDepartmentList({})]);
     const res = await requests();
     const [roles, users, departmentsRes] = res;
-
     const departments = departmentsRes.data || {};
     const departmentTree = [];
     departmentTree.push(departments);
@@ -110,7 +109,6 @@ class Operation extends PureComponent {
     });
 
     const data = dataSource;
-
     this.setState({
       loading: false,
       dataSource,
@@ -140,7 +138,6 @@ class Operation extends PureComponent {
     });
     this.setState({
       dataSource,
-      data: dataSource,
     });
   };
 
