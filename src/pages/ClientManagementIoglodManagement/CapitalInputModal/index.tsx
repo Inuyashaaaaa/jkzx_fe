@@ -120,14 +120,14 @@ const ClientManagementInsert = memo<any>(props => {
     setCounterPartyFormData(
       Form2.createFields({
         counterPartyFundChange: 0,
-        counterPartyCreditChange: 0,
+        counterPartyCreditBalanceChange: 0,
         counterPartyMarginChange: 0,
       })
     );
     setPartyFormData(
       Form2.createFields({
         cashChange: 0,
-        creditChange: 0,
+        creditBalanceChange: 0,
         debtChange: 0,
         premiumChange: 0,
         marginChange: 0,
@@ -150,33 +150,23 @@ const ClientManagementInsert = memo<any>(props => {
 
   const legalFormChange = async (props, changedFields, allFields) => {
     setLegalFormData(allFields);
-
-    const { error: _error, data: _data } = await clientAccountGetByLegalName({
-      legalName: allFields.legalName.value,
-    });
-
-    if (_error) {
-      return;
-    }
-
-    _data.use = (_data.credit - _data.creditUsed).toFixed(4);
-    setTableDataSource([_data]);
-    setLegalFormData(
-      Form2.createFields({
-        legalName: allFields.legalName.value,
-        normalStatus: _data.normalStatus ? '正常' : '异常',
-      })
-    );
   };
 
   const legalFormValueChange = async (props, changedValues, allValues) => {
     if (changedValues.legalName) {
       setTradeIds([]);
     }
-    const { error, data } = await trdTradeIdListByCounterPartyName({
-      counterPartyName: changedValues.legalName,
-    });
-    if (error) return;
+    const requests = () =>
+      Promise.all([
+        trdTradeIdListByCounterPartyName({
+          counterPartyName: changedValues.legalName,
+        }),
+        clientAccountGetByLegalName({
+          legalName: allValues.legalName,
+        }),
+      ]);
+    const [{ error, data }, { error: _error, data: _data }] = await requests();
+    if (error || _error) return;
     const tradeIds = data.map(item => {
       return {
         label: item,
@@ -184,6 +174,13 @@ const ClientManagementInsert = memo<any>(props => {
       };
     });
     setTradeIds(tradeIds);
+    setTableDataSource([_data]);
+    setLegalFormData(
+      Form2.createFields({
+        legalName: allValues.legalName,
+        normalStatus: _data.normalStatus ? '正常' : '异常',
+      })
+    );
   };
 
   return (
