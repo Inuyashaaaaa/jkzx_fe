@@ -417,7 +417,7 @@ class CommonModel extends PureComponent<{ status: any }> {
               size="middle"
               pagination={false}
               rowKey={'positionId'}
-              scroll={{ x: 2300 }}
+              scroll={{ x: 2500 }}
               dataSource={this.state.tableDataSource}
               columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}
               onRow={record => {
