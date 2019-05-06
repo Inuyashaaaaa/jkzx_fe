@@ -268,15 +268,15 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
   return {
     ...createLegDataSourceItem(leg, env),
     [LEG_ID_FIELD]: position.positionId,
-    ...Form2.createFields(
-      backConvertPercent({
+    ...backConvertPercent({
+      ...Form2.createFields({
         ..._.omitBy(
           _.omit(position.asset, ['counterpartyCode', 'annualized', 'exerciseType']),
           _.isNull
         ),
         [LEG_FIELD.IS_ANNUAL]: isAnnualized,
-      })
-    ),
-    ...leg.getPageData(env, position),
+      }),
+      ...leg.getPageData(env, position),
+    }),
   };
 };

@@ -12,7 +12,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 export const UpBarrier: ILegColDef = {
-  title: '行权收益',
+  title: '敲出障碍价',
   dataIndex: LEG_FIELD.UP_BARRIER,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
