@@ -82,6 +82,7 @@ class BarrierIn extends PureComponent<
     if (error) return;
     message.success('敲入成功');
     this.setState({ visible: false });
+    this.reload();
   };
 
   public render() {

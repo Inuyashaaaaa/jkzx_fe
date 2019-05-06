@@ -64,6 +64,7 @@ export const Forward: ILeg = {
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
       return [
+        IsAnnual,
         Direction,
         NotionalAmountType,
         StrikeType,
@@ -83,6 +84,7 @@ export const Forward: ILeg = {
     }
     if (env === LEG_ENV.EDITING) {
       return [
+        IsAnnual,
         Direction,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
@@ -102,6 +104,7 @@ export const Forward: ILeg = {
     }
     if (env === LEG_ENV.BOOKING) {
       return [
+        IsAnnual,
         Direction,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,

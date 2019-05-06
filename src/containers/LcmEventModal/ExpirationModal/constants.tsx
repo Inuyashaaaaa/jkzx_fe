@@ -2,13 +2,14 @@ import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
   INPUT_NUMBER_PERCENTAGE_DECIMAL_CONFIG,
+  NOTION_ENUM_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { Button } from 'antd';
 import React from 'react';
 
-export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
+export const EXPIRATION_FIXED_FORM_CONTROLS: (notionalType) => IFormControl[] = notionalType => [
   {
     field: 'EXPIRE_NO_BARRIER_PREMIUM_TYPE',
     control: {
@@ -27,9 +28,9 @@ export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
   {
     field: 'NOTIONAL_AMOUNT',
     control: {
-      label: '名义金额',
+      label: notionalType === NOTION_ENUM_MAP.CNY ? '名义本金 (￥)' : '名义本金 (手)',
     },
-    input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
+    input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
     decorator: {
       rules: [
         {
@@ -72,9 +73,10 @@ export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
 ];
 
 export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
+  notionalType,
   premiumType,
   handleSettleAmount
-) => IFormControl[] = (premiumType, handleSettleAmount) => [
+) => IFormControl[] = (notionalType, premiumType, handleSettleAmount) => [
   {
     field: 'EXPIRE_NO_BARRIER_PREMIUM_TYPE',
     control: {
@@ -93,14 +95,14 @@ export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
   {
     field: 'NOTIONAL_AMOUNT',
     control: {
-      label: '名义金额',
+      label: notionalType === NOTION_ENUM_MAP.CNY ? '名义本金 (￥)' : '名义本金 (手)',
     },
-    input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
+    input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
     decorator: {
       rules: [
         {
           required: true,
-          message: '名义金额为必填项',
+          message: '名义本金为必填项',
         },
       ],
     },
