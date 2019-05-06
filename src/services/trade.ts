@@ -6,6 +6,7 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
+import { Form2 } from '@/design/components';
 import BigNumber from 'bignumber.js';
 
 export const judgeLegTypeExsit = (colDef, data, computedAllLegTypes) => {
@@ -23,8 +24,7 @@ export const handleJudge = (params, computedAllLegTypes) => {
 };
 
 export const getActualNotionAmountBigNumber = legData => {
-  const isAnnualized = legData[LEG_ANNUALIZED_FIELD];
-
+  const isAnnualized = legData[LEG_FIELD.IS_ANNUAL];
   if (isAnnualized) {
     if (legData[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
       return new BigNumber(legData[LEG_FIELD.NOTIONAL_AMOUNT])

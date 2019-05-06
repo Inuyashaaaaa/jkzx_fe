@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import DownloadExcelButton from '@/containers/DownloadExcelButton'
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import SourceTable from '@/design/components/SourceTable';
 import { unionId } from '@/design/utils/unionId';
@@ -79,19 +79,23 @@ class RiskManagerPortfolioRisk extends PureComponent implements ISourceTable {
     const length = data.length;
     dataSource.forEach((ds, index) => {
       const _data = [];
-        Object.keys(ds).forEach(key => {
-          const dsIndex = _.findIndex(cols, (k) => k === key);
-          if(dsIndex >= 0) {
-            _data[dsIndex] = ds[key];
-          }
-        });
-      data.push(_data)
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
     });
     return data;
-  }
+  };
 
   public render() {
-    const _data = this.handleData(this.state.tableDataSource, PAGE_TABLE_COL_DEFS.map(item => item.field), PAGE_TABLE_COL_DEFS.map(item => item.headerName));
+    const _data = this.handleData(
+      this.state.tableDataSource,
+      PAGE_TABLE_COL_DEFS.map(item => item.field),
+      PAGE_TABLE_COL_DEFS.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper title="投资组合风险">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
@@ -123,13 +127,13 @@ class RiskManagerPortfolioRisk extends PureComponent implements ISourceTable {
           // }}
           header={
             <DownloadExcelButton
-              style={{margin: '10px 0'}}
-              key='export'
+              style={{ margin: '10px 0' }}
+              key="export"
               type="primary"
               data={{
-                'dataSource': _data,
+                dataSource: _data,
                 cols: PAGE_TABLE_COL_DEFS.map(item => item.headerName),
-                name: '投资组合风险'
+                name: '投资组合风险',
               }}
             >
               导出Excel

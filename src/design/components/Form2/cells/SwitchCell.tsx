@@ -15,10 +15,29 @@ class SwitchCell extends PureComponent<
   IFormCellProps,
   {
     editing: boolean;
+    editable: boolean;
+    editableChanged: boolean;
   }
 > {
   public static defaultProps = {
     prefix: 'tongyu',
+  };
+
+  public static getDerivedStateFromProps = (props, state) => {
+    const {
+      colDef: { editable, defaultEditing },
+    } = props;
+    const editableChanged = editable !== state.editable;
+
+    return {
+      editableChanged,
+      editable,
+      editing: editableChanged
+        ? defaultEditing == null
+          ? !editable
+          : defaultEditing
+        : state.editing,
+    };
   };
 
   public oldValue: any = EMPTY_VALUE;
@@ -32,7 +51,9 @@ class SwitchCell extends PureComponent<
   public constructor(props) {
     super(props);
     this.state = {
-      editing: _.get(props.colDef, 'defaultEditing', !props.colDef.editable),
+      editing: null,
+      editable: null,
+      editableChanged: null,
     };
   }
 
