@@ -1,12 +1,14 @@
+import { Form2, Select } from '@/design/components';
 import SourceTable from '@/lib/components/_SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { mktQuotesListPaged } from '@/services/market-data-service';
-import { Button } from 'antd';
+import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
+import { Button, Divider, Row, Table } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
-import { searchFormControls, TABLE_COLUMN_DEFS } from './constants';
-
+import { columns, searchFormControls, TABLE_COLUMN_DEFS } from './constants';
 class TradeManagementMarketManagement extends PureComponent {
   public $sourceTable: SourceTable = null;
 
@@ -17,6 +19,38 @@ class TradeManagementMarketManagement extends PureComponent {
     dataSource: [],
     lastUpdateTime: '',
     searchFormData: {},
+    tableDataSource: [],
+    pagination: {
+      current: 1,
+      pageSize: 20,
+      total: 20,
+      showSizeChanger: true,
+      showQuickJumper: true,
+      onChange: this.paginationChange,
+    },
+    loading: false,
+  };
+
+  public paginationChange = (a, b) => {
+    const { pagination } = this.state;
+    pagination.current = a;
+    pagination.pageSize = b;
+    this.setState(
+      {
+        pagination,
+      },
+      () => {
+        this.fetchTable({ page: a - 1, pageSize: this.state.pagination.pageSize }, null, true);
+      }
+    );
+  };
+
+  public componentWillMount = () => {
+    this.fetchTable(
+      { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
+      null,
+      true
+    );
   };
 
   public componentDidMount = () => {
@@ -24,7 +58,11 @@ class TradeManagementMarketManagement extends PureComponent {
       this.setState({
         lastUpdateTime: moment().format('HH:mm:ss'),
       });
-      this.$sourceTable.searchSilent();
+      this.fetchTable(
+        { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
+        null,
+        false
+      );
     }, 1000 * 30);
   };
 
@@ -34,24 +72,26 @@ class TradeManagementMarketManagement extends PureComponent {
     }
   };
 
-  public fetchTable = event => {
+  public fetchTable = (data, fields = null, loading) => {
     this.setState({
       lastUpdateTime: moment().format('HH:mm:ss'),
+      loading: loading ? true : false,
     });
     return mktQuotesListPaged({
-      page: event.pagination.current - 1,
-      pageSize: event.pagination.pageSize,
-      ...event.searchFormData,
+      page: data.page,
+      pageSize: data.pageSize,
+      ...fields,
     }).then(result => {
+      this.setState({
+        loading: false,
+      });
       if (result.error) return undefined;
-
-      return {
+      const { pagination } = this.state;
+      this.setState({
         tableDataSource: result.data.page,
-        pagination: {
-          ...event.pagination,
-          total: result.data.totalCount,
-        },
-      };
+        current: data.page,
+        pagination: _.assign(pagination, { total: result.data.totalCount }),
+      });
     });
   };
 
@@ -60,13 +100,11 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public onSearchFormChange = event => {
-    this.setState(
-      {
-        searchFormData: event.formData,
-      },
-      () => {
-        this.$sourceTable.search();
-      }
+    event.domEvent.preventDefault();
+    this.fetchTable(
+      { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
+      this.getFormData(),
+      true
     );
   };
 
@@ -76,7 +114,32 @@ class TradeManagementMarketManagement extends PureComponent {
         searchFormData: {},
       },
       () => {
-        this.$sourceTable.search();
+        this.fetchTable(
+          { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
+          this.getFormData(),
+          true
+        );
+      }
+    );
+  };
+
+  public getFormData = () => {
+    return _.mapValues(this.state.searchFormData, item => {
+      return _.get(item, 'value');
+    });
+  };
+
+  public onFieldsChange = (props, changedFields, allFields) => {
+    this.setState(
+      {
+        searchFormData: allFields,
+      },
+      () => {
+        this.fetchTable(
+          { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
+          this.getFormData(),
+          true
+        );
       }
     );
   };
@@ -84,36 +147,60 @@ class TradeManagementMarketManagement extends PureComponent {
   public render() {
     return (
       <PageHeaderWrapper>
-        <SourceTable
+        <Form2
           ref={node => (this.$sourceTable = node)}
-          rowKey="instrumentId"
-          searchable={true}
-          searchButtonProps={{
+          layout="inline"
+          dataSource={this.state.searchFormData}
+          submitText={`刷新 ${this.state.lastUpdateTime}`}
+          submitButtonProps={{
             icon: 'reload',
           }}
-          onReset={this.onReset}
-          searchText={`刷新 ${this.state.lastUpdateTime}`}
-          searchFormControls={searchFormControls}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          tableColumnDefs={TABLE_COLUMN_DEFS}
-          paginationProps={{
-            backend: true,
-          }}
-          createButton={
-            <Button type="primary" onClick={this.handleSubjectBtnClick}>
-              标的物管理
-            </Button>
-          }
-          onSearch={this.fetchTable}
-          tableProps={{
-            unionId: 'TradeManagementMarketManagement',
-            defaultColDef: {
-              cellRenderer: 'HeatmapCellRenderer',
-              enableCellChangeFlash: false,
-              width: 130,
+          onSubmitButtonClick={this.onSearchFormChange}
+          onResetButtonClick={this.onReset}
+          onFieldsChange={this.onFieldsChange}
+          columns={[
+            {
+              title: '标的物列表',
+              dataIndex: 'instrumentIds',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        mode="multiple"
+                        options={async (value: string = '') => {
+                          const { data, error } = await mktInstrumentSearch({
+                            instrumentIdPart: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
             },
-          }}
+          ]}
+        />
+        <Divider type="horizontal" />
+        <Row style={{ textAlign: 'right', marginBottom: '20px' }}>
+          <Button type="primary" onClick={this.handleSubjectBtnClick}>
+            标的物管理
+          </Button>
+        </Row>
+        <Table
+          dataSource={this.state.tableDataSource}
+          columns={columns}
+          pagination={this.state.pagination}
+          loading={this.state.loading}
         />
       </PageHeaderWrapper>
     );
