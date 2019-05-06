@@ -1242,6 +1242,7 @@ const CreateModalButton = memo<any>(props => {
         title: '新建交易对手',
         width: 900,
         visible: modalVisible,
+        maskClosable: false,
         onCancel: () => setModalVisible(false),
         footer: (
           <Row gutter={8} type="flex" justify="end">
@@ -1279,19 +1280,19 @@ const CreateModalButton = memo<any>(props => {
                   Object.keys(baseFormData).forEach(item => {
                     baseData[item] = baseFormData[item].value;
                     if (item.endsWith('Date') && baseData[item]) {
-                      baseData[item] = baseData[item].split(' ')[0];
+                      baseData[item] = baseData[item].format('YYYY-MM-DD');
                     }
                   });
                   Object.keys(productFormData).forEach(item => {
                     baseData[item] = productFormData[item].value;
                     if (item.endsWith('Date') && baseData[item]) {
-                      baseData[item] = baseData[item].split(' ')[0];
+                      baseData[item] = baseData[item].format('YYYY-MM-DD');
                     }
                   });
                   Object.keys(authFormData).forEach(item => {
                     baseData[item] = authFormData[item].value;
                     if (item.endsWith('Date') && baseData[item]) {
-                      baseData[item] = baseData[item].split(' ')[0];
+                      baseData[item] = baseData[item].format('YYYY-MM-DD');
                     }
                   });
                   Object.keys(attachFormData).forEach(item => {
@@ -1304,7 +1305,7 @@ const CreateModalButton = memo<any>(props => {
                     return {
                       tradeAuthorizerName: item.姓名.value,
                       tradeAuthorizerIdNumber: item.身份证号.value,
-                      tradeAuthorizerIdExpiryDate: item.证件有效期.value.split(' ')[0],
+                      tradeAuthorizerIdExpiryDate: item.证件有效期.value.format('YYYY-MM-DD'),
                       tradeAuthorizerPhone: item.联系电话.value,
                     };
                   });
