@@ -1,6 +1,6 @@
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/design/components';
+import { Form2, Select, Table2, Loading } from '@/design/components';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
@@ -11,7 +11,7 @@ import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { DatePicker, Divider, Table } from 'antd';
+import { DatePicker, Divider, Table, Pagination, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
@@ -412,27 +412,33 @@ class CommonModel extends PureComponent<{ status: any }> {
         />
         <Divider />
         <div style={{ marginTop: VERTICAL_GUTTER }}>
-          <Table
-            size="middle"
-            pagination={{
-              position: 'bottom',
-              showSizeChanger: true,
-              onShowSizeChange: this.onShowSizeChange,
-              showQuickJumper: true,
-              current: this.state.pagination.current,
-              pageSize: this.state.pageSizeCurrent,
-              onChange: this.onChange,
-              total: this.state.pagination.total,
-            }}
-            rowKey={'positionId'}
-            scroll={{ x: 2300 }}
-            loading={this.state.loading}
-            dataSource={this.state.tableDataSource}
-            columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}
-            onRow={record => {
-              return record.style ? { style: record.style } : null;
-            }}
-          />
+          <Loading loading={this.state.loading}>
+            <Table
+              size="middle"
+              pagination={false}
+              rowKey={'positionId'}
+              scroll={{ x: 2300 }}
+              dataSource={this.state.tableDataSource}
+              columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}
+              onRow={record => {
+                return record.style ? { style: record.style } : null;
+              }}
+            />
+            <Row type="flex" justify="end" style={{ marginTop: 15 }}>
+              <Pagination
+                {...{
+                  size: 'small',
+                  showSizeChanger: true,
+                  onShowSizeChange: this.onShowSizeChange,
+                  showQuickJumper: true,
+                  current: this.state.pagination.current,
+                  pageSize: this.state.pageSizeCurrent,
+                  onChange: this.onChange,
+                  total: this.state.pagination.total,
+                }}
+              />
+            </Row>
+          </Loading>
         </div>
       </>
     );
