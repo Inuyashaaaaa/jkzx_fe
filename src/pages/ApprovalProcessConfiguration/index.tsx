@@ -77,9 +77,13 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
 
     tabsData = tabsData.filter(item => item.tabName.indexOf('资金录入') >= 0);
-
-    const taskData = (taskApproveGroupList.data || []).map(item => {
+    const firstData = taskApproveGroupList.data[0] || {};
+    const taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
+      if (index === taskApproveGroupList.data.length - 1) {
+        item.approveGroupList = firstData.approveGroupList;
+        item.approveGroupDTO = firstData.approveGroupDTO;
+      }
       return item;
     });
 
@@ -133,8 +137,15 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public handleApproveGroup = (e, taskId) => {
     let { taskApproveGroupList } = this.state;
-    taskApproveGroupList = taskApproveGroupList.map(item => {
+    let fristChange = false;
+    taskApproveGroupList = taskApproveGroupList.map((item, index) => {
       if (item.taskId === taskId) {
+        item.approveGroupList = e;
+        if (index === 0) {
+          fristChange = true;
+        }
+      }
+      if (fristChange && index === taskApproveGroupList.length - 1) {
         item.approveGroupList = e;
       }
       return item;
@@ -295,7 +306,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                           {/* <Icon type="plus-circle" /> */}
                         </span>
                       </List.Item>
-                      {this.state.taskApproveGroupList.map(group => {
+                      {this.state.taskApproveGroupList.map((group, gIndex) => {
                         return (
                           <List.Item key={group.taskId}>
                             <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
@@ -323,6 +334,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                                   className={styles.select}
                                   value={group.approveGroupList}
                                   mode="multiple"
+                                  disabled={gIndex === this.state.taskApproveGroupList.length - 1}
                                   onChange={e => this.handleApproveGroup(e, group.taskId)}
                                   optionFilterProp="children"
                                   filterOption={(input, option) =>
