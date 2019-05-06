@@ -1,25 +1,47 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select } from '@/design/components';
+import { Form2, Input, Select } from '@/design/components';
 import Form from '@/design/components/Form';
-import { IFormControl } from '@/design/components/Form/types';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
+import { IFormColDef } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { trdPortfolioCreate, trdPortfolioSearch } from '@/services/trade-service';
-import { Button, Divider, Input, Row, Table } from 'antd';
+import {
+  trdPortfolioCreate,
+  trdPortfolioListBySimilarPortfolioName,
+  trdPortfolioSearch,
+} from '@/services/trade-service';
+import { Divider, message, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import ActionCol from './ActionCol';
+import Action from './Action';
 
-export const RESOURCE_FORM_CONTROLS: IFormControl[] = [
+export const RESOURCE_FORM_CONTROLS: IFormColDef[] = [
   {
-    field: 'portfolioName',
-    control: {
-      label: '输入投资组合名称',
-    },
-    input: {
-      type: 'input',
+    dataIndex: 'portfolioName',
+    title: '输入投资组合名称',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '必填内容',
+              },
+              {
+                validator: (rule, value, callback) => {
+                  if (value && (value.startsWith(' ') || value.endsWith(' '))) {
+                    return callback(true);
+                  }
+                  callback();
+                },
+                message: '前后不可以有空格',
+              },
+            ],
+          })(<Input />)}
+        </FormItem>
+      );
     },
   },
 ];
@@ -70,10 +92,13 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     });
   };
 
-  public switchModal = () => {
-    this.setState({
-      visible: !this.state.visible,
-    });
+  public switchModal = (callback?) => {
+    this.setState(
+      {
+        visible: !this.state.visible,
+      },
+      callback
+    );
   };
 
   public onModalClick = () => {
@@ -81,14 +106,28 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
   };
 
   public onCreate = async () => {
-    const { error } = await trdPortfolioCreate(this.state.createFormData);
-    if (error) return;
-    return () => {
-      this.setState({
-        createFormData: {},
+    try {
+      if (!this.$createForm) return;
+
+      const result = await this.$createForm.validate();
+      if (result.error) return;
+
+      const { error } = await trdPortfolioCreate(Form2.getFieldsValue(this.state.createFormData));
+      if (error) {
+        message.error('新建失败');
+        return;
+      }
+
+      this.switchModal(() => {
+        this.setState({
+          createFormData: {},
+        });
+        message.success('新建成功');
+        this.search();
       });
-      this.search();
-    };
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   public bindChange = params => async () => {};
@@ -105,9 +144,12 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
 
   public bindRemove = params => async () => {};
 
-  public onCreateFormDataChange = params => {
+  public onCreateFormDataChange = (props, changedFields) => {
     this.setState({
-      createFormData: params.values,
+      createFormData: {
+        ...this.state.createFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -118,6 +160,8 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
   };
 
   public render() {
+    console.log(this.state.dataSource);
+
     return (
       <PageHeaderWrapper title="投资组合管理">
         <Form2
@@ -136,7 +180,34 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
               title: '投资组合名称',
               dataIndex: 'portfolioName',
               render: (value, record, index, { form, editing }) => {
-                return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        {...{
+                          editing,
+                          style: {
+                            width: 180,
+                          },
+                          placeholder: '请输入内容搜索',
+                          allowClear: true,
+                          type: 'select',
+                          showSearch: true,
+                          options: async (value: string) => {
+                            const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+                              similarPortfolioName: value,
+                            });
+                            if (error) return [];
+                            return data.map(item => ({
+                              label: item,
+                              value: item,
+                            }));
+                          },
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
               },
             },
           ]}
@@ -146,14 +217,16 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
           <ModalButton
             type="primary"
             content={
-              <Form
+              <Form2
+                ref={node => (this.$createForm = node)}
                 footer={false}
-                controls={RESOURCE_FORM_CONTROLS}
+                columns={RESOURCE_FORM_CONTROLS}
                 dataSource={this.state.createFormData}
-                onValueChange={this.onCreateFormDataChange}
+                onFieldsChange={this.onCreateFormDataChange}
               />
             }
             modalProps={{
+              title: '新建投资组合名称',
               onOk: this.onCreate,
             }}
           >
@@ -161,6 +234,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
           </ModalButton>
         </Row>
         <Table
+          rowKey="uuid"
           dataSource={this.state.dataSource}
           columns={[
             {
@@ -171,7 +245,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
               title: '操作',
               dataIndex: '操作',
               render: (text, record, index) => {
-                return <ActionCol params={{ data: record }} reload={this.search} />;
+                return <Action params={{ data: record }} reload={this.search} />;
               },
             },
           ]}

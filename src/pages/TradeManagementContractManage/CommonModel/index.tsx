@@ -74,7 +74,7 @@ class CommonModel extends PureComponent<{ status: any }> {
     this.setState({ loading: true });
     const { error, data } = await trdTradeSearchIndexPaged({
       page: (paramsPagination || pagination).current - 1,
-      pageSize: 10,
+      pageSize: (paramsPagination || pagination).pageSize,
       ...formatValues,
       ...(this.status ? { status: this.status } : null),
     });
@@ -107,7 +107,6 @@ class CommonModel extends PureComponent<{ status: any }> {
       },
       []
     );
-
     this.setState({
       tableDataSource,
       pagination: {
@@ -115,7 +114,7 @@ class CommonModel extends PureComponent<{ status: any }> {
         ...paramsPagination,
         total: data.totalCount,
       },
-      pageSizeCurrent: tableDataSource.length,
+      pageSizeCurrent: (paramsPagination || pagination).pageSize,
     });
   };
 
@@ -125,26 +124,19 @@ class CommonModel extends PureComponent<{ status: any }> {
     });
   };
 
-  //   public onShowSizeChange = (current, pageSize) => {
-  //     this.onPagination(current, pageSize);
-  //   };
+  public onShowSizeChange = (current, pageSize) => {
+    this.onPagination(current, pageSize);
+  };
 
   public onChange = (current, pageSize) => {
     this.onPagination(current, pageSize);
   };
 
   public onPagination = (current, pageSize) => {
-    this.setState(
-      {
-        pagination: {
-          current,
-          pageSize,
-        },
-      },
-      () => {
-        this.onTradeTableSearch();
-      }
-    );
+    this.onTradeTableSearch({
+      current,
+      pageSize,
+    });
   };
 
   public onReset = event => {
@@ -424,8 +416,8 @@ class CommonModel extends PureComponent<{ status: any }> {
             size="middle"
             pagination={{
               position: 'bottom',
-              //   showSizeChanger: true,
-              //   onShowSizeChange: this.onShowSizeChange,
+              showSizeChanger: true,
+              onShowSizeChange: this.onShowSizeChange,
               showQuickJumper: true,
               current: this.state.pagination.current,
               pageSize: this.state.pageSizeCurrent,

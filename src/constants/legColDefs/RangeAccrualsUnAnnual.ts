@@ -1,8 +1,7 @@
-import { DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import { convertObservetions } from '@/services/common';
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_DAYS_IN_YEAR } from '.';
 import {
   ASSET_CLASS_MAP,
   FREQUENCY_TYPE_MAP,
@@ -50,53 +49,76 @@ export const RangeAccrualsUnAnnual: ILegType = pipeLeg({
   type: LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   isAnnualized: false,
-
-  getColumnDefs: (env = 'booking') =>
-    env === 'pricing'
-      ? [
-          Direction,
-          UnderlyerMultiplier,
-          UnderlyerInstrumentId,
-          InitialSpot,
-          PricingTerm,
-          DaysInYear,
-          ParticipationRate,
-          NotionalAmount,
-          NotionalAmountType,
-          EffectiveDate,
-          PricingExpirationDate,
-          PaymentType,
-          PremiumType,
-          Payment,
-          BarrierType,
-          HighBarrier,
-          LowBarrier,
-          ObservationDates,
-          ObservationStep,
-        ]
-      : [
-          Direction,
-          UnderlyerMultiplier,
-          UnderlyerInstrumentId,
-          InitialSpot,
-          SpecifiedPrice,
-          SettlementDate,
-          Term,
-          ParticipationRate,
-          NotionalAmount,
-          NotionalAmountType,
-          EffectiveDate,
-          ExpirationDate,
-          PaymentType,
-          PremiumType,
-          Premium,
-          Payment,
-          BarrierType,
-          HighBarrier,
-          LowBarrier,
-          ObservationDates,
-          ObservationStep,
-        ],
+  getColumnDefs: (env = 'booking') => {
+    if (env === 'pricing') {
+      return [
+        Direction,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        InitialSpot,
+        PricingTerm,
+        DaysInYear,
+        ParticipationRate,
+        NotionalAmount,
+        NotionalAmountType,
+        EffectiveDate,
+        PricingExpirationDate,
+        PaymentType,
+        PremiumType,
+        Payment,
+        BarrierType,
+        HighBarrier,
+        LowBarrier,
+        ObservationDates,
+        ObservationStep,
+      ];
+    }
+    if (env === 'editing') {
+      return [
+        Direction,
+        UnderlyerMultiplier,
+        UnderlyerInstrumentId,
+        InitialSpot,
+        SpecifiedPrice,
+        SettlementDate,
+        ParticipationRate,
+        NotionalAmount,
+        NotionalAmountType,
+        EffectiveDate,
+        ExpirationDate,
+        PaymentType,
+        PremiumType,
+        Premium,
+        Payment,
+        BarrierType,
+        HighBarrier,
+        LowBarrier,
+        ObservationDates,
+      ];
+    }
+    return [
+      Direction,
+      UnderlyerMultiplier,
+      UnderlyerInstrumentId,
+      InitialSpot,
+      SpecifiedPrice,
+      SettlementDate,
+      ParticipationRate,
+      NotionalAmount,
+      NotionalAmountType,
+      EffectiveDate,
+      ExpirationDate,
+      PaymentType,
+      PremiumType,
+      Premium,
+      Payment,
+      BarrierType,
+      HighBarrier,
+      LowBarrier,
+      ObservationDates,
+      ObservationStep,
+    ];
+  },
   getDefault: (nextDataSourceItem, isPricing) => {
     return {
       ...nextDataSourceItem,

@@ -43,7 +43,7 @@ import { Button, Col, message, Row } from 'antd';
 import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
 import ExportModal from './ExportModal';
@@ -170,8 +170,14 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
 
   public loadCommon = (tableDataSource, tableFormData, reset) => {
     // 找到每条腿有的生命周期事件
+    if (!allLegTypes.length) return;
     tableDataSource.forEach(item => {
-      const leg = allLegTypes.find(it => it.type === item.productType);
+      const leg = allLegTypes.find(it => {
+        if (!it) {
+          return false;
+        }
+        return it.type === item.productType;
+      });
       trdPositionLCMEventTypes({
         positionId: item.id,
       }).then(rsp => {
@@ -266,7 +272,12 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public judgeLegTypeExsit = (colDef, data) => {
-    const legType = allLegTypes.find(item => item.type === data[LEG_TYPE_FIELD]);
+    const legType = allLegTypes.find(it => {
+      if (!it) {
+        return false;
+      }
+      return it.type === data[LEG_TYPE_FIELD];
+    });
 
     if (!legType) return false;
 
@@ -344,12 +355,16 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     }
 
     if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-      if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
+      if (
+        legType === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+        legType === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+        legType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+        legType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+      ) {
         const convertedData = filterObDays(convertObservetions(params.rowData));
         if (convertedData.some(item => !item.price)) {
           return message.warn('请先完善观察日价格');
         }
-
         return this.$asianExerciseModal.show(
           this.activeRowData,
           this.state.tableFormData,
@@ -421,6 +436,10 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         () => this.loadData(true)
       );
     }
+
+    if (eventType === LCM_EVENT_TYPE_MAP.AMEND) {
+      this.handleEditable(this.activeRowData);
+    }
   };
 
   public handleEventType = eventType => {
@@ -455,9 +474,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         message.success(this.handleEventType(params.extra.eventType));
         // this.loadData(true);
       }, 100);
-      this.setState({
-        visible: true,
-      });
       return {
         formData: {},
       };
@@ -563,8 +579,18 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
   };
 
   public saveModify = async () => {
-    const modifyData = this.state.dataSource.filter(item => {
+    const actionData = this.state.dataSource.filter(item => {
       return item.positionId === this.state.editablePositionId;
+    });
+    const date = ['settlementDate', 'effectiveDate', 'expirationDate'];
+    const modifyData = _.mapValues(actionData[0], (value, key) => {
+      if (date.some(item => item === key)) {
+        if (isMoment(value)) {
+          return value;
+        }
+        return moment(value);
+      }
+      return value;
     });
     const tableFormData = {
       ...this.state.tableFormData,
@@ -572,13 +598,13 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
     };
 
     const trade = convertTradePageData2ApiData(
-      modifyData,
+      [modifyData],
       tableFormData,
       this.props.currentUser.userName
     );
 
     const { error, data } = await trdTradeLCMEventProcess({
-      positionId: modifyData[0].positionId,
+      positionId: modifyData.positionId,
       tradeId: trade.tradeId,
       eventType: 'AMEND',
       userLoginId: this.props.currentUser.userName,
@@ -677,12 +703,6 @@ class TradeManagementBookEdit extends PureComponent<any, any> {
         />
         <ExpirationModal ref={node => (this.$expirationModal = node)} />
         <KnockOutModal ref={node => (this.$knockOutModal = node)} />
-        <ExportModal
-          visible={this.state.visible}
-          trade={this.state.tableFormData}
-          convertVisible={this.convertVisible}
-          loadData={this.loadData}
-        />
         <FixingModal
           ref={node => {
             this.$fixingModal = node;

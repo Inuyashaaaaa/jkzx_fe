@@ -24,7 +24,7 @@ export interface SourceListProps extends Omit<ListProps, 'dataSource' | 'loading
   modalContent?: React.ReactNode;
   style?: CSSProperties;
   createFormProps?: Form2Props;
-  rowKey: string;
+  rowKey: string | ((record: any, rowIndex: number) => string);
   rowSelection?: 'single' | 'multiple';
   selectable?: boolean;
   onRemove?: (rowData: any, index: number) => void | boolean | Promise<void | boolean>;
@@ -211,7 +211,8 @@ class SourceList extends PureComponent<SourceListProps> {
     });
   };
 
-  public bindOnSelectRow = (data, index) => () => this.onSelectRow(data[this.props.rowKey]);
+  public bindOnSelectRow = (data, index) => () =>
+    this.onSelectRow(data[this.getRowKey(data, index)]);
 
   public onSelectRow = rowId => {
     const { selectable, rowSelection, rowKey } = this.props;
@@ -301,7 +302,9 @@ class SourceList extends PureComponent<SourceListProps> {
   };
 
   public getSelectedRecord = selectedRowKeys => {
-    return this.state.dataSource.filter(item => selectedRowKeys.includes(item[this.props.rowKey]));
+    return this.state.dataSource.filter((item, index) =>
+      selectedRowKeys.includes(item[this.getRowKey(item, index)])
+    );
   };
 
   public getCreateable = (modalContent, createFormControls) => {
@@ -315,6 +318,13 @@ class SourceList extends PureComponent<SourceListProps> {
     return this.props.dataSource || this.state.dataSource;
   };
 
+  public getRowKey = (item, index): string => {
+    if (typeof this.props.rowKey === 'function') {
+      return this.props.rowKey(item, index);
+    }
+    return this.props.rowKey;
+  };
+
   public onSearch = value => {
     if (this.props.onSearch) {
       const dataSource = this.props.onSearch(value);
@@ -323,24 +333,19 @@ class SourceList extends PureComponent<SourceListProps> {
       }
     }
 
-    if (!this.props.dataSource) {
-      const reg = new RegExp(value);
-
-      const searchedDataSource = this.getDataSource().filter(item =>
-        reg.test(item[this.props.rowKey])
-      );
-
-      this.setState(
-        {
-          searchedDataSource,
-        },
-        () => {
-          this.state.selectedRowKeys.forEach(rowId => {
-            this.onSelectRow(rowId);
-          });
-        }
-      );
-    }
+    const reg = new RegExp(value);
+    const _data = this.props.dataSource ? this.props.dataSource : this.getDataSource();
+    const searchedDataSource = _data.filter(item => reg.test(item[this.props.rowKey]));
+    this.setState(
+      {
+        searchedDataSource,
+      },
+      () => {
+        this.state.selectedRowKeys.forEach(rowId => {
+          this.onSelectRow(rowId);
+        });
+      }
+    );
   };
 
   public getSelectedPanel = (selectedKey, dataSource) => {
@@ -367,7 +372,7 @@ class SourceList extends PureComponent<SourceListProps> {
       createText,
       createFormControls,
       modalContent,
-      renderItem = data => data[rowKey],
+      renderItem = (data, index) => data[this.getRowKey(data, index)],
       rowKey,
       loading,
       dataSource,
@@ -413,8 +418,8 @@ class SourceList extends PureComponent<SourceListProps> {
         renderItem={(data, index) => (
           <RenderItem
             onClick={this.bindOnSelectRow(data, index)}
-            removeLoading={this.state.removeLoadings[data[rowKey]]}
-            selected={selectedKey.indexOf(data[rowKey]) !== -1}
+            removeLoading={this.state.removeLoadings[data[this.getRowKey(data, index)]]}
+            selected={selectedKey.indexOf(data[this.getRowKey(data, index)]) !== -1}
             onRemove={this.onRemove(data, index)}
             hideRemove={!removeable}
           >

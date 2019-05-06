@@ -13,14 +13,13 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const pricingUsedLegs = [...allLegTypes];
-    const removeUsedLegs = _.remove(pricingUsedLegs, item => {
-      if (!item) return;
+    const filterLegs = _.reject(allLegTypes, item => {
+      if (!item) return true;
       return item.type === 'MODEL_XY_ANNUAL' || item.type === 'MODEL_XY_UNANNUAL';
     });
-    const usedLegs = this.props.isPricing ? pricingUsedLegs : allLegTypes;
+    const usedLegs = this.props.isPricing ? filterLegs : allLegTypes;
     if (!usedLegs) return;
-    return [
+    const items = [
       {
         name: '年化',
         children: usedLegs
@@ -34,6 +33,7 @@ export default class MultilLegCreateButton extends PureComponent<{
           .map(item => ({ ...item, name: item.name.replace(' - 非年化', '') })),
       },
     ];
+    return items;
   };
 
   public getLegMenuNodes = menus => {

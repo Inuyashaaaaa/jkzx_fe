@@ -1,8 +1,5 @@
-import LoadingButton from '@/components/LoadingButton';
-import PopconfirmButton from '@/components/PopconfirmButton';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Select, Table2 } from '@/design/components';
-import ModalButton from '@/design/components/ModalButton';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import {
   trdPortfolioDelete,
@@ -14,11 +11,10 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
-import { RESOURCE_FORM_CONTROLS } from '.';
-import styles from './actionCol.less';
+import styles from './Action.less';
 import { BOOKING_TABLE_COLUMN_DEFS } from './constants';
 
-class ActionCol extends PureComponent<any, any> {
+class Action extends PureComponent<any, any> {
   public $table2: Table2 = null;
   public status: any;
 
@@ -60,7 +56,11 @@ class ActionCol extends PureComponent<any, any> {
     const { error, data } = await trdPortfolioDelete({
       portfolioName: params.data.portfolioName,
     });
-    if (error) return;
+    if (error) {
+      message.error('删除失败');
+      return;
+    }
+    message.success('删除成功');
     this.props.reload();
   };
 
@@ -211,11 +211,11 @@ class ActionCol extends PureComponent<any, any> {
       similarTradeId: '',
     });
     if (tradeIds.error) return [];
-    let tradeIdsData = tradeIds.data.map(item => ({
+    const tableDataTrade = tradeIds.data.map(item => ({
       label: item,
       value: item,
     }));
-    tradeIdsData = tradeIdsData.filter(
+    const tradeIdsData = tableDataTrade.filter(
       item => !tableDataSource.map(t => t.tradeId).includes(item.value)
     );
 
@@ -269,7 +269,11 @@ class ActionCol extends PureComponent<any, any> {
         },
       },
       () => {
-        this.onTradeTableSearch({ current, pageSize });
+        this.onTradeTableSearch({
+          current,
+          pageSize,
+          portfolioNames: [this.state.portfolio.portfolioName],
+        });
       }
     );
   };
@@ -279,11 +283,15 @@ class ActionCol extends PureComponent<any, any> {
     return (
       <Row type="flex" align="middle">
         <Button.Group>
-          <Button type="primary" onClick={this.showModal}>
+          <Button size="small" type="primary" onClick={this.showModal}>
             查看/修改
           </Button>
           <Popconfirm title="确认删除？" onConfirm={this.onRemove}>
-            <Button type="danger" style={{ marginLeft: '5px', border: '1px solid #ccc' }}>
+            <Button
+              size="small"
+              type="danger"
+              style={{ marginLeft: '5px', border: '1px solid #ccc' }}
+            >
               删除
             </Button>
           </Popconfirm>
@@ -294,6 +302,7 @@ class ActionCol extends PureComponent<any, any> {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           width={1200}
+          footer={null}
         >
           {!this.state.editabled ? (
             <p>
@@ -384,4 +393,4 @@ class ActionCol extends PureComponent<any, any> {
   }
 }
 
-export default ActionCol;
+export default Action;

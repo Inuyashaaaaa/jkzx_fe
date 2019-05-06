@@ -73,7 +73,7 @@ export const OptionType: IColDef = {
         type: 'select',
         defaultOpen: true,
         options: OPTION_TYPE_OPTIONS,
-        prompt: '行权价>障碍价为看涨;行权价>障碍价为看跌',
+        prompt: '行权价 < 障碍价时为看涨；行权价 > 障碍价时为看跌',
       };
     }
     return {
@@ -89,10 +89,28 @@ export const OptionType: IColDef = {
       params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
-        depends: [LEG_FIELD.BARRIER, LEG_FIELD.STRIKE],
+        depends: [
+          LEG_FIELD.BARRIER,
+          LEG_FIELD.STRIKE,
+          LEG_FIELD.BARRIER_TYPE,
+          LEG_FIELD.STRIKE_TYPE,
+        ],
         value(record) {
           if (record[LEG_FIELD.BARRIER] !== undefined && record[LEG_FIELD.STRIKE] !== undefined) {
-            if (record[LEG_FIELD.BARRIER] > record[LEG_FIELD.STRIKE]) {
+            let barrier = record[LEG_FIELD.BARRIER];
+            let strike = record[LEG_FIELD.STRIKE];
+            if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              barrier = new BigNumber(barrier)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+            if (record[LEG_FIELD.STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              strike = new BigNumber(strike)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+
+            if (barrier > strike) {
               return OPTION_TYPE_MAP.CALL;
             }
             return OPTION_TYPE_MAP.PUT;
@@ -726,13 +744,6 @@ export const Barrier: IColDef = {
       };
     }
 
-    if (record[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.USD) {
-      return {
-        depends: [LEG_FIELD.BARRIER_TYPE],
-        value: INPUT_NUMBER_CURRENCY_USD_CONFIG,
-      };
-    }
-
     return {
       depends: [LEG_FIELD.BARRIER_TYPE],
       value: INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -1111,6 +1122,7 @@ export const AlreadyBarrier: IColDef = {
   editable: true,
   input: {
     type: 'checkbox',
+    emptyFormatWhenNullValue: false,
   },
   rules: RULES_REQUIRED,
 };
@@ -1309,31 +1321,29 @@ export const StrikeType: IColDef = {
   editable: true,
   field: LEG_FIELD.STRIKE_TYPE,
   input: record => {
-    if (
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_ANNUAL ||
-      record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_UNANNUAL
-    ) {
-      return {
-        defaultOpen: true,
-        type: 'select',
-        options: [
-          {
-            label: '人民币',
-            value: STRIKE_TYPES_MAP.CNY,
-          },
-          {
-            label: '百分比',
-            value: STRIKE_TYPES_MAP.PERCENT,
-          },
-          {
-            label: '美元',
-            value: STRIKE_TYPES_MAP.USD,
-          },
-        ],
-      };
-    }
+    // if (
+    //   record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_ANNUAL ||
+    //   record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.EAGLE_UNANNUAL
+    // ) {
+    //   return {
+    //     defaultOpen: true,
+    //     type: 'select',
+    //     options: [
+    //       {
+    //         label: '人民币',
+    //         value: STRIKE_TYPES_MAP.CNY,
+    //       },
+    //       {
+    //         label: '百分比',
+    //         value: STRIKE_TYPES_MAP.PERCENT,
+    //       },
+    //       {
+    //         label: '美元',
+    //         value: STRIKE_TYPES_MAP.USD,
+    //       },
+    //     ],
+    //   };
+    // }
 
     return {
       defaultOpen: true,
@@ -1878,10 +1888,28 @@ export const KnockDirection: IColDef = {
       params.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER_UNANNUAL
     ) {
       return {
-        depends: [LEG_FIELD.BARRIER, LEG_FIELD.STRIKE],
+        depends: [
+          LEG_FIELD.BARRIER,
+          LEG_FIELD.STRIKE,
+          LEG_FIELD.BARRIER_TYPE,
+          LEG_FIELD.STRIKE_TYPE,
+        ],
         value(data) {
           if (data[LEG_FIELD.BARRIER] !== undefined && data[LEG_FIELD.STRIKE] !== undefined) {
-            if (data[LEG_FIELD.BARRIER] > data[LEG_FIELD.STRIKE]) {
+            let barrier = data[LEG_FIELD.BARRIER];
+            let strike = data[LEG_FIELD.STRIKE];
+            if (data[LEG_FIELD.BARRIER_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              barrier = new BigNumber(barrier)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+            if (data[LEG_FIELD.STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+              strike = new BigNumber(strike)
+                .multipliedBy(0.01)
+                .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+            }
+
+            if (barrier > strike) {
               return KNOCK_DIRECTION_MAP.UP;
             }
             return KNOCK_DIRECTION_MAP.DOWN;

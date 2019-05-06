@@ -1,4 +1,4 @@
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -73,8 +73,6 @@ export const ConvexUnAnnual: ILegType = pipeLeg({
           InitialSpot,
           SpecifiedPrice,
           SettlementDate,
-          Term,
-          DaysInYear,
           ParticipationRate,
           NotionalAmount,
           NotionalAmountType,

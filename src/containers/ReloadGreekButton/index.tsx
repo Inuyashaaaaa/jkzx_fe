@@ -29,9 +29,9 @@ class ReloadGreekButton extends PureComponent<any, any> {
 
     return (
       <Button.Group>
-        <Button loading={reloading} icon="reload" onClick={this.onReload}>
+        {/* <Button loading={reloading} icon="reload" onClick={this.onReload}>
           重新计算
-        </Button>
+        </Button> */}
         <Button type="primary" onClick={this.onReloadButtonClick}>
           刷新计算结果
         </Button>

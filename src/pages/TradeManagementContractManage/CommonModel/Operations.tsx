@@ -22,6 +22,7 @@ import SettleModal from '@/pages/TradeManagementBookEdit/modals/SettleModal';
 import UnwindModal from '@/pages/TradeManagementBookEdit/modals/UnwindModal';
 import { modalFormControls } from '@/pages/TradeManagementBookEdit/services';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
+import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventList } from '@/services/general-service';
 import { convertTradeApiData2PageData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMEventProcess } from '@/services/trade-service';
@@ -108,12 +109,16 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
     }
     if (keyPath.length === 2) {
       const { tableDataSource, tableFormData } = convertTradeApiData2PageData(this.props.record);
+      console.log(this.props.record);
+      const rowData = tableDataSource.find(item => {
+        return item.positionId === this.props.record.positionId;
+      });
       this.setState(
         {
           tableFormData,
         },
         () => {
-          this.bindEventAction(key, { rowData: tableDataSource[0] });
+          this.bindEventAction(key, { rowData });
         }
       );
     }
@@ -303,9 +308,7 @@ class Operations extends PureComponent<{ record: any; onSearch: any }> {
         message.success('展期成功');
         // this.loadData(true);
       }, 100);
-      this.setState({
-        visible: true,
-      });
+      this.props.onSearch();
       return {
         formData: {},
       };

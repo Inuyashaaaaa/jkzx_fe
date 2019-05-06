@@ -6,11 +6,11 @@ import {
 } from '@/services/auditing';
 import { queryAuthDepartmentList } from '@/services/department';
 import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import AuditGourpLists from './AuditGourpLists';
 import styles from './AuditGourpLists.less';
 import DrawerContarner from './DrawerContarner';
-
 class SystemSettingsRoleManagement extends PureComponent {
   public $drawer: DrawerContarner = null;
 
@@ -72,10 +72,10 @@ class SystemSettingsRoleManagement extends PureComponent {
     userList = userList.filter(item => item.userApproveGroupId !== key);
 
     currentGroup.userList = userList;
-    const { data, error } = await wkApproveGroupModify({
+    const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
-      description: currentGroup.description,
       approveGroupName: currentGroup.approveGroupName,
+      userList,
     });
     const { message } = error;
     if (error) {
@@ -170,8 +170,17 @@ class SystemSettingsRoleManagement extends PureComponent {
     });
   };
 
-  public onBatchAdd = async param => {
+  public onBatchAdd = async (param, batchBool) => {
     const { currentGroup } = this.state;
+    const _d = _.intersection(
+      param.map(p => p.department_id),
+      (this.state.currentGroup.userList || []).map(p => p.departmentId)
+    );
+    if (_d.length > 0) {
+      return notification.success({
+        message: '该用户已在审批组中',
+      });
+    }
     currentGroup.userList = currentGroup.userList.concat(param);
     currentGroup.userList.forEach(item => {
       if (!item.department_id) {
@@ -191,7 +200,9 @@ class SystemSettingsRoleManagement extends PureComponent {
       return;
     } else {
       notification.success({
-        message: `加入成功`,
+        message: batchBool
+          ? `${param.length}个用户成功加入审批组,${currentGroup.userList.length}个用户已在审批组中`
+          : '成功加入审批组',
       });
     }
 
@@ -291,7 +302,7 @@ class SystemSettingsRoleManagement extends PureComponent {
             >
               <DrawerContarner
                 ref={node => (this.$drawer = node)}
-                onBatchAdd={param => this.onBatchAdd(param)}
+                onBatchAdd={(param, bool) => this.onBatchAdd(param, bool)}
                 currentGroup={this.state.currentGroup}
               />
             </Drawer>

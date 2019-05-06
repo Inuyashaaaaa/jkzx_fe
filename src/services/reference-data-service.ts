@@ -221,6 +221,28 @@ export async function clientSaveAccountOpRecord(params = {}) {
   });
 }
 
+// 根据交易对手获取交易id
+export async function trdTradeIdListByCounterPartyName(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradeIdListByCounterPartyName',
+      params,
+    },
+  });
+}
+
+// 调整授信额度
+export async function clientUpdateCredit(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientUpdateCredit',
+      params,
+    },
+  });
+}
+
 export async function cliTradeTaskListByLegalNames(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,

@@ -1,6 +1,6 @@
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import _ from 'lodash';
 import moment from 'moment';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '.';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -129,7 +129,6 @@ export const AnnulizedVanillaOptionDTOAmericanAnnual = pipeLeg({
     return nextPosition;
   },
   getPageData: (nextDataSourceItem, position) => {
-    nextDataSourceItem.strikePercentAndNumber = position.asset.strike;
     return nextDataSourceItem;
   },
 });

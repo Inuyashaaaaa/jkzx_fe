@@ -6,7 +6,7 @@ import {
   ModalButton,
   Select,
   Table2,
-  Upload,
+  // Upload,
 } from '@/design/components';
 import { remove, uuid } from '@/design/utils';
 import { getPartyDoc, HREF_UPLOAD_URL, UPLOAD_URL } from '@/services/document';
@@ -18,7 +18,7 @@ import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
-
+import Upload from './Upload';
 const TabPane = Tabs.TabPane;
 
 const useTableData = props => {
@@ -241,7 +241,7 @@ const EditModalButton = memo<any>(props => {
                     {
                       title: (
                         <span>
-                          1开户名称
+                          开户名称
                           <span style={{ fontSize: 12 }} />
                         </span>
                       ),
@@ -986,10 +986,12 @@ const EditModalButton = memo<any>(props => {
                       title: '主协议',
                       dataIndex: 'masterAgreementDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1020,10 +1022,12 @@ const EditModalButton = memo<any>(props => {
                       title: '补充协议',
                       dataIndex: 'supplementalAgreementDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1054,10 +1058,12 @@ const EditModalButton = memo<any>(props => {
                       title: '风险问卷调查',
                       dataIndex: 'riskSurveyDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1088,10 +1094,12 @@ const EditModalButton = memo<any>(props => {
                       title: '交易授权书',
                       dataIndex: 'tradeAuthDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1122,10 +1130,12 @@ const EditModalButton = memo<any>(props => {
                       title: '对手尽职调查',
                       dataIndex: 'dueDiligenceDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1156,10 +1166,12 @@ const EditModalButton = memo<any>(props => {
                       title: '风险承受能力调查问卷',
                       dataIndex: 'riskPreferenceDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1190,10 +1202,12 @@ const EditModalButton = memo<any>(props => {
                       title: '合规性承诺书',
                       dataIndex: 'complianceDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1224,10 +1238,12 @@ const EditModalButton = memo<any>(props => {
                       title: '风险揭示书',
                       dataIndex: 'riskRevelationDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1258,10 +1274,12 @@ const EditModalButton = memo<any>(props => {
                       title: '适当性警示书',
                       dataIndex: 'qualificationWarningDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1292,10 +1310,12 @@ const EditModalButton = memo<any>(props => {
                       title: '授信协议',
                       dataIndex: 'creditAgreement',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
@@ -1326,10 +1346,12 @@ const EditModalButton = memo<any>(props => {
                       title: '履约保障协议',
                       dataIndex: 'performanceGuaranteeDoc',
                       render: (val, record, index, { form }) => {
-                        val = (val || []).map(item => {
-                          item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                          return item;
-                        });
+                        if (_.isArray(val)) {
+                          val = (val || []).map(item => {
+                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+                            return item;
+                          });
+                        }
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({

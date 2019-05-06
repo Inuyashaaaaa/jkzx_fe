@@ -66,6 +66,7 @@ export const getObLifePayment = (
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
         .toNumber();
     }
+    return 0;
   }
 
   if (alObPrice < cuponBarrier) {

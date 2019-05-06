@@ -20,7 +20,7 @@ export const TABLE_COL_DEF = [
   },
   {
     title: '可用授信 (¥)',
-    dataIndex: 'credit',
+    dataIndex: 'creditBalance',
   },
   {
     title: '当前负债 (¥)',
@@ -53,7 +53,7 @@ export const PARTY_FORM_CONTROLS = [
   },
   {
     title: '可用授信变化',
-    dataIndex: 'creditChange',
+    dataIndex: 'creditBalanceChange',
     render: (value, record, index, { form, editing }) => {
       return (
         <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
@@ -102,7 +102,7 @@ export const COUNTER_PARTY_FORM_CONTROLS = [
   },
   {
     title: '可用授信变化',
-    dataIndex: 'counterPartyCreditChange',
+    dataIndex: 'counterPartyCreditBalanceChange',
     render: (value, record, index, { form, editing }) => {
       return (
         <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
@@ -134,12 +134,18 @@ export const COUNTER_PARTY_FORM_CONTROLS = [
   },
 ];
 
-export const MIDDLE_FORM_CONTROLS = [
+export const MIDDLE_FORM_CONTROLS = tradeIds => [
   {
     title: '交易编号',
     dataIndex: 'tradeId',
     render: (value, record, index, { form, editing }) => {
-      return <FormItem>{form.getFieldDecorator({})(<Input type="input" />)}</FormItem>;
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <Select style={{ minWidth: 180 }} options={tradeIds} allowClear={true} />
+          )}
+        </FormItem>
+      );
     },
   },
   {
@@ -149,7 +155,11 @@ export const MIDDLE_FORM_CONTROLS = [
       return (
         <FormItem>
           {form.getFieldDecorator({ rules: RULES_REQUIRED })(
-            <Select style={{ minWidth: 180 }} options={ACCOUNT_EVENT_TYPE_OPTIONS} />
+            <Select
+              style={{ minWidth: 180 }}
+              options={ACCOUNT_EVENT_TYPE_OPTIONS}
+              allowClear={true}
+            />
           )}
         </FormItem>
       );

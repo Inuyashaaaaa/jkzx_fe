@@ -10,6 +10,7 @@ import {
   clientAccountGetByLegalName,
   clientSaveAccountOpRecord,
   refSimilarLegalNameList,
+  trdTradeIdListByCounterPartyName,
 } from '@/services/reference-data-service';
 import { Button, Card, Col, message, Modal, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -37,6 +38,7 @@ const ClientManagementInsert = memo<any>(props => {
   const [tradeFormData, setTradeFormData] = useState({});
   const [partyFormData, setPartyFormData] = useState({});
   const [counterPartyFormData, setCounterPartyFormData] = useState({});
+  const [tradeIds, setTradeIds] = useState([]);
 
   const handleConfirm = async () => {
     const rsp = await Promise.all([
@@ -46,21 +48,21 @@ const ClientManagementInsert = memo<any>(props => {
       counterPartyForm.current.validate(),
     ]);
     if (rsp.some(item => item.error)) return;
-    setConfirmLoading(true);
     handlePageData2apiData();
   };
 
   const handlePageData2apiData = async () => {
+    setConfirmLoading(true);
     const fundType = Form2.getFieldsValue(tradeFormData).event;
     const partyData = Form2.getFieldsValue(partyFormData);
     const counterPartyData = Form2.getFieldsValue(counterPartyFormData);
     const { error: _error, data: _data } = await clientAccountGetByLegalName({
       legalName: Form2.getFieldsValue(legalFormData).legalName,
     });
-    if (_error) {
-      setConfirmLoading(false);
-      return;
-    }
+
+    setConfirmLoading(false);
+    if (_error) return;
+
     const params = handleFundChange(_data.accountId, fundType, partyData, counterPartyData);
     const { error, data } = await clientSaveAccountOpRecord(params);
     setVisible(false);
@@ -75,8 +77,8 @@ const ClientManagementInsert = memo<any>(props => {
 
   const handleFundChange = (accountId, fundType, partyData, counterPartyData) => {
     let event;
-    if (fundType.includes('START_TRADE')) {
-      event = 'START_TRADE';
+    if (fundType.includes('CHANGE_PREMIUM')) {
+      event = 'CHANGE_PREMIUM';
     } else if (fundType.includes('UNWIND_TRADE')) {
       event = 'UNWIND_TRADE';
     } else if (fundType.includes('SETTLE_TRADE')) {
@@ -111,101 +113,27 @@ const ClientManagementInsert = memo<any>(props => {
         counterPartyCredit: '-',
         counterPartyFund: '-',
         counterPartyMargin: '-',
+        use: '-',
       },
     ]);
     setLegalFormData(Form2.createFields({ normalStatus: '-' }));
     setCounterPartyFormData(
       Form2.createFields({
         counterPartyFundChange: 0,
-        counterPartyCreditChange: 0,
+        counterPartyCreditBalanceChange: 0,
         counterPartyMarginChange: 0,
       })
     );
     setPartyFormData(
       Form2.createFields({
         cashChange: 0,
-        creditChange: 0,
+        creditBalanceChange: 0,
         debtChange: 0,
         premiumChange: 0,
         marginChange: 0,
       })
     );
     setVisible(true);
-  };
-
-  const getFundFormData = async fundType => {
-    let rsp;
-    const values = props.record;
-    if (fundType.includes('START_TRADE')) {
-      rsp = await clientNewTrade({
-        accountId: values.accountId,
-        tradeId: values.tradeId,
-        premium:
-          fundType === 'BUYER_START_TRADE'
-            ? values.premium
-            : new BigNumber(values.premium).negated().toNumber(),
-        information: '',
-      });
-    }
-    if (fundType.includes('UNWIND_TRADE')) {
-      rsp = await clientSettleTrade({
-        accountId: values.accountId,
-        amount: 'BUYER_UNWIND_TRADE'
-          ? values.cashFlow
-          : new BigNumber(values.cashFlow).negated().toNumber(),
-        accountEvent: 'UNWIND_TRADE',
-        premium:
-          fundType === 'BUYER_UNWIND_TRADE'
-            ? new BigNumber(values.premium).negated().toNumber()
-            : values.premium,
-        information: '',
-        tradeId: values.tradeId,
-      });
-    }
-    if (fundType.includes('SETTLE_TRADE')) {
-      rsp = await clientSettleTrade({
-        accountId: values.accountId,
-        amount:
-          fundType === 'BUYER_SETTLE_TRADE'
-            ? values.cashFlow
-            : new BigNumber(values.cashFlow).negated().toNumber(),
-        accountEvent: 'SETTLE_TRADE',
-        premium: 'BUYER_SETTLE_TRADE'
-          ? new BigNumber(values.premium).negated().toNumber()
-          : values.premium,
-        information: '',
-        tradeId: values.tradeId,
-      });
-    }
-    if (rsp.error) return;
-    setPartyFormData(
-      Form2.createFields(
-        _.pick(rsp.data, ['cashChange', 'creditChange', 'debtChange', 'premiumChange'])
-      )
-    );
-    setCounterPartyFormData(
-      Form2.createFields(_.pick(rsp.data, ['counterPartyFundChange', 'counterPartyCreditChange']))
-    );
-  };
-
-  const handleFundEventType = (direction, lcmEventType) => {
-    if (direction === 'BUYER') {
-      if (lcmEventType === 'OPEN') {
-        return 'BUYER_START_TRADE';
-      }
-      if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
-        return 'BUYER_UNWIND_TRADE';
-      }
-      return 'BUYER_SETTLE_TRADE';
-    } else {
-      if (lcmEventType === 'OPEN') {
-        return 'SELLER_START_TRADE';
-      }
-      if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
-        return 'SELLER_UNWIND_TRADE';
-      }
-      return 'SELLER_SETTLE_TRADE';
-    }
   };
 
   const partyFormChange = (props, changedFields, allFields) => {
@@ -220,8 +148,39 @@ const ClientManagementInsert = memo<any>(props => {
     setTradeFormData(allFields);
   };
 
-  const legalFormChange = (props, changedFields, allFields) => {
+  const legalFormChange = async (props, changedFields, allFields) => {
     setLegalFormData(allFields);
+  };
+
+  const legalFormValueChange = async (props, changedValues, allValues) => {
+    if (changedValues.legalName) {
+      setTradeIds([]);
+    }
+    const requests = () =>
+      Promise.all([
+        trdTradeIdListByCounterPartyName({
+          counterPartyName: changedValues.legalName,
+        }),
+        clientAccountGetByLegalName({
+          legalName: allValues.legalName,
+        }),
+      ]);
+    const [{ error, data }, { error: _error, data: _data }] = await requests();
+    if (error || _error) return;
+    const tradeIds = data.map(item => {
+      return {
+        label: item,
+        value: item,
+      };
+    });
+    setTradeIds(tradeIds);
+    setTableDataSource([_data]);
+    setLegalFormData(
+      Form2.createFields({
+        legalName: allValues.legalName,
+        normalStatus: _data.normalStatus ? '正常' : '异常',
+      })
+    );
   };
 
   return (
@@ -243,6 +202,7 @@ const ClientManagementInsert = memo<any>(props => {
           dataSource={legalFormData}
           columns={LEGAL_FORM_CONTROLS}
           onFieldsChange={legalFormChange}
+          onValuesChange={legalFormValueChange}
         />
         <Table
           rowKey="id"
@@ -257,7 +217,7 @@ const ClientManagementInsert = memo<any>(props => {
           footer={false}
           columnNumberOneRow={3}
           dataSource={tradeFormData}
-          columns={MIDDLE_FORM_CONTROLS}
+          columns={MIDDLE_FORM_CONTROLS(tradeIds)}
           onFieldsChange={tableFormChange}
         />
         <Row type="flex" justify="space-around">

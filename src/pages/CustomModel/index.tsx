@@ -38,7 +38,7 @@ const tabPaneData = [
 
 const columnsData = [
   {
-    title: '价格',
+    title: '标的物价格',
     dataIndex: 's',
   },
   {
@@ -74,6 +74,9 @@ const useList = () => {
     });
     setLoading(false);
     let positions = [];
+    if (error) {
+      return setTradeList(positions);
+    }
     const page = JSON.parse(JSON.stringify(data.page || []));
     page.forEach(item => {
       item.positions.forEach(param => {
@@ -217,6 +220,13 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
+      const _data = tabPaneData.map(tab => {
+        const columns = _.cloneDeep(columnsData);
+        tab.columns = columns;
+        tab.dataSource = [];
+        return tab;
+      });
+      setTabPane(_data);
       return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane
@@ -252,13 +262,16 @@ const CustomModel = memo(() => {
     setInstrumentId(e);
     setLoading(true);
     const { data, error } = await trdTradeSearchIndexPaged({
-      instrumentId: e,
+      tradeId: e,
       page: 0,
       pageSize: 20,
       productType: PRODUCTTYPE,
     });
     setLoading(false);
     let positions = [];
+    if (error) {
+      return setTradeList(positions);
+    }
     const page = JSON.parse(JSON.stringify(data.page || []));
     page.forEach(item => {
       item.positions.forEach(param => {
@@ -280,6 +293,13 @@ const CustomModel = memo(() => {
     });
     setTableLoading(false);
     if (error) {
+      const _data = tabPaneData.map(tab => {
+        const columns = _.cloneDeep(columnsData);
+        tab.columns = columns;
+        tab.dataSource = [];
+        return tab;
+      });
+      setTabPane(_data);
       return message.error('未获取到模型数据');
     }
     // 整合查询返回数据setTabPane
@@ -334,7 +354,13 @@ const CustomModel = memo(() => {
       // 导入失败或者没模板数据下载空表
       const _data = cols.map(tab => {
         const tabData = [
-          ['标的物价格', '2019-04-22T11:00:00', '2019-04-22T13:00:00', '2019-04-22T15:00:00'],
+          [
+            '标的物价格',
+            '2019-04-19T09:00:00',
+            '2019-04-19T12:00:00',
+            '2019-04-19T15:00:00',
+            '2019-04-19T18:00:00',
+          ],
         ];
         return tabData;
       });
@@ -372,7 +398,7 @@ const CustomModel = memo(() => {
         <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
           <p>
             <Search
-              placeholder="输入标的物代码查询"
+              placeholder="输入交易编号查询"
               onSearch={handleSearch}
               style={{ width: '100%' }}
             />

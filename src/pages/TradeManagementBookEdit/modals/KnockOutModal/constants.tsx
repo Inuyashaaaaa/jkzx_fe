@@ -1,17 +1,28 @@
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DATE_CONFIG } from '@/constants/common';
+import {
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DATE_CONFIG,
+  INPUT_NUMBER_LOT_CONFIG,
+  NOTION_ENUM_MAP,
+} from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { Button } from 'antd';
 import React from 'react';
 
-export const KNOCKOUT_FORM_CONTROLS: (
+export const KNOCKOUT_FORM_CONTROLS: (notionalType, handleSettleAmount) => IFormControl[] = (
+  notionalType,
   handleSettleAmount
-) => IFormControl[] = handleSettleAmount => [
+) => [
   {
     field: 'NOTIONAL_AMOUNT',
     control: {
-      label: '名义金额',
+      label: notionalType === NOTION_ENUM_MAP.CNY ? '名义本金 (￥)' : '名义本金 (手)',
     },
-    input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
+    input: {
+      ...(notionalType === NOTION_ENUM_MAP.CNY
+        ? INPUT_NUMBER_CURRENCY_CNY_CONFIG
+        : INPUT_NUMBER_LOT_CONFIG),
+      disabled: true,
+    },
     decorator: {
       rules: [
         {

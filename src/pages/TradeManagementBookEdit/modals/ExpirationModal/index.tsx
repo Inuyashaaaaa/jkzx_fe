@@ -2,10 +2,12 @@ import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
+  NOTION_ENUM_MAP,
   OB_DAY_FIELD,
   OPTION_TYPE_OPTIONS,
 } from '@/constants/common';
@@ -13,7 +15,7 @@ import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
-import { Button, message, Modal } from 'antd';
+import { Alert, Button, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
@@ -42,6 +44,8 @@ class ExpirationModal extends PureComponent<
 
   public $expirationCallModal: Form;
 
+  public $autocallPhoenix: Form;
+
   public data: any = {};
 
   public tableFormData: any;
@@ -61,6 +65,7 @@ class ExpirationModal extends PureComponent<
     callPutDataSource: {},
     premiumType: null,
     formData: {},
+    notionalType: '',
   };
 
   public autocalPhoenixInitial = () => {
@@ -119,6 +124,7 @@ class ExpirationModal extends PureComponent<
       visible: true,
       autoCallPaymentType,
       premiumType,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       ...(this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
       EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
         ? {
@@ -208,6 +214,22 @@ class ExpirationModal extends PureComponent<
   };
 
   public onConfirm = async () => {
+    let rsp;
+    if (isAutocallPhoenix(this.data)) {
+      rsp = await this.$autocallPhoenix.validate();
+    } else {
+      if (
+        isAutocallSnow(this.data) &&
+        this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+      ) {
+        rsp = await this.$expirationFixedModal.validate();
+      } else if (isAutocallSnow(this.data)) {
+        rsp = await this.$expirationCallModal.validate();
+      } else {
+        rsp = 'expiration';
+      }
+    }
+    if (rsp.error) return;
     const usedFormData = this.getUsedFormData();
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
@@ -251,6 +273,12 @@ class ExpirationModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.callPutDataSource;
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -302,15 +330,21 @@ class ExpirationModal extends PureComponent<
         <Form
           dataSource={this.state.formData}
           onValueChange={this.onFormValueChange}
+          ref={node => {
+            this.$autocallPhoenix = node;
+          }}
           controlNumberOneRow={1}
           footer={false}
           controls={[
             {
               field: LEG_FIELD.NOTIONAL_AMOUNT,
               control: {
-                label: '名义金额',
+                label:
+                  this.state.notionalType === NOTION_ENUM_MAP.CNY
+                    ? '名义本金 (￥)'
+                    : '名义本金 (手)',
               },
-              input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
+              input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
               decorator: {
                 rules: [getRequiredRule(), getMinRule()],
               },
@@ -393,19 +427,19 @@ class ExpirationModal extends PureComponent<
     if (isAutocallSnow(this.data)) {
       return this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED ? (
         <Form
-          wrappedComponentRef={node => {
+          ref={node => {
             this.$expirationFixedModal = node;
           }}
           dataSource={this.state.fixedDataSource}
           onValueChange={this.onFixedValueChange}
           controlNumberOneRow={1}
           footer={false}
-          controls={EXPIRATION_FIXED_FORM_CONTROLS}
+          controls={EXPIRATION_FIXED_FORM_CONTROLS(this.state.notionalType)}
         />
       ) : (
         <>
           <Form
-            wrappedComponentRef={node => {
+            ref={node => {
               this.$expirationCallModal = node;
             }}
             dataSource={this.state.callPutDataSource}
@@ -413,6 +447,7 @@ class ExpirationModal extends PureComponent<
             controlNumberOneRow={1}
             footer={false}
             controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
+              this.state.notionalType,
               this.state.premiumType,
               this.handleSettleAmount
             )}
@@ -449,6 +484,11 @@ class ExpirationModal extends PureComponent<
           }
         >
           {this.getForm()}
+          {isAutocallPhoenix(this.data) ? (
+            <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
+          ) : isAutocallSnow(this.data) ? (
+            <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
+          ) : null}
         </Modal>
       </>
     );

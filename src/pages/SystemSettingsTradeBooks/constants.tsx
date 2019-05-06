@@ -1,9 +1,9 @@
-import { IFormControl } from '@/lib/components/_Form2';
-import { IColumnDef } from '@/lib/components/_Table2';
-import { Icon } from 'antd';
+import { IFormControl } from '@/design/components/Form/types';
+import { IColumnDef } from '@/design/components/SourceTable/types';
 import React from 'react';
+import Operation from './Operation';
 
-export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
+export const PAGE_TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {
     headerName: '名称',
     field: 'resourceName',
@@ -18,18 +18,25 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
     headerName: '创建时间',
     field: 'createTime',
   },
+  {
+    headerName: '操作',
+    field: 'action',
+    render: params => {
+      return <Operation record={params.data} fetchTable={fetchTable} />;
+    },
+  },
 ];
 
 export const CREATE_FORM_CONTROLS: IFormControl[] = [
   {
-    dataIndex: 'resourceName',
+    field: 'resourceName',
     control: {
       label: '交易簿名称',
     },
     input: {
       type: 'input',
     },
-    options: {
+    decorator: {
       rules: [
         {
           required: true,
