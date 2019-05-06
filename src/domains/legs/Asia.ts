@@ -13,7 +13,7 @@ import {
   FREQUENCY_TYPE_MAP,
   OB_PRICE_FIELD,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,

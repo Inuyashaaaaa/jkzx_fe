@@ -8,7 +8,7 @@ import {
   UNIT_ENUM_MAP,
   PAYMENT_TYPE_MAP,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,

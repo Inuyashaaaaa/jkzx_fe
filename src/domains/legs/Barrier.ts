@@ -12,7 +12,7 @@ import {
   OPTION_TYPE_MAP,
   BIG_NUMBER_CONFIG,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
