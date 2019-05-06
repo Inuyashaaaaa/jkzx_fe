@@ -10,6 +10,7 @@ import {
 import { remove, uuid } from '@/design/utils';
 import { getPartyDoc, HREF_UPLOAD_URL, UPLOAD_URL } from '@/services/document';
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
+import { getMoment } from '@/utils';
 import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -1413,9 +1414,7 @@ const EditModalButton = memo<any>(props => {
                 Object.keys(baseFormData).forEach(item => {
                   baseData[item] = baseFormData[item].value;
                   if (item.endsWith('Date') && baseData[item]) {
-                    isMoment(baseData[item])
-                      ? (baseData[item] = baseData[item].format('YYYY-MM-DD'))
-                      : (baseData[item] = baseData[item].split(' ')[0]);
+                    baseData[item] = getMoment(baseData[item]).format('YYYY-MM-DD');
                   }
                   if (item.endsWith('Doc')) {
                     baseData[item] = baseFormData[item].value
@@ -1435,9 +1434,9 @@ const EditModalButton = memo<any>(props => {
                   return {
                     tradeAuthorizerName: item.name.value,
                     tradeAuthorizerIdNumber: item.IDNumber.value,
-                    tradeAuthorizerIdExpiryDate: isMoment(item.periodValidity.value)
-                      ? item.periodValidity.value.format('YYYY-MM-DD')
-                      : item.periodValidity.value.split(' ')[0],
+                    tradeAuthorizerIdExpiryDate: getMoment(item.periodValidity.value).format(
+                      'YYYY-MM-DD'
+                    ),
                     tradeAuthorizerPhone: item.phoneNumber.value,
                   };
                 });
