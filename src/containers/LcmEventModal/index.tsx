@@ -105,7 +105,7 @@ const LcmEventModal = memo<{
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
-        return this.$settleModal.show(data, tableFormData, currentUser, loadData);
+        return $settleModal.current.show(data, tableFormData, currentUser, loadData);
       }
     },
   };

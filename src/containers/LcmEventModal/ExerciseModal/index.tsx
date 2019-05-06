@@ -1,10 +1,10 @@
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
+import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { Button, message, Modal } from 'antd';
+import { Alert, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
-import CashExportModal from '@/containers/CashExportModal';
 import {
   EXERCISE_FORM_CONTROLS,
   NOTIONAL_AMOUNT,
@@ -36,6 +36,7 @@ class ExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     exportVisible: false,
+    notionalType: null,
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -47,6 +48,7 @@ class ExerciseModal extends PureComponent<
     const direction = this.data.direction;
     this.setState({
       visible: true,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       direction,
       ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
         ? {
@@ -113,6 +115,8 @@ class ExerciseModal extends PureComponent<
   };
 
   public onConfirm = async () => {
+    const rsp = await this.$exerciseForm.validate();
+    if (rsp.error) return;
     const dataSource = this.state.dataSource;
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
@@ -151,6 +155,12 @@ class ExerciseModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.dataSource;
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -189,15 +199,16 @@ class ExerciseModal extends PureComponent<
           title={direction === 'BUYER' ? '我方行权' : '客户行权'}
         >
           <Form
-            wrappedComponentRef={node => {
+            ref={node => {
               this.$exerciseForm = node;
             }}
             dataSource={this.state.dataSource}
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={EXERCISE_FORM_CONTROLS(this.handleSettleAmount)}
+            controls={EXERCISE_FORM_CONTROLS(this.state.notionalType, this.handleSettleAmount)}
           />
+          <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>
     );
