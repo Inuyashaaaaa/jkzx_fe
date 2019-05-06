@@ -26,10 +26,10 @@ const getSelectProps = record => {
           label: '百分比',
           value: STRIKE_TYPES_MAP.PERCENT,
         },
-        {
-          label: '美元',
-          value: STRIKE_TYPES_MAP.USD,
-        },
+        // {
+        //   label: '美元',
+        //   value: STRIKE_TYPES_MAP.USD,
+        // },
       ],
     };
   }

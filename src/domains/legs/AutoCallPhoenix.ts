@@ -215,7 +215,6 @@ export const AutoCallPhoenix: ILeg = {
       LEG_FIELD.UP_BARRIER,
       LEG_FIELD.UP_BARRIER_TYPE,
       AlreadyBarrier.dataIndex,
-      UpObservationStep.dataIndex,
       LEG_FIELD.IS_ANNUAL,
     ];
 
@@ -229,6 +228,9 @@ export const AutoCallPhoenix: ILeg = {
 
     if (!dataItem[AlreadyBarrier.dataIndex]) {
       nextPosition.asset[DownBarrierDate.dataIndex] = undefined;
+      nextPosition.lcmEventType = 'OPEN';
+    } else {
+      nextPosition.lcmEventType = 'KNOCK_IN';
     }
 
     nextPosition.asset.barrier = dataItem[LEG_FIELD.UP_BARRIER];
@@ -280,7 +282,8 @@ export const AutoCallPhoenix: ILeg = {
       }),
       [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
       [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
-      [AlreadyBarrier.dataIndex]: !!position.asset[DownBarrierDate.dataIndex],
+      [LEG_FIELD.ALREADY_BARRIER]: position.lcmEventType === 'KNOCK_IN' ? true : false,
+      // [AlreadyBarrier.dataIndex]: !!position.asset[DownBarrierDate.dataIndex],
     });
     return fields;
   },

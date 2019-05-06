@@ -1,8 +1,14 @@
-import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
+import {
+  LCM_EVENT_TYPE_MAP,
+  LEG_FIELD,
+  NOTIONAL_AMOUNT_TYPE_MAP,
+  LEG_TYPE_MAP,
+  LEG_TYPE_FIELD,
+} from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { message, Modal } from 'antd';
+import { Alert, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
 import {
@@ -36,6 +42,7 @@ class SettleModal extends PureComponent<
     dataSource: {},
     exportVisible: false,
     productType: 'MODEL_XY',
+    notionalType: '',
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -43,10 +50,10 @@ class SettleModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-
     this.setState({
       visible: true,
-      productType: this.data.productType,
+      productType: this.data[LEG_TYPE_FIELD],
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
         ? {
             dataSource: this.computeLotDataSource({
@@ -94,6 +101,8 @@ class SettleModal extends PureComponent<
   };
 
   public onConfirm = async () => {
+    const rsp = await this.$settleForm.validate();
+    if (rsp.error) return;
     const dataSource = this.state.dataSource;
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
@@ -132,6 +141,12 @@ class SettleModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.dataSource;
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -139,10 +154,7 @@ class SettleModal extends PureComponent<
         numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
         notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
-      eventType:
-        this.data.productType === 'FORWARD_UNANNUAL'
-          ? LCM_EVENT_TYPE_MAP.SETTLE
-          : LCM_EVENT_TYPE_MAP.EXERCISE,
+      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
     });
     if (error) return;
     this.setState({
@@ -170,18 +182,25 @@ class SettleModal extends PureComponent<
           destroyOnClose={true}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={'结算: (自定义产品)'}
+          title={`结算: (${
+            this.state.productType === LEG_TYPE_MAP.FORWARD ? '远期' : '自定义产品'
+          })`}
         >
           <Form
-            wrappedComponentRef={node => {
+            ref={node => {
               this.$settleForm = node;
             }}
             dataSource={this.state.dataSource}
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={SETTLE_FORM_CONTROLS(this.state.productType, this.handleSettleAmount)}
+            controls={SETTLE_FORM_CONTROLS(
+              this.state.notionalType,
+              this.state.productType,
+              this.handleSettleAmount
+            )}
           />
+          <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>
     );
