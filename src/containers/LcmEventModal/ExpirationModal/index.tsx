@@ -20,8 +20,8 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { OB_LIFE_PAYMENT } from '../../constants';
-import { getObservertionFieldData } from '../../tools';
+import { OB_LIFE_PAYMENT } from '../constants';
+import { getObservertionFieldData } from '../tools';
 import {
   EXERCISE_PRICE,
   EXPIRATION_CALL_PUT_FORM_CONTROLS,

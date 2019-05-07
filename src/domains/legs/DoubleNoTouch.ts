@@ -11,7 +11,11 @@ import {
   SPECIFIED_PRICE_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
+import {
+  DEFAULT_DAYS_IN_YEAR,
+  DEFAULT_TERM,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/global';
 import _ from 'lodash';
 import moment from 'moment';
 import { Form2 } from '@/design/components';
@@ -149,6 +153,7 @@ export const DoubleNoTouch: ILeg = {
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       ...(env === LEG_ENV.PRICING
         ? {
+            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : undefined),

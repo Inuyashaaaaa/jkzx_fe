@@ -253,7 +253,10 @@ const TradeManagementBooking = props => {
     );
 
     // val，q 等都为空，视为默认
-    if (!reload && _.some(_.pick(record, tradeOptions), item => item != null)) {
+    if (
+      !reload &&
+      _.some(_.pick(record, tradeOptions), item => Form2.getFieldValue(item) != null)
+    ) {
       return;
     }
 
@@ -263,7 +266,7 @@ const TradeManagementBooking = props => {
 
     inlineSetLoadings(true);
 
-    const { error, data = [] } = await prcTrialPositionsService({
+    const { error, data = [], raw } = await prcTrialPositionsService({
       positions: convertTradePositions(
         [Form2.getFieldsValue(_.omit(record, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))],
         {},
@@ -275,6 +278,13 @@ const TradeManagementBooking = props => {
     inlineSetLoadings(false);
 
     if (error) return;
+
+    if (raw.diagnostics) {
+      return notification.error({
+        message: '请求错误',
+        description: _.get(raw.diagnostics, '[0].message'),
+      });
+    }
 
     const rowId = record[LEG_ID_FIELD];
 
