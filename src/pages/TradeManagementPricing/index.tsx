@@ -4,6 +4,8 @@ import {
   LEG_ID_FIELD,
   LEG_ENV_FIELD,
   LEG_INJECT_FIELDS,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -168,20 +170,30 @@ const TradeManagementBooking = props => {
     const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
 
     if (from === PRICING_FROM_EDITING) {
-      const next = editingTableData.map(record => {
-        const leg = getLegByRecord(record);
-        if (!leg) return record;
-        const omits = _.difference(
-          leg.getColumns(LEG_ENV.EDITING).map(item => item.dataIndex),
-          leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex)
-        );
-        return {
-          ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-          ...leg.getDefaultData(LEG_ENV.PRICING),
-          ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
-          [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
-        };
-      });
+      const recordTypeIsModelXY = record => {
+        return Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
+      };
+
+      if (editingTableData.some(recordTypeIsModelXY)) {
+        message.info('暂不支持自定义产品试定价');
+      }
+
+      const next = editingTableData
+        .filter(record => !recordTypeIsModelXY(record))
+        .map(record => {
+          const leg = getLegByRecord(record);
+          if (!leg) return record;
+          const omits = _.difference(
+            leg.getColumns(LEG_ENV.EDITING).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex)
+          );
+          return {
+            ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+            ...leg.getDefaultData(LEG_ENV.PRICING),
+            ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
+            [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
+          };
+        });
       setTableData(next);
     }
   });
