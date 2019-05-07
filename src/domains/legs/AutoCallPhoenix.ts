@@ -10,7 +10,11 @@ import {
   UP_BARRIER_TYPE_MAP,
   UNIT_ENUM_MAP2,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
+import {
+  DEFAULT_DAYS_IN_YEAR,
+  DEFAULT_TERM,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
@@ -205,6 +209,7 @@ export const AutoCallPhoenix: ILeg = {
       [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],
       ...(env === LEG_ENV.PRICING
         ? {
+            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),

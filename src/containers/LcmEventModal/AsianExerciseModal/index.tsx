@@ -20,7 +20,7 @@ import { Alert, Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { countAvg } from '@/pages/TradeManagementBookEdit/utils';
+import { countAvg } from '../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 const OPTIONS_NUMBER = 'optionsNumber';

@@ -14,7 +14,11 @@ import {
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/legColDefs';
+import {
+  DEFAULT_DAYS_IN_YEAR,
+  DEFAULT_TERM,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
@@ -64,6 +68,7 @@ export const Forward: ILeg = {
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
       return [
+        IsAnnual,
         Direction,
         NotionalAmountType,
         StrikeType,
@@ -83,6 +88,7 @@ export const Forward: ILeg = {
     }
     if (env === LEG_ENV.EDITING) {
       return [
+        IsAnnual,
         Direction,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
@@ -102,6 +108,7 @@ export const Forward: ILeg = {
     }
     if (env === LEG_ENV.BOOKING) {
       return [
+        IsAnnual,
         Direction,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
@@ -133,6 +140,7 @@ export const Forward: ILeg = {
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       ...(env === LEG_ENV.PRICING
         ? {
+            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),

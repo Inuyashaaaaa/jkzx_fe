@@ -21,7 +21,7 @@ import {
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, message, Typography, Menu } from 'antd';
+import { Divider, message, Typography, Menu, Skeleton } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
@@ -161,72 +161,78 @@ const TradeManagementBooking = props => {
 
   return (
     <PageHeaderWrapper>
-      <Typography.Title level={4}>基本信息</Typography.Title>
-      <Divider />
-      <Loading loading={tableLoading}>
-        <BookingBaseInfoForm
-          columnNumberOneRow={2}
-          editableStatus={FORM_EDITABLE_STATUS.SHOW}
-          createFormData={createFormData}
-          setCreateFormData={setCreateFormData}
-        />
-      </Loading>
-      <Typography.Title style={{ marginTop: 20 }} level={4}>
-        交易结构信息
-      </Typography.Title>
-      <Divider />
-      <MultiLegTable
-        env={LEG_ENV.EDITING}
-        loading={tableLoading}
-        tableEl={tableEl}
-        onCellFieldsChange={params => {
-          const { record } = params;
-          const leg = getLegByRecord(record);
+      {tableLoading ? (
+        <Skeleton active={true} paragraph={{ rows: 4 }} />
+      ) : (
+        <>
+          <Typography.Title level={4}>基本信息</Typography.Title>
+          <Divider />
+          <Loading loading={tableLoading}>
+            <BookingBaseInfoForm
+              columnNumberOneRow={2}
+              editableStatus={FORM_EDITABLE_STATUS.SHOW}
+              createFormData={createFormData}
+              setCreateFormData={setCreateFormData}
+            />
+          </Loading>
+          <Typography.Title style={{ marginTop: 20 }} level={4}>
+            交易结构信息
+          </Typography.Title>
+          <Divider />
+          <MultiLegTable
+            env={LEG_ENV.EDITING}
+            loading={tableLoading}
+            tableEl={tableEl}
+            onCellFieldsChange={params => {
+              const { record } = params;
+              const leg = getLegByRecord(record);
 
-          setTableData(pre => {
-            const newData = pre.map(item => {
-              if (item[LEG_ID_FIELD] === params.rowId) {
-                return {
-                  ...item,
-                  ...params.changedFields,
-                };
-              }
-              return item;
-            });
-            if (leg.onDataChange) {
-              leg.onDataChange(
-                LEG_ENV.EDITING,
-                params,
-                newData[params.rowIndex],
-                newData,
-                (colId: string, loading: boolean) => {
-                  tableEl.current.setLoadings(params.rowId, colId, loading);
-                },
-                tableEl.current.setLoadingsByRow,
-                (colId: string, newVal: ITableData) => {
-                  setTableData(pre =>
-                    pre.map(item => {
-                      if (item[LEG_ID_FIELD] === params.rowId) {
-                        return {
-                          ...item,
-                          [colId]: newVal,
-                        };
-                      }
-                      return item;
-                    })
+              setTableData(pre => {
+                const newData = pre.map(item => {
+                  if (item[LEG_ID_FIELD] === params.rowId) {
+                    return {
+                      ...item,
+                      ...params.changedFields,
+                    };
+                  }
+                  return item;
+                });
+                if (leg.onDataChange) {
+                  leg.onDataChange(
+                    LEG_ENV.EDITING,
+                    params,
+                    newData[params.rowIndex],
+                    newData,
+                    (colId: string, loading: boolean) => {
+                      tableEl.current.setLoadings(params.rowId, colId, loading);
+                    },
+                    tableEl.current.setLoadingsByRow,
+                    (colId: string, newVal: ITableData) => {
+                      setTableData(pre =>
+                        pre.map(item => {
+                          if (item[LEG_ID_FIELD] === params.rowId) {
+                            return {
+                              ...item,
+                              [colId]: newVal,
+                            };
+                          }
+                          return item;
+                        })
+                      );
+                    },
+                    setTableData
                   );
-                },
-                setTableData
-              );
-            }
-            return newData;
-          });
-        }}
-        dataSource={tableData}
-        getContextMenu={getContextMenu}
-      />
-      <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
-      <ActionBar />
+                }
+                return newData;
+              });
+            }}
+            dataSource={tableData}
+            getContextMenu={getContextMenu}
+          />
+          <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
+        </>
+      )}
+      <ActionBar tableData={tableData} />
     </PageHeaderWrapper>
   );
 };

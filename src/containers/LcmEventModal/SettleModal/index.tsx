@@ -19,7 +19,7 @@ import {
   UNDERLYER_PRICE,
 } from './constants';
 
-class SettleModal extends PureComponent<
+class ExerciseModal extends PureComponent<
   {
     visible?: boolean;
     data?: any;
@@ -207,4 +207,4 @@ class SettleModal extends PureComponent<
   }
 }
 
-export default SettleModal;
+export default ExerciseModal;
