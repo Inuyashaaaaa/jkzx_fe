@@ -232,13 +232,22 @@ const TradeManagementBooking = props => {
     return false;
   };
 
+  const getSelfTradesColDataIndexs = record => {
+    const leg = getLegByRecord(record);
+    const selfTradesColDataIndexs = _.intersection(
+      leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
+      TRADESCOL_FIELDS
+    );
+    return selfTradesColDataIndexs;
+  };
+
   const fetchDefaultPricingEnvData = _.debounce(async (record, reload = false) => {
     if (judgeLegColumnsHasError(record)) {
       return;
     }
 
     const inlineSetLoadings = loading => {
-      tradeOptions.forEach(colId => {
+      requiredTradeOptions.forEach(colId => {
         tableEl.current.setLoadings(record[LEG_ID_FIELD], colId, loading);
       });
     };
@@ -248,14 +257,16 @@ const TradeManagementBooking = props => {
     //   return;
     // }
 
-    const tradeOptions = TRADESCOL_FIELDS.filter(
-      item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE
+    const requiredTradeOptions = getSelfTradesColDataIndexs(record).filter(
+      item =>
+        item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE &&
+        item !== TRADESCOLDEFS_LEG_FIELD_MAP.Q
     );
 
     // val，q 等都为空，视为默认
     if (
       !reload &&
-      _.some(_.pick(record, tradeOptions), item => Form2.getFieldValue(item) != null)
+      _.some(_.pick(record, requiredTradeOptions), item => Form2.getFieldValue(item) != null)
     ) {
       return;
     }
@@ -279,7 +290,7 @@ const TradeManagementBooking = props => {
 
     if (error) return;
 
-    if (raw.diagnostics) {
+    if (!_.isEmpty(raw.diagnostics)) {
       return notification.error({
         message: '请求错误',
         description: _.get(raw.diagnostics, '[0].message'),
@@ -291,6 +302,7 @@ const TradeManagementBooking = props => {
     setTableData(pre => {
       return pre.map(item => {
         if (item[LEG_ID_FIELD] === rowId) {
+          const selfTradesColDataIndexs = getSelfTradesColDataIndexs(item);
           return {
             ...item,
             ...Form2.createFields(
@@ -299,7 +311,7 @@ const TradeManagementBooking = props => {
                   [key: string]: number;
                 }>(
                   _.first(data),
-                  TRADESCOL_FIELDS.filter(
+                  selfTradesColDataIndexs.filter(
                     item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE
                   )
                 ),
