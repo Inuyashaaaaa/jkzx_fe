@@ -274,15 +274,7 @@ class AsianExerciseModal extends PureComponent<
                   rules: [
                     {
                       required: true,
-                    },
-                    {
-                      message: '结算金额不能小与0',
-                      validator(rule, value, callback) {
-                        if (value < 0) {
-                          return callback(true);
-                        }
-                        callback();
-                      },
+                      message: '结算金额为必填项',
                     },
                   ],
                 },
