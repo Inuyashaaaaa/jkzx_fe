@@ -137,6 +137,12 @@ const TradeManagementBooking = props => {
   const { query } = location;
   const { from } = query;
 
+  const getPricingPermium = record => {
+    return Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY
+      ? record[COMPUTED_LEG_FIELD_MAP.PRICE]
+      : record[COMPUTED_LEG_FIELD_MAP.PRICE_PER];
+  };
+
   const [tableData, setTableData] = useState(
     from === BOOKING_FROM_PRICING
       ? (props.pricingData.tableData || []).map(item => {
@@ -147,14 +153,10 @@ const TradeManagementBooking = props => {
             leg.getColumns(LEG_ENV.BOOKING).map(item => item.dataIndex)
           );
 
-          const permium = Math.abs(
-            Form2.getFieldValue(
-              item[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.CNY
-                ? item[COMPUTED_LEG_FIELD_MAP.PRICE]
-                : item[COMPUTED_LEG_FIELD_MAP.PRICE_PER],
-              0
-            )
-          );
+          const pricingPermium = getPricingPermium(item);
+          const permium =
+            pricingPermium == null ? undefined : Math.abs(Form2.getFieldValue(pricingPermium));
+
           return {
             ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
             ...leg.getDefaultData(LEG_ENV.BOOKING),
