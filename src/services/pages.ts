@@ -18,6 +18,7 @@ import { ILeg } from '@/types/leg';
 import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+import { Form2 } from '@/design/components';
 
 export const createLegDataSourceItem = (leg: ILeg, env: string) => {
   return {
@@ -389,7 +390,7 @@ function miniumlPercent(item) {
 }
 
 export function backConvertPercent(item) {
-  const clone = { ...item };
+  const clone = { ...Form2.getFieldsValue(item) };
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
@@ -609,5 +610,5 @@ export function backConvertPercent(item) {
       .multipliedBy(100)
       .toNumber();
   }
-  return clone;
+  return Form2.createFields(clone);
 }

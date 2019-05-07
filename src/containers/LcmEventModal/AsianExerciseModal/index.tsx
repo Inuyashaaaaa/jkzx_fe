@@ -6,6 +6,9 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
+  NOTION_ENUM_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
@@ -13,11 +16,11 @@ import Form from '@/design/components/Form';
 import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMoment } from '@/utils';
-import { Button, Col, message, Modal, Row } from 'antd';
+import { Alert, Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { countAvg } from '@/pages/TradeManagementBookEdit/utils';
+import { countAvg } from '../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 const OPTIONS_NUMBER = 'optionsNumber';
@@ -53,16 +56,19 @@ class AsianExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     formData: {},
+    productType: 'ASIAN_ANNUAL',
+    notionalType: null,
   };
 
-  public show = (data = {}, tableFormData, currentUser, reload) => {
+  public show = (data, tableFormData, currentUser, reload) => {
     this.data = data;
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-
     this.setState({
       visible: true,
+      productType: this.data[LEG_TYPE_FIELD],
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       formData: this.getDefaultFormData(),
     });
   };
@@ -130,6 +136,10 @@ class AsianExerciseModal extends PureComponent<
   };
 
   public getTitle = () => {
+    // @todo xxxx
+    if (this.isRange()) {
+      return '到期结算';
+    }
     return this.data[LEG_FIELD.DIRECTION] === DIRECTION_TYPE_MAP.BUYER ? '我方行权' : '对方行权';
   };
 
@@ -163,6 +173,13 @@ class AsianExerciseModal extends PureComponent<
     this.setState({
       formData: params.values,
     });
+  };
+
+  public isRange = () => {
+    return (
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL
+    );
   };
 
   public render() {
@@ -212,7 +229,10 @@ class AsianExerciseModal extends PureComponent<
               {
                 field: LEG_FIELD.NOTIONAL_AMOUNT,
                 control: {
-                  label: '名义金额',
+                  label:
+                    this.state.notionalType === NOTION_ENUM_MAP.CNY
+                      ? '名义金额 (￥)'
+                      : '名义金额 (手)',
                 },
                 input: {
                   ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -229,16 +249,20 @@ class AsianExerciseModal extends PureComponent<
                   disabled: true,
                 },
               },
-              {
-                field: LEG_FIELD.STRIKE,
-                control: {
-                  label: '行权价（¥）',
-                },
-                input: {
-                  ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                  disabled: true,
-                },
-              },
+              ...(this.isRange()
+                ? []
+                : [
+                    {
+                      field: LEG_FIELD.STRIKE,
+                      control: {
+                        label: '行权价（¥）',
+                      },
+                      input: {
+                        ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                        disabled: true,
+                      },
+                    },
+                  ]),
               {
                 field: SETTLEA_MOUNT,
                 control: {
@@ -264,6 +288,7 @@ class AsianExerciseModal extends PureComponent<
               },
             ]}
           />
+          <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>
     );

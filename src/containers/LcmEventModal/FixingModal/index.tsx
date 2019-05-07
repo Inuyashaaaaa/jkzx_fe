@@ -8,6 +8,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
+  UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
@@ -20,10 +21,12 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '@/pages/TradeManagementBookEdit/constants';
-import { getObservertionFieldData } from '@/pages/TradeManagementBookEdit/tools';
-import { countAvg, filterObDays } from '@/pages/TradeManagementBookEdit/utils';
+import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
+import { getObservertionFieldData } from '../tools';
+import { countAvg, filterObDays } from '../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
+import ExpirationModal from '../ExpirationModal';
+import KnockOutModal from '../KnockOutModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 class FixingModal extends PureComponent<
@@ -34,6 +37,10 @@ class FixingModal extends PureComponent<
   any
 > {
   public $asianExerciseModal: AsianExerciseModal;
+
+  public $expirationModal: ExpirationModal;
+
+  public $knockOutModal: KnockOutModal;
 
   public $exerciseForm: Form;
 
@@ -53,6 +60,7 @@ class FixingModal extends PureComponent<
     exportVisible: false,
     tableData: [],
     avg: 0,
+    upBarrierType: '',
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -64,6 +72,7 @@ class FixingModal extends PureComponent<
     this.setState(
       {
         tableData,
+        upBarrierType: this.data[LEG_FIELD.UP_BARRIER_TYPE],
         visible: true,
       },
       () => {
@@ -98,21 +107,25 @@ class FixingModal extends PureComponent<
   };
 
   public onConfirm = async () => {
-    if (this.$asianExerciseModal) {
-      this.setState(
-        {
-          visible: false,
-        },
-        () => {
-          this.$asianExerciseModal.show(
-            this.data,
-            this.tableFormData,
-            this.currentUser,
-            this.reload
-          );
-        }
-      );
-    }
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.$expirationModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+      }
+    );
+  };
+
+  public onKnockOutConfirm = async () => {
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.$knockOutModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+      }
+    );
   };
 
   public convertVisible = () => {
@@ -184,7 +197,10 @@ class FixingModal extends PureComponent<
         {
           headerName: '敲出障碍价',
           field: LEG_FIELD.UP_BARRIER,
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+          input:
+            this.state.upBarrierType === UP_BARRIER_TYPE_MAP.CNY
+              ? INPUT_NUMBER_CURRENCY_CNY_CONFIG
+              : INPUT_NUMBER_PERCENTAGE_CONFIG,
         },
         {
           headerName: 'Coupon障碍',
@@ -295,7 +311,7 @@ class FixingModal extends PureComponent<
             <Button
               disabled={!this.canBarrier()}
               style={{ marginLeft: VERTICAL_GUTTER }}
-              onClick={this.onConfirm}
+              onClick={this.onKnockOutConfirm}
               loading={this.state.modalConfirmLoading}
             >
               敲出
@@ -339,7 +355,8 @@ class FixingModal extends PureComponent<
     const { visible } = this.state;
     return (
       <>
-        <AsianExerciseModal ref={node => (this.$asianExerciseModal = node)} />
+        <ExpirationModal ref={node => (this.$expirationModal = node)} />
+        <KnockOutModal ref={node => (this.$knockOutModal = node)} />
         <Modal
           onCancel={this.switchModal}
           destroyOnClose={true}

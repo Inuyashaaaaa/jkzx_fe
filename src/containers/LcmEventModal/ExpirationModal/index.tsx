@@ -2,24 +2,26 @@ import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
+  NOTION_ENUM_MAP,
   OB_DAY_FIELD,
   OPTION_TYPE_OPTIONS,
 } from '@/constants/common';
+import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { getMinRule, getRequiredRule, isAutocallPhoenix, isKnockIn } from '@/tools';
-import { Button, message, Modal } from 'antd';
+import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
+import { Alert, Button, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { OB_LIFE_PAYMENT } from '@/pages/TradeManagementBookEdit/constants';
-import CashExportModal from '@/containers/CashExportModal';
-import { getObservertionFieldData } from '@/pages/TradeManagementBookEdit/tools';
+import { OB_LIFE_PAYMENT } from '../constants';
+import { getObservertionFieldData } from '../tools';
 import {
   EXERCISE_PRICE,
   EXPIRATION_CALL_PUT_FORM_CONTROLS,
@@ -42,6 +44,8 @@ class ExpirationModal extends PureComponent<
 
   public $expirationCallModal: Form;
 
+  public $autocallPhoenix: Form;
+
   public data: any = {};
 
   public tableFormData: any;
@@ -61,6 +65,7 @@ class ExpirationModal extends PureComponent<
     callPutDataSource: {},
     premiumType: null,
     formData: {},
+    notionalType: '',
   };
 
   public autocalPhoenixInitial = () => {
@@ -119,6 +124,7 @@ class ExpirationModal extends PureComponent<
       visible: true,
       autoCallPaymentType,
       premiumType,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       ...(this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
       EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
         ? {
@@ -196,14 +202,34 @@ class ExpirationModal extends PureComponent<
             : String(formData[LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]),
       };
     }
-
-    return {
-      ...(formData[UNDERLYER_PRICE] ? { underlyerPrice: String(formData[UNDERLYER_PRICE]) } : null),
-      settleAmount: String(formData[SETTLE_AMOUNT]),
-    };
+    if (isAutocallSnow(this.data)) {
+      return {
+        ...(formData[UNDERLYER_PRICE]
+          ? { underlyerPrice: String(formData[UNDERLYER_PRICE]) }
+          : null),
+        settleAmount: String(formData[SETTLE_AMOUNT]),
+      };
+    }
+    return null;
   };
 
   public onConfirm = async () => {
+    let rsp;
+    if (isAutocallPhoenix(this.data)) {
+      rsp = await this.$autocallPhoenix.validate();
+    } else {
+      if (
+        isAutocallSnow(this.data) &&
+        this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+      ) {
+        rsp = await this.$expirationFixedModal.validate();
+      } else if (isAutocallSnow(this.data)) {
+        rsp = await this.$expirationCallModal.validate();
+      } else {
+        rsp = 'expiration';
+      }
+    }
+    if (rsp.error) return;
     const usedFormData = this.getUsedFormData();
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
@@ -211,14 +237,16 @@ class ExpirationModal extends PureComponent<
       tradeId: this.tableFormData.tradeId,
       eventType: isAutocallPhoenix(this.data)
         ? LCM_EVENT_TYPE_MAP.EXPIRATION
-        : LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
+        : isAutocallSnow(this.data)
+        ? LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE
+        : LCM_EVENT_TYPE_MAP.EXPIRATION,
       userLoginId: this.currentUser.userName,
       eventDetail: this.getEventDetail(usedFormData),
     });
 
     this.switchConfirmLoading();
     if (error) return;
-    message.success('行权成功');
+    message.success('操作成功');
     this.setState({
       visible: false,
       exportVisible: true,
@@ -245,6 +273,12 @@ class ExpirationModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.callPutDataSource;
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -296,15 +330,21 @@ class ExpirationModal extends PureComponent<
         <Form
           dataSource={this.state.formData}
           onValueChange={this.onFormValueChange}
+          ref={node => {
+            this.$autocallPhoenix = node;
+          }}
           controlNumberOneRow={1}
           footer={false}
           controls={[
             {
               field: LEG_FIELD.NOTIONAL_AMOUNT,
               control: {
-                label: '名义金额',
+                label:
+                  this.state.notionalType === NOTION_ENUM_MAP.CNY
+                    ? '名义本金 (￥)'
+                    : '名义本金 (手)',
               },
-              input: { ...INPUT_NUMBER_CURRENCY_CNY_CONFIG, disabled: true },
+              input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
               decorator: {
                 rules: [getRequiredRule(), getMinRule()],
               },
@@ -384,34 +424,38 @@ class ExpirationModal extends PureComponent<
         />
       );
     }
-    return this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED ? (
-      <Form
-        wrappedComponentRef={node => {
-          this.$expirationFixedModal = node;
-        }}
-        dataSource={this.state.fixedDataSource}
-        onValueChange={this.onFixedValueChange}
-        controlNumberOneRow={1}
-        footer={false}
-        controls={EXPIRATION_FIXED_FORM_CONTROLS}
-      />
-    ) : (
-      <>
+    if (isAutocallSnow(this.data)) {
+      return this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED ? (
         <Form
-          wrappedComponentRef={node => {
-            this.$expirationCallModal = node;
+          ref={node => {
+            this.$expirationFixedModal = node;
           }}
-          dataSource={this.state.callPutDataSource}
-          onValueChange={this.onCallValueChange}
+          dataSource={this.state.fixedDataSource}
+          onValueChange={this.onFixedValueChange}
           controlNumberOneRow={1}
           footer={false}
-          controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
-            this.state.premiumType,
-            this.handleSettleAmount
-          )}
+          controls={EXPIRATION_FIXED_FORM_CONTROLS(this.state.notionalType)}
         />
-      </>
-    );
+      ) : (
+        <>
+          <Form
+            ref={node => {
+              this.$expirationCallModal = node;
+            }}
+            dataSource={this.state.callPutDataSource}
+            onValueChange={this.onCallValueChange}
+            controlNumberOneRow={1}
+            footer={false}
+            controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
+              this.state.notionalType,
+              this.state.premiumType,
+              this.handleSettleAmount
+            )}
+          />
+        </>
+      );
+    }
+    return '确认到期操作？';
   };
 
   public render() {
@@ -431,9 +475,20 @@ class ExpirationModal extends PureComponent<
           destroyOnClose={true}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={`到期结算 (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
+          title={
+            (isAutocallPhoenix(this.data)
+              ? `到期结算`
+              : isAutocallSnow(this.data)
+              ? `到期结算`
+              : `到期`) + ` (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`
+          }
         >
           {this.getForm()}
+          {isAutocallPhoenix(this.data) ? (
+            <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
+          ) : isAutocallSnow(this.data) ? (
+            <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
+          ) : null}
         </Modal>
       </>
     );

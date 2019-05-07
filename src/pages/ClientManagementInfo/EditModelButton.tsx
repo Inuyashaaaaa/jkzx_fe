@@ -6,19 +6,20 @@ import {
   ModalButton,
   Select,
   Table2,
-  // Upload,
 } from '@/design/components';
 import { remove, uuid } from '@/design/utils';
 import { getPartyDoc, HREF_UPLOAD_URL, UPLOAD_URL } from '@/services/document';
-
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
-import { Button, Cascader, Icon, message, notification, Row, Spin, Steps, Tabs } from 'antd';
+import { getMoment } from '@/utils';
+import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import { isMoment } from 'moment';
+import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 import Upload from './Upload';
+
 const TabPane = Tabs.TabPane;
 
 const useTableData = props => {
@@ -1393,6 +1394,7 @@ const EditModalButton = memo<any>(props => {
         title: name,
         width: 900,
         visible: modalVisible,
+        maskClosable: false,
         onCancel: () => setModalVisible(false),
         footer: disabled ? (
           false
@@ -1412,7 +1414,7 @@ const EditModalButton = memo<any>(props => {
                 Object.keys(baseFormData).forEach(item => {
                   baseData[item] = baseFormData[item].value;
                   if (item.endsWith('Date') && baseData[item]) {
-                    baseData[item] = baseData[item].split(' ')[0];
+                    baseData[item] = getMoment(baseData[item]).format('YYYY-MM-DD');
                   }
                   if (item.endsWith('Doc')) {
                     baseData[item] = baseFormData[item].value
@@ -1432,7 +1434,9 @@ const EditModalButton = memo<any>(props => {
                   return {
                     tradeAuthorizerName: item.name.value,
                     tradeAuthorizerIdNumber: item.IDNumber.value,
-                    tradeAuthorizerIdExpiryDate: item.periodValidity.value.split(' ')[0],
+                    tradeAuthorizerIdExpiryDate: getMoment(item.periodValidity.value).format(
+                      'YYYY-MM-DD'
+                    ),
                     tradeAuthorizerPhone: item.phoneNumber.value,
                   };
                 });

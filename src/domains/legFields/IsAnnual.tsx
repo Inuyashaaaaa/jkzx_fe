@@ -1,6 +1,6 @@
-import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
-import { Checkbox } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { LEG_FIELD, RULES_REQUIRED, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import { Checkbox, Form2 } from '@/design/components';
+import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -9,12 +9,16 @@ export const IsAnnual: ILegColDef = {
   title: '是否年化',
   dataIndex: LEG_FIELD.IS_ANNUAL,
   editable: record => {
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
-    if (isBooking || isPricing) {
-      return true;
+    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
+
+    if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.FORWARD) {
+      return false;
     }
-    return false;
+
+    if (isEditing) {
+      return false;
+    }
+    return true;
   },
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {

@@ -4,6 +4,8 @@ import {
   LEG_ID_FIELD,
   LEG_ENV_FIELD,
   LEG_INJECT_FIELDS,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -168,20 +170,30 @@ const TradeManagementBooking = props => {
     const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
 
     if (from === PRICING_FROM_EDITING) {
-      const next = editingTableData.map(record => {
-        const leg = getLegByRecord(record);
-        if (!leg) return record;
-        const omits = _.difference(
-          leg.getColumns(LEG_ENV.EDITING).map(item => item.dataIndex),
-          leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex)
-        );
-        return {
-          ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-          ...leg.getDefaultData(LEG_ENV.PRICING),
-          ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
-          [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
-        };
-      });
+      const recordTypeIsModelXY = record => {
+        return Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
+      };
+
+      if (editingTableData.some(recordTypeIsModelXY)) {
+        message.info('暂不支持自定义产品试定价');
+      }
+
+      const next = editingTableData
+        .filter(record => !recordTypeIsModelXY(record))
+        .map(record => {
+          const leg = getLegByRecord(record);
+          if (!leg) return record;
+          const omits = _.difference(
+            leg.getColumns(LEG_ENV.EDITING).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex)
+          );
+          return {
+            ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+            ...leg.getDefaultData(LEG_ENV.PRICING),
+            ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
+            [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
+          };
+        });
       setTableData(next);
     }
   });
@@ -232,13 +244,22 @@ const TradeManagementBooking = props => {
     return false;
   };
 
+  const getSelfTradesColDataIndexs = record => {
+    const leg = getLegByRecord(record);
+    const selfTradesColDataIndexs = _.intersection(
+      leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
+      TRADESCOL_FIELDS
+    );
+    return selfTradesColDataIndexs;
+  };
+
   const fetchDefaultPricingEnvData = _.debounce(async (record, reload = false) => {
     if (judgeLegColumnsHasError(record)) {
       return;
     }
 
     const inlineSetLoadings = loading => {
-      tradeOptions.forEach(colId => {
+      requiredTradeOptions.forEach(colId => {
         tableEl.current.setLoadings(record[LEG_ID_FIELD], colId, loading);
       });
     };
@@ -248,12 +269,17 @@ const TradeManagementBooking = props => {
     //   return;
     // }
 
-    const tradeOptions = TRADESCOL_FIELDS.filter(
-      item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE
+    const requiredTradeOptions = getSelfTradesColDataIndexs(record).filter(
+      item =>
+        item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE &&
+        item !== TRADESCOLDEFS_LEG_FIELD_MAP.Q
     );
 
     // val，q 等都为空，视为默认
-    if (!reload && _.some(_.pick(record, tradeOptions), item => item != null)) {
+    if (
+      !reload &&
+      _.some(_.pick(record, requiredTradeOptions), item => Form2.getFieldValue(item) != null)
+    ) {
       return;
     }
 
@@ -263,7 +289,7 @@ const TradeManagementBooking = props => {
 
     inlineSetLoadings(true);
 
-    const { error, data = [] } = await prcTrialPositionsService({
+    const { error, data = [], raw } = await prcTrialPositionsService({
       positions: convertTradePositions(
         [Form2.getFieldsValue(_.omit(record, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))],
         {},
@@ -276,11 +302,19 @@ const TradeManagementBooking = props => {
 
     if (error) return;
 
+    if (!_.isEmpty(raw.diagnostics)) {
+      return notification.error({
+        message: '请求错误',
+        description: _.get(raw.diagnostics, '[0].message'),
+      });
+    }
+
     const rowId = record[LEG_ID_FIELD];
 
     setTableData(pre => {
       return pre.map(item => {
         if (item[LEG_ID_FIELD] === rowId) {
+          const selfTradesColDataIndexs = getSelfTradesColDataIndexs(item);
           return {
             ...item,
             ...Form2.createFields(
@@ -289,7 +323,7 @@ const TradeManagementBooking = props => {
                   [key: string]: number;
                 }>(
                   _.first(data),
-                  TRADESCOL_FIELDS.filter(
+                  selfTradesColDataIndexs.filter(
                     item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE
                   )
                 ),

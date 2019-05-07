@@ -4,13 +4,13 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
+import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/design/components/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMoment } from '@/utils';
-import { message, Modal } from 'antd';
+import { Alert, message, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import CashExportModal from '@/containers/CashExportModal';
 import {
   KNOCK_OUT_DATE,
   KNOCKOUT_FORM_CONTROLS,
@@ -41,6 +41,7 @@ class ExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     exportVisible: false,
+    notionalType: null,
   };
 
   public getInitialKnockOutDate = data => {
@@ -65,6 +66,7 @@ class ExerciseModal extends PureComponent<
     this.reload = reload;
     this.setState({
       visible: true,
+      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       dataSource: {
         [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
         [KNOCK_OUT_DATE]: this.getInitialKnockOutDate(this.data),
@@ -83,6 +85,8 @@ class ExerciseModal extends PureComponent<
   };
 
   public onConfirm = async () => {
+    const rsp = await this.$knockOutModal.validate();
+    if (rsp.error) return;
     const dataSource = this.state.dataSource;
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
@@ -121,6 +125,12 @@ class ExerciseModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.dataSource;
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
@@ -159,15 +169,16 @@ class ExerciseModal extends PureComponent<
           title={`敲出 (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
         >
           <Form
-            wrappedComponentRef={node => {
+            ref={node => {
               this.$knockOutModal = node;
             }}
             dataSource={this.state.dataSource}
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={KNOCKOUT_FORM_CONTROLS(this.handleSettleAmount)}
+            controls={KNOCKOUT_FORM_CONTROLS(this.state.notionalType, this.handleSettleAmount)}
           />
+          <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>
     );
