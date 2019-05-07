@@ -1,6 +1,6 @@
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2, Loading } from '@/design/components';
+import { Form2, Loading, Select, Table2 } from '@/design/components';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
@@ -11,7 +11,7 @@ import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { DatePicker, Divider, Table, Row, Pagination } from 'antd';
+import { DatePicker, Divider, Pagination, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
