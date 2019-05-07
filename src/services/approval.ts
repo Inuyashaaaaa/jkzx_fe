@@ -168,3 +168,59 @@ export async function queryProcessDiagram(params) {
       }
     });
 }
+// 	获取流程实例审批单内容
+export async function wkProcessInstanceFormGet(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessInstanceFormGet',
+      params,
+    },
+  });
+}
+
+// 获取流程实例信息
+export async function wkProcessGet(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessGet',
+      params,
+    },
+  });
+}
+
+// 发起审批流程
+export async function wkProcessInstanceCreate(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessInstanceCreate',
+      params,
+    },
+  });
+}
+
+// 上传附件
+export async function wkAttachmentCreateOrUpdate(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentCreateOrUpdate',
+      params,
+    },
+  });
+}
+
+export const UPLOAD_URL = `${HOST_TEST}workflow-service/api/upload/rpc`;
+
+// 附件关联流程实例
+export async function wkAttachmentProcessInstanceModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentProcessInstanceBind',
+      params,
+    },
+  });
+}

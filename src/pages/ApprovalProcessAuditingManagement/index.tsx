@@ -173,7 +173,7 @@ class SystemSettingsRoleManagement extends PureComponent {
   public onBatchAdd = async (param, batchBool) => {
     const { currentGroup } = this.state;
     const _d = _.intersection(
-      param.map(p => p.department_id),
+      param.map(p => p.departmentId),
       (this.state.currentGroup.userList || []).map(p => p.departmentId)
     );
     if (_d.length > 0) {
@@ -181,15 +181,7 @@ class SystemSettingsRoleManagement extends PureComponent {
         message: '该用户已在审批组中',
       });
     }
-    currentGroup.userList = currentGroup.userList.concat(param);
-    currentGroup.userList.forEach(item => {
-      if (!item.department_id) {
-        item.department_id = item.departmentId;
-      }
-      if (!item.nick_name) {
-        item.nick_name = item.nickName;
-      }
-    });
+    currentGroup.userList = (currentGroup.userList || []).concat(param);
 
     const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
@@ -214,6 +206,7 @@ class SystemSettingsRoleManagement extends PureComponent {
       }
       return item;
     });
+    console.log(approveGroupList);
     this.setState(
       {
         approveGroupList,

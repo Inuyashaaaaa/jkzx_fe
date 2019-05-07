@@ -4,18 +4,25 @@ import {
   queryProcessForm,
   queryProcessHistoryForm,
   terminateProcess,
+  wkProcessInstanceFormGet,
+  UPLOAD_URL,
+  wkAttachmentProcessInstanceModify,
 } from '@/services/approval';
 import moment from 'moment';
-
+import { Form2, Select, Input, Upload } from '@/design/components';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
-import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
+import { Button, Icon, Popconfirm, Spin, Table, Row, Modal, message } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { generateColumns } from './constants';
+import FormItem from 'antd/lib/form/FormItem';
+import { getToken } from '@/lib/utils/authority';
 
-const { TextArea } = Input;
+// const { TextArea } = Input;
 
 class ApprovalForm extends PureComponent {
+  public $sourceTable: SourceTable = null;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -30,6 +37,10 @@ class ApprovalForm extends PureComponent {
       rejectReason: '',
       passComment: '',
       modifyComment: '',
+      detailData: [],
+      fileList: [],
+      transactionModalVisible: false,
+      attachmentId: null,
     };
   }
   public componentDidMount() {
@@ -63,18 +74,18 @@ class ApprovalForm extends PureComponent {
   }
 
   public fetchData = async (params, status) => {
-    if (!params.processInstanceId) {
-      return;
-    }
+    const processInstanceId = params.processInstanceId || params.processInstance.processInstanceId;
     const isCheckBtn =
-      params && params.taskName && params.taskName.includes('录入资金流水') && status === 'queued';
+      params && params.taskName && status === 'pending' && params.taskName.includes('修改资金流水');
+
     this.setState({
       loading: true,
     });
-    const isCompleted = !!params.operator;
+
+    const isCompleted = params.status ? !params.status.includes('unfinished') : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
-      processInstanceId: params.processInstanceId,
+      processInstanceId,
     });
     if (!res || res.error) {
       this.setState({
@@ -87,8 +98,23 @@ class ApprovalForm extends PureComponent {
       const instance = data.processInstance;
       instance.initiatorName = (instance.initiator && instance.initiator.userName) || '';
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
-      // instance.startTime = moment(instance.startTime).format('YYYY-MM-DD hh:mm:ss');
     }
+    const { error: _error, data: _data } = await wkProcessInstanceFormGet({ processInstanceId });
+    if (_error) return;
+    // 审批内容
+    const _detailData = {
+      tradeId: _data.process._business_payload.tradeId,
+      bookName: _data.process._business_payload.bookName,
+      tradeDate: _data.process._business_payload.tradeDate,
+      trader: _data.process._business_payload.trader,
+      salesName: _data.process._business_payload.salesName,
+      counterPartyName: _data.process._business_payload.positions[0].counterPartyName,
+    };
+    this.setState({
+      detailData: _detailData,
+    });
+    console.log(_data);
+
     if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
       this.setState({
@@ -141,6 +167,7 @@ class ApprovalForm extends PureComponent {
   };
 
   public formatFormItems = (data, isDisable) => {
+    console.log(data);
     const payload = (data && data.process && data.process._business_payload) || {};
     // isDisable = false;
     payload.paymentDirection = payload.paymentDirection === 'IN' ? '入金' : '出金';
@@ -210,12 +237,24 @@ class ApprovalForm extends PureComponent {
   };
 
   public confirmAbandon = async () => {
-    const { formData } = this.props;
-    const params = {
-      processInstanceId: formData.processInstanceId,
-    };
-    this.executeModify(params, 'abandon');
+    this.$formBuilder.validateForm(values => {
+      const obj = { ...values };
+      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
+      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
+      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+      const { formData } = this.props;
+      const { modifyComment } = this.state;
+      const params = {
+        taskId: formData.taskId,
+        ctlProcessData: {
+          abandon: true,
+        },
+        businessProcessData: obj,
+      };
+      this.executeModify(params, 'abandon');
+    });
   };
+
   public confirmPass = async () => {
     const { formData } = this.props;
     const { passComment } = this.state;
@@ -241,6 +280,7 @@ class ApprovalForm extends PureComponent {
         taskId: formData.taskId,
         ctlProcessData: {
           comment: modifyComment,
+          abandon: false,
         },
         businessProcessData: obj,
       };
@@ -284,7 +324,7 @@ class ApprovalForm extends PureComponent {
       modifying: true,
       modifyBtn: modifyType,
     });
-    const executeMethod = modifyType === 'abandon' ? terminateProcess : completeTaskProcess;
+    const executeMethod = completeTaskProcess;
     const res = await executeMethod(params);
     this.setState({
       modifying: false,
@@ -295,6 +335,28 @@ class ApprovalForm extends PureComponent {
     }
     const { handleFormChange } = this.props;
     handleFormChange();
+  };
+
+  public transactionHandleOk = async () => {
+    // 关联附件
+    if (this.state.attachmentId) {
+      const { error, data } = await wkAttachmentProcessInstanceModify({
+        attachmentId: this.state.attachmentId,
+        processInstanceId: this.props.formData.processInstanceId,
+      });
+      if (error) return;
+      message.success('重新上传附件成功');
+    }
+
+    this.setState({
+      transactionModalVisible: false,
+    });
+  };
+
+  public transactionHandleCancel = () => {
+    this.setState({
+      transactionModalVisible: false,
+    });
   };
 
   public render() {
@@ -310,7 +372,7 @@ class ApprovalForm extends PureComponent {
       modifyComment,
     } = this.state;
     const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
+      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
@@ -319,33 +381,136 @@ class ApprovalForm extends PureComponent {
     const processData = data.processInstance ? [data.processInstance] : [];
     const histories = data.taskHistory ? data.taskHistory : [];
     const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin={true} />;
+    const _data = data.processInstance ? data.processInstance : {};
+    if (histories.length > 0) {
+      _data.status = histories[histories.length - 1].operation === '退回' ? '待审批' : '待修改';
+    }
     return (
       <div>
         {!loading && (
           <div>
-            <Table
-              columns={approvalColumns}
-              gi={true}
-              dataSource={processData}
-              size="small"
-              pagination={false}
-              bordered={false}
+            <Form2
+              ref={node => (this.$sourceTable = node)}
+              layout="horizontal"
+              dataSource={_data}
+              resetable={false}
+              submitable={false}
+              columnNumberOneRow={3}
+              style={{ paddingLeft: '30px' }}
+              columns={[
+                {
+                  title: '审批单号',
+                  dataIndex: 'processSequenceNum',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '审批类型',
+                  dataIndex: 'processName',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+
+                {
+                  title: '状态',
+                  dataIndex: 'status',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '发起人',
+                  dataIndex: 'initiatorName',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '标题',
+                  dataIndex: 'subject',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+              ]}
             />
-            <div
-              style={{
-                marginTop: 20,
-                borderWidth: 1,
-                borderStyle: 'solid',
-                borderColor: '#e8e8e8',
-                paddingTop: 20,
-                paddingBottom: 20,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <CommonForm data={formItems} ref={ele => (this.$formBuilder = ele)} />
-            </div>
+            <Row>
+              <b>审批内容</b>
+            </Row>
+            <Form2
+              layout="horizontal"
+              dataSource={this.state.detailData}
+              resetable={false}
+              submitable={false}
+              style={{ paddingLeft: '30px' }}
+              columnNumberOneRow={3}
+              columns={[
+                {
+                  title: '交易编号',
+                  dataIndex: 'tradeId',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '交易簿',
+                  dataIndex: 'bookName',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '交易日',
+                  dataIndex: 'tradeDate',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '交易对手',
+                  dataIndex: 'counterPartyName',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '关联销售',
+                  dataIndex: 'salesName',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+                {
+                  title: '交易创建人',
+                  dataIndex: 'trader',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{value}</FormItem>;
+                  },
+                },
+              ]}
+            />
+            {_data.status === '待审批' ? (
+              <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
+                <Button style={{ marginRight: '20px' }}>查看合约详情</Button>
+                <Button>下载审批附件</Button>
+              </Row>
+            ) : (
+              <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
+                <Button style={{ marginRight: '20px' }}>修改合约详情</Button>
+                <Button
+                  onClick={() => {
+                    this.setState({ transactionModalVisible: true });
+                  }}
+                >
+                  重新上传附件
+                </Button>
+              </Row>
+            )}
+            <Row>
+              <b>流程记录</b>
+            </Row>
             <div style={{ marginTop: 20 }}>
               <Table
                 columns={processColumns}
@@ -355,7 +520,7 @@ class ApprovalForm extends PureComponent {
                 bordered={false}
               />
             </div>
-            {status === 'queued' && (
+            {status === 'pending' && (
               <div
                 style={{
                   borderTopStyle: 'solid',
@@ -374,7 +539,12 @@ class ApprovalForm extends PureComponent {
                       title={
                         <div>
                           <p>确认通过该审批单的复核？</p>
-                          <TextArea
+                          {/* <TextArea
+                                                        onChange={this.setPassComment}
+                                                        value={passComment}
+                                                        placeholder={'请输入审核意见（可选）'}
+                                                    /> */}
+                          <Input
                             onChange={this.setPassComment}
                             value={passComment}
                             placeholder={'请输入审核意见（可选）'}
@@ -399,7 +569,7 @@ class ApprovalForm extends PureComponent {
                       title={
                         <div>
                           <p>请输入不通过审批的原因：</p>
-                          <TextArea onChange={this.setRejectReson} value={rejectReason} />
+                          <Input onChange={this.setRejectReson} value={rejectReason} />
                         </div>
                       }
                       onConfirm={this.rejectForm}
@@ -414,37 +584,39 @@ class ApprovalForm extends PureComponent {
                   </div>
                 )}
                 {!isCheckBtn && (
-                  <div style={{ marginLeft: 10 }}>
-                    <Popconfirm
-                      title={
-                        <div>
-                          <p>确认将此次修改提交复核吗？</p>
-                          <TextArea onChange={this.setModifyComment} value={modifyComment} />
-                        </div>
-                      }
-                      onConfirm={this.confirmModify}
-                    >
-                      <Button
-                        type="primary"
-                        disabled={modifying && modifyBtn === 'modify'}
-                        loading={modifying && modifyBtn !== 'modify'}
+                  <>
+                    <div style={{ marginLeft: 10 }}>
+                      <Popconfirm
+                        title={
+                          <div>
+                            <p>确认将此次修改提交复核吗？</p>
+                            <Input onChange={this.setModifyComment} value={modifyComment} />
+                          </div>
+                        }
+                        onConfirm={this.confirmModify}
                       >
-                        确认修改
-                      </Button>
-                    </Popconfirm>
-                  </div>
+                        <Button
+                          type="primary"
+                          disabled={modifying && modifyBtn === 'modify'}
+                          loading={modifying && modifyBtn !== 'modify'}
+                        >
+                          确认修改
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                    <div style={{ marginLeft: 10 }}>
+                      <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
+                        <Button
+                          type="danger"
+                          loading={modifying && modifyBtn === 'abandon'}
+                          disabled={modifying && modifyBtn !== 'abandon'}
+                        >
+                          废弃
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                  </>
                 )}
-                <div style={{ marginLeft: 10 }}>
-                  <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
-                    <Button
-                      type="danger"
-                      loading={modifying && modifyBtn === 'abandon'}
-                      disabled={modifying && modifyBtn !== 'abandon'}
-                    >
-                      废弃
-                    </Button>
-                  </Popconfirm>
-                </div>
               </div>
             )}
           </div>
@@ -456,6 +628,40 @@ class ApprovalForm extends PureComponent {
             <Spin indicator={antIcon} />
           </div>
         )}
+        <Modal
+          title="发起审批"
+          visible={this.state.transactionModalVisible}
+          onOk={this.transactionHandleOk}
+          onCancel={this.transactionHandleCancel}
+        >
+          <div style={{ margin: '20px' }}>
+            <p>您提交的交易需要通过审批才能完成簿记。请上传交易确认书等证明文件后发起审批。</p>
+            <p style={{ margin: '20px', textAlign: 'center' }}>
+              <Upload
+                maxLen={1}
+                action={UPLOAD_URL}
+                data={{
+                  method: 'wkAttachmentUpload',
+                  params: JSON.stringify({}),
+                }}
+                headers={{ Authorization: `Bearer ${getToken()}` }}
+                onChange={fileList => {
+                  console.log(fileList);
+                  this.setState({
+                    fileList,
+                  });
+                  if (fileList[0].status === 'done') {
+                    this.setState({
+                      attachmentId: fileList[0].response.result.attachmentId,
+                    });
+                  }
+                }}
+                value={this.state.fileList}
+              />
+            </p>
+            <p>审批中的交易请在审批管理页面查看。</p>
+          </div>
+        </Modal>
       </div>
     );
   }
