@@ -122,6 +122,7 @@ class Related extends PureComponent {
           dataSource={this.state.dataSource}
           columns={RELATED_COL_DEFS(this.fetchTable)}
           scroll={{ x: 1600 }}
+          size="middle"
         />
       </>
     );
