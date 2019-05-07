@@ -232,7 +232,7 @@ const TradeManagementBooking = props => {
           <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
         </>
       )}
-      <ActionBar />
+      <ActionBar tableData={tableData} />
     </PageHeaderWrapper>
   );
 };
