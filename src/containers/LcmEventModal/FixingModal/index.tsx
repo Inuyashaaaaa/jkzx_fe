@@ -9,6 +9,8 @@ import {
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
   UP_BARRIER_TYPE_MAP,
+  UNIT_ENUM_MAP2,
+  BIG_NUMBER_CONFIG,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
@@ -153,15 +155,33 @@ class FixingModal extends PureComponent<
   };
 
   public onCellValueChanged = params => {
-    if (params.colDef.field === OB_PRICE_FIELD && params.newValue !== params.oldValue) {
+    if (
+      params.colDef.field === OB_PRICE_FIELD &&
+      params.newValue &&
+      params.newValue !== params.oldValue
+    ) {
       this.startOb(params.data);
-      this.setState({
-        avg: this.countAvg(),
-      });
+      // this.setState({
+      //   avg: this.countAvg(),
+      // });
     }
   };
 
   public startOb = async data => {
+    this.data = {
+      ...this.data,
+      [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: this.data[
+        LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY
+      ].map(item => {
+        if (item[OB_DAY_FIELD] === data[OB_DAY_FIELD]) {
+          return {
+            [OB_DAY_FIELD]: data[OB_DAY_FIELD],
+            [OB_PRICE_FIELD]: data[OB_PRICE_FIELD],
+          };
+        }
+        return item;
+      }),
+    };
     const { error } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
@@ -175,6 +195,17 @@ class FixingModal extends PureComponent<
     if (error) return;
     message.success('观察价格更新成功');
     this.reload();
+    const tableData = filterObDays(getObservertionFieldData(this.data));
+    this.setState(
+      {
+        tableData,
+      },
+      () => {
+        this.setState({
+          avg: this.countAvg(),
+        });
+      }
+    );
   };
 
   public isAutocallPhoenix = () => {
@@ -272,12 +303,21 @@ class FixingModal extends PureComponent<
       const alObPrice = record[OB_PRICE_FIELD];
       const upBarrier = record[LEG_FIELD.UP_BARRIER];
       const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
+      const actUpBarrier =
+        this.data[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP2.PERCENT
+          ? new BigNumber(upBarrier)
+              .multipliedBy(0.01)
+              .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber()
+          : upBarrier;
+
       if (direction === KNOCK_DIRECTION_MAP.UP) {
-        return alObPrice > upBarrier;
+        return alObPrice > actUpBarrier;
       }
 
       if (direction === KNOCK_DIRECTION_MAP.DOWN) {
-        return alObPrice < upBarrier;
+        return alObPrice < actUpBarrier;
       }
 
       return false;
@@ -287,17 +327,32 @@ class FixingModal extends PureComponent<
   // 未发生敲出
   public notBarrierHappen = () => {
     const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
-    return this.state.tableData.every(record => {
-      const upBarrier = record[LEG_FIELD.UP_BARRIER];
-      const alObPrice = record[OB_PRICE_FIELD];
-      if (direction === KNOCK_DIRECTION_MAP.UP) {
-        return alObPrice <= upBarrier;
-      }
-      if (direction === KNOCK_DIRECTION_MAP.DOWN) {
-        return alObPrice >= upBarrier;
-      }
-      return false;
+    const fixObservations = this.data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
+    const last = fixObservations.every(item => {
+      return _.isNumber(item[OB_PRICE_FIELD]);
     });
+    return (
+      last &&
+      this.state.tableData.every(record => {
+        const upBarrier = record[LEG_FIELD.UP_BARRIER];
+        const alObPrice = record[OB_PRICE_FIELD];
+        const actUpBarrier =
+          this.data[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP2.PERCENT
+            ? new BigNumber(upBarrier)
+                .multipliedBy(0.01)
+                .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                .toNumber()
+            : upBarrier;
+        if (direction === KNOCK_DIRECTION_MAP.UP) {
+          return alObPrice <= actUpBarrier;
+        }
+        if (direction === KNOCK_DIRECTION_MAP.DOWN) {
+          return alObPrice >= actUpBarrier;
+        }
+        return false;
+      })
+    );
   };
 
   public getModalFooter = () => {
@@ -316,7 +371,7 @@ class FixingModal extends PureComponent<
           </Col>
           <Col>
             <Button
-              disabled={!(this.isCanExercise() || this.notBarrierHappen())}
+              disabled={!this.notBarrierHappen()}
               style={{ marginLeft: VERTICAL_GUTTER }}
               onClick={this.onConfirm}
               loading={this.state.modalConfirmLoading}

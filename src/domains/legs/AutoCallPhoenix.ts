@@ -71,6 +71,7 @@ import { AlreadyBarrier } from '../legFields/AlreadyBarrier';
 import { DownBarrierDate } from '../legFields/DownBarrierDate';
 import { DownBarrier } from '../legFields/DownBarrier';
 import { getMoment } from '@/utils';
+import BigNumber from 'bignumber.js';
 
 export const AutoCallPhoenix: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX],
@@ -280,7 +281,10 @@ export const AutoCallPhoenix: ILeg = {
           [OB_DAY_FIELD]: key,
         };
       }),
-      [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
+      [LEG_FIELD.UP_BARRIER]:
+        position.asset.barrierType === UNIT_ENUM_MAP2.PERCENT
+          ? new BigNumber(position.asset.barrier).multipliedBy(100)
+          : position.asset.barrier,
       [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
       [LEG_FIELD.ALREADY_BARRIER]: position.lcmEventType === 'KNOCK_IN' ? true : false,
       // [AlreadyBarrier.dataIndex]: !!position.asset[DownBarrierDate.dataIndex],
