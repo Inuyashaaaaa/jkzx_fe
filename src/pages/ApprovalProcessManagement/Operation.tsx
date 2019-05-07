@@ -10,7 +10,6 @@ class Operation extends PureComponent {
     diagramVisible: false,
     flowDiagram: '',
   };
-
   public switchModal = () => {
     this.setState({
       visible: true,

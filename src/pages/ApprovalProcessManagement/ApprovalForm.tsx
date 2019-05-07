@@ -1,4 +1,3 @@
-import SourceTable from '@/lib/components/_SourceTable';
 import {
   completeTaskProcess,
   queryProcessForm,
@@ -337,7 +336,6 @@ class ApprovalForm extends PureComponent {
           <div>
             <Table
               columns={approvalColumns}
-              gi={true}
               dataSource={processData}
               size="small"
               pagination={false}
