@@ -2,6 +2,7 @@ import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  LEG_TYPE_MAP,
   LEG_TYPE_FIELD,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
@@ -49,7 +50,6 @@ class ExerciseModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-
     this.setState({
       visible: true,
       productType: this.data[LEG_TYPE_FIELD],
@@ -154,10 +154,7 @@ class ExerciseModal extends PureComponent<
         numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
         notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
-      eventType:
-        this.data.productType === 'FORWARD_UNANNUAL'
-          ? LCM_EVENT_TYPE_MAP.SETTLE
-          : LCM_EVENT_TYPE_MAP.EXERCISE,
+      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
     });
     if (error) return;
     this.setState({
@@ -185,7 +182,9 @@ class ExerciseModal extends PureComponent<
           destroyOnClose={true}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={'结算: (自定义产品)'}
+          title={`结算: (${
+            this.state.productType === LEG_TYPE_MAP.FORWARD ? '远期' : '自定义产品'
+          })`}
         >
           <Form
             ref={node => {

@@ -1,4 +1,5 @@
 import {
+  BIG_NUMBER_CONFIG,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
   INPUT_NUMBER_PERCENTAGE_CONFIG,
@@ -8,26 +9,28 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
+  UNIT_ENUM_MAP2,
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColumnDef } from '@/design/components/Table/types';
+import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
+import { getObservertionFieldData } from '../tools';
+import { countAvg, filterObDays } from '../utils';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { isRangeAccruals } from '@/tools';
+import { isAutocallPhoenix, isRangeAccruals } from '@/tools';
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
-import { getObservertionFieldData } from '../tools';
-import { countAvg, filterObDays } from '../utils';
 import AsianExerciseModal from '../AsianExerciseModal';
 import ExpirationModal from '../ExpirationModal';
 import KnockOutModal from '../KnockOutModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
+import { getMoment } from '@/utils';
 
 class FixingModal extends PureComponent<
   {
@@ -101,9 +104,14 @@ class FixingModal extends PureComponent<
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: false,
-    });
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.reload();
+      }
+    );
   };
 
   public onConfirm = async () => {
@@ -113,6 +121,17 @@ class FixingModal extends PureComponent<
       },
       () => {
         this.$expirationModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+      }
+    );
+  };
+
+  public onAsianExerciseConfirm = async () => {
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.$asianExerciseModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
       }
     );
   };
@@ -137,11 +156,13 @@ class FixingModal extends PureComponent<
   public isCanExercise = () => {
     const now = moment();
     // 今天是最后一个观察日
-    const last = _.get(_.last(this.state.tableData) || {}, [OB_DAY_FIELD]);
+    const last = getMoment(_.get(_.last(this.state.tableData) || {}, [OB_DAY_FIELD]));
+    const expirationDate = getMoment(this.data[LEG_FIELD.EXPIRATION_DATE]);
     if (
-      ((last && now.isSame(last, 'day')) ||
-        now.isSame(this.data[LEG_FIELD.EXPIRATION_DATE], 'day')) &&
-      this.state.tableData.every(item => item[OB_PRICE_FIELD] != null)
+      ((last && (last.isBefore(now, 'day') || now.isSame(last, 'day'))) ||
+        (expirationDate &&
+          (expirationDate.isBefore(now, 'days') || now.isSame(expirationDate, 'day')))) &&
+      this.state.tableData.every(item => _.isNumber(item[OB_PRICE_FIELD]))
     ) {
       return true;
     }
@@ -153,12 +174,40 @@ class FixingModal extends PureComponent<
   };
 
   public onCellValueChanged = params => {
-    if (params.colDef.field === OB_PRICE_FIELD && params.newValue !== params.oldValue) {
+    if (
+      params.colDef.field === OB_PRICE_FIELD &&
+      params.newValue &&
+      params.newValue !== params.oldValue
+    ) {
       this.startOb(params.data);
-      this.setState({
-        avg: this.countAvg(),
-      });
     }
+    if (this.isAutocallPhoenix()) {
+      this.data = {
+        ...this.data,
+        [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: this.data[
+          LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY
+        ].map(item => {
+          if (item[OB_DAY_FIELD] === params.data[OB_DAY_FIELD]) {
+            return {
+              [OB_DAY_FIELD]: params.data[OB_DAY_FIELD],
+              [OB_PRICE_FIELD]: params.data[OB_PRICE_FIELD],
+            };
+          }
+          return item;
+        }),
+      };
+    }
+    const tableData = filterObDays(getObservertionFieldData(this.data));
+    this.setState(
+      {
+        tableData,
+      },
+      () => {
+        this.setState({
+          avg: this.countAvg(),
+        });
+      }
+    );
   };
 
   public startOb = async data => {
@@ -174,14 +223,10 @@ class FixingModal extends PureComponent<
     });
     if (error) return;
     message.success('观察价格更新成功');
-    this.reload();
   };
 
   public isAutocallPhoenix = () => {
-    return (
-      this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||
-      this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL
-    );
+    return this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX;
   };
 
   public getColumnDefs = (): IColumnDef[] => {
@@ -240,8 +285,7 @@ class FixingModal extends PureComponent<
           type: 'date',
         },
       },
-      ...(this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-      this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
+      ...(this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS
         ? []
         : [
             {
@@ -275,12 +319,21 @@ class FixingModal extends PureComponent<
       const alObPrice = record[OB_PRICE_FIELD];
       const upBarrier = record[LEG_FIELD.UP_BARRIER];
       const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
+      const actUpBarrier =
+        this.data[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP2.PERCENT
+          ? new BigNumber(upBarrier)
+              .multipliedBy(0.01)
+              .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber()
+          : upBarrier;
+
       if (direction === KNOCK_DIRECTION_MAP.UP) {
-        return alObPrice > upBarrier;
+        return alObPrice > actUpBarrier;
       }
 
       if (direction === KNOCK_DIRECTION_MAP.DOWN) {
-        return alObPrice < upBarrier;
+        return alObPrice < actUpBarrier;
       }
 
       return false;
@@ -290,17 +343,32 @@ class FixingModal extends PureComponent<
   // 未发生敲出
   public notBarrierHappen = () => {
     const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
-    return this.state.tableData.every(record => {
-      const upBarrier = record[LEG_FIELD.UP_BARRIER];
-      const alObPrice = record[OB_PRICE_FIELD];
-      if (direction === KNOCK_DIRECTION_MAP.UP) {
-        return alObPrice <= upBarrier;
-      }
-      if (direction === KNOCK_DIRECTION_MAP.DOWN) {
-        return alObPrice >= upBarrier;
-      }
-      return false;
+    const fixObservations = this.data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
+    const last = fixObservations.every(item => {
+      return _.isNumber(item[OB_PRICE_FIELD]);
     });
+    return (
+      last &&
+      this.state.tableData.every(record => {
+        const upBarrier = record[LEG_FIELD.UP_BARRIER];
+        const alObPrice = record[OB_PRICE_FIELD];
+        const actUpBarrier =
+          this.data[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP2.PERCENT
+            ? new BigNumber(upBarrier)
+                .multipliedBy(0.01)
+                .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                .toNumber()
+            : upBarrier;
+        if (direction === KNOCK_DIRECTION_MAP.UP) {
+          return alObPrice <= actUpBarrier;
+        }
+        if (direction === KNOCK_DIRECTION_MAP.DOWN) {
+          return alObPrice >= actUpBarrier;
+        }
+        return false;
+      })
+    );
   };
 
   public getModalFooter = () => {
@@ -319,7 +387,7 @@ class FixingModal extends PureComponent<
           </Col>
           <Col>
             <Button
-              disabled={!(this.isCanExercise() || this.notBarrierHappen())}
+              disabled={!this.notBarrierHappen()}
               style={{ marginLeft: VERTICAL_GUTTER }}
               onClick={this.onConfirm}
               loading={this.state.modalConfirmLoading}
@@ -337,7 +405,7 @@ class FixingModal extends PureComponent<
             <Button
               disabled={!this.isCanExercise()}
               style={{ marginLeft: VERTICAL_GUTTER }}
-              onClick={this.onConfirm}
+              onClick={this.onAsianExerciseConfirm}
               loading={this.state.modalConfirmLoading}
             >
               行权
@@ -357,6 +425,7 @@ class FixingModal extends PureComponent<
       <>
         <ExpirationModal ref={node => (this.$expirationModal = node)} />
         <KnockOutModal ref={node => (this.$knockOutModal = node)} />
+        <AsianExerciseModal ref={node => (this.$asianExerciseModal = node)} />
         <Modal
           onCancel={this.switchModal}
           destroyOnClose={true}

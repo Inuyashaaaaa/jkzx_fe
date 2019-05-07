@@ -83,7 +83,7 @@ class ExpirationModal extends PureComponent<
         .get(OB_DAY_FIELD)
         .value(),
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
-      [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.STRIKE],
+      [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
       [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
       [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
       [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),

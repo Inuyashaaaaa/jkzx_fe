@@ -56,7 +56,7 @@ class AsianExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     formData: {},
-    productType: 'ASIAN_ANNUAL',
+    productType: 'ASIAN',
     notionalType: null,
   };
 
@@ -178,7 +178,8 @@ class AsianExerciseModal extends PureComponent<
   public isRange = () => {
     return (
       this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
-      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS
     );
   };
 

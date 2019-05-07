@@ -69,7 +69,7 @@ const LcmEventModal = memo<{
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-        if (legType === LEG_TYPE_MAP.ASIAN_ANNUAL || legType === LEG_TYPE_MAP.ASIAN_UNANNUAL) {
+        if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
           const convertedData = filterObDays(convertObservetions(data));
           if (convertedData.some(item => !item.price)) {
             return message.warn('请先完善观察日价格');
