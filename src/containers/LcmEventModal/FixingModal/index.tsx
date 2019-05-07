@@ -104,9 +104,14 @@ class FixingModal extends PureComponent<
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: false,
-    });
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        this.reload();
+      }
+    );
   };
 
   public onConfirm = async () => {
@@ -175,9 +180,6 @@ class FixingModal extends PureComponent<
       params.newValue !== params.oldValue
     ) {
       this.startOb(params.data);
-      // this.setState({
-      //   avg: this.countAvg(),
-      // });
     }
     if (this.isAutocallPhoenix()) {
       this.data = {
@@ -221,7 +223,6 @@ class FixingModal extends PureComponent<
     });
     if (error) return;
     message.success('观察价格更新成功');
-    this.reload();
   };
 
   public isAutocallPhoenix = () => {
