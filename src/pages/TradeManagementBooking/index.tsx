@@ -67,10 +67,22 @@ const ActionBar = memo<any>(props => {
     // 发起审批
     const { error: _error, data: _data } = await wkProcessInstanceCreate({
       processName: '交易录入经办复合流程',
-      processData: trade,
+      processData: {
+        trade,
+        validTime: '2018-01-01T10:10:10',
+      },
     });
 
     if (_error) return;
+    if (_data.processInstanceId) {
+      message.success('已进入流程');
+    } else {
+      setTableData([]);
+
+      setCashModalVisible(true);
+      message.success('簿记成功');
+    }
+    setCreateModalVisible(false);
 
     // 发起审批成功关联附件
     if (attachmentId) {
@@ -81,19 +93,14 @@ const ActionBar = memo<any>(props => {
       if (aerror) return;
     }
 
-    const { error } = await trdTradeCreate({
-      trade,
-      validTime: '2018-01-01T10:10:10',
-    });
+    // const { error } = await trdTradeCreate({
+    //   trade,
+    //   validTime: '2018-01-01T10:10:10',
+    // });
 
-    if (error) return;
+    // if (error) return;
 
-    message.success('簿记成功');
-
-    setCreateModalVisible(false);
-    setTableData([]);
-
-    setCashModalVisible(true);
+    // message.success('簿记成功');
   };
 
   const [fileList, setFileList] = useState([]);

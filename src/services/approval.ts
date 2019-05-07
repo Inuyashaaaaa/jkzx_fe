@@ -139,6 +139,7 @@ export async function terminateProcess(params = {}) {
 
 // 通过审核
 export async function completeTaskProcess(params = {}) {
+  // debugger
   return request(`${HOST_TEST}workflow-service/api/rpc`, {
     method: `POST`,
     body: {
@@ -213,6 +214,7 @@ export async function wkAttachmentCreateOrUpdate(params = {}) {
 }
 
 export const UPLOAD_URL = `${HOST_TEST}workflow-service/api/upload/rpc`;
+export const downloadTradeAttachment = `${HOST_TEST}workflow-service/bct/download/attachment?attachmentId=`;
 
 // 附件关联流程实例
 export async function wkAttachmentProcessInstanceModify(params = {}) {
@@ -220,6 +222,26 @@ export async function wkAttachmentProcessInstanceModify(params = {}) {
     method: `POST`,
     body: {
       method: 'wkAttachmentProcessInstanceBind',
+      params,
+    },
+  });
+}
+
+export async function wkAttachmentList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentList',
+      params,
+    },
+  });
+}
+
+export async function wkTaskComplete(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkTaskComplete',
       params,
     },
   });
