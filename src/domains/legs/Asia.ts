@@ -13,7 +13,11 @@ import {
   FREQUENCY_TYPE_MAP,
   OB_PRICE_FIELD,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/global';
+import {
+  DEFAULT_DAYS_IN_YEAR,
+  DEFAULT_TERM,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
@@ -187,6 +191,7 @@ export const Asia: ILeg = {
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       ...(env === LEG_ENV.PRICING
         ? {
+            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),

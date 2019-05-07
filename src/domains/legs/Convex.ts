@@ -8,7 +8,11 @@ import {
   UNIT_ENUM_MAP,
   PAYMENT_TYPE_MAP,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/global';
+import {
+  DEFAULT_DAYS_IN_YEAR,
+  DEFAULT_TERM,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
@@ -159,7 +163,11 @@ export const Convex: ILeg = {
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-      ...(env === LEG_ENV.PRICING ? {} : {}),
+      ...(env === LEG_ENV.PRICING
+        ? {
+            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
+          }
+        : {}),
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {

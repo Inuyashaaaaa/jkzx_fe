@@ -1,10 +1,5 @@
-import { LEG_FIELD, LEG_ID_FIELD, PREMIUM_TYPE_MAP, LEG_INJECT_FIELDS } from '@/constants/common';
-import {
-  COMPUTED_LEG_FIELDS,
-  COMPUTED_LEG_FIELD_MAP,
-  FORM_EDITABLE_STATUS,
-  TRADESCOL_FIELDS,
-} from '@/constants/global';
+import { LEG_FIELD, LEG_ID_FIELD, LEG_INJECT_FIELDS, PREMIUM_TYPE_MAP } from '@/constants/common';
+import { COMPUTED_LEG_FIELD_MAP, FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { BOOKING_FROM_PRICING } from '@/constants/trade';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';

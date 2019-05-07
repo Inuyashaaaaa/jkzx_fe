@@ -6,7 +6,11 @@ import {
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM } from '@/constants/global';
+import {
+  DEFAULT_DAYS_IN_YEAR,
+  DEFAULT_TERM,
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+} from '@/constants/global';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
@@ -152,6 +156,7 @@ export const VerticalSpread: ILeg = {
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       ...(env === LEG_ENV.PRICING
         ? {
+            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),
