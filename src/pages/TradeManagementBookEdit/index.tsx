@@ -48,7 +48,6 @@ const TradeManagementBooking = props => {
 
   const addLeg = (leg: ILeg, position) => {
     if (!leg) return;
-
     setTableData(pre => {
       const next = {
         ...createLegRecordByPosition(leg, position, LEG_ENV.EDITING),

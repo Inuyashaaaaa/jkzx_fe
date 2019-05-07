@@ -157,7 +157,7 @@ class FixingModal extends PureComponent<
       ((last && (last.isBefore(now, 'day') || now.isSame(last, 'day'))) ||
         (expirationDate &&
           (expirationDate.isBefore(now, 'days') || now.isSame(expirationDate, 'day')))) &&
-      this.state.tableData.every(item => item[OB_PRICE_FIELD] !== null)
+      this.state.tableData.every(item => _.isNumber(item[OB_PRICE_FIELD]))
     ) {
       return true;
     }
@@ -179,6 +179,33 @@ class FixingModal extends PureComponent<
       //   avg: this.countAvg(),
       // });
     }
+    if (this.isAutocallPhoenix()) {
+      this.data = {
+        ...this.data,
+        [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: this.data[
+          LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY
+        ].map(item => {
+          if (item[OB_DAY_FIELD] === params.data[OB_DAY_FIELD]) {
+            return {
+              [OB_DAY_FIELD]: params.data[OB_DAY_FIELD],
+              [OB_PRICE_FIELD]: params.data[OB_PRICE_FIELD],
+            };
+          }
+          return item;
+        }),
+      };
+    }
+    const tableData = filterObDays(getObservertionFieldData(this.data));
+    this.setState(
+      {
+        tableData,
+      },
+      () => {
+        this.setState({
+          avg: this.countAvg(),
+        });
+      }
+    );
   };
 
   public startOb = async data => {
@@ -195,37 +222,6 @@ class FixingModal extends PureComponent<
     if (error) return;
     message.success('观察价格更新成功');
     this.reload();
-    if (this.isAutocallPhoenix()) {
-      this.data = {
-        ...this.data,
-        [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: this.data[
-          LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY
-        ].map(item => {
-          if (item[OB_DAY_FIELD] === data[OB_DAY_FIELD]) {
-            return {
-              [OB_DAY_FIELD]: data[OB_DAY_FIELD],
-              [OB_PRICE_FIELD]: data[OB_PRICE_FIELD],
-            };
-          }
-          return item;
-        }),
-      };
-      const tableData = filterObDays(getObservertionFieldData(this.data));
-      this.setState(
-        {
-          tableData,
-        },
-        () => {
-          this.setState({
-            avg: this.countAvg(),
-          });
-        }
-      );
-    } else {
-      this.setState({
-        avg: this.countAvg(),
-      });
-    }
   };
 
   public isAutocallPhoenix = () => {

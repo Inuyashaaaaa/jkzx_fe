@@ -286,10 +286,7 @@ export const AutoCallPhoenix: ILeg = {
           [OB_DAY_FIELD]: key,
         };
       }),
-      [LEG_FIELD.UP_BARRIER]:
-        position.asset.barrierType === UNIT_ENUM_MAP2.PERCENT
-          ? new BigNumber(position.asset.barrier).multipliedBy(100)
-          : position.asset.barrier,
+      [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
       [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
       [LEG_FIELD.ALREADY_BARRIER]: position.lcmEventType === 'KNOCK_IN' ? true : false,
       // [AlreadyBarrier.dataIndex]: !!position.asset[DownBarrierDate.dataIndex],
