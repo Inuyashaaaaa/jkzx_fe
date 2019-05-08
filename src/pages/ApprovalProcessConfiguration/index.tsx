@@ -83,11 +83,11 @@ class ApprovalProcessConfiguration extends PureComponent {
 
     tabsData = _.concat(tabsData, fristData);
 
-    const taskData = (taskApproveGroupList.data || []).map(item => {
+    const taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       if (index === taskApproveGroupList.data.length - 1) {
-        item.approveGroupList = firstData.approveGroupList;
-        item.approveGroupDTO = firstData.approveGroupDTO;
+        item.approveGroupList = fristData.approveGroupList;
+        item.approveGroupDTO = fristData.approveGroupDTO;
       }
       return item;
     });

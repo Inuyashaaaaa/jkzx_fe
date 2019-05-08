@@ -1,40 +1,39 @@
 import { PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
 import React from 'react';
 import Operation from './Operation';
 
 const processNum = {
-  field: 'processSequenceNum',
-  headerName: '审批单号',
-  width: 270,
+  dataIndex: 'processSequenceNum',
+  title: '审批单号',
 };
 
 const processName = {
-  field: 'processName',
-  headerName: '审批类型',
+  dataIndex: 'processName',
+  title: '审批类型',
   width: 250,
 };
 
 const initiatorName = {
-  field: 'initiatorName',
-  headerName: '发起人',
+  dataIndex: 'initiatorName',
+  title: '发起人',
   width: 200,
 };
 
 const operatorName = {
-  field: 'operatorName',
-  headerName: '操作人',
+  dataIndex: 'operatorName',
+  title: '操作人',
 };
 
 const subject = {
-  field: 'subject',
-  headerName: '标题',
-  wdith: 200,
+  dataIndex: 'subject',
+  title: '标题',
+  width: 200,
 };
 
 const startTime = {
-  field: 'startTime',
-  headerName: '发起时间',
+  dataIndex: 'startTime',
+  title: '发起时间',
+  width: 200,
 };
 const taskName = {
   title: '流程节点',
@@ -68,65 +67,24 @@ const comment = {
 
 const pendingCol = [processNum, processName, initiatorName, subject, startTime];
 
-export const PENDING_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
-  // {
-  //   field: 'processSequenceNum',
-  //   headerName: '审批单号',
-  //   width: 250,
-  // },
-  // {
-  //   field: 'processName',
-  //   headerName: '审批类型',
-  // },
-  // {
-  //   field: 'initiatorName',
-  //   headerName: '发起人',
-  // },
-  // {
-  //   field: 'subject',
-  //   headerName: '标题',
-  // },
-  // {
-  //   field: 'startTime',
-  //   headerName: '发起时间',
-  // },
+export const PENDING_COL_DEFS = fetchTable => [
   ...pendingCol,
   {
-    headerName: '操作',
-    width: 440,
-    pinned: 'right',
-    render: params => {
-      return <Operation formData={params.data} status="pending" fetchTable={fetchTable} />;
+    title: '操作',
+    dataIndex: 'operation',
+    fixed: 'right',
+    width: 200,
+    render: (text, params, index) => {
+      return <Operation formData={params} status="pending" fetchTable={fetchTable} />;
     },
   },
 ];
 
-export const RELATED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
-  // {
-  //   field: 'processSequenceNum',
-  //   headerName: '审批单号',
-  //   width: 300,
-  // },
-  // {
-  //   field: 'processName',
-  //   headerName: '审批类型',
-  // },
-  // {
-  //   field: 'initiatorName',
-  //   headerName: '发起人',
-  // },
-  // {
-  //   field: 'subject',
-  //   headerName: '标题',
-  // },
-  // {
-  //   field: 'startTime',
-  //   headerName: '发起时间',
-  // },
+export const RELATED_COL_DEFS = fetchTable => [
   ...pendingCol,
   {
-    field: 'status',
-    headerName: '流程状态',
+    dataIndex: 'status',
+    title: '流程状态',
     width: 160,
     input: {
       type: 'select',
@@ -134,11 +92,12 @@ export const RELATED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
     },
   },
   {
-    headerName: '操作',
-    width: 340,
-    pinned: 'right',
-    render: params => {
-      return <Operation formData={params.data} status="related" fetchTable={fetchTable} />;
+    title: '操作',
+    dataIndex: 'operation',
+    fixed: 'right',
+    width: 250,
+    render: (text, params, index) => {
+      return <Operation formData={params} status="related" fetchTable={fetchTable} />;
     },
   },
 ];
@@ -152,11 +111,11 @@ export function generateColumns(type, tag) {
 
     return columns.map(item => {
       const obj = {
-        title: item.headerName,
-        key: item.field,
-        dataIndex: item.field,
+        title: item.title,
+        key: item.dataIndex,
+        dataIndex: item.dataIndex,
       };
-      if (item.field === 'processSequenceNum') {
+      if (item.dataIndex === 'processSequenceNum') {
         obj.width = 120;
       }
       return obj;

@@ -489,7 +489,7 @@ export const LEG_FIELD = {
   COUPON_BARRIER: 'couponBarrier', // coupon障碍
   OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日
   OBSERVATION_STEP: 'observationStep', // 观察频率
-  UP_OBSERVATION_STEP: 'UP_OBSERVATION_STEP', // 观察频率
+  UP_OBSERVATION_STEP: 'knockOutObservationStep', // 观察频率
   DOWN_OBSERVATION_STEP: 'knockInObservationStep', // 观察频率
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',

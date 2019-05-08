@@ -173,8 +173,8 @@ class SystemSettingsRoleManagement extends PureComponent {
   public onBatchAdd = async (param, batchBool) => {
     const { currentGroup } = this.state;
     const _d = _.intersection(
-      param.map(p => p.departmentId),
-      (this.state.currentGroup.userList || []).map(p => p.departmentId)
+      param.map(p => p.username),
+      (this.state.currentGroup.userList || []).map(p => p.username)
     );
     if (_d.length > 0) {
       return notification.success({
@@ -182,11 +182,18 @@ class SystemSettingsRoleManagement extends PureComponent {
       });
     }
     currentGroup.userList = (currentGroup.userList || []).concat(param);
-
+    const userList = currentGroup.userList.map(item => {
+      return {
+        userApproveGroupId: item.userApproveGroupId,
+        username: item.username,
+        departmentId: item.departmentId,
+        nickName: item.nickName,
+      };
+    });
     const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
       approveGroupName: currentGroup.approveGroupName,
-      userList: currentGroup.userList,
+      userList,
     });
     if (error) {
       return;
@@ -197,21 +204,17 @@ class SystemSettingsRoleManagement extends PureComponent {
           : '成功加入审批组',
       });
     }
-
-    currentGroup.userList = data.userList;
-
-    const approveGroupList = this.state.approveGroupList.map(item => {
-      if (item.approveGroupId === currentGroup.approveGroupId) {
-        item = data;
-      }
-      return item;
-    });
-    console.log(approveGroupList);
+    currentGroup.userList =
+      data[
+        _.findIndex(data, item => {
+          return item.approveGroupId === currentGroup.approveGroupId;
+        })
+      ].userList;
     this.setState(
       {
-        approveGroupList,
+        approveGroupList: data,
         currentGroup,
-        userList: data.userList,
+        userList: currentGroup.userList,
       },
       () => {
         if (this.$drawer) {

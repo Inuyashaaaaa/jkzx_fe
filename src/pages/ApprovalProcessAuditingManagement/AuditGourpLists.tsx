@@ -205,6 +205,7 @@ class AuditLists extends PureComponent {
   };
 
   public handleMenber = param => {
+    if (!param) return;
     this.setState({
       indexGroupId: param.approveGroupId,
     });

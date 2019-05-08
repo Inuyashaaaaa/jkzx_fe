@@ -11,7 +11,6 @@ class Operation extends PureComponent {
     flowDiagram: '',
     transactionModel: false,
   };
-
   public switchModal = () => {
     if (this.props.formData.processName === '交易录入经办复合流程') {
       this.setState({

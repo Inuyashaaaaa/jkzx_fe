@@ -56,7 +56,7 @@ class AsianExerciseModal extends PureComponent<
     modalConfirmLoading: false,
     dataSource: {},
     formData: {},
-    productType: 'ASIAN_ANNUAL',
+    productType: 'ASIAN',
     notionalType: null,
   };
 
@@ -178,7 +178,8 @@ class AsianExerciseModal extends PureComponent<
   public isRange = () => {
     return (
       this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
-      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS
     );
   };
 
@@ -273,15 +274,7 @@ class AsianExerciseModal extends PureComponent<
                   rules: [
                     {
                       required: true,
-                    },
-                    {
-                      message: '结算金额不能小与0',
-                      validator(rule, value, callback) {
-                        if (value < 0) {
-                          return callback(true);
-                        }
-                        callback();
-                      },
+                      message: '结算金额为必填项',
                     },
                   ],
                 },

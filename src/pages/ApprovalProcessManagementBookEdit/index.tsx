@@ -111,6 +111,7 @@ const TradeManagementBooking = props => {
       addLeg(leg, position);
     });
   };
+
   const handelSave = async () => {
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
@@ -124,27 +125,7 @@ const TradeManagementBooking = props => {
       ctlProcessData: props.res,
       businessProcessData: { trade, validTime: '2018-01-01T10:10:10' },
     });
-    // const { error, data } = await wkTaskComplete({
-    //   taskId: props.taskId,
-    //   ctlProcessData: props.res,
-    //   businessProcessData: trade
-    // })
-    // if(error) return;
   };
-  // const fetchEventType = composePositions => {
-  //   composePositions.forEach(position => {
-  //     trdPositionLCMEventTypes({
-  //       positionId: position.positionId,
-  //     }).then(rsp => {
-  //       if (rsp.error) return;
-  //       const data = [...rsp.data];
-  //       setEventTypes(pre => ({
-  //         ...pre,
-  //         [position.positionId]: data,
-  //       }));
-  //     });
-  //   });
-  // };
 
   const handleEventAction = (eventType, params) => {
     lcmEventModalEl.current.show({

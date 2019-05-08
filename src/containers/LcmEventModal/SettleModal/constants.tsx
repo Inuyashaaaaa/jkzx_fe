@@ -2,6 +2,7 @@ import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
   NOTION_ENUM_MAP,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { Button } from 'antd';
@@ -62,16 +63,17 @@ export const SETTLE_FORM_CONTROLS: (
     control: {
       label: '结算金额',
     },
-    input: productType.includes('MODEL_XY')
-      ? INPUT_NUMBER_CURRENCY_CNY_CONFIG
-      : {
-          ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-          after: (
-            <Button key="upload" type="primary" onClick={handleSettleAmount}>
-              结算
-            </Button>
-          ),
-        },
+    input:
+      productType === LEG_TYPE_MAP.MODEL_XY
+        ? INPUT_NUMBER_CURRENCY_CNY_CONFIG
+        : {
+            ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+            after: (
+              <Button key="upload" type="primary" onClick={handleSettleAmount}>
+                结算
+              </Button>
+            ),
+          },
     decorator: {
       rules: [
         {

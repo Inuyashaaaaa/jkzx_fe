@@ -126,6 +126,7 @@ export const AutoCallSnow: ILeg = {
         AutoCallStrikeUnit,
         AutoCallStrike,
         ExpireNoBarrierObserveDay,
+        UpObservationStep,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -194,7 +195,6 @@ export const AutoCallSnow: ILeg = {
     const COMPUTED_FIELDS = [
       LEG_FIELD.UP_BARRIER,
       LEG_FIELD.UP_BARRIER_TYPE,
-      UpObservationStep.dataIndex,
       ExpireNoBarrierObserveDay.dataIndex,
       LEG_FIELD.IS_ANNUAL,
     ];

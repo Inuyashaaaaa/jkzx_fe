@@ -15,15 +15,15 @@ import { Form2, Select, Input, Upload } from '@/design/components';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import { Button, Icon, Popconfirm, Spin, Table, Row, Modal, message } from 'antd';
 import React, { PureComponent } from 'react';
-import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { generateColumns } from './constants';
+import CommonForm from '@/page/SystemSettingDepartment/components/CommonForm';
+import { generateColumns } from '../constants';
 import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/lib/utils/authority';
-import ApprovalProcessManagementBookEdit from '../ApprovalProcessManagementBookEdit';
+import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
 // const { TextArea } = Input;
 
-class ApprovalForm extends PureComponent {
+class ApprovalForm extends PureComponent<any, any> {
   public $sourceTable: SourceTable = null;
 
   constructor(props) {
@@ -105,8 +105,6 @@ class ApprovalForm extends PureComponent {
       instance.initiatorName = (instance.initiator && instance.initiator.userName) || '';
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
-    // 审批内容
-    console.log(data);
     const _detailData = {
       tradeId: data.process._business_payload.trade.tradeId,
       bookName: data.process._business_payload.trade.bookName,
@@ -172,7 +170,6 @@ class ApprovalForm extends PureComponent {
   };
 
   public formatFormItems = (data, isDisable) => {
-    console.log(data);
     const payload = (data && data.process && data.process._business_payload) || {};
     // isDisable = false;
     payload.paymentDirection = payload.paymentDirection === 'IN' ? '入金' : '出金';
@@ -242,22 +239,22 @@ class ApprovalForm extends PureComponent {
   };
 
   public confirmAbandon = async () => {
-    this.$formBuilder.validateForm(values => {
-      const obj = { ...values };
-      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
-      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
-      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
-      const { formData } = this.props;
-      const { modifyComment } = this.state;
-      const params = {
-        taskId: formData.taskId,
-        ctlProcessData: {
-          abandon: true,
-        },
-        businessProcessData: obj,
-      };
-      this.executeModify(params, 'abandon');
-    });
+    // this.$formBuilder.validateForm(values => {
+    //   const obj = { ...values };
+    //   obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
+    //   obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
+    //   obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+    const { formData } = this.props;
+    const { modifyComment } = this.state;
+    const params = {
+      taskId: formData.taskId,
+      ctlProcessData: {
+        abandon: true,
+      },
+      businessProcessData: {},
+    };
+    this.executeModify(params, 'abandon');
+    // });
   };
 
   public confirmPass = async () => {
@@ -274,33 +271,33 @@ class ApprovalForm extends PureComponent {
     };
     this.executeModify(params, 'pass');
   };
-  public confirmModify = async (e, data) => {
+
+  public confirmModify = async (e, param) => {
     const { passComment } = this.state;
-    if (data) {
-      data.ctlProcessData = {
+    if (param) {
+      param.ctlProcessData = {
         comment: passComment,
         abandon: false,
       };
-      return this.executeModify(_.cloneDeep(data), 'pass');
+      return this.executeModify(_.cloneDeep(param), 'pass');
     }
-    this.$formBuilder.validateForm(values => {
-      const obj = { ...values };
-      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
-      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
-      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
-      const { formData } = this.props;
-      const { modifyComment } = this.state;
-      const params = {
-        taskId: formData.taskId,
-        ctlProcessData: {
-          comment: modifyComment,
-          abandon: false,
-        },
-        businessProcessData: obj,
-      };
-      this.executeModify(params, 'modify');
+    const { data, error } = await wkProcessInstanceFormGet({
+      processInstanceId: this.props.formData.processInstanceId,
     });
+    if (error) return;
+    const { formData } = this.props;
+    const { modifyComment } = this.state;
+    const params = {
+      taskId: formData.taskId,
+      ctlProcessData: {
+        comment: modifyComment,
+        abandon: false,
+      },
+      businessProcessData: data.process._business_payload,
+    };
+    this.executeModify(params, 'modify');
   };
+
   public rejectForm = async () => {
     const { formData } = this.props;
     const { rejectReason } = this.state;
@@ -352,7 +349,6 @@ class ApprovalForm extends PureComponent {
   };
 
   public transactionHandleOk = async () => {
-    // 关联附件
     if (this.state.attachmentId) {
       const { error, data } = await wkAttachmentProcessInstanceModify({
         attachmentId: this.state.attachmentId,
@@ -394,6 +390,10 @@ class ApprovalForm extends PureComponent {
     window.open(`${downloadTradeAttachment}${_data[0].attachmentId}`);
   };
 
+  public handleConfirmModify = (e, data) => {
+    return this.confirmModify(e, data);
+  };
+
   public render() {
     const { status, formData } = this.props;
     const {
@@ -417,14 +417,12 @@ class ApprovalForm extends PureComponent {
     let histories = data.taskHistory ? data.taskHistory : [];
     const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin={true} />;
     const _data = data.processInstance ? data.processInstance : {};
-    console.log(histories);
     histories = histories.sort((item1, item2) => {
       return moment(item1.operateTime).valueOf() - moment(item2.operateTime).valueOf();
     });
     if (histories.length > 0) {
       _data.status = histories[histories.length - 1].operation === '退回' ? '待修改' : '待审批';
     }
-    console.log(data);
     return (
       <div>
         {!loading && (
@@ -649,7 +647,7 @@ class ApprovalForm extends PureComponent {
                             <Input onChange={this.setModifyComment} value={modifyComment} />
                           </div>
                         }
-                        onConfirm={this.confirmModify}
+                        onConfirm={e => this.confirmModify(e, null)}
                       >
                         <Button
                           type="primary"
@@ -702,7 +700,6 @@ class ApprovalForm extends PureComponent {
                 }}
                 headers={{ Authorization: `Bearer ${getToken()}` }}
                 onChange={fileList => {
-                  console.log(fileList);
                   this.setState({
                     fileList,
                   });
@@ -733,7 +730,7 @@ class ApprovalForm extends PureComponent {
             tbookEditCancel={this.tbookEditCancel}
             taskId={this.props.formData.taskId}
             res={this.state.res}
-            confirmModify={this.confirmModify}
+            confirmModify={this.handleConfirmModify}
           />
         </Modal>
       </div>
