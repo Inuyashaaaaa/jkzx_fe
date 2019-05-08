@@ -22,7 +22,7 @@ import {
 } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
-
+import _ from 'lodash';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -71,18 +71,23 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
+    let fristData = {};
     let tabsData = processList.data.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
+      if (item.processName === '交易录入经办复合流程') {
+        fristData = item;
+      }
       return item;
     });
+    tabsData = tabsData.filter(item => item.processName !== '交易录入经办复合流程');
 
-    tabsData = tabsData.filter(item => item.tabName.indexOf('资金录入') >= 0);
-    const firstData = taskApproveGroupList.data[0] || {};
+    tabsData = _.concat(tabsData, fristData);
+
     const taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       if (index === taskApproveGroupList.data.length - 1) {
-        item.approveGroupList = firstData.approveGroupList;
-        item.approveGroupDTO = firstData.approveGroupDTO;
+        item.approveGroupList = fristData.approveGroupList;
+        item.approveGroupDTO = fristData.approveGroupDTO;
       }
       return item;
     });
@@ -279,10 +284,8 @@ class ApprovalProcessConfiguration extends PureComponent {
     return (
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
-          <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
+          <Tabs defaultActiveKey="资金录入经办复合流程" onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
-              // 只显示第二条数据
-              // if (index !== 1) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div

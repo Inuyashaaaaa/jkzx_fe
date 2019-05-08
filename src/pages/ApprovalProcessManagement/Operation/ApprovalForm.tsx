@@ -9,8 +9,8 @@ import moment from 'moment';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
 import React, { PureComponent } from 'react';
-import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { generateColumns } from './constants';
+import CommonForm from '@/pages/SystemSettingDepartment/components/CommonForm';
+import { generateColumns } from '../constants';
 
 const { TextArea } = Input;
 

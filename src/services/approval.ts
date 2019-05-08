@@ -139,6 +139,7 @@ export async function terminateProcess(params = {}) {
 
 // 通过审核
 export async function completeTaskProcess(params = {}) {
+  // debugger
   return request(`${HOST_TEST}workflow-service/api/rpc`, {
     method: `POST`,
     body: {
@@ -167,4 +168,81 @@ export async function queryProcessDiagram(params) {
         return null;
       }
     });
+}
+// 	获取流程实例审批单内容
+export async function wkProcessInstanceFormGet(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessInstanceFormGet',
+      params,
+    },
+  });
+}
+
+// 获取流程实例信息
+export async function wkProcessGet(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessGet',
+      params,
+    },
+  });
+}
+
+// 发起审批流程
+export async function wkProcessInstanceCreate(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessInstanceCreate',
+      params,
+    },
+  });
+}
+
+// 上传附件
+export async function wkAttachmentCreateOrUpdate(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentCreateOrUpdate',
+      params,
+    },
+  });
+}
+
+export const UPLOAD_URL = `${HOST_TEST}workflow-service/api/upload/rpc`;
+export const downloadTradeAttachment = `${HOST_TEST}workflow-service/bct/download/attachment?attachmentId=`;
+
+// 附件关联流程实例
+export async function wkAttachmentProcessInstanceModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentProcessInstanceBind',
+      params,
+    },
+  });
+}
+
+export async function wkAttachmentList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentList',
+      params,
+    },
+  });
+}
+
+export async function wkTaskComplete(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkTaskComplete',
+      params,
+    },
+  });
 }
