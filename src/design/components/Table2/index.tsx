@@ -1,7 +1,7 @@
 import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, KeyboardEvent } from 'react';
 import { createEventBus, EVERY_EVENT_TYPE, uuid } from '../../utils';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
@@ -10,6 +10,7 @@ import {
   TABLE_CELL_EDITING_CHANGED,
   TABLE_CELL_FIELDS_CHANGE,
   TABLE_CELL_VALUES_CHANGE,
+  TABLE_KEY_DOWN,
 } from './constants/EVENT';
 import FormRow from './rows/FormRow';
 import './styles.less';
@@ -59,11 +60,13 @@ class Table2 extends PureComponent<ITableProps> {
     this.$dom = document.getElementById(this.domId);
     this.getTbody().addEventListener('click', this.onTbodyClick, false);
     this.getThead().addEventListener('click', this.onTheadClick, false);
+    window.addEventListener('keydown', this.onKeyDown, false);
   };
 
   public componentWillUnmount = () => {
     this.getTbody().removeEventListener('click', this.onTbodyClick, false);
     this.getThead().removeEventListener('click', this.onTheadClick, false);
+    window.removeEventListener('keydown', this.onKeyDown, false);
   };
 
   public onTbodyClick = (event: Event) => {
@@ -74,6 +77,10 @@ class Table2 extends PureComponent<ITableProps> {
 
   public onTheadClick = (event: Event) => {
     this.save();
+  };
+
+  public onKeyDown = (event: Event) => {
+    this.api.eventBus.emit(TABLE_KEY_DOWN, event);
   };
 
   public getFieldNames = () => {
