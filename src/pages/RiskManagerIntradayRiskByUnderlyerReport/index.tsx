@@ -99,7 +99,7 @@ class RiskManagerIntradayRiskByUnderlyerReport extends PureComponent implements 
     return (
       <PageHeaderWrapper title="标的风险">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <ReloadGreekButton fetchTable={this.fetch} id="real_time_dag" />
+          <ReloadGreekButton fetchTable={this.fetch} id="real_time_risk_dag" />
         </Row>
         <SourceTable
           loading={this.state.loading}
