@@ -1,7 +1,7 @@
 import { PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
 import React from 'react';
 import Operation from './Operation';
-
+import _ from 'lodash';
 const processNum = {
   dataIndex: 'processSequenceNum',
   title: '审批单号',
@@ -89,6 +89,12 @@ export const RELATED_COL_DEFS = fetchTable => [
     input: {
       type: 'select',
       options: PROCESS_STATUS_TYPE_OPTIONS,
+    },
+    render: (text, params, index) => {
+      const _index = _.findIndex(PROCESS_STATUS_TYPE_OPTIONS, item => {
+        return item.value === text;
+      });
+      return PROCESS_STATUS_TYPE_OPTIONS[_index].label;
     },
   },
   {

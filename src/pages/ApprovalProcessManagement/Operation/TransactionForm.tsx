@@ -12,7 +12,19 @@ import {
 import moment from 'moment';
 import { Form2, Upload } from '@/design/components';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
-import { Button, Icon, Popconfirm, Spin, Table, Row, Modal, message, Input } from 'antd';
+import {
+  Button,
+  Icon,
+  Popconfirm,
+  Spin,
+  Table,
+  Row,
+  Modal,
+  message,
+  Input,
+  Typography,
+  Divider,
+} from 'antd';
 import React, { PureComponent } from 'react';
 import { generateColumns } from '../constants';
 import FormItem from 'antd/lib/form/FormItem';
@@ -20,7 +32,7 @@ import { getToken } from '@/lib/utils/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
 const { TextArea } = Input;
-
+const { Title } = Typography;
 class ApprovalForm extends PureComponent<any, any> {
   public $sourceTable: SourceTable = null;
 
@@ -431,7 +443,7 @@ class ApprovalForm extends PureComponent<any, any> {
               dataSource={_data}
               resetable={false}
               submitable={false}
-              columnNumberOneRow={3}
+              columnNumberOneRow={2}
               style={{ paddingLeft: '30px' }}
               footer={false}
               columns={[
@@ -473,16 +485,15 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
               ]}
             />
-            <Row>
-              <b>审批内容</b>
-            </Row>
+            <Divider type="horizontal" />
+            <Title level={4}>审批内容</Title>
             <Form2
               layout="horizontal"
               dataSource={this.state.detailData}
               resetable={false}
               submitable={false}
               style={{ paddingLeft: '30px' }}
-              columnNumberOneRow={3}
+              columnNumberOneRow={2}
               footer={false}
               columns={[
                 {
@@ -529,6 +540,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
               ]}
             />
+            <Divider type="horizontal" />
             {_data.status === '待审批' ? (
               <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
                 <Button
@@ -560,9 +572,8 @@ class ApprovalForm extends PureComponent<any, any> {
                 </Button>
               </Row>
             )}
-            <Row>
-              <b>流程记录</b>
-            </Row>
+            <Divider type="horizontal" />
+            <Title level={4}>流程记录</Title>
             <div style={{ marginTop: 20 }}>
               <Table
                 columns={processColumns}

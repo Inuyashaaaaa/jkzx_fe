@@ -80,7 +80,7 @@ class Operation extends PureComponent {
                 title: '审批单',
                 visible: this.state.visible,
                 footer: null,
-                width: 720,
+                width: 900,
                 onCancel: this.handleFormChange,
               }}
               content={
