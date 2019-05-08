@@ -2,6 +2,7 @@ import { InputNumber } from '@/design/components';
 import { IInputNumberProps } from '@/design/components/Input/InputNumber';
 import { IInputBaseProps } from '@/design/components/type';
 import React, { memo } from 'react';
+import { formatMoney, parseMoney } from '@/tools';
 
 export const UnitInputNumber = memo<
   IInputNumberProps &
@@ -14,8 +15,8 @@ export const UnitInputNumber = memo<
   const options = undefined;
 
   if (unit === '$' || unit === '¥') {
-    formatter = value => `${unit}${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    parser = value => (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');
+    formatter = value => formatMoney(value, unit);
+    parser = value => parseMoney(value, unit);
   } else {
     formatter = value => {
       return `${value}${unit}`;
