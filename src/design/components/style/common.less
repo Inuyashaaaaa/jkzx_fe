@@ -35,6 +35,11 @@
   }
 
   .tongyu-table-row {
+    .tongyu-table-cell {
+      &.active {
+        border: 1px solid @primary-color !important;
+      }
+    }
     &:hover {
       .tongyu-table-cell {
         transition: background-color 0.5s;
