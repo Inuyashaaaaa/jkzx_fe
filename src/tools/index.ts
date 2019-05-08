@@ -37,6 +37,7 @@ import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { Form2 } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import { ILeg } from '@/types/leg';
+import BigNumber from 'bignumber.js';
 
 export const isModelXY = data => {
   return (
@@ -280,3 +281,14 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
     }),
   };
 };
+
+export const placement = (value, num) => {
+  if (!value) return;
+  return new BigNumber(value).toFormat(num);
+};
+
+export const formatMoney = (value, unit = '', space = false) =>
+  `${unit}${space ? ' ' : ''}${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+export const parseMoney = (value, unit) =>
+  (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');

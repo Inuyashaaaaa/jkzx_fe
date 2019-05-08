@@ -1,34 +1,24 @@
-import {
-  LEG_FIELD,
-  LEG_ID_FIELD,
-  LCM_EVENT_TYPE_ZHCN_MAP,
-  LEG_TYPE_FIELD,
-} from '@/constants/common';
+import { LCM_EVENT_TYPE_ZHCN_MAP, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
+import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdTradeGet } from '@/services/general-service';
-import {
-  backConvertPercent,
-  createLegDataSourceItem,
-  getTradeCreateModalData,
-} from '@/services/pages';
+import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
+import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, message, Typography, Menu, Skeleton } from 'antd';
+import { Divider, Menu, message, Skeleton, Typography } from 'antd';
 import { connect } from 'dva';
-import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import './index.less';
-import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;

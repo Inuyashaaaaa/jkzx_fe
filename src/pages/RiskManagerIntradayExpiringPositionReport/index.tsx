@@ -99,7 +99,7 @@ class RiskManagerIntradayExpiringPositionReport extends PureComponent implements
     return (
       <PageHeaderWrapper title="到期合约">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <ReloadGreekButton fetchTable={this.fetch} id="real_time_dag" />
+          <ReloadGreekButton fetchTable={this.fetch} id="real_time_expiring_position_dag" />
         </Row>
         <SourceTable
           loading={this.state.loading}

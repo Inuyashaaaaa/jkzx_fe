@@ -86,6 +86,48 @@ class TableManager {
     }
     return null;
   }
+
+  public getDownCell(rowId: string, colId: string) {
+    if (!this.cellNodes[rowId]) return null;
+    const cellIndex = this.cellNodes[rowId].findIndex(item => item.id === colId);
+    if (cellIndex === -1) return null;
+    const next = this.cellNodes[rowId][cellIndex + 1];
+    return next ? next.node : null;
+  }
+
+  public getUpCell(rowId: string, colId: string) {
+    if (!this.cellNodes[rowId]) return null;
+    const cellIndex = this.cellNodes[rowId].findIndex(item => item.id === colId);
+    if (cellIndex === -1) return null;
+    const next = this.cellNodes[rowId][cellIndex - 1];
+    return next ? next.node : null;
+  }
+
+  public getLeftCell(rowId: string, colId: string) {
+    const rowIndex = this.rowNodes.findIndex(item => item.id === rowId);
+    if (rowIndex === -1) return null;
+
+    const nextRow = this.rowNodes[rowIndex - 1];
+    if (!nextRow) return null;
+
+    const cellIndex = this.cellNodes[nextRow.id].findIndex(item => item.id === colId);
+    if (cellIndex === -1) return null;
+    const next = this.cellNodes[nextRow.id][cellIndex];
+    return next ? next.node : null;
+  }
+
+  public getRightCell(rowId: string, colId: string) {
+    const rowIndex = this.rowNodes.findIndex(item => item.id === rowId);
+    if (rowIndex === -1) return null;
+
+    const nextRow = this.rowNodes[rowIndex + 1];
+    if (!nextRow) return null;
+
+    const cellIndex = this.cellNodes[nextRow.id].findIndex(item => item.id === colId);
+    if (cellIndex === -1) return null;
+    const next = this.cellNodes[nextRow.id][cellIndex];
+    return next ? next.node : null;
+  }
 }
 
 export default TableManager;

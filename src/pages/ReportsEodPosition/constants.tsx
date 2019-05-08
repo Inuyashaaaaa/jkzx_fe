@@ -1,131 +1,185 @@
-import {
-  INPUT_NUMBER_DATE_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  PRODUCT_TYPE_OPTIONS,
-} from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
+import { placement } from '@/tools';
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '交易簿',
-    field: 'bookName',
+    title: '交易簿',
+    dataIndex: 'bookName',
+    fixed: 'left',
+    width: 150,
   },
   {
-    headerName: '交易对手',
-    field: 'partyName',
+    title: '交易对手',
+    dataIndex: 'partyName',
+    width: 150,
   },
   {
-    headerName: '持仓编号',
-    field: 'positionId',
+    title: '持仓编号',
+    dataIndex: 'positionId',
+    width: 150,
   },
   {
-    headerName: '交易代码',
-    field: 'tradeId',
+    title: '交易代码',
+    dataIndex: 'tradeId',
+    width: 150,
   },
   {
-    headerName: '标的物代码',
-    field: 'underlyerInstrumentId',
+    title: '标的物代码',
+    dataIndex: 'underlyerInstrumentId',
+    width: 150,
   },
   {
-    headerName: '期权类型',
-    field: 'productType',
-    input: {
-      type: 'select',
-      options: PRODUCT_TYPE_OPTIONS,
+    title: '期权类型',
+    dataIndex: 'productType',
+    width: 150,
+    render: (value, record, index) => {
+      return PRODUCTTYPE_ZHCH_MAP[value];
     },
   },
   {
-    headerName: '期初数量 (手)',
-    field: 'initialNumber',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '交易日',
+    dataIndex: 'tradeDate',
+    width: 112,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '平仓数量 (手)',
-    field: 'unwindNumber',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '到期日',
+    dataIndex: 'expirationDate',
+    width: 120,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '持仓数量 (手)',
-    field: 'number',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '期初数量 (手)',
+    dataIndex: 'initialNumber',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权费 (¥)',
-    field: 'premium',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '平仓数量 (手)',
+    dataIndex: 'unwindNumber',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '平仓金额 (¥)',
-    field: 'unwindAmount',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '持仓数量 (手)',
+    dataIndex: 'number',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '市值 (¥)',
-    field: 'marketValue',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '期权费 (¥)',
+    dataIndex: 'premium',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '盈亏 (¥)',
-    field: 'pnl',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '平仓金额 (¥)',
+    dataIndex: 'unwindAmount',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Delta (手)',
-    field: 'delta',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '市值 (¥)',
+    dataIndex: 'marketValue',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Delta Decay (手)',
-    field: 'deltaDecay',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '盈亏 (¥)',
+    dataIndex: 'pnl',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '预期Delta (手)',
-    field: 'deltaWithDecay',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Delta (手)',
+    dataIndex: 'delta',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Gamma (手)',
-    field: 'gamma',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Delta Decay (手)',
+    dataIndex: 'deltaDecay',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Gamma金额 (¥)',
-    field: 'gammaCash',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '预期Delta (手)',
+    dataIndex: 'deltaWithDecay',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Vega/1% (¥)',
-    field: 'vega',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Gamma (手)',
+    dataIndex: 'gamma',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Theta/1天 (¥)',
-    field: 'theta',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Gamma金额 (¥)',
+    dataIndex: 'gammaCash',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Rho/1% (¥)',
-    field: 'rho',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Vega/1% (¥)',
+    dataIndex: 'vega',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '交易日',
-    field: 'tradeDate',
-    input: INPUT_NUMBER_DATE_CONFIG,
+    title: 'Theta/1天 (¥)',
+    dataIndex: 'theta',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '到期日',
-    field: 'expirationDate',
+    title: 'Rho/1% (¥)',
+    dataIndex: 'rho',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物价格 (¥)',
-    field: 'underlyerPrice',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '标的物价格 (¥)',
+    dataIndex: 'underlyerPrice',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '错误信息',
-    field: 'message',
-    width: 200,
+    title: '错误信息',
+    dataIndex: 'message',
   },
 ];

@@ -7,7 +7,7 @@ import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, ModalButton } from '@/design/components';
+import { Form2, ModalButton, Upload } from '@/design/components';
 import { IFormField } from '@/design/components/type';
 import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
@@ -15,11 +15,20 @@ import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/service
 import { trdTradeCreate } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Affix, Button, Divider, Menu, message, Row } from 'antd';
+import { Affix, Button, Divider, Menu, message, Row, Modal, Icon } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import './index.less';
+import {
+  wkProcessGet,
+  wkProcessInstanceCreate,
+  wkAttachmentCreateOrUpdate,
+  wkAttachmentProcessInstanceModify,
+  UPLOAD_URL,
+} from '@/services/approval';
+import ImportExcelButton from '@/lib/components/_ImportExcelButton';
+import { getToken } from '@/lib/utils/authority';
 
 const ActionBar = memo<any>(props => {
   const { setTableData, tableData, tableEl, currentUser } = props;
@@ -30,12 +39,71 @@ const ActionBar = memo<any>(props => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const [cashModalVisible, setCashModalVisible] = useState(false);
+  const [transactionModalVisible, setTransactionModalVisible] = useState(false);
 
+  const [attachmentId, setAttachmentId] = useState(null);
   const handleCancel = () => {
     setCashModalVisible(false);
     setCreateFormData({});
   };
 
+  const transactionHandleOk = () => {
+    setTransactionModalVisible(false);
+    handelTrdTradeCreate();
+  };
+
+  const transactionHandleCancel = () => {
+    setTransactionModalVisible(false);
+  };
+
+  const handelTrdTradeCreate = async () => {
+    const trade = convertTradePageData2ApiData(
+      tableData.map(item => Form2.getFieldsValue(item)),
+      Form2.getFieldsValue(createFormData),
+      currentUser.userName,
+      LEG_ENV.BOOKING
+    );
+
+    // 发起审批
+    const { error: _error, data: _data } = await wkProcessInstanceCreate({
+      processName: '交易录入经办复合流程',
+      processData: {
+        trade,
+        validTime: '2018-01-01T10:10:10',
+      },
+    });
+
+    if (_error) return;
+    if (_data.processInstanceId) {
+      message.success('已进入流程');
+    } else {
+      setTableData([]);
+
+      setCashModalVisible(true);
+      message.success('簿记成功');
+    }
+    setCreateModalVisible(false);
+
+    // 发起审批成功关联附件
+    if (attachmentId) {
+      const { error: aerror, data: adata } = await wkAttachmentProcessInstanceModify({
+        attachmentId,
+        processInstanceId: _data.processInstanceId,
+      });
+      if (aerror) return;
+    }
+
+    // const { error } = await trdTradeCreate({
+    //   trade,
+    //   validTime: '2018-01-01T10:10:10',
+    // });
+
+    // if (error) return;
+
+    // message.success('簿记成功');
+  };
+
+  const [fileList, setFileList] = useState([]);
   return (
     <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
       <Row
@@ -82,26 +150,15 @@ const ActionBar = memo<any>(props => {
               title: '创建簿记',
               visible: createModalVisible,
               onOk: async () => {
-                const trade = convertTradePageData2ApiData(
-                  tableData.map(item => Form2.getFieldsValue(item)),
-                  Form2.getFieldsValue(createFormData),
-                  currentUser.userName,
-                  LEG_ENV.BOOKING
-                );
-
-                const { error } = await trdTradeCreate({
-                  trade,
-                  validTime: '2018-01-01T10:10:10',
+                const { error: _error, data: _data } = await wkProcessGet({
+                  processName: '交易录入经办复合流程',
                 });
+                if (_error) return;
+                if (_data.status) {
+                  return setTransactionModalVisible(true);
+                }
 
-                if (error) return;
-
-                message.success('簿记成功');
-
-                setCreateModalVisible(false);
-                setTableData([]);
-
-                setCashModalVisible(true);
+                handelTrdTradeCreate();
               },
               onCancel: () => setCreateModalVisible(false),
               children: (
@@ -123,6 +180,35 @@ const ActionBar = memo<any>(props => {
         trade={Form2.getFieldsValue(createFormData)}
         convertVisible={handleCancel}
       />
+      <Modal
+        title="发起审批"
+        visible={transactionModalVisible}
+        onOk={transactionHandleOk}
+        onCancel={transactionHandleCancel}
+      >
+        <div style={{ margin: '20px' }}>
+          <p>您提交的交易需要通过审批才能完成簿记。请上传交易确认书等证明文件后发起审批。</p>
+          <p style={{ margin: '20px', textAlign: 'center' }}>
+            <Upload
+              maxLen={1}
+              action={UPLOAD_URL}
+              data={{
+                method: 'wkAttachmentUpload',
+                params: JSON.stringify({}),
+              }}
+              headers={{ Authorization: `Bearer ${getToken()}` }}
+              onChange={fileList => {
+                setFileList(fileList);
+                if (fileList[0].status === 'done') {
+                  setAttachmentId(fileList[0].response.result.attachmentId);
+                }
+              }}
+              value={fileList}
+            />
+          </p>
+          <p>审批中的交易请在审批管理页面查看。</p>
+        </div>
+      </Modal>
     </Affix>
   );
 });
