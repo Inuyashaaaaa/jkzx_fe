@@ -1,146 +1,172 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG, PRODUCT_TYPE_OPTIONS } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
+import { placement } from '@/tools';
 
-export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '交易簿',
-    field: 'bookName',
-    width: 130,
+    title: '交易簿',
+    dataIndex: 'bookName',
+    fixed: 'left',
+    width: 150,
   },
   {
-    headerName: '交易对手',
-    field: 'partyName',
-    width: 130,
+    title: '交易对手',
+    dataIndex: 'partyName',
+    width: 150,
   },
   {
-    headerName: '交易代码',
-    field: 'tradeId',
-    width: 130,
+    title: '交易代码',
+    dataIndex: 'tradeId',
+    width: 150,
   },
   {
-    headerName: '标的物代码',
-    field: 'underlyerInstrumentId',
-    width: 130,
+    title: '标的物代码',
+    dataIndex: 'underlyerInstrumentId',
+    width: 150,
   },
   {
-    headerName: '期权类型',
-    field: 'productType',
-    width: 130,
-    input: {
-      type: 'select',
-      options: PRODUCT_TYPE_OPTIONS,
+    title: '期权类型',
+    dataIndex: 'productType',
+    width: 150,
+    render: (value, record, index) => {
+      return PRODUCTTYPE_ZHCH_MAP[value];
     },
   },
   {
-    headerName: '期初数量 (手)',
-    field: 'initialNumber',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '交易日',
+    dataIndex: 'tradeDate',
+    width: 112,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '平仓数量 (手)',
-    field: 'unwindNumber',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '到期日',
+    dataIndex: 'expirationDate',
+    width: 120,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '持仓数量 (手)',
-    field: 'number',
+    title: '期初数量 (手)',
+    dataIndex: 'initialNumber',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '期权费 (¥)',
-    field: 'premium',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-
-  {
-    headerName: '平仓金额 (¥)',
-    field: 'unwindAmount',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '市值 (¥)',
-    field: 'marketValue',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '盈亏 (¥)',
-    field: 'pnl',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: 'Delta (手)',
-    field: 'delta',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: 'Delta Decay (手)',
-    field: 'deltaDecay',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '预期 Delta (手)',
-    field: 'deltaWithDecay',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: 'Gamma (手)',
-    field: 'gamma',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: 'Gamma 金额 (¥)',
-    field: 'gammaCash',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: 'Vega/1% (¥)',
-    field: 'vega',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: 'Theta/1天 (¥)',
-    field: 'theta',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: 'Rho/1% (¥)',
-    field: 'rho',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '交易日',
-    field: 'tradeDate',
-    width: 130,
-    input: {
-      type: 'date',
+    render: (value, record, index) => {
+      return placement(value, 4);
     },
   },
   {
-    headerName: '到期日',
-    field: 'expirationDate',
+    title: '平仓数量 (手)',
+    dataIndex: 'unwindNumber',
     width: 130,
-    input: {
-      type: 'date',
+    render: (value, record, index) => {
+      return placement(value, 4);
     },
   },
   {
-    headerName: '错误信息',
-    field: 'message',
-    width: 200,
+    title: '持仓数量 (手)',
+    dataIndex: 'number',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: '期权费 (¥)',
+    dataIndex: 'premium',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: '平仓金额 (¥)',
+    dataIndex: 'unwindAmount',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: '市值 (¥)',
+    dataIndex: 'marketValue',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: '盈亏 (¥)',
+    dataIndex: 'pnl',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: 'Delta (手)',
+    dataIndex: 'delta',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: 'Delta Decay (手)',
+    dataIndex: 'deltaDecay',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: '预期Delta (手)',
+    dataIndex: 'deltaWithDecay',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: 'Gamma (手)',
+    dataIndex: 'gamma',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: 'Gamma金额 (¥)',
+    dataIndex: 'gammaCash',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: 'Vega/1% (¥)',
+    dataIndex: 'vega',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: 'Theta/1天 (¥)',
+    dataIndex: 'theta',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: 'Rho/1% (¥)',
+    dataIndex: 'rho',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
+  },
+  {
+    title: '错误信息',
+    dataIndex: 'message',
   },
 ];

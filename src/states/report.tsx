@@ -13,9 +13,18 @@ import useLifecycles from 'react-use/lib/useLifecycles';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
 
-const ReportsEodPosition = memo<any>(props => {
+export const Modal = props => {
   const form = useRef<Form2>(null);
-
+  const {
+    TABLE_COL_DEFS,
+    searchFormControls,
+    defaultSort,
+    defaultDirection,
+    reportType,
+    searchMethod,
+    downloadName,
+    scrollWidth,
+  } = props;
   const [markets, setMarkets] = useState([]);
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
@@ -25,7 +34,7 @@ const ReportsEodPosition = memo<any>(props => {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState(true);
   const [searchFormData, setSearchFormData] = useState({});
-  const [sortField, setSortField] = useState({ orderBy: 'createdAt', order: 'desc' });
+  const [sortField, setSortField] = useState({ orderBy: defaultSort, order: defaultDirection });
   const [total, setTotal] = useState(null);
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
@@ -37,7 +46,7 @@ const ReportsEodPosition = memo<any>(props => {
     });
   };
 
-  const onSearchFormChange = (props, fields, allFields) => {
+  const onSearchFormChange = (param, fields, allFields) => {
     setSearchFormData(allFields);
   };
 
@@ -48,7 +57,7 @@ const ReportsEodPosition = memo<any>(props => {
       return;
     }
     setLoading(true);
-    const { error, data } = await rptPositionReportSearchPaged({
+    const { error, data } = await searchMethod({
       page: pagination.current - 1,
       pageSize: pagination.pageSize,
       ..._.mapValues(Form2.getFieldsValue(usedFormData), (values, key) => {
@@ -85,8 +94,8 @@ const ReportsEodPosition = memo<any>(props => {
       };
       if (_.isEqual(aPagination, bPagination)) {
         return setSortField({
-          orderBy: 'createdAt',
-          order: 'desc',
+          orderBy: defaultSort,
+          order: defaultDirection,
         });
       }
       return setSortField({
@@ -120,7 +129,7 @@ const ReportsEodPosition = memo<any>(props => {
   useLifecycles(async () => {
     setIsMount(true);
     const { error, data } = await rptReportNameList({
-      reportType: 'LIVE_POSITION_INFO',
+      reportType,
     });
     if (error) return;
     const _markets = data.map(item => ({
@@ -168,7 +177,7 @@ const ReportsEodPosition = memo<any>(props => {
         style={{ marginBottom: VERTICAL_GUTTER }}
         submitText={'查询'}
         onFieldsChange={onSearchFormChange}
-        onSubmitButtonClick={() => fetchTable(searchFormData)}
+        onSubmitButtonClick={() => fetchTable()}
         resetable={false}
       />
       <Divider />
@@ -179,7 +188,7 @@ const ReportsEodPosition = memo<any>(props => {
         data={{
           dataSource: data,
           cols: TABLE_COL_DEFS.map(item => item.title),
-          name: '持仓明细',
+          name: downloadName,
         }}
       >
         导出Excel
@@ -199,12 +208,10 @@ const ReportsEodPosition = memo<any>(props => {
             onChange: onPaginationChange,
           }}
           columns={TABLE_COL_DEFS}
-          scroll={{ x: 3320 }}
           onChange={onChange}
+          scroll={{ x: scrollWidth }}
         />
       </ConfigProvider>
     </PageHeaderWrapper>
   );
-});
-
-export default ReportsEodPosition;
+};

@@ -1,19 +1,7 @@
-import {
-  INPUT_NUMBER_DATE_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  PRODUCT_TYPE_OPTIONS,
-  PRODUCTTYPE_ZHCH_MAP,
-  BIG_NUMBER_CONFIG,
-} from '@/constants/common';
-import { inputNumberDigitalConfig } from '@/domains/inputNumberConfig';
-import FormItem from 'antd/lib/form/FormItem';
-import { Form2, InputNumber } from '@/design/components';
-import React from 'react';
-import BigNumber from 'bignumber.js';
-import { Typography } from 'antd';
-import { ITableColDef } from '@/design/components/type';
+import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
+import { placement } from '@/tools';
 
-export const TABLE_COL_DEFS: ITableColDef[] = [
+export const TABLE_COL_DEFS = [
   {
     title: '交易簿',
     dataIndex: 'bookName',
@@ -66,98 +54,129 @@ export const TABLE_COL_DEFS: ITableColDef[] = [
     title: '期初数量 (手)',
     dataIndex: 'initialNumber',
     width: 130,
-    render: (value, record, index, { form }) =>
-      inputNumberDigitalConfig(value, record, index, form),
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '平仓数量 (手)',
     dataIndex: 'unwindNumber',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '持仓数量 (手)',
     dataIndex: 'number',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '期权费 (¥)',
     dataIndex: 'premium',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '平仓金额 (¥)',
     dataIndex: 'unwindAmount',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '市值 (¥)',
     dataIndex: 'marketValue',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '盈亏 (¥)',
     dataIndex: 'pnl',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: 'Delta (手)',
     dataIndex: 'delta',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: 'Delta Decay (手)',
     dataIndex: 'deltaDecay',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '预期Delta (手)',
     dataIndex: 'deltaWithDecay',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: 'Gamma (手)',
     dataIndex: 'gamma',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: 'Gamma金额 (¥)',
     dataIndex: 'gammaCash',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: 'Vega/1% (¥)',
     dataIndex: 'vega',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: 'Theta/1天 (¥)',
     dataIndex: 'theta',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: 'Rho/1% (¥)',
     dataIndex: 'rho',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '标的物价格 (¥)',
     dataIndex: 'underlyerPrice',
-    // input: INPUT_NUMBER_DIGITAL_CONFIG,
     width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
     title: '错误信息',

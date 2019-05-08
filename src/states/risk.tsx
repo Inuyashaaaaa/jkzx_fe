@@ -5,18 +5,28 @@ import { Form2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptPositionReportSearchPaged, rptReportNameList } from '@/services/report-service';
 import { getMoment } from '@/utils';
-import { ConfigProvider, Divider, message, Table } from 'antd';
+import { ConfigProvider, Divider, message, Table, Row } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
+import ReloadGreekButton from '@/containers/ReloadGreekButton';
+import { socketHOC } from '@/tools/socketHOC';
 
-const ReportsEodPosition = memo<any>(props => {
+const Modal = props => {
   const form = useRef<Form2>(null);
-
-  const [markets, setMarkets] = useState([]);
+  const {
+    TABLE_COL_DEFS,
+    searchFormControls,
+    defaultSort,
+    defaultDirection,
+    reportType,
+    searchMethod,
+    downloadName,
+    scrollWidth,
+  } = props;
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -25,7 +35,7 @@ const ReportsEodPosition = memo<any>(props => {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState(true);
   const [searchFormData, setSearchFormData] = useState({});
-  const [sortField, setSortField] = useState({ orderBy: 'createdAt', order: 'desc' });
+  const [sortField, setSortField] = useState({ orderBy: defaultSort, order: defaultDirection });
   const [total, setTotal] = useState(null);
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
@@ -37,7 +47,7 @@ const ReportsEodPosition = memo<any>(props => {
     });
   };
 
-  const onSearchFormChange = (props, fields, allFields) => {
+  const onSearchFormChange = (param, fields, allFields) => {
     setSearchFormData(allFields);
   };
 
@@ -48,21 +58,16 @@ const ReportsEodPosition = memo<any>(props => {
       return;
     }
     setLoading(true);
-    const { error, data } = await rptPositionReportSearchPaged({
+    const { error, data } = await searchMethod({
       page: pagination.current - 1,
       pageSize: pagination.pageSize,
-      ..._.mapValues(Form2.getFieldsValue(usedFormData), (values, key) => {
-        if (key === 'valuationDate') {
-          return getMoment(values).format('YYYY-MM-DD');
-        }
-        return values;
-      }),
+      ..._.mapValues(Form2.getFieldsValue(usedFormData)),
       ...sortField,
     });
     setLoading(false);
     if (error) return;
     if (!data.page.length) {
-      message.warning('查询日期内暂无数据');
+      message.warning('当日暂无数据');
       setDataSource(data.page);
       setInfo(false);
       setTotal(data.totalCount);
@@ -85,8 +90,8 @@ const ReportsEodPosition = memo<any>(props => {
       };
       if (_.isEqual(aPagination, bPagination)) {
         return setSortField({
-          orderBy: 'createdAt',
-          order: 'desc',
+          orderBy: defaultSort,
+          order: defaultDirection,
         });
       }
       return setSortField({
@@ -119,22 +124,7 @@ const ReportsEodPosition = memo<any>(props => {
 
   useLifecycles(async () => {
     setIsMount(true);
-    const { error, data } = await rptReportNameList({
-      reportType: 'LIVE_POSITION_INFO',
-    });
-    if (error) return;
-    const _markets = data.map(item => ({
-      label: item,
-      value: item,
-    }));
-
-    setMarkets(_markets);
-    const _searchFormData = {
-      ...(_markets.length ? { reportName: Form2.createField(_markets[0].value) } : null),
-      valuationDate: Form2.createField(moment().subtract(1, 'days')),
-    };
-    setSearchFormData(_searchFormData);
-    fetchTable(_searchFormData);
+    fetchTable();
   });
 
   useEffect(
@@ -163,27 +153,30 @@ const ReportsEodPosition = memo<any>(props => {
       <Form2
         ref={node => (form.current = node)}
         dataSource={searchFormData}
-        columns={searchFormControls(markets)}
+        columns={searchFormControls()}
         layout="inline"
         style={{ marginBottom: VERTICAL_GUTTER }}
         submitText={'查询'}
         onFieldsChange={onSearchFormChange}
-        onSubmitButtonClick={() => fetchTable(searchFormData)}
+        onSubmitButtonClick={() => fetchTable()}
         resetable={false}
       />
       <Divider />
-      <DownloadExcelButton
-        style={{ margin: '10px 0' }}
-        key="export"
-        type="primary"
-        data={{
-          dataSource: data,
-          cols: TABLE_COL_DEFS.map(item => item.title),
-          name: '持仓明细',
-        }}
-      >
-        导出Excel
-      </DownloadExcelButton>
+      <Row type="flex" justify="space-between" style={{ marginBottom: VERTICAL_GUTTER }}>
+        <DownloadExcelButton
+          key="export"
+          type="primary"
+          data={{
+            dataSource: data,
+            cols: TABLE_COL_DEFS.map(item => item.title),
+            name: downloadName,
+          }}
+        >
+          导出Excel
+        </DownloadExcelButton>
+        <ReloadGreekButton fetchTable={fetchTable} id="real_time_valuation_dag" />
+      </Row>
+
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
         <Table
           size="middle"
@@ -199,12 +192,12 @@ const ReportsEodPosition = memo<any>(props => {
             onChange: onPaginationChange,
           }}
           columns={TABLE_COL_DEFS}
-          scroll={{ x: 3320 }}
           onChange={onChange}
+          scroll={{ x: scrollWidth }}
         />
       </ConfigProvider>
     </PageHeaderWrapper>
   );
-});
+};
 
-export default ReportsEodPosition;
+export default socketHOC(Modal);
