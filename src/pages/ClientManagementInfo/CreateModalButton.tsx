@@ -16,6 +16,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
+import EmailInput from '@/containers/EmailInput';
 
 const CreateModalButton = memo<any>(props => {
   const { salesCascaderList, fetchTableData } = props;
@@ -33,7 +34,7 @@ const CreateModalButton = memo<any>(props => {
   const [currenStep, setCurrentStep] = useState(0);
   const editable = true;
   const [modalVisible, setModalVisible] = useState(false);
-  const [trustorSource, setTrustorSourceSource] = useState([]);
+  const [trustorSource, setTrustorSource] = useState([]);
   const [tradeSource, setTradeSource] = useState([]);
 
   const getProduceIcon = () => {
@@ -59,7 +60,7 @@ const CreateModalButton = memo<any>(props => {
     if (!value || value.indexOf('@') >= 0) {
       const trustorSource = [];
     }
-    setTrustorSourceSource(trustorSource);
+    setTrustorSource(trustorSource);
   };
 
   const tradeChange = value => {
@@ -310,16 +311,7 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(
-                          <span>
-                            {/* <Input editing={editable}/> */}
-                            <AutoComplete
-                              dataSource={trustorSource}
-                              style={{ width: '100%' }}
-                              onChange={trustorChange}
-                            />
-                          </span>
-                        )}
+                        })(<EmailInput style={{ width: '100%' }} />)}
                       </FormItem>
                     );
                   },
@@ -374,14 +366,7 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(
-                          // <Input editing={editable} />
-                          <AutoComplete
-                            dataSource={tradeSource}
-                            style={{ width: '100%' }}
-                            onChange={tradeChange}
-                          />
-                        )}
+                        })(<EmailInput style={{ width: '100%' }} />)}
                       </FormItem>
                     );
                   },
