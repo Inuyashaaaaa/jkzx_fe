@@ -1,120 +1,106 @@
+import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import SourceTable from '@/design/components/SourceTable';
+import { Form2, Table2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { rptPositionReportPagedByNameAndDate, rptReportNameList } from '@/services/report-service';
-import { message } from 'antd';
+import { rptPositionReportSearchPaged, rptReportNameList } from '@/services/report-service';
+import { getMoment } from '@/utils';
+import { ConfigProvider, Divider, message, Table } from 'antd';
+import _ from 'lodash';
 import moment from 'moment';
-import React, { PureComponent } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
 
-class ReportsEodPosition extends PureComponent {
-  public $sourceTable: SourceTable = null;
+const ReportsEodPosition = memo<any>(props => {
+  const form = useRef<Form2>(null);
 
-  public state = {
-    markets: [],
-    dataSource: [],
-    pagination: {
-      current: 1,
-      pageSize: 20,
-    },
-    loading: false,
-    info: true,
-    searchFormData: {},
-  };
+  const [markets, setMarkets] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+  const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState(true);
+  const [searchFormData, setSearchFormData] = useState({});
+  const [sortField, setSortField] = useState({ orderBy: 'createdAt', order: 'desc' });
+  const [total, setTotal] = useState(null);
+  const [isMount, setIsMount] = useState(false);
+  const [data, setData] = useState([]);
 
-  constructor(props) {
-    super(props);
-  }
-
-  public componentDidMount = async () => {
-    const { error, data } = await rptReportNameList({
-      reportType: 'LIVE_POSITION_INFO',
+  const onPaginationChange = (current, pageSize) => {
+    setPagination({
+      current,
+      pageSize,
     });
-    if (error) return;
-    this.setState(
-      {
-        markets: data.map(item => ({
-          label: item,
-          value: item,
-        })),
-      },
-      () => {
-        this.setState(
-          {
-            searchFormData: {
-              ...(this.state.markets.length ? { reportName: this.state.markets[0].value } : null),
-              valuationDate: moment().subtract(1, 'days'),
-            },
-          },
-          () => {
-            this.fetchTable();
-          }
-        );
-      }
-    );
   };
 
-  public fetchTable = async () => {
-    const { searchFormData, pagination } = this.state;
-    if (!searchFormData.reportName || !searchFormData.valuationDate) {
+  const onSearchFormChange = (props, fields, allFields) => {
+    setSearchFormData(allFields);
+  };
+
+  const fetchTable = async (paramsSearchFormData?) => {
+    const usedFormData = paramsSearchFormData || searchFormData;
+    const formValidateRsp = await form.current.validate();
+    if (formValidateRsp.error) {
       return;
     }
-    this.setState({
-      loading: true,
-    });
-    const { error, data } = await rptPositionReportPagedByNameAndDate({
+    setLoading(true);
+    const { error, data } = await rptPositionReportSearchPaged({
       page: pagination.current - 1,
       pageSize: pagination.pageSize,
-      reportName: searchFormData.reportName,
-      valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+      ..._.mapValues(Form2.getFieldsValue(usedFormData), (values, key) => {
+        if (key === 'valuationDate') {
+          return getMoment(values).format('YYYY-MM-DD');
+        }
+        return values;
+      }),
+      ...sortField,
     });
-    if (error) return false;
-    this.setState({
-      loading: false,
-    });
+    setLoading(false);
+    if (error) return;
     if (!data.page.length) {
-      this.setState({
-        info: false,
-        dataSource: data.page,
-        pagination: {
-          current: 1,
-          pageSize: 20,
-          total: 0,
-        },
-      });
+      message.warning('查询日期内暂无数据');
+      setDataSource(data.page);
+      setInfo(false);
+      setTotal(data.totalCount);
       return;
     }
-    message.success('查询成功');
-    this.setState({
-      dataSource: data.page,
-      pagination: {
-        ...this.state.pagination,
-        total: data.totalCount,
-      },
-    });
-    return;
+    setDataSource(data.page);
+    setTotal(data.totalCount);
   };
 
-  public onPaginationChange = ({ pagination }) => {
-    this.setState(
-      {
-        pagination,
-      },
-      () => {
-        this.fetchTable();
+  const onChange = (paramsPagination, filters, sorter) => {
+    if (!sorter.columnKey) {
+      const aPagination = {
+        current: paramsPagination.current,
+        pageSize: paramsPagination.pageSize,
+        total: paramsPagination.total,
+      };
+      const bPagination = {
+        ...pagination,
+        total,
+      };
+      if (_.isEqual(aPagination, bPagination)) {
+        return setSortField({
+          orderBy: 'createdAt',
+          order: 'desc',
+        });
       }
-    );
-  };
-
-  public onSearchFormChange = params => {
-    this.setState({
-      searchFormData: params.values,
+      return setSortField({
+        orderBy: sortField.orderBy,
+        order: sortField.order,
+      });
+    }
+    setSortField({
+      orderBy: sorter.columnKey,
+      order: sorter.order === 'ascend' ? 'asc' : 'desc',
     });
   };
 
-  public handleData = (dataSource, cols, headers) => {
+  const handleData = (dataSource, cols, headers) => {
     const data = [];
     data.push(headers);
     const length = data.length;
@@ -131,68 +117,94 @@ class ReportsEodPosition extends PureComponent {
     return data;
   };
 
-  public render() {
-    const _data = this.handleData(
-      this.state.dataSource,
-      TABLE_COL_DEFS.map(item => item.field),
-      TABLE_COL_DEFS.map(item => item.headerName)
-    );
-    return (
-      <PageHeaderWrapper>
-        <SourceTable
-          context={{
-            description: this.state.info ? '暂无数据' : '查询日期内无报告',
-          }}
-          frameworkComponents={{
-            CustomNoDataOverlay,
-          }}
+  useLifecycles(async () => {
+    setIsMount(true);
+    const { error, data } = await rptReportNameList({
+      reportType: 'LIVE_POSITION_INFO',
+    });
+    if (error) return;
+    const _markets = data.map(item => ({
+      label: item,
+      value: item,
+    }));
+
+    setMarkets(_markets);
+    const _searchFormData = {
+      ...(_markets.length ? { reportName: Form2.createField(_markets[0].value) } : null),
+      valuationDate: Form2.createField(moment().subtract(1, 'days')),
+    };
+    setSearchFormData(_searchFormData);
+    fetchTable(_searchFormData);
+  });
+
+  useEffect(
+    () => {
+      if (!isMount) return;
+      fetchTable();
+    },
+    [sortField, pagination]
+  );
+
+  useEffect(
+    () => {
+      setData(
+        handleData(
+          dataSource,
+          TABLE_COL_DEFS.map(item => item.dataIndex),
+          TABLE_COL_DEFS.map(item => item.title)
+        )
+      );
+    },
+    [dataSource]
+  );
+
+  return (
+    <PageHeaderWrapper>
+      <Form2
+        ref={node => (form.current = node)}
+        dataSource={searchFormData}
+        columns={searchFormControls(markets)}
+        layout="inline"
+        style={{ marginBottom: VERTICAL_GUTTER }}
+        submitText={'查询'}
+        onFieldsChange={onSearchFormChange}
+        onSubmitButtonClick={() => fetchTable(searchFormData)}
+        resetable={false}
+      />
+      <Divider />
+      <DownloadExcelButton
+        style={{ margin: '10px 0' }}
+        key="export"
+        type="primary"
+        data={{
+          dataSource: data,
+          cols: TABLE_COL_DEFS.map(item => item.title),
+          name: '持仓明细',
+        }}
+      >
+        导出Excel
+      </DownloadExcelButton>
+      <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
+        <Table2
+          size="middle"
           rowKey="uuid"
-          ref={node => (this.$sourceTable = node)}
-          loading={this.state.loading}
-          searchFormControls={searchFormControls(this.state.markets).map(item => ({
-            ...item,
-            decorator: {
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            },
-          }))}
-          searchable={true}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          onSearchButtonClick={this.fetchTable}
-          editable={false}
-          resetable={false}
-          paginationProps={{
-            backend: true,
+          loading={loading}
+          dataSource={dataSource}
+          pagination={{
+            ...pagination,
+            total,
+            showSizeChanger: true,
+            onShowSizeChange: onPaginationChange,
+            showQuickJumper: true,
+            onChange: onPaginationChange,
           }}
-          dataSource={this.state.dataSource}
-          pagination={this.state.pagination}
-          onPaginationChange={this.onPaginationChange}
-          onPaginationShowSizeChange={this.onPaginationChange}
-          columnDefs={TABLE_COL_DEFS}
-          autoSizeColumnsToFit={false}
-          // onCellValueChanged={this.onCellValueChanged}
-          defaultColDef={{ width: 130 }}
-          header={
-            <DownloadExcelButton
-              style={{ margin: '10px 0' }}
-              key="export"
-              type="primary"
-              data={{
-                dataSource: _data,
-                cols: TABLE_COL_DEFS.map(item => item.headerName),
-                name: '持仓明细',
-              }}
-            >
-              导出Excel
-            </DownloadExcelButton>
-          }
+          columns={TABLE_COL_DEFS}
+          scroll={{ x: 3320 }}
+          onChange={onChange}
         />
-      </PageHeaderWrapper>
-    );
-  }
-}
+      </ConfigProvider>
+    </PageHeaderWrapper>
+  );
+});
+
 export default ReportsEodPosition;

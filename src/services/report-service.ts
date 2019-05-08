@@ -160,6 +160,16 @@ export async function rptPositionReportPagedByNameAndDate(params) {
   });
 }
 
+export async function rptPositionReportSearchPaged(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptPositionReportSearchPaged',
+      params,
+    },
+  });
+}
+
 export async function rptPnlHstReportPagedByNameAndDate(params) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
     method: `POST`,
