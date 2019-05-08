@@ -1,6 +1,4 @@
-import { LEG_TYPE_MAP } from '@/constants/common';
 import { allLegTypes } from '@/constants/legColDefs';
-import { AssetClassOptions } from '@/constants/legColDefs/common/common';
 import { Button, Dropdown, Menu } from 'antd';
 import { ClickParam } from 'antd/lib/menu';
 import _ from 'lodash';
@@ -15,28 +13,13 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const usedLegs = this.props.isPricing
-      ? allLegTypes.filter(
-          item =>
-            !(
-              item.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_ANNUAL ||
-              item.type === LEG_TYPE_MAP.DOUBLE_SHARK_FIN_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL ||
-              item.type === LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-              item.type === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.STRADDLE_ANNUAL ||
-              item.type === LEG_TYPE_MAP.STRADDLE_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.CONCAVA_ANNUAL ||
-              item.type === LEG_TYPE_MAP.CONCAVA_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.CONVEX_ANNUAL ||
-              item.type === LEG_TYPE_MAP.CONVEX_UNANNUAL ||
-              item.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_ANNUAL ||
-              item.type === LEG_TYPE_MAP.DOUBLE_DIGITAL_UNANNUAL
-            )
-        )
-      : allLegTypes;
-    return [
+    const filterLegs = _.reject(allLegTypes, item => {
+      if (!item) return true;
+      return item.type === 'MODEL_XY_ANNUAL' || item.type === 'MODEL_XY_UNANNUAL';
+    });
+    const usedLegs = this.props.isPricing ? filterLegs : allLegTypes;
+    if (!usedLegs) return;
+    const items = [
       {
         name: '年化',
         children: usedLegs
@@ -50,6 +33,7 @@ export default class MultilLegCreateButton extends PureComponent<{
           .map(item => ({ ...item, name: item.name.replace(' - 非年化', '') })),
       },
     ];
+    return items;
   };
 
   public getLegMenuNodes = menus => {
@@ -72,7 +56,10 @@ export default class MultilLegCreateButton extends PureComponent<{
         // disabled={this.state.dataSource.length >= 1}
         key="add"
         overlay={
-          <Menu onClick={this.props.handleAddLeg}>
+          <Menu
+            onClick={this.props.handleAddLeg}
+            style={{ display: 'flex', justifyContent: 'start' }}
+          >
             {this.getLegMenuNodes(this.normalLegMenus())}
           </Menu>
         }

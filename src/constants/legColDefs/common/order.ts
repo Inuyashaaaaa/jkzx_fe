@@ -1,7 +1,7 @@
 import { LEG_FIELD } from '@/constants/common';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import { IColDef } from '@/design/components/Table/types';
 import _ from 'lodash';
-import { ILegType } from '..';
 
 export const LEG_FIELD_ORDERS = [
   LEG_FIELD.DIRECTION,
@@ -54,6 +54,31 @@ export const LEG_FIELD_ORDERS = [
   LEG_FIELD.OBSERVATION_TYPE,
   LEG_FIELD.PAY_OFF_TYPE,
   LEG_FIELD.PAY_OFF,
+  LEG_FIELD.OBSERVATION_STEP,
+  LEG_FIELD.OBSERVE_START_DAY,
+  LEG_FIELD.OBSERVE_END_DAY,
+  LEG_FIELD.OBSERVATION_DATES,
+  LEG_FIELD.UP_BARRIER_TYPE,
+  LEG_FIELD.UP_BARRIER,
+  LEG_FIELD.STEP,
+  LEG_FIELD.COUPON_BARRIER,
+  LEG_FIELD.COUPON_PAYMENT,
+  LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE,
+  LEG_FIELD.EXPIRE_NOBARRIERPREMIUM,
+  LEG_FIELD.AUTO_CALL_STRIKE_UNIT,
+  LEG_FIELD.AUTO_CALL_STRIKE,
+  LEG_FIELD.UP_OBSERVATION_STEP,
+  LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
+  LEG_FIELD.DOWN_BARRIER_TYPE,
+  LEG_FIELD.DOWN_BARRIER,
+  LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE,
+  LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE,
+  LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE,
+  LEG_FIELD.DOWN_OBSERVATION_STEP,
+  LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY,
+  LEG_FIELD.ALREADY_BARRIER,
+  LEG_FIELD.DOWN_BARRIER_DATE,
+  LEG_FIELD.COMMENT,
 ];
 
 export function orderLegColDefs(legColDefs: IColDef[]) {
@@ -69,11 +94,4 @@ export function orderLegColDefs(legColDefs: IColDef[]) {
     }
     return pre;
   }, []).concat(notOrders.map(next => legColDefs.find(item => item.field === next)));
-}
-
-export function orderLeg(leg: ILegType) {
-  return {
-    ...leg,
-    columnDefs: orderLegColDefs(leg.columnDefs),
-  };
 }

@@ -1,7 +1,7 @@
 import {
   EVENT_TYPE_OPTIONS,
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DATE_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
   PRODUCT_TYPE_OPTIONS,
 } from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
@@ -22,7 +22,12 @@ export const SEARCH_FORM_DEFS: IFormControl[] = [
       type: 'date',
       range: 'range',
       disabledDate(startValue) {
-        return startValue.valueOf() < moment().valueOf();
+        return (
+          startValue.valueOf() <
+          moment()
+            .subtract(1, 'days')
+            .valueOf()
+        );
       },
     },
   },
@@ -79,22 +84,21 @@ export const TABLE_COLUMN_DEFS: IColumnDef[] = [
     field: 'underlyerInstrumentId',
   },
   {
-    headerName: '当前价格',
+    headerName: '当前价格 (¥)',
     field: 'underlyerPrice',
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
   },
   {
-    headerName: '障碍价',
-    field: 'barrier',
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+    headerName: '障碍价 (¥)',
+    field: 'barriers',
   },
   {
     headerName: '支付类型',
     field: 'paymentType',
   },
   {
-    headerName: '支付金额',
+    headerName: '支付金额 (¥)',
     field: 'payment',
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+    input: INPUT_NUMBER_DIGITAL_CONFIG,
   },
 ];

@@ -16,6 +16,18 @@ class TradeManagementMarketManagement extends PureComponent {
 
   public state = {
     createFormData: {},
+    searchFormData: {},
+  };
+
+  public onReset = event => {
+    this.setState(
+      {
+        searchFormData: {},
+      },
+      () => {
+        this.$sourceTable.search();
+      }
+    );
   };
 
   public fetchTable = event => {
@@ -83,12 +95,14 @@ class TradeManagementMarketManagement extends PureComponent {
 
   public composeInstrumentInfo = modalFormData => {
     const instrumentInfoFields = ['multiplier', 'name', 'exchange', 'maturity'];
-
+    let instrumentInfoSomeFields = ['multiplier', 'name', 'exchange', 'maturity'];
+    if (modalFormData.instrumentType === 'INDEX') {
+      instrumentInfoSomeFields = ['name', 'exchange'];
+    }
     const params = {
       ..._.omit(modalFormData, instrumentInfoFields),
-      instrumentInfo: this.omitNull(_.pick(modalFormData, instrumentInfoFields)),
+      instrumentInfo: this.omitNull(_.pick(modalFormData, instrumentInfoSomeFields)),
     };
-
     return this.omitNull(params);
   };
 
@@ -97,6 +111,12 @@ class TradeManagementMarketManagement extends PureComponent {
   public onCreate = async (event: SourceTableState) => {
     const { createFormData } = event;
     const { error } = await mktInstrumentCreate(this.composeInstrumentInfo(createFormData));
+    if (error) {
+      return;
+    }
+    this.setState({
+      createFormData: {},
+    });
     return !error;
   };
 
@@ -109,6 +129,20 @@ class TradeManagementMarketManagement extends PureComponent {
       message.success('修改成功');
 
       return true;
+    });
+  };
+
+  public onSearchFormChange = params => {
+    if (Object.keys(params.changed)[0] === 'assetClass') {
+      return this.setState({
+        searchFormData: {
+          ...params.formData,
+          instrumentType: undefined,
+        },
+      });
+    }
+    return this.setState({
+      searchFormData: params.formData,
     });
   };
 
@@ -127,10 +161,16 @@ class TradeManagementMarketManagement extends PureComponent {
           createFormControls={createFormControls}
           createFormData={this.state.createFormData}
           searchFormControls={searchFormControls}
+          searchFormData={this.state.searchFormData}
+          onSearchFormChange={this.onSearchFormChange}
           onCreate={this.onCreate}
           paginationProps={{
             backend: true,
           }}
+          createModalProps={{
+            visible: this.state.visible,
+          }}
+          onReset={this.onReset}
           rowActions={[
             <ModalButton
               key="edit"

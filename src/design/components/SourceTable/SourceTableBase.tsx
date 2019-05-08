@@ -15,8 +15,6 @@ import { TOTAL_DATA_ID, TOTAL_DATA_TAG, VERTICAL_GUTTER } from './constants';
 import ActionCellRendererClass from './rendering/ActionCellRendererClass';
 import { IInputTypeColDef, ITableDataSource, SourceTableBaseProps } from './types';
 
-const ButtonGroup = Button.Group;
-
 class SourceTableBase extends PureComponent<SourceTableBaseProps, any> {
   public static defaultProps = {
     columnDefs: [],

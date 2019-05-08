@@ -12,7 +12,12 @@ export const GROUP_KEY = 'modelType';
 
 export const MARKET_KEY = 'underlyer';
 
-export const SEARCH_FORM_CONTROLS: (groups: OptionProps[]) => IFormControl[] = groups => [
+export const INSTANCE_KEY = 'instance';
+
+export const SEARCH_FORM_CONTROLS: (groups: OptionProps[], formData: any) => IFormControl[] = (
+  groups,
+  formData
+) => [
   {
     control: {
       label: '标的',
@@ -43,6 +48,34 @@ export const SEARCH_FORM_CONTROLS: (groups: OptionProps[]) => IFormControl[] = g
       type: 'select',
       options: groups,
       placeholder: '选择标的物后，继续选择分组项',
+    },
+    options: {
+      rules: [
+        {
+          required: true,
+        },
+      ],
+    },
+  },
+  {
+    control: {
+      label: '定价环境',
+    },
+    dataIndex: INSTANCE_KEY,
+    input: {
+      disabled: !formData[GROUP_KEY],
+      type: 'select',
+      options: [
+        {
+          label: '日内',
+          value: 'INTRADAY',
+        },
+        {
+          label: '收盘',
+          value: 'CLOSE',
+        },
+      ],
+      placeholder: '选择定价环境',
     },
     options: {
       rules: [

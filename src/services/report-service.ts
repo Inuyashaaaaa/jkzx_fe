@@ -11,6 +11,16 @@ export async function rptIntradayTradeReportPaged(params = {}) {
   });
 }
 
+export async function rptIntradayPortfolioRiskReportPaged(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptIntradayPortfolioRiskReportPaged',
+      params,
+    },
+  });
+}
+
 export async function rptIntradayRiskReportPaged(params = {}) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
     method: `POST`,
@@ -130,11 +140,11 @@ export async function rptValuationReportList(params) {
   });
 }
 
-export async function rptValuationReportSend(params) {
+export async function emlSendValuationReport(params) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'rptValuationReportSend',
+      method: 'emlSendValuationReport',
       params,
     },
   });
@@ -175,6 +185,36 @@ export async function rptIntradayReportPaged(params = {}) {
     method: `POST`,
     body: {
       method: 'rptIntradayReportPaged',
+      params,
+    },
+  });
+}
+
+export async function rptOtcTradeReportPagedByNameAndDate(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptOtcTradeReportPagedByNameAndDate',
+      params,
+    },
+  });
+}
+
+export async function rptFinancialOtcFundDetailReportPagedByNameAndDate(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptFinancialOtcFundDetailReportPagedByNameAndDate',
+      params,
+    },
+  });
+}
+
+export async function rptFinanicalOtcClientFundReportPagedByNameAndDate(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptFinanicalOtcClientFundReportPagedByNameAndDate',
       params,
     },
   });

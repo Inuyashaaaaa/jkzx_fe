@@ -156,6 +156,36 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+          {
+            headerName: '投资组合管理',
+            field: 'portfolioManagement',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '交易文档',
+            field: 'tradeDocuments',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
         ],
       },
       {
@@ -236,14 +266,9 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
-        ],
-      },
-      {
-        headerName: '客户管理',
-        children: [
           {
-            headerName: '客户信息管理',
-            field: 'clientInfo',
+            headerName: '自定义模型',
+            field: 'customModel',
             editable: true,
             input: {
               type: 'checkbox',
@@ -256,9 +281,14 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+        ],
+      },
+      {
+        headerName: '客户管理',
+        children: [
           {
-            headerName: '文档管理',
-            field: 'documentManagement',
+            headerName: '客户信息管理',
+            field: 'clientInfo',
             editable: true,
             input: {
               type: 'checkbox',
@@ -416,6 +446,51 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+          {
+            headerName: '交易报表',
+            field: 'tradingStatements',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '资金明细报表',
+            field: 'fundsDetailedStatements',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '客户资金汇总报表',
+            field: 'customerFundsSummaryStatements',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
         ],
       },
       {
@@ -469,6 +544,86 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
           {
             headerName: '到期合约',
             field: 'intradayExpiringPositionReport',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '定制化报告',
+            field: 'customReport',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '投资组合风险',
+            field: 'portfolioRisk',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+        ],
+      },
+      {
+        headerName: '审核管理',
+        children: [
+          {
+            headerName: '流程管理',
+            field: 'approvalProcessManagement',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '审批组管理',
+            field: 'approvalAuditingManagement',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '审批流程配置',
+            field: 'approvalProcessConfiguration',
             editable: true,
             input: {
               type: 'checkbox',
@@ -621,29 +776,9 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
-        ],
-      },
-      {
-        headerName: '帮助',
-        children: [
           {
-            headerName: '使用手册',
-            field: 'userGuide',
-            editable: true,
-            input: {
-              type: 'checkbox',
-              formatValue(value) {
-                if (value) {
-                  return <Icon type="check" />;
-                }
-                return <Icon type="close" />;
-              },
-            },
-            width: 150,
-          },
-          {
-            headerName: '开发指南',
-            field: 'developmentGuide',
+            headerName: '文档模板管理',
+            field: 'documentManagement',
             editable: true,
             input: {
               type: 'checkbox',

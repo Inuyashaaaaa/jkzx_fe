@@ -1,6 +1,14 @@
 import mapTree from '../src/lib/utils/mapTree';
 
 export default [
+  {
+    path: '/socket-test-page',
+    component: './SocketTestPage/index',
+  },
+  {
+    path: '/component-test',
+    component: './ComponentTest/index',
+  },
   // user
   {
     path: '/user',
@@ -26,17 +34,17 @@ export default [
       path: '/',
       component: '../layouts/BasicLayout',
       routes: [
+        // {
+        //   path: '/dashboard',
+        //   name: 'dashboard',
+        //   icon: 'dashboard',
+        //   component: './Dashboard',
+        // },
         {
-          path: '/dashboard',
-          name: 'dashboard',
-          icon: 'dashboard',
-          component: './Dashboard',
-        },
-        {
-          path: '/user-info',
-          name: 'userInfo',
+          path: '/welcome-page',
+          name: 'welcomePage',
+          component: './WelcomePage',
           hideInMenu: true,
-          component: './UserInfo',
         },
         {
           path: '/trade-management',
@@ -49,9 +57,9 @@ export default [
               component: './TradeManagementBooking/index',
             },
             {
-              path: '/trade-management/contract-management',
+              path: '/trade-management/contract-manage',
               name: 'contractManagement',
-              component: './TradeManagementContractManagement/index',
+              component: './TradeManagementContractManage/index',
             },
             {
               path: '/trade-management/pricing',
@@ -84,6 +92,16 @@ export default [
               path: '/trade-management/on-board-transaction',
               name: 'onBoardTransaction',
               component: './TradeManagementOnBoardTransaction/index',
+            },
+            {
+              path: '/trade-management/portfolio-management',
+              name: 'portfolioManagement',
+              component: './TradeManagementPortfolioManagement/index',
+            },
+            {
+              path: '/trade-management/trade-documents',
+              name: 'tradeDocuments',
+              component: './TradeManagementTradeDocuments/index',
             },
           ],
         },
@@ -118,6 +136,11 @@ export default [
               name: 'pricingEnvironment',
               component: './PricingSettingsPricingEnvironment/index',
             },
+            {
+              path: '/pricingSettings/customModel',
+              name: 'customModel',
+              component: './CustomModel/index',
+            },
           ],
         },
         {
@@ -131,9 +154,39 @@ export default [
               component: './ClientManagementInfo/index',
             },
             {
-              path: '/client-management/document-management',
-              name: 'documentManagement',
-              component: './ClientManagementDocument/index',
+              path: '/client-management/sales-management',
+              name: 'salesManagement',
+              component: './ClientManagementSalesManagement/index',
+            },
+            {
+              path: '/client-management/bank-account',
+              name: 'bankAccount',
+              component: './ClientManagementBankAccount/index',
+            },
+            {
+              path: '/client-management/fund-statistics',
+              name: 'fundStatistics',
+              component: './ClientManagementFundStatistics/index',
+            },
+            {
+              path: '/client-management/margin-management',
+              name: 'marginManagement',
+              component: './ClientManagementMarginManagement/index',
+            },
+            {
+              path: '/client-management/ioglod-management',
+              name: 'ioglodManagement',
+              component: './ClientManagementIoglodManagement/index',
+            },
+            {
+              path: '/client-management/discrepancy-management',
+              name: 'discrepancyManagement',
+              component: './ClientManagementDiscrepancyManagement/index',
+            },
+            {
+              path: '/client-management/valuation-management',
+              name: 'valuationManagement',
+              component: './ClientManagementValuationManagement/index',
             },
           ],
         },
@@ -156,12 +209,12 @@ export default [
 
           hideInMenu: true,
         },
-        {
-          path: '/bank-account',
-          name: 'bankAccount',
-          component: './BankAccount/index',
-          hideInMenu: true,
-        },
+        // {
+        //   path: '/bank-account',
+        //   name: 'bankAccount',
+        //   component: './BankAccount/index',
+        //   hideInMenu: true,
+        // },
         {
           path: '/workflow-management',
           name: 'workflowManagement',
@@ -211,6 +264,21 @@ export default [
               name: 'eodHistoricalPnlByUnderlyer',
               component: './ReportsEodHistoricalPnlByUnderlyer/index',
             },
+            {
+              path: '/reports/trading-statements',
+              name: 'tradingStatements',
+              component: './ReportsTradingStatements/index',
+            },
+            {
+              path: '/reports/funds-detailed-statements',
+              name: 'fundsDetailedStatements',
+              component: './ReportsFundsDetailedStatements/index',
+            },
+            {
+              path: '/reports/customer-funds-summary-statements',
+              name: 'customerFundsSummaryStatements',
+              component: './ReportsCustomerFundsSummaryStatements/index',
+            },
           ],
         },
         {
@@ -238,11 +306,38 @@ export default [
               name: 'customReport',
               component: './RiskManagerCustomReport/index',
             },
-            // {
-            //   path: '/risk-manager/intraday-expiring-position-report',
-            //   name: 'intradayExpiringPositionReport',
-            //   component: './RiskManagerIntradayExpiringPositionReport/index',
-            // },
+            {
+              path: '/risk-manager/intraday-expiring-position-report',
+              name: 'intradayExpiringPositionReport',
+              component: './RiskManagerIntradayExpiringPositionReport/index',
+            },
+            {
+              path: '/risk-manager/portfolio-risk',
+              name: 'portfolioRisk',
+              component: './RiskManagerPortfolioRisk/index',
+            },
+          ],
+        },
+        {
+          path: '/approval-process',
+          name: 'approvalProcess',
+          icon: 'interation',
+          routes: [
+            {
+              path: '/approval-process/process-manangement',
+              name: 'approvalProcessManagement',
+              component: './ApprovalProcessManagement/index',
+            },
+            {
+              path: '/approval-process/auditing-management',
+              name: 'auditingManagement',
+              component: './ApprovalProcessAuditingManagement/index',
+            },
+            {
+              path: '/approval-process/process-configuration',
+              name: 'processConfiguration',
+              component: './ApprovalProcessConfiguration/index',
+            },
           ],
         },
         {
@@ -255,10 +350,15 @@ export default [
               name: 'users',
               component: './SystemSettingsUsers/index',
             },
+            // {
+            //   path: '/system-settings/roles',
+            //   name: 'roles',
+            //   component: './SystemSettingsRoles/index',
+            // },
             {
-              path: '/system-settings/roles',
-              name: 'roles',
-              component: './SystemSettingsRoles/index',
+              path: '/system-settings/role-management',
+              name: 'roleManagement',
+              component: './SystemSettingsRoleManagement/index',
             },
             {
               path: '/system-settings/department',
@@ -290,22 +390,10 @@ export default [
               name: 'riskSettings',
               component: './SystemSettingsRiskSettings/index',
             },
-          ],
-        },
-        {
-          path: '/help',
-          name: 'help',
-          icon: 'compass',
-          routes: [
             {
-              path: '/help/user-guide',
-              name: 'userGuide',
-              component: './HelpUserGuide/index',
-            },
-            {
-              path: '/help/development-guide',
-              name: 'developmentGuide',
-              component: './HelpDevelopmentGuide/index',
+              path: '/system-settings/document-management',
+              name: 'documentManagement',
+              component: './SystemSettingsDocumentManagement/index',
             },
           ],
         },

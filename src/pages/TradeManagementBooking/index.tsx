@@ -1,12 +1,26 @@
-import { LEG_NAME_FIELD, LEG_TYPE_FIELD } from '@/constants/common';
-import { VERTICAL_GUTTER } from '@/constants/global';
+import {
+  LEG_FIELD,
+  LEG_NAME_FIELD,
+  LEG_PRICING_FIELD,
+  LEG_TYPE_FIELD,
+  PREMIUM_TYPE_MAP,
+} from '@/constants/common';
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType, VERTICAL_GUTTER } from '@/constants/global';
 import { allLegTypes } from '@/constants/legColDefs';
 import { orderLegColDefs } from '@/constants/legColDefs/common/order';
+import {
+  COMPUTED_LEG_FIELD_MAP,
+  COMPUTED_LEG_FIELDS,
+} from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
+import { TRADESCOL_FIELDS } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
+import { LEG_MAP } from '@/constants/legType';
+import { PRICING_FROM_TAG } from '@/constants/trade';
+import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
-import Form from '@/lib/components/_Form2';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import { trdBookList } from '@/services/general-service';
 import { mktInstrumentWhitelistListPaged } from '@/services/market-data-service';
 import {
@@ -20,21 +34,21 @@ import {
   clientSaveAccountOpRecord,
   clientTradeCashFlow,
   cliMmarkTradeTaskProcessed,
-  cliTasksGenerateByTradeId,
   cliUnProcessedTradeTaskListByTradeId,
   refSalesGetByLegalName,
 } from '@/services/reference-data-service';
 import { refPartyGetByLegalName, trdTradeCreate } from '@/services/trade-service';
 import { GetContextMenuItemsParams, MenuItemDef } from 'ag-grid-community';
-import { Button, message, Modal, Row, Tabs } from 'antd';
+import { Button, message, Row, Tabs } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
+import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
+import router from 'umi/router';
 import uuidv4 from 'uuid/v4';
-import { OUR_CREATE_FORM_CONTROLS, TABLE_COL_DEFS, TOOUR_CREATE_FORM_CONTROLS } from './constants';
 import { bookingTableFormControls } from './services';
 
 const ButtonGroup = Button.Group;
@@ -70,6 +84,9 @@ class BookCreate extends PureComponent<any> {
     tradeTableData: [],
     tadeInfo: {},
     modalVisible: false,
+    entryMargin: true,
+    entryPremium: true,
+    entryCash: false,
   };
 
   public modalFormData: any;
@@ -79,14 +96,73 @@ class BookCreate extends PureComponent<any> {
   }
 
   public componentDidMount = () => {
+    this.loadBookList();
+    this.loadInstrumentIds();
+    this.initialFromPricingPage();
+  };
+
+  // http://10.1.2.16:8080/browse/OTMS-2659
+  public getConvertPremium = (leg: ILegType, defaultData, pricingData) => {
+    if (!!leg.getColumnDefs().find(item => item.field === LEG_FIELD.PREMIUM) === false) {
+      return {};
+    }
+    return {
+      [LEG_FIELD.PREMIUM]: Math.abs(
+        (defaultData[LEG_FIELD.PREMIUM_TYPE] === PREMIUM_TYPE_MAP.PERCENT
+          ? pricingData[COMPUTED_LEG_FIELD_MAP.PRICE_PER]
+          : pricingData[COMPUTED_LEG_FIELD_MAP.PRICE]) || 0
+      ),
+    };
+  };
+
+  public initialFromPricingPage = () => {
+    const { location } = this.props;
+    const { query } = location;
+    const { from } = query;
+    if (from === PRICING_FROM_TAG) {
+      const dataSource = this.props.pricingData.dataSource.map(item => {
+        const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
+        const defaultData = createLegDataSourceItem(leg, leg.getDefault({}, false));
+        const pricingColumnDefs = leg.getColumnDefs('pricing');
+        const bookColumnDefs = leg.getColumnDefs('booking');
+        const differenceColumnDefs = _.differenceBy(
+          pricingColumnDefs,
+          bookColumnDefs,
+          item => item.field
+        );
+        const differenceColumnFields = differenceColumnDefs.map(item => item.field);
+
+        return {
+          ...defaultData,
+          ..._.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS, ...differenceColumnFields]),
+          ...this.getConvertPremium(leg, defaultData, item),
+          [LEG_PRICING_FIELD]: false,
+        };
+      });
+      this.setState({
+        dataSource,
+        columnDefs: orderLegColDefs(
+          _.unionBy<IColDef>(
+            this.chainColumnsDefs(
+              dataSource.reduce((container, item) => {
+                const leg = LEG_MAP[item[LEG_TYPE_FIELD]];
+                return container.concat(leg.getColumnDefs('booking'));
+              }, [])
+            ),
+            item => item.field
+          )
+        ),
+      });
+    }
+  };
+
+  public loadBookList = () => {
     trdBookList().then(rsp => {
       if (rsp.error) return;
       this.setState({
         bookList: rsp.data,
       });
     });
-
-    this.loadInstrumentIds();
   };
 
   public loadInstrumentIds = () => {
@@ -106,11 +182,11 @@ class BookCreate extends PureComponent<any> {
 
     if (!legType) return false;
 
-    return !!legType.columnDefs.find(item => item.field === colDef.field);
+    return !!legType.getColumnDefs(false, false).find(item => item.field === colDef.field);
   };
 
   public handleAddLeg = event => {
-    const leg = allLegTypes.find(item => item.type === event.key);
+    const leg = allLegTypes.find(item => (item ? item.type === event.key : null));
 
     if (!leg) return;
 
@@ -126,35 +202,42 @@ class BookCreate extends PureComponent<any> {
     return this.judgeLegTypeExsit(colDef, data);
   };
 
+  public chainColumnsDefs = (columnDefs: IColDef[]): IColDef[] => {
+    return columnDefs.map<IColDef>(col => {
+      return {
+        ...col,
+        suppressMenu: true,
+        editable: col.editable
+          ? params => {
+              if (typeof col.editable === 'function') {
+                if (col.editable(params)) {
+                  return this.handleJudge(params);
+                } else {
+                  return false;
+                }
+              }
+              return this.handleJudge(params);
+            }
+          : false,
+        exsitable: params => {
+          const legExsitable = this.handleJudge(params);
+          if (!legExsitable) return false;
+          if (typeof col.exsitable === 'function') {
+            return col.exsitable(params);
+          }
+          return col.exsitable === undefined ? true : col.exsitable;
+        },
+      };
+    });
+  };
+
   public addLegData = (leg, rowData) => {
     this.setState(
       produce((state: any) => {
         if (this.cacheTyeps.indexOf(leg.type) !== -1) {
           state.columnDefs = orderLegColDefs(
             _.unionBy<IColDef>(
-              state.columnDefs.concat(
-                leg.columnDefs.map(col => {
-                  return {
-                    ...col,
-                    suppressMenu: true,
-                    editable: col.editable
-                      ? params => {
-                          if (typeof col.editable === 'function') {
-                            if (col.editable(params)) {
-                              return this.handleJudge(params);
-                            } else {
-                              return false;
-                            }
-                          }
-                          return this.handleJudge(params);
-                        }
-                      : false,
-                    exsitable: params => {
-                      return this.handleJudge(params);
-                    },
-                  };
-                })
-              ),
+              state.columnDefs.concat(this.chainColumnsDefs(leg.getColumnDefs())),
               item => item.field
             )
           );
@@ -184,7 +267,6 @@ class BookCreate extends PureComponent<any> {
       'separator',
       'copy',
       'paste',
-      'export',
     ];
   };
 
@@ -231,16 +313,17 @@ class BookCreate extends PureComponent<any> {
     return this.state.dataSource.find(item => item.id === colField);
   };
 
-  public createTrade = async event => {
+  public createTrade = async () => {
     const tableDataSource = this.state.dataSource;
-    if (_.isEmpty(tableDataSource)) {
-      message.warn('请添加期权结构');
-      return false;
-    }
 
     const trade = convertTradePageData2ApiData(
       tableDataSource,
-      this.state.bookTableFormData,
+      _.mapValues(this.state.bookTableFormData, (val, key) => {
+        if (key === 'tradeId') {
+          return val && (val as string).replace('.', '-');
+        }
+        return val;
+      }),
       this.props.currentUser.userName
     );
 
@@ -249,24 +332,24 @@ class BookCreate extends PureComponent<any> {
       validTime: '2018-01-01T10:10:10',
     });
 
-    if (error) return false;
+    if (error) return;
 
-    const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
-      tradeId: trade.tradeId,
-      legalName: trade.positions[0].counterPartyCode,
-    });
+    // const { error: _error, data: _data } = await cliTasksGenerateByTradeId({
+    //   tradeId: trade.tradeId,
+    //   legalName: trade.positions[0].counterPartyCode,
+    // });
 
-    if (_error) return false;
+    // if (_error) return;
 
     this.setState({
       dataSource: [],
-      createModalDataSource: _data,
+      // createModalDataSource: _data,
       visible: true,
-      bookTableFormData: {},
+      // bookTableFormData: {},
     });
   };
 
-  public onCreateTradeButtonClick = async event => {
+  public onCreateTradeButtonClick = async () => {
     const validateTableFormRsp: any = await this.$sourceTable.validateTableForm();
 
     if (validateTableFormRsp.error) return;
@@ -282,7 +365,7 @@ class BookCreate extends PureComponent<any> {
     this.setState({
       createTradeLoading: true,
     });
-    await this.createTrade(event);
+    await this.createTrade();
     this.setState({
       createTradeLoading: false,
     });
@@ -293,20 +376,20 @@ class BookCreate extends PureComponent<any> {
   };
 
   public handleA = async (uuidList, values, resolve) => {
-    const clientTradeCashFlowRsp = await clientTradeCashFlow({
+    const clientNewTradeRsp = await clientNewTrade({
       accountId: this.modalFormData
         ? this.modalFormData.accountId
         : this.state.selectedRows[0].accountId,
+      premium: values.premium,
+      information: '',
       tradeId: values.tradeId,
-      cashFlow: String(values.cashFlow),
-      marginFlow: String(0),
     });
 
-    if (clientTradeCashFlowRsp.error) {
+    if (clientNewTradeRsp.error) {
       return resolve(false);
     }
-    if (!clientTradeCashFlowRsp.data.status) {
-      message.error(clientTradeCashFlowRsp.data.information);
+    if (!clientNewTradeRsp.data.status) {
+      message.error(clientNewTradeRsp.data.information);
       return resolve(false);
     }
     const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
@@ -315,6 +398,38 @@ class BookCreate extends PureComponent<any> {
     if (cliMmarkTradeTaskProcessedRsp.error) {
       return resolve(false);
     }
+
+    resolve(true);
+    this.onFetch();
+    message.success('录入成功');
+  };
+
+  public handleD = async (uuidList, values, resolve, type) => {
+    const clientSettleTradeRsp = await clientSettleTrade({
+      accountId: this.modalFormData
+        ? this.modalFormData.accountId
+        : this.state.selectedRows[0].accountId,
+      amount: values.cashFlow,
+      accountEvent: type,
+      premium: values.premium,
+      information: '',
+      tradeId: values.tradeId,
+    });
+
+    if (clientSettleTradeRsp.error) {
+      return resolve(false);
+    }
+    if (!clientSettleTradeRsp.data.status) {
+      message.error(clientSettleTradeRsp.data.information);
+      return resolve(false);
+    }
+    const cliMmarkTradeTaskProcessedRsp = await cliMmarkTradeTaskProcessed({
+      uuidList,
+    });
+    if (cliMmarkTradeTaskProcessedRsp.error) {
+      return resolve(false);
+    }
+
     resolve(true);
     this.onFetch();
     message.success('录入成功');
@@ -383,15 +498,27 @@ class BookCreate extends PureComponent<any> {
         if (error) return resolve(false);
         switch (values.cashType) {
           case '期权费扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.premium = new BigNumber(values.premium).negated().toNumber();
           case '期权费收入':
             return this.handleA(uuidList, values, resolve);
           case '授信扣除':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '授信恢复':
             return this.handleB(uuidList, values, resolve);
+          case '平仓金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '平仓金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'UNWIND_TRADE');
+          case '结算金额扣除':
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
+          case '结算金额收入':
+            values.premium = new BigNumber(values.premium).negated().toNumber();
+            return this.handleD(uuidList, values, resolve, 'SETTLE_TRADE');
           case '保证金释放':
-            values.cashFlow = '-' + values.cashFlow;
+            values.cashFlow = new BigNumber(values.cashFlow).negated().toNumber();
           case '保证金冻结':
             return this.handleC(uuidList, values, resolve);
           default:
@@ -458,6 +585,7 @@ class BookCreate extends PureComponent<any> {
   public handleCancel = () => {
     this.setState({
       visible: false,
+      bookTableFormData: {},
     });
   };
 
@@ -488,6 +616,7 @@ class BookCreate extends PureComponent<any> {
       legalName: event.rowData.legalName,
       tradeId: event.rowData.tradeId,
       cashFlow: event.rowData.cashFlow,
+      premium: event.rowData.premium,
     };
     const toOurDataSource = {
       legalName: event.rowData.legalName,
@@ -510,13 +639,83 @@ class BookCreate extends PureComponent<any> {
     });
   };
 
-  public handleChangeValueOur = values => {
+  public handleChangeValueOur = params => {
+    const values = params.values;
+    if (values.cashType === '保证金释放' || values.cashType === '保证金冻结') {
+      this.setState({
+        item: false,
+        entryMargin: false,
+        entryPremium: false,
+        entryCash: true,
+        ourDataSource: values,
+      });
+      return;
+    }
+    if (
+      values.cashType === '平仓金额收入' ||
+      values.cashType === '平仓金额扣除' ||
+      values.cashType === '结算金额收入' ||
+      values.cashType === '结算金额扣除'
+    ) {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '期权费收入' || values.cashType === '期权费扣除') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: true,
+        entryCash: false,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
+    if (values.cashType === '授信扣除' || values.cashType === '授信恢复') {
+      this.setState({
+        entryMargin: true,
+        entryPremium: false,
+        entryCash: true,
+        ourDataSource: {
+          ...values,
+          tradeId: this.modalFormData.tradeId,
+          premium: this.modalFormData.premium,
+          cashFlow: this.modalFormData.cashFlow,
+        },
+      });
+      return;
+    }
+
     this.setState({
-      ourDataSource: values,
+      entryMargin: true,
+      entryPremium: false,
+      entryCash: false,
+      ourDataSource: {
+        ...values,
+        tradeId: this.modalFormData.tradeId,
+        premium: this.modalFormData.premium,
+        cashFlow: this.modalFormData.cashFlow,
+      },
     });
   };
 
-  public handleChangeValueToOur = values => {
+  public handleChangeValueToOur = params => {
+    const values = params.values;
     this.setState({
       toOurDataSource: values,
     });
@@ -588,7 +787,7 @@ class BookCreate extends PureComponent<any> {
     }
   };
 
-  public onSwtichModal = () => {
+  public onSwtichModal = async () => {
     this.setState({
       modalVisible: !this.state.modalVisible,
     });
@@ -613,7 +812,7 @@ class BookCreate extends PureComponent<any> {
       <PageHeaderWrapper>
         <SourceTable
           header={
-            <Row style={{ marginBottom: VERTICAL_GUTTER }}>
+            <Row type="flex" justify="space-between" style={{ marginBottom: VERTICAL_GUTTER }}>
               <ButtonGroup>
                 <MultilLegCreateButton
                   isPricing={false}
@@ -629,6 +828,16 @@ class BookCreate extends PureComponent<any> {
                   完成簿记
                 </Button>
               </ButtonGroup>
+
+              {_.get(this.props.location, 'query.from', false) && (
+                <Button
+                  onClick={() => {
+                    router.push('/trade-management/pricing');
+                  }}
+                >
+                  返回定价
+                </Button>
+              )}
             </Row>
           }
           tableFormData={this.state.bookTableFormData}
@@ -665,7 +874,7 @@ class BookCreate extends PureComponent<any> {
           columnDefs={this.state.columnDefs}
           pagination={false}
         />
-        <Modal
+        {/* <Modal
           visible={this.state.visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
@@ -702,8 +911,12 @@ class BookCreate extends PureComponent<any> {
                   return;
                 }}
                 dataSource={this.state.ourDataSource}
-                controls={OUR_CREATE_FORM_CONTROLS}
-                onChangeValue={this.handleChangeValueOur}
+                controls={OUR_CREATE_FORM_CONTROLS(
+                  this.state.entryMargin,
+                  this.state.entryPremium,
+                  this.state.entryCash
+                )}
+                onValueChange={this.handleChangeValueOur}
                 controlNumberOneRow={1}
                 footer={false}
               />
@@ -718,13 +931,18 @@ class BookCreate extends PureComponent<any> {
                 }}
                 dataSource={this.state.toOurDataSource}
                 controls={TOOUR_CREATE_FORM_CONTROLS}
-                onChangeValue={this.handleChangeValueToOur}
+                onValueChange={this.handleChangeValueToOur}
                 controlNumberOneRow={1}
                 footer={false}
               />
             </TabPane>
           </Tabs>
-        </Modal>
+        </Modal> */}
+        <CashExportModal
+          visible={this.state.visible}
+          trade={this.state.bookTableFormData}
+          convertVisible={this.handleCancel}
+        />
       </PageHeaderWrapper>
     );
   }
@@ -732,4 +950,5 @@ class BookCreate extends PureComponent<any> {
 
 export default connect(state => ({
   currentUser: (state.user as any).currentUser,
+  pricingData: state.pricingData,
 }))(BookCreate);

@@ -1,3 +1,5 @@
+import { IColDef } from '@/design/components/Table/types';
+
 export const ROLE_LOCAL_FIELD = 'tongyu_ROLE_LOCAL_FIELD';
 
 export const TOKEN_LOCAL_FIELD = 'tongyu_TOKEN_LOCAL_FIELD';
@@ -19,3 +21,30 @@ export const HOST_TEST = process.env.NODE_ENV === 'development' ? '/api/' : '/';
 
 // 生产环境
 export const HOST_PRO = process.env.NODE_ENV === 'development' ? '/api/' : '/';
+
+export const SOCKET_MAP = {
+  ALL: 'ALL',
+  PNL: 'PNL',
+  RISK: 'RISK',
+  POSITION: 'POSITION',
+  VALUATION: 'VALUATION',
+};
+
+// 下拉 select 的 全部 选项
+export const ALL_OPTIONS_VALUE = 'all';
+
+export const DEFAULT_TERM = 30;
+
+export const DEFAULT_DAYS_IN_YEAR = 365;
+
+export interface ILegType {
+  type: string;
+  name: string;
+  assetClass: string;
+  getColumnDefs: (env?: string) => IColDef[];
+  getPricingColumnDefs?: () => any[];
+  isAnnualized: boolean;
+  getDefault?: any;
+  getPosition?: any;
+  getPageData?: any;
+}

@@ -2,6 +2,7 @@ import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import { trdTradeLCMEventList } from '@/services/general-service';
 import produce from 'immer';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import { OVERVIEW_TABLE_COLUMNDEFS, ROW_KEY } from './constants';
@@ -25,8 +26,12 @@ class LifeModalTable extends PureComponent<
     });
     this.switchLifeLoading();
     if (error) return;
+    const result = [...data];
+    result.sort((item1, item2) => {
+      return moment(item1.createdAt).valueOf() - moment(item2.createdAt).valueOf();
+    });
     this.setState({
-      lifeTableData: data.map(item => {
+      lifeTableData: result.map(item => {
         return {
           ...item,
           uuid: uuidv4(),
@@ -43,7 +48,7 @@ class LifeModalTable extends PureComponent<
     );
   };
 
-  public handleOk = () => {
+  public handleOk = async () => {
     this.setState({
       modalVisiable: false,
     });
@@ -72,6 +77,9 @@ class LifeModalTable extends PureComponent<
       title: '生命周期事件概览',
       footer: false,
       closable: true,
+      onOk: this.handleOk,
+      visible: this.state.modalVisiable,
+      onCancel: this.handleCancel,
     };
 
     return (
@@ -80,10 +88,7 @@ class LifeModalTable extends PureComponent<
         key="check"
         type="primary"
         onClick={this.showModal}
-        visible={this.state.modalVisiable}
         modalProps={modalProps}
-        onCancel={this.handleCancel}
-        onConfirm={this.handleOk}
         content={
           <SourceTable
             rowKey={'uuid'}

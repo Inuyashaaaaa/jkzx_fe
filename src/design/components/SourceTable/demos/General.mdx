@@ -98,7 +98,7 @@ import produce from 'immer';
                     dataSource={dataSource}
                     header={
                         <Row style={{marginBottom: 10}}>
-                            <ModalButton visible={visible} onClick={this.onModalButtonClick} onConfirm={this.onCreate} key='create' type='primary' content={
+                            <ModalButton visible={visible} onClick={this.onModalButtonClick} modalProps={{ onOk: this.onCreate }} key='create' type='primary' content={
                             <Form
                                 wrappedComponentRef={ref => this.$createForm = ref}
                                 controlNumberOneRow={1}

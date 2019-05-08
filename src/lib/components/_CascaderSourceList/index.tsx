@@ -28,7 +28,8 @@ export interface CascaderSourceListProps {
   onChange?: (value: string[][]) => void;
   createable?: boolean;
   removeable?: boolean;
-  onSearch?: (value: any, index: number) => void;
+  onSearch?: (value: any, index: number, dataSourceItem: any) => void;
+  sort?: boolean;
 }
 
 class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
@@ -65,7 +66,7 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
     );
   });
 
-  public countNodes = memo((list, options) => {
+  public countNodes = memo((list, options, sort) => {
     const nodes = [];
     // list 长度和 option 深度得手动保证一致，暂不做验证，提高效率
     const deep = list.length;
@@ -77,7 +78,6 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
       }
       nodes[curDeep] = _.flatten(nodes[curDeep - 1].map(item => item.children));
     });
-
     return nodes;
   });
 
@@ -154,7 +154,7 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
 
   public bindSearch = (index, dataSourceItem) => value => {
     if (this.props.onSearch) {
-      const dataSource = this.props.onSearch(value, index);
+      const dataSource = this.props.onSearch(value, index, dataSourceItem);
       if (Array.isArray(dataSource)) {
         return this.setState(
           produce(
@@ -184,9 +184,8 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
   };
 
   public render() {
-    const { list, width, options, loading, removeable } = this.props;
-
-    const nodes = this.countNodes(list, options);
+    const { list, width, options, loading, removeable, sort } = this.props;
+    const nodes = this.countNodes(list, options, sort);
 
     return (
       <Loading loading={loading}>
@@ -201,6 +200,16 @@ class CascaderSourceList extends PureComponent<CascaderSourceListProps> {
               ...rest
             } = listItem;
             const dataSource = this.getListDataSource(index, this.getValue(), nodes);
+            if (sort && listItem.title !== 'Position') {
+              dataSource.sort((a, b) => {
+                return b.label.toString().localeCompare(a.label.toString());
+              });
+            }
+            if (sort && listItem.title === 'Position') {
+              dataSource.sort((a, b) => {
+                return b.data.expiry.toString().localeCompare(a.data.expiry.toString());
+              });
+            }
             return (
               <Col key={index}>
                 <SourceList

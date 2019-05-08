@@ -25,24 +25,27 @@ Install:
   script:
     - yarn install
   only:
-    - master-staging
     - master
+    - master-staging
+    - /release.*/
 
 Lint:
   stage: test
   script:
     - echo 'yarn run lint'
   only:
-    - master-staging
     - master
+    - master-staging
+    - /release.*/
 
 Test:
   stage: test
   script:
     - echo 'yarn run test'
   only:
-    - master-staging
     - master
+    - master-staging
+    - /release.*/
 
 Build:
   stage: build
@@ -51,6 +54,14 @@ Build:
   only:
     - master
     - master-staging
+    - /release.*/
+
+Deploy-Release:
+  stage: deploy
+  script:
+    - yarn run deploy:release
+  only:
+    - /release.*/
 
 Deploy-Test:
   stage: deploy
@@ -59,19 +70,18 @@ Deploy-Test:
   only:
     - master-staging
 
-Deploy-Doc:
-  stage: deploy
-  script:
-    - yarn run deploy:doc
-  when: manual
-  only:
-    - master
-    - master-staging
-
 Deploy-Prod:
   stage: deploy
   script:
     - yarn run deploy:prod
+  when: manual
+  only:
+    - master
+
+Deploy-Doc:
+  stage: deploy
+  script:
+    - yarn run deploy:doc
   when: manual
   only:
     - master

@@ -61,6 +61,16 @@ export async function mgnMarginsUpdate(params) {
   });
 }
 
+export async function mgnMarginSearch(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'mgnMarginSearch',
+      params,
+    },
+  });
+}
+
 // export async function refPartyList(params = {}) {
 //   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
 //     method: `POST`,
@@ -101,6 +111,26 @@ export async function refSimilarLegalNameList(params) {
   });
 }
 
+export async function refSimilarSalesNameList(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refSimilarSalesNameList',
+      params,
+    },
+  });
+}
+
+export async function refMasterAgreementSearch(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refMasterAgreementSearch',
+      params,
+    },
+  });
+}
+
 export async function refSimilarAccountNameList(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,
@@ -126,6 +156,16 @@ export async function refBankAccountSave(params) {
     method: `POST`,
     body: {
       method: 'refBankAccountSave',
+      params,
+    },
+  });
+}
+
+export async function refBankAccountDel(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refBankAccountDel',
       params,
     },
   });
@@ -176,6 +216,28 @@ export async function clientSaveAccountOpRecord(params = {}) {
     method: `POST`,
     body: {
       method: 'clientSaveAccountOpRecord',
+      params,
+    },
+  });
+}
+
+// 根据交易对手获取交易id
+export async function trdTradeIdListByCounterPartyName(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradeIdListByCounterPartyName',
+      params,
+    },
+  });
+}
+
+// 调整授信额度
+export async function clientUpdateCredit(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientUpdateCredit',
       params,
     },
   });
@@ -316,6 +378,69 @@ export async function cliUnProcessedTradeTaskListByTradeId(params) {
     method: `POST`,
     body: {
       method: 'cliUnProcessedTradeTaskListByTradeId',
+      params,
+    },
+  });
+}
+
+export async function refPartyList(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refPartyList',
+      params,
+    },
+  });
+}
+
+export async function cliFundEventSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'cliFundEventSearch',
+      params,
+    },
+  });
+}
+
+export async function cliTradeTaskSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'cliTradeTaskSearch',
+      params: {
+        ...params,
+        processStatus: 'UN_PROCESSED',
+      },
+    },
+  });
+}
+
+export async function clientAccountOpRecordSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientAccountOpRecordSearch',
+      params,
+    },
+  });
+}
+
+export async function clientAccountGetByLegalName(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'clientAccountGetByLegalName',
+      params,
+    },
+  });
+}
+
+export async function rptValuationReportSearch(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptValuationReportSearch',
       params,
     },
   });

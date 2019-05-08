@@ -1,18 +1,17 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import SourceTable from '@/design/components/SourceTable';
 import { unionId } from '@/design/utils/unionId';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import {
-  rptIntradayPnlReportPaged,
-  rptIntradayRiskReportPaged,
-  rptIntradayTradeExpiringReportPaged,
-} from '@/services/report-service';
+import { rptIntradayPnlReportPaged } from '@/services/report-service';
+import { socketHOC } from '@/tools/socketHOC';
+import { ISourceTable } from '@/types';
 import { Row } from 'antd';
 import React, { PureComponent } from 'react';
 import { PAGE_TABLE_COL_DEFS } from './constants';
 
-class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent {
+class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent implements ISourceTable {
   public $sourceTable: SourceTable = null;
 
   public state = {
@@ -27,7 +26,7 @@ class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent {
     },
   };
 
-  public fetchTable = async (paramsPagination?) => {
+  public fetch = async (paramsPagination?) => {
     this.setState({
       loading: true,
     });
@@ -57,7 +56,7 @@ class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent {
   };
 
   public componentDidMount = () => {
-    this.fetchTable();
+    this.fetch();
   };
 
   public onPaginationChange = ({ pagination }) => {
@@ -69,16 +68,38 @@ class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent {
         },
       },
       () => {
-        this.fetchTable();
+        this.fetch();
       }
     );
   };
 
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
+
   public render() {
+    const _data = this.handleData(
+      this.state.tableDataSource,
+      PAGE_TABLE_COL_DEFS.map(item => item.field),
+      PAGE_TABLE_COL_DEFS.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper title="标的盈亏">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <ReloadGreekButton fetchTable={this.fetchTable} id="refPartySave" />
+          <ReloadGreekButton fetchTable={this.fetch} id="real_time_dag" />
         </Row>
         <SourceTable
           loading={this.state.loading}
@@ -104,10 +125,24 @@ class RiskManagerIntradayDailyPnlByUnderlyerReport extends PureComponent {
           //     return styles.makeError;
           //   }
           // }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: PAGE_TABLE_COL_DEFS.map(item => item.headerName),
+                name: '标的盈亏',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );
   }
 }
 
-export default RiskManagerIntradayDailyPnlByUnderlyerReport;
+export default socketHOC(RiskManagerIntradayDailyPnlByUnderlyerReport);

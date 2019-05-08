@@ -3,6 +3,7 @@ import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { removeCalendar } from '@/services/calendars';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 import produce from 'immer';
+import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import Calendars from './Calendars';
@@ -63,9 +64,18 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     this.setState({
       tableDataSource: data.map(item => {
         const { eventInfo = {} } = item;
+        let barriers;
+        if (item.notificationEventType === 'KNOCK_OUT') {
+          if (eventInfo.productType === 'DOUBLE_SHARK_FIN') {
+            barriers = _.values(_.pick(eventInfo, ['lowBarrier', 'highBarrier'])).join('/');
+          } else if (eventInfo.productType === 'BARRIER') {
+            barriers = eventInfo.barrier;
+          }
+        }
         return {
           ...item,
           ...eventInfo,
+          barriers,
         };
       }),
     });
@@ -134,7 +144,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
             resetable={true}
             onSearchButtonClick={this.onFetch}
             onResetButtonClick={this.onReset}
-            rowKey="uuid"
+            rowKey="notificationUUID"
             ref={node => (this.$sourceTable = node)}
             searchFormData={this.state.searchFormData}
             onSearchFormChange={this.onSearchFormChange}

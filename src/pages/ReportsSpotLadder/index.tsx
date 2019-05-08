@@ -1,21 +1,31 @@
 import {
   ASSET_CLASS_ZHCN_MAP,
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
-  INPUT_NUMBER_PERCENTAGE_CONFIG,
+  INPUT_NUMBER_LOT_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import RangeNumberInput from '@/containers/RangeNumberInput';
 import Form from '@/design/components/Form';
 import SourceTable from '@/design/components/SourceTable';
 import { IColDef } from '@/design/components/Table/types';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { countDeltaCash, countGamaCash, countRhoR } from '@/services/cash';
+import {
+  countDelta,
+  countDeltaCash,
+  countGamaCash,
+  countGamma,
+  countPnlValue,
+  countRhoR,
+  countTheta,
+  countVega,
+} from '@/services/cash';
 import { mktInstrumentInfo } from '@/services/market-data-service';
 import { prcSpotScenarios } from '@/services/pricing-service';
 import { trdBookListBySimilarBookName, trdInstrumentListByBook } from '@/services/trade-service';
 import { Card, Empty, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
-import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
@@ -40,49 +50,54 @@ class Component extends PureComponent<
       instruments: [],
       tableColumnDefs: [
         {
-          headerName: '标的物价格 (¥)',
+          headerName: '标的物价格',
           field: 'underlyerPrice',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
-          headerName: '价格 (¥)',
+          headerName: '价格',
           field: 'price',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+        },
+        {
+          headerName: 'PNL变动',
+          field: 'pnlChange',
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'DELTA',
           field: 'delta',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_LOT_CONFIG,
         },
         {
           headerName: 'DELTA CASH',
           field: 'deltaCash',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'GAMMA',
           field: 'gamma',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_DIGITAL_CONFIG,
         },
         {
           headerName: 'GAMMA CASH',
           field: 'gammaCash',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'VEGA',
           field: 'vega',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'THETA',
           field: 'theta',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
         },
         {
           headerName: 'RHO_R',
           field: 'rhoR',
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          input: INPUT_NUMBER_DIGITAL_CONFIG,
         },
       ],
     };
@@ -95,31 +110,57 @@ class Component extends PureComponent<
     const { error, data } = await prcSpotScenarios(
       this.convertSearchFormData(this.state.searchFormData)
     );
-    this.setState({
-      loading: false,
-    });
+
     if (error) return;
 
     const instruments = this.convertInstruments(data);
 
-    this.setState({ instruments }, () => this.fetchAssets());
+    let nextInstruments: any[] = await this.fetchAssets(instruments);
+
+    nextInstruments = nextInstruments.map(item => {
+      const multiplier = item.multiplier;
+      return {
+        ...item,
+        tableDataSource: item.tableDataSource.map((dataItem, key) => {
+          return {
+            ...dataItem,
+            pnlChange: countPnlValue(dataItem.pnlChange),
+            delta: countDelta(dataItem.delta, multiplier),
+            deltaCash: countDeltaCash(dataItem.delta, dataItem.underlyerPrice),
+            gamma: countGamma(dataItem.gamma, multiplier, dataItem.underlyerPrice),
+            gammaCash: countGamaCash(dataItem.gamma, dataItem.underlyerPrice),
+            theta: countTheta(dataItem.theta),
+            vega: countVega(dataItem.vega),
+            rhoR: countRhoR(dataItem.rhoR),
+          };
+        }),
+      };
+    });
+
+    this.setState({
+      loading: false,
+    });
+
+    this.setState({ instruments: nextInstruments });
   };
 
-  public fetchAssets = () => {
-    this.state.instruments.forEach((item, index) => {
-      mktInstrumentInfo({
-        instrumentId: item.underlyerInstrumentId,
-      }).then(result => {
-        const { error, data } = result;
-        if (error) return;
-        this.setState(
-          produce((state: any) => {
-            state.instruments[index].assetClass = ASSET_CLASS_ZHCN_MAP[data.assetClass];
-            state.instruments[index].instrumentType = INSTRUMENT_TYPE_ZHCN_MAP[data.instrumentType];
-          })
-        );
-      });
-    });
+  public fetchAssets = instruments => {
+    return Promise.all(
+      instruments.map((item, index) => {
+        return mktInstrumentInfo({
+          instrumentId: item.underlyerInstrumentId,
+        }).then(result => {
+          const { error, data } = result;
+          if (error) return item;
+          return {
+            ...item,
+            assetClass: ASSET_CLASS_ZHCN_MAP[data.assetClass],
+            instrumentType: INSTRUMENT_TYPE_ZHCN_MAP[data.instrumentType],
+            multiplier: data.instrumentInfo.multiplier,
+          };
+        });
+      })
+    );
   };
 
   public convertSearchFormData = formData => {
@@ -150,33 +191,39 @@ class Component extends PureComponent<
     return unionUnderlyerInstruments.map(array => {
       const item = array[0];
 
-      const dataSource = array
-        .map(item => {
-          return {
-            ...item,
-            gammaCash: countGamaCash(item.gamma, item.underlyerPrice),
-            deltaCash: countDeltaCash(item.delta, item.underlyerPrice),
-            rhoR: countRhoR(item.rhoR),
-          };
-        })
-        .map(item => _.omitBy(item, _.isNull));
+      const dataSource = array;
+
       const groups = _.groupBy(dataSource, 'scenarioId');
       const groupObj = _.mapValues(groups, (group, scenarioId) => {
         return group.reduce((dist, next) => {
           Object.keys(next).forEach(key => {
             const value = next[key];
-            dist[key] = _.isNumber(value)
-              ? new BigNumber(value).plus(dist[key] || 0).toNumber()
-              : value;
+            dist[key] =
+              [
+                'pnlChange',
+                'delta',
+                'deltaCash',
+                'gamma',
+                'gammaCash',
+                'q',
+                'r',
+                'rhoQ',
+                'rhoR',
+                'theta',
+                'vega',
+                'vol',
+                'price',
+              ].indexOf(key) > -1
+                ? new BigNumber(value).plus(dist[key] || 0).toNumber()
+                : value;
           });
           return dist;
         }, {});
       });
-      const tableDataSource = _.values(groupObj);
+
+      const tableDataSource = _.values(groupObj).map(item => _.omitBy(item, _.isNull));
 
       return {
-        assetClass: '...',
-        instrumentType: '...',
         underlyerInstrumentId: item.underlyerInstrumentId,
         tableDataSource,
       };
@@ -227,7 +274,32 @@ class Component extends PureComponent<
     });
   };
 
+  public handleData = (instruments, cols, headers) => {
+    const json = instruments.map(item => {
+      const data = [];
+      data.push(headers);
+      const length = data.length;
+      item.tableDataSource.forEach((ds, index) => {
+        const _data = [];
+        Object.keys(ds).forEach(key => {
+          const dsIndex = _.findIndex(cols, k => k === key);
+          if (dsIndex >= 0) {
+            _data[dsIndex] = ds[key];
+          }
+        });
+        data.push(_data);
+      });
+      return data;
+    });
+    return json;
+  };
+
   public render() {
+    const headers = this.state.tableColumnDefs.map(item => item.headerName);
+    headers.unshift('');
+    const cols = this.state.tableColumnDefs.map(item => item.field);
+    cols.unshift('scenarioId');
+    const _data = this.handleData(this.state.instruments, cols, headers);
     return (
       <PageHeaderWrapper title="标的物情景分析" card={false}>
         <Card>
@@ -303,6 +375,19 @@ class Component extends PureComponent<
           />
         </Card>
         <Card style={{ marginTop: 15 }} loading={this.state.loading}>
+          <DownloadExcelButton
+            style={{ margin: '10px 0' }}
+            key="export"
+            type="primary"
+            data={{
+              dataSource: _data,
+              cols: headers,
+              name: '标的物情景分析',
+            }}
+            tabs={this.state.instruments.map(item => item.underlyerInstrumentId)}
+          >
+            导出Excel
+          </DownloadExcelButton>
           {this.state.instruments && !!this.state.instruments.length ? (
             <Tabs animated={false}>
               {this.state.instruments.map(item => {

@@ -45,11 +45,31 @@ export async function trdTradeSearchPaged(params = {}) {
   });
 }
 
+export async function trdTradeSearchIndexPaged(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradeSearchIndexPaged',
+      params,
+    },
+  });
+}
+
 export async function trdTradeListByBook(params = {}) {
   return request(`${HOST_TEST}trade-service/api/rpc`, {
     method: `POST`,
     body: {
       method: 'trdTradeListByBook',
+      params,
+    },
+  });
+}
+
+export async function positionDocPositionIdListByTradeId(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'positionDocPositionIdListByTradeId',
       params,
     },
   });

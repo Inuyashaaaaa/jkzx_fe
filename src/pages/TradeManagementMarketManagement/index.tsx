@@ -39,10 +39,13 @@ class TradeManagementMarketManagement extends PureComponent {
       lastUpdateTime: moment().format('HH:mm:ss'),
     });
     return mktQuotesListPaged({
-      page: event.pagination.current - 1,
+      page: !this.state.reload ? event.pagination.current - 1 : 0,
       pageSize: event.pagination.pageSize,
       ...event.searchFormData,
     }).then(result => {
+      this.setState({
+        reload: false,
+      });
       if (result.error) return undefined;
 
       return {
@@ -63,6 +66,18 @@ class TradeManagementMarketManagement extends PureComponent {
     this.setState(
       {
         searchFormData: event.formData,
+        reload: true,
+      },
+      () => {
+        this.$sourceTable.search();
+      }
+    );
+  };
+
+  public onReset = event => {
+    this.setState(
+      {
+        searchFormData: {},
       },
       () => {
         this.$sourceTable.search();
@@ -80,6 +95,7 @@ class TradeManagementMarketManagement extends PureComponent {
           searchButtonProps={{
             icon: 'reload',
           }}
+          onReset={this.onReset}
           searchText={`刷新 ${this.state.lastUpdateTime}`}
           searchFormControls={searchFormControls}
           searchFormData={this.state.searchFormData}

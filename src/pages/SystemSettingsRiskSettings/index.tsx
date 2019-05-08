@@ -167,13 +167,15 @@ class SystemSettingsRiskSettings extends PureComponent {
                   key="import"
                   type="primary"
                   onImport={data => {
+                    console.log('data', data);
+                    const _data = data.data[0][Object.keys(data.data[0])[0]];
                     this.setState({
                       visible: true,
-                      excelData: data.data.slice(1).map(item => {
+                      excelData: _data.slice(1).map(item => {
                         return {
                           venueCode: item[0],
                           instrumentId: item[1],
-                          notionalLimit: item[2],
+                          notionalLimit: item[2] ? item[2] : 100000000,
                         };
                       }),
                     });

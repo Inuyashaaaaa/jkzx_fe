@@ -11,14 +11,12 @@ export const permissions = {
   spotLadder: false,
   pnlAttribution: false,
   roles: true,
-  userGuide: false,
-  developmentGuide: false,
   intradayGreeks: true,
   intradayPnl: true,
   bookEdit: true,
   subjectStore: true,
   marketManagement: true,
-  bankAccount: true,
+  // bankAccount: true,
   customSalesManage: true,
   userInfo: true,
   users: true,
@@ -35,6 +33,9 @@ export const permissions = {
   eodRiskByUnderlyer: true,
   eodDailyPnlByUnderlyer: true,
   eodHistoricalPnlByUnderlyer: true,
+  tradingStatements: true,
+  fundsDetailedStatements: true,
+  customerFundsSummaryStatements: true,
   calendars: true,
   riskSettings: true,
   permissions: true,
@@ -42,6 +43,18 @@ export const permissions = {
   department: true,
   resources: true,
   tradeBooks: true,
+  documentManagement: true,
+  roleManagement: true,
+  auditingManagement: true,
+  processConfiguration: true,
+  newClient: true,
+  fundStatistics: true,
+  marginManagement: true,
+  discrepancyManagement: true,
+  voluationManagement: true,
+  bankAccount: true,
+  ioglodManagement: true,
+  salesManagement: true,
 };
 
 /**
@@ -68,13 +81,6 @@ export const permissions = {
  * }
  */
 export async function login(params) {
-  // return delay(2000, {
-  //   data: {
-  //     token: 'xxxxxxx',
-  //     roles: ['admin'],
-  //     permissions,
-  //   },
-  // });
   return request(`${HOST_TEST}auth-service/users/login`, {
     method: `POST`,
     body: params,
@@ -102,12 +108,6 @@ export async function logout() {
       token: 'xxxx',
     },
   };
-  // return delay(3000, {
-  //   error: false,
-  //   data: {
-  //     token: 'xxxx',
-  //   },
-  // });
 }
 
 export async function queryCaptcha(params) {

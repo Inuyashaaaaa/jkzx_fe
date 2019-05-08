@@ -1,3 +1,5 @@
+export const EVERY_EVENT_TYPE = 'EVERY_EVENT_TYPE';
+
 /* eslint-disable no-underscore-dangle, no-prototype-builtins, no-restricted-syntax */
 const createEventBus = () => {
   const eventBus = {
@@ -33,7 +35,7 @@ const createEventBus = () => {
         this._listeners[type].splice(index, 1);
       }
     },
-    listen(type, cb, scope) {
+    listen(type, cb, scope?) {
       const index = this._listen(type, cb, scope);
       const unListen = () => {
         this._listeners[type].splice(index, 1);
@@ -43,11 +45,8 @@ const createEventBus = () => {
     emit(type, payload) {
       this._eventCache[type] = payload;
       const listeners = this._match(type);
-      if (typeof listeners === 'undefined') {
-        return;
-      }
       listeners.forEach(listen => {
-        listen.cb.call(listen.scope, payload);
+        listen.cb.call(listen.scope, payload, type);
       });
     },
     _listen(type, cb, scope) {
@@ -62,12 +61,13 @@ const createEventBus = () => {
       return index;
     },
     _match(type) {
+      let arr = this._listeners[EVERY_EVENT_TYPE] || [];
       for (const key in this._listeners) {
-        if (new RegExp(key).test(type)) {
-          return this._listeners[key];
+        if (type === key) {
+          arr = arr.concat(this._listeners[key]);
         }
       }
-      return undefined;
+      return arr;
     },
   };
   return eventBus;

@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 import { login, queryCaptcha, permissions, updateOwnPassword } from '@/services/user';
 import { initPagePermissions } from '@/services/role';
 import { setAuthority, setToken, setPermissions } from '@/lib/utils/authority';
-// import { getPageQuery } from '@/lib/utils';
+import { getPageQuery } from '@/lib/utils';
 import { reloadAuthorized } from '@/lib/utils/Authorized';
 import { notification } from 'antd';
 
@@ -35,37 +35,15 @@ function setPagePermissions(user, roles, rolePagesPermission, pagePermissionTree
   setPermission(pagePermissionTree, pageIds);
 }
 
-function findLoginRedirectPage(routers, userPermissions) {
-  let redirect = '';
-  function inner(router) {
-    const { name, path, routes } = router;
-    if (redirect) {
-      return;
-    }
-    if (name !== 'dashboard' && userPermissions[name] && !routes) {
-      redirect = path;
-      return;
-    }
-    if (routes && routes.length > 0) {
-      routes.forEach(r => inner(r));
-    }
-  }
-  inner(routers);
-  return redirect;
-}
-
-// function validateRedirect(routers, redirect, userPermissions) {
-//   let valid = false;
-//   if (!redirect || redirect === '/user/login') {
-//     return false;
-//   }
+// function findLoginRedirectPage(routers, userPermissions) {
+//   let redirect = '';
 //   function inner(router) {
 //     const { name, path, routes } = router;
-//     if (valid) {
+//     if (redirect) {
 //       return;
 //     }
-//     if (name !== 'dashboard' && path === redirect && userPermissions[name]) {
-//       valid = !(routes && routes.length > 0);
+//     if (name !== 'welcomePage' && userPermissions[name] && !routes) {
+//       redirect = path;
 //       return;
 //     }
 //     if (routes && routes.length > 0) {
@@ -73,8 +51,30 @@ function findLoginRedirectPage(routers, userPermissions) {
 //     }
 //   }
 //   inner(routers);
-//   return valid;
+//   return redirect;
 // }
+
+function validateRedirect(routers, redirect, userPermissions) {
+  let valid = false;
+  if (!redirect || redirect === '/user/login') {
+    return false;
+  }
+  function inner(router) {
+    const { name, path, routes } = router;
+    if (valid) {
+      return;
+    }
+    if (name !== 'welcomePage' && path === redirect && userPermissions[name]) {
+      valid = !(routes && routes.length > 0);
+      return;
+    }
+    if (routes && routes.length > 0) {
+      routes.forEach(r => inner(r));
+    }
+  }
+  inner(routers);
+  return valid;
+}
 
 export default {
   namespace: 'login',
@@ -122,7 +122,7 @@ export default {
 
       const newPermissions = Object.assign({}, permissions);
       Object.keys(newPermissions).forEach(key => (newPermissions[key] = false));
-      newPermissions.dashboard = true;
+      // newPermissions.booking = true;
       setPagePermissions(
         userInfo,
         roles || [],
@@ -138,34 +138,34 @@ export default {
 
       reloadAuthorized();
 
-      // const urlParams = new URL(window.location.href);
-      // const params = getPageQuery();
-      // let { redirect } = params;
-      // if (redirect) {
-      //   const redirectUrlParams = new URL(redirect);
-      //   if (redirectUrlParams.origin === urlParams.origin) {
-      //     redirect = redirect.substr(urlParams.origin.length);
-      //     if (redirect.match(/^\/.*#/)) {
-      //       redirect = redirect.substr(redirect.indexOf('#') + 1);
-      //     }
-      //   } else {
-      //     window.location.href = redirect;
-      //     return;
-      //   }
-      // }
+      const urlParams = new URL(window.location.href);
+      const params = getPageQuery();
+      let { redirect } = params;
 
-      // if (!validateRedirect(pageRouters[3], redirect, newPermissions)) {
-      //   redirect = findLoginRedirectPage(pageRouters[3], newPermissions);
-      //   redirect = redirect || '/dashboard';
-      // }
+      // CROS 判断
+      if (redirect) {
+        const redirectUrlParams = new URL(redirect);
+        if (redirectUrlParams.origin === urlParams.origin) {
+          redirect = redirect.substr(urlParams.origin.length);
+          if (redirect.match(/^\/.*#/)) {
+            redirect = redirect.substr(redirect.indexOf('#') + 1);
+          }
+        } else {
+          window.location.href = redirect;
+          return;
+        }
+      }
 
-      let redirect = findLoginRedirectPage(pageRouters[3], newPermissions);
-      redirect = redirect || '/dashboard';
+      const appRoutes = pageRouters.find(item => !!item.appRoute);
+      if (!validateRedirect(appRoutes, redirect, newPermissions)) {
+        // redirect = findLoginRedirectPage(appRoutes, newPermissions);
+        redirect = '/welcome-page';
+      }
 
       const nextQueryStr = stringify({
         _random: Math.random(),
       });
-      localStorage.setItem('first-page', redirect);
+
       window.location.href = `/?${nextQueryStr}/#${redirect || ''}`;
     },
 

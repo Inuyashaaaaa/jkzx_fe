@@ -1,8 +1,10 @@
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptReportNameList, rptRiskReportPagedByNameAndDate } from '@/services/report-service';
 import { message } from 'antd';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
@@ -19,7 +21,9 @@ class ReportsEodRiskByUnderlyer extends PureComponent {
     },
     loading: false,
     info: true,
-    searchFormData: {},
+    searchFormData: {
+      valuationDate: moment().subtract(1, 'days'),
+    },
   };
 
   constructor(props) {
@@ -57,10 +61,14 @@ class ReportsEodRiskByUnderlyer extends PureComponent {
     this.setState({
       loading: false,
     });
+    const page = data.page.sort((a, b) => {
+      return a.underlyerInstrumentId.localeCompare(b.underlyerInstrumentId);
+    });
+
     if (!data.page.length) {
       this.setState({
         info: false,
-        dataSource: data.page,
+        dataSource: page,
         pagination: {
           current: 1,
           pageSize: 20,
@@ -71,7 +79,7 @@ class ReportsEodRiskByUnderlyer extends PureComponent {
     }
     message.success('查询成功');
     this.setState({
-      dataSource: data.page,
+      dataSource: page,
       pagination: {
         ...this.state.pagination,
         total: data.totalCount,
@@ -104,7 +112,29 @@ class ReportsEodRiskByUnderlyer extends PureComponent {
     });
   };
 
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
+
   public render() {
+    const _data = this.handleData(
+      this.state.dataSource,
+      TABLE_COL_DEFS.map(item => item.field),
+      TABLE_COL_DEFS.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper>
         <SourceTable
@@ -144,6 +174,20 @@ class ReportsEodRiskByUnderlyer extends PureComponent {
           autoSizeColumnsToFit={false}
           // onCellValueChanged={this.onCellValueChanged}
           defaultColDef={{ width: 130 }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: TABLE_COL_DEFS.map(item => item.headerName),
+                name: '汇总风险',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );

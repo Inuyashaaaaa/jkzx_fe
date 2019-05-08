@@ -29,7 +29,7 @@ class RendererCellRenderer extends React.PureComponent<IInputCellRendererParams,
 
   public cacheValue = null;
 
-  public validate = memo((value, rules, field) => {
+  public validate = memo((value, rules, field, showError) => {
     if (!rules.length) {
       return Promise.resolve({ error: false });
     }
@@ -50,7 +50,7 @@ class RendererCellRenderer extends React.PureComponent<IInputCellRendererParams,
         reject(error);
       }
     }).then((result: any) => {
-      if (result.error) {
+      if (showError && result.error) {
         this.setState({
           hasError: true,
           errorMessage: result.error[0].message,
@@ -156,11 +156,11 @@ class RendererCellRenderer extends React.PureComponent<IInputCellRendererParams,
     this.props.context.TableEventBus.unListen(EVENT_CELL_DEPEND_HOVER, this.onCellDependHover);
   };
 
-  public validateCell = () => {
+  public validateCell = (showError = true) => {
     const colDef = this.getColDef();
     const value = this.props.value;
     const { field } = colDef;
-    return this.validate(value, this.normalizeRules().value, field);
+    return this.validate(value, this.normalizeRules().value, field, showError);
   };
 
   public refresh = () => false;

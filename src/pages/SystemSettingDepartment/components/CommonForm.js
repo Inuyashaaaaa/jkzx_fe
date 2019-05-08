@@ -8,6 +8,7 @@ import {
   Button,
   Icon,
   notification,
+  InputNumber,
   // Popconfirm,
 } from 'antd';
 import PropTypes from 'prop-types';
@@ -17,6 +18,8 @@ import { TOKEN_LOCAL_FIELD } from '@/constants/global';
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
 const { TextArea } = Input;
+
+const LABEL_FONT_SIZE = 14;
 
 function sortResource(data, sortPropoerty) {
   if (!data) {
@@ -168,6 +171,22 @@ export default class CommonForm extends Component {
     }
   };
 
+  setLabelWidth = () => {
+    const { data } = this.props;
+    let defaultWidth = 20;
+    const englishNumberPattern = /^[A-Za-z0-9\s]+$/;
+    data.forEach(d => {
+      const { label } = d;
+      const length = (label && label.length) || 0;
+      let labelWidth = length * LABEL_FONT_SIZE;
+      if (englishNumberPattern.test(label)) {
+        labelWidth = length * LABEL_FONT_SIZE * 0.5;
+      }
+      defaultWidth = defaultWidth > labelWidth ? defaultWidth : labelWidth;
+    });
+    return defaultWidth + LABEL_FONT_SIZE * 2;
+  };
+
   generateInput = (item, index) => {
     const {
       type,
@@ -181,14 +200,21 @@ export default class CommonForm extends Component {
       formatter,
       marginTop,
       attachData,
+      listener,
     } = item;
     const st = this.state;
     const { uploadDisabled } = this.props;
     const commonStyle = {
       display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+    };
+    const labelStyle = {
+      display: 'flex',
       justifyContent: 'flex-end',
       alignItems: 'flex-start',
-      width: 450,
+      width: this.setLabelWidth(),
+      fontSize: LABEL_FONT_SIZE,
     };
     if (index !== 0) {
       commonStyle.marginTop = marginTop || 10;
@@ -196,7 +222,7 @@ export default class CommonForm extends Component {
     if (type === 'text') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -213,16 +239,36 @@ export default class CommonForm extends Component {
         </div>
       );
     }
+    if (type === 'number') {
+      return (
+        <div style={commonStyle}>
+          <div style={labelStyle}>
+            {!!required && <span style={{ color: 'red' }}>*</span>}
+            {label}：
+          </div>
+          <div>
+            <InputNumber
+              disabled={!!disabled}
+              defaultValue={value}
+              placeholder={placeholder || ''}
+              onChange={newValue => this.handleChange(newValue, property)}
+              style={{ width: 300, marginLeft: 10 }}
+            />
+            <div style={{ width: 300, marginLeft: 10, color: '#f5222d' }}>{st[property] || ''}</div>
+          </div>
+        </div>
+      );
+    }
     if (type === 'plain') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
           <div>
             <div>{value}</div>
-            <div style={{ width: 300, marginLeft: 10, color: '#f5222d' }}>{st[property] || ''}</div>
+            <div style={{ width: 150, marginLeft: 10, color: '#f5222d' }}>{st[property] || ''}</div>
           </div>
         </div>
       );
@@ -230,7 +276,7 @@ export default class CommonForm extends Component {
     if (type === 'textArea') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -247,7 +293,7 @@ export default class CommonForm extends Component {
     if (type === 'password') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -267,7 +313,7 @@ export default class CommonForm extends Component {
     if (type === 'select') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -277,7 +323,10 @@ export default class CommonForm extends Component {
               placeholder={placeholder || '请选择'}
               defaultValue={value}
               disabled={!!disabled}
-              onChange={newValue => this.handleChange(newValue, property)}
+              onChange={newValue => {
+                this.handleChange(newValue, property);
+                listener && listener(newValue);
+              }}
             >
               {item.options.map(op => (
                 <Option key={op}>{op}</Option>
@@ -291,7 +340,7 @@ export default class CommonForm extends Component {
     if (type === 'multiSelect') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -316,7 +365,7 @@ export default class CommonForm extends Component {
       sortResource(item.data, display);
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -341,7 +390,7 @@ export default class CommonForm extends Component {
     if (type === 'date') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -361,7 +410,7 @@ export default class CommonForm extends Component {
     if (type === 'upload') {
       return (
         <div style={commonStyle}>
-          <div>
+          <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
           </div>
@@ -384,7 +433,7 @@ export default class CommonForm extends Component {
               </Button>
             </Upload>
             {attachData.mimeTypes && attachData.mimeTypes.length > 0 && (
-              <div style={{ width: 300, marginTop: 2, color: '#999999' }}>
+              <div style={{ width: 150, marginTop: 2, color: '#999999' }}>
                 {`支持${attachData.mimeTypes.join(',')}文件类型`}
               </div>
             )}
@@ -396,6 +445,10 @@ export default class CommonForm extends Component {
 
   render() {
     const { data } = this.props;
-    return <div>{data.map((item, index) => this.generateInput(item, index))}</div>;
+    return (
+      <div style={{ borderWidth: 0, borderColor: '#e8e8e8', borderStyle: 'solid' }}>
+        {data.map((item, index) => this.generateInput(item, index))}
+      </div>
+    );
   }
 }

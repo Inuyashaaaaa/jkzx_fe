@@ -1,0 +1,86 @@
+@import '~antd/lib/style/themes/default.less';
+
+.listItem {
+  .icon {
+    visibility: hidden;
+    margin-left: 4px;
+    i {
+      padding: 9px;
+      font-size: 14px;
+    }
+  }
+  &:hover .icon {
+    visibility: visible;
+  }
+  .value {
+    width: 150px;
+    margin: 3px 0;
+    display: inline-block;
+    color: rgba(0, 0, 0, 0.65);
+    padding: 3px 0;
+    padding-left: 6px;
+  }
+  .background {
+    width: 150px;
+    margin: 3px 0;
+    display: inline-block;
+    color: rgba(0, 0, 0, 0.65);
+    padding: 3px 0;
+    padding-left: 6px;
+    background: #cce7f2;
+  }
+  button {
+    border: none;
+    padding: 3px !important;
+  }
+}
+.label {
+  display: inline-block;
+  span {
+    width: 80px;
+  }
+}
+.menberTable {
+  width: 100%;
+  float: left;
+}
+.auditingWrapper {
+  :global {
+    .ant-card-body {
+      display: flex;
+      min-height: 720px;
+      padding: 0;
+      background: #f3f3f3;
+    }
+  }
+}
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.modelInput {
+  text-align: center;
+  span {
+    margin-right: 15px;
+  }
+  :global {
+    .ant-input {
+      width: 320px;
+    }
+  }
+}
+.userTable {
+  :global {
+    .ant-table.ant-table-default tbody > tr > td {
+      min-width: 100px;
+      max-width: 130px;
+    }
+  }
+}
+:global {
+  .ant-btn-primary {
+    border-radius: 4px;
+  }
+}

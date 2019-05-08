@@ -1,3 +1,4 @@
+import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
 import { LEG_TYPE_MAP } from './common';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanAnnual';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual';
@@ -5,6 +6,10 @@ import { AnnulizedVanillaOptionDTOAmericanAnnual } from './legColDefs/AnnulizedV
 import { AnnulizedVanillaOptionDTOAmericanUnAnnual } from './legColDefs/AnnulizedVanillaOptionDTOAmericanUnAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanAnnual } from './legColDefs/AnnulizedVanillaOptionDTOEuropeanAnnual';
 import { AnnulizedVanillaOptionDTOEuropeanUnAnnual } from './legColDefs/AnnulizedVanillaOptionDTOEuropeanUnAnnual';
+import { AsiaAnnual } from './legColDefs/AsiaAnnual';
+import { AsiaUnAnnual } from './legColDefs/AsiaUnAnnual';
+import { AutoCallPhoenixAnnual } from './legColDefs/AutoCallPhoenixAnnual';
+import { AutoCallSnowAnnual } from './legColDefs/AutoCallSnowAnnual';
 import { BarrierAnnual } from './legColDefs/BarrierAnnual';
 import { BarrierUnAnnual } from './legColDefs/BarrierUnAnnual';
 import { ConcavaAnnual } from './legColDefs/ConcavaAnnual';
@@ -25,6 +30,9 @@ import { DoubleTouchAnnual } from './legColDefs/DoubleTouchAnnual';
 import { DoubleTouchUnAnnual } from './legColDefs/DoubleTouchUnAnnual';
 import { EagleAnnual } from './legColDefs/EagleAnnual';
 import { EagleUnAnnual } from './legColDefs/EagleUnAnnual';
+import { ForwardUnAnnual } from './legColDefs/ForwardUnAnnual';
+import { ModelXYAnnual } from './legColDefs/ModelXYAnnual';
+import { ModelXYUnAnnual } from './legColDefs/ModelXYUnAnnual';
 import { RangeAccrualsAnnual } from './legColDefs/RangeAccrualsAnnual';
 import { RangeAccrualsUnAnnual } from './legColDefs/RangeAccrualsUnAnnual';
 import { StraddleAnnual } from './legColDefs/StraddleAnnual';
@@ -32,7 +40,15 @@ import { StraddleUnAnnual } from './legColDefs/StraddleUnAnnual';
 import { TripleDigitalAnnual } from './legColDefs/TripleDigitalAnnual';
 import { TripleDigitalUnAnnual } from './legColDefs/TripleDigitalUnAnnual';
 
-export const LEG_MAP = {
+export const LEG_MAP: {
+  [key: string]: ILegType;
+} = {
+  [LEG_TYPE_MAP.ASIAN_ANNUAL]: AsiaAnnual,
+  [LEG_TYPE_MAP.ASIAN_UNANNUAL]: AsiaUnAnnual,
+
+  [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: AutoCallSnowAnnual,
+  [LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL]: AutoCallPhoenixAnnual,
+
   // 现金
   // [LEG_TYPE_MAP.CASH]: 'CASH',
   // 其他单资产期权
@@ -78,9 +94,9 @@ export const LEG_MAP = {
   // 价差
   // [LEG_TYPE_MAP.VERTICAL_SPREAD]: 'VERTICAL_SPREAD',
   // 价差欧式非年化
-  [LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_UNANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual,
+  [LEG_TYPE_MAP.VERTICAL_SPREAD_UNANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual,
   // 价差欧式年化
-  [LEG_TYPE_MAP.VERTICAL_SPREAD_EUROPEAN_ANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanAnnual,
+  [LEG_TYPE_MAP.VERTICAL_SPREAD_ANNUAL]: AnnualizedVerticalSpreadOptionDTOEuropeanAnnual,
   // 单鲨
   // [LEG_TYPE_MAP.BARRIER]: 'BARRIER',
   // 单鲨年化
@@ -127,12 +143,18 @@ export const LEG_MAP = {
   [LEG_TYPE_MAP.TRIPLE_DIGITAL_ANNUAL]: TripleDigitalAnnual,
   // 四层积累非年化
   [LEG_TYPE_MAP.TRIPLE_DIGITAL_UNANNUAL]: TripleDigitalUnAnnual,
-  // 区间积累年化
+  // 区间累积年化
   [LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL]: RangeAccrualsAnnual,
-  // 区间积累非年化
+  // 区间累积非年化
   [LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL]: RangeAccrualsUnAnnual,
   // 跨式年化
   [LEG_TYPE_MAP.STRADDLE_ANNUAL]: StraddleAnnual,
   // 跨式非年化
   [LEG_TYPE_MAP.STRADDLE_UNANNUAL]: StraddleUnAnnual,
+  // 自定义产品年化
+  [LEG_TYPE_MAP.MODEL_XY_ANNUAL]: ModelXYAnnual,
+  // 自定义产品非年化
+  [LEG_TYPE_MAP.MODEL_XY_UNANNUAL]: ModelXYUnAnnual,
+  // 远期非年化
+  [LEG_TYPE_MAP.FORWARD_UNANNUAL]: ForwardUnAnnual,
 };

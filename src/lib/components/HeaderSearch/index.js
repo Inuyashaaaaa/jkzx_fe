@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Input, Icon, AutoComplete } from 'antd';
+// import { Input, Icon, AutoComplete } from 'antd';
 import classNames from 'classnames';
 import Debounce from 'lodash-decorators/debounce';
 import Bind from 'lodash-decorators/bind';
@@ -100,11 +100,12 @@ export default class HeaderSearch extends PureComponent {
 
   render() {
     const { className, placeholder, open, ...restProps } = this.props;
-    const { searchMode, value } = this.state;
+    const { searchMode } = this.state;
+    // const { searchMode, value } = this.state;
     delete restProps.defaultOpen; // for rc-select not affected
-    const inputClass = classNames(styles.input, {
-      [styles.show]: searchMode,
-    });
+    // const inputClass = classNames(styles.input, {
+    //   [styles.show]: searchMode,
+    // });
     return (
       <span
         className={classNames(className, styles.headerSearch)}
@@ -116,8 +117,8 @@ export default class HeaderSearch extends PureComponent {
           }
         }}
       >
-        <Icon type="search" key="Icon" />
-        <AutoComplete
+        {/* <Icon type="search" key="Icon" /> */}
+        {/* <AutoComplete
           key="AutoComplete"
           {...restProps}
           className={inputClass}
@@ -133,7 +134,7 @@ export default class HeaderSearch extends PureComponent {
             onKeyDown={this.onKeyDown}
             onBlur={this.leaveSearchMode}
           />
-        </AutoComplete>
+        </AutoComplete> */}
       </span>
     );
   }

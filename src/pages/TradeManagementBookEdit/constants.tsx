@@ -86,3 +86,9 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     },
   },
 ];
+
+// 观察周期收益
+export const OB_LIFE_PAYMENT = 'OB_LIFE_PAYMENT';
+
+// 已观察到的价格
+export const OB_PRICE_FIELD = 'price';

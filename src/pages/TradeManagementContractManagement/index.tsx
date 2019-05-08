@@ -1,26 +1,13 @@
-import Section from '@/components/Section';
-import { BOOK_NAME_FIELD } from '@/constants/common';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import {
-  trdBookList,
-  trdExpiringTradeList,
-  trdTradeListByBook,
-  trdTradeSearchPaged,
-} from '@/services/general-service';
-import { refSalesGetByLegalName } from '@/services/reference-data-service';
-import { Button } from 'antd';
+import { trdExpiringTradeList } from '@/services/general-service';
+import { connect } from 'dva';
 import produce from 'immer';
 import _ from 'lodash';
-import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
-import {
-  BOOKING_TABLE_COLUMN_DEFS,
-  BOOKING_TABLE_COLUMN_DEFS2,
-  bookingSearchFormControls,
-  ROW_KEY,
-} from './constants';
+import CommonModel from './CommonModel';
+import { ROW_KEY } from './constants';
 
 class TradeManagementContractManagement extends PureComponent {
   public $sourceTable: SourceTable = null;
@@ -46,25 +33,7 @@ class TradeManagementContractManagement extends PureComponent {
   };
 
   public componentDidMount = () => {
-    trdBookList().then(rsp => {
-      if (rsp.error) return;
-      this.setState({
-        bookList: rsp.data,
-      });
-    });
-    this.onTradeTableSearch();
     this.onFetchTradeTableData();
-  };
-
-  public onReset = event => {
-    this.setState(
-      {
-        searchFormData: {},
-      },
-      () => {
-        this.onTradeTableSearch({ current: 1, pageSize: 10 });
-      }
-    );
   };
 
   public onCheckContract = async event => {
@@ -115,133 +84,40 @@ class TradeManagementContractManagement extends PureComponent {
     );
   };
 
-  public onTradeTableSearchFormChange = async params => {
-    if (
-      Object.keys(params.changedValues)[0] === BOOK_NAME_FIELD &&
-      params.changedValues[BOOK_NAME_FIELD]
-    ) {
-      const { error, data } = await trdTradeListByBook({
-        bookName: params.changedValues[BOOK_NAME_FIELD],
-      });
-      if (error) return;
-      this.setState({
-        bookIdList: data,
-      });
-    }
-
-    let refSalesGetByLegalNameRsp;
-    if (params.changedValues.counterPartyCode) {
-      refSalesGetByLegalNameRsp = await refSalesGetByLegalName({
-        legalName: params.changedValues.counterPartyCode,
-      });
-      if (refSalesGetByLegalNameRsp.error) return;
-      return this.setState({
-        searchFormData: {
-          ...params.values,
-          salesName: refSalesGetByLegalNameRsp.data.salesName,
-        },
-      });
-    }
-    this.setState({
-      searchFormData: params.values,
+  public onTabChange = key => {
+    this.props.dispatch({
+      type: 'tradeManagementContractManagement/onTabChange',
+      payload: { key },
     });
-  };
-
-  public onTradeTableSearch = async (paramsPagination?) => {
-    const { searchFormData, pagination } = this.state;
-
-    const formatValues = _.mapValues(searchFormData, (val, key) => {
-      if (isMoment(val)) {
-        return val.format('YYYY-MM-DD');
-      }
-      return val;
-    });
-
-    this.setState({ loading: true });
-    const { error, data } = await trdTradeSearchPaged({
-      page: (paramsPagination || pagination).current - 1,
-      pageSize: (paramsPagination || pagination).pageSize,
-      ...formatValues,
-    });
-    this.setState({ loading: false });
-
-    if (error) return;
-    if (_.isEmpty(data)) return;
-
-    // @todo
-    const commonCounterPartyName = data.page[0] && data.page[0].positions[0].counterPartyName;
-
-    const tableDataSource = data.page.map(item => {
-      return {
-        ...item,
-        commonCounterPartyName,
-      };
-    });
-
-    this.setState({
-      tableDataSource,
-      pagination: {
-        ...pagination,
-        ...paramsPagination,
-        total: data.totalCount,
-      },
-    });
-  };
-
-  public onTablePaginationChange = ({ pagination }) => {
-    this.setState(
-      {
-        pagination,
-      },
-      () => {
-        this.onTradeTableSearch();
-      }
-    );
-  };
-
-  public onSearch = () => {
-    this.onTradeTableSearch({ current: 1, pageSize: 10 });
   };
 
   public render() {
+    const activeTabKey = this.props.tradeManagementContractManagement.activeTabKey;
     return (
-      <PageHeaderWrapper>
-        <SourceTable
-          searchable={true}
-          resetable={true}
-          loading={this.state.loading}
-          pagination={this.state.pagination}
-          onPaginationChange={this.onTablePaginationChange}
-          onPaginationShowSizeChange={this.onTablePaginationChange}
-          rowKey={ROW_KEY}
-          onSearchButtonClick={this.onSearch}
-          dataSource={this.state.tableDataSource}
-          ref={node => (this.$sourceTable = node)}
-          onResetButtonClick={this.onReset}
-          onSearchFormChange={this.onTradeTableSearchFormChange}
-          searchFormData={this.state.searchFormData}
-          autoSizeColumnsToFit={true}
-          searchFormControls={bookingSearchFormControls(this.state.bookList, this.state.bookIdList)}
-          columnDefs={BOOKING_TABLE_COLUMN_DEFS(this.bindCheckContract)}
-          paginationProps={{
-            backend: true,
-          }}
-        />
-        <Section>当日到期交易</Section>
-        <SourceTable
-          rowKey={ROW_KEY}
-          dataSource={this.state.tradeTableData}
-          loading={this.state.tradeLoading}
-          columnDefs={BOOKING_TABLE_COLUMN_DEFS2}
-          rowActions={[
-            <Button key="查看合约" type="primary" onClick={this.onCheckContract}>
-              查看合约
-            </Button>,
-          ]}
-        />
+      <PageHeaderWrapper
+        title="合约管理"
+        tabList={[
+          { key: 'contractManagement', tab: '合约管理' },
+          { key: 'open', tab: '当日开仓' },
+          { key: 'unwind', tab: '当日平仓' },
+          { key: 'expiration', tab: '当日到期' },
+          { key: 'overlate', tab: '已过期' },
+        ]}
+        tabActiveKey={activeTabKey}
+        onTabChange={this.onTabChange}
+      >
+        {activeTabKey === 'contractManagement' && <CommonModel />}
+        {activeTabKey === 'open' && <CommonModel status="OPEN_TODAY" />}
+        {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" />}
+        {activeTabKey === 'expiration' && <CommonModel status="EXPIRATION_TODAY" />}
+        {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" />}
       </PageHeaderWrapper>
     );
   }
 }
 
-export default TradeManagementContractManagement;
+export default connect(state => {
+  return {
+    tradeManagementContractManagement: state.tradeManagementContractManagement,
+  };
+})(TradeManagementContractManagement);

@@ -101,7 +101,7 @@ class RendererCellRenderer extends React.PureComponent<IInputCellRendererParams,
         });
         validator.validate(
           {
-            [field]: value,
+            [field]: value == null,
           },
           (error, fields) => {
             resolve({ error, fields });

@@ -1,10 +1,12 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2 } from '@/design/components';
 import Form from '@/design/components/Form';
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { delay } from '@/lib/utils';
 import { createCalendar, queryCalendar, removeCalendar } from '@/services/calendars';
+import { getMoment } from '@/utils';
 import { Button, Col, DatePicker, message, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
@@ -17,6 +19,8 @@ const { RangePicker } = DatePicker;
 
 class SystemTradeDate extends PureComponent<any, any> {
   public $sourceTable: SourceTable = null;
+
+  public $createForm: Form2 = null;
 
   public state = {
     loading: false,
@@ -64,20 +68,27 @@ class SystemTradeDate extends PureComponent<any, any> {
   };
 
   public onCreate = async () => {
+    if (this.$createForm) {
+      const result = await this.$createForm.validate();
+      if (result.error) return;
+    }
     const { createFormData, holidays: tableDataSource } = this.state;
+
+    const createFormDataValues = Form2.getFieldsValue(createFormData);
 
     const { error } = await createCalendar({
       calendarId: DEFAULT_CALENDAR,
-      holidays: [createFormData],
+      holidays: [createFormDataValues],
     });
+
     if (error) {
       message.error('创建失败');
-      return false;
+      return;
     }
 
     const newOne = {
-      ...createFormData,
-      holiday: createFormData.holiday.format(HOLIDAY_FORMAT),
+      ...createFormDataValues,
+      holiday: getMoment(createFormDataValues.holiday).format(HOLIDAY_FORMAT),
       uuid: uuidv4(),
     };
     const holidays = this.getSortedTableData(tableDataSource.concat(newOne));
@@ -154,9 +165,12 @@ class SystemTradeDate extends PureComponent<any, any> {
     );
   };
 
-  public onCreateFormChange = params => {
+  public onCreateFormChange = (props, changedFields) => {
     this.setState({
-      createFormData: params.values,
+      createFormData: {
+        ...this.state.createFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -191,19 +205,23 @@ class SystemTradeDate extends PureComponent<any, any> {
                 <Row style={{ marginBottom: VERTICAL_GUTTER }}>
                   <ModalButton
                     type="primary"
-                    visible={this.state.visible}
                     onClick={this.onOpenCreateModal}
-                    onCancel={this.onCloseCreateModal}
+                    modalProps={{
+                      visible: this.state.visible,
+                      onCancel: this.onCloseCreateModal,
+                      onOk: this.onCreate,
+                      title: '创建交易日',
+                    }}
                     content={
-                      <Form
-                        onValueChange={this.onCreateFormChange}
+                      <Form2
+                        ref={node => (this.$createForm = node)}
+                        onFieldsChange={this.onCreateFormChange}
                         dataSource={this.state.createFormData}
                         footer={false}
-                        controlNumberOneRow={1}
-                        controls={createFormControls(this.state.holidays)}
+                        columnNumberOneRow={1}
+                        columns={createFormControls(this.state.holidays)}
                       />
                     }
-                    onConfirm={this.onCreate}
                   >
                     创建
                   </ModalButton>

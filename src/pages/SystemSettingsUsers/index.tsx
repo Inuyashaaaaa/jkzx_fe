@@ -1,3 +1,4 @@
+import PopconfirmButton from '@/components/PopconfirmButton';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
@@ -15,7 +16,7 @@ import {
   updateUser,
   updateUserRole,
 } from '@/services/user';
-import { Button, Col, message, Modal, notification, Row } from 'antd';
+import { Button, Col, Modal, notification, Row } from 'antd';
 import produce from 'immer';
 import React, { PureComponent } from 'react';
 import FormBuilder from '../SystemSettingDepartment/components/CommonForm';
@@ -425,9 +426,17 @@ class SystemSettingsUsers extends PureComponent {
     const { rowData } = event;
     const { locked, expired } = rowData;
     return [
-      <Button key="remove" type="danger" onClick={this.onRemove}>
+      <PopconfirmButton
+        type="primary"
+        size="small"
+        key="remove"
+        popconfirmProps={{
+          title: '确定要删除吗?',
+          onConfirm: this.onRemove.bind(this, event),
+        }}
+      >
         删除
-      </Button>,
+      </PopconfirmButton>,
       <Button key="password" type="primary" onClick={this.resetPassword}>
         重置密码
       </Button>,
@@ -440,8 +449,8 @@ class SystemSettingsUsers extends PureComponent {
       <Button key="user" type="primary" onClick={this.updateUser}>
         修改用户
       </Button>,
-      <Button key="resource" type="primary" onClick={() => this.showResources(rowData)}>
-        资源权限
+      <Button key="resource" type="primary" onClick={async () => this.showResources(rowData)}>
+        数据权限
       </Button>,
     ];
   };
@@ -518,7 +527,7 @@ class SystemSettingsUsers extends PureComponent {
               }}
             >
               <h2>
-                用户：<span style={{ color: '#08c' }}>{choosedUser.username}</span> 资源权限列表
+                用户：<span style={{ color: '#08c' }}>{choosedUser.username}</span> 数据权限列表
               </h2>
               <Button type="primary" onClick={this.hideResource}>
                 返回用户列表

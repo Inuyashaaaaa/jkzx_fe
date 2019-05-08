@@ -12,12 +12,23 @@ export async function queryTradeRecord(params = {}) {
   });
 }
 
-// 获取场内持仓统计
-export async function queryPositions(params = {}) {
+// 获取场内持仓按明细统计
+export async function queryDetail(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'exePositionSnapshotSearch',
+      method: 'excPositionRecordSearch',
+      params,
+    },
+  });
+}
+
+// 获取场内持仓按明细统计
+export async function querySummary(params = {}) {
+  return request(`${HOST_TEST}auth-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'excPositionRecordSearchGroupByInstrumentId',
       params,
     },
   });

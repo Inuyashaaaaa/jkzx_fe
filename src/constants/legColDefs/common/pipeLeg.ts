@@ -1,7 +1,5 @@
-import { ILegType } from '..';
-import { orderLeg } from './order';
+import { ILegType } from '@/constants/global';
 
 export function pipeLeg(leg: ILegType) {
-  const next = orderLeg(leg);
-  return next;
+  return leg;
 }

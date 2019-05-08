@@ -1,11 +1,14 @@
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SourceTable from '@/design/components/SourceTable';
 import { unionId } from '@/design/utils/unionId';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptIntradayReportNamesList, rptIntradayReportPaged } from '@/services/report-service';
+import { socketHOC } from '@/tools/socketHOC';
+import { ISourceTable } from '@/types';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
-class RiskManagerCustomReport extends PureComponent {
+class RiskManagerCustomReport extends PureComponent implements ISourceTable {
   public $sourceTable: SourceTable = null;
 
   public state = {
@@ -24,7 +27,7 @@ class RiskManagerCustomReport extends PureComponent {
 
   public reportName: string;
 
-  public fetchTable = async (paramsPagination?) => {
+  public fetch = async (paramsPagination?) => {
     this.setState({
       loading: true,
     });
@@ -43,16 +46,18 @@ class RiskManagerCustomReport extends PureComponent {
 
     const tableDataSource = data.page.map(item => {
       return {
-        ...JSON.parse(_.get(item, 'reportData', '{}')),
+        ..._.get(item, 'reportData', {}),
         rowId: unionId(),
       };
     });
 
-    const tableColumnDefs = Object.keys(_.get(tableDataSource, '[0]', {})).map(item => ({
-      headerName: item,
-      field: item,
-      width: 200,
-    }));
+    const tableColumnDefs = Object.keys(_.get(tableDataSource, '[0]', {}))
+      .filter(key => key !== 'rowId')
+      .map(item => ({
+        headerName: item,
+        field: item,
+        width: 200,
+      }));
 
     this.setState({
       tableColumnDefs,
@@ -74,7 +79,7 @@ class RiskManagerCustomReport extends PureComponent {
         },
       },
       () => {
-        this.fetchTable();
+        this.fetch();
       }
     );
   };
@@ -86,10 +91,33 @@ class RiskManagerCustomReport extends PureComponent {
   };
 
   public onSearchButtonClick = () => {
-    this.fetchTable();
+    this.fetch();
+  };
+
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
   };
 
   public render() {
+    console.log(this.state.tableColumnDefs);
+    const _data = this.handleData(
+      this.state.tableDataSource,
+      this.state.tableColumnDefs.map(item => item.field),
+      this.state.tableColumnDefs.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper title="定制化报告">
         <SourceTable
@@ -143,10 +171,24 @@ class RiskManagerCustomReport extends PureComponent {
             cellRenderer: 'HeatmapCellRenderer',
             enableCellChangeFlash: false,
           }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: this.state.tableColumnDefs.map(item => item.headerName),
+                name: '定制化报告',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );
   }
 }
 
-export default RiskManagerCustomReport;
+export default socketHOC(RiskManagerCustomReport);

@@ -1,46 +1,33 @@
 import { Button, Modal } from 'antd';
+import { ButtonProps } from 'antd/lib/button';
 import React, { PureComponent } from 'react';
 import { ModalButtonBaseProps } from './types';
 
 class ModalButtonBase extends PureComponent<ModalButtonBaseProps> {
-  public static defaultProps = {
-    visible: false,
-    confirmLoading: false,
-  };
-
   public static defaultModalProps = {
     okText: '确认',
     cancelText: '取消',
   };
 
   public render() {
-    const {
-      onCancel,
-      onConfirm,
-      confirmLoading,
-      content,
-      visible,
-      modalProps,
-      children,
-      ...buttonProps
-    } = this.props;
-
+    const { content, modalProps, children, text, ...props } = this.props;
     return (
       <>
-        <Modal
-          closable={false}
-          visible={visible}
-          onCancel={onCancel}
-          onOk={onConfirm}
-          confirmLoading={confirmLoading}
-          {...{
-            ...ModalButtonBase.defaultModalProps,
-            ...modalProps,
-          }}
-        >
-          {content}
-        </Modal>
-        {children && <Button {...buttonProps}>{children}</Button>}
+        <Modal {...ModalButtonBase.defaultModalProps} children={content} {...modalProps} />
+        {children &&
+          (text ? (
+            <a
+              href="javascript:;"
+              {...props as React.DetailedHTMLProps<
+                React.AnchorHTMLAttributes<HTMLAnchorElement>,
+                HTMLAnchorElement
+              >}
+            >
+              {children}
+            </a>
+          ) : (
+            <Button {...props as ButtonProps}>{children}</Button>
+          ))}
       </>
     );
   }

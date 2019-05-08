@@ -1,4 +1,8 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_LOT_CONFIG } from '@/constants/common';
+import {
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
+  INPUT_NUMBER_LOT_CONFIG,
+} from '@/constants/common';
 import { IFormControl } from '@/design/components/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -57,13 +61,25 @@ const historyBuyAmount = {
   field: 'historyBuyAmount',
   headerName: '总买金额',
 };
+
 const historySellAmount = {
   field: 'historySellAmount',
   headerName: '总卖金额',
 };
+
+const totalBuy = {
+  field: 'totalBuy',
+  headerName: '总买量',
+};
+
 const longPosition = {
   field: 'longPosition',
-  headerName: '总买量',
+  headerName: '多头持仓',
+};
+
+const shortPosition = {
+  field: 'shortPosition',
+  headerName: '空头持仓',
 };
 
 const netPosition = {
@@ -71,8 +87,8 @@ const netPosition = {
   headerName: '持仓数量',
 };
 
-const shortPosition = {
-  field: 'shortPosition',
+const totalSell = {
+  field: 'totalSell',
   headerName: '总卖量',
 };
 
@@ -81,11 +97,11 @@ const totalPnl = {
   headerName: '总盈亏',
 };
 
-// const t = {
-//   field: '',
-//   headerName: '',
-//   key: '',
-// };
+const marketValue = {
+  field: 'marketValue',
+  headerName: '市值',
+  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+};
 
 export function generateColumns(type) {
   if (type === 'flow') {
@@ -108,9 +124,12 @@ export function generateColumns(type) {
       instrumentId,
       netPosition,
       longPosition,
-      historyBuyAmount,
       shortPosition,
+      totalBuy,
+      historyBuyAmount,
+      totalSell,
       historySellAmount,
+      marketValue,
       totalPnl,
     ];
   }
@@ -120,9 +139,12 @@ export function generateColumns(type) {
       instrumentId,
       netPosition,
       longPosition,
-      historyBuyAmount,
       shortPosition,
+      totalBuy,
+      historyBuyAmount,
+      totalSell,
       historySellAmount,
+      marketValue,
       totalPnl,
     ];
   }

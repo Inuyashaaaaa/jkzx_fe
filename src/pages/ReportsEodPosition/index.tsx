@@ -1,8 +1,10 @@
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { rptPositionReportPagedByNameAndDate, rptReportNameList } from '@/services/report-service';
 import { message } from 'antd';
+import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
@@ -31,12 +33,27 @@ class ReportsEodPosition extends PureComponent {
       reportType: 'LIVE_POSITION_INFO',
     });
     if (error) return;
-    this.setState({
-      markets: data.map(item => ({
-        label: item,
-        value: item,
-      })),
-    });
+    this.setState(
+      {
+        markets: data.map(item => ({
+          label: item,
+          value: item,
+        })),
+      },
+      () => {
+        this.setState(
+          {
+            searchFormData: {
+              ...(this.state.markets.length ? { reportName: this.state.markets[0].value } : null),
+              valuationDate: moment().subtract(1, 'days'),
+            },
+          },
+          () => {
+            this.fetchTable();
+          }
+        );
+      }
+    );
   };
 
   public fetchTable = async () => {
@@ -80,13 +97,6 @@ class ReportsEodPosition extends PureComponent {
     return;
   };
 
-  // public onCellValueChanged = async event => {
-  //   const { error, data } = await rptRiskReportUpdate({ riskReport: event.data });
-  //   if (error) return message.error('更新错误');
-  //   message.success('更新成功');
-  //   return true;
-  // };
-
   public onPaginationChange = ({ pagination }) => {
     this.setState(
       {
@@ -104,7 +114,29 @@ class ReportsEodPosition extends PureComponent {
     });
   };
 
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
+
   public render() {
+    const _data = this.handleData(
+      this.state.dataSource,
+      TABLE_COL_DEFS.map(item => item.field),
+      TABLE_COL_DEFS.map(item => item.headerName)
+    );
     return (
       <PageHeaderWrapper>
         <SourceTable
@@ -144,6 +176,20 @@ class ReportsEodPosition extends PureComponent {
           autoSizeColumnsToFit={false}
           // onCellValueChanged={this.onCellValueChanged}
           defaultColDef={{ width: 130 }}
+          header={
+            <DownloadExcelButton
+              style={{ margin: '10px 0' }}
+              key="export"
+              type="primary"
+              data={{
+                dataSource: _data,
+                cols: TABLE_COL_DEFS.map(item => item.headerName),
+                name: '持仓明细',
+              }}
+            >
+              导出Excel
+            </DownloadExcelButton>
+          }
         />
       </PageHeaderWrapper>
     );

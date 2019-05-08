@@ -5,6 +5,13 @@ const common = [
   },
 ];
 
+const SCRIPT_USER = [
+  {
+    value: 'CREATE_SCRIPT_USER',
+    zh: '创建脚本用户',
+  },
+];
+
 const ROLE = common.concat([
   {
     value: 'CREATE_ROLE',
@@ -252,12 +259,46 @@ const TEMP = [
   ...ROLE,
   ...USER,
 ];
-const ROOT = [...common];
+const ROOT = [...common, ...SCRIPT_USER];
 TEMP.forEach(t => {
   if (!ROOT.find(r => r.value === t.value)) {
     ROOT.push(t);
   }
 });
+
+const APPROVAL_GROUP = common.concat([
+  {
+    value: 'CREATE_APPROVAL_GROUP',
+    zh: '创建审批组',
+  },
+  {
+    value: 'UPDATE_TASK_NODE',
+    zh: '审批组关联任务节点',
+  },
+]);
+
+const APPROVAL_GROUP_INFO = [
+  // {
+  //   value: 'CREATE_APPROVAL_GROUP',
+  //   zh: '创建审批组',
+  // },
+  {
+    value: 'UPDATE_APPROVAL_GROUP',
+    zh: '更新审批组',
+  },
+  {
+    value: 'DELETE_APPROVAL_GROUP',
+    zh: '删除审批组',
+  },
+  {
+    value: 'UPDATE_APPROVAL_GROUP_USER',
+    zh: '更新审批组用户列表',
+  },
+  // {
+  //   value: 'UPDATE_TASK_NODE',
+  //   zh: '审批组关联任务节点',
+  // },
+];
 
 export const RESOURCE_ENUM = [
   'ROOT',
@@ -271,6 +312,8 @@ export const RESOURCE_ENUM = [
   'TRADE',
   'MARGIN',
   'CLIENT_INFO',
+  'APPROVAL_GROUP',
+  'APPROVAL_GROUP_INFO',
 ];
 
 export default {
@@ -285,4 +328,6 @@ export default {
   TRADE,
   MARGIN,
   CLIENT_INFO,
+  APPROVAL_GROUP,
+  APPROVAL_GROUP_INFO,
 };
