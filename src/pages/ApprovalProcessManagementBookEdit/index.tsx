@@ -1,24 +1,23 @@
-import { LCM_EVENT_TYPE_ZHCN_MAP, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import { LEG_ID_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
-import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { trdTradeGet } from '@/services/general-service';
-import { getTradeCreateModalData } from '@/services/pages';
-import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
+import { wkProcessInstanceFormGet } from '@/services/approval';
+import { convertTradePageData2ApiData } from '@/services/pages';
+import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, Menu, message, Skeleton, Typography } from 'antd';
+import { Divider, message, Typography, Skeleton, Row, Button } from 'antd';
 import { connect } from 'dva';
+import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import ActionBar from './ActionBar';
 import './index.less';
+import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
@@ -30,19 +29,18 @@ const TradeManagementBooking = props => {
       payload,
     });
   };
+  const useEnv = props.editable ? LEG_ENV.BOOKING : LEG_ENV.EDITING;
 
   const [tableLoading, setTableLoading] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [eventTypes, setEventTypes] = useState({});
-
   const addLeg = (leg: ILeg, position) => {
     if (!leg) return;
+
     setTableData(pre => {
       const next = {
-        ...createLegRecordByPosition(leg, position, LEG_ENV.EDITING),
-        [LEG_FIELD.POSITION_ID]: Form2.createField(position.positionId),
-        [LEG_FIELD.LCM_EVENT_TYPE]: Form2.createField(position.lcmEventType),
+        ...createLegRecordByPosition(leg, position, useEnv),
       };
       return pre.concat(next);
     });
@@ -52,46 +50,37 @@ const TradeManagementBooking = props => {
     setTableData([]);
     setCreateFormData([]);
 
-    if (!props.location.query.id) {
+    if (!props.id) {
       return message.warn('查看 id 不存在');
     }
 
     setTableLoading(true);
 
-    const { error, data } = await trdTradeGet({
-      tradeId: props.location.query.id,
+    // const { error, data } = await trdTradeGet({
+    //   tradeId: props.id,
+    // });
+    const { error, data } = await wkProcessInstanceFormGet({
+      processInstanceId: props.id,
     });
-
+    console.log(props.taskId);
     if (error) return;
+    const _detailData = {
+      tradeId: data.process._business_payload.trade.tradeId,
+      bookName: data.process._business_payload.trade.bookName,
+      tradeDate: data.process._business_payload.trade.tradeDate,
+      salesCode: data.process._business_payload.trade.salesCode,
+      counterPartyCode: data.process._business_payload.trade.positions[0].counterPartyCode,
+    };
+    // setCreateFormData(_detailData)
 
-    const tableFormData = getTradeCreateModalData(data);
+    // const tableFormData = getTradeCreateModalData(_detailData);
 
-    const { positions } = data;
-
-    const composePositions = await Promise.all(
-      positions.map(position => {
-        return trdTradeLCMUnwindAmountGet({
-          tradeId: tableFormData.tradeId,
-          positionId: position.positionId,
-        }).then(rsp => {
-          const { error, data } = rsp;
-          if (error) return position;
-          return {
-            ...position,
-            asset: {
-              ...position.asset,
-              [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
-              [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
-            },
-          };
-        });
-      })
-    );
+    const { positions } = data.process._business_payload.trade;
 
     setTableLoading(false);
-    setCreateFormData(Form2.createFields(tableFormData));
-    mockAddLegItem(composePositions, tableFormData);
-    fetchEventType(composePositions);
+    setCreateFormData(Form2.createFields(_detailData));
+    mockAddLegItem(positions, _detailData);
+    // fetchEventType(positions);
   };
 
   const mockAddLegItem = async (composePositions, tableFormData) => {
@@ -101,35 +90,19 @@ const TradeManagementBooking = props => {
     });
   };
 
-  const fetchEventType = composePositions => {
-    composePositions.forEach(position => {
-      trdPositionLCMEventTypes({
-        positionId: position.positionId,
-      }).then(rsp => {
-        if (rsp.error) return;
-        const data = [...rsp.data];
-        setEventTypes(pre => ({
-          ...pre,
-          [position.positionId]: data,
-        }));
-      });
-    });
-  };
-
-  const getContextMenu = params => {
-    const menuItem =
-      eventTypes[params.record.id] &&
-      eventTypes[params.record.id].map(eventType => {
-        return { key: eventType, value: LCM_EVENT_TYPE_ZHCN_MAP[eventType] };
-      });
-    if (!menuItem) return;
-    return (
-      <Menu onClick={({ key }) => handleEventAction(key, params)}>
-        {menuItem.map(item => {
-          return <Menu.Item key={item.key}>{item.value}</Menu.Item>;
-        })}
-      </Menu>
+  const handelSave = async () => {
+    const trade = convertTradePageData2ApiData(
+      tableData.map(item => Form2.getFieldsValue(item)),
+      Form2.getFieldsValue(createFormData),
+      currentUser.userName,
+      LEG_ENV.BOOKING
     );
+    props.tbookEditCancel();
+    props.confirmModify(null, {
+      taskId: props.taskId,
+      ctlProcessData: props.res,
+      businessProcessData: { trade, validTime: '2018-01-01T10:10:10' },
+    });
   };
 
   const handleEventAction = (eventType, params) => {
@@ -147,7 +120,6 @@ const TradeManagementBooking = props => {
   });
 
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
-
   return (
     <PageHeaderWrapper>
       {tableLoading ? (
@@ -159,7 +131,9 @@ const TradeManagementBooking = props => {
           <Loading loading={tableLoading}>
             <BookingBaseInfoForm
               columnNumberOneRow={2}
-              editableStatus={FORM_EDITABLE_STATUS.SHOW}
+              editableStatus={
+                props.editable ? FORM_EDITABLE_STATUS.EDITING_NO_CONVERT : FORM_EDITABLE_STATUS.SHOW
+              }
               createFormData={createFormData}
               setCreateFormData={setCreateFormData}
             />
@@ -169,7 +143,7 @@ const TradeManagementBooking = props => {
           </Typography.Title>
           <Divider />
           <MultiLegTable
-            env={LEG_ENV.EDITING}
+            env={useEnv}
             loading={tableLoading}
             tableEl={tableEl}
             onCellFieldsChange={params => {
@@ -187,8 +161,9 @@ const TradeManagementBooking = props => {
                   return item;
                 });
                 if (leg.onDataChange) {
+                  const _LEG_ENV = useEnv;
                   leg.onDataChange(
-                    LEG_ENV.EDITING,
+                    _LEG_ENV,
                     params,
                     newData[params.rowIndex],
                     newData,
@@ -216,12 +191,25 @@ const TradeManagementBooking = props => {
               });
             }}
             dataSource={tableData}
-            getContextMenu={getContextMenu}
           />
-          <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
         </>
       )}
-      <ActionBar tableData={tableData} />
+      {props.editable ? (
+        <Row
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginTop: '25px',
+          }}
+        >
+          <Button type="primary" onClick={handelSave}>
+            保存
+          </Button>
+          <Button style={{ marginLeft: '20px' }} onClick={() => props.tbookEditCancel()}>
+            取消
+          </Button>
+        </Row>
+      ) : null}
     </PageHeaderWrapper>
   );
 };

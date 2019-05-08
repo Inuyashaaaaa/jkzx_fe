@@ -34,3 +34,11 @@ export const TRADER_TYPE = {
 };
 
 export const PARTY_DOC_CREATE_OR_UPDATE = 'partyDocCreateOrUpdate';
+
+export const ALL_DATE_FIELD_KEYS = [
+  'periodValidity',
+  'authorizeExpiryDate',
+  'signAuthorizerIdExpiryDate',
+  'productFoundDate',
+  'productExpiringDate',
+];

@@ -14,10 +14,15 @@ import { getMoment } from '@/utils';
 import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
-import { isMoment } from 'moment';
+import moment, { isMoment } from 'moment';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
+import {
+  BASE_FORM_FIELDS,
+  PARTY_DOC_CREATE_OR_UPDATE,
+  TRADER_TYPE,
+  ALL_DATE_FIELD_KEYS,
+} from './constants';
 import Upload from './Upload';
 
 const TabPane = Tabs.TabPane;
@@ -42,11 +47,7 @@ const useTableData = props => {
       ];
     }
     Object.keys(data).forEach(async item => {
-      newData[item] = {
-        type: 'field',
-        value: data[item],
-        name: item,
-      };
+      newData[item] = Form2.createField(data[item]);
       if (item.endsWith('Doc')) {
         newData[item].value = [];
         if (data[item]) {
@@ -62,6 +63,9 @@ const useTableData = props => {
             newData[item].uid = doc.data.uuid;
           }
         }
+      }
+      if (ALL_DATE_FIELD_KEYS.indexOf(item) !== -1 && newData[item].value != null) {
+        newData[item].value = moment(newData[item].value);
       }
     });
     setBaseFormData(newData);

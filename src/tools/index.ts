@@ -280,3 +280,9 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
     }),
   };
 };
+
+export const formatMoney = (value, unit, space = false) =>
+  `${unit}${space ? ' ' : ''}${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+export const parseMoney = (value, unit) =>
+  (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');

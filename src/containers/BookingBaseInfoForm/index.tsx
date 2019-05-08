@@ -11,9 +11,12 @@ import { Button, Input as AntInput, Modal, Typography } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import moment, { isMoment } from 'moment';
 import React, { memo, useState } from 'react';
+import _ from 'lodash';
 
 const InputGroup = AntInput.Group;
 const { Title } = Typography;
+
+const COMMON_FIELD = 'comment';
 
 const BookingBaseInfoForm = memo<any>(props => {
   const {
@@ -225,11 +228,23 @@ const BookingBaseInfoForm = memo<any>(props => {
         footer={false}
         dataSource={createFormData}
         onFieldsChange={(props, changedFields, allFields) => {
-          if (changedFields.counterPartyCode) {
-            featchTradeData(Form2.getFieldValue(changedFields.counterPartyCode));
+          setCreateFormData({
+            ...createFormData,
+            ..._.mapValues<any>(changedFields, (val, key) => {
+              if (key === COMMON_FIELD) {
+                return {
+                  ...val,
+                  value: _.last(val.value),
+                };
+              }
+              return val;
+            }),
+          });
+        }}
+        onValuesChange={(props, changedValues, allValues) => {
+          if (changedValues.counterPartyCode) {
+            featchTradeData(Form2.getFieldValue(changedValues.counterPartyCode));
           }
-
-          setCreateFormData(allFields);
         }}
         columns={[
           {
@@ -363,6 +378,29 @@ const BookingBaseInfoForm = memo<any>(props => {
                       format="YYYY-MM-DD"
                       defaultOpen={editing ? false : true}
                     />
+                  )}
+                </FormItem>
+              );
+            },
+          },
+          {
+            title: '备注',
+            ...formEditingMeta,
+            dataIndex: COMMON_FIELD,
+            render: (value, record, index, { form, editing }) => {
+              return (
+                <FormItem>
+                  {form.getFieldDecorator()(
+                    <Select
+                      editing={editing}
+                      mode="tags"
+                      style={{ width: '100%' }}
+                      tokenSeparators={[',']}
+                    >
+                      {['期权', '线性互换', '非线性互换', '远期'].map(item => {
+                        return <Select.Option key={item}>{item}</Select.Option>;
+                      })}
+                    </Select>
                   )}
                 </FormItem>
               );

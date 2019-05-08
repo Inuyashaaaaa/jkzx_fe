@@ -142,9 +142,10 @@ class Operation extends PureComponent {
     }
 
     const { currentGroup } = this.props;
+
     let { dataSource } = this.state;
     dataSource = dataSource.filter(item => {
-      return !currentGroup.userList.find(items => item.username === items.username);
+      return !(currentGroup.userList || []).find(items => item.username === items.username);
     });
     this.setState({
       dataSource,
@@ -236,8 +237,8 @@ class Operation extends PureComponent {
       return {
         userApproveGroupId: item.id,
         username: item.username,
-        department_id: item.departmentId,
-        nick_name: item.nickName,
+        departmentId: item.departmentId,
+        nickName: item.nickName,
       };
     });
     this.props.onBatchAdd(selectArray, false);
@@ -249,8 +250,8 @@ class Operation extends PureComponent {
       return {
         userApproveGroupId: item.id,
         username: item.username,
-        department_id: item.departmentId,
-        nick_name: item.nickName,
+        departmentId: item.departmentId,
+        nickName: item.nickName,
       };
     });
     this.setState({ selectArray, selectedRowKeys });

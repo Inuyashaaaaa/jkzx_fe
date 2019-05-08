@@ -20,6 +20,8 @@ class Select extends InputBase<
     options?: IOptionProps[];
   }
 > {
+  public static Option = AntdSelect.Option;
+
   public static defaultProps = {
     editing: true,
   };
@@ -117,13 +119,14 @@ class Select extends InputBase<
         onChange={this.onChange}
         ref={this.getRef}
       >
-        {(Array.isArray(this.props.options) ? this.props.options : this.state.options).map(
-          (item, index) => (
-            <AntdSelect.Option key={index} {...omit(item, ['label'])}>
-              {item.label}
-            </AntdSelect.Option>
-          )
-        )}
+        {this.props.children ||
+          (Array.isArray(this.props.options) ? this.props.options : this.state.options).map(
+            (item, index) => (
+              <AntdSelect.Option key={index} {...omit(item, ['label'])}>
+                {item.label}
+              </AntdSelect.Option>
+            )
+          )}
       </AntdSelect>
     );
   }
