@@ -29,23 +29,13 @@ class DatePicker extends InputBase<IDatePickerProps> {
     }
   };
 
-  public isM = () => {
-    if (this.props.value == null) {
-      return true;
-    }
-    if (isMoment(this.props.value)) {
-      return true;
-    }
-    return false;
-  };
-
   public onChange = (date: moment.Moment, dateString: string) => {
     if (this.props.onChange) {
-      this.props.onChange(this.isM() ? date : dateString);
+      this.props.onChange(date, dateString);
     }
 
     if (this.props.onValueChange) {
-      this.props.onValueChange(this.isM() ? date : dateString);
+      this.props.onValueChange(date, dateString);
     }
   };
 
@@ -64,7 +54,7 @@ class DatePicker extends InputBase<IDatePickerProps> {
     return (
       <AntdDatePicker
         {...omit(this.props, ['autoSelect', 'onValueChange', 'editing'])}
-        value={this.parse()}
+        value={this.props.value}
         style={{
           width: '100%',
           ...this.props.style,
