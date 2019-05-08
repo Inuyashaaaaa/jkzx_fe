@@ -228,7 +228,6 @@ const BookingBaseInfoForm = memo<any>(props => {
           if (changedFields.counterPartyCode) {
             featchTradeData(Form2.getFieldValue(changedFields.counterPartyCode));
           }
-
           setCreateFormData(allFields);
         }}
         columns={[
