@@ -1,9 +1,4 @@
-import {
-  LEG_FIELD,
-  LEG_ID_FIELD,
-  LCM_EVENT_TYPE_ZHCN_MAP,
-  LEG_TYPE_FIELD,
-} from '@/constants/common';
+import { LEG_ID_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
@@ -12,34 +7,17 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { trdTradeGet } from '@/services/general-service';
-import { wkProcessInstanceFormGet, wkTaskComplete } from '@/services/approval';
-import {
-  backConvertPercent,
-  createLegDataSourceItem,
-  getTradeCreateModalData,
-  convertTradePageData2ApiData,
-} from '@/services/pages';
-import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
+import { wkProcessInstanceFormGet } from '@/services/approval';
+import { convertTradePageData2ApiData } from '@/services/pages';
 import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, message, Typography, Menu, Skeleton, Row, Button } from 'antd';
+import { Divider, message, Typography, Skeleton, Row, Button } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import ActionBar from './ActionBar';
 import './index.less';
-import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
-
-const UN_EDITDIR = [
-  LEG_FIELD.UNDERLYER_MULTIPLIER,
-  LEG_FIELD.TERM,
-  LEG_FIELD.EFFECTIVE_DATE,
-  LEG_FIELD.EXPIRATION_DATE,
-  LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
-  LEG_FIELD.NOTIONAL_AMOUNT,
-];
+import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;

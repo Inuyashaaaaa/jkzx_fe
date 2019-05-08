@@ -3,7 +3,6 @@ import {
   completeTaskProcess,
   queryProcessForm,
   queryProcessHistoryForm,
-  terminateProcess,
   wkProcessInstanceFormGet,
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
@@ -11,17 +10,16 @@ import {
   downloadTradeAttachment,
 } from '@/services/approval';
 import moment from 'moment';
-import { Form2, Select, Input, Upload } from '@/design/components';
+import { Form2, Upload } from '@/design/components';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
-import { Button, Icon, Popconfirm, Spin, Table, Row, Modal, message } from 'antd';
+import { Button, Icon, Popconfirm, Spin, Table, Row, Modal, message, Input } from 'antd';
 import React, { PureComponent } from 'react';
-import CommonForm from '@/page/SystemSettingDepartment/components/CommonForm';
 import { generateColumns } from '../constants';
 import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/lib/utils/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
-// const { TextArea } = Input;
+const { TextArea } = Input;
 
 class ApprovalForm extends PureComponent<any, any> {
   public $sourceTable: SourceTable = null;
@@ -598,7 +596,7 @@ class ApprovalForm extends PureComponent<any, any> {
                                                         value={passComment}
                                                         placeholder={'请输入审核意见（可选）'}
                                                     /> */}
-                          <Input
+                          <TextArea
                             onChange={this.setPassComment}
                             value={passComment}
                             placeholder={'请输入审核意见（可选）'}
@@ -623,7 +621,7 @@ class ApprovalForm extends PureComponent<any, any> {
                       title={
                         <div>
                           <p>请输入不通过审批的原因：</p>
-                          <Input onChange={this.setRejectReson} value={rejectReason} />
+                          <TextArea onChange={this.setRejectReson} value={rejectReason} />
                         </div>
                       }
                       onConfirm={this.rejectForm}
@@ -644,7 +642,7 @@ class ApprovalForm extends PureComponent<any, any> {
                         title={
                           <div>
                             <p>确认将此次修改提交复核吗？</p>
-                            <Input onChange={this.setModifyComment} value={modifyComment} />
+                            <TextArea onChange={this.setModifyComment} value={modifyComment} />
                           </div>
                         }
                         onConfirm={e => this.confirmModify(e, null)}
