@@ -409,11 +409,11 @@ export default class CommonForm extends Component {
     }
     if (type === 'upload') {
       return (
-        <div style={commonStyle}>
-          <div style={labelStyle}>
+        <div style={{ textAlign: 'center', margin: '30px' }}>
+          {/* <div style={labelStyle}>
             {!!required && <span style={{ color: 'red' }}>*</span>}
             {label}：
-          </div>
+          </div> */}
           <div>
             <Upload
               name="file"
@@ -432,11 +432,11 @@ export default class CommonForm extends Component {
                 上传文件
               </Button>
             </Upload>
-            {attachData.mimeTypes && attachData.mimeTypes.length > 0 && (
+            {/* {attachData.mimeTypes && attachData.mimeTypes.length > 0 && (
               <div style={{ width: 150, marginTop: 2, color: '#999999' }}>
                 {`支持${attachData.mimeTypes.join(',')}文件类型`}
               </div>
-            )}
+            )} */}
           </div>
         </div>
       );
