@@ -23,7 +23,7 @@ import {
   TRADER_TYPE,
   ALL_DATE_FIELD_KEYS,
 } from './constants';
-import Upload from './Upload';
+import Upload from '@/containers/Upload';
 
 const TabPane = Tabs.TabPane;
 
@@ -46,28 +46,41 @@ const useTableData = props => {
         data.salesName ? data.salesName : '',
       ];
     }
-    Object.keys(data).forEach(async item => {
+
+    const requests = Object.keys(data).map(async item => {
       newData[item] = Form2.createField(data[item]);
       if (item.endsWith('Doc')) {
         newData[item].value = [];
         if (data[item]) {
-          setLoading(true);
-          const doc = await getPartyDoc({ uuid: data[item] });
-          setLoading(false);
-          if (!doc.error && doc.data.name) {
-            newData[item].value.push({
-              name: doc.data.templates[0].fileName,
-              id: doc.data.uuid,
-              uid: doc.data.uuid,
-            });
-            newData[item].uid = doc.data.uuid;
-          }
+          return getPartyDoc({ uuid: data[item] });
+        }
+        return;
+      }
+      return;
+    });
+    setLoading(true);
+
+    const [...res] = await Promise.all(requests);
+    setLoading(false);
+    res.forEach((item, index) => {
+      if (!item) return;
+      const _item = Object.keys(data)[index];
+      if (_item.endsWith('Doc')) {
+        const { error, data } = item;
+        if (!error && data.name) {
+          newData[_item].value.push({
+            name: data.templates[0].fileName,
+            id: data.uuid,
+            uid: data.uuid,
+          });
+          newData[_item].uid = data.uuid;
         }
       }
-      if (ALL_DATE_FIELD_KEYS.indexOf(item) !== -1 && newData[item].value != null) {
-        newData[item].value = moment(newData[item].value);
+      if (ALL_DATE_FIELD_KEYS.indexOf(_item) !== -1 && newData[_item].value != null) {
+        newData[_item].value = moment(newData[_item].value);
       }
-    });
+    })
+    
     setBaseFormData(newData);
     const _traderList = (authorizers || []).map(item => {
       item = {
@@ -105,7 +118,7 @@ const useTableData = props => {
 };
 
 const EditModalButton = memo<any>(props => {
-  const columns = [
+  let columns = [
     {
       title: '姓名',
       dataIndex: 'name',
@@ -217,7 +230,9 @@ const EditModalButton = memo<any>(props => {
   }
 
   if (disabled) {
-    columns.pop();
+    const cloneColumns = columns;
+    cloneColumns.pop();
+    columns = cloneColumns;
   }
   return (
     <ModalButton
@@ -413,8 +428,8 @@ const EditModalButton = memo<any>(props => {
                                 />
                               )
                             ) : (
-                              <Input editing={editable} value={val} />
-                            )}
+                                <Input editing={editable} value={val} />
+                              )}
                           </FormItem>
                         );
                       },
@@ -1403,69 +1418,69 @@ const EditModalButton = memo<any>(props => {
         footer: disabled ? (
           false
         ) : (
-          <Row gutter={8} type="flex" justify="end">
-            <Button
-              onClick={() => {
-                setModalVisible(false);
-              }}
-            >
-              取消
+            <Row gutter={8} type="flex" justify="end">
+              <Button
+                onClick={() => {
+                  setModalVisible(false);
+                }}
+              >
+                取消
             </Button>
-            <Button
-              type="primary"
-              onClick={async () => {
-                const baseData = {};
-                Object.keys(baseFormData).forEach(item => {
-                  baseData[item] = baseFormData[item].value;
-                  if (item.endsWith('Date') && baseData[item]) {
-                    baseData[item] = getMoment(baseData[item]).format('YYYY-MM-DD');
+              <Button
+                type="primary"
+                onClick={async () => {
+                  const baseData = {};
+                  Object.keys(baseFormData).forEach(item => {
+                    baseData[item] = baseFormData[item].value;
+                    if (item.endsWith('Date') && baseData[item]) {
+                      baseData[item] = getMoment(baseData[item]).format('YYYY-MM-DD');
+                    }
+                    if (item.endsWith('Doc')) {
+                      baseData[item] = baseFormData[item].value
+                        .map(param => {
+                          if (param.id) {
+                            return param.id;
+                          }
+                          if (param.response) {
+                            return param.response.result.uuid;
+                          }
+                          return param;
+                        })
+                        .join('');
+                    }
+                  });
+                  const tradeAuthorizer = traderList.map(item => {
+                    return {
+                      tradeAuthorizerName: item.name.value,
+                      tradeAuthorizerIdNumber: item.IDNumber.value,
+                      tradeAuthorizerIdExpiryDate: getMoment(item.periodValidity.value).format(
+                        'YYYY-MM-DD'
+                      ),
+                      tradeAuthorizerPhone: item.phoneNumber.value,
+                    };
+                  });
+                  if (Array.isArray(baseData.salesName)) {
+                    const [subsidiaryName, branchName, salesName] = baseData.salesName;
+                    baseData.subsidiaryName = subsidiaryName;
+                    baseData.branchName = branchName;
+                    baseData.salesName = salesName;
                   }
-                  if (item.endsWith('Doc')) {
-                    baseData[item] = baseFormData[item].value
-                      .map(param => {
-                        if (param.id) {
-                          return param.id;
-                        }
-                        if (param.response) {
-                          return param.response.result.uuid;
-                        }
-                        return param;
-                      })
-                      .join('');
-                  }
-                });
-                const tradeAuthorizer = traderList.map(item => {
-                  return {
-                    tradeAuthorizerName: item.name.value,
-                    tradeAuthorizerIdNumber: item.IDNumber.value,
-                    tradeAuthorizerIdExpiryDate: getMoment(item.periodValidity.value).format(
-                      'YYYY-MM-DD'
-                    ),
-                    tradeAuthorizerPhone: item.phoneNumber.value,
-                  };
-                });
-                if (Array.isArray(baseData.salesName)) {
-                  const [subsidiaryName, branchName, salesName] = baseData.salesName;
-                  baseData.subsidiaryName = subsidiaryName;
-                  baseData.branchName = branchName;
-                  baseData.salesName = salesName;
-                }
-                baseData.tradeAuthorizer = tradeAuthorizer;
-                setLoading(true);
-                const { data, error } = await createRefParty(baseData);
-                setLoading(false);
-                if (error) return;
-                setModalVisible(false);
-                fetchTable();
-                notification.success({
-                  message: '保存成功',
-                });
-              }}
-            >
-              提交修改
+                  baseData.tradeAuthorizer = tradeAuthorizer;
+                  setLoading(true);
+                  const { data, error } = await createRefParty(baseData);
+                  setLoading(false);
+                  if (error) return;
+                  setModalVisible(false);
+                  fetchTable();
+                  notification.success({
+                    message: '保存成功',
+                  });
+                }}
+              >
+                提交修改
             </Button>
-          </Row>
-        ),
+            </Row>
+          ),
       }}
     >
       {name}
