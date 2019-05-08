@@ -24,6 +24,7 @@ import {
   ALL_DATE_FIELD_KEYS,
 } from './constants';
 import Upload from './Upload';
+import EmailInput from '@/containers/EmailInput';
 
 const TabPane = Tabs.TabPane;
 
@@ -468,7 +469,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} editing={editable} />)}
+                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -523,7 +524,7 @@ const EditModalButton = memo<any>(props => {
                                   message: '必填',
                                 },
                               ],
-                            })(<Input disabled={disabled} editing={editable} />)}
+                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
                           </FormItem>
                         );
                       },
