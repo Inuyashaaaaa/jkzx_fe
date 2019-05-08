@@ -6,6 +6,7 @@ import {
 import { IFormControl } from '@/design/components/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import { formatMoney } from '@/tools';
 
 const bookId = {
   field: 'bookId',
@@ -60,11 +61,21 @@ const multiplier = {
 const historyBuyAmount = {
   field: 'historyBuyAmount',
   headerName: '总买金额',
+  input: {
+    type: 'input',
+    formatValue: val => {
+      if (val == null) {
+        return val;
+      }
+      return formatMoney(parseInt(val, 10), '¥', true);
+    },
+  },
 };
 
 const historySellAmount = {
   field: 'historySellAmount',
   headerName: '总卖金额',
+  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
 };
 
 const totalBuy = {
