@@ -27,6 +27,22 @@ const { RangePicker } = DatePicker;
 class TradeConfirmation extends PureComponent {
   public $sourceTable: SourceTable = null;
 
+  public onTablePaginationChange = (page, pagesize) => {
+    const { pagination } = this.state;
+    this.setState(
+      {
+        pagination: {
+          ...pagination,
+          current: page,
+          pagesize,
+        },
+      },
+      () => {
+        this.onFetch();
+      }
+    );
+  };
+
   public state = {
     loading: false,
     dataSource: [],
@@ -34,6 +50,10 @@ class TradeConfirmation extends PureComponent {
     pagination: {
       current: 1,
       pageSize: 10,
+      // showSizeChanger: true,
+      showQuickJumper: true,
+      onChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
+      onShowSizeChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
     },
     bookIdList: [],
   };
@@ -103,7 +123,6 @@ class TradeConfirmation extends PureComponent {
   public onReset = () => {
     let { searchFormData } = this.state;
     searchFormData = {
-      ...searchFormData,
       ...Form2.createFields({ tradeDate: [moment().subtract(1, 'day'), moment()] }),
     };
     this.setState(
@@ -142,17 +161,6 @@ class TradeConfirmation extends PureComponent {
 
   public onSearch = () => {
     this.onFetch({ current: 1, pageSize: 10 });
-  };
-
-  public onTablePaginationChange = ({ pagination }) => {
-    this.setState(
-      {
-        pagination,
-      },
-      () => {
-        this.onFetch();
-      }
-    );
   };
 
   public render() {
