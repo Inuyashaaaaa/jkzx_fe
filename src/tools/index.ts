@@ -283,7 +283,12 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
 };
 
 export const placement = (value, num) => {
-  if (!value) return;
+  if (!value) {
+    if (value === 0) {
+      return value;
+    }
+    return;
+  }
   return new BigNumber(value).toFormat(num);
 };
 
