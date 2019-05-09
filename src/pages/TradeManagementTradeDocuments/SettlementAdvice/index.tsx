@@ -5,7 +5,9 @@ import { positionDocSearch } from '@/services/trade-service';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { SEARCH_FORM_CONTROLS_SETTLE, SETTLE_COLUMN_DEFS } from './constants';
+import { SEARCH_FORM_CONTROLS_SETTLE, SETTLE_COLUMN_DEFS, columns } from './constants';
+import { Button, Divider, Row, Table } from 'antd';
+import { Form2, Select } from '@/design/components';
 
 class SettlementAdvice extends PureComponent {
   public $sourceTable: SourceTable = null;
@@ -129,6 +131,56 @@ class SettlementAdvice extends PureComponent {
   public render() {
     return (
       <>
+        {/* <Form2
+          ref={node => (this.$sourceTable = node)}
+          layout="inline"
+          dataSource={this.state.searchFormData}
+          submitText={`刷新 ${this.state.lastUpdateTime}`}
+          submitButtonProps={{
+            icon: 'reload',
+          }}
+          onSubmitButtonClick={this.onSearchFormChange}
+          onResetButtonClick={this.onReset}
+          onFieldsChange={this.onFieldsChange}
+          columns={[
+            {
+              title: '标的物列表',
+              dataIndex: 'instrumentIds',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        mode="multiple"
+                        options={async (value: string = '') => {
+                          const { data, error } = await mktInstrumentSearch({
+                            instrumentIdPart: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+          ]}
+        />
+        <Divider type="horizontal" />
+        <Table
+          dataSource={this.state.dataSource}
+          columns={columns}
+          pagination={this.state.pagination}
+          loading={this.state.loading}
+        /> */}
         <SourceTable
           rowKey="uuid"
           ref={node => (this.$sourceTable = node)}
