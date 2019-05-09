@@ -16,22 +16,6 @@ const { RangePicker } = DatePicker;
 class SettlementAdvice extends PureComponent {
   public $sourceTable: SourceTable = null;
 
-  public onTablePaginationChange = (page, pagesize) => {
-    const { pagination } = this.state;
-    this.setState(
-      {
-        pagination: {
-          ...pagination,
-          current: page,
-          pagesize,
-        },
-      },
-      () => {
-        this.onFetch();
-      }
-    );
-  };
-
   public state = {
     loading: false,
     dataSource: [],
@@ -46,6 +30,22 @@ class SettlementAdvice extends PureComponent {
     },
     bookIdList: [],
     positionIdList: [],
+  };
+
+  public onTablePaginationChange = (page, pagesize) => {
+    const { pagination } = this.state;
+    this.setState(
+      {
+        pagination: {
+          ...pagination,
+          current: page,
+          pagesize,
+        },
+      },
+      () => {
+        this.onFetch();
+      }
+    );
   };
 
   public componentDidMount = () => {
