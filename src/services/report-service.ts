@@ -11,6 +11,16 @@ export async function rptIntradayTradeReportPaged(params = {}) {
   });
 }
 
+export async function rptIntradayTradeReportSearchPaged(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptIntradayTradeReportSearchPaged',
+      params,
+    },
+  });
+}
+
 export async function rptIntradayPortfolioRiskReportPaged(params = {}) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
     method: `POST`,

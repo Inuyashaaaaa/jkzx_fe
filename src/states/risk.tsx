@@ -1,19 +1,14 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
+import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import { Form2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { rptPositionReportSearchPaged, rptReportNameList } from '@/services/report-service';
-import { getMoment } from '@/utils';
-import { ConfigProvider, Divider, message, Table, Row } from 'antd';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import { TABLE_COL_DEFS } from './constants';
-import { searchFormControls } from './services';
-import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import { socketHOC } from '@/tools/socketHOC';
+import { ConfigProvider, Divider, message, Row, Table } from 'antd';
+import _ from 'lodash';
+import React, { useEffect, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
 
 const Modal = props => {
   const form = useRef<Form2>(null);
@@ -22,10 +17,10 @@ const Modal = props => {
     searchFormControls,
     defaultSort,
     defaultDirection,
-    reportType,
     searchMethod,
     downloadName,
     scrollWidth,
+    getReload,
   } = props;
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
@@ -125,6 +120,9 @@ const Modal = props => {
   useLifecycles(async () => {
     setIsMount(true);
     fetchTable();
+    if (getReload) {
+      getReload(fetchTable);
+    }
   });
 
   useEffect(
