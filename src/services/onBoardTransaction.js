@@ -58,4 +58,4 @@ export async function docBctTemplateList(params) {
   });
 }
 
-export const downloadUrl = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;
+export const downloadUrl = `${HOST_TEST}document-service/bct/download/template?fileName=`;

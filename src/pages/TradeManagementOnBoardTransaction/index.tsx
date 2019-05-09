@@ -394,11 +394,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
   };
 
   public downloadFormModal = async () => {
-    const { data, error } = await docBctTemplateList({
-      category: 'POSITION_TEMPLATE',
-    });
-    if (error) return;
-    window.open(`${downloadUrl}${data[0].uuid}`);
+    window.open(`${downloadUrl}position.csv`);
   };
 
   public handleFlowChange = value => {

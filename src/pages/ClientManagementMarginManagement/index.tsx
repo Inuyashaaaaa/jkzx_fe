@@ -98,11 +98,7 @@ class ClientManagementMarginManagement extends PureComponent {
   };
 
   public downloadFormModal = async () => {
-    const { data, error } = await docBctTemplateList({
-      category: 'MARGIN_TEMPLATE',
-    });
-    if (error) return;
-    window.open(`${downloadUrl}${data[0].uuid}`);
+    window.open(`${downloadUrl}margin.xlsx`);
   };
 
   public render() {
