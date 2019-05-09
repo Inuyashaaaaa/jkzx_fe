@@ -337,13 +337,13 @@ export const KNOCK_DIRECTION_ZHCN_MAP = {
 };
 
 export const DIRECTION_MAP = {
-  BUY: 'BUYER',
-  SELL: 'SELLER',
+  BUYER: 'BUYER',
+  SELLER: 'SELLER',
 };
 
 export const DIRECTION_ZHCN_MAP = {
-  BUY: '买',
-  SELL: '卖',
+  BUYER: '买',
+  SELLER: '卖',
 };
 
 export const DIRECTION_OPTIONS = convertOptions(DIRECTION_MAP, DIRECTION_ZHCN_MAP);
@@ -815,7 +815,6 @@ export const PRODUCTTYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.TRIPLE_DIGITAL]: '四层阶梯',
   [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间累积',
   [LEG_TYPE_MAP.STRADDLE]: '跨式',
-  [LEG_TYPE_MAP.FORWARD]: '远期',
 };
 
 export const PRODUCTTYPE_MAP = {

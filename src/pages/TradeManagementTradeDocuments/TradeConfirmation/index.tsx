@@ -27,6 +27,21 @@ const { RangePicker } = DatePicker;
 class TradeConfirmation extends PureComponent {
   public $sourceTable: SourceTable = null;
 
+  public state = {
+    loading: false,
+    dataSource: [],
+    searchFormData: {},
+    pagination: {
+      current: 1,
+      pageSize: 10,
+      // showSizeChanger: true,
+      showQuickJumper: true,
+      onChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
+      onShowSizeChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
+    },
+    bookIdList: [],
+  };
+
   public onTablePaginationChange = (page, pagesize) => {
     const { pagination } = this.state;
     this.setState(
@@ -41,21 +56,6 @@ class TradeConfirmation extends PureComponent {
         this.onFetch();
       }
     );
-  };
-
-  public state = {
-    loading: false,
-    dataSource: [],
-    searchFormData: {},
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      // showSizeChanger: true,
-      showQuickJumper: true,
-      onChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
-      onShowSizeChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
-    },
-    bookIdList: [],
   };
 
   public componentDidMount = () => {

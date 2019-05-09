@@ -1,102 +1,128 @@
-import {
-  INPUT_NUMBER_DATE_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  PRODUCT_TYPE_OPTIONS,
-} from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
+import { formatNumber } from '@/tools';
 
-export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
-  { field: 'bookName', headerName: '交易簿', width: 130 },
-
-  { field: 'partyName', headerName: '交易对手', width: 130 },
-
-  { field: 'tradeId', headerName: '交易代码', width: 130 },
-
+export const TABLE_COL_DEFS = [
   {
-    field: 'underlyerInstrumentId',
-    headerName: '标的物代码',
+    dataIndex: 'bookName',
+    title: '交易簿',
+    width: 130,
+    fixed: true,
+  },
+  {
+    dataIndex: 'partyName',
+    title: '交易对手',
     width: 130,
   },
-
   {
-    headerName: '期权类型',
-    field: 'productType',
+    dataIndex: 'tradeId',
+    title: '交易代码',
     width: 130,
-    input: {
-      type: 'select',
-      options: PRODUCT_TYPE_OPTIONS,
-    },
   },
-
   {
-    field: 'initialNumber',
-    headerName: '期初数量 (手)',
+    dataIndex: 'underlyerInstrumentId',
+    title: '标的物代码',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
   },
-
   {
-    field: 'unwindNumber',
-    headerName: '平仓数量 (手)',
+    title: '期权类型',
+    dataIndex: 'productType',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => PRODUCTTYPE_ZHCH_MAP[value],
   },
-
-  { field: 'number', headerName: '持仓数量 (手)', width: 130, input: INPUT_NUMBER_DIGITAL_CONFIG },
-
-  { field: 'premium', headerName: '期权费 (¥)', width: 130, input: INPUT_NUMBER_DIGITAL_CONFIG },
-
   {
-    field: 'unwindAmount',
-    headerName: '平仓金额 (¥)',
+    dataIndex: 'tradeDate',
+    title: '交易日',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
-
-  { field: 'marketValue', headerName: '市值 (¥)', width: 130, input: INPUT_NUMBER_DIGITAL_CONFIG },
-
-  { field: 'pnl', headerName: '盈亏 (¥)', width: 130, input: INPUT_NUMBER_DIGITAL_CONFIG },
-
   {
-    headerName: 'Delta (手)',
-    field: 'delta',
+    dataIndex: 'initialNumber',
+    title: '期初数量 (手)',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
-
   {
-    headerName: 'Delta Decay (手)',
-    field: 'deltaDecay',
+    dataIndex: 'unwindNumber',
+    title: '平仓数量 (手)',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
-
   {
-    field: 'deltaWithDecay',
-    headerName: '预期Delta (手)',
+    dataIndex: 'number',
+    title: '持仓数量 (手)',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, reocrd, index) => formatNumber(value, 4),
   },
-
   {
-    headerName: 'Gamma (手)',
-    field: 'gamma',
+    dataIndex: 'premium',
+    title: '期权费 (¥)',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, reocrd, index) => formatNumber(value, 4),
   },
-
   {
-    headerName: 'Gamma 金额 (¥)',
-    field: 'gammaCash',
+    dataIndex: 'unwindAmount',
+    title: '平仓金额 (¥)',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
-
-  { field: 'rho', headerName: 'Rho/1% (¥)', width: 130, input: INPUT_NUMBER_DIGITAL_CONFIG },
-
-  { field: 'theta', headerName: 'Theta/1天 (¥)', width: 130, input: INPUT_NUMBER_DIGITAL_CONFIG },
-
-  { field: 'vega', headerName: 'Vega/1% (¥)', width: 130, input: INPUT_NUMBER_DIGITAL_CONFIG },
-
-  { field: 'tradeDate', headerName: '交易日', width: 130, input: INPUT_NUMBER_DATE_CONFIG },
+  {
+    dataIndex: 'marketValue',
+    title: '市值 (¥)',
+    width: 130,
+    render: (value, reocrd, index) => formatNumber(value, 4),
+  },
+  {
+    dataIndex: 'pnl',
+    title: '盈亏 (¥)',
+    width: 130,
+    render: (value, reocrd, index) => formatNumber(value, 4),
+  },
+  {
+    title: 'Delta (手)',
+    dataIndex: 'delta',
+    width: 130,
+    render: (value, record, index) => formatNumber(value, 4),
+  },
+  {
+    title: 'Delta Decay (手)',
+    dataIndex: 'deltaDecay',
+    width: 130,
+    render: (value, record, index) => formatNumber(value, 4),
+  },
+  {
+    dataIndex: 'deltaWithDecay',
+    title: '预期Delta (手)',
+    width: 130,
+    render: (value, record, index) => formatNumber(value, 4),
+  },
+  {
+    title: 'Gamma (手)',
+    dataIndex: 'gamma',
+    width: 130,
+    render: (value, record, index) => formatNumber(value, 4),
+  },
+  {
+    title: 'Gamma 金额 (¥)',
+    dataIndex: 'gammaCash',
+    width: 130,
+    render: (value, record, index) => formatNumber(value, 4),
+  },
+  {
+    dataIndex: 'rho',
+    title: 'Rho/1% (¥)',
+    width: 130,
+    render: (value, record, index) => formatNumber(value, 4),
+  },
+  {
+    dataIndex: 'theta',
+    title: 'Theta/1天 (¥)',
+    width: 130,
+    render: (value, record, index) => formatNumber(value, 4),
+  },
+  {
+    dataIndex: 'vega',
+    title: 'Vega/1% (¥)',
+    render: (value, record, index) => formatNumber(value, 4),
+  },
 ];

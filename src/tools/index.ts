@@ -37,6 +37,7 @@ import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { Form2 } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import { ILeg } from '@/types/leg';
+import BigNumber from 'bignumber.js';
 import { notification } from 'antd';
 
 export const isModelXY = data => {
@@ -282,8 +283,21 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
   };
 };
 
-export const formatMoney = (value, unit, space = false) =>
-  `${unit}${space ? ' ' : ''}${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+export const formatNumber = (
+  value,
+  decimalPlaces?: number,
+  roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_UP,
+  config?: BigNumber.Format
+) => {
+  if (!value) {
+    return value;
+  }
+  return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
+};
+
+export const formatMoney = (value, unit = '', space = false) => {
+  return `${unit}${space ? ' ' : ''}${formatNumber(value)}`;
+};
 
 export const parseMoney = (value, unit) =>
   (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');

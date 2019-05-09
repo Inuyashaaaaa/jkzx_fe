@@ -1,63 +1,81 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { formatNumber } from '@/tools';
 
-export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '交易簿',
-    field: 'bookName',
+    title: '交易簿',
+    dataIndex: 'bookName',
     width: 130,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '标的物代码',
-    field: 'underlyerInstrumentId',
+    title: '标的物代码',
+    dataIndex: 'underlyerInstrumentId',
     width: 130,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '当日总盈亏 (¥)',
-    field: 'dailyPnl',
+    title: '当日总盈亏 (¥)',
+    dataIndex: 'dailyPnl',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
   {
-    headerName: '当日期权盈亏 (¥)',
-    field: 'dailyOptionPnl',
+    title: '当日期权盈亏 (¥)',
+    dataIndex: 'dailyOptionPnl',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
   {
-    headerName: '当日标的物盈亏 (¥)',
-    field: 'dailyUnderlyerPnl',
+    title: '当日标的物盈亏 (¥)',
+    dataIndex: 'dailyUnderlyerPnl',
     width: 150,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
   {
-    headerName: 'Delta 贡献 (¥)',
-    field: 'pnlContributionDelta',
+    title: 'Delta 贡献 (¥)',
+    dataIndex: 'pnlContributionDelta',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
   {
-    headerName: 'Vega 贡献 (¥)',
-    field: 'pnlContributionVega',
+    title: 'Vega 贡献 (¥)',
+    dataIndex: 'pnlContributionVega',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
   {
-    headerName: 'Theta 贡献 (¥)',
-    field: 'pnlContributionTheta',
+    title: 'Theta 贡献 (¥)',
+    dataIndex: 'pnlContributionTheta',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
   {
-    headerName: 'Rho 贡献 (¥)',
-    field: 'pnlContributionRho',
+    title: 'Rho 贡献 (¥)',
+    dataIndex: 'pnlContributionRho',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
   {
-    headerName: '其它贡献 (¥)',
-    field: 'pnlContributionUnexplained',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '其它贡献 (¥)',
+    dataIndex: 'pnlContributionUnexplained',
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
   },
 ];
