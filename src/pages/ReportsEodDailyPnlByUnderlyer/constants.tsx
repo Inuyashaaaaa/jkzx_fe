@@ -1,60 +1,78 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { placement } from '@/tools';
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '交易簿',
-    field: 'bookName',
+    title: '交易簿',
+    dataIndex: 'bookName',
   },
   {
-    headerName: '标的物代码',
-    field: 'underlyerInstrumentId',
+    title: '标的物代码',
+    dataIndex: 'underlyerInstrumentId',
   },
   {
-    headerName: '当日总盈亏 (¥)',
-    field: 'dailyPnl',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '当日总盈亏 (¥)',
+    dataIndex: 'dailyPnl',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '当日期权盈亏 (¥)',
-    field: 'dailyOptionPnl',
+    title: '当日期权盈亏 (¥)',
+    dataIndex: 'dailyOptionPnl',
     width: 140,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '当日标的物盈亏 (¥)',
-    field: 'dailyUnderlyerPnl',
+    title: '当日标的物盈亏 (¥)',
+    dataIndex: 'dailyUnderlyerPnl',
     width: 150,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Delta贡献 (¥)',
-    field: 'pnlContributionDelta',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Delta贡献 (¥)',
+    dataIndex: 'pnlContributionDelta',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Gamma贡献 (¥)',
-    field: 'pnlContributionGamma',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Gamma贡献 (¥)',
+    dataIndex: 'pnlContributionGamma',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Vega贡献 (¥)',
-    field: 'pnlContributionVega',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Vega贡献 (¥)',
+    dataIndex: 'pnlContributionVega',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Theta贡献 (¥)',
-    field: 'pnlContributionTheta',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Theta贡献 (¥)',
+    dataIndex: 'pnlContributionTheta',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Rho贡献 (¥)',
-    field: 'pnlContributionRho',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Rho贡献 (¥)',
+    dataIndex: 'pnlContributionRho',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '其他贡献 (¥)',
-    field: 'pnlContributionUnexplained',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '其他贡献 (¥)',
+    dataIndex: 'pnlContributionUnexplained',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
 ];

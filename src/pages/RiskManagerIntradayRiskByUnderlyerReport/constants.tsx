@@ -1,88 +1,115 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { placement } from '@/tools';
 
-export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '交易簿',
-    field: 'bookName',
+    title: '交易簿',
+    dataIndex: 'bookName',
     width: 130,
+    fixed: 'left',
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '标的物代码',
-    field: 'underlyerInstrumentId',
+    title: '标的物代码',
+    dataIndex: 'underlyerInstrumentId',
     width: 130,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
   },
   {
-    headerName: '标的物价格 (¥)',
-    field: 'underlyerPrice',
+    title: '标的物价格 (¥)',
+    dataIndex: 'underlyerPrice',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物价格变化 (%)',
-    field: 'underlyerPriceChangePercent',
+    title: '标的物价格变化 (%)',
+    dataIndex: 'underlyerPriceChangePercent',
     width: 150,
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4) + '%';
+    },
   },
   {
-    headerName: '标的物持仓 (手)',
-    field: 'underlyerNetPosition',
+    title: '标的物持仓 (手)',
+    dataIndex: 'underlyerNetPosition',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权 Delta (手)',
-    field: 'delta',
+    title: '期权 Delta (手)',
+    dataIndex: 'delta',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '净 Delta (手)',
-    field: 'netDelta',
+    title: '净 Delta (手)',
+    dataIndex: 'netDelta',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Delta Decay (手)',
-    field: 'deltaDecay',
+    title: 'Delta Decay (手)',
+    dataIndex: 'deltaDecay',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
 
   {
-    headerName: '预期 Delta (手)',
-    field: 'deltaWithDecay',
+    title: '预期 Delta (手)',
+    dataIndex: 'deltaWithDecay',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Gamma (手)',
-    field: 'gamma',
+    title: 'Gamma (手)',
+    dataIndex: 'gamma',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Gamma 金额 (¥)',
-    field: 'gammaCash',
+    title: 'Gamma 金额 (¥)',
+    dataIndex: 'gammaCash',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Vega/1% (¥)',
-    field: 'vega',
+    title: 'Vega/1% (¥)',
+    dataIndex: 'vega',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Theta/1天 (¥)',
-    field: 'theta',
+    title: 'Theta/1天 (¥)',
+    dataIndex: 'theta',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: 'Rho/1% (¥)',
-    field: 'rho',
-    width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: 'Rho/1% (¥)',
+    dataIndex: 'rho',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
 ];
