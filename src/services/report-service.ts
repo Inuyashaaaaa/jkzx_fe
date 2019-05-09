@@ -55,7 +55,7 @@ export async function reloadAirflowTrigger(id) {
   return request(
     `${location.protocol}//${location.hostname}:8080/admin/airflow/trigger?dag_id=${id}`,
     {
-      method: `GET`,
+      method: `POST`,
     },
     true
   );
