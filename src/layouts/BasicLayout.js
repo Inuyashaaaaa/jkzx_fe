@@ -145,6 +145,7 @@ class BasicLayout extends React.PureComponent {
     return {
       margin: '24px 24px 0',
       paddingTop: fixedHeader ? 64 : 0,
+      position: 'relative',
     };
   };
 
