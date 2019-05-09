@@ -231,7 +231,7 @@ const EditModalButton = memo<any>(props => {
   }
 
   if (disabled) {
-    const cloneColumns = _.cloneDeep(columns);
+    const cloneColumns = [...columns];
     cloneColumns.pop();
     columns = cloneColumns;
   }
