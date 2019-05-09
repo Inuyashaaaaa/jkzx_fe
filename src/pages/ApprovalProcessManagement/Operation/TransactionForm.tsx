@@ -116,12 +116,14 @@ class ApprovalForm extends PureComponent<any, any> {
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
     const _detailData = {
-      tradeId: data.process._business_payload.trade.tradeId,
-      bookName: data.process._business_payload.trade.bookName,
-      tradeDate: data.process._business_payload.trade.tradeDate,
-      trader: data.process._business_payload.trade.trader,
-      salesName: data.process._business_payload.trade.salesName,
-      counterPartyName: data.process._business_payload.trade.positions[0].counterPartyName,
+      tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
+      bookName: _.get(data, 'process._business_payload.trade.bookName'),
+      tradeDate: _.get(data, 'process._business_payload.trade.tradeDate'),
+      salesName: _.get(data, 'process._business_payload.trade.salesName'),
+      counterPartyName: _.get(
+        data,
+        'process._business_payload.trade.positions[0].counterPartyName'
+      ),
     };
     this.setState({
       detailData: _detailData,
