@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 class WelcomePage extends PureComponent {
   public render() {
     return (
-      <div style={{ height: '100%', position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
         <div
           style={{
             position: 'absolute',
