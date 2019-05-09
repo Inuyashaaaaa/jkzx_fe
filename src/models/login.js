@@ -244,9 +244,7 @@ export default {
     },
 
     *updatePassword({ payload }, { call, put }) {
-      console.log(payload);
       const response = yield call(updateOwnPassword, payload);
-      console.log(response);
       const error = (response.data && response.data.error) || '';
       if (error) {
         notification.error({

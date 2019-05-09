@@ -99,7 +99,7 @@ class RiskManagerIntradayPositionReport extends PureComponent implements ISource
     return (
       <PageHeaderWrapper title="持仓明细">
         <Row type="flex" justify="end" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <ReloadGreekButton fetchTable={this.fetch} id="real_time_dag" />
+          <ReloadGreekButton fetchTable={this.fetch} id="real_time_valuation_dag" />
         </Row>
         <SourceTable
           loading={this.state.loading}

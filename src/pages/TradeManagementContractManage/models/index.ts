@@ -1,5 +1,5 @@
 export default {
-  namespace: 'tradeManagementContractManagement',
+  namespace: 'tradeManagementContractManage',
   state: {
     activeTabKey: 'contractManagement',
   },
@@ -8,7 +8,10 @@ export default {
       const {
         payload: { key },
       } = action;
-      state.activeTabKey = key;
+      return {
+        ...state,
+        activeTabKey: key,
+      };
     },
   },
 };

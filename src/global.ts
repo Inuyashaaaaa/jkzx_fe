@@ -94,6 +94,7 @@ numeral.register('format', '¥', {
   },
   format: (value, format, roundingFunction) => {
     const space = numeral._.includes(format, ' ¥') ? ' ' : '';
+    const start = format.startsWith('¥');
 
     format = format.replace(/\s?¥/, '');
 
@@ -106,7 +107,11 @@ numeral.register('format', '¥', {
       value = isnan ? 0 : val;
     }
 
-    return `${numeral._.numberToFormat(value, format, roundingFunction)}${space} ¥`;
+    return `${start ? '¥ ' : ''}${numeral._.numberToFormat(
+      value,
+      format,
+      roundingFunction
+    )}${space}${!start ? ' ¥' : ''}`;
   },
   unformat: str => {
     return numeral._.stringToNumber(str);

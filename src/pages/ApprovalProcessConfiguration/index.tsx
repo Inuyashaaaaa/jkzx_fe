@@ -22,7 +22,7 @@ import {
 } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
-
+import _ from 'lodash';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -71,14 +71,18 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
+    let fristData = {};
     let tabsData = processList.data.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
+      if (item.processName === '交易录入经办复合流程') {
+        fristData = item;
+      }
       return item;
     });
+    tabsData = tabsData.filter(item => item.processName !== '交易录入经办复合流程');
 
-    tabsData = tabsData.filter(item => item.tabName.indexOf('资金录入') >= 0);
-
-    const taskData = (taskApproveGroupList.data || []).map(item => {
+    tabsData = _.concat(tabsData, fristData);
+    const taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       return item;
     });
@@ -133,8 +137,15 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public handleApproveGroup = (e, taskId) => {
     let { taskApproveGroupList } = this.state;
-    taskApproveGroupList = taskApproveGroupList.map(item => {
+    let fristChange = false;
+    taskApproveGroupList = taskApproveGroupList.map((item, index) => {
       if (item.taskId === taskId) {
+        item.approveGroupList = e;
+        if (index === 0) {
+          fristChange = true;
+        }
+      }
+      if (fristChange && index === taskApproveGroupList.length - 1) {
         item.approveGroupList = e;
       }
       return item;
@@ -164,6 +175,15 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public onConfirm = async () => {
     const { currentProcessName, taskApproveGroupList, status, globalConfig } = this.state;
+    const noneGroupIndex = _.findIndex(
+      taskApproveGroupList,
+      item => item.approveGroupList.length <= 0
+    );
+    if (noneGroupIndex >= 0) {
+      return notification.success({
+        message: `请至少选择一个审批组`,
+      });
+    }
     const requests = () =>
       Promise.all([
         wkProcessStatusModify({ processName: currentProcessName, status }),
@@ -268,10 +288,8 @@ class ApprovalProcessConfiguration extends PureComponent {
     return (
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
-          <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
+          <Tabs defaultActiveKey="资金录入经办复合流程" onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
-              // 只显示第二条数据
-              // if (index !== 1) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div
@@ -295,7 +313,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                           {/* <Icon type="plus-circle" /> */}
                         </span>
                       </List.Item>
-                      {this.state.taskApproveGroupList.map(group => {
+                      {this.state.taskApproveGroupList.map((group, gIndex) => {
                         return (
                           <List.Item key={group.taskId}>
                             <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
@@ -323,6 +341,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                                   className={styles.select}
                                   value={group.approveGroupList}
                                   mode="multiple"
+                                  disabled={gIndex === this.state.taskApproveGroupList.length - 1}
                                   onChange={e => this.handleApproveGroup(e, group.taskId)}
                                   optionFilterProp="children"
                                   filterOption={(input, option) =>

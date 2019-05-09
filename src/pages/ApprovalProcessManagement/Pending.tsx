@@ -1,4 +1,4 @@
-import SourceTable from '@/design/components/SourceTable';
+import { Table2 } from '@/design/components';
 import { queryProcessToDoList } from '@/services/approval';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -32,7 +32,6 @@ class Pending extends PureComponent {
       // obj.startTime = moment(obj.startTime).format('YYYY-MM-DD hh:mm:ss');
       return obj;
     });
-
     this.setState({
       dataSource: result.sort((item1, item2) => {
         return moment(item1.startTime).valueOf() - moment(item2.startTime).valueOf();
@@ -43,12 +42,13 @@ class Pending extends PureComponent {
   public render() {
     return (
       <>
-        <SourceTable
+        <Table2
           rowKey="taskId"
+          size="middle"
           loading={this.state.loading}
           dataSource={this.state.dataSource}
-          columnDefs={PENDING_COL_DEFS(this.fetchTable)}
-          autoSizeColumnsToFit={false}
+          columns={PENDING_COL_DEFS(this.fetchTable)}
+          scroll={{ x: 1400 }}
         />
       </>
     );

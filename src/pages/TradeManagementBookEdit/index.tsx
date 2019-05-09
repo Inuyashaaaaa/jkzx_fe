@@ -1,733 +1,234 @@
-import {
-  LCM_EVENT_TYPE_MAP,
-  LCM_EVENT_TYPE_OPTIONS,
-  LCM_EVENT_TYPE_ZHCN_MAP,
-  LEG_FIELD,
-  LEG_NAME_FIELD,
-  LEG_PRICING_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
-} from '@/constants/common';
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { allLegTypes } from '@/constants/legColDefs';
-import { orderLegColDefs } from '@/constants/legColDefs/common/order';
-import { ComputedColDefs } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
-import {
-  TradesColDefs,
-  TRADESCOLDEFS_LEG_FIELD_MAP,
-} from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { AlUnwindNotionalAmount, InitialNotionalAmount } from '@/constants/legColDefs/extraColDefs';
-import Form from '@/design/components/Form';
-import { IFormControl } from '@/design/components/Form/types';
-import SourceTable from '@/design/components/SourceTable';
-import { IColDef } from '@/design/components/Table/types';
-import ModalButton from '@/lib/components/_ModalButton2';
+import { LCM_EVENT_TYPE_ZHCN_MAP, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import { FORM_EDITABLE_STATUS } from '@/constants/global';
+import { LEG_ENV } from '@/constants/legs';
+import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
+import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
+import MultiLegTable from '@/containers/MultiLegTable';
+import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
+import { Form2, Loading } from '@/design/components';
+import { ITableData } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { convertObservetions } from '@/services/common';
 import { trdTradeGet } from '@/services/general-service';
-import {
-  bookingTableFormControls,
-  convertTradeApiData2PageData,
-  convertTradePageData2ApiData,
-  createLegDataSourceItem,
-  getAddLegItem,
-} from '@/services/pages';
-import {
-  trdPositionLCMEventTypes,
-  trdTradeLCMEventProcess,
-  trdTradeLCMUnwindAmountGet,
-} from '@/services/trade-service';
-import { getMoment } from '@/utils';
-import { MenuItemDef } from 'ag-grid-community';
-import { Button, Col, message, Row } from 'antd';
+import { getTradeCreateModalData } from '@/services/pages';
+import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
+import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
+import { ILeg } from '@/types/leg';
+import { Divider, Menu, message, Skeleton, Typography } from 'antd';
 import { connect } from 'dva';
-import produce from 'immer';
-import _ from 'lodash';
-import moment, { isMoment } from 'moment';
-import React, { PureComponent } from 'react';
-import router from 'umi/router';
-import ExportModal from './ExportModal';
-import AsianExerciseModal from './modals/AsianExerciseModal';
-import BarrierIn from './modals/BarrierIn';
-import ExerciseModal from './modals/ExerciseModal';
-import ExpirationModal from './modals/ExpirationModal';
-import FixingModal from './modals/FixingModal';
-import KnockOutModal from './modals/KnockOutModal';
-import SettleModal from './modals/SettleModal';
-import UnwindModal from './modals/UnwindModal';
-import { modalFormControls } from './services';
-import { filterObDays } from './utils';
+import React, { memo, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import ActionBar from './ActionBar';
+import './index.less';
 
-class TradeManagementBookEdit extends PureComponent<any, any> {
-  public rowKey: string = 'id';
-
-  public $souceTable: SourceTable = null;
-
-  public $modelButton: ModalButton = null;
-
-  public cacheTyeps = [];
-
-  public activeRowData: any = {};
-
-  public $unwindModal: UnwindModal;
-
-  public $exerciseModal: ExerciseModal;
-
-  public $expirationModal: ExpirationModal;
-
-  public $knockOutModal: KnockOutModal;
-
-  public $fixingModal: FixingModal;
-
-  public $asianExerciseModal: AsianExerciseModal;
-
-  public $barrierIn: BarrierIn;
-
-  public $settleModal: SettleModal;
-
-  public unEditDir = [
-    LEG_FIELD.UNDERLYER_MULTIPLIER,
-    LEG_FIELD.TERM,
-    LEG_FIELD.EFFECTIVE_DATE,
-    LEG_FIELD.EXPIRATION_DATE,
-    LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
-    LEG_FIELD.NOTIONAL_AMOUNT,
-  ];
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      unwindModalState: {
-        visible: false,
-      },
-      columnDefs: [],
-      dataSource: [],
-      loading: false,
-      tableFormData: {},
-      bookList: [],
-      eventTypes: {},
-      markets: {},
-      visible: false,
-      editable: false,
-      editablePositionId: '',
-      buttonDisable: true,
-    };
-  }
-
-  public componentDidMount = () => {
-    this.loadData();
+const TradeManagementBooking = props => {
+  const { currentUser } = props;
+  const { tradeManagementBookEditPageData, dispatch } = props;
+  const { tableData } = tradeManagementBookEditPageData;
+  const setTableData = payload => {
+    dispatch({
+      type: 'tradeManagementBookEdit/setTableData',
+      payload,
+    });
   };
 
-  public loadData = async (reset = false) => {
-    if (!this.props.location.query.id) {
+  const [tableLoading, setTableLoading] = useState(false);
+  const [createFormData, setCreateFormData] = useState({});
+  const tableEl = useRef<IMultiLegTableEl>(null);
+  const [eventTypes, setEventTypes] = useState({});
+
+  const addLeg = (leg: ILeg, position) => {
+    if (!leg) return;
+    setTableData(pre => {
+      const next = {
+        ...createLegRecordByPosition(leg, position, LEG_ENV.EDITING),
+        [LEG_FIELD.POSITION_ID]: Form2.createField(position.positionId),
+        [LEG_FIELD.LCM_EVENT_TYPE]: Form2.createField(position.lcmEventType),
+      };
+      return pre.concat(next);
+    });
+  };
+
+  const loadTableData = async () => {
+    setTableData([]);
+    setCreateFormData([]);
+
+    if (!props.location.query.id) {
       return message.warn('查看 id 不存在');
     }
 
-    this.setState({ loading: true });
+    setTableLoading(true);
 
     const { error, data } = await trdTradeGet({
-      tradeId: this.props.location.query.id,
+      tradeId: props.location.query.id,
     });
 
     if (error) return;
 
-    const { tableDataSource, tableFormData } = convertTradeApiData2PageData(data);
+    const tableFormData = getTradeCreateModalData(data);
 
-    const composeTableDataSource = await Promise.all(
-      tableDataSource.map(item => {
+    const { positions } = data;
+
+    const composePositions = await Promise.all(
+      positions.map(position => {
         return trdTradeLCMUnwindAmountGet({
           tradeId: tableFormData.tradeId,
-          positionId: item.id,
+          positionId: position.positionId,
         }).then(rsp => {
           const { error, data } = rsp;
-          if (error) return item;
+          if (error) return position;
           return {
-            ...item,
-            [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
-            [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
+              [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
+            },
           };
         });
       })
     );
 
-    this.setState({ loading: false });
-
-    if (reset) {
-      this.cacheTyeps = [];
-      return this.setState(
-        {
-          dataSource: [],
-          columnDefs: [],
-        },
-        () => {
-          this.loadCommon(composeTableDataSource, tableFormData, reset);
-        }
-      );
-    }
-
-    this.loadCommon(composeTableDataSource, tableFormData, reset);
+    setTableLoading(false);
+    setCreateFormData(Form2.createFields(tableFormData));
+    mockAddLegItem(composePositions, tableFormData);
+    fetchEventType(composePositions);
   };
 
-  public loadCommon = (tableDataSource, tableFormData, reset) => {
-    // 找到每条腿有的生命周期事件
-    if (!allLegTypes.length) return;
-    tableDataSource.forEach(item => {
-      const leg = allLegTypes.find(it => {
-        if (!it) {
-          return false;
-        }
-        return it.type === item.productType;
-      });
+  const mockAddLegItem = async (composePositions, tableFormData) => {
+    composePositions.forEach(position => {
+      const leg = getLegByProductType(position.productType, position.asset.exerciseType);
+      addLeg(leg, position);
+    });
+  };
+
+  const fetchEventType = composePositions => {
+    composePositions.forEach(position => {
       trdPositionLCMEventTypes({
-        positionId: item.id,
+        positionId: position.positionId,
       }).then(rsp => {
         if (rsp.error) return;
-        this.setState({
-          eventTypes: {
-            ...this.state.eventTypes,
-            [item.id]: item.id === this.state.editablePositionId ? [] : rsp.data,
-          },
-        });
-      });
-      this.addLegData(leg, this.makeData(leg, item));
-    });
-    this.setState({
-      tableFormData,
-      loading: false,
-    });
-  };
-
-  public makeData(leg, data) {
-    // data是rowData
-    return {
-      ...createLegDataSourceItem(leg),
-      ...data,
-    };
-  }
-
-  public addLegData = (leg, rowData) => {
-    if (this.cacheTyeps.indexOf(leg.type) === -1) {
-      this.cacheTyeps.push(leg.type);
-    }
-    const index = this.state.dataSource.findIndex(iitem => iitem.positionId === rowData.positionId);
-    this.setState(
-      produce((state: any) => {
-        if (this.cacheTyeps.indexOf(leg.type) !== -1) {
-          state.columnDefs = orderLegColDefs(
-            _.unionBy<IColDef>(
-              [
-                {
-                  headerName: '持仓ID',
-                  field: 'positionId',
-                  editable: false,
-                },
-                {
-                  headerName: '状态',
-                  field: LEG_FIELD.LCM_EVENT_TYPE,
-                  oldEditable: false,
-                  editable: false,
-                  input: {
-                    type: 'select',
-                    options: LCM_EVENT_TYPE_OPTIONS,
-                  },
-                },
-                ...state.columnDefs.concat(
-                  leg.getColumnDefs('editing').map(col => {
-                    return {
-                      ...col,
-                      oldEditable: col.editable,
-                      suppressMenu: true,
-                      editable: rowData => {
-                        if (rowData.data.positionId === this.state.editablePositionId) {
-                          if (this.unEditDir.find(item => item === col.field)) {
-                            return false;
-                          }
-                          return true;
-                        }
-                        return false;
-                      },
-                      exsitable: params => {
-                        const { colDef, data } = params;
-                        return this.judgeLegTypeExsit(colDef, data);
-                      },
-                    };
-                  })
-                ),
-                {
-                  ...InitialNotionalAmount,
-                  editable: false,
-                },
-                {
-                  ...AlUnwindNotionalAmount,
-                  editable: false,
-                },
-              ],
-              item => item.field
-            )
-          );
-        }
-        state.dataSource.splice(index, 0, rowData);
-      })
-    );
-  };
-
-  public judgeLegTypeExsit = (colDef, data) => {
-    const legType = allLegTypes.find(it => {
-      if (!it) {
-        return false;
-      }
-      return it.type === data[LEG_TYPE_FIELD];
-    });
-
-    if (!legType) return false;
-
-    return !!legType.getColumnDefs('editing').find(item => item.field === colDef.field);
-  };
-
-  public getHorizontalrColumnDef = params => {
-    return {
-      headerName: params.rowData[LEG_NAME_FIELD],
-      suppressMenu: true,
-    };
-  };
-
-  public getContextMenuItems = (params): Array<MenuItemDef | string> => {
-    return [
-      ...(this.state.eventTypes[params.rowData.id] &&
-        this.state.eventTypes[params.rowData.id].map(eventType => {
-          return {
-            name: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
-            action: this.bindEventAction(eventType, params),
-          };
-        })),
-      'separator',
-      'copy',
-      'paste',
-    ];
-  };
-
-  public handleEditable = rowData => {
-    const leg = allLegTypes.find(item => item.type === rowData.productType);
-    const dataSource = [...this.state.dataSource];
-    this.setState(
-      {
-        editablePositionId: rowData.positionId,
-        dataSource: [],
-        buttonDisable: false,
-      },
-      () => {
-        this.loadData();
-      }
-    );
-  };
-
-  public bindEventAction = (eventType, params) => () => {
-    const legType = params.rowData[LEG_TYPE_FIELD];
-
-    // 每次操作后及时更新，并保证数据一致性
-    this.activeRowData = params.rowData;
-
-    if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
-      return this.$expirationModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_IN) {
-      return this.$barrierIn.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.OBSERVE) {
-      return this.$fixingModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
-      if (
-        legType === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-        legType === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
-        legType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-        legType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL
-      ) {
-        const convertedData = filterObDays(convertObservetions(params.rowData));
-        if (convertedData.some(item => !item.price)) {
-          return message.warn('请先完善观察日价格');
-        }
-        return this.$asianExerciseModal.show(
-          this.activeRowData,
-          this.state.tableFormData,
-          this.props.currentUser,
-          () => this.loadData(true)
-        );
-      }
-
-      return this.$exerciseModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
-      if (this.activeRowData[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
-        return message.warn(
-          `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
-        );
-      }
-
-      this.$unwindModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.ROLL) {
-      this.$modelButton.click({
-        formControls: modalFormControls({
-          info: 'expirationDate',
-          name: '到期日',
-          input: { type: 'date', startDate: params.rowData.expirationDate },
-        }),
-        extra: {
-          ...params,
-          eventType,
-        },
-      });
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE) {
-      this.$expirationModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_OUT) {
-      this.$knockOutModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
-      return this.$settleModal.show(
-        this.activeRowData,
-        this.state.tableFormData,
-        this.props.currentUser,
-        () => this.loadData(true)
-      );
-    }
-
-    if (eventType === LCM_EVENT_TYPE_MAP.AMEND) {
-      this.handleEditable(this.activeRowData);
-    }
-  };
-
-  public handleEventType = eventType => {
-    switch (eventType) {
-      case 'EXERCISE':
-        return '行权成功';
-      case 'UNWIND':
-        return '平仓成功';
-      case 'ROLL':
-        return '展期成功';
-      default:
-        break;
-    }
-  };
-
-  public onConfirm = params => {
-    return trdTradeLCMEventProcess({
-      positionId: params.extra.rowData.id,
-      tradeId: this.state.tableFormData.tradeId,
-      eventType: params.extra.eventType,
-      userLoginId: this.props.currentUser.userName,
-      eventDetail: {
-        underlyerPrice: params.formData.underlyerPrice,
-        cashFlow: params.formData.cashFlow,
-        expirationDate: params.formData.expirationDate
-          ? params.formData.expirationDate.format('YYYY-MM-DD')
-          : undefined,
-      },
-    }).then(rsp => {
-      if (rsp.error) return;
-      setTimeout(() => {
-        message.success(this.handleEventType(params.extra.eventType));
-        // this.loadData(true);
-      }, 100);
-      return {
-        formData: {},
-      };
-    });
-  };
-
-  public convertVisible = () => {
-    this.setState({
-      visible: false,
-    });
-  };
-
-  public abandonModify = () => {
-    this.setState(
-      {
-        buttonDisable: true,
-        editablePositionId: '',
-        dataSource: [],
-      },
-      () => {
-        this.loadData();
-      }
-    );
-  };
-
-  public onConvertPricing = () => {
-    const nextTradesColDefs = TradesColDefs.map(item => ({
-      ...item,
-      totalable: false,
-    }));
-
-    const computedAllLegTypes = allLegTypes.map(item => {
-      return {
-        ...item,
-        columnDefs: item
-          .getColumnDefs('pricing')
-          .map(item => ({
-            ...item,
-            totalable: false,
-          }))
-          .concat(nextTradesColDefs)
-          .concat(ComputedColDefs),
-      };
-    });
-
-    const cacheTyeps = [];
-
-    this.props.dispatch({
-      type: 'pricingData/clean',
-    });
-
-    this.state.dataSource.forEach(record => {
-      const computedLeg = computedAllLegTypes.find(item => item.type === record[LEG_TYPE_FIELD]);
-
-      if (!computedLeg) return;
-
-      if (cacheTyeps.indexOf(computedLeg.type) === -1) {
-        cacheTyeps.push(computedLeg.type);
-      }
-
-      const legData = getAddLegItem(
-        computedLeg,
-        createLegDataSourceItem(computedLeg, {
-          [LEG_PRICING_FIELD]: true,
-        }),
-        true
-      );
-
-      const rowData = _.mapValues(
-        {
-          ...legData,
-          ..._.pick(record, computedLeg.getColumnDefs('pricing').map(item => item.field)),
-          [TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
-        },
-        (val, key) => {
-          if (key === LEG_FIELD.EXPIRATION_DATE) {
-            return getMoment(record[LEG_FIELD.EXPIRATION_DATE]);
-          }
-          if (key === LEG_FIELD.EFFECTIVE_DATE) {
-            return getMoment(record[LEG_FIELD.EFFECTIVE_DATE]);
-          }
-          return val;
-        }
-      );
-
-      this.props.dispatch({
-        type: 'pricingData/addLegData',
-        payload: {
-          cacheTyeps,
-          computedLeg,
-          computedAllLegTypes,
-          nextTradesColDefs,
-          rowData,
-        },
+        const data = [...rsp.data];
+        setEventTypes(pre => ({
+          ...pre,
+          [position.positionId]: data,
+        }));
       });
     });
-    router.push({
-      pathname: '/trade-management/pricing',
-      query: {
-        fromEdit: true,
-      },
-    });
   };
 
-  public saveModify = async () => {
-    const actionData = this.state.dataSource.filter(item => {
-      return item.positionId === this.state.editablePositionId;
-    });
-    const date = ['settlementDate', 'effectiveDate', 'expirationDate'];
-    const modifyData = _.mapValues(actionData[0], (value, key) => {
-      if (date.some(item => item === key)) {
-        if (isMoment(value)) {
-          return value;
-        }
-        return moment(value);
-      }
-      return value;
-    });
-    const tableFormData = {
-      ...this.state.tableFormData,
-      tradeDate: moment(this.state.tableFormData.tradeDate),
-    };
-
-    const trade = convertTradePageData2ApiData(
-      [modifyData],
-      tableFormData,
-      this.props.currentUser.userName
-    );
-
-    const { error, data } = await trdTradeLCMEventProcess({
-      positionId: modifyData.positionId,
-      tradeId: trade.tradeId,
-      eventType: 'AMEND',
-      userLoginId: this.props.currentUser.userName,
-      eventDetail: {
-        asset: _.omit(trade.positions[0].asset, [
-          'lcmEventType',
-          'positionId',
-          'productType',
-          'historyValue',
-          'initialValue',
-        ]),
-        productType: trade.positions[0].productType,
-      },
-    });
-    if (error) {
-      message.error('修改失败');
-      return;
-    }
-    message.success('修改成功');
-    this.setState({
-      editablePositionId: '',
-      buttonDisable: true,
-      dataSource: [],
-    });
-    this.loadData();
-  };
-
-  public render() {
+  const getContextMenu = params => {
+    const menuItem =
+      eventTypes[params.record.id] &&
+      eventTypes[params.record.id].map(eventType => {
+        return { key: eventType, value: LCM_EVENT_TYPE_ZHCN_MAP[eventType] };
+      });
+    if (!menuItem) return;
     return (
-      <PageHeaderWrapper back={true}>
-        <Form
-          dataSource={this.state.tableFormData}
-          controlNumberOneRow={5}
-          footer={false}
-          layout="inline"
-          controls={bookingTableFormControls().map<IFormControl>(item => ({
-            ...item,
-            input: {
-              ...item.input,
-              type: 'input',
-              subtype: 'show',
-            },
-          }))}
-        />
-        <SourceTable
-          loading={this.state.loading}
-          ref={node => (this.$souceTable = node)}
-          rowKey={this.rowKey}
-          pagination={false}
-          vertical={true}
-          autoSizeColumnsToFit={false}
-          enableSorting={false}
-          darkIfDoNotEditable={true}
-          getHorizontalrColumnDef={this.getHorizontalrColumnDef}
-          getContextMenuItems={this.getContextMenuItems}
-          dataSource={this.state.dataSource}
-          columnDefs={this.state.columnDefs}
-          header={
-            <Row
-              style={{ marginBottom: VERTICAL_GUTTER, marginTop: VERTICAL_GUTTER }}
-              type="flex"
-              justify="space-between"
-              gutter={16}
-            >
-              <Col>
-                <Button
-                  type="primary"
-                  disabled={this.state.buttonDisable}
-                  onClick={this.saveModify}
-                >
-                  保存修改
-                </Button>
-                <Button
-                  style={{ marginLeft: 10 }}
-                  type="primary"
-                  disabled={this.state.buttonDisable}
-                  onClick={this.abandonModify}
-                >
-                  放弃修改
-                </Button>
-              </Col>
-              <Col>
-                <Button type="primary" onClick={this.onConvertPricing}>
-                  转换定价
-                </Button>
-              </Col>
-            </Row>
-          }
-        />
-        <ModalButton ref={node => (this.$modelButton = node)} onConfirm={this.onConfirm} />
-        <UnwindModal ref={node => (this.$unwindModal = node)} />
-        <ExerciseModal
-          ref={node => {
-            this.$exerciseModal = node;
-          }}
-        />
-        <ExpirationModal ref={node => (this.$expirationModal = node)} />
-        <KnockOutModal ref={node => (this.$knockOutModal = node)} />
-        <FixingModal
-          ref={node => {
-            this.$fixingModal = node;
-          }}
-        />
-        <AsianExerciseModal
-          ref={node => {
-            this.$asianExerciseModal = node;
-          }}
-        />
-        <BarrierIn
-          ref={node => {
-            this.$barrierIn = node;
-          }}
-        />
-        <SettleModal
-          ref={node => {
-            this.$settleModal = node;
-          }}
-        />
-      </PageHeaderWrapper>
+      <Menu onClick={({ key }) => handleEventAction(key, params)}>
+        {menuItem.map(item => {
+          return <Menu.Item key={item.key}>{item.value}</Menu.Item>;
+        })}
+      </Menu>
     );
-  }
-}
+  };
 
-export default connect(state => ({
-  currentUser: (state.user as any).currentUser,
-}))(TradeManagementBookEdit);
+  const handleEventAction = (eventType, params) => {
+    lcmEventModalEl.current.show({
+      eventType,
+      record: params.record,
+      createFormData,
+      currentUser,
+      loadData: loadTableData,
+    });
+  };
+
+  useLifecycles(() => {
+    loadTableData();
+  });
+
+  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
+
+  return (
+    <PageHeaderWrapper>
+      {tableLoading ? (
+        <Skeleton active={true} paragraph={{ rows: 4 }} />
+      ) : (
+        <>
+          <Typography.Title level={4}>基本信息</Typography.Title>
+          <Divider />
+          <Loading loading={tableLoading}>
+            <BookingBaseInfoForm
+              columnNumberOneRow={2}
+              editableStatus={FORM_EDITABLE_STATUS.SHOW}
+              createFormData={createFormData}
+              setCreateFormData={setCreateFormData}
+            />
+          </Loading>
+          <Typography.Title style={{ marginTop: 20 }} level={4}>
+            交易结构信息
+          </Typography.Title>
+          <Divider />
+          <MultiLegTable
+            env={LEG_ENV.EDITING}
+            loading={tableLoading}
+            tableEl={tableEl}
+            onCellFieldsChange={params => {
+              const { record } = params;
+              const leg = getLegByRecord(record);
+
+              setTableData(pre => {
+                const newData = pre.map(item => {
+                  if (item[LEG_ID_FIELD] === params.rowId) {
+                    return {
+                      ...item,
+                      ...params.changedFields,
+                    };
+                  }
+                  return item;
+                });
+                if (leg.onDataChange) {
+                  leg.onDataChange(
+                    LEG_ENV.EDITING,
+                    params,
+                    newData[params.rowIndex],
+                    newData,
+                    (colId: string, loading: boolean) => {
+                      tableEl.current.setLoadings(params.rowId, colId, loading);
+                    },
+                    tableEl.current.setLoadingsByRow,
+                    (colId: string, newVal: ITableData) => {
+                      setTableData(pre =>
+                        pre.map(item => {
+                          if (item[LEG_ID_FIELD] === params.rowId) {
+                            return {
+                              ...item,
+                              [colId]: newVal,
+                            };
+                          }
+                          return item;
+                        })
+                      );
+                    },
+                    setTableData
+                  );
+                }
+                return newData;
+              });
+            }}
+            dataSource={tableData}
+            getContextMenu={getContextMenu}
+          />
+          <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
+        </>
+      )}
+      <ActionBar tableData={tableData} />
+    </PageHeaderWrapper>
+  );
+};
+
+export default memo(
+  connect(state => ({
+    currentUser: (state.user as any).currentUser,
+    tradeManagementBookEditPageData: state.tradeManagementBookEdit,
+  }))(TradeManagementBooking)
+);

@@ -11,7 +11,7 @@ import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { DatePicker, Divider, Pagination, Row, Table } from 'antd';
+import { DatePicker, Divider, Table, Pagination, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';

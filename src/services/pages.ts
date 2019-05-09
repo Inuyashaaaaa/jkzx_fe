@@ -1,31 +1,31 @@
 import {
-  LEG_ANNUALIZED_FIELD,
+  LEG_ENV_FIELD,
   LEG_FIELD,
   LEG_ID_FIELD,
   LEG_NAME_FIELD,
   LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
   PAYMENT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
-import { LEG_MAP } from '@/constants/legType';
 import { IFormControl } from '@/design/components/Form/types';
+import { uuid } from '@/design/utils';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import { getLegByType } from '@/tools';
+import { ILeg } from '@/types/leg';
+import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import uuidv4 from 'uuid/v4';
+import { Form2 } from '@/design/components';
 
-export const createLegDataSourceItem = (leg: ILegType, extra?) => {
+export const createLegDataSourceItem = (leg: ILeg, env: string) => {
   return {
-    [LEG_ID_FIELD]: uuidv4(),
+    [LEG_ID_FIELD]: uuid(),
     [LEG_TYPE_FIELD]: leg.type,
     [LEG_NAME_FIELD]: leg.name,
-    [LEG_ANNUALIZED_FIELD]: leg.isAnnualized,
-    ...extra,
+    [LEG_ENV_FIELD]: env,
   };
 };
 
@@ -101,17 +101,21 @@ export const bookingTableFormControls: () => IFormControl[] = () => [
   },
 ];
 
-export const getAddLegItem = (leg: ILegType, dataSourceItem: any, isPricing = false) => {
+export const getAddLegItem = (leg: ILeg, dataSourceItem: any, isPricing = false) => {
   return leg.getDefault(dataSourceItem, isPricing);
 };
 
-export const convertTradePositions = (tableDataSource, tableFormData, isPricing = false) => {
+export const convertTradePositions = (tableDataSource, tableFormData, env) => {
   const positions: any[] = tableDataSource.map(dataSourceItem => {
     dataSourceItem = miniumlPercent(dataSourceItem);
+    const type = dataSourceItem[LEG_TYPE_FIELD];
+    const leg = getLegByType(type);
 
-    const productType = dataSourceItem[LEG_TYPE_FIELD];
+    if (!leg) {
+      throw new Error('not found Leg type');
+    }
 
-    const nextPosition: any = {
+    return {
       lcmEventType: 'OPEN',
       positionAccountCode: 'empty',
       positionAccountName: 'empty',
@@ -119,17 +123,15 @@ export const convertTradePositions = (tableDataSource, tableFormData, isPricing 
       counterPartyAccountName: 'empty',
       counterPartyCode: tableFormData.counterPartyCode,
       counterPartyName: tableFormData.counterPartyCode,
+      ...leg.getPosition(env, dataSourceItem, tableDataSource),
     };
-
-    const Leg = LEG_MAP[productType];
-    return Leg.getPosition(nextPosition, dataSourceItem, tableDataSource, isPricing);
   });
 
   return positions;
 };
 
-export const convertTradePageData2ApiData = (tableDataSource, tableFormData, userName) => {
-  const positions: any[] = convertTradePositions(tableDataSource, tableFormData);
+export const convertTradePageData2ApiData = (tableDataSource, tableFormData, userName, env) => {
+  const positions: any[] = convertTradePositions(tableDataSource, tableFormData, env);
   const params: any = _.omit(tableFormData, ['counterPartyCode']);
 
   params.comment = 'empty';
@@ -140,52 +142,24 @@ export const convertTradePageData2ApiData = (tableDataSource, tableFormData, use
   params.salesName = tableFormData.salesCode;
   params.salesCode = tableFormData.salesCode;
   params.positions = positions;
-  params.tradeDate = params.tradeDate.format('YYYY-MM-DDTHH:mm:ss');
+  params.tradeDate = getMoment(params.tradeDate).format('YYYY-MM-DDTHH:mm:ss');
   params.trader = userName;
 
   return params;
 };
 
-export const convertTradeApiData2PageData = (apiData: any = {}) => {
+export const getTradeCreateModalData = (apiData: any = {}) => {
   const tableFormData: any = {};
   const { positions } = apiData;
 
   tableFormData.salesCode = apiData.salesCode;
-  tableFormData.counterPartyCode = positions[0].counterPartyCode;
+  tableFormData.counterPartyCode = _.get(positions, '[0].counterPartyCode');
   tableFormData.bookName = apiData.bookName;
   tableFormData.tradeId = apiData.tradeId;
   tableFormData.salesCode = apiData.salesCode;
   tableFormData.tradeDate = apiData.tradeDate;
 
-  const tableDataSource = positions.map(position => {
-    const isAnnualized = position.asset.annualized;
-    let Leg;
-    if (position.productType === LEG_TYPE_MAP.DIGITAL) {
-      Leg =
-        LEG_MAP[
-          `${position.productType}_${position.asset.exerciseType}_${
-            isAnnualized ? 'ANNUAL' : 'UNANNUAL'
-          }`
-        ];
-    } else {
-      Leg = LEG_MAP[`${position.productType}_${isAnnualized ? 'ANNUAL' : 'UNANNUAL'}`];
-    }
-    const nextPageDataItem: any = backConvertPercent({
-      ..._.omitBy(position.asset, _.isNull),
-      lcmEventType: position.lcmEventType,
-      ...createLegDataSourceItem(Leg),
-      id: position.positionId,
-      positionId: position.positionId,
-      productType: Leg.type,
-    });
-
-    return Leg.getPageData(nextPageDataItem, position);
-  });
-
-  return {
-    tableDataSource,
-    tableFormData,
-  };
+  return tableFormData;
 };
 
 function miniumlPercent(item) {
@@ -415,8 +389,8 @@ function miniumlPercent(item) {
   return clone;
 }
 
-function backConvertPercent(item) {
-  const clone = { ...item };
+export function backConvertPercent(item) {
+  const clone = { ...Form2.getFieldsValue(item) };
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
@@ -636,5 +610,5 @@ function backConvertPercent(item) {
       .multipliedBy(100)
       .toNumber();
   }
-  return clone;
+  return Form2.createFields(clone);
 }

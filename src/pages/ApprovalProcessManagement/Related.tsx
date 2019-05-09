@@ -1,11 +1,10 @@
 import { PROCESS_STATUS_TYPE_MAP, PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
+import { Table2 } from '@/design/components';
 import Form from '@/design/components/Form';
 import { IFormControl } from '@/design/components/Form/types';
-import SourceTable from '@/design/components/SourceTable';
-import { delay, mockData } from '@/lib/utils';
 import { wkProcessInstanceComplexList } from '@/services/approval';
-import { Col, Row, Switch } from 'antd';
+import { Switch } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -117,12 +116,13 @@ class Related extends PureComponent {
             footer={false}
           />
         </div>
-        <SourceTable
+        <Table2
           rowKey="processInstanceId"
           loading={this.state.loading}
           dataSource={this.state.dataSource}
-          columnDefs={RELATED_COL_DEFS(this.fetchTable)}
-          autoSizeColumnsToFit={false}
+          columns={RELATED_COL_DEFS(this.fetchTable)}
+          scroll={{ x: 1600 }}
+          size="middle"
         />
       </>
     );

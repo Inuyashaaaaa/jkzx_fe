@@ -169,7 +169,7 @@ class AuditLists extends PureComponent {
         description: message,
       });
       let { approveGroupList } = this.state;
-      approveGroupList = approveGroupList.concat(data);
+      approveGroupList = data;
       this.setState(
         {
           visible: false,
