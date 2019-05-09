@@ -7,10 +7,10 @@ import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { socketHOC } from '@/tools/socketHOC';
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 
-const Modal = props => {
+const Modal = memo<any>(props => {
   const form = useRef<Form2>(null);
   const {
     TABLE_COL_DEFS,
@@ -21,6 +21,7 @@ const Modal = props => {
     downloadName,
     scrollWidth,
     getReload,
+    hideReload = false,
   } = props;
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
@@ -48,9 +49,11 @@ const Modal = props => {
 
   const fetchTable = async (paramsSearchFormData?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
-    const formValidateRsp = await form.current.validate();
-    if (formValidateRsp.error) {
-      return;
+    if (searchFormControls) {
+      const formValidateRsp = await form.current.validate();
+      if (formValidateRsp.error) {
+        return;
+      }
     }
     setLoading(true);
     const { error, data } = await searchMethod({
@@ -148,18 +151,23 @@ const Modal = props => {
 
   return (
     <PageHeaderWrapper>
-      <Form2
-        ref={node => (form.current = node)}
-        dataSource={searchFormData}
-        columns={searchFormControls()}
-        layout="inline"
-        style={{ marginBottom: VERTICAL_GUTTER }}
-        submitText={'查询'}
-        onFieldsChange={onSearchFormChange}
-        onSubmitButtonClick={() => fetchTable()}
-        resetable={false}
-      />
-      <Divider />
+      {searchFormControls && (
+        <>
+          <Form2
+            ref={node => (form.current = node)}
+            dataSource={searchFormData}
+            columns={searchFormControls()}
+            layout="inline"
+            style={{ marginBottom: VERTICAL_GUTTER }}
+            submitText={'查询'}
+            onFieldsChange={onSearchFormChange}
+            onSubmitButtonClick={() => fetchTable()}
+            resetable={false}
+          />
+          <Divider />
+        </>
+      )}
+
       <Row type="flex" justify="space-between" style={{ marginBottom: VERTICAL_GUTTER }}>
         <DownloadExcelButton
           key="export"
@@ -172,9 +180,12 @@ const Modal = props => {
         >
           导出Excel
         </DownloadExcelButton>
-        <ReloadGreekButton fetchTable={fetchTable} id="real_time_valuation_dag" />
+        <ReloadGreekButton
+          fetchTable={fetchTable}
+          id="real_time_valuation_dag"
+          hideReload={hideReload}
+        />
       </Row>
-
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
         <Table
           size="middle"
@@ -196,6 +207,6 @@ const Modal = props => {
       </ConfigProvider>
     </PageHeaderWrapper>
   );
-};
+});
 
 export default socketHOC(Modal);

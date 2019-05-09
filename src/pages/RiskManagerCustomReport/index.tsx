@@ -1,100 +1,84 @@
+import { VERTICAL_GUTTER } from '@/constants/global';
+import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import SourceTable from '@/design/components/SourceTable';
-import { unionId } from '@/design/utils/unionId';
+import ReloadGreekButton from '@/containers/ReloadGreekButton';
+import { Form2, Select } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { rptIntradayReportNamesList, rptIntradayReportPaged } from '@/services/report-service';
 import { socketHOC } from '@/tools/socketHOC';
-import { ISourceTable } from '@/types';
+import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import FormItem from 'antd/lib/form/FormItem';
+import { rptIntradayReportNamesList, rptIntradayReportPaged } from '@/services/report-service';
+import uuidV4 from 'uuid';
 
-class RiskManagerCustomReport extends PureComponent implements ISourceTable {
-  public $sourceTable: SourceTable = null;
+const RiskManagerCustomReport = memo<any>(props => {
+  const form = useRef<Form2>(null);
+  const { getReload } = props;
+  const [dataSource, setDataSource] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+  const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState(true);
+  const [searchFormData, setSearchFormData] = useState({});
+  const [total, setTotal] = useState(null);
+  const [data, setData] = useState([]);
+  const [tableColumnDefs, setTableColumnDefs] = useState([]);
 
-  public state = {
-    formData: {},
-    tableDataSource: [],
-    loading: false,
-    canSave: false,
-    saveLoading: false,
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
-    tableColumnDefs: [],
-    searchFormData: {},
+  const onPaginationChange = (current, pageSize) => {
+    setPagination({
+      current,
+      pageSize,
+    });
   };
 
-  public reportName: string;
+  const onSearchFormChange = (param, fields, allFields) => {
+    setSearchFormData(allFields);
+  };
 
-  public fetch = async (paramsPagination?) => {
-    this.setState({
-      loading: true,
-    });
-
+  const fetchTable = async (paramsSearchFormData?) => {
+    const usedFormData = paramsSearchFormData || searchFormData;
+    const formValidateRsp = await form.current.validate();
+    if (formValidateRsp.error) {
+      return;
+    }
+    setLoading(true);
     const { error, data } = await rptIntradayReportPaged({
-      reportName: this.state.searchFormData.reportName,
-      page: (paramsPagination || this.state.pagination).current - 1,
-      pageSize: (paramsPagination || this.state.pagination).pageSize,
+      page: pagination.current - 1,
+      pageSize: pagination.pageSize,
+      ..._.mapValues(Form2.getFieldsValue(usedFormData)),
     });
-
-    this.setState({
-      loading: false,
-    });
-
+    setLoading(false);
     if (error) return;
-
+    if (!data.page.length) {
+      message.warning('报告暂无数据');
+      setDataSource(data.page);
+      setInfo(false);
+      setTotal(data.totalCount);
+      return;
+    }
     const tableDataSource = data.page.map(item => {
       return {
         ..._.get(item, 'reportData', {}),
-        rowId: unionId(),
+        uuid: uuidV4(),
       };
     });
-
     const tableColumnDefs = Object.keys(_.get(tableDataSource, '[0]', {}))
-      .filter(key => key !== 'rowId')
+      .filter(key => key !== 'uuid')
       .map(item => ({
-        headerName: item,
-        field: item,
+        title: item,
+        dataIndex: item,
         width: 200,
       }));
-
-    this.setState({
-      tableColumnDefs,
-      tableDataSource,
-      pagination: {
-        ...this.state.pagination,
-        ...paramsPagination,
-        total: data.totalCount,
-      },
-    });
+    setTableColumnDefs(tableColumnDefs);
+    setDataSource(tableDataSource);
+    setTotal(data.totalCount);
   };
 
-  public onPaginationChange = ({ pagination }) => {
-    this.setState(
-      {
-        pagination: {
-          ...this.state.pagination,
-          ...pagination,
-        },
-      },
-      () => {
-        this.fetch();
-      }
-    );
-  };
-
-  public onSearchFormChange = params => {
-    this.setState({
-      searchFormData: params.values,
-    });
-  };
-
-  public onSearchButtonClick = () => {
-    this.fetch();
-  };
-
-  public handleData = (dataSource, cols, headers) => {
+  const handleData = (dataSource, cols, headers) => {
     const data = [];
     data.push(headers);
     const length = data.length;
@@ -111,84 +95,111 @@ class RiskManagerCustomReport extends PureComponent implements ISourceTable {
     return data;
   };
 
-  public render() {
-    console.log(this.state.tableColumnDefs);
-    const _data = this.handleData(
-      this.state.tableDataSource,
-      this.state.tableColumnDefs.map(item => item.field),
-      this.state.tableColumnDefs.map(item => item.headerName)
-    );
-    return (
-      <PageHeaderWrapper title="定制化报告">
-        <SourceTable
-          autoSizeColumnsToFit={false}
-          searchable={true}
-          searchFormControls={[
-            {
-              field: 'reportName',
-              control: {
-                label: '选择报告名称',
-              },
-              input: {
-                type: 'select',
-                placeholder: '请输入内容搜索',
-                showSearch: true,
-                options: async (value: string) => {
-                  const { data, error } = await rptIntradayReportNamesList();
-                  if (error) return [];
-                  return data.map(item => ({
-                    label: item,
-                    value: item,
-                  }));
-                },
-              },
-              decorator: {
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
-              },
+  useLifecycles(async () => {
+    if (getReload) {
+      getReload(fetchTable);
+    }
+  });
+
+  useEffect(
+    () => {
+      setData(
+        handleData(
+          dataSource,
+          tableColumnDefs.map(item => item.dataIndex),
+          tableColumnDefs.map(item => item.title)
+        )
+      );
+    },
+    [dataSource]
+  );
+
+  return (
+    <PageHeaderWrapper>
+      <Form2
+        ref={node => (form.current = node)}
+        dataSource={searchFormData}
+        columns={[
+          {
+            title: '报告名称',
+            dataIndex: 'reportName',
+            render: (value, record, index, { form, editing }) => {
+              return (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '报告名称是必填项',
+                      },
+                    ],
+                  })(
+                    <Select
+                      {...{
+                        editing,
+                        style: {
+                          width: 180,
+                        },
+                        placeholder: '请输入内容搜索',
+                        allowClear: true,
+                        type: 'select',
+                        showSearch: true,
+                        options: async (value: string) => {
+                          const { data, error } = await rptIntradayReportNamesList();
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        },
+                      }}
+                    />
+                  )}
+                </FormItem>
+              );
             },
-          ]}
-          onSearchButtonClick={this.onSearchButtonClick}
-          resetable={false}
-          onSearchFormChange={this.onSearchFormChange}
-          searchFormData={this.state.searchFormData}
-          loading={this.state.loading}
-          ref={node => (this.$sourceTable = node)}
-          paginationProps={{
-            backend: true,
+          },
+        ]}
+        layout="inline"
+        style={{ marginBottom: VERTICAL_GUTTER }}
+        submitText={'查询'}
+        onFieldsChange={onSearchFormChange}
+        onSubmitButtonClick={() => fetchTable(searchFormData)}
+        resetable={false}
+      />
+      <Divider />
+      <DownloadExcelButton
+        style={{ margin: '10px 0' }}
+        key="export"
+        type="primary"
+        data={{
+          dataSource: data,
+          cols: tableColumnDefs.map(item => item.title),
+          name: '定制化报告',
+        }}
+      >
+        导出Excel
+      </DownloadExcelButton>
+      <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
+        <Table
+          size="middle"
+          rowKey="uuid"
+          loading={loading}
+          dataSource={dataSource}
+          pagination={{
+            ...pagination,
+            total,
+            showSizeChanger: true,
+            onShowSizeChange: onPaginationChange,
+            showQuickJumper: true,
+            onChange: onPaginationChange,
           }}
-          dataSource={this.state.tableDataSource}
-          pagination={this.state.pagination}
-          onPaginationChange={this.onPaginationChange}
-          onPaginationShowSizeChange={this.onPaginationChange}
-          rowKey={'rowId'}
-          columnDefs={this.state.tableColumnDefs}
-          unionId={'RiskManagerCustomReport'}
-          defaultColDef={{
-            cellRenderer: 'HeatmapCellRenderer',
-            enableCellChangeFlash: false,
-          }}
-          header={
-            <DownloadExcelButton
-              style={{ margin: '10px 0' }}
-              key="export"
-              type="primary"
-              data={{
-                dataSource: _data,
-                cols: this.state.tableColumnDefs.map(item => item.headerName),
-                name: '定制化报告',
-              }}
-            >
-              导出Excel
-            </DownloadExcelButton>
-          }
+          columns={tableColumnDefs}
+          scroll={{ x: 1350 }}
         />
-      </PageHeaderWrapper>
-    );
-  }
-}
+      </ConfigProvider>
+    </PageHeaderWrapper>
+  );
+});
 
 export default socketHOC(RiskManagerCustomReport);
