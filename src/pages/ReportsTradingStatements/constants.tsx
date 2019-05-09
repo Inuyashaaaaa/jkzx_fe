@@ -1,81 +1,93 @@
-import {
-  ASSET_TYPE_OPTIONS,
-  DIRECTION_OPTIONS,
-  INPUT_NUMBER_DATE_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-} from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { ASSET_TYPE_ZHCN_MAP, DIRECTION_ZHCN_MAP } from '@/constants/common';
+import { placement } from '@/tools';
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: 'SAC协议编码',
-    field: 'masterAgreementId',
+    title: 'SAC协议编码',
+    dataIndex: 'masterAgreementId',
+    width: 130,
+    fixed: 'left',
   },
   {
-    headerName: '交易确认书编码',
-    field: 'optionName',
+    title: '交易确认书编码',
+    dataIndex: 'optionName',
+    width: 200,
   },
   {
-    headerName: '客户名称',
-    field: 'client',
+    title: '客户名称',
+    dataIndex: 'client',
+    width: 130,
   },
   {
-    headerName: '开始日期',
-    field: 'dealStartDate',
-    input: INPUT_NUMBER_DATE_CONFIG,
+    title: '开始日期',
+    dataIndex: 'dealStartDate',
+    width: 130,
+    sorter: true,
+    sortDirectons: ['ascend', 'descend'],
   },
   {
-    headerName: '到期日期',
-    field: 'expiry',
-    input: INPUT_NUMBER_DATE_CONFIG,
+    title: '到期日期',
+    dataIndex: 'expiry',
+    width: 130,
+    sorter: true,
+    sortDirectons: ['ascend', 'descend'],
   },
   {
-    headerName: '买卖方向',
-    field: 'side',
-    input: {
-      type: 'select',
-      options: DIRECTION_OPTIONS,
+    title: '买卖方向',
+    dataIndex: 'side',
+    width: 80,
+    render: (value, record, index) => DIRECTION_ZHCN_MAP[value],
+  },
+  {
+    title: '标的资产名称',
+    dataIndex: 'baseContract',
+    width: 130,
+  },
+  {
+    title: '标的资产类型',
+    dataIndex: 'assetType',
+    width: 130,
+    render: (value, record, index) => ASSET_TYPE_ZHCN_MAP[value],
+  },
+  {
+    title: '名义金额 (¥)',
+    dataIndex: 'nominalPrice',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
     },
   },
   {
-    headerName: '标的资产名称',
-    field: 'baseContract',
-  },
-  {
-    headerName: '标的资产类型',
-    field: 'assetType',
-    input: {
-      type: 'select',
-      options: ASSET_TYPE_OPTIONS,
+    title: '期权费 (¥)',
+    dataIndex: 'beginPremium',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
     },
   },
   {
-    headerName: '名义金额 (¥)',
-    field: 'nominalPrice',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '市值 (¥)',
+    dataIndex: 'endPremium',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权费 (¥)',
-    field: 'beginPremium',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '总盈亏 (¥)',
+    dataIndex: 'totalPremium',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '市值 (¥)',
-    field: 'endPremium',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '实际平仓日期',
+    dataIndex: 'endDate',
+    width: 130,
   },
   {
-    headerName: '总盈亏 (¥)',
-    field: 'totalPremium',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '实际平仓日期',
-    field: 'endDate',
-    input: INPUT_NUMBER_DATE_CONFIG,
-  },
-  {
-    headerName: '存续状态',
-    field: 'status',
+    title: '存续状态',
+    dataIndex: 'status',
   },
 ];

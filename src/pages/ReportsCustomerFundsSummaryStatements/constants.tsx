@@ -1,63 +1,71 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { placement } from '@/tools';
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: 'SAC协议编码',
-    field: 'masterAgreementId',
+    title: 'SAC协议编码',
+    dataIndex: 'masterAgreementId',
+    width: 100,
   },
   {
-    headerName: '客户名称',
-    field: 'clientName',
+    title: '客户名称',
+    dataIndex: 'clientName',
+    width: 100,
   },
   {
-    headerName: '财务录入资金',
+    title: '财务录入资金',
     children: [
       {
-        headerName: '客户入金金额 (¥)',
-        field: 'paymentIn',
-        input: INPUT_NUMBER_DIGITAL_CONFIG,
+        title: '客户入金金额 (¥)',
+        dataIndex: 'paymentIn',
+        render: (value, record, index) => placement(value, 4),
+        width: 100,
       },
       {
-        headerName: '客户出金金额 (¥)',
-        field: 'paymentOut',
-        input: INPUT_NUMBER_DIGITAL_CONFIG,
+        title: '客户出金金额 (¥)',
+        dataIndex: 'paymentOut',
+        render: (value, record, index) => placement(value, 4),
+        width: 100,
       },
     ],
   },
   {
-    headerName: '交易权利金收支',
+    title: '交易权利金收支',
     children: [
       {
-        headerName: '期权收取权利金 (¥)',
-        field: 'premiumBuy',
-        input: INPUT_NUMBER_DIGITAL_CONFIG,
+        title: '期权收取权利金 (¥)',
+        dataIndex: 'premiumBuy',
+        render: (value, record, index) => placement(value, 4),
+        width: 100,
       },
       {
-        headerName: '期权支出权利金 (¥)',
-        field: 'premiumSell',
-        input: INPUT_NUMBER_DIGITAL_CONFIG,
+        title: '期权支出权利金 (¥)',
+        dataIndex: 'premiumSell',
+        render: (value, record, index) => placement(value, 4),
+        width: 100,
       },
     ],
   },
   {
-    headerName: '交易了结盈亏/赔付',
+    title: '交易了结盈亏/赔付',
     children: [
       {
-        headerName: '期权了结盈利 (¥)',
-        field: 'profitAmount',
-        input: INPUT_NUMBER_DIGITAL_CONFIG,
+        title: '期权了结盈利 (¥)',
+        dataIndex: 'profitAmount',
+        render: (value, record, index) => placement(value, 4),
+        width: 100,
       },
       {
-        headerName: '期权了结赔付 (¥)',
-        field: 'lossAmount',
-        input: INPUT_NUMBER_DIGITAL_CONFIG,
+        title: '期权了结赔付 (¥)',
+        dataIndex: 'lossAmount',
+        width: 100,
+        render: (value, record, index) => placement(value, 4),
       },
     ],
   },
   {
-    headerName: '场外预付金金额 (¥)',
-    field: 'fundTotal',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '场外预付金金额 (¥)',
+    dataIndex: 'fundTotal',
+    render: (value, record, index) => placement(value, 4),
+    width: 100,
   },
 ];

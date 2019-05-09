@@ -24,6 +24,7 @@ export const Modal = props => {
     searchMethod,
     downloadName,
     scrollWidth,
+    bordered = false,
   } = props;
   const [markets, setMarkets] = useState([]);
   const [dataSource, setDataSource] = useState([]);
@@ -210,6 +211,7 @@ export const Modal = props => {
           columns={TABLE_COL_DEFS}
           onChange={onChange}
           scroll={{ x: scrollWidth }}
+          bordered={bordered}
         />
       </ConfigProvider>
     </PageHeaderWrapper>
