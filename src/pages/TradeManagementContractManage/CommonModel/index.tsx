@@ -152,6 +152,8 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public render() {
+    let { tableDataSource } = this.state;
+    tableDataSource = _.reverse(_.sortBy(tableDataSource, 'createdAt'));
     return (
       <>
         <Form2
@@ -418,7 +420,7 @@ class CommonModel extends PureComponent<{ status: any }> {
               pagination={false}
               rowKey={'positionId'}
               scroll={{ x: 2500 }}
-              dataSource={this.state.tableDataSource}
+              dataSource={tableDataSource}
               columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}
               onRow={record => {
                 return record.style ? { style: record.style } : null;
