@@ -73,6 +73,7 @@ Deploy-Test:
 Deploy-Prod:
   stage: deploy
   script:
+    - export
     - yarn run deploy:prod
   when: manual
   only:

@@ -42,7 +42,12 @@ function last(prodContainerPath) {
 function prod() {
   const prodContainerPath = path.join(USER_PATH, PROD_CONTAINER);
   // @todo 获取当前 master 的标签作为文件名
-  const filename = new Date().toISOString();
+  const filename = process.env.CI_COMMIT_TAG;
+
+  if (!filename) {
+    return console.log('当前 commit 没有 tag 内容，无法发布');
+  }
+
   console.log(`文件名：${filename}`);
 
   // 拷贝文件到目标位置
