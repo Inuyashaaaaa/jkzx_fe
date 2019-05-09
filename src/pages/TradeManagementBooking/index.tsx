@@ -249,7 +249,6 @@ const TradeManagementBooking = props => {
   );
 
   const tableEl = useRef<IMultiLegTableEl>(null);
-
   return (
     <PageHeaderWrapper>
       <ActionBar

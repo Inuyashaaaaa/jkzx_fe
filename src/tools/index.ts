@@ -37,6 +37,7 @@ import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { Form2 } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import { ILeg } from '@/types/leg';
+import { notification } from 'antd';
 
 export const isModelXY = data => {
   return (
@@ -286,3 +287,16 @@ export const formatMoney = (value, unit, space = false) =>
 
 export const parseMoney = (value, unit) =>
   (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');
+
+export const catchCallbackError = (target: any) => {
+  return function() {
+    try {
+      target.apply(this, arguments);
+    } catch (error) {
+      notification.error({
+        message: '抱歉，发送了未知错误',
+        description: error + '',
+      });
+    }
+  };
+};
