@@ -1,16 +1,22 @@
 import ModalButton from '@/design/components/ModalButton';
 import { queryProcessDiagram } from '@/services/approval';
-import { Col, Row } from 'antd';
+import { Col, Row, Button, Model } from 'antd';
 import React, { PureComponent } from 'react';
 import ApprovalForm from './ApprovalForm';
-
+import TransactionForm from './TransactionForm';
 class Operation extends PureComponent {
   public state = {
     visible: false,
     diagramVisible: false,
     flowDiagram: '',
+    transactionModel: false,
   };
   public switchModal = () => {
+    if (this.props.formData.processName === '交易录入经办复合流程') {
+      this.setState({
+        transactionModel: true,
+      });
+    }
     this.setState({
       visible: true,
     });
@@ -74,10 +80,16 @@ class Operation extends PureComponent {
                 title: '审批单',
                 visible: this.state.visible,
                 footer: null,
-                width: 720,
+                width: 900,
                 onCancel: this.handleFormChange,
               }}
-              content={<ApprovalForm {...this.props} handleFormChange={this.handleFormChange} />}
+              content={
+                this.state.transactionModel ? (
+                  <TransactionForm {...this.props} handleFormChange={this.handleFormChange} />
+                ) : (
+                  <ApprovalForm {...this.props} handleFormChange={this.handleFormChange} />
+                )
+              }
             >
               查看审批单
             </ModalButton>

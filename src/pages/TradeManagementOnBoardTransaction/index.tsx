@@ -22,7 +22,6 @@ import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import XLSX from 'xlsx';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import RowForm from './components/RowForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
 
 const { TabPane } = Tabs;
@@ -30,16 +29,6 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 
 const reg = /^[+-]?\d+\.?\d*$/;
-
-function handleObjNumber(obj) {
-  const keys = Object.keys(obj);
-  keys.forEach(key => {
-    const value = obj[key];
-    if (reg.test(value)) {
-      obj[key] = value.toLocaleString();
-    }
-  });
-}
 
 class TradeManagementOnBoardTansaction extends PureComponent {
   constructor(props) {
@@ -142,7 +131,6 @@ class TradeManagementOnBoardTansaction extends PureComponent {
           : '-';
         obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
       }
-      handleObjNumber(obj);
       return obj;
     });
 
@@ -235,14 +223,9 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       }
     });
 
-    // return Object.values(obj).map(value => {
-    //   handleObjNumber(value);
-    //   return value;
-    // });
     const keys = Object.keys(obj);
     const finalData = keys.map(key => {
       const value = obj[key];
-      handleObjNumber(value);
       return value;
     });
     return finalData;

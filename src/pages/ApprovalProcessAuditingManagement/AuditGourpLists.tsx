@@ -169,7 +169,7 @@ class AuditLists extends PureComponent {
         description: message,
       });
       let { approveGroupList } = this.state;
-      approveGroupList = approveGroupList.concat(data);
+      approveGroupList = data;
       this.setState(
         {
           visible: false,
@@ -205,6 +205,7 @@ class AuditLists extends PureComponent {
   };
 
   public handleMenber = param => {
+    if (!param) return;
     this.setState({
       indexGroupId: param.approveGroupId,
     });
