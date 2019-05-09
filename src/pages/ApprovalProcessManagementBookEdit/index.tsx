@@ -77,7 +77,7 @@ const TradeManagementBooking = props => {
 
     // const tableFormData = getTradeCreateModalData(_detailData);
 
-    const { positions } = _.get(data, 'process._business_payload.trade.');
+    const { positions } = _.get(data, 'process._business_payload.trade');
 
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
