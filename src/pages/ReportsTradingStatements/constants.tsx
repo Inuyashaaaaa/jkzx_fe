@@ -1,5 +1,5 @@
 import { ASSET_TYPE_ZHCN_MAP, DIRECTION_ZHCN_MAP } from '@/constants/common';
-import { placement } from '@/tools';
+import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -54,7 +54,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'nominalPrice',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -62,7 +62,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'beginPremium',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -70,7 +70,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'endPremium',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -78,7 +78,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'totalPremium',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {

@@ -3,20 +3,18 @@ import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import { Form2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { rptPositionReportSearchPaged, rptReportNameList } from '@/services/report-service';
+import { rptReportNameList } from '@/services/report-service';
 import { getMoment } from '@/utils';
 import { ConfigProvider, Divider, message, Table } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import { TABLE_COL_DEFS } from './constants';
-import { searchFormControls } from './services';
 
-export const Modal = props => {
+const ReportCommonTable = memo<any>(props => {
   const form = useRef<Form2>(null);
   const {
-    TABLE_COL_DEFS,
+    tableColDefs,
     searchFormControls,
     defaultSort,
     defaultDirection,
@@ -41,6 +39,7 @@ export const Modal = props => {
   const [data, setData] = useState([]);
 
   const onPaginationChange = (current, pageSize) => {
+    setIsMount(true);
     setPagination({
       current,
       pageSize,
@@ -51,7 +50,7 @@ export const Modal = props => {
     setSearchFormData(allFields);
   };
 
-  const fetchTable = async (paramsSearchFormData?) => {
+  const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
     const formValidateRsp = await form.current.validate();
     if (formValidateRsp.error) {
@@ -59,8 +58,8 @@ export const Modal = props => {
     }
     setLoading(true);
     const { error, data } = await searchMethod({
-      page: pagination.current - 1,
-      pageSize: pagination.pageSize,
+      page: (paramsPagination || pagination).current - 1,
+      pageSize: (paramsPagination || pagination).pageSize,
       ..._.mapValues(Form2.getFieldsValue(usedFormData), (values, key) => {
         if (key === 'valuationDate') {
           return getMoment(values).format('YYYY-MM-DD');
@@ -70,7 +69,10 @@ export const Modal = props => {
       ...sortField,
     });
     setLoading(false);
-    if (error) return;
+    if (error) {
+      setDataSource([]);
+      return;
+    }
     if (!data.page.length) {
       message.warning('查询日期内暂无数据');
       setDataSource(data.page);
@@ -83,6 +85,7 @@ export const Modal = props => {
   };
 
   const onChange = (paramsPagination, filters, sorter) => {
+    setIsMount(true);
     if (!sorter.columnKey) {
       const aPagination = {
         current: paramsPagination.current,
@@ -160,8 +163,8 @@ export const Modal = props => {
       setData(
         handleData(
           dataSource,
-          TABLE_COL_DEFS.map(item => item.dataIndex),
-          TABLE_COL_DEFS.map(item => item.title)
+          tableColDefs.map(item => item.dataIndex),
+          tableColDefs.map(item => item.title)
         )
       );
     },
@@ -178,7 +181,14 @@ export const Modal = props => {
         style={{ marginBottom: VERTICAL_GUTTER }}
         submitText={'查询'}
         onFieldsChange={onSearchFormChange}
-        onSubmitButtonClick={() => fetchTable()}
+        onSubmitButtonClick={() => {
+          setIsMount(false);
+          setPagination({
+            current: 1,
+            pageSize: 10,
+          });
+          fetchTable(searchFormData, { current: 1, pageSize: 10 });
+        }}
         resetable={false}
       />
       <Divider />
@@ -188,7 +198,7 @@ export const Modal = props => {
         type="primary"
         data={{
           dataSource: data,
-          cols: TABLE_COL_DEFS.map(item => item.title),
+          cols: tableColDefs.map(item => item.title),
           name: downloadName,
         }}
       >
@@ -208,7 +218,7 @@ export const Modal = props => {
             showQuickJumper: true,
             onChange: onPaginationChange,
           }}
-          columns={TABLE_COL_DEFS}
+          columns={tableColDefs}
           onChange={onChange}
           scroll={{ x: scrollWidth }}
           bordered={bordered}
@@ -216,4 +226,6 @@ export const Modal = props => {
       </ConfigProvider>
     </PageHeaderWrapper>
   );
-};
+});
+
+export default ReportCommonTable;

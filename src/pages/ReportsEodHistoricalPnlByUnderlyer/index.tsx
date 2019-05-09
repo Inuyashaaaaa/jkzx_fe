@@ -1,20 +1,20 @@
-import { rptPnlHstReportPagedByNameAndDate } from '@/services/report-service';
+import { rptPnlHstReportSearchPaged } from '@/services/report-service';
 import React, { memo } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
-import { Modal } from '@/states/report';
+import ReportCommonTable from '@/containers/ReportCommonTable';
 
 const ReportsEodHistoricalPnlByUnderlyer = memo<any>(props => {
   return (
-    <Modal
-      TABLE_COL_DEFS={TABLE_COL_DEFS}
+    <ReportCommonTable
+      tableColDefs={TABLE_COL_DEFS}
       searchFormControls={searchFormControls}
       defaultSort={'bookName'}
       defaultDirection={'asc'}
       reportType={'PNL_HST'}
-      searchMethod={rptPnlHstReportPagedByNameAndDate}
+      searchMethod={rptPnlHstReportSearchPaged}
       downloadName={'历史盈亏'}
-      scrollWidth={1600}
+      scrollWidth={2000}
     />
   );
 });

@@ -5,7 +5,7 @@ import {
   ProductType,
   ReportName,
   ValuationDate,
-} from '@/domains/commonSearchForm';
+} from '@/domains/SearchForm';
 
 export const searchFormControls = markets => {
   return [ReportName(markets), ValuationDate, BookName, LegalName, InstrumentId, ProductType];

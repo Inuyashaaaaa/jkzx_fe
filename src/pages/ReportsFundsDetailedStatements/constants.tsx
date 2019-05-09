@@ -1,4 +1,4 @@
-import { placement } from '@/tools';
+import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -21,19 +21,19 @@ export const TABLE_COL_DEFS = [
   {
     title: '入金 (¥)',
     dataIndex: 'paymentIn',
-    render: (value, record, index) => placement(value, 4),
+    render: (value, record, index) => formatNumber(value, 4),
     width: 100,
   },
   {
     title: '出金 (¥)',
     dataIndex: 'paymentOut',
-    render: (value, record, index) => placement(value, 4),
+    render: (value, record, index) => formatNumber(value, 4),
     width: 100,
   },
   {
     title: '出入金净额 (¥)',
     dataIndex: 'paymentAmount',
-    render: (value, record, index) => placement(value, 4),
+    render: (value, record, index) => formatNumber(value, 4),
     width: 100,
   },
 ];

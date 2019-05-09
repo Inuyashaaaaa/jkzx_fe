@@ -1,6 +1,6 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { IColumnDef } from '@/design/components/Table/types';
-import { placement, formatMoney } from '@/tools';
+import { formatNumber, formatMoney } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -23,7 +23,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'underlyerPrice',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -31,7 +31,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'underlyerPriceChangePercent',
     width: 150,
     render: (value, record, index) => {
-      return placement(value, 4) + '%';
+      return formatNumber(value, 4) + '%';
     },
   },
   {
@@ -39,7 +39,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'underlyerNetPosition',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -47,7 +47,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'delta',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -55,7 +55,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'netDelta',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -63,7 +63,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'deltaDecay',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
 
@@ -72,7 +72,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'deltaWithDecay',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -80,7 +80,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'gamma',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -88,7 +88,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'gammaCash',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -96,7 +96,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'vega',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -104,14 +104,14 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'theta',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
     title: 'Rho/1% (¥)',
     dataIndex: 'rho',
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
 ];

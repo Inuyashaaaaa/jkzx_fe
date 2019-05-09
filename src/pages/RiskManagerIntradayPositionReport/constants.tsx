@@ -1,5 +1,5 @@
 import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
-import { placement } from '@/tools';
+import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -50,7 +50,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'initialNumber',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -58,7 +58,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'unwindNumber',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -66,7 +66,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'number',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -74,7 +74,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'premium',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -82,7 +82,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'unwindAmount',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -90,7 +90,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'marketValue',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -98,7 +98,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'pnl',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -106,7 +106,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'delta',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -114,7 +114,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'deltaDecay',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -122,7 +122,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'deltaWithDecay',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -130,7 +130,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'gamma',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -138,7 +138,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'gammaCash',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -146,7 +146,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'vega',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -154,7 +154,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'theta',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -162,7 +162,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'rho',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {

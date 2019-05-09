@@ -1,12 +1,12 @@
 import { rptIntradayTradeExpiringReportPaged } from '@/services/report-service';
-import Modal from '@/states/risk';
+import RiskCommonTable from '@/containers/RiskCommonTable';
 import React, { memo } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 
 const RiskManagerIntradayExpiringPositionReport = memo<any>(props => {
   return (
-    <Modal
-      TABLE_COL_DEFS={TABLE_COL_DEFS}
+    <RiskCommonTable
+      tableColDefs={TABLE_COL_DEFS}
       defaultSort={'tradeDate'}
       defaultDirection={'desc'}
       searchMethod={rptIntradayTradeExpiringReportPaged}

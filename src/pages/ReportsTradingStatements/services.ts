@@ -1,11 +1,11 @@
 import {
   ClientName,
   MasterAgreementId,
-  InstrumentId,
+  BaseContract,
   AssetType,
   ReportName,
   ValuationDate,
-} from '@/domains/commonSearchForm';
+} from '@/domains/SearchForm';
 
 export const searchFormControls = markets => {
   return [
@@ -13,7 +13,7 @@ export const searchFormControls = markets => {
     ValuationDate,
     ClientName,
     MasterAgreementId,
-    InstrumentId,
+    BaseContract,
     AssetType,
   ];
 };

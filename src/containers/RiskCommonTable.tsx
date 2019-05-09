@@ -1,22 +1,28 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
+import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import { Form2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { rptPositionReportSearchPaged, rptReportNameList } from '@/services/report-service';
-import { getMoment } from '@/utils';
-import { ConfigProvider, Divider, message, Table } from 'antd';
+import { socketHOC } from '@/tools/socketHOC';
+import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
-import moment from 'moment';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import { TABLE_COL_DEFS } from './constants';
-import { searchFormControls } from './services';
 
-const ReportsEodPosition = memo<any>(props => {
+const RiskCommonTable = memo<any>(props => {
   const form = useRef<Form2>(null);
-
-  const [markets, setMarkets] = useState([]);
+  const {
+    tableColDefs,
+    searchFormControls,
+    defaultSort,
+    defaultDirection,
+    searchMethod,
+    downloadName,
+    scrollWidth,
+    getReload,
+    hideReload = false,
+  } = props;
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -25,44 +31,42 @@ const ReportsEodPosition = memo<any>(props => {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState(true);
   const [searchFormData, setSearchFormData] = useState({});
-  const [sortField, setSortField] = useState({ orderBy: 'createdAt', order: 'desc' });
+  const [sortField, setSortField] = useState({ orderBy: defaultSort, order: defaultDirection });
   const [total, setTotal] = useState(null);
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
 
   const onPaginationChange = (current, pageSize) => {
+    setIsMount(true);
     setPagination({
       current,
       pageSize,
     });
   };
 
-  const onSearchFormChange = (props, fields, allFields) => {
+  const onSearchFormChange = (param, fields, allFields) => {
     setSearchFormData(allFields);
   };
 
-  const fetchTable = async (paramsSearchFormData?) => {
+  const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
-    const formValidateRsp = await form.current.validate();
-    if (formValidateRsp.error) {
-      return;
+    if (searchFormControls) {
+      const formValidateRsp = await form.current.validate();
+      if (formValidateRsp.error) {
+        return;
+      }
     }
     setLoading(true);
-    const { error, data } = await rptPositionReportSearchPaged({
-      page: pagination.current - 1,
-      pageSize: pagination.pageSize,
-      ..._.mapValues(Form2.getFieldsValue(usedFormData), (values, key) => {
-        if (key === 'valuationDate') {
-          return getMoment(values).format('YYYY-MM-DD');
-        }
-        return values;
-      }),
+    const { error, data } = await searchMethod({
+      page: (paramsPagination || pagination).current - 1,
+      pageSize: (paramsPagination || pagination).pageSize,
+      ..._.mapValues(Form2.getFieldsValue(usedFormData)),
       ...sortField,
     });
     setLoading(false);
     if (error) return;
     if (!data.page.length) {
-      message.warning('查询日期内暂无数据');
+      message.warning('当日暂无数据');
       setDataSource(data.page);
       setInfo(false);
       setTotal(data.totalCount);
@@ -73,6 +77,7 @@ const ReportsEodPosition = memo<any>(props => {
   };
 
   const onChange = (paramsPagination, filters, sorter) => {
+    setIsMount(true);
     if (!sorter.columnKey) {
       const aPagination = {
         current: paramsPagination.current,
@@ -85,8 +90,8 @@ const ReportsEodPosition = memo<any>(props => {
       };
       if (_.isEqual(aPagination, bPagination)) {
         return setSortField({
-          orderBy: 'createdAt',
-          order: 'desc',
+          orderBy: defaultSort,
+          order: defaultDirection,
         });
       }
       return setSortField({
@@ -119,22 +124,10 @@ const ReportsEodPosition = memo<any>(props => {
 
   useLifecycles(async () => {
     setIsMount(true);
-    const { error, data } = await rptReportNameList({
-      reportType: 'LIVE_POSITION_INFO',
-    });
-    if (error) return;
-    const _markets = data.map(item => ({
-      label: item,
-      value: item,
-    }));
-
-    setMarkets(_markets);
-    const _searchFormData = {
-      ...(_markets.length ? { reportName: Form2.createField(_markets[0].value) } : null),
-      valuationDate: Form2.createField(moment().subtract(1, 'days')),
-    };
-    setSearchFormData(_searchFormData);
-    fetchTable(_searchFormData);
+    fetchTable();
+    if (getReload) {
+      getReload(fetchTable);
+    }
   });
 
   useEffect(
@@ -150,8 +143,8 @@ const ReportsEodPosition = memo<any>(props => {
       setData(
         handleData(
           dataSource,
-          TABLE_COL_DEFS.map(item => item.dataIndex),
-          TABLE_COL_DEFS.map(item => item.title)
+          tableColDefs.map(item => item.dataIndex),
+          tableColDefs.map(item => item.title)
         )
       );
     },
@@ -160,30 +153,48 @@ const ReportsEodPosition = memo<any>(props => {
 
   return (
     <PageHeaderWrapper>
-      <Form2
-        ref={node => (form.current = node)}
-        dataSource={searchFormData}
-        columns={searchFormControls(markets)}
-        layout="inline"
-        style={{ marginBottom: VERTICAL_GUTTER }}
-        submitText={'查询'}
-        onFieldsChange={onSearchFormChange}
-        onSubmitButtonClick={() => fetchTable(searchFormData)}
-        resetable={false}
-      />
-      <Divider />
-      <DownloadExcelButton
-        style={{ margin: '10px 0' }}
-        key="export"
-        type="primary"
-        data={{
-          dataSource: data,
-          cols: TABLE_COL_DEFS.map(item => item.title),
-          name: '持仓明细',
-        }}
-      >
-        导出Excel
-      </DownloadExcelButton>
+      {searchFormControls && (
+        <>
+          <Form2
+            ref={node => (form.current = node)}
+            dataSource={searchFormData}
+            columns={searchFormControls()}
+            layout="inline"
+            style={{ marginBottom: VERTICAL_GUTTER }}
+            submitText={'查询'}
+            onFieldsChange={onSearchFormChange}
+            onSubmitButtonClick={() => {
+              setIsMount(false);
+              setPagination({
+                current: 1,
+                pageSize: 10,
+              });
+              fetchTable(searchFormData, { current: 1, pageSize: 10 });
+            }}
+            resetable={false}
+          />
+          <Divider />
+        </>
+      )}
+
+      <Row type="flex" justify="space-between" style={{ marginBottom: VERTICAL_GUTTER }}>
+        <DownloadExcelButton
+          key="export"
+          type="primary"
+          data={{
+            dataSource: data,
+            cols: tableColDefs.map(item => item.title),
+            name: downloadName,
+          }}
+        >
+          导出Excel
+        </DownloadExcelButton>
+        <ReloadGreekButton
+          fetchTable={fetchTable}
+          id="real_time_valuation_dag"
+          hideReload={hideReload}
+        />
+      </Row>
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
         <Table
           size="middle"
@@ -198,13 +209,13 @@ const ReportsEodPosition = memo<any>(props => {
             showQuickJumper: true,
             onChange: onPaginationChange,
           }}
-          columns={TABLE_COL_DEFS}
-          scroll={{ x: 3320 }}
+          columns={tableColDefs}
           onChange={onChange}
+          scroll={{ x: scrollWidth }}
         />
       </ConfigProvider>
     </PageHeaderWrapper>
   );
 });
 
-export default ReportsEodPosition;
+export default socketHOC(RiskCommonTable);

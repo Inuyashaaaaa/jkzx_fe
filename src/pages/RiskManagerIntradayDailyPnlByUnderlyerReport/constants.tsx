@@ -1,4 +1,4 @@
-import { placement } from '@/tools';
+import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -20,7 +20,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'dailyPnl',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -28,7 +28,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'dailyOptionPnl',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -36,7 +36,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'dailyUnderlyerPnl',
     width: 150,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -44,7 +44,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'pnlContributionDelta',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -52,7 +52,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'pnlContributionVega',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -60,7 +60,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'pnlContributionTheta',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
@@ -68,14 +68,14 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'pnlContributionRho',
     width: 130,
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
   {
     title: '其它贡献 (¥)',
     dataIndex: 'pnlContributionUnexplained',
     render: (value, record, index) => {
-      return placement(value, 4);
+      return formatNumber(value, 4);
     },
   },
 ];

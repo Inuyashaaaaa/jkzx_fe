@@ -282,18 +282,21 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
   };
 };
 
-export const placement = (value, num) => {
+export const formatNumber = (
+  value,
+  decimalPlaces?: number,
+  roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_UP,
+  config?: BigNumber.Format
+) => {
   if (!value) {
-    if (value === 0) {
-      return value;
-    }
-    return;
+    return value;
   }
-  return new BigNumber(value).toFormat(num);
+  return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
 };
 
-export const formatMoney = (value, unit = '', space = false) =>
-  `${unit}${space ? ' ' : ''}${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+export const formatMoney = (value, unit = '', space = false) => {
+  return `${unit}${space ? ' ' : ''}${formatNumber(value)}`;
+};
 
 export const parseMoney = (value, unit) =>
   (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');

@@ -111,6 +111,36 @@ export const InstrumentId = {
   },
 };
 
+export const BaseContract = {
+  title: '标的物',
+  dataIndex: 'baseContract',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={async (value: string = '') => {
+              const { data, error } = await mktInstrumentSearch({
+                instrumentIdPart: value,
+              });
+              if (error) return [];
+              return data.map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />
+        )}
+      </FormItem>
+    );
+  },
+};
+
 export const ProductType = {
   title: '期权类型',
   dataIndex: 'productType',
