@@ -1,78 +1,115 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { IColumnDef } from '@/design/components/Table/types';
+import { placement } from '@/tools';
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '交易簿',
-    field: 'bookName',
+    title: '交易簿',
+    dataIndex: 'bookName',
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
+    width: 130,
   },
   {
-    headerName: '标的物代码',
-    field: 'underlyerInstrumentId',
+    title: '标的物代码',
+    dataIndex: 'underlyerInstrumentId',
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
+    width: 130,
   },
   {
-    headerName: '总盈亏 (¥)',
-    field: 'pnl',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '总盈亏 (¥)',
+    dataIndex: 'pnl',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权费 (¥)',
-    field: 'optionPremium',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '期权费 (¥)',
+    dataIndex: 'optionPremium',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权平仓金额 (¥)',
-    field: 'optionUnwindAmount',
+    title: '期权平仓金额 (¥)',
+    dataIndex: 'optionUnwindAmount',
     width: 150,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权结算金额 (¥)',
-    field: 'optionSettleAmount',
+    title: '期权结算金额 (¥)',
+    dataIndex: 'optionSettleAmount',
     width: 150,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权持仓市值 (¥)',
-    field: 'optionMarketValue',
+    title: '期权持仓市值 (¥)',
+    dataIndex: 'optionMarketValue',
     width: 150,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '期权盈亏 (¥)',
-    field: 'optionPnl',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '期权盈亏 (¥)',
+    dataIndex: 'optionPnl',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物买入金额 (¥)',
-    field: 'underlyerBuyAmount',
+    title: '标的物买入金额 (¥)',
+    dataIndex: 'underlyerBuyAmount',
     width: 150,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物卖出金额 (¥)',
-    field: 'underlyerSellAmount',
+    title: '标的物卖出金额 (¥)',
+    dataIndex: 'underlyerSellAmount',
     width: 150,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物持仓 (手)',
-    field: 'underlyerNetPosition',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '标的物持仓 (手)',
+    dataIndex: 'underlyerNetPosition',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物价格 (¥)',
-    field: 'underlyerPrice',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '标的物价格 (¥)',
+    dataIndex: 'underlyerPrice',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物市值 (¥)',
-    field: 'underlyerMarketValue',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '标的物市值 (¥)',
+    dataIndex: 'underlyerMarketValue',
+    width: 130,
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
   {
-    headerName: '标的物盈亏 (¥)',
-    field: 'underlyerPnl',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '标的物盈亏 (¥)',
+    dataIndex: 'underlyerPnl',
+    render: (value, record, index) => {
+      return placement(value, 4);
+    },
   },
 ];
