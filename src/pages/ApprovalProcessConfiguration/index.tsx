@@ -82,13 +82,8 @@ class ApprovalProcessConfiguration extends PureComponent {
     tabsData = tabsData.filter(item => item.processName !== '交易录入经办复合流程');
 
     tabsData = _.concat(tabsData, fristData);
-
     const taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
-      if (index === taskApproveGroupList.data.length - 1) {
-        item.approveGroupList = fristData.approveGroupList;
-        item.approveGroupDTO = fristData.approveGroupDTO;
-      }
       return item;
     });
 
@@ -180,6 +175,15 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public onConfirm = async () => {
     const { currentProcessName, taskApproveGroupList, status, globalConfig } = this.state;
+    const noneGroupIndex = _.findIndex(
+      taskApproveGroupList,
+      item => item.approveGroupList.length <= 0
+    );
+    if (noneGroupIndex >= 0) {
+      return notification.success({
+        message: `请至少选择一个审批组`,
+      });
+    }
     const requests = () =>
       Promise.all([
         wkProcessStatusModify({ processName: currentProcessName, status }),

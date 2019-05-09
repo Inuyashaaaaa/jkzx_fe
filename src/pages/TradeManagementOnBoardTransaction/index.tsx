@@ -14,6 +14,8 @@ import {
   querySummary,
   queryTradeRecord,
   uploadUrl,
+  docBctTemplateList,
+  downloadUrl,
 } from '@/services/onBoardTransaction';
 import { Button, message, Modal, Radio, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
@@ -374,77 +376,8 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  public downloadFormModal = () => {
-    const cols = ['sheet'];
-    const colData = cols.map(() => {
-      const tabData = [
-        [
-          'book1',
-          'trade1',
-          'account1',
-          'instrument1',
-          '100',
-          '100',
-          'OPEN',
-          'BUYER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          'book2',
-          'trade2',
-          'account2',
-          'instrument2',
-          '100',
-          '100',
-          'CLOSE',
-          'SELLER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          'book3',
-          'trade3',
-          'account3',
-          'instrument3',
-          '100',
-          '100',
-          'OPEN',
-          'BUYER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          'book4',
-          'trade4',
-          'account4',
-          'instrument4',
-          '100',
-          '100',
-          'OPEN',
-          'BUYER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          '推荐使用MS Excel编辑本模板，保存时请选择CSV格式。编辑时请务必删除以下备注文字（包括本行）：',
-        ],
-        [
-          '交易簿',
-          '成交ID',
-          '交易账号',
-          '合约代码',
-          '手数股数',
-          '价格',
-          'OPEN/CLOSE',
-          'BUYER/SELLER',
-          '交易时间',
-        ],
-      ];
-      return tabData;
-    });
-    const wb = XLSX.utils.book_new();
-    cols.forEach((item, index) => {
-      const ws = XLSX.utils.aoa_to_sheet(colData[index]);
-      XLSX.utils.book_append_sheet(wb, ws, item);
-    });
-    XLSX.writeFile(wb, `导入场内场内流水模板.csv`);
+  public downloadFormModal = async () => {
+    window.open(`${downloadUrl}position.csv`);
   };
 
   public handleFlowChange = value => {
@@ -487,8 +420,6 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       modalVisible,
       formItems,
       modalLoading,
-      flowData,
-      positionData,
       loading,
       instrumentIds,
       positionMode,
@@ -500,6 +431,8 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     const flowColumns = generateColumns('flow');
     const detailColumns = generateColumns('detail');
     const summaryColumns = generateColumns('summary');
+    flowData = _.reverse(_.sortBy(this.state.flowData, 'createdAt'));
+    positionData = _.reverse(_.sortBy(this.state.positionData, 'createdAt'));
     return (
       <PageHeaderWrapper>
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
@@ -551,9 +484,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               <Button onClick={this.showModal} type="primary" style={{ marginTop: 10 }}>
                 导入场内流水
               </Button>
-              <Button onClick={this.downloadFormModal} type="default" style={{ marginTop: 10 }}>
-                下载导入模板
-              </Button>
+
               <Button onClick={this.createFormModal} type="default" style={{ marginTop: 10 }}>
                 新建
               </Button>
@@ -646,6 +577,12 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               uploadDisabled={modalLoading}
             />
           )}
+          <p style={{ marginTop: '20px' }}>操作说明:</p>
+          <p style={{ marginLeft: '20px' }}>1.仅支持导入.csv格式的文件</p>
+          <p style={{ marginLeft: '20px' }}>
+            2.导入模板下载:
+            <a onClick={this.downloadFormModal}>导入场内流水模板.csv</a>
+          </p>
         </Modal>
         <Modal
           visible={createFormVisible}

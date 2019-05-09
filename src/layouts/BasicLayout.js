@@ -13,6 +13,7 @@ import { formatMessage } from 'umi/locale';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
+import ErrorBoundary from '@/containers/ErrorBoundary';
 
 const logoPath = '/logo.svg';
 
@@ -190,23 +191,23 @@ class BasicLayout extends React.PureComponent {
             isMobile={isMobile}
             {...this.props}
           />
-          <Content style={this.getContentStyle()}>{children}</Content>
+          <ErrorBoundary>
+            <Content style={this.getContentStyle()}>{children}</Content>
+          </ErrorBoundary>
           <Footer />
         </Layout>
       </Layout>
     );
     return (
-      <React.Fragment>
-        <DocumentTitle title={this.getPageTitle(pathname)}>
-          <ContainerQuery query={query}>
-            {params => (
-              <Context.Provider value={this.getContext()}>
-                <div className={classNames(params)}>{layout}</div>
-              </Context.Provider>
-            )}
-          </ContainerQuery>
-        </DocumentTitle>
-      </React.Fragment>
+      <DocumentTitle title={this.getPageTitle(pathname)}>
+        <ContainerQuery query={query}>
+          {params => (
+            <Context.Provider value={this.getContext()}>
+              <div className={classNames(params)}>{layout}</div>
+            </Context.Provider>
+          )}
+        </ContainerQuery>
+      </DocumentTitle>
     );
   }
 }

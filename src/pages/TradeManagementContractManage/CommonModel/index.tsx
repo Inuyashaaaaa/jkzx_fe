@@ -1,6 +1,6 @@
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2, Loading } from '@/design/components';
+import { Form2, Loading, Select, Table2 } from '@/design/components';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
@@ -152,6 +152,8 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public render() {
+    let { tableDataSource } = this.state;
+    tableDataSource = _.reverse(_.sortBy(tableDataSource, 'createdAt'));
     return (
       <>
         <Form2
@@ -418,7 +420,7 @@ class CommonModel extends PureComponent<{ status: any }> {
               pagination={false}
               rowKey={'positionId'}
               scroll={{ x: 2500 }}
-              dataSource={this.state.tableDataSource}
+              dataSource={tableDataSource}
               columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}
               onRow={record => {
                 return record.style ? { style: record.style } : null;

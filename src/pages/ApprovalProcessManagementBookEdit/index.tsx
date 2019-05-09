@@ -62,20 +62,22 @@ const TradeManagementBooking = props => {
     const { error, data } = await wkProcessInstanceFormGet({
       processInstanceId: props.id,
     });
-    console.log(props.taskId);
     if (error) return;
     const _detailData = {
-      tradeId: data.process._business_payload.trade.tradeId,
-      bookName: data.process._business_payload.trade.bookName,
-      tradeDate: data.process._business_payload.trade.tradeDate,
-      salesCode: data.process._business_payload.trade.salesCode,
-      counterPartyCode: data.process._business_payload.trade.positions[0].counterPartyCode,
+      tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
+      bookName: _.get(data, 'process._business_payload.trade.bookName'),
+      tradeDate: _.get(data, 'process._business_payload.trade.tradeDate'),
+      salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
+      counterPartyCode: _.get(
+        data,
+        'process._business_payload.trade.positions[0].counterPartyCode'
+      ),
     };
     // setCreateFormData(_detailData)
 
     // const tableFormData = getTradeCreateModalData(_detailData);
 
-    const { positions } = data.process._business_payload.trade;
+    const { positions } = _.get(data, 'process._business_payload.trade');
 
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));

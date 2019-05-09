@@ -116,12 +116,14 @@ class ApprovalForm extends PureComponent<any, any> {
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
     const _detailData = {
-      tradeId: data.process._business_payload.trade.tradeId,
-      bookName: data.process._business_payload.trade.bookName,
-      tradeDate: data.process._business_payload.trade.tradeDate,
-      trader: data.process._business_payload.trade.trader,
-      salesName: data.process._business_payload.trade.salesName,
-      counterPartyName: data.process._business_payload.trade.positions[0].counterPartyName,
+      tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
+      bookName: _.get(data, 'process._business_payload.trade.bookName'),
+      tradeDate: _.get(data, 'process._business_payload.trade.tradeDate'),
+      salesName: _.get(data, 'process._business_payload.trade.salesName'),
+      counterPartyName: _.get(
+        data,
+        'process._business_payload.trade.positions[0].counterPartyName'
+      ),
     };
     this.setState({
       detailData: _detailData,
@@ -431,7 +433,12 @@ class ApprovalForm extends PureComponent<any, any> {
       return moment(item1.operateTime).valueOf() - moment(item2.operateTime).valueOf();
     });
     if (histories.length > 0) {
-      _data.status = histories[histories.length - 1].operation === '退回' ? '待修改' : '待审批';
+      _data.status =
+        histories[histories.length - 1].operation === '退回'
+          ? '待修改'
+          : histories[histories.length - 1].operation === '复核通过'
+          ? '审核完成'
+          : '待审批';
     }
     return (
       <div>
@@ -471,7 +478,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
                 {
                   title: '发起人',
-                  dataIndex: 'initiatorName',
+                  dataIndex: 'operatorName',
                   render: (value, record, index, { form, editing }) => {
                     return <FormItem>{value}</FormItem>;
                   },
@@ -541,7 +548,7 @@ class ApprovalForm extends PureComponent<any, any> {
               ]}
             />
             <Divider type="horizontal" />
-            {_data.status === '待审批' ? (
+            {_data.status === '待审批' || _data.status === '审核完成' ? (
               <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
                 <Button
                   style={{ marginRight: '20px' }}

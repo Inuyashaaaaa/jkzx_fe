@@ -278,13 +278,6 @@ const ClientManagementInfo = memo(() => {
               render: (value, record, index) => {
                 return (
                   <span className={styles.action}>
-                    {/* <a href="javascript:;">查看</a>
-                    <Divider type="vertical" />
-                    <a href="javascript:;">编辑</a>
-                    <Divider type="vertical" />
-                    <a href="javascript:;" style={{ color: 'red' }}>
-                      删除
-                    </a> */}
                     <EditModalButton
                       salesCascaderList={salesCascaderList}
                       name="查看"
