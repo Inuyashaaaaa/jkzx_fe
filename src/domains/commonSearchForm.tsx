@@ -1,10 +1,18 @@
-import React from 'react';
-import FormItem from 'antd/lib/form/FormItem';
-import { BOOK_NAME_FIELD, PRODUCTTYPE_OPTIONS, RULES_REQUIRED } from '@/constants/common';
-import { Select, Input, DatePicker } from '@/design/components';
-import { trdBookListBySimilarBookName } from '@/services/trade-service';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
+import {
+  ASSET_TYPE_OPTIONS,
+  BOOK_NAME_FIELD,
+  PRODUCTTYPE_OPTIONS,
+  RULES_REQUIRED,
+} from '@/constants/common';
+import { DatePicker, Select } from '@/design/components';
 import { mktInstrumentSearch } from '@/services/market-data-service';
+import {
+  refMasterAgreementSearch,
+  refSimilarLegalNameList,
+} from '@/services/reference-data-service';
+import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
 
 export const BookName = {
   title: '交易簿',
@@ -155,6 +163,117 @@ export const ValuationDate = {
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
         })(<DatePicker editing={true} />)}
+      </FormItem>
+    );
+  },
+};
+
+export const MasterAgreementId = {
+  title: '主协议编码',
+  dataIndex: 'masterAgreementId',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={async (value: string = '') => {
+              const { data, error } = await refMasterAgreementSearch({
+                masterAgreementId: value,
+              });
+              if (error) return [];
+              return data.map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />
+        )}
+      </FormItem>
+    );
+  },
+};
+
+export const ClientName = {
+  title: '交易对手',
+  dataIndex: 'client',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={async (value: string = '') => {
+              const { data, error } = await refSimilarLegalNameList({
+                similarLegalName: value,
+              });
+              if (error) return [];
+              return data.map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />
+        )}
+      </FormItem>
+    );
+  },
+};
+
+export const AssetType = {
+  title: '标的物类型',
+  dataIndex: 'assetType',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            // showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={ASSET_TYPE_OPTIONS}
+          />
+        )}
+      </FormItem>
+    );
+  },
+};
+
+export const ClientNameFund = {
+  title: '交易对手',
+  dataIndex: 'clientName',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={async (value: string = '') => {
+              const { data, error } = await refSimilarLegalNameList({
+                similarLegalName: value,
+              });
+              if (error) return [];
+              return data.map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />
+        )}
       </FormItem>
     );
   },

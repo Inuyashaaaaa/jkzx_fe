@@ -337,13 +337,13 @@ export const KNOCK_DIRECTION_ZHCN_MAP = {
 };
 
 export const DIRECTION_MAP = {
-  BUY: 'BUYER',
-  SELL: 'SELLER',
+  BUYER: 'BUYER',
+  SELLER: 'SELLER',
 };
 
 export const DIRECTION_ZHCN_MAP = {
-  BUY: '买',
-  SELL: '卖',
+  BUYER: '买',
+  SELLER: '卖',
 };
 
 export const DIRECTION_OPTIONS = convertOptions(DIRECTION_MAP, DIRECTION_ZHCN_MAP);
