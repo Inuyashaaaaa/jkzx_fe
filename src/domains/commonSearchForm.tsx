@@ -10,7 +10,10 @@ import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
-import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import {
+  trdBookListBySimilarBookName,
+  trdPortfolioListBySimilarPortfolioName,
+} from '@/services/trade-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
@@ -271,6 +274,42 @@ export const ClientNameFund = {
                 label: item,
                 value: item,
               }));
+            }}
+          />
+        )}
+      </FormItem>
+    );
+  },
+};
+
+export const PortfolioName = {
+  title: '投资组合名称',
+  dataIndex: 'portfolioName',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            {...{
+              editing,
+              style: {
+                minWidth: 180,
+              },
+              placeholder: '请输入内容搜索',
+              allowClear: true,
+              type: 'select',
+              showSearch: true,
+              fetchOptionsOnSearch: true,
+              options: async (value: string) => {
+                const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+                  similarPortfolioName: value,
+                });
+                if (error) return [];
+                return data.map(item => ({
+                  label: item,
+                  value: item,
+                }));
+              },
             }}
           />
         )}
