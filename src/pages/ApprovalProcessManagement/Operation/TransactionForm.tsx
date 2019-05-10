@@ -399,6 +399,9 @@ class ApprovalForm extends PureComponent<any, any> {
       processInstanceId: data.processInstance.processInstanceId,
     });
     if (_error) return;
+    if (!_data || _data.length <= 0) {
+      return message.success('未上传审批附件');
+    }
     window.open(`${downloadTradeAttachment}${_data[0].attachmentId}`);
   };
 
