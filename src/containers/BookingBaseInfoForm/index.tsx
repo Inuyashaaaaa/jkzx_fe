@@ -396,11 +396,25 @@ const BookingBaseInfoForm = memo<any>(props => {
                       mode="tags"
                       style={{ width: '100%' }}
                       tokenSeparators={[',']}
-                    >
-                      {['期权', '线性互换', '非线性互换', '远期'].map(item => {
-                        return <Select.Option key={item}>{item}</Select.Option>;
-                      })}
-                    </Select>
+                      options={[
+                        {
+                          label: '期权',
+                          value: '期权',
+                        },
+                        {
+                          label: '线性互换',
+                          value: '线性互换',
+                        },
+                        {
+                          label: '非线性互换',
+                          value: '非线性互换',
+                        },
+                        {
+                          label: '远期',
+                          value: '远期',
+                        },
+                      ]}
+                    />
                   )}
                 </FormItem>
               );
