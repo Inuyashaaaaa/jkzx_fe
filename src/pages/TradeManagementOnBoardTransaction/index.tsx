@@ -431,8 +431,8 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     const flowColumns = generateColumns('flow');
     const detailColumns = generateColumns('detail');
     const summaryColumns = generateColumns('summary');
-    flowData = _.reverse(_.sortBy(this.state.flowData, 'createdAt'));
-    positionData = _.reverse(_.sortBy(this.state.positionData, 'createdAt'));
+    const flowData = _.reverse(_.sortBy(this.state.flowData, 'createdAt'));
+    const positionData = _.reverse(_.sortBy(this.state.positionData, 'createdAt'));
     return (
       <PageHeaderWrapper>
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
