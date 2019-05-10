@@ -3,7 +3,11 @@ import { IInputNumberProps } from '@/design/components/Input/InputNumber';
 import { IInputBaseProps } from '@/design/components/type';
 import React, { memo } from 'react';
 import { formatMoney, parseMoney } from '@/tools';
+import _ from 'lodash';
 
+/**
+ * 当用户输入非数值类型的值时，onChange 会进行拦截，formatter 也会对非法值类型进行判断，保证显示和当前 value 的一致性
+ */
 export const UnitInputNumber = memo<
   IInputNumberProps &
     IInputBaseProps & {
@@ -16,9 +20,11 @@ export const UnitInputNumber = memo<
 
   if (unit === '$' || unit === '¥') {
     formatter = value => {
+      if (value == null) return unit;
+
       const parsed = parseFloat(value);
       if (isNaN(parsed)) {
-        return '0';
+        return unit;
       }
 
       if (typeof value === 'string' && value.endsWith('.')) {
@@ -38,7 +44,7 @@ export const UnitInputNumber = memo<
   const handleChange = value => {
     value = parseFloat(value);
     if (isNaN(value)) {
-      return onChange(0);
+      return onChange();
     }
     onChange(value);
   };
