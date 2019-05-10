@@ -195,7 +195,7 @@ export const ValuationDate = {
       <FormItem>
         {form.getFieldDecorator({
           rules: RULES_REQUIRED,
-        })(<DatePicker editing={true} />)}
+        })(<DatePicker editing={true} format="YYYY-MM-DD" />)}
       </FormItem>
     );
   },

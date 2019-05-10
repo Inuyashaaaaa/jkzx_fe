@@ -2,6 +2,7 @@ import PopconfirmButton from '@/components/PopconfirmButton';
 import { deleteNonGroupResource } from '@/services/tradeBooks';
 import { message } from 'antd';
 import React, { PureComponent } from 'react';
+import { trdTradeListByBook } from '@/services/general-service';
 
 class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public state = {
@@ -13,6 +14,18 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     this.setState({
       loading: true,
     });
+    const trdTradeListByBookRsp = await trdTradeListByBook({
+      bookName: this.props.record.resourceName,
+    });
+    if (trdTradeListByBookRsp.error) {
+      return;
+    }
+    if (trdTradeListByBookRsp.data.length) {
+      this.setState({ loading: false });
+      message.error('该交易簿下已存在交易，不允许删除');
+      this.props.fetchTable();
+      return;
+    }
     const { error, data } = await deleteNonGroupResource({
       resourceType: this.props.record.resourceType,
       resourceName: this.props.record.resourceName,
