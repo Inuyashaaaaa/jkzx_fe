@@ -1293,8 +1293,8 @@ const CreateModalButton = memo<any>(props => {
                     }
                   });
                   Object.keys(attachFormData).forEach(item => {
-                    baseData[item] = attachFormData[item].value;
-                    if (attachFormData[item].value) {
+                    if (attachFormData[item].value && attachFormData[item].value.length > 0) {
+                      baseData[item] = attachFormData[item].value;
                       baseData[item] = attachFormData[item].value[0].response.result.uuid;
                     }
                   });
