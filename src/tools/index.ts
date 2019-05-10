@@ -303,14 +303,22 @@ export const parseMoney = (value, unit) =>
   (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');
 
 export const catchCallbackError = (target: any) => {
+  const handleError = error => {
+    notification.error({
+      message: '抱歉，发送了未知错误',
+      description: error + '',
+    });
+  };
   return function() {
     try {
-      target.apply(this, arguments);
+      const result = target.apply(this, arguments);
+      if (result instanceof Promise) {
+        result.catch(error => {
+          handleError(error);
+        });
+      }
     } catch (error) {
-      notification.error({
-        message: '抱歉，发送了未知错误',
-        description: error + '',
-      });
+      handleError(error);
     }
   };
 };
