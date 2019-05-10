@@ -26,7 +26,8 @@ class TradeManagementMarketManagement extends PureComponent {
       total: 20,
       showSizeChanger: true,
       showQuickJumper: true,
-      onChange: this.paginationChange,
+      onChange: (page, pagesize) => this.paginationChange(page, pagesize),
+      onShowSizeChange: (page, pagesize) => this.paginationChange(page, pagesize),
     },
     loading: false,
   };
@@ -40,7 +41,7 @@ class TradeManagementMarketManagement extends PureComponent {
         pagination,
       },
       () => {
-        this.fetchTable({ page: a - 1, pageSize: this.state.pagination.pageSize }, null, true);
+        this.fetchTable({ page: a - 1, pageSize: b }, null, true);
       }
     );
   };
@@ -145,6 +146,7 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public render() {
+    console.log(this.state.tableDataSource);
     return (
       <PageHeaderWrapper>
         <Form2
@@ -201,6 +203,8 @@ class TradeManagementMarketManagement extends PureComponent {
           columns={columns}
           pagination={this.state.pagination}
           loading={this.state.loading}
+          rowKey={(data, index) => index}
+          scroll={this.state.tableDataSource ? { x: '2000px' } : { x: false }}
         />
       </PageHeaderWrapper>
     );
