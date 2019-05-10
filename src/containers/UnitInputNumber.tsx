@@ -9,13 +9,24 @@ export const UnitInputNumber = memo<
     IInputBaseProps & {
       unit?: string;
     }
->(({ unit = '¥', ...props }) => {
+>(({ unit = '¥', onChange, ...props }) => {
   let formatter;
   let parser;
   const options = undefined;
 
   if (unit === '$' || unit === '¥') {
-    formatter = value => formatMoney(value, unit);
+    formatter = value => {
+      const parsed = parseFloat(value);
+      if (isNaN(parsed)) {
+        return '0';
+      }
+
+      if (typeof value === 'string' && value.endsWith('.')) {
+        return `${formatMoney(parsed, unit)}.`;
+      }
+
+      return formatMoney(value, unit);
+    };
     parser = value => parseMoney(value, unit);
   } else {
     formatter = value => {
@@ -24,7 +35,22 @@ export const UnitInputNumber = memo<
     parser = value => value.replace(unit, '');
   }
 
+  const handleChange = value => {
+    value = parseFloat(value);
+    if (isNaN(value)) {
+      return onChange(0);
+    }
+    onChange(value);
+  };
+
   return (
-    <InputNumber precision={4} {...props} {...options} formatter={formatter} parser={parser} />
+    <InputNumber
+      precision={4}
+      {...props}
+      {...options}
+      formatter={formatter}
+      parser={parser}
+      onChange={handleChange}
+    />
   );
 });

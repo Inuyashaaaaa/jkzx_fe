@@ -15,7 +15,7 @@ import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/service
 import { trdTradeCreate } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Affix, Button, Divider, Menu, message, Row, Modal, Icon } from 'antd';
+import { Affix, Button, Divider, Menu, message, Row, Modal, Icon, Alert } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
@@ -187,7 +187,11 @@ const ActionBar = memo<any>(props => {
         onCancel={transactionHandleCancel}
       >
         <div style={{ margin: '20px' }}>
-          <p>您提交的交易需要通过审批才能完成簿记。请上传相关材料后发起审批。</p>
+          <Alert
+            showIcon={true}
+            type="info"
+            message={'您提交的交易需要通过审批才能完成簿记。请上传相关材料后发起审批。'}
+          />
           <p style={{ margin: '20px', textAlign: 'center' }}>
             <Upload
               maxLen={1}
@@ -206,7 +210,6 @@ const ActionBar = memo<any>(props => {
               value={fileList}
             />
           </p>
-          <p>审批中的交易请在审批管理页面查看。</p>
         </div>
       </Modal>
     </Affix>
