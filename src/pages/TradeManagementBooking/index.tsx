@@ -190,8 +190,7 @@ const ActionBar = memo<any>(props => {
           <Alert
             showIcon={true}
             type="info"
-            message={'您提交的交易需要通过审批才能完成簿记'}
-            description={'请上传交易确认书等证明文件后发起审批；审批中的交易请在审批管理页面查看'}
+            message={'您提交的交易需要通过审批才能完成簿记。请上传相关材料后发起审批。'}
           />
           <p style={{ margin: '20px', textAlign: 'center' }}>
             <Upload

@@ -152,8 +152,8 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public render() {
-    let { tableDataSource } = this.state;
-    tableDataSource = _.reverse(_.sortBy(tableDataSource, 'createdAt'));
+    const { tableDataSource } = this.state;
+    // tableDataSource = _.reverse(_.sortBy(tableDataSource, 'createdAt'));
     return (
       <>
         <Form2

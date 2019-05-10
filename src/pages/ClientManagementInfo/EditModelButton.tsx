@@ -25,6 +25,7 @@ import {
 } from './constants';
 import Upload from '@/containers/Upload';
 import EmailInput from '@/containers/EmailInput';
+import { values } from 'mobx';
 
 const TabPane = Tabs.TabPane;
 
@@ -235,6 +236,8 @@ const EditModalButton = memo<any>(props => {
     cloneColumns.pop();
     columns = cloneColumns;
   }
+
+  console.log(baseFormData);
   return (
     <ModalButton
       text={true}
@@ -995,7 +998,7 @@ const EditModalButton = memo<any>(props => {
                     setBaseFormData({ ...baseFormData, ...changedFields });
                   }}
                   dataSource={baseFormData}
-                  style={{ paddingTop: 20 }}
+                  style={{ paddingTop: 20, paddingLeft: 30 }}
                   footer={false}
                   columnNumberOneRow={editable ? 3 : 2}
                   layout={editable ? 'vertical' : 'horizontal'}
@@ -1014,7 +1017,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1050,7 +1053,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1086,7 +1089,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1122,7 +1125,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1158,7 +1161,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1194,7 +1197,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1230,7 +1233,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1266,7 +1269,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1302,7 +1305,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1338,7 +1341,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1374,7 +1377,7 @@ const EditModalButton = memo<any>(props => {
                           });
                         }
                         return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
+                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {

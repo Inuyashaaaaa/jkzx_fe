@@ -90,7 +90,10 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setBaseFormData(allFields);
+                setBaseFormData({
+                  ...baseFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={baseFormData}
               style={{ paddingTop: 20 }}
@@ -483,7 +486,10 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setProductFormData(allFields);
+                setProductFormData({
+                  ...productFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={productFormData}
               style={{ paddingTop: 20 }}
@@ -619,7 +625,10 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setAuthFormData(allFields);
+                setAuthFormData({
+                  ...authFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={authFormData}
               style={{ paddingTop: 20 }}
@@ -901,7 +910,10 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setAttachFormData(allFields);
+                setAttachFormData({
+                  ...attachFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={attachFormData}
               style={{ paddingTop: 20 }}
@@ -1281,8 +1293,8 @@ const CreateModalButton = memo<any>(props => {
                     }
                   });
                   Object.keys(attachFormData).forEach(item => {
-                    baseData[item] = attachFormData[item].value;
-                    if (attachFormData[item].value) {
+                    if (attachFormData[item].value && attachFormData[item].value.length > 0) {
+                      baseData[item] = attachFormData[item].value;
                       baseData[item] = attachFormData[item].value[0].response.result.uuid;
                     }
                   });
@@ -1310,10 +1322,8 @@ const CreateModalButton = memo<any>(props => {
                   return;
                 }
 
-                if ([0, 1, 2, 5].findIndex(item => item === currenStep) !== -1) {
-                  const { error } = await formRef.current.validate();
-                  if (error) return;
-                }
+                const res = await formRef.current.validate();
+                if (res.error) return;
 
                 if (
                   currenStep === 0 &&

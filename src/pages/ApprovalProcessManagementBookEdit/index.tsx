@@ -18,6 +18,7 @@ import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
 import { ILcmEventModalEl } from '@/containers/LcmEventModal';
+import moment from 'moment';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
@@ -56,9 +57,6 @@ const TradeManagementBooking = props => {
 
     setTableLoading(true);
 
-    // const { error, data } = await trdTradeGet({
-    //   tradeId: props.id,
-    // });
     const { error, data } = await wkProcessInstanceFormGet({
       processInstanceId: props.id,
     });
@@ -66,23 +64,19 @@ const TradeManagementBooking = props => {
     const _detailData = {
       tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
       bookName: _.get(data, 'process._business_payload.trade.bookName'),
-      tradeDate: _.get(data, 'process._business_payload.trade.tradeDate'),
+      tradeDate: moment(_.get(data, 'process._business_payload.trade.tradeDate')),
       salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
       counterPartyCode: _.get(
         data,
         'process._business_payload.trade.positions[0].counterPartyCode'
       ),
+      comment: _.get(data, 'process._business_payload.trade.comment'),
     };
-    // setCreateFormData(_detailData)
-
-    // const tableFormData = getTradeCreateModalData(_detailData);
-
     const { positions } = _.get(data, 'process._business_payload.trade');
 
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
     mockAddLegItem(positions, _detailData);
-    // fetchEventType(positions);
   };
 
   const mockAddLegItem = async (composePositions, tableFormData) => {

@@ -9,20 +9,18 @@ import {
   mktQuotesListPaged,
 } from '@/services/market-data-service';
 import {
+  downloadUrl,
   exeTradeRecordSave,
   queryDetail,
   querySummary,
   queryTradeRecord,
   uploadUrl,
-  docBctTemplateList,
-  downloadUrl,
 } from '@/services/onBoardTransaction';
 import { Button, message, Modal, Radio, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
-import XLSX from 'xlsx';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
 
@@ -136,7 +134,18 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       return obj;
     });
 
-    if (!isFlow && positionMode === 'summary') {
+    if (isFlow) {
+      finalData.sort((a, b) => {
+        const dealTime = moment(a.dealTime).valueOf() - moment(b.dealTime).valueOf();
+        if (dealTime > 0) {
+          return -1;
+        } else if (dealTime < 0) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    } else if (!isFlow && positionMode === 'summary') {
       finalData.sort((a, b) => {
         const aStr = a.instrumentId;
         const bStr = b.instrumentId;
@@ -427,12 +436,12 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       createModalDataSource,
       searchFormDataFlow,
       searchFormDataPosition,
+      flowData,
+      positionData,
     } = this.state;
     const flowColumns = generateColumns('flow');
     const detailColumns = generateColumns('detail');
     const summaryColumns = generateColumns('summary');
-    const flowData = _.reverse(_.sortBy(this.state.flowData, 'createdAt'));
-    const positionData = _.reverse(_.sortBy(this.state.positionData, 'createdAt'));
     return (
       <PageHeaderWrapper>
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
