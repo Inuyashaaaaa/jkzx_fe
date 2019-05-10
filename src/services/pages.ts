@@ -134,7 +134,6 @@ export const convertTradePageData2ApiData = (tableDataSource, tableFormData, use
   const positions: any[] = convertTradePositions(tableDataSource, tableFormData, env);
   const params: any = _.omit(tableFormData, ['counterPartyCode']);
 
-  params.comment = 'empty';
   params.tradeStatus = 'LIVE';
   params.partyCode = 'empty';
   params.partyName = 'empty';
