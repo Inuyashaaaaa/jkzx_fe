@@ -204,6 +204,7 @@ class TradeManagementMarketManagement extends PureComponent {
           pagination={this.state.pagination}
           loading={this.state.loading}
           rowKey={(data, index) => index}
+          size="middle"
           scroll={this.state.tableDataSource ? { x: '2000px' } : { x: false }}
         />
       </PageHeaderWrapper>
