@@ -605,6 +605,11 @@ export const INSTRUMENT_TYPE_ZHCN_MAP = {
   FUTURES: '期货',
 };
 
+export const INSTRUMENT_TYPE_OPTIONS = convertOptions(
+  INSTRUMENT_TYPE_MAP,
+  INSTRUMENT_TYPE_ZHCN_MAP
+);
+
 export const ASSET_TYPE_MAP = {
   STOCK: 'STOCK',
   COMMODITY: 'COMMODITY',
@@ -616,23 +621,6 @@ export const ASSET_TYPE_ZHCN_MAP = {
 };
 
 export const ASSET_TYPE_OPTIONS = convertOptions(ASSET_TYPE_MAP, ASSET_TYPE_ZHCN_MAP);
-
-// export const SURVIVAL_STATUS_MAP = {
-//   LIVE: 'LIVE',
-//   MATURED: 'MATURED',
-//   CLOSED: 'CLOSED',
-// };
-
-// export const SURVIVAL_STATUS_ZHCN_MAP = {
-//   LIVE: '股票',
-//   MATURED: '商品',
-//   CLOSED: '',
-// };
-
-// export const SURVIVAL_STATUS_OPTIONS = convertOptions(
-//   SURVIVAL_STATUS_MAP,
-//   SURVIVAL_STATUS_ZHCN_MAP
-// );
 
 export const EXERCISETYPE_MAP = {
   EUROPEAN: 'EUROPEAN',
@@ -895,4 +883,40 @@ export const ACCOUNT_EVENT_TYPE_ZHCN_MAP = {
 export const ACCOUNT_EVENT_TYPE_OPTIONS = convertOptions(
   ACCOUNT_EVENT_TYPE_MAP,
   ACCOUNT_EVENT_TYPE_ZHCN_MAP
+);
+
+export const COMMODITY_EXCHANGE_MAP = {
+  SHFE: 'SHFE',
+  DCE: 'DCE',
+  CZCE: 'CZCE',
+  SGE: 'SGE',
+};
+
+export const COMMODITY_EXCHANGE_ZHCN_MAP = {
+  SHFE: '上期所',
+  DCE: '大商所',
+  CZCE: '郑商所',
+  SGE: '金交所',
+};
+
+export const COMMODITY_EXCHANGE_OPTIONS = convertOptions(
+  COMMODITY_EXCHANGE_MAP,
+  COMMODITY_EXCHANGE_ZHCN_MAP
+);
+
+export const EQUITY_EXCHANGE_MAP = {
+  SSE: 'SSE',
+  SZSE: 'SZSE',
+  CFFEX: 'CFFEX',
+};
+
+export const EQUITY_EXCHANGE_ZHCN_MAP = {
+  SSE: '上交所',
+  SZSE: '深交所',
+  CFFEX: '中金所',
+};
+
+export const EQUITY_EXCHANGE_OPTIONS = convertOptions(
+  EQUITY_EXCHANGE_MAP,
+  EQUITY_EXCHANGE_ZHCN_MAP
 );

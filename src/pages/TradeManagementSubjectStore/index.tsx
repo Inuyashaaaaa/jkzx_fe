@@ -1,68 +1,84 @@
-import ModalButton from '@/lib/components/_ModalButton2';
-import SourceTable, { SourceTableState } from '@/lib/components/_SourceTable';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import {
-  mktInstrumentCreate,
-  mktInstrumentDelete,
-  mktInstrumentsListPaged,
-} from '@/services/market-data-service';
-import { message } from 'antd';
+import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
+import { Button, Divider, message, Modal, Table } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
-import { createFormControls, editFormControls, searchFormControls } from './services';
+import { createFormControls, searchFormControls } from './services';
 class TradeManagementMarketManagement extends PureComponent {
-  public $sourceTable: SourceTable = null;
+  public $form: Form2 = null;
 
   public state = {
     createFormData: {},
     searchFormData: {},
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
+    total: 0,
+    loading: false,
+    tableDataSource: [],
+    createVisible: false,
+    createFormControls: {},
   };
 
-  public onReset = event => {
+  public componentDidMount = () => {
+    this.fetchTable();
+    this.setState({
+      createFormControls: createFormControls({}, 'create'),
+    });
+  };
+
+  public onReset = () => {
     this.setState(
       {
+        pagination: {
+          current: 1,
+          pageSize: 10,
+        },
         searchFormData: {},
       },
       () => {
-        this.$sourceTable.search();
+        this.fetchTable();
       }
     );
   };
 
-  public fetchTable = event => {
-    return mktInstrumentsListPaged({
-      page: event.pagination.current - 1,
-      pageSize: event.pagination.pageSize,
-      ...event.searchFormData,
-    }).then(result => {
-      if (result.error) return undefined;
+  public fetchTable = async (paramsPagination?) => {
+    const pagination = paramsPagination || this.state.pagination;
+    this.setState({
+      loading: true,
+    });
+    const searchFormData = _.mapValues(
+      Form2.getFieldsValue(this.state.searchFormData),
+      (value, key) => {
+        if (key === 'instrumentIds' && (!value || !value.length)) {
+          return undefined;
+        }
+        return value;
+      }
+    );
 
-      return {
-        tableDataSource: result.data.page,
-        pagination: {
-          ...event.pagination,
-          total: result.data.totalCount,
-        },
-      };
+    const { error, data } = await mktInstrumentsListPaged({
+      page: pagination.current - 1,
+      pageSize: pagination.pageSize,
+      ...searchFormData,
+    });
+    this.setState({
+      loading: false,
+    });
+    if (error) return;
+    this.setState({
+      tableDataSource: data.page,
+      total: data.totalCount,
     });
   };
 
-  public onRowEdit = event => {
-    return {
-      formControls: editFormControls,
-      formData: event.rowData,
-    };
-  };
-
-  public onRemove = async event => {
-    const { error } = await mktInstrumentDelete({
-      instrumentId: event.rowId,
-    });
-    return !error;
-  };
-
-  public filterFormData = (formData, changed) => {
+  public filterFormData = (allFields, fields) => {
+    const changed = Form2.getFieldsValue(fields);
+    const formData = Form2.getFieldsValue(allFields);
     if (Object.keys(changed)[0] === 'assetClass') {
       return {
         ..._.pick(formData, ['instrumentId']),
@@ -78,19 +94,12 @@ class TradeManagementMarketManagement extends PureComponent {
     return formData;
   };
 
-  public onCreateFormChange = (
-    values: object,
-    tableData: any[],
-    tableFormData: object,
-    changed: {}
-  ) => {
+  public onCreateFormChange = (props, fields, allFields) => {
+    const columns = createFormControls(Form2.getFieldsValue(allFields), 'create');
     this.setState({
-      createFormData: this.filterFormData(values, changed),
+      createFormControls: columns,
+      createFormData: Form2.createFields(this.filterFormData(allFields, fields)),
     });
-  };
-
-  public onEditFormDataChange = (values, changed) => {
-    return this.filterFormData(values, changed);
   };
 
   public composeInstrumentInfo = modalFormData => {
@@ -108,81 +117,122 @@ class TradeManagementMarketManagement extends PureComponent {
 
   public omitNull = obj => _.omitBy(obj, val => val === null);
 
-  public onCreate = async (event: SourceTableState) => {
-    const { createFormData } = event;
+  public onCreate = async () => {
+    const rsp = await this.$form.validate();
+    if (rsp.error) return;
+    const createFormData = Form2.getFieldsValue(this.state.createFormData);
     const { error } = await mktInstrumentCreate(this.composeInstrumentInfo(createFormData));
     if (error) {
+      message.error('创建失败');
       return;
     }
+    message.success('创建成功');
     this.setState({
+      createVisible: false,
       createFormData: {},
+      createFormControls: createFormControls({}, 'create'),
+      pagination: {
+        current: 1,
+        pageSize: 10,
+      },
     });
-    return !error;
+    this.fetchTable({ current: 1, pageSize: 10 });
   };
 
-  public onConfirmRowEdit = ({ formData }) => {
-    return mktInstrumentCreate(this.composeInstrumentInfo(formData)).then(rsp => {
-      if (rsp.error) return false;
-
-      this.$sourceTable.onSearch(this.$sourceTable.getStationlData());
-
-      message.success('修改成功');
-
-      return true;
+  public onSearchFormChange = (props, fields, allFields) => {
+    const changed = Form2.getFieldsValue(fields);
+    const formData = Form2.getFieldsValue(allFields);
+    const searchFormData =
+      Object.keys(changed)[0] === 'assetClass'
+        ? {
+            ..._.pick(formData, ['instrumentIds']),
+            ...changed,
+          }
+        : formData;
+    this.setState({
+      searchFormData: Form2.createFields(searchFormData),
     });
   };
 
-  public onSearchFormChange = params => {
-    if (Object.keys(params.changed)[0] === 'assetClass') {
-      return this.setState({
-        searchFormData: {
-          ...params.formData,
-          instrumentType: undefined,
+  public onPaginationChange = (current, pageSize) => {
+    this.setState(
+      {
+        pagination: {
+          current,
+          pageSize,
         },
-      });
-    }
-    return this.setState({
-      searchFormData: params.formData,
+      },
+      () => {
+        this.fetchTable();
+      }
+    );
+  };
+
+  public switchModal = () => {
+    this.setState({
+      createVisible: !this.state.createVisible,
+      createFormData: {},
+      createFormControls: createFormControls({}, 'create'),
     });
+  };
+
+  public onSearch = () => {
+    this.setState(
+      {
+        pagination: {
+          current: 1,
+          pageSize: 10,
+        },
+      },
+      () => {
+        this.fetchTable();
+      }
+    );
   };
 
   public render() {
     return (
       <PageHeaderWrapper back={true}>
-        <SourceTable
-          ref={node => (this.$sourceTable = node)}
-          rowKey="instrumentId"
-          createText="新建标的物"
-          onRemove={this.onRemove}
-          onSearch={this.fetchTable}
-          tableColumnDefs={TABLE_COL_DEFS}
-          removeable={true}
-          onCreateFormChange={this.onCreateFormChange}
-          createFormControls={createFormControls}
-          createFormData={this.state.createFormData}
-          searchFormControls={searchFormControls}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          onCreate={this.onCreate}
-          paginationProps={{
-            backend: true,
-          }}
-          createModalProps={{
-            visible: this.state.visible,
-          }}
-          onReset={this.onReset}
-          rowActions={[
-            <ModalButton
-              key="edit"
-              onClick={this.onRowEdit}
-              onConfirm={this.onConfirmRowEdit}
-              onFormChange={this.onEditFormDataChange}
-            >
-              编辑
-            </ModalButton>,
-            // <Button key="order">订阅</Button>,
-          ]}
+        <Form2
+          columns={searchFormControls()}
+          dataSource={this.state.searchFormData}
+          layout={'inline'}
+          onSubmitButtonClick={this.onSearch}
+          onResetButtonClick={this.onReset}
+          onFieldsChange={this.onSearchFormChange}
+          submitText={'查询'}
         />
+        <Divider />
+        <Button style={{ marginBottom: VERTICAL_GUTTER }} type="primary" onClick={this.switchModal}>
+          新建标的物
+        </Button>
+        <Table
+          rowKey="instrumentId"
+          columns={TABLE_COL_DEFS(this.fetchTable)}
+          loading={this.state.loading}
+          dataSource={this.state.tableDataSource}
+          pagination={{
+            ...this.state.pagination,
+            total: this.state.total,
+            showQuickJumper: true,
+            showSizeChanger: true,
+            onChange: this.onPaginationChange,
+          }}
+        />
+        <Modal
+          visible={this.state.createVisible}
+          onOk={this.onCreate}
+          onCancel={this.switchModal}
+          title={'新建标的物'}
+        >
+          <Form2
+            ref={node => (this.$form = node)}
+            columns={this.state.createFormControls}
+            dataSource={this.state.createFormData}
+            onFieldsChange={this.onCreateFormChange}
+            footer={false}
+          />
+        </Modal>
       </PageHeaderWrapper>
     );
   }
