@@ -340,6 +340,14 @@ class SwitchCell extends PureComponent<
     });
   };
 
+  public looseActive = () => {
+    if (this.getActive()) {
+      this.setState({
+        active: false,
+      });
+    }
+  };
+
   public setAcitve = () => {
     this.props.api.eventBus.emit(TABLE_STOP_ACTIVE, this);
     this.setState({

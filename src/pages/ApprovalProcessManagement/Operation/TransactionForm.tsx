@@ -24,6 +24,7 @@ import {
   Input,
   Typography,
   Divider,
+  Alert,
 } from 'antd';
 import React, { PureComponent } from 'react';
 import { generateColumns } from '../constants';
@@ -31,6 +32,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/lib/utils/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
+
 const { TextArea } = Input;
 const { Title } = Typography;
 class ApprovalForm extends PureComponent<any, any> {
@@ -360,14 +362,14 @@ class ApprovalForm extends PureComponent<any, any> {
     handleFormChange();
   };
 
-  public transactionHandleOk = async () => {
+  public transactionHandleOk = async attachmentName => {
     if (this.state.attachmentId) {
       const { error, data } = await wkAttachmentProcessInstanceModify({
         attachmentId: this.state.attachmentId,
         processInstanceId: this.props.formData.processInstanceId,
       });
       if (error) return;
-      message.success('重新上传附件成功');
+      message.success(`${attachmentName}上传成功`);
     }
 
     this.setState({
@@ -399,6 +401,9 @@ class ApprovalForm extends PureComponent<any, any> {
       processInstanceId: data.processInstance.processInstanceId,
     });
     if (_error) return;
+    if (!_data || _data.length <= 0) {
+      return message.success('未上传审批附件');
+    }
     window.open(`${downloadTradeAttachment}${_data[0].attachmentId}`);
   };
 
@@ -570,13 +575,36 @@ class ApprovalForm extends PureComponent<any, any> {
                 >
                   修改合约详情
                 </Button>
-                <Button
-                  onClick={() => {
-                    this.setState({ transactionModalVisible: true });
+                <Upload
+                  maxLen={1}
+                  action={UPLOAD_URL}
+                  data={{
+                    method: 'wkAttachmentUpload',
+                    params: JSON.stringify({}),
                   }}
+                  headers={{ Authorization: `Bearer ${getToken()}` }}
+                  onChange={fileList => {
+                    this.setState({
+                      fileList,
+                    });
+                    if (fileList[0].status === 'done') {
+                      this.setState(
+                        {
+                          attachmentId: _.get(fileList, '[0].response.result.attachmentId'),
+                        },
+                        () => {
+                          this.transactionHandleOk(
+                            _.get(fileList, '[0].response.result.attachmentName')
+                          );
+                        }
+                      );
+                    }
+                  }}
+                  value={this.state.fileList}
+                  showUploadList={false}
                 >
-                  重新上传附件
-                </Button>
+                  <Button>重新上传附件</Button>
+                </Upload>
               </Row>
             )}
             <Divider type="horizontal" />
@@ -609,11 +637,6 @@ class ApprovalForm extends PureComponent<any, any> {
                       title={
                         <div>
                           <p>确认通过该审批单的复核？</p>
-                          {/* <TextArea
-                                                        onChange={this.setPassComment}
-                                                        value={passComment}
-                                                        placeholder={'请输入审核意见（可选）'}
-                                                    /> */}
                           <TextArea
                             onChange={this.setPassComment}
                             value={passComment}
@@ -700,46 +723,12 @@ class ApprovalForm extends PureComponent<any, any> {
         )}
         <Modal
           title="发起审批"
-          visible={this.state.transactionModalVisible}
-          onOk={this.transactionHandleOk}
-          onCancel={this.transactionHandleCancel}
-        >
-          <div style={{ margin: '20px' }}>
-            <p>您提交的交易需要通过审批才能完成簿记。请上传交易确认书等证明文件后发起审批。</p>
-            <p style={{ margin: '20px', textAlign: 'center' }}>
-              <Upload
-                maxLen={1}
-                action={UPLOAD_URL}
-                data={{
-                  method: 'wkAttachmentUpload',
-                  params: JSON.stringify({}),
-                }}
-                headers={{ Authorization: `Bearer ${getToken()}` }}
-                onChange={fileList => {
-                  this.setState({
-                    fileList,
-                  });
-                  if (fileList[0].status === 'done') {
-                    this.setState({
-                      attachmentId: fileList[0].response.result.attachmentId,
-                    });
-                  }
-                }}
-                value={this.state.fileList}
-              />
-            </p>
-            <p>审批中的交易请在审批管理页面查看。</p>
-          </div>
-        </Modal>
-        <Modal
-          title="发起审批"
           visible={this.state.bookEditVisible}
           onOk={this.bookEditHandleOk}
           onCancel={this.tbookEditCancel}
           width={1100}
           footer={false}
         >
-          {/* <ApprovalProcessManagementBookEdit id={data.process ? data.process._business_payload.trade.tradeId : null}/> */}
           <ApprovalProcessManagementBookEdit
             id={data.processInstance ? data.processInstance.processInstanceId : null}
             editable={this.state.editable}

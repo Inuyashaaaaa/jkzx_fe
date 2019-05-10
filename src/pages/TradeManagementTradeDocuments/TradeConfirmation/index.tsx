@@ -34,10 +34,14 @@ class TradeConfirmation extends PureComponent {
     pagination: {
       current: 1,
       pageSize: 10,
-      // showSizeChanger: true,
+      showSizeChanger: true,
       showQuickJumper: true,
-      onChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
-      onShowSizeChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
+      onChange: (page, pagesize) => {
+        return this.onTablePaginationChange(page, pagesize);
+      },
+      onShowSizeChange: (page, pagesize) => {
+        return this.onTablePaginationChange(page, pagesize);
+      },
     },
     bookIdList: [],
   };
@@ -49,11 +53,14 @@ class TradeConfirmation extends PureComponent {
         pagination: {
           ...pagination,
           current: page,
-          pagesize,
+          pageSize: pagesize,
         },
       },
       () => {
-        this.onFetch();
+        this.onFetch({
+          current: page,
+          pageSize: pagesize,
+        });
       }
     );
   };
@@ -81,6 +88,7 @@ class TradeConfirmation extends PureComponent {
   };
 
   public onFetch = async (paramsPagination?) => {
+    console.log(paramsPagination);
     const formValues = {
       startDate: _.get(this.state.searchFormData, 'tradeDate.value[0]').format('YYYY-MM-DD'),
       endDate: _.get(this.state.searchFormData, 'tradeDate.value[1]').format('YYYY-MM-DD'),
@@ -367,26 +375,6 @@ class TradeConfirmation extends PureComponent {
           pagination={this.state.pagination}
           loading={this.state.loading}
         />
-        {/* <SourceTable
-          rowKey="uuid"
-          ref={node => (this.$sourceTable = node)}
-          columnDefs={TRADE_COLUMN_DEFS(this.onFetch)}
-          searchFormControls={SEARCH_FORM_CONTROLS_TRADE(this.state.bookIdList)}
-          searchable={true}
-          resetable={true}
-          loading={this.state.loading}
-          onSearchButtonClick={this.onSearch}
-          onResetButtonClick={this.onReset}
-          dataSource={this.state.dataSource}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          paginationProps={{
-            backend: true,
-          }}
-          pagination={this.state.pagination}
-          onPaginationChange={this.onTablePaginationChange}
-          onPaginationShowSizeChange={this.onTablePaginationChange}
-        /> */}
       </>
     );
   }

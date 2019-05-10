@@ -22,6 +22,7 @@ import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { countAvg } from '../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
+import CashExportModal from '@/containers/CashExportModal';
 
 const OPTIONS_NUMBER = 'optionsNumber';
 
@@ -58,6 +59,7 @@ class AsianExerciseModal extends PureComponent<
     formData: {},
     productType: 'ASIAN',
     notionalType: null,
+    exportVisible: false,
   };
 
   public show = (data, tableFormData, currentUser, reload) => {
@@ -159,14 +161,10 @@ class AsianExerciseModal extends PureComponent<
 
     if (error) return;
     message.success('行权成功');
-    this.setState(
-      {
-        visible: false,
-      },
-      () => {
-        this.reload();
-      }
-    );
+    this.setState({
+      visible: false,
+      exportVisible: true,
+    });
   };
 
   public onValueChange = params => {
@@ -183,10 +181,22 @@ class AsianExerciseModal extends PureComponent<
     );
   };
 
+  public convertVisible = () => {
+    this.setState({
+      exportVisible: false,
+    });
+  };
+
   public render() {
     const { visible } = this.state;
     return (
       <>
+        <CashExportModal
+          visible={this.state.exportVisible}
+          trade={this.tableFormData}
+          convertVisible={this.convertVisible}
+          loadData={this.reload}
+        />
         <Modal
           footer={
             <Row type="flex" justify="space-between">

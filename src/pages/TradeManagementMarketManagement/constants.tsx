@@ -39,25 +39,31 @@ export const columns: IColumnDef[] = [
   {
     title: '标的物代码',
     dataIndex: 'instrumentId',
+    fixed: 'left',
+    width: 150,
   },
   {
     title: '标的物名称',
     dataIndex: 'instrumentName',
+    width: 150,
   },
   {
     title: '买价 (¥)',
     dataIndex: 'bid',
     render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '卖价 (¥)',
     dataIndex: 'ask',
     render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '最新成交价 (¥)',
     dataIndex: 'last',
     render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '时间戳',
@@ -65,16 +71,19 @@ export const columns: IColumnDef[] = [
     render: (value, record, index) => {
       return getDate(value);
     },
+    width: 200,
   },
   {
     title: '今收 (¥)',
     dataIndex: 'close',
     render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '昨收 (¥)',
     dataIndex: 'yesterdayClose',
     render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '交易所',
@@ -85,21 +94,19 @@ export const columns: IColumnDef[] = [
         ...COMMODITY_EXCHANGE_ZHCN_MAP,
       }[value];
     },
+    width: 150,
   },
   {
     title: '合约乘数',
     dataIndex: 'multiplier',
     render: (value, record, index) => formatNumber(value, 4),
-  },
-  {
-    title: '资产类别',
-    dataIndex: 'assetClass',
-    render: (value, record, index) => ASSET_CLASS_ZHCN_MAP[value],
+    width: 150,
   },
   {
     title: '合约类型',
     dataIndex: 'instrumentType',
     render: (value, record, index) => INSTRUMENT_TYPE_ZHCN_MAP[value],
+    width: 150,
   },
   {
     title: '合约到期日',

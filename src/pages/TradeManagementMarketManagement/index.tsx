@@ -123,6 +123,7 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public render() {
+    console.log(this.state.tableDataSource);
     return (
       <PageHeaderWrapper>
         <Form2
@@ -188,6 +189,9 @@ class TradeManagementMarketManagement extends PureComponent {
             onChange: this.paginationChange,
           }}
           loading={this.state.loading}
+          rowKey={(data, index) => index}
+          size="middle"
+          scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
         />
       </PageHeaderWrapper>
     );
