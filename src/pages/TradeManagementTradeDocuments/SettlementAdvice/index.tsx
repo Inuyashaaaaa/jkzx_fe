@@ -23,7 +23,7 @@ class SettlementAdvice extends PureComponent {
     pagination: {
       current: 1,
       pageSize: 10,
-      // showSizeChanger: true,
+      showSizeChanger: true,
       showQuickJumper: true,
       onChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
       onShowSizeChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
@@ -39,11 +39,14 @@ class SettlementAdvice extends PureComponent {
         pagination: {
           ...pagination,
           current: page,
-          pagesize,
+          pageSize: pagesize,
         },
       },
       () => {
-        this.onFetch();
+        this.onFetch({
+          current: page,
+          pageSize: pagesize,
+        });
       }
     );
   };
