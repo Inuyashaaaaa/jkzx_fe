@@ -16,7 +16,7 @@ import {
   queryTradeRecord,
   uploadUrl,
 } from '@/services/onBoardTransaction';
-import { Button, message, Modal, Radio, Tabs } from 'antd';
+import { Button, message, Modal, Radio, Tabs, Table, Divider } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
@@ -498,22 +498,16 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 新建
               </Button>
             </div>
-            <SourceTable
-              loading={loading}
-              searchable={false}
-              removeable={false}
-              // saveDisabled
-              rowKey="uuid"
+            <Divider type="horizontal" />
+            <Table
               dataSource={flowData}
-              columnDefs={flowColumns}
-              autoSizeColumnsToFit={true}
+              columns={flowColumns}
+              loading={loading}
+              rowKey="uuid"
+              scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
             />
           </TabPane>
           <TabPane tab="场内持仓统计" key="2">
-            {/* <RowForm
-              mode="position"
-              handleQuery={positionMode === 'detail' ? this.queryDetail : this.querySummary}
-            /> */}
             <Form
               submitText="查询"
               dataSource={searchFormDataPosition}
@@ -543,27 +537,21 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               <RadioButton value="b">按合约代码统计</RadioButton>
             </RadioGroup>
             {positionMode === 'detail' && (
-              <SourceTable
-                loading={loading}
-                searchable={false}
-                removeable={false}
-                // saveDisabled
-                rowKey="uuid"
+              <Table
                 dataSource={positionData}
-                columnDefs={detailColumns}
-                autoSizeColumnsToFit={true}
+                columns={detailColumns}
+                loading={loading}
+                rowKey="uuid"
+                scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
               />
             )}
             {positionMode === 'summary' && (
-              <SourceTable
-                loading={loading}
-                searchable={false}
-                removeable={false}
-                // saveDisabled
-                rowKey="uuid"
+              <Table
                 dataSource={positionData}
-                columnDefs={summaryColumns}
-                autoSizeColumnsToFit={true}
+                columns={summaryColumns}
+                loading={loading}
+                scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
+                rowKey="uuid"
               />
             )}
           </TabPane>

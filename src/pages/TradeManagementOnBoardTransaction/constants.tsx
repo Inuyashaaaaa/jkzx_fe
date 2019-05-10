@@ -9,109 +9,126 @@ import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import { formatMoney } from '@/tools';
 
 const bookId = {
-  field: 'bookId',
-  headerName: '交易簿',
+  dataIndex: 'bookId',
+  title: '交易簿',
+  width: 150,
 };
 
 const instrumentId = {
-  field: 'instrumentId',
-  headerName: '合约代码',
+  dataIndex: 'instrumentId',
+  width: 150,
+  title: '合约代码',
 };
 
 const direction = {
-  field: 'direction',
-  headerName: '买/卖',
+  dataIndex: 'direction',
+  width: 150,
+  title: '买/卖',
 };
 
 const openClose = {
-  field: 'openClose',
-  headerName: '开/平',
+  dataIndex: 'openClose',
+  width: 150,
+  title: '开/平',
 };
 
 const dealPrice = {
-  field: 'dealPrice',
-  headerName: '价格',
+  dataIndex: 'dealPrice',
+  width: 150,
+  title: '价格',
 };
 
 const dealAmount = {
-  field: 'dealAmount',
-  headerName: '手数/股数',
+  dataIndex: 'dealAmount',
+  width: 150,
+  title: '手数/股数',
 };
 
 const dealTime = {
-  field: 'dealTime',
-  headerName: '交易时间',
+  dataIndex: 'dealTime',
+  width: 150,
+  title: '交易时间',
 };
 
 const tradeId = {
-  field: 'tradeId',
-  headerName: '成交ID',
+  dataIndex: 'tradeId',
+  width: 150,
+  title: '成交ID',
 };
 
 const tradeAccount = {
-  field: 'tradeAccount',
-  headerName: '交易账号',
+  dataIndex: 'tradeAccount',
+  width: 150,
+  title: '交易账号',
 };
 
 const multiplier = {
-  field: 'multiplier',
-  headerName: '合约乘数',
+  dataIndex: 'multiplier',
+  width: 150,
+  title: '合约乘数',
 };
 
 const historyBuyAmount = {
-  field: 'historyBuyAmount',
-  headerName: '总买金额',
-  input: {
-    type: 'input',
-    formatValue: val => {
-      if (val == null) {
-        return val;
-      }
-      return formatMoney(parseInt(val, 10), '¥', true);
-    },
+  dataIndex: 'historyBuyAmount',
+  width: 150,
+  title: '总买金额(￥)',
+  render: (text, record, index) => {
+    return formatMoney(text, '');
   },
 };
 
 const historySellAmount = {
-  field: 'historySellAmount',
-  headerName: '总卖金额',
-  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  dataIndex: 'historySellAmount',
+  width: 150,
+  title: '总卖金额(￥)',
+  render: (text, record, index) => {
+    return formatMoney(text, '');
+  },
 };
 
 const totalBuy = {
-  field: 'totalBuy',
-  headerName: '总买量',
+  width: 150,
+  dataIndex: 'totalBuy',
+  title: '总买量',
 };
 
 const longPosition = {
-  field: 'longPosition',
-  headerName: '多头持仓',
+  dataIndex: 'longPosition',
+  width: 150,
+  title: '多头持仓',
 };
 
 const shortPosition = {
-  field: 'shortPosition',
-  headerName: '空头持仓',
+  dataIndex: 'shortPosition',
+  width: 150,
+  title: '空头持仓',
 };
 
 const netPosition = {
-  field: 'netPosition',
-  headerName: '持仓数量',
+  dataIndex: 'netPosition',
+  width: 150,
+  title: '持仓数量',
 };
 
 const totalSell = {
-  field: 'totalSell',
-  headerName: '总卖量',
+  dataIndex: 'totalSell',
+  width: 150,
+  title: '总卖量',
 };
 
 const totalPnl = {
-  field: 'totalPnl',
-  headerName: '总盈亏',
+  dataIndex: 'totalPnl',
+  width: 150,
+  title: '总盈亏',
 };
 
 const marketValue = {
-  field: 'marketValue',
-  headerName: '市值',
-  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  dataIndex: 'marketValue',
+  width: 150,
+  title: '市值(￥)',
+  render: (text, record, index) => {
+    return formatMoney(text, '');
+  },
 };
 
 export function generateColumns(type) {
