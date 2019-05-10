@@ -31,6 +31,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/lib/utils/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
+
 const { TextArea } = Input;
 const { Title } = Typography;
 class ApprovalForm extends PureComponent<any, any> {
@@ -360,14 +361,14 @@ class ApprovalForm extends PureComponent<any, any> {
     handleFormChange();
   };
 
-  public transactionHandleOk = async () => {
+  public transactionHandleOk = async attachmentName => {
     if (this.state.attachmentId) {
       const { error, data } = await wkAttachmentProcessInstanceModify({
         attachmentId: this.state.attachmentId,
         processInstanceId: this.props.formData.processInstanceId,
       });
       if (error) return;
-      message.success('重新上传附件成功');
+      message.success(`${attachmentName}上传成功`);
     }
 
     this.setState({
@@ -577,9 +578,6 @@ class ApprovalForm extends PureComponent<any, any> {
                     method: 'wkAttachmentUpload',
                     params: JSON.stringify({}),
                   }}
-                  style={{
-                    marginLeft: 20,
-                  }}
                   headers={{ Authorization: `Bearer ${getToken()}` }}
                   onChange={fileList => {
                     this.setState({
@@ -588,15 +586,18 @@ class ApprovalForm extends PureComponent<any, any> {
                     if (fileList[0].status === 'done') {
                       this.setState(
                         {
-                          attachmentId: fileList[0].response.result.attachmentId,
+                          attachmentId: _.get(fileList, '[0].response.result.attachmentId'),
                         },
                         () => {
-                          this.transactionHandleOk();
+                          this.transactionHandleOk(
+                            _.get(fileList, '[0].response.result.attachmentName')
+                          );
                         }
                       );
                     }
                   }}
                   value={this.state.fileList}
+                  showUploadList={false}
                 >
                   <Button>重新上传附件</Button>
                 </Upload>
