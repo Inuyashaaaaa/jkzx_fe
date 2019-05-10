@@ -367,26 +367,6 @@ class TradeConfirmation extends PureComponent {
           pagination={this.state.pagination}
           loading={this.state.loading}
         />
-        {/* <SourceTable
-          rowKey="uuid"
-          ref={node => (this.$sourceTable = node)}
-          columnDefs={TRADE_COLUMN_DEFS(this.onFetch)}
-          searchFormControls={SEARCH_FORM_CONTROLS_TRADE(this.state.bookIdList)}
-          searchable={true}
-          resetable={true}
-          loading={this.state.loading}
-          onSearchButtonClick={this.onSearch}
-          onResetButtonClick={this.onReset}
-          dataSource={this.state.dataSource}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          paginationProps={{
-            backend: true,
-          }}
-          pagination={this.state.pagination}
-          onPaginationChange={this.onTablePaginationChange}
-          onPaginationShowSizeChange={this.onTablePaginationChange}
-        /> */}
       </>
     );
   }
