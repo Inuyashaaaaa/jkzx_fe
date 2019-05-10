@@ -284,9 +284,9 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
 };
 
 export const formatNumber = (
-  value,
+  value: BigNumber.Value,
   decimalPlaces?: number,
-  roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_UP,
+  roundingMode?: BigNumber.RoundingMode,
   config?: BigNumber.Format
 ) => {
   if (!value) {
@@ -296,11 +296,27 @@ export const formatNumber = (
 };
 
 export const formatMoney = (value, unit = '', space = false) => {
-  return `${unit}${space ? ' ' : ''}${formatNumber(value)}`;
+  return formatNumber(value, null, null, {
+    // the decimal separator
+    decimalSeparator: '.',
+    // the grouping separator of the integer part
+    groupSeparator: ',',
+    // the primary grouping size of the integer part
+    groupSize: 3,
+    // the secondary grouping size of the integer part
+    secondaryGroupSize: 0,
+    // the grouping separator of the fraction part
+    fractionGroupSeparator: ' ',
+    // the grouping size of the fraction part
+    fractionGroupSize: 0,
+    // string to append
+    suffix: '',
+    prefix: `${unit}${space ? ' ' : ''}`,
+  });
 };
 
-export const parseMoney = (value, unit) =>
-  (value != null ? value : '').replace(new RegExp(`${unit}\s?|(,*)`, 'g'), '');
+export const parseMoney = (value, unit = '', space = false) =>
+  (value != null ? value : '').replace(new RegExp(`${unit}${space ? ' ' : ''}\s?|(,*)`, 'g'), '');
 
 export const catchCallbackError = (target: any) => {
   const handleError = error => {

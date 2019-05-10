@@ -24,6 +24,7 @@ import {
   Input,
   Typography,
   Divider,
+  Alert,
 } from 'antd';
 import React, { PureComponent } from 'react';
 import { generateColumns } from '../constants';
@@ -705,7 +706,12 @@ class ApprovalForm extends PureComponent<any, any> {
           onCancel={this.transactionHandleCancel}
         >
           <div style={{ margin: '20px' }}>
-            <p>您提交的交易需要通过审批才能完成簿记。请上传交易确认书等证明文件后发起审批。</p>
+            <Alert
+              type="info"
+              message={
+                '您提交的交易需要通过审批才能完成簿记。请上传交易确认书等证明文件后发起审批。'
+              }
+            />
             <p style={{ margin: '20px', textAlign: 'center' }}>
               <Upload
                 maxLen={1}
@@ -728,7 +734,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 value={this.state.fileList}
               />
             </p>
-            <p>审批中的交易请在审批管理页面查看。</p>
+            <Alert type="warning" message={'审批中的交易请在审批管理页面查看。'} />
           </div>
         </Modal>
         <Modal
