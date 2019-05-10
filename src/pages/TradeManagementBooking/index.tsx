@@ -187,7 +187,7 @@ const ActionBar = memo<any>(props => {
         onCancel={transactionHandleCancel}
       >
         <div style={{ margin: '20px' }}>
-          <p>您提交的交易需要通过审批才能完成簿记。请上传交易确认书等证明文件后发起审批。</p>
+          <p>您提交的交易需要通过审批才能完成簿记。请上传相关材料后发起审批。</p>
           <p style={{ margin: '20px', textAlign: 'center' }}>
             <Upload
               maxLen={1}
