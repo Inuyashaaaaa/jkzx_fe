@@ -1,19 +1,22 @@
 import React, { PureComponent } from 'react';
 import Exception from '@/lib/components/Exception';
 import { Button } from 'antd';
+import withRouter from 'umi/withRouter';
 
 class ErrorBoundary extends PureComponent<any, any> {
   constructor(props) {
     super(props);
-    this.state = { error: null };
+    this.state = { errorPathname: null };
   }
 
   public componentDidCatch(error, errorInfo) {
-    this.setState({ error });
+    this.setState({ errorPathname: this.props.location.pathname });
   }
 
   public render() {
-    if (this.state.error) {
+    const { location } = this.props;
+
+    if (this.state.errorPathname === location.pathname) {
       return (
         <Exception
           type="404"
@@ -32,4 +35,4 @@ class ErrorBoundary extends PureComponent<any, any> {
   }
 }
 
-export default ErrorBoundary;
+export default withRouter(ErrorBoundary);
