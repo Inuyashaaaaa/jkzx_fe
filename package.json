@@ -1,15 +1,13 @@
 {
-  "name": "ant-design-pro",
-  "version": "2.1.1",
-  "description": "An out-of-box UI solution for enterprise applications",
   "private": true,
   "scripts": {
+    "check-env": "node ./scripts/node-env.js",
     "jsdoc": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md",
     "precommit": "yarn run lint-staged",
     "dev": "umi dev",
-    "start": "yarn run dev",
+    "start": "yarn run check-env && yarn run dev",
     "start:no-mock": "cross-env MOCK=none yarn run start",
-    "build": "cross-env UMI_ENV=prod umi build",
+    "build": "yarn run check-env && cross-env UMI_ENV=prod umi build",
     "deploy:test": "cross-env DEPLOY_DIST=test node ./scripts/deploy.js",
     "deploy:release": "cross-env DEPLOY_DIST=release node ./scripts/deploy.js",
     "deploy:prod": "cross-env DEPLOY_DIST=prod node ./scripts/deploy.js",
@@ -152,12 +150,16 @@
       "**/*.min.*"
     ]
   },
-  "engines": {
-    "node": ">=8.0.0"
-  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "hope-env": {
+    "node": "v10.15.3",
+    "yarn": "1.16.0"
+  }
 }
