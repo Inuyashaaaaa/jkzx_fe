@@ -45,7 +45,6 @@ class Operation extends PureComponent {
   };
 
   public render() {
-    console.log(this.props);
     return (
       <>
         <Row type="flex" justify="start">
