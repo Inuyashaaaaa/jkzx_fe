@@ -13,10 +13,9 @@ cache:
 before_script:
   - source ~/.bashrc
   - tail ~/.bashrc
-  # - nvm -v
   - whoami
-  # - echo $NVM_DIR
-  - export PATH=/home/gitlab-runner/.nvm/versions/node/v10.15.1/bin:$PATH
+  - export PATH=/home/gitlab-runner/.nvm/versions/node/v10.15.3/bin:$PATH
+  - node -v
   - yarn -v
 
 # 安装依赖
