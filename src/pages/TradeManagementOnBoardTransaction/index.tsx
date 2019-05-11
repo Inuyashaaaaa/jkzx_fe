@@ -503,7 +503,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               dataSource={flowData}
               columns={flowColumns}
               loading={loading}
-              size='middle'
+              size="middle"
               rowKey="uuid"
               scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
             />
@@ -543,7 +543,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 columns={detailColumns}
                 loading={loading}
                 rowKey="uuid"
-                size='middle'
+                size="middle"
                 scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
               />
             )}
@@ -554,7 +554,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 loading={loading}
                 scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
                 rowKey="uuid"
-                size='middle'
+                size="middle"
               />
             )}
           </TabPane>

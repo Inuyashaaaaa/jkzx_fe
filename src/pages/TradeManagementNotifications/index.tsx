@@ -203,11 +203,16 @@ class TradeManagementNotifications extends PureComponent<any, any> {
             />
             <Divider type="horizontal" />
             <Table
+              scroll={{
+                x: 2300,
+              }}
               dataSource={this.state.tableDataSource}
               columns={[
                 {
                   title: '事件类型',
                   dataIndex: 'notificationEventType',
+                  fixed: 'left',
+                  width: 200,
                   render: (text, record, index) => {
                     const i = _.findIndex(EVENT_TYPE_OPTIONS, option => {
                       return option.value === text;
@@ -218,6 +223,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 {
                   title: '事件日期',
                   dataIndex: 'notificationTime',
+                  width: 200,
                   render: (text, record, index) => {
                     return text.split('T')[0];
                   },
@@ -233,6 +239,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 {
                   title: '期权类型',
                   dataIndex: 'productType',
+                  width: 200,
                   render: (text, record, index) => {
                     const i = _.findIndex(PRODUCT_TYPE_OPTIONS, option => {
                       return option.value === text;
@@ -243,10 +250,12 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 {
                   title: '标的物',
                   dataIndex: 'underlyerInstrumentId',
+                  width: 200,
                 },
                 {
                   title: '当前价格 (¥)',
                   dataIndex: 'underlyerPrice',
+                  width: 200,
                   render: (text, record, index) => {
                     return text ? text.toFixed(4) : text;
                   },
@@ -254,14 +263,17 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 {
                   title: '障碍价 (¥)',
                   dataIndex: 'barriers',
+                  width: 200,
                 },
                 {
                   title: '支付类型',
                   dataIndex: 'paymentType',
+                  width: 200,
                 },
                 {
                   title: '支付金额 (¥)',
                   dataIndex: 'payment',
+                  width: 200,
                   render: (text, record, index) => {
                     return text ? text.toFixed(4) : text;
                   },

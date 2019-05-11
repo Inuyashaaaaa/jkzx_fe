@@ -22,36 +22,28 @@ class TradeManagementMarketManagement extends PureComponent {
     tableDataSource: [],
     pagination: {
       current: 1,
-      pageSize: 20,
-      total: 20,
-      showSizeChanger: true,
-      showQuickJumper: true,
-      onChange: (page, pagesize) => this.paginationChange(page, pagesize),
-      onShowSizeChange: (page, pagesize) => this.paginationChange(page, pagesize),
+      pageSize: 10,
     },
+    total: 0,
     loading: false,
   };
 
-  public paginationChange = (a, b) => {
-    const { pagination } = this.state;
-    pagination.current = a;
-    pagination.pageSize = b;
+  public paginationChange = (current, pageSize) => {
     this.setState(
       {
-        pagination,
+        pagination: {
+          current,
+          pageSize,
+        },
       },
       () => {
-        this.fetchTable({ page: a - 1, pageSize: b }, null, true);
+        this.fetchTable(true);
       }
     );
   };
 
   public componentWillMount = () => {
-    this.fetchTable(
-      { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
-      null,
-      true
-    );
+    this.fetchTable(true);
   };
 
   public componentDidMount = () => {
@@ -59,11 +51,7 @@ class TradeManagementMarketManagement extends PureComponent {
       this.setState({
         lastUpdateTime: moment().format('HH:mm:ss'),
       });
-      this.fetchTable(
-        { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
-        null,
-        false
-      );
+      this.fetchTable(false);
     }, 1000 * 30);
   };
 
@@ -73,25 +61,24 @@ class TradeManagementMarketManagement extends PureComponent {
     }
   };
 
-  public fetchTable = (data, fields = null, loading) => {
+  public fetchTable = loading => {
+    const pagination = this.state.pagination;
     this.setState({
       lastUpdateTime: moment().format('HH:mm:ss'),
-      loading: loading ? true : false,
+      loading,
     });
     return mktQuotesListPaged({
-      page: data.page,
-      pageSize: data.pageSize,
-      ...fields,
+      page: pagination.current - 1,
+      pageSize: pagination.pageSize,
+      ...Form2.getFieldsValue(this.state.searchFormData),
     }).then(result => {
       this.setState({
         loading: false,
       });
       if (result.error) return undefined;
-      const { pagination } = this.state;
       this.setState({
         tableDataSource: result.data.page,
-        current: data.page,
-        pagination: _.assign(pagination, { total: result.data.totalCount }),
+        total: result.data.totalCount,
       });
     });
   };
@@ -101,48 +88,38 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public onSearchFormChange = event => {
-    event.domEvent.preventDefault();
-    this.fetchTable(
-      { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
-      this.getFormData(),
-      true
+    this.setState(
+      {
+        pagination: {
+          current: 1,
+          pageSize: 10,
+        },
+      },
+      () => {
+        this.fetchTable(true);
+      }
     );
   };
 
-  public onReset = event => {
+  public onReset = () => {
     this.setState(
       {
         searchFormData: {},
+        pagination: {
+          current: 1,
+          pageSize: 10,
+        },
       },
       () => {
-        this.fetchTable(
-          { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
-          this.getFormData(),
-          true
-        );
+        this.fetchTable(true);
       }
     );
-  };
-
-  public getFormData = () => {
-    return _.mapValues(this.state.searchFormData, item => {
-      return _.get(item, 'value');
-    });
   };
 
   public onFieldsChange = (props, changedFields, allFields) => {
-    this.setState(
-      {
-        searchFormData: allFields,
-      },
-      () => {
-        this.fetchTable(
-          { page: this.state.pagination.current - 1, pageSize: this.state.pagination.pageSize },
-          this.getFormData(),
-          true
-        );
-      }
-    );
+    this.setState({
+      searchFormData: allFields,
+    });
   };
 
   public render() {
@@ -153,9 +130,9 @@ class TradeManagementMarketManagement extends PureComponent {
           ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={this.state.searchFormData}
-          submitText={`刷新 ${this.state.lastUpdateTime}`}
+          submitText={'查询'}
           submitButtonProps={{
-            icon: 'reload',
+            icon: 'search',
           }}
           onSubmitButtonClick={this.onSearchFormChange}
           onResetButtonClick={this.onReset}
@@ -193,19 +170,28 @@ class TradeManagementMarketManagement extends PureComponent {
           ]}
         />
         <Divider type="horizontal" />
-        <Row style={{ textAlign: 'right', marginBottom: '20px' }}>
+        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
           <Button type="primary" onClick={this.handleSubjectBtnClick}>
             标的物管理
+          </Button>
+          <Button type="primary" onClick={this.onSearchFormChange}>
+            {`刷新 ${this.state.lastUpdateTime}`}
           </Button>
         </Row>
         <Table
           dataSource={this.state.tableDataSource}
           columns={columns}
-          pagination={this.state.pagination}
+          pagination={{
+            ...this.state.pagination,
+            total: this.state.total,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            onChange: this.paginationChange,
+          }}
           loading={this.state.loading}
           rowKey={(data, index) => index}
           size="middle"
-          scroll={this.state.tableDataSource ? { x: '2000px' } : { x: false }}
+          scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
         />
       </PageHeaderWrapper>
     );
