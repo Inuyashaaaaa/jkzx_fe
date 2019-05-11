@@ -77,28 +77,30 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public filterFormData = (allFields, fields) => {
-    const changed = Form2.getFieldsValue(fields);
-    const formData = Form2.getFieldsValue(allFields);
-    if (Object.keys(changed)[0] === 'assetClass') {
+    if (Object.keys(fields)[0] === 'assetClass') {
       return {
-        ..._.pick(formData, ['instrumentId']),
-        ...changed,
+        ..._.pick(allFields, ['instrumentId']),
+        ...fields,
       };
     }
-    if (changed.instrumentType === 'STOCK') {
+    if (fields.instrumentType === 'STOCK') {
       return {
-        ...formData,
-        multiplier: 1,
+        ...allFields,
+        multiplier: Form2.createField(1),
       };
     }
-    return formData;
+    return allFields;
   };
 
   public onCreateFormChange = (props, fields, allFields) => {
-    const columns = createFormControls(Form2.getFieldsValue(allFields), 'create');
+    const nextAllFields = {
+      ...this.state.createFormData,
+      ...fields,
+    };
+    const columns = createFormControls(Form2.getFieldsValue(nextAllFields), 'create');
     this.setState({
       createFormControls: columns,
-      createFormData: Form2.createFields(this.filterFormData(allFields, fields)),
+      createFormData: this.filterFormData(nextAllFields, fields),
     });
   };
 
