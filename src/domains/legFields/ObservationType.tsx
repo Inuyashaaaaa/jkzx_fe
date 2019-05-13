@@ -10,7 +10,7 @@ import {
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -45,7 +45,7 @@ export const ObservationType: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           <Select
             defaultOpen={getDefaultOpen()}

@@ -6,7 +6,7 @@ import {
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
@@ -65,7 +65,7 @@ export const StrikeType: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           <Select
             {...getSelectProps(record)}

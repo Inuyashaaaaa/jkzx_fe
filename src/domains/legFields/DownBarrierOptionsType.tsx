@@ -7,7 +7,7 @@ import {
   OPTION_TYPE_OPTIONS,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -29,7 +29,7 @@ export const DownBarrierOptionsType: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<Select defaultOpen={true} editing={editing} options={OPTION_TYPE_OPTIONS} />)}
       </FormItem>
     );

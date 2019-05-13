@@ -1,6 +1,6 @@
-import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
+import { LEG_FIELD } from '@/constants/common';
 import { Input } from '@/design/components/Input';
-import { getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -24,7 +24,7 @@ export const Comment: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<Input autoSelect={true} editing={editing} />)}
       </FormItem>
     );

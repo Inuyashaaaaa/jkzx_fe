@@ -1,7 +1,7 @@
-import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP, OPTION_TYPE_MAP } from '@/constants/common';
+import { LEG_FIELD, OPTION_TYPE_MAP, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/design/components';
-import { getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { ValidationRule } from 'antd/lib/form';
 import FormItem from 'antd/lib/form/FormItem';
