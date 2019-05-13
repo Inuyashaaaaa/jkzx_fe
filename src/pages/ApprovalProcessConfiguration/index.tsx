@@ -93,7 +93,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
 
     let editTask = {};
-    const taskData = (taskApproveGroupList.data || []).map((item, index) => {
+    let taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       if (item.taskType === '修改') {
         editTask = item;
@@ -101,7 +101,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       }
       return item;
     });
-    taskData.push(editTask);
+    taskData = taskData.concat([editTask]);
 
     this.setState({
       loading: false,
