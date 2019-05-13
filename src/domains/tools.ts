@@ -18,7 +18,7 @@ import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
-const fetchUnderlyerMultiplier = _.debounce(
+const fetchUnderlyerMultiplierAndUnit = _.debounce(
   (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
@@ -32,20 +32,30 @@ const fetchUnderlyerMultiplier = _.debounce(
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
     setColLoading(LEG_FIELD.UNDERLYER_MULTIPLIER, true);
+    setColLoading(LEG_FIELD.UNIT, true);
     mktInstrumentInfo({
       instrumentId,
     })
       .then(rsp => {
-        if (rsp.error || undefined === rsp.data.instrumentInfo.multiplier) return 1;
-        return new BigNumber(rsp.data.instrumentInfo.multiplier)
-          .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-          .toNumber();
+        const multiplier =
+          rsp.error || rsp.data.instrumentInfo.multiplier === undefined
+            ? 1
+            : new BigNumber(rsp.data.instrumentInfo.multiplier)
+                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                .toNumber();
+        const unit =
+          rsp.error || rsp.data.instrumentInfo.unit === undefined
+            ? '-'
+            : rsp.data.instrumentInfo.unit;
+        return { multiplier, unit };
       })
       .then(val => {
-        setColValue(LEG_FIELD.UNDERLYER_MULTIPLIER, Form2.createField(val));
+        setColValue(LEG_FIELD.UNDERLYER_MULTIPLIER, Form2.createField(val.multiplier));
+        setColValue(LEG_FIELD.UNIT, Form2.createField(val.unit));
       })
       .finally(() => {
         setColLoading(LEG_FIELD.UNDERLYER_MULTIPLIER, false);
+        setColLoading(LEG_FIELD.UNIT, false);
       });
   },
   50
@@ -107,7 +117,7 @@ export const commonLinkage = (
 ) => {
   const { changedFields } = changeFieldsParams;
   if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
-    fetchUnderlyerMultiplier(
+    fetchUnderlyerMultiplierAndUnit(
       env,
       changeFieldsParams,
       record,

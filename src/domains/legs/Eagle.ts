@@ -56,6 +56,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
+import { Unit } from '../legFields/Unit';
 import { commonLinkage } from '../tools';
 
 export const Eagle: ILeg = {
@@ -110,6 +111,7 @@ export const Eagle: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -138,6 +140,7 @@ export const Eagle: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

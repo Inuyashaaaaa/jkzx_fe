@@ -61,6 +61,7 @@ import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
 import { PaymentType } from '../legFields/PaymentType';
 import { RebateType } from '../legFields/RebateType';
+import { Unit } from '../legFields/Unit';
 
 export const VanillaEuropean: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_EUROPEAN],
@@ -109,6 +110,7 @@ export const VanillaEuropean: ILeg = {
         Premium,
         MinimumPremium,
         FrontPremium,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -135,6 +137,7 @@ export const VanillaEuropean: ILeg = {
         Premium,
         MinimumPremium,
         FrontPremium,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

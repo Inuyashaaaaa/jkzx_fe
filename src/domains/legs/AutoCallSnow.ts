@@ -65,6 +65,7 @@ import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
 import { commonLinkage } from '../tools';
 import { getMoment } from '@/utils';
+import { Unit } from '../legFields/Unit';
 
 export const AutoCallSnow: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL],
@@ -127,6 +128,7 @@ export const AutoCallSnow: ILeg = {
         AutoCallStrike,
         ExpireNoBarrierObserveDay,
         UpObservationStep,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -160,6 +162,7 @@ export const AutoCallSnow: ILeg = {
         AutoCallStrike,
         ExpireNoBarrierObserveDay,
         UpObservationStep,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

@@ -78,6 +78,7 @@ import { HighBarrier } from '../legFields/HighBarrier';
 import { PaymentType } from '../legFields/PaymentType';
 import { HighPayment } from '../legFields/HighPayment';
 import { LowPayment } from '../legFields/LowPayment';
+import { Unit } from '../legFields/Unit';
 
 export const DoubleDigital: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_DIGITAL],
@@ -133,6 +134,7 @@ export const DoubleDigital: ILeg = {
         Term,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -162,6 +164,7 @@ export const DoubleDigital: ILeg = {
         Term,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

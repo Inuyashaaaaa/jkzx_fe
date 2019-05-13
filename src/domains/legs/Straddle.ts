@@ -65,6 +65,7 @@ import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { BarrierType } from '../legFields/BarrierType';
 import { LowBarrier } from '../legFields/LowBarrier';
+import { Unit } from '../legFields/Unit';
 
 export const Straddle: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.STRADDLE],
@@ -119,6 +120,7 @@ export const Straddle: ILeg = {
         HighStrike,
         LowParticipationRate,
         HighParticipationRate,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -146,6 +148,7 @@ export const Straddle: ILeg = {
         HighStrike,
         LowParticipationRate,
         HighParticipationRate,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

@@ -59,6 +59,7 @@ import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
+import { Unit } from '../legFields/Unit';
 
 export const VanillaAmerican: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
@@ -107,6 +108,7 @@ export const VanillaAmerican: ILeg = {
         Premium,
         MinimumPremium,
         FrontPremium,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -133,6 +135,7 @@ export const VanillaAmerican: ILeg = {
         Premium,
         MinimumPremium,
         FrontPremium,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -170,6 +173,7 @@ export const VanillaAmerican: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;
@@ -199,7 +203,6 @@ export const VanillaAmerican: ILeg = {
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
-
     return nextPosition;
   },
   getPageData: (env: string, position: any) => {},

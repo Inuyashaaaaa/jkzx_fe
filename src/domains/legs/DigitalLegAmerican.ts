@@ -66,6 +66,7 @@ import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { RebateType } from '../legFields/RebateType';
 import { ObservationType } from '../legFields/ObservationType';
+import { Unit } from '../legFields/Unit';
 
 export const DigitalLegAmerican: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DIGITAL_AMERICAN],
@@ -121,6 +122,7 @@ export const DigitalLegAmerican: ILeg = {
         EffectiveDate,
         ObservationType,
         RebateType,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -151,6 +153,7 @@ export const DigitalLegAmerican: ILeg = {
         EffectiveDate,
         ObservationType,
         RebateType,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

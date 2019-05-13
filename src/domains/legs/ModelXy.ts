@@ -60,6 +60,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
+import { Unit } from '../legFields/Unit';
 import { commonLinkage } from '../tools';
 
 export const ModelXy: ILeg = {
@@ -110,6 +111,7 @@ export const ModelXy: ILeg = {
         ExpirationDate,
         EffectiveDate,
         Comment,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -135,6 +137,7 @@ export const ModelXy: ILeg = {
         ExpirationDate,
         EffectiveDate,
         Comment,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

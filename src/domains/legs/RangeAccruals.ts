@@ -81,6 +81,7 @@ import { HighBarrier } from '../legFields/HighBarrier';
 import { LowBarrier } from '../legFields/LowBarrier';
 import { ObservationDates } from '../legFields/ObservationDates';
 import { ObservationStep } from '../legFields/ObservationStep';
+import { Unit } from '../legFields/Unit';
 
 export const RangeAccruals: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.RANGE_ACCRUALS],
@@ -139,6 +140,7 @@ export const RangeAccruals: ILeg = {
         HighBarrier,
         LowBarrier,
         ObservationDates,
+        Unit,
         // ObservationStep,
         ...TOTAL_EDITING_FIELDS,
       ];
@@ -170,6 +172,7 @@ export const RangeAccruals: ILeg = {
         LowBarrier,
         ObservationDates,
         ObservationStep,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

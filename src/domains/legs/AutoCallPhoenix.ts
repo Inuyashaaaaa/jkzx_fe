@@ -64,6 +64,7 @@ import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
+import { Unit } from '../legFields/Unit';
 import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
@@ -139,6 +140,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierDate,
         DownBarrier,
         DownBarrierOptionsStrike,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -177,6 +179,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierDate,
         DownBarrier,
         DownBarrierOptionsStrike,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
