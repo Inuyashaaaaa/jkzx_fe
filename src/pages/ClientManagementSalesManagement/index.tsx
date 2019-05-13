@@ -16,11 +16,14 @@ import {
   refSubsidiaryDelete,
   refSubsidiaryUpdate,
 } from '@/services/sales';
-import { Col, Icon, message, Modal, Popconfirm, Row, Tree } from 'antd';
+import { Col, Icon, message, Modal, Popconfirm, Row, Tree, Table, Divider } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEF } from './constants';
 import CreateFormModal from './CreateFormModal';
+import Operation from './Operation';
+import { getMoment } from '@/utils';
+
 const { TreeNode } = Tree;
 
 class ClientManagementSalesManagement extends PureComponent {
@@ -47,6 +50,10 @@ class ClientManagementSalesManagement extends PureComponent {
     editBranch: true,
     branchId: '',
     subsidiaryId: '',
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
   };
 
   public componentDidMount = () => {
@@ -433,6 +440,15 @@ class ClientManagementSalesManagement extends PureComponent {
     });
   };
 
+  public paginationChange = (current, pageSize) => {
+    this.setState({
+      pagination: {
+        current,
+        pageSize,
+      },
+    });
+  };
+
   public render() {
     return (
       <PageHeaderWrapper title="销售管理">
@@ -443,36 +459,72 @@ class ClientManagementSalesManagement extends PureComponent {
             </Tree>
           </Col>
           <Col>
-            <SourceTable
-              rowKey="uuid"
-              ref={node => (this.$sourceTable = node)}
-              dataSource={this.state.dataSource}
-              columnDefs={TABLE_COL_DEF(this.state.branchSalesList, this.fetchTable)}
-              loading={this.state.loading}
-              header={
-                <ModalButton
-                  key="create"
-                  style={{ marginBottom: '20px' }}
-                  type="primary"
-                  onClick={this.switchModal}
-                  modalProps={{
-                    title: '新建销售',
-                    visible: this.state.visible,
-                    comfirmLoading: this.state.confirmLoading,
-                    onCancel: this.switchModal,
-                    onOk: this.onCreate,
-                  }}
-                  content={
-                    <CreateFormModal
-                      dataSource={this.state.createFormData}
-                      handleValueChange={this.handleValueChange}
-                      branchSalesList={this.state.branchSalesList}
-                    />
-                  }
-                >
-                  新建销售
-                </ModalButton>
+            <ModalButton
+              key="create"
+              style={{ marginBottom: '20px' }}
+              type="primary"
+              onClick={this.switchModal}
+              modalProps={{
+                title: '新建销售',
+                visible: this.state.visible,
+                comfirmLoading: this.state.confirmLoading,
+                onCancel: this.switchModal,
+                onOk: this.onCreate,
+              }}
+              content={
+                <CreateFormModal
+                  dataSource={this.state.createFormData}
+                  handleValueChange={this.handleValueChange}
+                  branchSalesList={this.state.branchSalesList}
+                />
               }
+            >
+              新建销售
+            </ModalButton>
+            <Divider type="horizontal" />
+            <Table
+              dataSource={this.state.dataSource}
+              columns={[
+                {
+                  title: '销售',
+                  dataIndex: 'salesName',
+                  width: 200,
+                },
+                {
+                  title: '营业部',
+                  width: 200,
+                  dataIndex: 'branchName',
+                },
+                {
+                  title: '分公司',
+                  width: 200,
+                  dataIndex: 'subsidiaryName',
+                },
+                {
+                  title: '创建时间',
+                  width: 250,
+                  dataIndex: 'createdAt',
+                  render: (text, record, index) => {
+                    return getMoment(text).format('YYYY-MM-DD HH:mm:ss');
+                  },
+                },
+                {
+                  title: '操作',
+                  width: 250,
+                  render: (text, record, index) => {
+                    return <Operation record={text} fetchTable={this.fetchTable} />;
+                  },
+                },
+              ]}
+              loading={this.state.loading}
+              rowKey="uuid"
+              size="middle"
+              pagination={{
+                ...this.state.pagination,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                onChange: this.paginationChange,
+              }}
             />
           </Col>
         </Row>
