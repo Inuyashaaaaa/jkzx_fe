@@ -204,8 +204,13 @@ const ActionBar = memo<any>(props => {
                 params: JSON.stringify({}),
               }}
               headers={{ Authorization: `Bearer ${getToken()}` }}
+              onRemove={() => {
+                message.info('请重新选择上传文件');
+                return false;
+              }}
               onChange={fileList => {
                 setFileList(fileList);
+                if (!fileList || fileList.length <= 0) return;
                 if (fileList[0].status === 'done') {
                   setAttachmentId(fileList[0].response.result.attachmentId);
                 }
