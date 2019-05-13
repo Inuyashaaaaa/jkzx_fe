@@ -16,7 +16,7 @@ const multiplier = {
               message: '合约乘数是必填项',
             },
           ],
-        })(<InputNumber precision={4} min={1} />)}
+        })(<InputNumber precision={0} min={1} />)}
       </FormItem>
     );
   },
