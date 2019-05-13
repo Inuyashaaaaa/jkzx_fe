@@ -41,8 +41,8 @@ class EditableRow extends React.Component<ITableRowProps> {
   };
 
   public validate = (options: any = {}, colIds = []) => {
-    const { silence } = options;
-    const { columns, record } = this.props;
+    const { silence, scroll = true, ...rest } = options;
+    // const { columns, record } = this.props;
 
     return new Promise<{ errors: any; values: any }>((resolve, reject) => {
       // if (silence) {
@@ -67,10 +67,13 @@ class EditableRow extends React.Component<ITableRowProps> {
       //   });
       //   return;
       // }
-
-      return this.props.form.validateFields(colIds, options, (errors, values) => {
-        resolve({ errors, values });
-      });
+      return this.props.form[scroll ? 'validateFieldsAndScroll' : 'validateFields'](
+        colIds,
+        rest,
+        (errors, values) => {
+          resolve({ errors, values });
+        }
+      );
     });
   };
 
