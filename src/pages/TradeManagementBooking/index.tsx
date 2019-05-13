@@ -34,7 +34,7 @@ const ActionBar = memo<any>(props => {
   const { setTableData, tableData, tableEl, currentUser } = props;
   const [affix, setAffix] = useState(false);
   const [createTradeLoading, setCreateTradeLoading] = useState(false);
-  const currentCreateFormRef = useRef<Form2>(null);
+  let currentCreateFormRef = useRef<Form2>(null);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const [cashModalVisible, setCashModalVisible] = useState(false);
@@ -148,7 +148,7 @@ const ActionBar = memo<any>(props => {
               title: '创建簿记',
               visible: createModalVisible,
               onOk: async () => {
-                const res = await currentCreateFormRef.current.validate();
+                const res = await currentCreateFormRef.validate();
                 if (res.error) return;
                 const { error: _error, data: _data } = await wkProcessGet({
                   processName: '交易录入经办复合流程',
@@ -164,7 +164,7 @@ const ActionBar = memo<any>(props => {
               children: (
                 <BookingBaseInfoForm
                   ref={node => {
-                    return (currentCreateFormRef.current = node);
+                    currentCreateFormRef = node;
                   }}
                   editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
                   createFormData={createFormData}
