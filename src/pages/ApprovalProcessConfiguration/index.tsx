@@ -32,7 +32,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     taskApproveGroupList: [],
     processList: [],
     loading: false,
-    currentProcessName: '资金录入经办复合流程',
+    currentProcessName: '',
     status: false,
     resetVisible: false,
     globalConfigList: [],
@@ -47,19 +47,35 @@ class ApprovalProcessConfiguration extends PureComponent {
     this.fetchData();
   };
 
-  public fetchData = async () => {
+  public fetchData = async currentProcessName => {
     this.setState({
       loading: true,
     });
+    const { data: processList, error: pError } = await wkProcessList();
+    if (pError) {
+      return this.setState({
+        loading: false,
+      });
+    }
+
+    if (!this.state.currentProcessName) {
+      this.setState({
+        currentProcessName: processList[0].processName,
+      });
+    }
+
     const requests = () =>
       Promise.all([
-        wkTaskApproveGroupList({ processName: this.state.currentProcessName }),
+        wkTaskApproveGroupList({
+          processName: currentProcessName ? currentProcessName : processList[0].processName,
+        }),
         wkApproveGroupList(),
-        wkProcessList(),
-        wkGlobalConfigList({ processName: this.state.currentProcessName }),
+        wkGlobalConfigList({
+          processName: currentProcessName ? currentProcessName : processList[0].processName,
+        }),
       ]);
     const res = await requests();
-    const [taskApproveGroupList, approveGroupList, processList, globalConfigList] = res;
+    const [taskApproveGroupList, approveGroupList, globalConfigList] = res;
     const error = res.some(item => {
       return item.error;
     });
@@ -71,17 +87,11 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    let fristData = {};
-    let tabsData = processList.data.map(item => {
+    let tabsData = processList.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
-      if (item.processName === '交易录入经办复合流程') {
-        fristData = item;
-      }
       return item;
     });
-    tabsData = tabsData.filter(item => item.processName !== '交易录入经办复合流程');
 
-    tabsData = _.concat(tabsData, fristData);
     const taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       return item;
@@ -130,7 +140,7 @@ class ApprovalProcessConfiguration extends PureComponent {
         processList,
       },
       () => {
-        this.fetchData();
+        this.fetchData(e);
       }
     );
   };
@@ -174,7 +184,13 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public onConfirm = async () => {
-    const { currentProcessName, taskApproveGroupList, status, globalConfig } = this.state;
+    const {
+      currentProcessName,
+      taskApproveGroupList,
+      status,
+      globalConfig,
+      globalConfigList,
+    } = this.state;
     const noneGroupIndex = _.findIndex(
       taskApproveGroupList,
       item => item.approveGroupList.length <= 0
@@ -191,7 +207,8 @@ class ApprovalProcessConfiguration extends PureComponent {
           processName: currentProcessName,
           taskList: taskApproveGroupList,
         }),
-        wkGlobalConfigModify(globalConfig),
+        // wkGlobalConfigModify(globalConfig)
+        ...globalConfigList.map(item => wkGlobalConfigModify(item)),
       ]);
     const res = await requests();
     const [modify, batch, globalConfigModify] = res;
@@ -206,7 +223,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public handleResetOk = async () => {
-    this.fetchData();
+    this.fetchData(this.state.currentProcessName);
     this.setState({
       resetVisible: false,
     });
@@ -219,12 +236,19 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public configListChange = (e, param) => {
+    const globalConfigList = this.state.globalConfigList.map(item => {
+      if (item.id === param.id) {
+        item.status = e.target.checked;
+      }
+      return item;
+    });
     this.setState({
       globalConfig: {
         processName: param.processName,
         id: param.id,
         status: e.target.checked,
       },
+      globalConfigList,
     });
   };
 
@@ -253,10 +277,7 @@ class ApprovalProcessConfiguration extends PureComponent {
           {this.state.globalConfigList.map(item => {
             return (
               <p key={item.id}>
-                <Checkbox
-                  onChange={e => this.configListChange(e, item)}
-                  defaultChecked={!!item.status}
-                >
+                <Checkbox onChange={e => this.configListChange(e, item)} checked={!!item.status}>
                   {item.globalName}
                 </Checkbox>
               </p>
