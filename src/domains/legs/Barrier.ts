@@ -73,6 +73,7 @@ import { RebateType } from '../legFields/RebateType';
 import { BarrierType } from '../legFields/BarrierType';
 import { Barrier } from '../legFields/Barrier';
 import BigNumber from 'bignumber.js';
+import { Unit } from '../legFields/Unit';
 
 export const BarrierLeg: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.BARRIER],
@@ -133,6 +134,7 @@ export const BarrierLeg: ILeg = {
         FrontPremium,
         MinimumPremium,
         ObservationType,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -166,6 +168,7 @@ export const BarrierLeg: ILeg = {
         FrontPremium,
         MinimumPremium,
         ObservationType,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

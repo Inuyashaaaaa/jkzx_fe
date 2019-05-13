@@ -9,6 +9,7 @@ import { Form2, Loading } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { trdTradeGet } from '@/services/general-service';
+import { mktInstrumentInfo } from '@/services/market-data-service';
 import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
@@ -68,8 +69,33 @@ const TradeManagementBooking = props => {
 
     const { positions } = data;
 
-    const composePositions = await Promise.all(
+    const unitPositions = await Promise.all(
       positions.map(position => {
+        return mktInstrumentInfo({
+          instrumentId: position.asset[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
+        }).then(rsp => {
+          const { error, data } = rsp;
+          if (error || data.instrumentInfo.unit === undefined) {
+            return {
+              ...position,
+              asset: {
+                ...position.asset,
+                [LEG_FIELD.UNIT]: '-',
+              },
+            };
+          }
+          return {
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.UNIT]: data.instrumentInfo.unit,
+            },
+          };
+        });
+      })
+    );
+    const composePositions = await Promise.all(
+      unitPositions.map(position => {
         return trdTradeLCMUnwindAmountGet({
           tradeId: tableFormData.tradeId,
           positionId: position.positionId,

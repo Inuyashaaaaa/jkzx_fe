@@ -56,6 +56,7 @@ import { commonLinkage } from '../tools';
 import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { RebateType } from '../legFields/RebateType';
+import { Unit } from '../legFields/Unit';
 
 export const DoubleNoTouch: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_NO_TOUCH],
@@ -106,6 +107,7 @@ export const DoubleNoTouch: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -134,6 +136,7 @@ export const DoubleNoTouch: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

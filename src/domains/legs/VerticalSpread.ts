@@ -63,6 +63,7 @@ import { PaymentType } from '../legFields/PaymentType';
 import { RebateType } from '../legFields/RebateType';
 import { LowStrike } from '../legFields/LowStrike';
 import { HighStrike } from '../legFields/HighStrike';
+import { Unit } from '../legFields/Unit';
 
 export const VerticalSpread: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VERTICAL_SPREAD],
@@ -111,6 +112,7 @@ export const VerticalSpread: ILeg = {
         NotionalAmount,
         PremiumType,
         Premium,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -136,6 +138,7 @@ export const VerticalSpread: ILeg = {
         NotionalAmount,
         PremiumType,
         Premium,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

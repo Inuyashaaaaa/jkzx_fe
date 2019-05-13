@@ -79,6 +79,7 @@ import { LowRebate } from '../legFields/LowRebate';
 import { HighRebate } from '../legFields/HighRebate';
 import { LowBarrier } from '../legFields/LowBarrier';
 import { HighBarrier } from '../legFields/HighBarrier';
+import { Unit } from '../legFields/Unit';
 
 export const DoubleSharkFin: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_SHARK_FIN],
@@ -143,6 +144,7 @@ export const DoubleSharkFin: ILeg = {
         FrontPremium,
         MinimumPremium,
         ObservationType,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -177,6 +179,7 @@ export const DoubleSharkFin: ILeg = {
         FrontPremium,
         MinimumPremium,
         ObservationType,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

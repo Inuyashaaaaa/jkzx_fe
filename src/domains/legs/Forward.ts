@@ -60,6 +60,7 @@ import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { RebateType } from '../legFields/RebateType';
 import { ObservationType } from '../legFields/ObservationType';
+import { Unit } from '../legFields/Unit';
 
 export const Forward: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.FORWARD],
@@ -103,6 +104,7 @@ export const Forward: ILeg = {
         Premium,
         ExpirationDate,
         EffectiveDate,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -123,6 +125,7 @@ export const Forward: ILeg = {
         Premium,
         ExpirationDate,
         EffectiveDate,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

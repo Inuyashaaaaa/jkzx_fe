@@ -59,6 +59,7 @@ import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
+import { Unit } from '../legFields/Unit';
 
 export const TripleDigital: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.TRIPLE_DIGITAL],
@@ -119,6 +120,7 @@ export const TripleDigital: ILeg = {
         Payment1,
         Payment2,
         Payment3,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -151,6 +153,7 @@ export const TripleDigital: ILeg = {
         Payment1,
         Payment2,
         Payment3,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

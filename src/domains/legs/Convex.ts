@@ -65,6 +65,7 @@ import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { BarrierType } from '../legFields/BarrierType';
 import { LowBarrier } from '../legFields/LowBarrier';
+import { Unit } from '../legFields/Unit';
 
 export const Convex: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.CONVEX],
@@ -117,6 +118,7 @@ export const Convex: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -145,6 +147,7 @@ export const Convex: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

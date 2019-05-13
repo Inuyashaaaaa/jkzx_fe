@@ -76,6 +76,7 @@ import { DownBarrierDate } from '../legFields/DownBarrierDate';
 import { DownBarrier } from '../legFields/DownBarrier';
 import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
+import { Unit } from '../legFields/Unit';
 
 export const AutoCallPhoenix: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX],
@@ -147,6 +148,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierDate,
         DownBarrier,
         DownBarrierOptionsStrike,
+        Unit,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -185,6 +187,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierDate,
         DownBarrier,
         DownBarrierOptionsStrike,
+        Unit,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
