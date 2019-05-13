@@ -19,6 +19,7 @@ import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
 import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import moment from 'moment';
+import uuidv4 from 'uuid/v4';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
@@ -41,7 +42,7 @@ const TradeManagementBooking = props => {
 
     setTableData(pre => {
       const next = {
-        ...createLegRecordByPosition(leg, position, useEnv),
+        ...createLegRecordByPosition(leg, { ...position, positionId: uuidv4() }, useEnv),
       };
       return pre.concat(next);
     });
