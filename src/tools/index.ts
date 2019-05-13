@@ -84,7 +84,7 @@ export const isKnockIn = data => {
   return data[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.KNOCK_IN;
 };
 
-export const getMinRule = (message = '不允许小于0') => {
+export const getMinRule = (message: string = '不允许小于0') => {
   return {
     message,
     validator: (rule, value, callback) => {
@@ -96,7 +96,7 @@ export const getMinRule = (message = '不允许小于0') => {
   };
 };
 
-export const getRequiredRule = (message = '必填') => {
+export const getRequiredRule = (message: string = '必填') => {
   return {
     message,
     required: true,

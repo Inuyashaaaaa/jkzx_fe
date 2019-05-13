@@ -1,7 +1,7 @@
 import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/design/components';
-import { getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -49,7 +49,7 @@ export const Strike4: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<UnitInputNumber autoSelect={true} editing={false} unit={getUnit()} />)}
       </FormItem>
     );

@@ -1,6 +1,6 @@
-import { LEG_FIELD, RULES_REQUIRED, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { Checkbox, Form2 } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -25,7 +25,7 @@ export const IsAnnual: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<Checkbox editing={editing} renderingLabels={['年化', '非年化']} />)}
       </FormItem>
     );

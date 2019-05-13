@@ -1,20 +1,14 @@
 import {
+  KNOCK_DIRECTION_OPTIONS,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  PREMIUM_TYPE_MAP,
-  RULES_REQUIRED,
-  STRIKE_TYPES_MAP,
-  REBATETYPE_TYPE_OPTIONS,
-  KNOCK_DIRECTION_OPTIONS,
 } from '@/constants/common';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
+import { Icon, Tooltip } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import { Tooltip, Icon } from 'antd';
 import React from 'react';
 
 export const KnockDirection: ILegColDef = {
@@ -46,7 +40,7 @@ export const KnockDirection: ILegColDef = {
             arrowPointAtCenter={true}
           >
             {form.getFieldDecorator({
-              rules: RULES_REQUIRED,
+              rules: [getRequiredRule()],
             })(
               <Select defaultOpen={editing} editing={editing} options={KNOCK_DIRECTION_OPTIONS} />
             )}
@@ -63,7 +57,7 @@ export const KnockDirection: ILegColDef = {
           </Tooltip>
         ) : (
           form.getFieldDecorator({
-            rules: RULES_REQUIRED,
+            rules: [getRequiredRule()],
           })(<Select defaultOpen={editing} editing={editing} options={KNOCK_DIRECTION_OPTIONS} />)
         )}
       </FormItem>
