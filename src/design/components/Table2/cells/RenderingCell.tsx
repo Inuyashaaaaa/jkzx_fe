@@ -15,7 +15,9 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
     const newVal = this.getValue();
     if (this.props.cellApi.valueHasChanged()) {
       setTimeout(() => {
-        this.props.cellApi.$cell.classList.add('tongyu-cell-diff');
+        if (this.props.cellApi.$cell) {
+          this.props.cellApi.$cell.classList.add('tongyu-cell-diff');
+        }
 
         if (this.cn) {
           clearTimeout(this.cn);
@@ -23,7 +25,9 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
         }
         this.cn = setTimeout(() => {
           this.cn = null;
-          this.props.cellApi.$cell.classList.remove('tongyu-cell-diff');
+          if (this.props.cellApi.$cell) {
+            this.props.cellApi.$cell.classList.remove('tongyu-cell-diff');
+          }
         }, 500);
       });
     }

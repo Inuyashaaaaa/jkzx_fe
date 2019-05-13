@@ -19,6 +19,7 @@ const UN_EDITDIR = [
   LEG_FIELD.EXPIRATION_DATE,
   LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   LEG_FIELD.NOTIONAL_AMOUNT,
+  LEG_FIELD.ALREADY_BARRIER,
 ];
 
 export interface IAmendModalEl {
@@ -81,7 +82,6 @@ const AmendModal = memo<IAmendModal>(props => {
           },
         });
         setConfirmLoading(false);
-
         if (error) return;
 
         message.success('修改交易要素成功');
