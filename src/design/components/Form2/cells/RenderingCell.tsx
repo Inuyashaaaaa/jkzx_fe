@@ -9,7 +9,9 @@ class RenderingCell extends PureComponent<IFormCellProps> {
     const newVal = this.getValue();
     if (this.props.cellApi.oldValue !== EMPTY_VALUE && this.props.cellApi.oldValue !== newVal) {
       setTimeout(() => {
-        this.props.cellApi.$cell.classList.add('tongyu-cell-diff');
+        if (this.props.cellApi.$cell) {
+          this.props.cellApi.$cell.classList.add('tongyu-cell-diff');
+        }
 
         if (this.cn) {
           clearTimeout(this.cn);
@@ -17,7 +19,9 @@ class RenderingCell extends PureComponent<IFormCellProps> {
         }
         this.cn = setTimeout(() => {
           this.cn = null;
-          this.props.cellApi.$cell.classList.remove('tongyu-cell-diff');
+          if (this.props.cellApi.$cell) {
+            this.props.cellApi.$cell.classList.remove('tongyu-cell-diff');
+          }
         }, 500);
       });
     }

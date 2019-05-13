@@ -149,7 +149,7 @@ const TradeManagementBooking = props => {
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
-    <PageHeaderWrapper>
+    <PageHeaderWrapper back={true}>
       {tableLoading ? (
         <Skeleton active={true} paragraph={{ rows: 4 }} />
       ) : (
