@@ -17,6 +17,7 @@ import {
   wkAttachmentProcessInstanceModify,
   wkProcessGet,
   wkProcessInstanceCreate,
+  wkAttachmentCreateOrUpdate,
 } from '@/services/approval';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
 import { getLegByRecord } from '@/tools';
@@ -26,6 +27,8 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import './index.less';
+import ImportExcelButton from '@/lib/components/_ImportExcelButton';
+import router from 'umi/router';
 
 const ActionBar = memo<any>(props => {
   const { setTableData, tableData, tableEl, currentUser } = props;
@@ -47,6 +50,7 @@ const ActionBar = memo<any>(props => {
   const transactionHandleOk = () => {
     setTransactionModalVisible(false);
     handelTrdTradeCreate();
+    router.push('/approval-process/process-manangement');
   };
 
   const transactionHandleCancel = () => {
@@ -89,15 +93,6 @@ const ActionBar = memo<any>(props => {
       });
       if (aerror) return;
     }
-
-    // const { error } = await trdTradeCreate({
-    //   trade,
-    //   validTime: '2018-01-01T10:10:10',
-    // });
-
-    // if (error) return;
-
-    // message.success('簿记成功');
   };
 
   const [fileList, setFileList] = useState([]);
