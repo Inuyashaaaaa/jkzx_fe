@@ -29,6 +29,7 @@ import {
 } from '@/services/approval';
 import ImportExcelButton from '@/lib/components/_ImportExcelButton';
 import { getToken } from '@/lib/utils/authority';
+import router from 'umi/router';
 
 const ActionBar = memo<any>(props => {
   const { setTableData, tableData, tableEl, currentUser } = props;
@@ -50,6 +51,7 @@ const ActionBar = memo<any>(props => {
   const transactionHandleOk = () => {
     setTransactionModalVisible(false);
     handelTrdTradeCreate();
+    router.push('/approval-process/process-manangement');
   };
 
   const transactionHandleCancel = () => {
@@ -92,15 +94,6 @@ const ActionBar = memo<any>(props => {
       });
       if (aerror) return;
     }
-
-    // const { error } = await trdTradeCreate({
-    //   trade,
-    //   validTime: '2018-01-01T10:10:10',
-    // });
-
-    // if (error) return;
-
-    // message.success('簿记成功');
   };
 
   const [fileList, setFileList] = useState([]);

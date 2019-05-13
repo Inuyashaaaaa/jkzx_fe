@@ -11,6 +11,7 @@ import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
+import router from 'umi/router';
 
 class ClientManagementDiscrepancyManagement extends PureComponent {
   public $form: Form = null;
@@ -130,7 +131,8 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       }),
       () => {
         message.success(data.processInstanceId ? '已进入流程' : '资金录入成功');
-        this.fetchTable();
+        router.push('/approval-process/process-manangement');
+        // this.fetchTable();
       }
     );
   };
