@@ -313,6 +313,7 @@ class SwitchCell extends PureComponent<
       return;
     }
     // 不在编辑状态，但是处在active状态
+    // 本次事件触发修改了 next cell 的状态，next cell 的事件还没有触发
     setTimeout(() => {
       this.saveCell();
     });
@@ -330,7 +331,10 @@ class SwitchCell extends PureComponent<
       return;
     }
     // 不在编辑状态，但是处在active状态
-    this.nextCellStartEditing(TABLE_ARROW_KEY_CODE_MAP.NEXT);
+    // 本次事件触发修改了 next cell 的状态，next cell 的事件还没有触发
+    setTimeout(() => {
+      this.nextCellStartEditing(TABLE_ARROW_KEY_CODE_MAP.NEXT);
+    });
   };
 
   public onStopActive = self => {
