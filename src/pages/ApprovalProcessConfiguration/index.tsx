@@ -101,7 +101,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       }
       return item;
     });
-    taskData = taskData.concat([editTask]);
+    taskData = taskData.concat(editTask);
 
     this.setState({
       loading: false,
