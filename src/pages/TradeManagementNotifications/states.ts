@@ -2,7 +2,7 @@ import { IFormControl } from '@/design/components/Form/types';
 import _ from 'lodash';
 import { HOLIDAY_FORMAT } from './constants';
 
-export const createFormControls: (data: any[]) => IFormControl[] = tableDataSource => [
+export const useCreateFormControls = ({ tableDataSource }) => [
   {
     field: 'holiday',
     control: {
