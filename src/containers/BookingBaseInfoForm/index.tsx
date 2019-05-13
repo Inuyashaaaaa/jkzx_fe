@@ -226,7 +226,7 @@ const BookingBaseInfoForm = memo<any>(props => {
         </Loading>
       </Modal>
       <Form2
-        ref={node => currentCreateFormRef(node)}
+        ref={node => (currentCreateFormRef ? currentCreateFormRef(node) : null)}
         columnNumberOneRow={columnNumberOneRow}
         footer={false}
         dataSource={createFormData}
