@@ -90,6 +90,7 @@ const BookingBaseInfoForm = memo<any>(props => {
             setCreateFormData(pre => ({
               ...pre,
               counterPartyCode: undefined,
+              salesCode: undefined,
             }));
             setModalVisible(false);
           },
