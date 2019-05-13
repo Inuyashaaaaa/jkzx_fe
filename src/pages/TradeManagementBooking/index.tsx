@@ -163,7 +163,7 @@ const ActionBar = memo<any>(props => {
               onCancel: () => setCreateModalVisible(false),
               children: (
                 <BookingBaseInfoForm
-                  ref={node => {
+                  currentCreateFormRef={node => {
                     currentCreateFormRef = node;
                   }}
                   editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
