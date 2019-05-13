@@ -26,7 +26,11 @@ export const IsAnnual: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<Checkbox editing={editing} renderingLabels={['年化', '非年化']} />)}
+        })(
+          <Checkbox editing={editing} renderingLabels={['年化', '非年化']}>
+            {val ? '年化' : '非年化'}
+          </Checkbox>
+        )}
       </FormItem>
     );
   },
