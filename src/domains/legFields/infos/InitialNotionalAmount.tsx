@@ -33,7 +33,7 @@ export const InitialNotionalAmount: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<UnitInputNumber editing={false} {...getProps()} />)}
       </FormItem>
     );

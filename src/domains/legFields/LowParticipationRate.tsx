@@ -1,6 +1,6 @@
 import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP, UNIT_ENUM_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -26,7 +26,7 @@ export const LowParticipationRate: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />)}
       </FormItem>
     );

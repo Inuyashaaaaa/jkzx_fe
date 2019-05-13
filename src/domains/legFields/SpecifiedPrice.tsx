@@ -8,7 +8,7 @@ import {
   SPECIFIED_PRICE_ZHCN_MAP,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -53,7 +53,7 @@ export const SpecifiedPrice: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           <Select
             {...getProps(record)}

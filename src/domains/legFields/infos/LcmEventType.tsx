@@ -20,7 +20,7 @@ export const LcmEventType: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<Select editing={false} options={LCM_EVENT_TYPE_OPTIONS} />)}
       </FormItem>
     );

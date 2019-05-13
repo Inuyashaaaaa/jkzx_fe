@@ -1,5 +1,6 @@
-import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
+import { LEG_FIELD } from '@/constants/common';
 import { InputNumber } from '@/design/components';
+import { getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -15,7 +16,7 @@ export const UnderlyerMultiplier: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<InputNumber editing={false} />)}
       </FormItem>
     );

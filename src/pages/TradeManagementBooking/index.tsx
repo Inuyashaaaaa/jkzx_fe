@@ -11,24 +11,23 @@ import { Form2, ModalButton, Upload } from '@/design/components';
 import { IFormField } from '@/design/components/type';
 import { insert, remove, uuid } from '@/design/utils';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { getToken } from '@/lib/utils/authority';
+import {
+  UPLOAD_URL,
+  wkAttachmentProcessInstanceModify,
+  wkProcessGet,
+  wkProcessInstanceCreate,
+  wkAttachmentCreateOrUpdate,
+} from '@/services/approval';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
-import { trdTradeCreate } from '@/services/trade-service';
 import { getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Affix, Button, Divider, Menu, message, Row, Modal, Icon, Alert } from 'antd';
+import { Affix, Alert, Button, Divider, Menu, message, Modal, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import './index.less';
-import {
-  wkProcessGet,
-  wkProcessInstanceCreate,
-  wkAttachmentCreateOrUpdate,
-  wkAttachmentProcessInstanceModify,
-  UPLOAD_URL,
-} from '@/services/approval';
 import ImportExcelButton from '@/lib/components/_ImportExcelButton';
-import { getToken } from '@/lib/utils/authority';
 import router from 'umi/router';
 
 const ActionBar = memo<any>(props => {

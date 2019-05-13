@@ -9,7 +9,7 @@ import { InputNumber, Select } from '@/design/components';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
-import { getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import _ from 'lodash';
 
 export const UpObservationStep: ILegColDef = {
@@ -29,7 +29,7 @@ export const UpObservationStep: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           <Select
             defaultOpen={true}

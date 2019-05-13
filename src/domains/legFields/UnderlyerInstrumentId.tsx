@@ -1,7 +1,7 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { Input, Select } from '@/design/components';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -25,7 +25,7 @@ export const UnderlyerInstrumentId: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           editing ? (
             <Select

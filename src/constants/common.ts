@@ -181,10 +181,10 @@ export const EVENT_TYPE_MAP = {
 };
 
 export const EVENT_TYPE_ZHCN_MAP = {
-  EXPIRATION: '到期',
-  KNOCK_OUT: '敲出',
+  EXPIRATION: '到期提醒',
+  KNOCK_OUT: '敲出提醒',
   // PAYMENT: '支付',
-  OBSERVE: '观察',
+  OBSERVE: '观察提醒',
 };
 
 export const EVENT_TYPE_OPTIONS = convertOptions(EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP);
