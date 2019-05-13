@@ -553,7 +553,7 @@ class ApprovalForm extends PureComponent<any, any> {
               ]}
             />
             <Divider type="horizontal" />
-            {_data.status === '待审批' || _data.status === '审核完成' ? (
+            {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
               <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
                 <Button
                   style={{ marginRight: '20px' }}
