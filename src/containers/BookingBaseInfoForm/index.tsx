@@ -24,6 +24,7 @@ const BookingBaseInfoForm = memo<any>(props => {
     setCreateFormData,
     editableStatus = FORM_EDITABLE_STATUS.EDITING_NO_CONVERT,
     columnNumberOneRow = 1,
+    currentCreateFormRef,
   } = props;
   const [tradeInfo, settradeInfo] = useState({});
   const [tradeTableData, settradeTableData] = useState([]);
@@ -225,6 +226,7 @@ const BookingBaseInfoForm = memo<any>(props => {
         </Loading>
       </Modal>
       <Form2
+        ref={node => currentCreateFormRef(node)}
         columnNumberOneRow={columnNumberOneRow}
         footer={false}
         dataSource={createFormData}
@@ -255,7 +257,14 @@ const BookingBaseInfoForm = memo<any>(props => {
             render: (val, record, index, { form, editing }) => {
               return (
                 <FormItem>
-                  {form.getFieldDecorator()(
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '交易簿为必填项',
+                      },
+                    ],
+                  })(
                     <Select
                       {...{
                         editing,
@@ -287,9 +296,14 @@ const BookingBaseInfoForm = memo<any>(props => {
             render: (val, record, index, { form, editing }) => {
               return (
                 <FormItem>
-                  {form.getFieldDecorator()(
-                    <Input editing={editing} autoSelect={editing ? false : true} />
-                  )}
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '交易编号为必填项',
+                      },
+                    ],
+                  })(<Input editing={editing} autoSelect={editing ? false : true} />)}
                 </FormItem>
               );
             },
@@ -304,7 +318,14 @@ const BookingBaseInfoForm = memo<any>(props => {
                   {editing ? (
                     <>
                       <InputGroup compact={true}>
-                        {form.getFieldDecorator()(
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: true,
+                              message: '交易对手为必填项',
+                            },
+                          ],
+                        })(
                           <Select
                             {...{
                               style: {
@@ -360,7 +381,14 @@ const BookingBaseInfoForm = memo<any>(props => {
               return (
                 <Loading loading={tradeBaseLoading}>
                   <FormItem>
-                    {form.getFieldDecorator()(<Input editing={editing} disabled={true} />)}
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '销售为必填项',
+                        },
+                      ],
+                    })(<Input editing={editing} disabled={true} />)}
                   </FormItem>
                 </Loading>
               );
@@ -373,7 +401,14 @@ const BookingBaseInfoForm = memo<any>(props => {
             render: (value, record, index, { form, editing }) => {
               return (
                 <FormItem>
-                  {form.getFieldDecorator()(
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '交易日为必填项',
+                      },
+                    ],
+                  })(
                     <DatePicker
                       editing={editing}
                       format="YYYY-MM-DD"
