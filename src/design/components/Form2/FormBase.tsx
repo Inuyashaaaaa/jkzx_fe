@@ -40,13 +40,18 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
   };
 
   public validate = async (
-    options = {},
+    options: any = {},
     fieldNames = this.props.columns.map(item => item.dataIndex)
   ) => {
+    const { silence, scroll, ...rest } = options;
     return new Promise<{ error: boolean; values: any }>((resolve, reject) => {
-      this.props.form.validateFieldsAndScroll(fieldNames, options, (error, values) => {
-        resolve({ error, values });
-      });
+      this.props.form[scroll ? 'validateFieldsAndScroll' : 'validateFields'](
+        fieldNames,
+        rest,
+        (error, values) => {
+          resolve({ error, values });
+        }
+      );
     });
   };
 
