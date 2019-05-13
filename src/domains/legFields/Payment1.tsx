@@ -1,17 +1,9 @@
-import {
-  LEG_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
-  PREMIUM_TYPE_MAP,
-  RULES_REQUIRED,
-  STRIKE_TYPES_MAP,
-} from '@/constants/common';
+import { LEG_FIELD, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
 import React from 'react';
 
 export const Payment1: ILegColDef = {
@@ -38,7 +30,7 @@ export const Payment1: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
       </FormItem>
     );
