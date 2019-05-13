@@ -1,6 +1,6 @@
 import { LEG_FIELD, PREMIUM_TYPE_MAP, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -37,7 +37,7 @@ export const FrontPremium: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           <UnitInputNumber
             autoSelect={isBooking || isPricing}

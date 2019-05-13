@@ -17,7 +17,7 @@ import { IColumnDef } from '@/design/components/Table/types';
 import { InputBase } from '@/design/components/type';
 import { remove } from '@/design/utils';
 import { qlDateScheduleCreate } from '@/services/quant-service';
-import { getLegEnvs, isAsian, isRangeAccruals } from '@/tools';
+import { getLegEnvs, isAsian, isRangeAccruals, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { getMoment } from '@/utils';
 import { Button, Col, message, Row } from 'antd';
@@ -452,7 +452,7 @@ export const ObservationDates: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<ObserveModalInput editing={editing} record={record} />)}
       </FormItem>
     );

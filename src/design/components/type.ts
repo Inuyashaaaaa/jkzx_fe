@@ -37,13 +37,18 @@ export interface ITableData {
   [key: string]: IFormField | any;
 }
 
-export interface IColDef {
+export interface IColDef<T> {
   title?: any;
-  render?: any;
   dataIndex?: string;
+  render?: (
+    value: any,
+    record: T,
+    index: number,
+    params: IRenderOptions<IColDef<T>>
+  ) => React.ReactNode;
 }
 
-export interface IRenderOptions<T = any, C = IColDef> {
+export interface IRenderOptions<C = any> {
   form?: Omit<WrappedFormUtils, 'getFieldDecorator'> & {
     getFieldDecorator<T extends object>(
       id: keyof T,
@@ -57,21 +62,23 @@ export interface IRenderOptions<T = any, C = IColDef> {
   colDef?: C;
 }
 
-export interface IFormColDef<T = any> extends IColDef {
-  render?: (
-    value: any,
-    record: T,
-    index: number,
-    params: IRenderOptions<T, IFormColDef>
-  ) => React.ReactNode;
+export interface IFormColDef<T = any> extends IColDef<T> {
   /* 作用和 field 中的 label 一样，方便直接使用 table.columns 的数据 */
   title?: React.ReactNode;
   editable?: boolean;
   defaultEditing?: boolean;
   editing?: boolean;
+  render?: (
+    value: any,
+    record: T,
+    index: number,
+    params: IRenderOptions<IFormColDef<T>>
+  ) => React.ReactNode;
 }
 
-export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 'render' | 'onCell'> {
+export interface ITableColDef<T = any>
+  extends IColDef<T>,
+    Omit<ColumnProps<T>, 'render' | 'onCell'> {
   // totalable?: boolean | ((params: { totalData: number; record: object }) => number);
   title?: React.ReactNode;
   defaultEditing?:
@@ -101,12 +108,6 @@ export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 're
           colDef: ITableColDef<T>;
         }
       ) => boolean);
-  render?: (
-    value: any,
-    record: T,
-    index: number,
-    params: IRenderOptions<T, ITableColDef<T>>
-  ) => React.ReactNode;
   onCell?: (
     record: T,
     index: number,
@@ -114,6 +115,12 @@ export interface ITableColDef<T = any> extends IColDef, Omit<ColumnProps<T>, 're
       colDef: ITableColDef<T>;
     }
   ) => any;
+  render?: (
+    value: any,
+    record: T,
+    index: number,
+    params: IRenderOptions<ITableColDef<T>>
+  ) => React.ReactNode;
 }
 
 export interface IFormCellProps<T = IFormData> {

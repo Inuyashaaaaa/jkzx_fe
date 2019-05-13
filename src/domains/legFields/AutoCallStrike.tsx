@@ -8,7 +8,7 @@ import {
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/design/components';
-import { getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -45,7 +45,7 @@ export const AutoCallStrike: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
       </FormItem>
     );

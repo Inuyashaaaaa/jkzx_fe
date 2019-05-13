@@ -3,7 +3,7 @@ import { InputNumber, Select } from '@/design/components';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
-import { getLegEnvs } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 
 export const DownBarrierOptionsStrikeType: ILegColDef = {
   title: '敲入期权行权价类型',
@@ -21,7 +21,7 @@ export const DownBarrierOptionsStrikeType: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<Select defaultOpen={true} editing={editing} options={UNIT_ENUM_OPTIONS2} />)}
       </FormItem>
     );

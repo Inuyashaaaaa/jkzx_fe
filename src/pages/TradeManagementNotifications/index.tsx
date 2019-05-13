@@ -1,22 +1,17 @@
+import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
+import { Form2, Select } from '@/design/components';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { removeCalendar } from '@/services/calendars';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
+import { DatePicker, Divider, Table, Icon, Tooltip } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import produce from 'immer';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import Calendars from './Calendars';
-import { DEFAULT_CALENDAR, SEARCH_FORM_DEFS, TABLE_COLUMN_DEFS } from './constants';
-import { Form2, Select } from '@/design/components';
-import { Divider, Table, DatePicker } from 'antd';
-import {
-  EVENT_TYPE_OPTIONS,
-  INPUT_NUMBER_DATE_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  PRODUCT_TYPE_OPTIONS,
-} from '@/constants/common';
-import FormItem from 'antd/lib/form/FormItem';
+import { DEFAULT_CALENDAR } from './constants';
 
 const { RangePicker } = DatePicker;
 
@@ -209,15 +204,22 @@ class TradeManagementNotifications extends PureComponent<any, any> {
               dataSource={this.state.tableDataSource}
               columns={[
                 {
-                  title: '事件类型',
+                  title: () => (
+                    <span>
+                      <span>事件类型</span>
+                      <Tooltip title="当标的物价格与障碍价相差不足10%，会触发敲出提醒">
+                        <Icon style={{ paddingLeft: 2 }} type="question-circle" theme="twoTone" />
+                      </Tooltip>
+                    </span>
+                  ),
                   dataIndex: 'notificationEventType',
                   fixed: 'left',
                   width: 200,
-                  render: (text, record, index) => {
-                    const i = _.findIndex(EVENT_TYPE_OPTIONS, option => {
+                  render: (text, record) => {
+                    const find = _.find(EVENT_TYPE_OPTIONS, option => {
                       return option.value === text;
                     });
-                    return EVENT_TYPE_OPTIONS[i].label;
+                    return find.label;
                   },
                 },
                 {

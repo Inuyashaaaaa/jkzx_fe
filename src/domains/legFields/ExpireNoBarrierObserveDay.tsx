@@ -18,7 +18,14 @@ import { IColumnDef } from '@/design/components/Table/types';
 import { InputBase } from '@/design/components/type';
 import { remove } from '@/design/utils';
 import { qlDateScheduleCreate } from '@/services/quant-service';
-import { getLegEnvs, isAsian, isAutocallPhoenix, isAutocallSnow, isRangeAccruals } from '@/tools';
+import {
+  getLegEnvs,
+  isAsian,
+  isAutocallPhoenix,
+  isAutocallSnow,
+  isRangeAccruals,
+  getRequiredRule,
+} from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { getMoment } from '@/utils';
 import { Button, Col, message, Row } from 'antd';
@@ -413,7 +420,7 @@ export const ExpireNoBarrierObserveDay: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           <ObserveModalInput editing={editing} record={record} direction={KNOCK_DIRECTION_MAP.UP} />
         )}
