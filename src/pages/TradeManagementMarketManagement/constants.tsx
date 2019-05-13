@@ -1,87 +1,16 @@
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import {
+  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
+  EQUITY_EXCHANGE_ZHCN_MAP,
+  COMMODITY_EXCHANGE_ZHCN_MAP,
+  ASSET_CLASS_ZHCN_MAP,
+  INSTRUMENT_TYPE_ZHCN_MAP,
+} from '@/constants/common';
 import { IFormControl } from '@/lib/components/_Form2';
 import { IColumnDef } from '@/lib/components/_Table2';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { getDate, getUnit } from '@/tools/format';
-export const TABLE_COLUMN_DEFS: IColumnDef[] = [
-  {
-    headerName: '标的物代码',
-    field: 'instrumentId',
-    width: 100,
-    pinned: 'left',
-    // checkboxSelection: true,
-  },
-  {
-    headerName: '标的物名称',
-    field: 'instrumentName',
-    width: 100,
-  },
-  {
-    headerName: '买价',
-    field: 'bid',
-    width: 100,
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  },
-  {
-    headerName: '卖价',
-    field: 'ask',
-    width: 100,
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  },
-  {
-    headerName: '最新成交价',
-    field: 'last',
-    width: 100,
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  },
-  {
-    headerName: '时间戳',
-    field: 'intradayQuoteTimestamp',
-    width: 160,
-    input: {
-      type: 'date',
-      format: 'YYYY-MM-DD HH:mm:ss',
-    },
-  },
-  {
-    headerName: '今收',
-    field: 'close',
-    width: 100,
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  },
-  {
-    headerName: '昨收',
-    field: 'yesterdayClose',
-    width: 100,
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  },
-  {
-    headerName: '交易所',
-    field: 'exchange',
-    width: 100,
-  },
-  {
-    headerName: '合约乘数',
-    field: 'multiplier',
-    width: 100,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '资产类别',
-    field: 'assetClass',
-    width: 100,
-  },
-  {
-    headerName: '合约类型',
-    field: 'instrumentType',
-    width: 100,
-  },
-  {
-    headerName: '合约到期日',
-    field: 'maturity',
-    width: 100,
-  },
-];
+import { formatNumber } from '@/tools';
 
 export const searchFormControls: (markets) => IFormControl[] = markets => [
   {
@@ -104,119 +33,83 @@ export const searchFormControls: (markets) => IFormControl[] = markets => [
       },
     },
   },
-  // {
-  //   dataIndex: 'valuationDate',
-  //   control: {
-  //     label: '估值日',
-  //   },
-  //   input: {
-  //     type: 'date',
-  //     range: 'day',
-  //   },
-  // },
-  // {
-  //   dataIndex: '时区',
-  //   control: {
-  //     label: '时区',
-  //   },
-  //   input: {
-  //     type: 'select',
-  //     options: [
-  //       {
-  //         label: 'label',
-  //         value: 'value',
-  //       },
-  //     ],
-  //   },
-  // },
 ];
 
 export const columns: IColumnDef[] = [
   {
     title: '标的物代码',
     dataIndex: 'instrumentId',
-    key: 1,
     fixed: 'left',
+    width: 150,
   },
   {
     title: '标的物名称',
     dataIndex: 'instrumentName',
-    key: 2,
+    width: 150,
   },
   {
-    title: '买价',
+    title: '买价 (¥)',
     dataIndex: 'bid',
-    key: 3,
-    render: (text, record, index) => {
-      return getUnit('￥', text);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
-    title: '卖价',
+    title: '卖价 (¥)',
     dataIndex: 'ask',
-    key: 4,
-    render: (text, record, index) => {
-      return getUnit('￥', text);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
-    title: '最新成交价',
+    title: '最新成交价 (¥)',
     dataIndex: 'last',
-    key: 5,
-    render: (text, record, index) => {
-      return getUnit('￥', text);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '时间戳',
     dataIndex: 'intradayQuoteTimestamp',
-    key: 6,
-    render: (text, record, index) => {
-      return getDate(text);
+    render: (value, record, index) => {
+      return getDate(value);
     },
+    width: 200,
   },
   {
-    title: '今收',
+    title: '今收 (¥)',
     dataIndex: 'close',
-    key: 7,
-    render: (text, record, index) => {
-      return getUnit('￥', text);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
-    title: '昨收',
+    title: '昨收 (¥)',
     dataIndex: 'yesterdayClose',
-    key: 8,
-    render: (text, record, index) => {
-      return getUnit('￥', text);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '交易所',
     dataIndex: 'exchange',
-    key: 9,
+    render: (value, record, index) => {
+      return {
+        ...EQUITY_EXCHANGE_ZHCN_MAP,
+        ...COMMODITY_EXCHANGE_ZHCN_MAP,
+      }[value];
+    },
+    width: 150,
   },
   {
     title: '合约乘数',
     dataIndex: 'multiplier',
-    key: 10,
-    render: (text, record, index) => {
-      return getUnit(' ', text);
-    },
-  },
-  {
-    title: '资产类别',
-    dataIndex: 'assetClass',
-    key: 11,
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 150,
   },
   {
     title: '合约类型',
     dataIndex: 'instrumentType',
-    key: 12,
+    render: (value, record, index) => INSTRUMENT_TYPE_ZHCN_MAP[value],
+    width: 150,
   },
   {
     title: '合约到期日',
     dataIndex: 'maturity',
-    key: 13,
   },
 ];

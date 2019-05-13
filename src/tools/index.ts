@@ -295,8 +295,16 @@ export const formatNumber = (
   return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
 };
 
-export const formatMoney = (value, unit = '', space = false) => {
-  return formatNumber(value, null, null, {
+export const formatMoney = (
+  value,
+  config?: {
+    unit?: string;
+    space?: boolean;
+    decimalPlaces?: number;
+  }
+) => {
+  const { unit = '', space = false, decimalPlaces = 4 } = config;
+  return formatNumber(value, decimalPlaces, null, {
     // the decimal separator
     decimalSeparator: '.',
     // the grouping separator of the integer part

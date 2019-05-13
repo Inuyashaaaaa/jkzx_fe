@@ -1,32 +1,56 @@
-import { IColumnDef } from '@/lib/components/_Table2/interface';
+import { formatNumber } from '@/tools';
+import {
+  EQUITY_EXCHANGE_ZHCN_MAP,
+  COMMODITY_EXCHANGE_ZHCN_MAP,
+  ASSET_CLASS_ZHCN_MAP,
+  INSTRUMENT_TYPE_ZHCN_MAP,
+} from '@/constants/common';
+import React from 'react';
+import Operation from './Operation';
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = fetchTable => [
   {
-    headerName: '标的物代码',
-    field: 'instrumentId',
+    title: '标的物代码',
+    dataIndex: 'instrumentId',
   },
   {
-    headerName: '标的物名称',
-    field: 'name',
+    title: '标的物名称',
+    dataIndex: 'name',
   },
   {
-    headerName: '交易所',
-    field: 'exchange',
+    title: '交易所',
+    dataIndex: 'exchange',
+    render: (value, record, index) => {
+      return {
+        ...EQUITY_EXCHANGE_ZHCN_MAP,
+        ...COMMODITY_EXCHANGE_ZHCN_MAP,
+      }[value];
+    },
   },
   {
-    headerName: '资产类别',
-    field: 'assetClass',
+    title: '资产类别',
+    dataIndex: 'assetClass',
+    render: (value, record, index) => ASSET_CLASS_ZHCN_MAP[value],
   },
   {
-    headerName: '合约类型',
-    field: 'instrumentType',
+    title: '合约类型',
+    dataIndex: 'instrumentType',
+    render: (value, record, index) => INSTRUMENT_TYPE_ZHCN_MAP[value],
   },
   {
-    headerName: '合约乘数',
-    field: 'multiplier',
+    title: '合约乘数',
+    dataIndex: 'multiplier',
+    render: (value, record, index) => formatNumber(value, 4),
   },
   {
-    headerName: '期货到期日',
-    field: 'maturity',
+    title: '期货到期日',
+    dataIndex: 'maturity',
+  },
+  {
+    dataIndex: 'operation',
+    title: '操作',
+    render: (value, record, index) => {
+      return <Operation record={record} fetchTable={fetchTable} />;
+    },
   },
 ];

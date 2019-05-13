@@ -1,6 +1,6 @@
 import { LEG_ID_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { LEG_ENV } from '@/constants/legs';
+import { LEG_ENV, TOTAL_EDITING_FIELDS, ILegColDef } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
@@ -72,6 +72,7 @@ const TradeManagementBooking = props => {
       ),
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
+
     const { positions } = _.get(data, 'process._business_payload.trade');
 
     setTableLoading(false);
@@ -187,6 +188,12 @@ const TradeManagementBooking = props => {
               });
             }}
             dataSource={tableData}
+            chainColumns={(columns: ILegColDef[]) => {
+              const totalFields = TOTAL_EDITING_FIELDS.map(item => item.dataIndex);
+              return columns.filter(item => {
+                return !totalFields.includes(item.dataIndex);
+              });
+            }}
           />
         </>
       )}

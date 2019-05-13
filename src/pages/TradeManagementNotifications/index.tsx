@@ -8,6 +8,17 @@ import moment from 'moment';
 import React, { PureComponent } from 'react';
 import Calendars from './Calendars';
 import { DEFAULT_CALENDAR, SEARCH_FORM_DEFS, TABLE_COLUMN_DEFS } from './constants';
+import { Form2, Select } from '@/design/components';
+import { Divider, Table, DatePicker } from 'antd';
+import {
+  EVENT_TYPE_OPTIONS,
+  INPUT_NUMBER_DATE_CONFIG,
+  INPUT_NUMBER_DIGITAL_CONFIG,
+  PRODUCT_TYPE_OPTIONS,
+} from '@/constants/common';
+import FormItem from 'antd/lib/form/FormItem';
+
+const { RangePicker } = DatePicker;
 
 class TradeManagementNotifications extends PureComponent<any, any> {
   public $sourceTable: SourceTable = null;
@@ -20,7 +31,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
       open: true,
       tableDataSource: [],
       visible: false,
-      searchFormData: this.getInitialSearchFormData(),
+      searchFormData: Form2.createFields(this.getInitialSearchFormData()),
     };
   }
 
@@ -36,10 +47,10 @@ class TradeManagementNotifications extends PureComponent<any, any> {
   };
 
   public getNotificationEventType = type => {
-    if (type === 'all') {
+    if (type.value === 'all') {
       return '';
     }
-    return type;
+    return type.value;
   };
 
   public onFetch = async () => {
@@ -48,10 +59,9 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     });
 
     const { searchFormData } = this.state;
-
     const { error, data } = await traTradeLCMNotificationSearch({
-      after: searchFormData.date[0].format('YYYY-MM-DD'),
-      before: searchFormData.date[1].format('YYYY-MM-DD'),
+      after: _.get(searchFormData, 'date.value[0]').format('YYYY-MM-DD'),
+      before: _.get(searchFormData, 'date.value[1]').format('YYYY-MM-DD'),
       notificationEventType: this.getNotificationEventType(searchFormData.notificationEventType),
     });
 
@@ -99,9 +109,12 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     );
   };
 
-  public onSearchFormChange = params => {
+  public onSearchFormChange = async (props, changedFields) => {
     this.setState({
-      searchFormData: params.values,
+      searchFormData: {
+        ...this.state.searchFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -114,9 +127,11 @@ class TradeManagementNotifications extends PureComponent<any, any> {
   public onReset = () => {
     this.setState(
       {
-        searchFormData: this.getInitialSearchFormData(),
+        searchFormData: Form2.createFields(this.getInitialSearchFormData()),
       },
-      () => this.onFetch()
+      () => {
+        this.onFetch();
+      }
     );
   };
 
@@ -138,20 +153,136 @@ class TradeManagementNotifications extends PureComponent<any, any> {
         onTabChange={this.onHeaderTabChange}
       >
         {this.state.activeTabKey === 'list' && (
-          <SourceTable
-            loading={this.state.loading}
-            searchable={true}
-            resetable={true}
-            onSearchButtonClick={this.onFetch}
-            onResetButtonClick={this.onReset}
-            rowKey="notificationUUID"
-            ref={node => (this.$sourceTable = node)}
-            searchFormData={this.state.searchFormData}
-            onSearchFormChange={this.onSearchFormChange}
-            columnDefs={TABLE_COLUMN_DEFS}
-            dataSource={this.state.tableDataSource}
-            searchFormControls={SEARCH_FORM_DEFS}
-          />
+          <div>
+            <Form2
+              ref={node => (this.$sourceTable = node)}
+              layout="inline"
+              dataSource={this.state.searchFormData}
+              submitText={`搜索`}
+              submitButtonProps={{
+                icon: 'search',
+              }}
+              onSubmitButtonClick={this.onFetch}
+              onResetButtonClick={this.onReset}
+              onFieldsChange={this.onSearchFormChange}
+              columns={[
+                {
+                  title: '选择日期',
+                  dataIndex: 'date',
+                  render: (value, record, index, { form, editing }) => {
+                    return <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>;
+                  },
+                },
+                {
+                  title: '事件类型',
+                  dataIndex: 'notificationEventType',
+                  render: (value, record, index, { form, editing }) => {
+                    return (
+                      <FormItem>
+                        {form.getFieldDecorator({})(
+                          <Select
+                            style={{ minWidth: 180 }}
+                            placeholder="请输入内容搜索"
+                            allowClear={true}
+                            showSearch={true}
+                            fetchOptionsOnSearch={true}
+                            options={[
+                              {
+                                label: '全部',
+                                value: 'all',
+                              },
+                              ...EVENT_TYPE_OPTIONS,
+                            ]}
+                          />
+                        )}
+                      </FormItem>
+                    );
+                  },
+                },
+              ]}
+            />
+            <Divider type="horizontal" />
+            <Table
+              scroll={{
+                x: 2300,
+              }}
+              dataSource={this.state.tableDataSource}
+              columns={[
+                {
+                  title: '事件类型',
+                  dataIndex: 'notificationEventType',
+                  fixed: 'left',
+                  width: 200,
+                  render: (text, record, index) => {
+                    const i = _.findIndex(EVENT_TYPE_OPTIONS, option => {
+                      return option.value === text;
+                    });
+                    return EVENT_TYPE_OPTIONS[i].label;
+                  },
+                },
+                {
+                  title: '事件日期',
+                  dataIndex: 'notificationTime',
+                  width: 200,
+                  render: (text, record, index) => {
+                    return text.split('T')[0];
+                  },
+                },
+                {
+                  title: '交易ID',
+                  dataIndex: 'tradeId',
+                },
+                {
+                  title: '持仓ID',
+                  dataIndex: 'positionId',
+                },
+                {
+                  title: '期权类型',
+                  dataIndex: 'productType',
+                  width: 200,
+                  render: (text, record, index) => {
+                    const i = _.findIndex(PRODUCT_TYPE_OPTIONS, option => {
+                      return option.value === text;
+                    });
+                    return PRODUCT_TYPE_OPTIONS[i].label;
+                  },
+                },
+                {
+                  title: '标的物',
+                  dataIndex: 'underlyerInstrumentId',
+                  width: 200,
+                },
+                {
+                  title: '当前价格 (¥)',
+                  dataIndex: 'underlyerPrice',
+                  width: 200,
+                  render: (text, record, index) => {
+                    return text ? text.toFixed(4) : text;
+                  },
+                },
+                {
+                  title: '障碍价 (¥)',
+                  dataIndex: 'barriers',
+                  width: 200,
+                },
+                {
+                  title: '支付类型',
+                  dataIndex: 'paymentType',
+                  width: 200,
+                },
+                {
+                  title: '支付金额 (¥)',
+                  dataIndex: 'payment',
+                  width: 200,
+                  render: (text, record, index) => {
+                    return text ? text.toFixed(4) : text;
+                  },
+                },
+              ]}
+              pagination={this.state.pagination}
+              loading={this.state.loading}
+            />
+          </div>
         )}
 
         {this.state.activeTabKey === 'calendars' && (

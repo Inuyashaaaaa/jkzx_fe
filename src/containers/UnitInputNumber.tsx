@@ -28,10 +28,10 @@ export const UnitInputNumber = memo<
       }
 
       if (typeof value === 'string' && value.endsWith('.')) {
-        return `${formatMoney(parsed, unit)}.`;
+        return `${formatMoney(parsed, { unit, decimalPlaces: null })}.`;
       }
 
-      return formatMoney(value, unit);
+      return formatMoney(value, { unit, decimalPlaces: null });
     };
     parser = value => parseMoney(value, unit);
   } else {
