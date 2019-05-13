@@ -554,7 +554,7 @@ class ApprovalForm extends PureComponent<any, any> {
               ]}
             />
             <Divider type="horizontal" />
-            {_data.status === '待审批' || _data.status === '审核完成' ? (
+            {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
               <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
                 <Button
                   style={{ marginRight: '20px' }}
@@ -723,7 +723,11 @@ class ApprovalForm extends PureComponent<any, any> {
           </div>
         )}
         <Modal
-          title="发起审批"
+          title={
+            _data.status === '待审批' || _data.status === '审核完成'
+              ? '查看合约详情'
+              : '修改合约详情'
+          }
           visible={this.state.bookEditVisible}
           onOk={this.bookEditHandleOk}
           onCancel={this.tbookEditCancel}
