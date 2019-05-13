@@ -6,6 +6,7 @@ import { TABLE_COL_DEFS } from './constants';
 const RiskManagerIntradayExpiringPositionReport = memo<any>(props => {
   return (
     <RiskCommonTable
+      id="real_time_expiring_position_dag"
       tableColDefs={TABLE_COL_DEFS}
       defaultSort={'tradeDate'}
       defaultDirection={'desc'}
