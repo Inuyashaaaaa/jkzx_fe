@@ -87,7 +87,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    let tabsData = processList.map(item => {
+    const tabsData = processList.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
