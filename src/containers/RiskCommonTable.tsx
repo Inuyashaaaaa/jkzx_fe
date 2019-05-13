@@ -13,6 +13,7 @@ import useLifecycles from 'react-use/lib/useLifecycles';
 const RiskCommonTable = memo<any>(props => {
   const form = useRef<Form2>(null);
   const {
+    id = 'real_time_valuation_dag',
     tableColDefs,
     searchFormControls,
     defaultSort,
@@ -189,11 +190,7 @@ const RiskCommonTable = memo<any>(props => {
         >
           导出Excel
         </DownloadExcelButton>
-        <ReloadGreekButton
-          fetchTable={fetchTable}
-          id="real_time_valuation_dag"
-          hideReload={hideReload}
-        />
+        <ReloadGreekButton fetchTable={fetchTable} id={id} hideReload={hideReload} />
       </Row>
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
         <Table

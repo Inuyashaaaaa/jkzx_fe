@@ -7,6 +7,7 @@ import { searchFormControls } from './services';
 const RiskManagerIntradayDailyPnlByUnderlyerReport = memo<any>(props => {
   return (
     <RiskCommonTable
+      id="real_time_pnl_dag"
       tableColDefs={TABLE_COL_DEFS}
       searchFormControls={searchFormControls}
       defaultSort={'bookName'}
