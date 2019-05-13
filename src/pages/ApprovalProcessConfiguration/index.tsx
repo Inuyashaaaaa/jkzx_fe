@@ -83,7 +83,7 @@ class ApprovalProcessConfiguration extends PureComponent {
 
     tabsData = _.concat(tabsData, fristData);
     let editTask = {};
-    let taskData = (taskApproveGroupList.data || []).map((item, index) => {
+    const taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
       if (item.taskType === '修改') {
         editTask = item;
