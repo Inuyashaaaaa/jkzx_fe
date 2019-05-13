@@ -92,10 +92,16 @@ class ApprovalProcessConfiguration extends PureComponent {
       return item;
     });
 
-    const taskData = (taskApproveGroupList.data || []).map((item, index) => {
+    let editTask = {};
+    let taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
+      if (item.taskType === '修改') {
+        editTask = item;
+        return null;
+      }
       return item;
     });
+    taskData = taskData.concat(editTask);
 
     this.setState({
       loading: false,
@@ -335,6 +341,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                         </span>
                       </List.Item>
                       {this.state.taskApproveGroupList.map((group, gIndex) => {
+                        if (!group) return;
                         return (
                           <List.Item key={group.taskId}>
                             <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>

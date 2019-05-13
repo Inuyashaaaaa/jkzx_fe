@@ -126,6 +126,7 @@ class ApprovalForm extends PureComponent<any, any> {
         data,
         'process._business_payload.trade.positions[0].counterPartyName'
       ),
+      trader: _.get(data, 'process._business_payload.trade.trader'),
     };
     this.setState({
       detailData: _detailData,
@@ -483,7 +484,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
                 {
                   title: '发起人',
-                  dataIndex: 'operatorName',
+                  dataIndex: `${!!_data.initiatorName ? 'initiatorName' : 'operatorName'}`,
                   render: (value, record, index, { form, editing }) => {
                     return <FormItem>{value}</FormItem>;
                   },
