@@ -105,12 +105,7 @@ class Operation extends PureComponent {
     const cloneDepartments = JSON.parse(JSON.stringify(departments));
 
     const array = this.toArray(cloneDepartments);
-    let dataSource = users.data.map(item => {
-      // const department = array.find(obj => obj.id === item.departmentId);
-      // item.departmentName = (department || {}).departmentName;
-      return item;
-    });
-    dataSource = dataSource.filter(item => {
+    dataSource = users.data.filter(item => {
       return !currentGroup.userList.find(items => item.username === items.username);
     });
 
