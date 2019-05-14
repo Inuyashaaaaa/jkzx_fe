@@ -26,6 +26,7 @@ const { TreeNode } = Tree;
 class ClientManagementSalesManagement extends PureComponent {
   public $subModalForm: Form2 = null;
   public $branchModalForm: Form2 = null;
+  public $refCreateFormModal: Form2 = null;
 
   public $sourceTable: SourceTable = null;
 
@@ -114,6 +115,8 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public onCreate = async () => {
+    const res = await this.$refCreateFormModal.validate();
+    if (res.error) return;
     this.setState({
       confirmLoading: true,
       visible: false,
@@ -464,6 +467,7 @@ class ClientManagementSalesManagement extends PureComponent {
                   }}
                   content={
                     <CreateFormModal
+                      refCreateFormModal={node => (this.$refCreateFormModal = node)}
                       dataSource={this.state.createFormData}
                       handleValueChange={this.handleValueChange}
                       branchSalesList={this.state.branchSalesList}
