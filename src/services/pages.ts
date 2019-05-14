@@ -159,6 +159,7 @@ export const getTradeCreateModalData = (apiData: any = {}) => {
   tableFormData.tradeId = apiData.tradeId;
   tableFormData.salesCode = apiData.salesCode;
   tableFormData.tradeDate = apiData.tradeDate;
+  tableFormData.comment = apiData.comment;
 
   return tableFormData;
 };
