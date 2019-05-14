@@ -17,6 +17,7 @@ before_script:
   - export PATH=/home/gitlab-runner/.nvm/versions/node/v10.15.3/bin:$PATH
   - node -v
   - yarn -v
+  - export
 
 # 安装依赖
 Install:
@@ -27,6 +28,7 @@ Install:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Lint:
   stage: test
@@ -36,6 +38,7 @@ Lint:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Test:
   stage: test
@@ -45,6 +48,7 @@ Test:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Build:
   stage: build
@@ -54,6 +58,7 @@ Build:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Deploy-Release:
   stage: deploy
@@ -69,10 +74,16 @@ Deploy-Test:
   only:
     - master-staging
 
+Deploy-Hotfix:
+  stage: deploy
+  script:
+    - yarn run deploy:hotfix
+  only:
+    - /hotfix.*/
+
 Deploy-Prod:
   stage: deploy
   script:
-    - export
     - yarn run deploy:prod
   when: manual
   only:
