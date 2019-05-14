@@ -73,7 +73,7 @@ const historyBuyAmount = {
   width: 150,
   title: '总买金额(￥)',
   render: (text, record, index) => {
-    return formatMoney(text);
+    return text ? formatMoney(text, {}) : text;
   },
 };
 
@@ -82,7 +82,7 @@ const historySellAmount = {
   width: 150,
   title: '总卖金额(￥)',
   render: (text, record, index) => {
-    return formatMoney(text);
+    return text ? formatMoney(text, {}) : text;
   },
 };
 
@@ -127,7 +127,7 @@ const marketValue = {
   width: 150,
   title: '市值(￥)',
   render: (text, record, index) => {
-    return formatMoney(text);
+    return text ? formatMoney(text, {}) : text;
   },
 };
 
