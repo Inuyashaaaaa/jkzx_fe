@@ -455,3 +455,25 @@ export async function clientAccountSearch(params = {}) {
     },
   });
 }
+
+// 禁用交易对手
+export async function refDisablePartyByLegalName(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refDisablePartyByLegalName',
+      params,
+    },
+  });
+}
+
+// 启用交易对手
+export async function refEnablePartyByLegalName(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refEnablePartyByLegalName',
+      params,
+    },
+  });
+}
