@@ -527,7 +527,9 @@ class ApprovalForm extends PureComponent<any, any> {
                   title: '交易日',
                   dataIndex: 'tradeDate',
                   render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
+                    return (
+                      <FormItem>{value.indexOf('T') >= 0 ? value.split('T')[0] : value}</FormItem>
+                    );
                   },
                 },
                 {
