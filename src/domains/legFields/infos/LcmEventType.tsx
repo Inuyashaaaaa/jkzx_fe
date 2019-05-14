@@ -4,6 +4,7 @@ import { Input, Select } from '@/design/components';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
+import { getRequiredRule } from '@/tools';
 
 export const LcmEventType: ILegColDef = {
   editable: record => {
@@ -20,7 +21,7 @@ export const LcmEventType: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(<Select editing={false} options={LCM_EVENT_TYPE_OPTIONS} />)}
       </FormItem>
     );

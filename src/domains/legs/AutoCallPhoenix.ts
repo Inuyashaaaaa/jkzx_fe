@@ -1,14 +1,12 @@
 import {
   ASSET_CLASS_MAP,
-  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   FREQUENCY_TYPE_MAP,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
   OB_DAY_FIELD,
-  PAYMENT_TYPE_MAP,
-  UP_BARRIER_TYPE_MAP,
   UNIT_ENUM_MAP2,
+  UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -28,6 +26,7 @@ import {
   ITableTriggerCellFieldsChangeParams,
 } from '@/design/components/type';
 import { ILeg } from '@/types/leg';
+import { getMoment } from '@/utils';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -37,15 +36,20 @@ import {
   SPECIFIED_PRICE_MAP,
 } from '../../constants/common';
 import { Direction } from '../legFields';
-import { AutoCallStrike } from '../legFields/AutoCallStrike';
-import { AutoCallStrikeUnit } from '../legFields/AutoCallStrikeUnit';
+import { AlreadyBarrier } from '../legFields/AlreadyBarrier';
+import { Coupon } from '../legFields/Coupon';
 import { CouponEarnings } from '../legFields/CouponEarnings';
 import { DaysInYear } from '../legFields/DaysInYear';
+import { DownBarrier } from '../legFields/DownBarrier';
+import { DownBarrierDate } from '../legFields/DownBarrierDate';
+import { DownBarrierOptionsStrike } from '../legFields/DownBarrierOptionsStrike';
+import { DownBarrierOptionsStrikeType } from '../legFields/DownBarrierOptionsStrikeType';
+import { DownBarrierOptionsType } from '../legFields/DownBarrierOptionsType';
+import { DownBarrierType } from '../legFields/DownBarrierType';
+import { DownObservationStep } from '../legFields/DownObservationStep';
 import { EffectiveDate } from '../legFields/EffectiveDate';
 import { ExpirationDate } from '../legFields/ExpirationDate';
 import { ExpireNoBarrierObserveDay } from '../legFields/ExpireNoBarrierObserveDay';
-import { ExpireNoBarrierPremium } from '../legFields/ExpireNoBarrierPremium';
-import { ExpireNoBarrierPremiumType } from '../legFields/ExpireNoBarrierPremiumType';
 import { FrontPremium } from '../legFields/FrontPremium';
 import { InitialSpot } from '../legFields/InitialSpot';
 import { KnockDirection } from '../legFields/KnockDirection';
@@ -57,7 +61,6 @@ import { Premium } from '../legFields/Premium';
 import { PremiumType } from '../legFields/PremiumType';
 import { SettlementDate } from '../legFields/SettlementDate';
 import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
-import { Step } from '../legFields/Step';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
@@ -65,17 +68,6 @@ import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
 import { commonLinkage } from '../tools';
-import { Coupon } from '../legFields/Coupon';
-import { DownBarrierType } from '../legFields/DownBarrierType';
-import { DownBarrierOptionsStrikeType } from '../legFields/DownBarrierOptionsStrikeType';
-import { DownBarrierOptionsStrike } from '../legFields/DownBarrierOptionsStrike';
-import { DownBarrierOptionsType } from '../legFields/DownBarrierOptionsType';
-import { DownObservationStep } from '../legFields/DownObservationStep';
-import { AlreadyBarrier } from '../legFields/AlreadyBarrier';
-import { DownBarrierDate } from '../legFields/DownBarrierDate';
-import { DownBarrier } from '../legFields/DownBarrier';
-import { getMoment } from '@/utils';
-import BigNumber from 'bignumber.js';
 
 export const AutoCallPhoenix: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX],

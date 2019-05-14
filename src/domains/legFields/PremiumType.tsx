@@ -8,7 +8,7 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -51,7 +51,7 @@ export const PremiumType: ILegColDef = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
+          rules: [getRequiredRule()],
         })(
           <Select
             {...getSelectProps(record)}
