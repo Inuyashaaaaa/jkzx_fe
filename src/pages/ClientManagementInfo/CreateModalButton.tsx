@@ -1322,8 +1322,13 @@ const CreateModalButton = memo<any>(props => {
                   return;
                 }
 
-                const res = await formRef.current.validate();
-                if (res.error) return;
+                const ref = currenStep === 3 ? tableEl : formRef;
+                const res = await ref.current.validate();
+                if (_.isArray(res)) {
+                  if (res.some(value => value.error)) return;
+                } else if (res.error) {
+                  return;
+                }
 
                 if (
                   currenStep === 0 &&

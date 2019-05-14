@@ -1,3 +1,5 @@
+import EmailInput from '@/containers/EmailInput';
+import Upload from '@/containers/Upload';
 import {
   DatePicker,
   Form2,
@@ -14,18 +16,14 @@ import { getMoment } from '@/utils';
 import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
-import moment, { isMoment } from 'moment';
+import moment from 'moment';
 import React, { memo, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
 import {
+  ALL_DATE_FIELD_KEYS,
   BASE_FORM_FIELDS,
   PARTY_DOC_CREATE_OR_UPDATE,
   TRADER_TYPE,
-  ALL_DATE_FIELD_KEYS,
 } from './constants';
-import Upload from '@/containers/Upload';
-import EmailInput from '@/containers/EmailInput';
-import { values } from 'mobx';
 
 const TabPane = Tabs.TabPane;
 
@@ -51,6 +49,9 @@ const useTableData = props => {
 
     const requests = Object.keys(data).map(async item => {
       newData[item] = Form2.createField(data[item]);
+      if (_.includes(ALL_DATE_FIELD_KEYS, item)) {
+        newData[item].value = data[item] ? getMoment(data[item]) : undefined;
+      }
       if (item.endsWith('Doc')) {
         newData[item].value = [];
         if (data[item]) {
@@ -61,7 +62,6 @@ const useTableData = props => {
       return;
     });
     setLoading(true);
-
     const [...res] = await Promise.all(requests);
     setLoading(false);
     res.forEach((item, index) => {
@@ -78,9 +78,9 @@ const useTableData = props => {
           newData[_item].uid = data.uuid;
         }
       }
-      if (ALL_DATE_FIELD_KEYS.indexOf(_item) !== -1 && newData[_item].value != null) {
-        newData[_item].value = moment(newData[_item].value);
-      }
+      // if (ALL_DATE_FIELD_KEYS.indexOf(_item) !== -1 && newData[_item].value != null) {
+      //   newData[_item].value = moment(newData[_item].value);
+      // }
     });
 
     setBaseFormData(newData);
@@ -88,7 +88,9 @@ const useTableData = props => {
       item = {
         name: item.tradeAuthorizerName,
         phoneNumber: item.tradeAuthorizerPhone,
-        periodValidity: item.tradeAuthorizerIdExpiryDate,
+        periodValidity: item.tradeAuthorizerIdExpiryDate
+          ? getMoment(item.tradeAuthorizerIdExpiryDate)
+          : item.tradeAuthorizerIdExpiryDate,
         IDNumber: item.tradeAuthorizerIdNumber,
       };
       Object.keys(item).forEach(async param => {
@@ -104,9 +106,9 @@ const useTableData = props => {
     setTraderList(_traderList);
   };
 
-  useLifecycles(() => {
-    fetchData();
-  });
+  // useLifecycles(() => {
+  //   fetchData();
+  // });
 
   return {
     baseFormData,

@@ -11,6 +11,7 @@ import { convertTradePositions } from '@/services/pages';
 import { Form2 } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
+import moment from 'moment';
 
 const UN_EDITDIR = [
   LEG_FIELD.UNDERLYER_MULTIPLIER,
@@ -21,6 +22,8 @@ const UN_EDITDIR = [
   LEG_FIELD.NOTIONAL_AMOUNT,
   LEG_FIELD.ALREADY_BARRIER,
 ];
+
+const DATE_ARRAY = [LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE, LEG_FIELD.SETTLEMENT_DATE];
 
 export interface IAmendModalEl {
   show: (record, tableFormData, currentUser, reload) => void;
@@ -41,10 +44,18 @@ const AmendModal = memo<IAmendModal>(props => {
     currentUser?: any;
     reload?: any;
   }>({});
-
   current({
     show: (record, tableFormData, currentUser, reload) => {
-      setTableData([convertLegDataByEnv(record, LEG_ENV.BOOKING)]);
+      const newData = _.mapValues(record, (item, key) => {
+        if (_.includes(DATE_ARRAY, key)) {
+          return {
+            type: 'field',
+            value: moment(item.value),
+          };
+        }
+        return item;
+      });
+      setTableData([convertLegDataByEnv(newData, LEG_ENV.BOOKING)]);
       setVisible(true);
       setStore({
         record,
