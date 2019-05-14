@@ -60,6 +60,9 @@ import React, { memo, useRef, useState, useEffect } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import router from 'umi/router';
 import './index.less';
+import { getMoment } from '@/utils';
+
+const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
 const ActionBar = memo<any>(props => {
   const {
@@ -151,7 +154,17 @@ const ActionBar = memo<any>(props => {
 });
 
 const TradeManagementBooking = props => {
-  const tableData = props.pricingData.tableData;
+  const tableData = _.map(props.pricingData.tableData, iitem => {
+    return _.mapValues(iitem, (item, key) => {
+      if (_.includes(DATE_ARRAY, key)) {
+        return {
+          type: 'field',
+          value: getMoment(item.value),
+        };
+      }
+      return item;
+    });
+  });
   const { location, tradeManagementBookEditPageData } = props;
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [curPricingEnv, setCurPricingEnv] = useState(null);
