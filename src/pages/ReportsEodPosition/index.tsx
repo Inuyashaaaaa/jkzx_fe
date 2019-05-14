@@ -13,7 +13,7 @@ const ReportsEodPosition = memo<any>(props => {
       reportType={'LIVE_POSITION_INFO'}
       searchMethod={rptPositionReportSearchPaged}
       downloadName={'持仓明细'}
-      scrollWidth={3320}
+      scrollWidth={3450}
     />
   );
 });

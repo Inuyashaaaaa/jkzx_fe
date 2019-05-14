@@ -14,7 +14,7 @@ const RiskManagerIntradayPositionReport = memo<any>(props => {
       defaultDirection={'desc'}
       searchMethod={rptIntradayTradeReportSearchPaged}
       downloadName={'持仓明细'}
-      scrollWidth={3320}
+      scrollWidth={3450}
     />
   );
 });
