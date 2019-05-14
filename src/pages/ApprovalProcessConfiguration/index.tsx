@@ -101,8 +101,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       }
       return item;
     });
-    taskData = taskData.concat(editTask);
-
+    taskData = taskData.concat(editTask).filter(item => !!item);
     this.setState({
       loading: false,
       approveGroupList: approveGroupList.data || [],
@@ -199,7 +198,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     } = this.state;
     const noneGroupIndex = _.findIndex(
       taskApproveGroupList,
-      item => item.approveGroupList.length <= 0
+      item => item && item.approveGroupList.length <= 0
     );
     if (noneGroupIndex >= 0) {
       return notification.success({
