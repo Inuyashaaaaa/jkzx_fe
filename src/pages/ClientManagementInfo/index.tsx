@@ -278,7 +278,6 @@ const ClientManagementInfo = memo(() => {
               title: '操作',
               dataIndex: 'actions',
               render: (value, record, index) => {
-                console.log(record);
                 return (
                   <span className={styles.action}>
                     <EditModalButton
@@ -314,9 +313,7 @@ const ClientManagementInfo = memo(() => {
                           禁用
                         </a>
                       ) : (
-                        <a href="javascipt:;" style={{ color: '#1890ff' }}>
-                          启用
-                        </a>
+                        <a href="javascipt:;">启用</a>
                       )}
                     </Popconfirm>
                     {/* <Button
