@@ -5,11 +5,13 @@ import {
   clientAccountDel,
   refPartyList,
   refSimilarLegalNameList,
+  refDisablePartyByLegalName,
+  refEnablePartyByLegalName,
 } from '@/services/reference-data-service';
 import { queryCompleteCompanys } from '@/services/sales';
 import { arr2treeOptions } from '@/tools';
 import { getMoment } from '@/utils';
-import { Button, Card, Divider, Form, notification, Row } from 'antd';
+import { Button, Card, Divider, Form, notification, Row, Popconfirm } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
@@ -276,6 +278,7 @@ const ClientManagementInfo = memo(() => {
               title: '操作',
               dataIndex: 'actions',
               render: (value, record, index) => {
+                console.log(record);
                 return (
                   <span className={styles.action}>
                     <EditModalButton
@@ -291,8 +294,32 @@ const ClientManagementInfo = memo(() => {
                       record={record}
                       fetchTable={fetchTable}
                     />
-                    {/* <Divider type="vertical" />
-                    <Button
+                    <Divider type="vertical" />
+                    <Popconfirm
+                      title={`是否${record.partyStatus === 'NORMAL' ? '禁用' : '启用'}交易对手`}
+                      onConfirm={async () => {
+                        const isDisableLegalName =
+                          record.partyStatus === 'NORMAL'
+                            ? refDisablePartyByLegalName
+                            : refEnablePartyByLegalName;
+                        const { error, data } = await isDisableLegalName({
+                          legalName: record.legalName,
+                        });
+                        if (error) return;
+                        fetchTableData(getFormData());
+                      }}
+                    >
+                      {record.partyStatus === 'NORMAL' ? (
+                        <a href="javascipt:;" style={{ color: 'red' }}>
+                          禁用
+                        </a>
+                      ) : (
+                        <a href="javascipt:;" style={{ color: '#1890ff' }}>
+                          启用
+                        </a>
+                      )}
+                    </Popconfirm>
+                    {/* <Button
                       style={{ color: 'red' }}
                       onClick={() => {
                         AccountDel(record);
