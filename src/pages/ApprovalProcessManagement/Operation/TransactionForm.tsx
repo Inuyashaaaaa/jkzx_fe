@@ -58,6 +58,7 @@ class ApprovalForm extends PureComponent<any, any> {
       attachmentId: null,
       bookEditVisible: false,
       editable: false,
+      isCompleted: null,
     };
   }
   public componentDidMount() {
@@ -99,7 +100,7 @@ class ApprovalForm extends PureComponent<any, any> {
       loading: true,
     });
     const isCompleted = params.status
-      ? !params.status.includes('unfinished') || this.props.status === 'pending'
+      ? !params.status.includes('unfinished') && this.props.status !== 'pending'
       : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
@@ -130,6 +131,7 @@ class ApprovalForm extends PureComponent<any, any> {
     };
     this.setState({
       detailData: _detailData,
+      isCompleted,
     });
 
     if (!isCheckBtn) {
@@ -259,6 +261,10 @@ class ApprovalForm extends PureComponent<any, any> {
     //   obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
     //   obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
     //   obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+    const { data, error } = await wkProcessInstanceFormGet({
+      processInstanceId: this.props.formData.processInstanceId,
+    });
+    if (error) return;
     const { formData } = this.props;
     const { modifyComment } = this.state;
     const params = {
@@ -266,7 +272,7 @@ class ApprovalForm extends PureComponent<any, any> {
       ctlProcessData: {
         abandon: true,
       },
-      businessProcessData: {},
+      businessProcessData: _.get(data, 'process._business_payload'),
     };
     this.executeModify(params, 'abandon');
     // });
@@ -743,6 +749,7 @@ class ApprovalForm extends PureComponent<any, any> {
             taskId={this.props.formData.taskId}
             res={this.state.res}
             confirmModify={this.handleConfirmModify}
+            isCompleted={this.state.isCompleted}
           />
         </Modal>
       </div>

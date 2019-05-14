@@ -7,7 +7,7 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { wkProcessInstanceFormGet } from '@/services/approval';
+import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 import { convertTradePageData2ApiData } from '@/services/pages';
 import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
 import { ILeg } from '@/types/leg';
@@ -23,7 +23,7 @@ import uuidv4 from 'uuid/v4';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
-  const { tradeManagementBookEditPageData, dispatch } = props;
+  const { tradeManagementBookEditPageData, dispatch, isCompleted } = props;
   const { tableData } = tradeManagementBookEditPageData;
   const setTableData = payload => {
     dispatch({
@@ -57,8 +57,8 @@ const TradeManagementBooking = props => {
     }
 
     setTableLoading(true);
-
-    const { error, data } = await wkProcessInstanceFormGet({
+    const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
+    const { error, data } = await executeMethod({
       processInstanceId: props.id,
     });
     if (error) return;
@@ -74,10 +74,10 @@ const TradeManagementBooking = props => {
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
 
-    const { positions } = _.get(data, 'process._business_payload.trade');
-
+    const positions = _.get(data, 'process._business_payload.trade.positions');
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
+    if (!positions) return;
     mockAddLegItem(positions, _detailData);
   };
 
