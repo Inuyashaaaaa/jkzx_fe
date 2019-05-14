@@ -1,18 +1,28 @@
 import ModalButton from '@/design/components/ModalButton';
 import SourceTable from '@/design/components/SourceTable';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { refBankAccountSave, refBankAccountSearch } from '@/services/reference-data-service';
-import { message } from 'antd';
+import { Form2, Select } from '@/design/components';
+import { message, Divider, Table } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import CommonModalForm from './CommonModalForm';
-import { SEARCH_FORM_CONTROL, TABLE_COLUMN_DEFS } from './constants';
+import {
+  refSimilarAccountNameList,
+  refSimilarBankAccountList,
+  refSimilarLegalNameList,
+  refBankAccountSave,
+  refBankAccountSearch,
+} from '@/services/reference-data-service';
+import Operation from './Operation';
 
 class ClientManagementBankAccount extends PureComponent {
+  public $sourceTable: SourceTable = null;
+
   public state = {
     dataSource: [],
     searchFormData: {},
     loading: false,
-    markets: [],
+    markets: null,
     legalNameList: [],
     visible: false,
     confirmLoading: false,
@@ -28,7 +38,7 @@ class ClientManagementBankAccount extends PureComponent {
       loading: true,
     });
     const { error, data } = await refBankAccountSearch({
-      ...this.state.searchFormData,
+      ...Form2.getFieldsValue(this.state.searchFormData),
     });
     this.setState({
       loading: false,
@@ -50,19 +60,17 @@ class ClientManagementBankAccount extends PureComponent {
     );
   };
 
-  public onSearchFormChange = async params => {
-    const { changedValues, values } = params;
-    if (Object.keys(changedValues)[0] === 'legalName' && !changedValues.legalName) {
+  public onSearchFormChange = async (props, changedFields, allFields) => {
+    if (Object.keys(changedFields)[0] === 'legalName' && !changedFields.legalName.value) {
       return this.setState({
-        markets: [],
+        markets: null,
         searchFormData: {},
       });
     }
 
     const { error, data } = await refBankAccountSearch({
-      legalName: values.legalName,
+      legalName: allFields.legalName.value,
     });
-
     if (error) return false;
 
     const markets = data.map(item => ({
@@ -74,18 +82,18 @@ class ClientManagementBankAccount extends PureComponent {
     let legalNameValue;
     let bankAccountValue;
 
-    if (changedValues.bankAccount) {
+    if (changedFields.bankAccount && changedFields.bankAccount.value) {
       const { error, data } = await refBankAccountSearch({
-        bankAccount: values.bankAccount,
+        bankAccount: changedFields.bankAccount.value,
       });
       bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
       legalNameValue = data[0].legalName;
       bankAccountValue = data[0].bankAccount;
     }
 
-    if (changedValues.bankAccountName) {
+    if (changedFields.bankAccountName && changedFields.bankAccountName.value) {
       const { error, data } = await refBankAccountSearch({
-        bankAccountName: values.bankAccountName,
+        bankAccountName: changedFields.bankAccountName.value,
       });
       bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
       legalNameValue = data[0].legalName;
@@ -94,11 +102,11 @@ class ClientManagementBankAccount extends PureComponent {
 
     this.setState({
       markets,
-      searchFormData: {
-        legalName: legalNameValue ? legalNameValue : values.legalName,
+      searchFormData: Form2.createFields({
+        legalName: legalNameValue ? legalNameValue : (allFields.legalName || {}).value,
         bankAccount: bankAccountValue,
         bankAccountName: bankAccountNameValue,
-      },
+      }),
     });
   };
 
@@ -142,41 +150,168 @@ class ClientManagementBankAccount extends PureComponent {
   public render() {
     return (
       <PageHeaderWrapper>
-        <SourceTable
-          rowKey="uuid"
-          dataSource={this.state.dataSource}
-          columnDefs={TABLE_COLUMN_DEFS(this.fetchTable)}
-          loading={this.state.loading}
-          searchable={true}
-          resetable={true}
+        <Form2
+          ref={node => (this.$sourceTable = node)}
+          layout="inline"
+          dataSource={this.state.searchFormData}
+          submitText={'搜索'}
+          submitButtonProps={{
+            icon: 'search',
+          }}
+          onSubmitButtonClick={this.fetchTable}
           onResetButtonClick={this.onReset}
-          searchFormControls={SEARCH_FORM_CONTROL(this.state.legalNameList, this.state.markets)}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          onSearchButtonClick={this.fetchTable}
-          header={
-            <ModalButton
-              type="primary"
-              key="create"
-              onClick={this.switchModal}
-              style={{ marginBottom: '20px' }}
-              modalProps={{
-                visible: this.state.visible,
-                confirmLoading: this.state.confirmLoading,
-                onCancel: this.onCancel,
-                onOk: this.handleCreate,
-                title: '新建银行账户',
-              }}
-              content={
-                <CommonModalForm
-                  createFormData={this.state.createFormData}
-                  onCreateFormChange={this.onCreateFormChange}
-                />
-              }
-            >
-              新建银行账户
-            </ModalButton>
+          onFieldsChange={this.onSearchFormChange}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await refSimilarLegalNameList({
+                            similarLegalName: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '交易账号',
+              dataIndex: 'bankAccount',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        options={
+                          this.state.markets
+                            ? this.state.markets
+                            : async (value: string = '') => {
+                                const { data, error } = await refSimilarBankAccountList({
+                                  similarBankAccount: value,
+                                });
+                                if (error) return [];
+                                return data.map(item => ({
+                                  label: item,
+                                  value: item,
+                                }));
+                              }
+                        }
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '交易对手账户名',
+              dataIndex: 'bankAccountName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await refSimilarAccountNameList({
+                            similarAccountName: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+          ]}
+        />
+        <Divider type="horizontal" />
+        <ModalButton
+          type="primary"
+          key="create"
+          onClick={this.switchModal}
+          style={{ marginBottom: '20px' }}
+          modalProps={{
+            visible: this.state.visible,
+            confirmLoading: this.state.confirmLoading,
+            onCancel: this.onCancel,
+            onOk: this.handleCreate,
+            title: '新建银行账户',
+          }}
+          content={
+            <CommonModalForm
+              createFormData={this.state.createFormData}
+              onCreateFormChange={this.onCreateFormChange}
+            />
           }
+        >
+          新建银行账户
+        </ModalButton>
+        <Table
+          dataSource={this.state.dataSource}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+            },
+            {
+              title: '交易对手银行账号',
+              dataIndex: 'bankAccount',
+            },
+            {
+              title: '交易对手银行账户名',
+              dataIndex: 'bankAccountName',
+            },
+            {
+              title: '交易对手开户行',
+              dataIndex: 'bankName',
+            },
+            {
+              title: '交易对手支付系统行号',
+              dataIndex: 'paymentSystemCode',
+            },
+            {
+              title: '操作',
+              render: (text, record, index) => {
+                return <Operation record={text} fetchTable={this.fetchTable} />;
+              },
+            },
+          ]}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+          }}
+          loading={this.state.loading}
+          rowKey="uuid"
+          size="middle"
+          scroll={this.state.dataSource.length ? { x: '1000px' } : { x: false }}
         />
       </PageHeaderWrapper>
     );
