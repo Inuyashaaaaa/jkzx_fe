@@ -4,12 +4,13 @@ import {
   LEG_ID_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
+  LEG_ENV_FIELD,
 } from '@/constants/common';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
-import { TOTAL_LEGS } from '@/constants/legs';
+import { TOTAL_LEGS, LEG_ENV } from '@/constants/legs';
 import { Form2, Loading, Table2 } from '@/design/components';
 import { ITableProps } from '@/design/components/type';
-import { remove } from '@/design/utils';
+import { remove, uuid } from '@/design/utils';
 import { getLegByRecord } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Tag } from 'antd';
@@ -96,6 +97,13 @@ const MultiLegTable = memo<
   };
 
   const cellIsEmpty = (record, colDef) => {
+    if (cellIsTotal(record)) {
+      if (_.findIndex(totalColumnIds, key => key === colDef.dataIndex) !== -1) {
+        return false;
+      }
+      return true;
+    }
+
     const leg = getLegByType(record[LEG_TYPE_FIELD]);
 
     if (colDef.dataIndex === LEG_FIELD.LEG_META) {
@@ -141,13 +149,11 @@ const MultiLegTable = memo<
           }
         },
         render(val, record, index, { colDef }) {
-          if (cellIsTotal(record)) {
-            return val;
-          }
           if (cellIsEmpty(record, colDef)) {
             return null;
           }
-          return item.render.apply(this, arguments);
+          const result = item.render.apply(this, arguments);
+          return result;
         },
       };
     });
@@ -213,18 +219,26 @@ const MultiLegTable = memo<
           return {
             ...totalItem,
             ..._.mapValues(record, (val, key) => {
+              const value = Form2.getFieldValue(val);
+              if (!_.isNumber(value) || totalColumnIds.indexOf(key) === -1) {
+                return val;
+              }
               const origin = Form2.getFieldValue(totalItem[key]);
-              if (!_.isNumber(Form2.getFieldValue(val)) || totalColumnIds.indexOf(key) === -1)
-                return origin;
-              return new BigNumber(origin || 0)
-                .plus(Form2.getFieldValue(val) || 0)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber();
+              return {
+                ...val,
+                value: new BigNumber(value || 0)
+                  .plus(origin || 0)
+                  .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                  .toNumber(),
+              };
             }),
+            [LEG_ID_FIELD]: totalItem[LEG_ID_FIELD],
           };
         },
         {
           [TOTAL_FIELD]: true,
+          [LEG_ENV_FIELD]: env,
+          [LEG_ID_FIELD]: uuid(),
         }
       );
       return dataSource.concat(totalRecord);

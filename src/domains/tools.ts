@@ -13,7 +13,7 @@ import {
   ITableTriggerCellFieldsChangeParams,
 } from '@/design/components/type';
 import { mktInstrumentInfo, mktQuotesListPaged } from '@/services/market-data-service';
-import { legEnvIsPricing } from '@/tools';
+import { legEnvIsPricing, getLegByRecord } from '@/tools';
 import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -30,6 +30,10 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
     setTableData: (newData: ITableData[]) => void
   ) => {
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
+
+    const curLegHasUnitField = !!getLegByRecord(record)
+      .getColumns(env)
+      .find(col => col.dataIndex === LEG_FIELD.UNIT);
 
     setColLoading(LEG_FIELD.UNDERLYER_MULTIPLIER, true);
     setColLoading(LEG_FIELD.UNIT, true);
@@ -51,11 +55,16 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
       })
       .then(val => {
         setColValue(LEG_FIELD.UNDERLYER_MULTIPLIER, Form2.createField(val.multiplier));
-        setColValue(LEG_FIELD.UNIT, Form2.createField(val.unit));
+
+        if (curLegHasUnitField) {
+          setColValue(LEG_FIELD.UNIT, Form2.createField(val.unit));
+        }
       })
       .finally(() => {
         setColLoading(LEG_FIELD.UNDERLYER_MULTIPLIER, false);
-        setColLoading(LEG_FIELD.UNIT, false);
+        if (curLegHasUnitField) {
+          setColLoading(LEG_FIELD.UNIT, false);
+        }
       });
   },
   50
