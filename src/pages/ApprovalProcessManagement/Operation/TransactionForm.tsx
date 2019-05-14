@@ -724,7 +724,7 @@ class ApprovalForm extends PureComponent<any, any> {
         )}
         <Modal
           title={
-            _data.status === '待审批' || _data.status === '审核完成'
+            _data.status === '待审批' || _data.status === '审核完成' || status !== 'pending'
               ? '查看合约详情'
               : '修改合约详情'
           }
