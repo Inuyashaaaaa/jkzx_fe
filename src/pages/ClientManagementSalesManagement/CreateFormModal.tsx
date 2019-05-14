@@ -11,6 +11,7 @@ class CreateFormModal extends PureComponent {
     return (
       <>
         <Form
+          ref={node => this.props.refCreateFormModal(node)}
           dataSource={this.props.dataSource}
           controls={CREATE_FORM_CONTROLS(this.props.branchSalesList)}
           footer={false}
