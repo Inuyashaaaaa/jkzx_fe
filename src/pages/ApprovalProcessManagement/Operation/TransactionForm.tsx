@@ -58,6 +58,7 @@ class ApprovalForm extends PureComponent<any, any> {
       attachmentId: null,
       bookEditVisible: false,
       editable: false,
+      isCompleted: null,
     };
   }
   public componentDidMount() {
@@ -99,7 +100,7 @@ class ApprovalForm extends PureComponent<any, any> {
       loading: true,
     });
     const isCompleted = params.status
-      ? !params.status.includes('unfinished') || this.props.status === 'pending'
+      ? !params.status.includes('unfinished') && this.props.status !== 'pending'
       : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
@@ -130,6 +131,7 @@ class ApprovalForm extends PureComponent<any, any> {
     };
     this.setState({
       detailData: _detailData,
+      isCompleted,
     });
 
     if (!isCheckBtn) {
@@ -741,6 +743,7 @@ class ApprovalForm extends PureComponent<any, any> {
             taskId={this.props.formData.taskId}
             res={this.state.res}
             confirmModify={this.handleConfirmModify}
+            isCompleted={this.state.isCompleted}
           />
         </Modal>
       </div>
