@@ -61,9 +61,6 @@ const TradeManagementBooking = props => {
     const { error, data } = await executeMethod({
       processInstanceId: props.id,
     });
-    // const { error, data } = await queryProcessForm({
-    //   processInstanceId: props.id,
-    // });
     if (error) return;
     const _detailData = {
       tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
@@ -77,10 +74,10 @@ const TradeManagementBooking = props => {
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
 
-    const { positions } = _.get(data, 'process._business_payload.trade');
-
+    const positions = _.get(data, 'process._business_payload.trade.positions');
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
+    if (!positions) return;
     mockAddLegItem(positions, _detailData);
   };
 
