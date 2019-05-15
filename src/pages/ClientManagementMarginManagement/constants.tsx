@@ -11,6 +11,7 @@ import {
 } from '@/services/reference-data-service';
 import React from 'react';
 import Operations from './Operations';
+import { formatMoney } from '@/tools';
 
 export const TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {
@@ -50,6 +51,62 @@ export const TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
     width: 300,
     render: params => {
       return <Operations record={params.data} fetchTable={fetchTable} />;
+    },
+  },
+];
+
+export const TABLE_COLUMNS = fetchTable => [
+  {
+    title: '交易对手',
+    dataIndex: 'legalName',
+    width: 150,
+  },
+  {
+    title: '可用资金 (¥)',
+    width: 150,
+    dataIndex: 'cash',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '剩余授信额度 (¥)',
+    width: 150,
+    dataIndex: 'credit',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '冻结保证金 (¥)',
+    width: 150,
+    dataIndex: 'margin',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '维持保证金 (¥)',
+    width: 150,
+    dataIndex: 'maintenanceMargin',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '状态',
+    width: 150,
+    dataIndex: 'status',
+    // input: {
+    //   type: 'select',
+    //   options: MARGIN_STATUS_TYPE_OPTIONS,
+    // },
+  },
+  {
+    title: '操作',
+    width: 250,
+    render: (text, record, index) => {
+      return <Operations record={text} fetchTable={fetchTable} />;
     },
   },
 ];
