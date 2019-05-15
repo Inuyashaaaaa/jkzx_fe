@@ -208,7 +208,7 @@ class ClientManagementMarginManagement extends PureComponent {
             showQuickJumper: true,
           }}
           loading={this.state.loading}
-          rowKey="accountId"
+          rowKey="uuid"
           size="middle"
           scroll={
             this.state.dataSource && this.state.dataSource.length > 0
