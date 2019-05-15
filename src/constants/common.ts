@@ -566,6 +566,7 @@ export const LEG_FIELD = {
   HIGH_BARRIER: 'highBarrier',
   UNDERLYER_INSTRUMENT_PRICE: 'UNDERLYER_INSTRUMENT_PRICE',
   COMMENT: 'comment',
+  VOL: 'vol',
 };
 
 /**

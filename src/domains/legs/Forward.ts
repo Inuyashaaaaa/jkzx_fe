@@ -144,6 +144,7 @@ export const Forward: ILeg = {
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),
+      [LEG_FIELD.VOL]: 0,
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
