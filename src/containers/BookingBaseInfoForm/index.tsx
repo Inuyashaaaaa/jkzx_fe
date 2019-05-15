@@ -367,7 +367,14 @@ const BookingBaseInfoForm = memo<any>(props => {
                       </InputGroup>
                     </>
                   ) : (
-                    form.getFieldDecorator()(<Input editing={editing} />)
+                    form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '交易对手为必填项',
+                        },
+                      ],
+                    })(<Input editing={editing} />)
                   )}
                 </FormItem>
               );
