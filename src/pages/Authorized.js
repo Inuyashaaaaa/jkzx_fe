@@ -1,15 +1,17 @@
-import React from 'react';
-import RenderAuthorized from '@/lib/components/Authorized';
-import { getAuthority } from '@/lib/utils/authority';
 import Exception403 from '@/pages/Exception/403';
+import { connect } from 'dva';
+import React from 'react';
 
-const Authority = getAuthority();
-const Authorized = RenderAuthorized(Authority);
+export default connect(state => {
+  return {
+    currentUser: state.user.currentUser,
+  };
+})(props => {
+  const { children, route = {}, currentUser = {} } = props;
+  const { permissions } = currentUser;
+  if (permissions && !permissions[route.name]) {
+    return <Exception403 />;
+  }
 
-export default ({ children }) => {
-  return (
-    <Authorized authority={children.props.route.authority} noMatch={<Exception403 />}>
-      {children}
-    </Authorized>
-  );
-};
+  return children;
+});
