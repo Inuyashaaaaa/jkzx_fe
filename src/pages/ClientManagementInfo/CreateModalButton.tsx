@@ -302,25 +302,6 @@ const CreateModalButton = memo<any>(props => {
                   },
                 },
                 {
-                  title: '托管邮箱',
-                  dataIndex: 'trustorEmail',
-                  render: (val, record, index, { form }) => {
-                    return (
-                      <FormItem hasFeedback={true}>
-                        {form.getFieldDecorator({
-                          rules: [
-                            {
-                              required: true,
-                              message: '必填',
-                            },
-                          ],
-                        })(<EmailInput style={{ width: '100%' }} />)}
-                      </FormItem>
-                    );
-                  },
-                },
-
-                {
                   title: '联系人',
                   dataIndex: 'contact',
                   render: (val, record, index, { form }) => {
@@ -388,6 +369,23 @@ const CreateModalButton = memo<any>(props => {
                             },
                           ],
                         })(<Input editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '托管邮箱',
+                  dataIndex: 'trustorEmail',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<EmailInput style={{ width: '100%' }} />)}
                       </FormItem>
                     );
                   },
@@ -473,6 +471,83 @@ const CreateModalButton = memo<any>(props => {
                             },
                           ],
                         })(<DatePicker editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '主协议编号版本',
+                  dataIndex: 'banben',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(
+                          <Select
+                            editing={editable}
+                            options={[
+                              {
+                                label: ' SAC2014',
+                                value: 'SAC2014',
+                              },
+                              {
+                                label: 'SAC2015',
+                                value: 'SAC2015',
+                              },
+                              {
+                                label: 'ISDA',
+                                value: 'ISDA',
+                              },
+                              {
+                                label: 'OTHER',
+                                value: 'OTHER',
+                              },
+                              {
+                                label: 'NAFMII',
+                                value: 'NAFMII',
+                              },
+                            ]}
+                          />
+                        )}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '主协议签证日期',
+                  dataIndex: 'xDate',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<DatePicker editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '营业执照',
+                  dataIndex: 'zhizhao',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<Input editing={editable} />)}
                       </FormItem>
                     );
                   },
@@ -1315,6 +1390,12 @@ const CreateModalButton = memo<any>(props => {
                   const { data, error } = await createRefParty(baseData);
                   if (error) return;
                   setModalVisible(false);
+                  setCurrentStep(0);
+                  setBaseFormData({});
+                  setProductFormData({});
+                  setAuthFormData({});
+                  setTraderList([]);
+                  setAttachFormData({});
                   fetchTableData({});
                   notification.success({
                     message: '新建交易对手成功',
