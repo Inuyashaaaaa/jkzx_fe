@@ -674,7 +674,7 @@ const EditModalButton = memo<any>(props => {
                   columns={[
                     {
                       title: '产品名称',
-                      dataIndex: BASE_FORM_FIELDS.LEGALNAME,
+                      dataIndex: BASE_FORM_FIELDS.PRODUCTNAME,
                       render: (val, record, index, { form }) => {
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
