@@ -282,7 +282,7 @@ class ClientManagementFundStatistics extends PureComponent {
             },
             {
               title: '已用授信额度 (¥)',
-              width: 150,
+              width: 170,
               dataIndex: 'creditUsed',
               render: (text, record, index) => {
                 return text ? formatMoney(text, {}) : text;
@@ -322,7 +322,7 @@ class ClientManagementFundStatistics extends PureComponent {
             },
             {
               title: '我方授信总额 (¥)',
-              width: 150,
+              width: 170,
               dataIndex: 'counterPartyCredit',
               render: (text, record, index) => {
                 return text ? formatMoney(text, {}) : text;
@@ -330,7 +330,7 @@ class ClientManagementFundStatistics extends PureComponent {
             },
             {
               title: '我方剩余授信余额 (¥)',
-              width: 150,
+              width: 200,
               dataIndex: 'counterPartyCreditBalance',
               render: (text, record, index) => {
                 return text ? formatMoney(text, {}) : text;
@@ -338,7 +338,7 @@ class ClientManagementFundStatistics extends PureComponent {
             },
             {
               title: '我方可用资金 (¥)',
-              width: 150,
+              width: 200,
               dataIndex: 'counterPartyFund',
               render: (text, record, index) => {
                 return text ? formatMoney(text, {}) : text;
@@ -346,7 +346,7 @@ class ClientManagementFundStatistics extends PureComponent {
             },
             {
               title: '我方冻结保证金 (¥)',
-              width: 150,
+              width: 200,
               dataIndex: 'counterPartyMargin',
               render: (text, record, index) => {
                 return text ? formatMoney(text, {}) : text;
@@ -368,7 +368,7 @@ class ClientManagementFundStatistics extends PureComponent {
           loading={this.state.loading}
           rowKey="accountId"
           size="middle"
-          scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
+          scroll={this.state.tableDataSource ? { x: '2000px' } : { x: false }}
         />
         {/* <SourceTable
           rowKey="accountId"
