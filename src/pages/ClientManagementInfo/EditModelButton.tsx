@@ -239,6 +239,25 @@ const EditModalButton = memo<any>(props => {
     columns = cloneColumns;
   }
 
+  const handleValue = val => {
+    if (_.isArray(val)) {
+      val = (val || []).map(item => {
+        item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+        return item;
+      });
+    }
+    if (!_.isArray(val)) {
+      val = [
+        {
+          name: val,
+          id: val,
+          uid: val,
+        },
+      ];
+    }
+    return val;
+  };
+
   return (
     <ModalButton
       text={true}
@@ -1011,21 +1030,7 @@ const EditModalButton = memo<any>(props => {
                       title: '主协议',
                       dataIndex: 'masterAgreementDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1056,21 +1061,7 @@ const EditModalButton = memo<any>(props => {
                       title: '补充协议',
                       dataIndex: 'supplementalAgreementDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1101,22 +1092,7 @@ const EditModalButton = memo<any>(props => {
                       title: '风险问卷调查',
                       dataIndex: 'riskSurveyDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1147,22 +1123,7 @@ const EditModalButton = memo<any>(props => {
                       title: '交易授权书',
                       dataIndex: 'tradeAuthDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1193,22 +1154,7 @@ const EditModalButton = memo<any>(props => {
                       title: '对手尽职调查',
                       dataIndex: 'dueDiligenceDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1239,22 +1185,7 @@ const EditModalButton = memo<any>(props => {
                       title: '风险承受能力调查问卷',
                       dataIndex: 'riskPreferenceDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1285,22 +1216,7 @@ const EditModalButton = memo<any>(props => {
                       title: '合规性承诺书',
                       dataIndex: 'complianceDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1331,22 +1247,7 @@ const EditModalButton = memo<any>(props => {
                       title: '风险揭示书',
                       dataIndex: 'riskRevelationDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1377,22 +1278,7 @@ const EditModalButton = memo<any>(props => {
                       title: '适当性警示书',
                       dataIndex: 'qualificationWarningDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1423,22 +1309,7 @@ const EditModalButton = memo<any>(props => {
                       title: '授信协议',
                       dataIndex: 'creditAgreement',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1469,22 +1340,7 @@ const EditModalButton = memo<any>(props => {
                       title: '履约保障协议',
                       dataIndex: 'performanceGuaranteeDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
-                        if (!_.isArray(val)) {
-                          val = [
-                            {
-                              name: val,
-                              id: val,
-                              uid: val,
-                            },
-                          ];
-                        }
-
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
