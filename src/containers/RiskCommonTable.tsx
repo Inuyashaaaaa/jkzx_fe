@@ -150,7 +150,6 @@ const RiskCommonTable = memo<any>(props => {
     },
     [dataSource]
   );
-
   return (
     <PageHeaderWrapper>
       {searchFormControls && (
@@ -198,7 +197,7 @@ const RiskCommonTable = memo<any>(props => {
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
         <Table
           size="middle"
-          rowKey="uuid"
+          rowKey={(data, index) => index}
           loading={loading}
           dataSource={dataSource}
           pagination={{

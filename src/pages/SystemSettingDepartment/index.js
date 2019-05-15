@@ -416,6 +416,7 @@ export default class DepartmentManagement extends PureComponent {
         </div>
         <Table
           bordered
+          rowKey="id"
           size="small"
           columns={columns}
           dataSource={data}
