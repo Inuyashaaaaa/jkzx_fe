@@ -1315,6 +1315,12 @@ const CreateModalButton = memo<any>(props => {
                   const { data, error } = await createRefParty(baseData);
                   if (error) return;
                   setModalVisible(false);
+                  setCurrentStep(0);
+                  setBaseFormData({});
+                  setProductFormData({});
+                  setAuthFormData({});
+                  setTraderList([]);
+                  setAttachFormData({});
                   fetchTableData({});
                   notification.success({
                     message: '新建交易对手成功',

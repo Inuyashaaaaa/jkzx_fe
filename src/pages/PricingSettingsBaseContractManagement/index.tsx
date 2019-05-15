@@ -2,7 +2,7 @@ import CascaderSourceList from '@/lib/components/_CascaderSourceList';
 import { PureStateComponent } from '@/lib/components/_Components';
 import Form from '@/lib/components/_Form2';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions, delay, isAllSame, mockData } from '@/lib/utils';
+import { baseTree, delay, isAllSame, mockData } from '@/lib/utils';
 import {
   mktInstrumentsListPaged,
   prcBaseContractsList,
@@ -51,7 +51,7 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
         ),
       };
     });
-    const datas = arr2treeOptions(
+    const datas = baseTree(
       data,
       [INSTRUMENT_KEY, EXPIRY_KEY, POSITION_KEY],
       [INSTRUMENT_KEY, EXPIRY_KEY, POSITION_SHOW_KEY]
