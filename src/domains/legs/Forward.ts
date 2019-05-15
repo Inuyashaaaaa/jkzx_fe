@@ -75,6 +75,7 @@ export const Forward: ILeg = {
         StrikeType,
         InitialSpot,
         UnderlyerMultiplier,
+        EffectiveDate,
         SpecifiedPrice,
         UnderlyerInstrumentId,
         Strike,

@@ -79,6 +79,7 @@ export const Convex: ILeg = {
         NotionalAmountType,
         InitialSpot,
         UnderlyerMultiplier,
+        EffectiveDate,
         UnderlyerInstrumentId,
         Term,
         ExpirationDate,

@@ -78,6 +78,7 @@ export const AutoCallPhoenix: ILeg = {
     if (env === LEG_ENV.PRICING) {
       return [
         SpecifiedPrice,
+        EffectiveDate,
         Direction,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,

@@ -71,6 +71,7 @@ export const DoubleTouch: ILeg = {
         InitialSpot,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
+        EffectiveDate,
         LowBarrier,
         HighBarrier,
         Payment,

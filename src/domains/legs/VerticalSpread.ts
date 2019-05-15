@@ -81,6 +81,7 @@ export const VerticalSpread: ILeg = {
         OptionType,
         LowStrike,
         StrikeType,
+        EffectiveDate,
         HighStrike,
         Term,
         ExpirationDate,

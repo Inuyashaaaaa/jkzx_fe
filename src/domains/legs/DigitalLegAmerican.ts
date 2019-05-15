@@ -77,6 +77,7 @@ export const DigitalLegAmerican: ILeg = {
       return [
         IsAnnual,
         Direction,
+        EffectiveDate,
         NotionalAmountType,
         StrikeType,
         InitialSpot,

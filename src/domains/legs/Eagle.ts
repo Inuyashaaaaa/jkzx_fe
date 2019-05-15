@@ -70,6 +70,7 @@ export const Eagle: ILeg = {
         Direction,
         NotionalAmountType,
         InitialSpot,
+        EffectiveDate,
         StrikeType,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,

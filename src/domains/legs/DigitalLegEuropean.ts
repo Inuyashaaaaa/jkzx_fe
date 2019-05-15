@@ -78,6 +78,7 @@ export const DigitalLegEuropean: ILeg = {
         IsAnnual,
         Direction,
         NotionalAmountType,
+        EffectiveDate,
         StrikeType,
         InitialSpot,
         UnderlyerMultiplier,

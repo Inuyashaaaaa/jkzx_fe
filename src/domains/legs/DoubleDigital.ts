@@ -92,6 +92,7 @@ export const DoubleDigital: ILeg = {
         NotionalAmountType,
         InitialSpot,
         UnderlyerMultiplier,
+        EffectiveDate,
         UnderlyerInstrumentId,
         OptionType,
         StrikeType,

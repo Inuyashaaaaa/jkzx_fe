@@ -74,6 +74,7 @@ export const TripleDigital: ILeg = {
         InitialSpot,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
+        EffectiveDate,
         OptionType,
         StrikeType,
         ParticipationRate,
