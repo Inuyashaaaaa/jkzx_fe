@@ -1,52 +1,56 @@
-import { queryUserInfo } from '@/services/user';
+import { getUser, setUser } from '@/lib/utils/authority';
+import router from 'umi/router';
 
 export default {
   namespace: 'user',
 
   state: {
-    list: [],
     currentUser: {},
   },
 
   effects: {
-    // *fetch(_, { call, put }) {
-    //   const response = yield call(queryUsers);
-    //   yield put({
-    //     type: 'save',
-    //     payload: response,
-    //   });
-    // },
-    *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryUserInfo);
-      if (response.error) return;
+    *replenishUserInfo(_, { put }) {
+      const userInfo = getUser();
+
+      if (!userInfo) {
+        router.push('/user/login');
+        return;
+      }
+
       yield put({
-        type: 'saveCurrentUser',
-        payload: response.data,
+        type: 'saveData',
+        payload: userInfo,
+      });
+      yield put({
+        type: 'menu/initMenu',
+        payload: userInfo,
+      });
+    },
+
+    *cleanCurrentUser(_, { put }) {
+      setUser('');
+      yield put({
+        type: 'saveData',
+        payload: {},
+      });
+    },
+
+    *saveCurrentUser(action, { put }) {
+      const { payload: userInfo = {} } = action;
+      setUser(userInfo);
+
+      yield put({
+        type: 'menu/initMenu',
+        payload: userInfo,
       });
     },
   },
 
   reducers: {
-    save(state, action) {
+    saveData(state, action) {
       return {
         ...state,
-        list: action.payload,
-      };
-    },
-    saveCurrentUser(state, action) {
-      return {
-        ...state,
-        currentUser: action.payload || {},
-      };
-    },
-    changeNotifyCount(state, action) {
-      return {
-        ...state,
-        currentUser: {
-          ...state.currentUser,
-          notifyCount: action.payload.totalCount,
-          unreadCount: action.payload.unreadCount,
-        },
+        currentUser: action.payload,
       };
     },
   },
