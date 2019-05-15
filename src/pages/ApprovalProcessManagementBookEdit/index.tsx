@@ -44,7 +44,7 @@ const TradeManagementBooking = props => {
     });
   };
   const useEnv = props.editable ? LEG_ENV.BOOKING : LEG_ENV.EDITING;
-
+  let currentCreateFormRef = useRef<Form2>(null);
   const [tableLoading, setTableLoading] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
@@ -101,6 +101,8 @@ const TradeManagementBooking = props => {
   };
 
   const handelSave = async () => {
+    const res = await currentCreateFormRef.validate();
+    if (res.error) return;
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
       Form2.getFieldsValue(createFormData),
@@ -136,6 +138,9 @@ const TradeManagementBooking = props => {
           <Divider />
           <Loading loading={tableLoading}>
             <BookingBaseInfoForm
+              currentCreateFormRef={node => {
+                currentCreateFormRef = node;
+              }}
               columnNumberOneRow={2}
               editableStatus={
                 props.editable ? FORM_EDITABLE_STATUS.EDITING_NO_CONVERT : FORM_EDITABLE_STATUS.SHOW
