@@ -3,8 +3,9 @@ import { SOCKET_EVENT_TYPE } from '@/constants/socket';
 import { socketEventBus } from '@/services/socket';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import { notification } from 'antd';
 
-export const socketHOC = Component => {
+export const socketHOC = reportType => Component => {
   return class Wrapper extends PureComponent {
     public $reload: any = null;
 
@@ -17,7 +18,11 @@ export const socketHOC = Component => {
     };
 
     public reload = event => {
-      if (this.$reload && _.get(event, 'data.reportType') === SOCKET_MAP.ALL) {
+      if (this.$reload && _.get(event, 'data.reportType') === reportType) {
+        notification.success({
+          message: '页面数据已刷新',
+          description: '接受到计算完成通知',
+        });
         this.$reload();
       }
     };

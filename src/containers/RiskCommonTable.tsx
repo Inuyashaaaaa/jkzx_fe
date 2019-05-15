@@ -215,4 +215,4 @@ const RiskCommonTable = memo<any>(props => {
   );
 });
 
-export default socketHOC(RiskCommonTable);
+export default RiskCommonTable;
