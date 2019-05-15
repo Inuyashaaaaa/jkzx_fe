@@ -52,7 +52,7 @@ const useTableData = props => {
       if (_.includes(ALL_DATE_FIELD_KEYS, item)) {
         newData[item].value = data[item] ? getMoment(data[item]) : undefined;
       }
-      if (item.endsWith('Doc')) {
+      if (item.endsWith('Doc') || item === 'creditAgreement') {
         newData[item].value = [];
         if (data[item]) {
           return getPartyDoc({ uuid: data[item] });
@@ -67,7 +67,7 @@ const useTableData = props => {
     res.forEach((item, index) => {
       if (!item) return;
       const _item = Object.keys(data)[index];
-      if (_item.endsWith('Doc')) {
+      if (_item.endsWith('Doc') || _item === 'creditAgreement') {
         const { error, data } = item;
         if (!error && data.name) {
           newData[_item].value.push({
@@ -239,7 +239,6 @@ const EditModalButton = memo<any>(props => {
     columns = cloneColumns;
   }
 
-  console.log(baseFormData);
   return (
     <ModalButton
       text={true}
@@ -1018,6 +1017,15 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1053,6 +1061,15 @@ const EditModalButton = memo<any>(props => {
                             item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
                             return item;
                           });
+                        }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
                         }
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
@@ -1090,6 +1107,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1126,6 +1153,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1162,6 +1199,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1198,6 +1245,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1234,6 +1291,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1270,6 +1337,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1306,6 +1383,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1342,6 +1429,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1378,6 +1475,16 @@ const EditModalButton = memo<any>(props => {
                             return item;
                           });
                         }
+                        if (!_.isArray(val)) {
+                          val = [
+                            {
+                              name: val,
+                              id: val,
+                              uid: val,
+                            },
+                          ];
+                        }
+
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1441,7 +1548,7 @@ const EditModalButton = memo<any>(props => {
                   if (item.endsWith('Date') && baseData[item]) {
                     baseData[item] = getMoment(baseData[item]).format('YYYY-MM-DD');
                   }
-                  if (item.endsWith('Doc')) {
+                  if (item.endsWith('Doc') || item === 'creditAgreement') {
                     baseData[item] = baseFormData[item].value
                       .map(param => {
                         if (param.id) {
