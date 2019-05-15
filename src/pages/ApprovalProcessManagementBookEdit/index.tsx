@@ -1,4 +1,4 @@
-import { LEG_ID_FIELD } from '@/constants/common';
+import { LEG_ID_FIELD, LEG_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_EDITING_FIELDS, ILegColDef } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
@@ -20,11 +20,23 @@ import './index.less';
 import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
+import { getMoment } from '@/utils';
+const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
   const { tradeManagementBookEditPageData, dispatch, isCompleted } = props;
-  const { tableData } = tradeManagementBookEditPageData;
+  const tableData = _.map(tradeManagementBookEditPageData.tableData, iitem => {
+    return _.mapValues(iitem, (item, key) => {
+      if (_.includes(DATE_ARRAY, key)) {
+        return {
+          type: 'field',
+          value: getMoment(item.value),
+        };
+      }
+      return item;
+    });
+  });
   const setTableData = payload => {
     dispatch({
       type: 'tradeManagementBookEdit/setTableData',
@@ -96,11 +108,7 @@ const TradeManagementBooking = props => {
       LEG_ENV.BOOKING
     );
     props.tbookEditCancel();
-    props.confirmModify(null, {
-      taskId: props.taskId,
-      ctlProcessData: props.res,
-      businessProcessData: { trade, validTime: '2018-01-01T10:10:10' },
-    });
+    props.confirmModify(trade);
   };
 
   const handleEventAction = (eventType, params) => {

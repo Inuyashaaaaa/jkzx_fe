@@ -59,6 +59,7 @@ class ApprovalForm extends PureComponent<any, any> {
       bookEditVisible: false,
       editable: false,
       isCompleted: null,
+      tableData: {},
     };
   }
   public componentDidMount() {
@@ -293,28 +294,23 @@ class ApprovalForm extends PureComponent<any, any> {
     this.executeModify(params, 'pass');
   };
 
-  public confirmModify = async (e, param) => {
+  public confirmModify = async () => {
     const { passComment } = this.state;
-    if (param) {
-      param.ctlProcessData = {
-        comment: passComment,
-        abandon: false,
-      };
-      return this.executeModify(_.cloneDeep(param), 'pass');
-    }
-    const { data, error } = await wkProcessInstanceFormGet({
-      processInstanceId: this.props.formData.processInstanceId,
-    });
-    if (error) return;
+    // if (param) {
+    //   param.ctlProcessData = {
+    //     comment: passComment,
+    //     abandon: false,
+    //   };
+    //   return this.executeModify(_.cloneDeep(param), 'pass');
+    // }
     const { formData } = this.props;
-    const { modifyComment } = this.state;
     const params = {
       taskId: formData.taskId,
       ctlProcessData: {
-        comment: modifyComment,
+        comment: passComment,
         abandon: false,
       },
-      businessProcessData: data.process._business_payload,
+      businessProcessData: { trade: this.state.tableData, validTime: '2018-01-01T10:10:10' },
     };
     this.executeModify(params, 'modify');
   };
@@ -414,8 +410,19 @@ class ApprovalForm extends PureComponent<any, any> {
     window.open(`${downloadTradeAttachment}${_data[0].attachmentId}`);
   };
 
-  public handleConfirmModify = (e, data) => {
-    return this.confirmModify(e, data);
+  public handleConfirmModify = data => {
+    const detailData = {
+      tradeId: _.get(data, 'tradeId'),
+      bookName: _.get(data, 'bookName'),
+      tradeDate: _.get(data, 'tradeDate'),
+      salesName: _.get(data, 'salesName'),
+      counterPartyName: _.get(data, 'positions[0].counterPartyName'),
+      trader: _.get(data, 'trader'),
+    };
+    this.setState({
+      tableData: data,
+      detailData,
+    });
   };
 
   public render() {
@@ -695,7 +702,7 @@ class ApprovalForm extends PureComponent<any, any> {
                             <TextArea onChange={this.setModifyComment} value={modifyComment} />
                           </div>
                         }
-                        onConfirm={e => this.confirmModify(e, null)}
+                        onConfirm={e => this.confirmModify()}
                       >
                         <Button
                           type="primary"
