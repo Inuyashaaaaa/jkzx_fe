@@ -141,7 +141,9 @@ export const convertTradePageData2ApiData = (tableDataSource, tableFormData, use
   params.salesName = tableFormData.salesCode;
   params.salesCode = tableFormData.salesCode;
   params.positions = positions;
-  params.tradeDate = getMoment(params.tradeDate).format('YYYY-MM-DDTHH:mm:ss');
+  params.tradeDate = params.tradeDate
+    ? getMoment(params.tradeDate).format('YYYY-MM-DDTHH:mm:ss')
+    : '';
   params.trader = userName;
 
   return params;
