@@ -87,6 +87,7 @@ export const BarrierLeg: ILeg = {
         NotionalAmountType,
         InitialSpot,
         StrikeType,
+        EffectiveDate,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
         OptionType,

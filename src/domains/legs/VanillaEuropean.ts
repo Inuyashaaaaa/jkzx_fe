@@ -76,6 +76,7 @@ export const VanillaEuropean: ILeg = {
         InitialSpot,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
+        EffectiveDate,
         OptionType,
         ParticipationRate,
         StrikeType,

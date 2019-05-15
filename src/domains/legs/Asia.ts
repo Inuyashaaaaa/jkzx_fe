@@ -90,6 +90,7 @@ export const Asia: ILeg = {
       return [
         IsAnnual,
         Direction,
+        EffectiveDate,
         OptionType,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,

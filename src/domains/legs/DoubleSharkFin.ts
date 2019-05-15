@@ -93,6 +93,7 @@ export const DoubleSharkFin: ILeg = {
         NotionalAmountType,
         InitialSpot,
         UnderlyerMultiplier,
+        EffectiveDate,
         UnderlyerInstrumentId,
         StrikeType,
         LowStrike,

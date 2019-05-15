@@ -76,6 +76,7 @@ export const ModelXy: ILeg = {
         StrikeType,
         InitialSpot,
         UnderlyerMultiplier,
+        EffectiveDate,
         UnderlyerInstrumentId,
         OptionType,
         Strike,

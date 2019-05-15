@@ -76,6 +76,7 @@ export const Concava: ILeg = {
       return [
         IsAnnual,
         Direction,
+        EffectiveDate,
         NotionalAmountType,
         InitialSpot,
         UnderlyerMultiplier,

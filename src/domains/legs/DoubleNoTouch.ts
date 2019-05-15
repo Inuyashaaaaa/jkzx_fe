@@ -68,6 +68,7 @@ export const DoubleNoTouch: ILeg = {
         IsAnnual,
         Direction,
         NotionalAmountType,
+        EffectiveDate,
         InitialSpot,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,

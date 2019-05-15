@@ -86,6 +86,7 @@ export const Straddle: ILeg = {
         DaysInYear,
         NotionalAmountType,
         NotionalAmount,
+        EffectiveDate,
         StrikeType,
         LowStrike,
         HighStrike,

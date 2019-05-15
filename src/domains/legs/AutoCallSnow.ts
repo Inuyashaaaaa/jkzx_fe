@@ -76,6 +76,7 @@ export const AutoCallSnow: ILeg = {
       return [
         Direction,
         UnderlyerInstrumentId,
+        EffectiveDate,
         UnderlyerMultiplier,
         InitialSpot,
         ParticipationRate,
