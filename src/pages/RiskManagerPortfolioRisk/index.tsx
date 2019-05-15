@@ -3,10 +3,13 @@ import RiskCommonTable from '@/containers/RiskCommonTable';
 import React, { memo } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
+import { socketHOC } from '@/tools/socketHOC';
+
+const Wrapper = socketHOC('PORTFOLIO_RISK')(RiskCommonTable);
 
 const RiskManagerPortfolioRisk = memo<any>(props => {
   return (
-    <RiskCommonTable
+    <Wrapper
       tableColDefs={TABLE_COL_DEFS}
       searchFormControls={searchFormControls}
       defaultSort={'portfolioName'}
