@@ -9,16 +9,24 @@ export default {
   },
 
   effects: {
-    *replenishUserInfo(_, { put }) {
+    *replenish(_, { put }) {
       const userInfo = getUser();
-
       if (!userInfo) {
         router.push('/user/login');
         return;
       }
 
       yield put({
-        type: 'saveData',
+        type: 'replenishUserInfo',
+        payload: userInfo,
+      });
+    },
+
+    *replenishUserInfo(action, { put }) {
+      const { payload: userInfo = {} } = action;
+
+      yield put({
+        type: 'saveUserData',
         payload: userInfo,
       });
       yield put({
@@ -28,26 +36,17 @@ export default {
     },
 
     *cleanCurrentUser(_, { put }) {
-      setUser('');
       yield put({
-        type: 'saveData',
+        type: 'saveUserData',
         payload: {},
-      });
-    },
-
-    *saveCurrentUser(action, { put }) {
-      const { payload: userInfo = {} } = action;
-      setUser(userInfo);
-
-      yield put({
-        type: 'menu/initMenu',
-        payload: userInfo,
       });
     },
   },
 
   reducers: {
-    saveData(state, action) {
+    saveUserData(state, action) {
+      setUser(action.payload);
+
       return {
         ...state,
         currentUser: action.payload,
