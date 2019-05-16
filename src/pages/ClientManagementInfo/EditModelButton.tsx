@@ -477,25 +477,6 @@ const EditModalButton = memo<any>(props => {
                       },
                     },
                     {
-                      title: '托管邮箱',
-                      dataIndex: 'trustorEmail',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
-                    },
-
-                    {
                       title: '联系人',
                       dataIndex: 'contact',
                       render: (val, record, index, { form }) => {
@@ -563,6 +544,23 @@ const EditModalButton = memo<any>(props => {
                                 },
                               ],
                             })(<Input disabled={disabled} editing={editable} />)}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '托管邮箱',
+                      dataIndex: 'trustorEmail',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -648,6 +646,83 @@ const EditModalButton = memo<any>(props => {
                                 },
                               ],
                             })(<DatePicker disabled={disabled} editing={editable} />)}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '主协议编号版本',
+                      dataIndex: 'masterAgreementNoVersion',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(
+                              <Select
+                                editing={editable}
+                                options={[
+                                  {
+                                    label: ' SAC2014',
+                                    value: 'SAC2014',
+                                  },
+                                  {
+                                    label: 'SAC2015',
+                                    value: 'SAC2015',
+                                  },
+                                  {
+                                    label: 'ISDA',
+                                    value: 'ISDA',
+                                  },
+                                  {
+                                    label: 'OTHER',
+                                    value: 'OTHER',
+                                  },
+                                  {
+                                    label: 'NAFMII',
+                                    value: 'NAFMII',
+                                  },
+                                ]}
+                              />
+                            )}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '主协议签证日期',
+                      dataIndex: 'masterAgreementSignDate',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(<DatePicker editing={editable} />)}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '营业执照',
+                      dataIndex: 'businessLicense',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
