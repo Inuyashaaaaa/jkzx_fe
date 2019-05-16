@@ -4,21 +4,19 @@ import { Col, Row, Button, Model } from 'antd';
 import React, { PureComponent } from 'react';
 import ApprovalForm from './ApprovalForm';
 import TransactionForm from './TransactionForm';
+import CreditForm from './CreditForm';
+import _ from 'lodash';
 class Operation extends PureComponent {
   public state = {
     visible: false,
     diagramVisible: false,
     flowDiagram: '',
-    transactionModel: false,
+    type: null,
   };
   public switchModal = () => {
-    if (this.props.formData.processName === '交易录入经办复合流程') {
-      this.setState({
-        transactionModel: true,
-      });
-    }
     this.setState({
       visible: true,
+      type: _.get(this.props, 'formData.processName'),
     });
   };
 
@@ -42,6 +40,16 @@ class Operation extends PureComponent {
     this.setState({
       diagramVisible: false,
     });
+  };
+
+  public handleContent = () => {
+    if (this.state.type === '交易录入') {
+      return <TransactionForm {...this.props} handleFormChange={this.handleFormChange} />;
+    }
+    if (this.state.type === '授信额度变更') {
+      return <CreditForm {...this.props} handleFormChange={this.handleFormChange} />;
+    }
+    return <ApprovalForm {...this.props} handleFormChange={this.handleFormChange} />;
   };
 
   public render() {
@@ -83,13 +91,7 @@ class Operation extends PureComponent {
                 width: 900,
                 onCancel: this.handleFormChange,
               }}
-              content={
-                this.state.transactionModel ? (
-                  <TransactionForm {...this.props} handleFormChange={this.handleFormChange} />
-                ) : (
-                  <ApprovalForm {...this.props} handleFormChange={this.handleFormChange} />
-                )
-              }
+              content={this.handleContent()}
             >
               查看审批单
             </ModalButton>
