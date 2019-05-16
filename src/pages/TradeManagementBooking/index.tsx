@@ -62,7 +62,7 @@ const ActionBar = memo<any>(props => {
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
       _createFormData,
-      currentUser.userName,
+      currentUser.username,
       LEG_ENV.BOOKING
     );
 
