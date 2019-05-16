@@ -41,7 +41,6 @@ export const assertType = (condition, used, defaultVal, message) => {
   if (result) {
     return used;
   }
-  console.error(message);
   return defaultVal;
 };
 
@@ -435,7 +434,7 @@ export function removeWithIndex(arr, indexs) {
   return nextArr;
 }
 
-export function arr2treeOptions(arr, paths, labelPaths) {
+export function baseTree(arr, paths, labelPaths) {
   if (!arr || arr.length === 0) return [];
 
   if (paths.length !== labelPaths.length) {
@@ -471,6 +470,60 @@ export function arr2treeOptions(arr, paths, labelPaths) {
       });
   }
   return getTree(deeps);
+}
+
+export function arr2treeOptions(arr, paths, labelPaths) {
+  if (!arr || arr.length === 0) return [];
+  const length = paths.length;
+  if (paths.length !== labelPaths.length) {
+    throw new Error('arr2treeOptions: paths.length should be equal with labelPaths.length.');
+  }
+  const deeps = _.unionBy(arr, paths[0]).map(item => item[paths[0]]);
+  function getTreeData(a, index) {
+    if (index === length) {
+      return;
+    }
+    if (a === null) return;
+    const data = _.uniq(
+      arr
+        .filter(iitem => {
+          return iitem[paths[index]] === a;
+        })
+        .map(value => value[paths[index + 1]])
+    );
+    return {
+      [a]: data.map(c => getTreeData(c, index + 1)),
+    };
+  }
+  const x = deeps.map(item => {
+    return getTreeData(item, 0);
+  });
+  function getTree(deep, index = 0) {
+    if (!deep) return [];
+
+    return deep.map(value => {
+      if (Object.keys(value)[0] === undefined) return;
+      if (_.values(value)[0][0] === undefined) {
+        return {
+          data: _.values(value)[0],
+          label: arr.find(params => params[paths[index]] === Object.keys(value)[0])[
+            labelPaths[index]
+          ],
+          value: Object.keys(value)[0],
+          children: [],
+        };
+      }
+      return {
+        data: _.values(value)[0],
+        label: arr.find(params => params[paths[index]] === Object.keys(value)[0])[
+          labelPaths[index]
+        ],
+        value: Object.keys(value)[0],
+        children: getTree(_.values(value)[0], index + 1),
+      };
+    });
+  }
+  return getTree(x);
 }
 
 export const remove = (array: any[], index: number): any[] => {
