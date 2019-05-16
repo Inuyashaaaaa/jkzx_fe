@@ -1,11 +1,10 @@
-import { stringify } from 'qs';
-import { login, queryCaptcha, permissions, updateOwnPassword } from '@/services/user';
-import { initPagePermissions } from '@/services/role';
-import { setAuthority, setToken, setPermissions } from '@/lib/utils/authority';
 import { getPageQuery } from '@/lib/utils';
+import { setToken } from '@/lib/utils/authority';
 import { reloadAuthorized } from '@/lib/utils/Authorized';
+import { initPagePermissions } from '@/services/role';
+import { login, permissions, queryCaptcha, updateOwnPassword } from '@/services/user';
 import { notification } from 'antd';
-
+import { stringify } from 'qs';
 import pageRouters from '../../config/router.config';
 
 function setPagePermissions(user, roles, rolePagesPermission, pagePermissionTree, userPermissions) {
@@ -35,25 +34,6 @@ function setPagePermissions(user, roles, rolePagesPermission, pagePermissionTree
   setPermission(pagePermissionTree, pageIds);
 }
 
-// function findLoginRedirectPage(routers, userPermissions) {
-//   let redirect = '';
-//   function inner(router) {
-//     const { name, path, routes } = router;
-//     if (redirect) {
-//       return;
-//     }
-//     if (name !== 'welcomePage' && userPermissions[name] && !routes) {
-//       redirect = path;
-//       return;
-//     }
-//     if (routes && routes.length > 0) {
-//       routes.forEach(r => inner(r));
-//     }
-//   }
-//   inner(routers);
-//   return redirect;
-// }
-
 function validateRedirect(routers, redirect, userPermissions) {
   let valid = false;
   if (!redirect || redirect === '/user/login') {
@@ -80,31 +60,37 @@ export default {
   namespace: 'login',
 
   state: {
-    status: undefined,
+    loginFormData: {},
+    img: null,
   },
 
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(login, payload);
-      const { data: userInfo } = response;
+      const { data: userInfo, error } = response;
 
-      if (response.error) {
-        // yield put({
-        //   type: 'loginFailed',
-        //   payload: response.error,
-        // });
+      if (error) {
         notification.error({
           message: `请求失败`,
           description: response.error.message,
         });
-        if (userInfo && userInfo.expired) {
+
+        if (userInfo.expired) {
+          // 首先设置一次用户信息，保存 token 内容到本地，因为修改密码接口需要 token
+          yield put({
+            type: 'user/saveUserData',
+            payload: userInfo,
+          });
+
           yield put({
             type: 'showUpdatePassword',
           });
         }
+
         yield put({
           type: 'queryCaptcha',
         });
+
         return;
       }
       setToken(userInfo.token);
@@ -158,9 +144,16 @@ export default {
 
       const appRoutes = pageRouters.find(item => !!item.appRoute);
       if (!validateRedirect(appRoutes, redirect, newPermissions)) {
-        // redirect = findLoginRedirectPage(appRoutes, newPermissions);
         redirect = '/welcome-page';
       }
+
+      // router.push({
+      //   pathname: redirect,
+      // });
+      // yield put({
+      //   type: 'changeForm',
+      //   payload: {}
+      // })
 
       const nextQueryStr = stringify({
         _random: Math.random(),
@@ -180,63 +173,18 @@ export default {
       });
     },
 
-    // *queryCurrentPagePermissions({ payload }, { call, put }) {
-    //   const permissionInfo = yield call(initPagePermissions);
-    //   const allRolePermissions = permissionInfo[0].data;
-    //   const allPagePermissions = permissionInfo[1].data;
-    //   const roles = permissionInfo[2].data;
-
-    //   const newPermissions = Object.assign({}, permissions);
-    //   Object.keys(newPermissions).forEach(key => (newPermissions[key] = false));
-    //   setPagePermissions(payload, roles || [], allRolePermissions || [], allPagePermissions, newPermissions);
-
-    //   yield put({
-    //     type: 'changeLoginStatus',
-    //     payload: { ...payload, permissions: newPermissions },
-    //   });
-
-    //   reloadAuthorized();
-
-    //   const urlParams = new URL(window.location.href);
-    //   const params = getPageQuery();
-    //   let { redirect } = params;
-    //   if (redirect) {
-    //     const redirectUrlParams = new URL(redirect);
-    //     if (redirectUrlParams.origin === urlParams.origin) {
-    //       redirect = redirect.substr(urlParams.origin.length);
-    //       if (redirect.match(/^\/.*#/)) {
-    //         redirect = redirect.substr(redirect.indexOf('#') + 1);
-    //       }
-    //     } else {
-    //       window.location.href = redirect;
-    //       return;
-    //     }
-    //   }
-
-    //   const nextQueryStr = stringify({
-    //     _random: Math.random(),
-    //   });
-
-    //   window.location.href = `/?${nextQueryStr}/#${redirect || ''}`;
-    // },
-
-    //  处理验证码
-    // *getCaptcha({ payload }, { call }) {
-    //   yield call(getFakeCaptcha, payload);
-    // },
-
     *logout(_, { put }) {
       setToken('');
       yield put({
-        type: 'changeLoginStatus',
-        payload: {
-          status: false,
-          roles: 'guest',
-          username: '',
-        },
+        type: 'user/cleanCurrentUser',
       });
 
-      reloadAuthorized();
+      // router.push({
+      //   pathname: '/user/login',
+      //   query: {
+      //     redirect: window.location.href,
+      //   },
+      // });
 
       window.location.href = `/#/user/login?${stringify({
         redirect: window.location.href,
@@ -244,37 +192,40 @@ export default {
     },
 
     *updatePassword({ payload }, { call, put }) {
-      const response = yield call(updateOwnPassword, payload);
-      const error = (response.data && response.data.error) || '';
-      if (error) {
-        notification.error({
-          message: `请求失败`,
-          description: error.message,
-        });
-        return;
-      }
+      const { error } = yield call(updateOwnPassword, payload);
+      if (error) return;
       notification.success({
         message: `更新成功`,
       });
       yield put({
-        type: 'hideUpdatePassword',
+        type: 'queryCaptcha',
+      });
+      yield put({
+        type: 'relogin',
       });
     },
   },
 
   reducers: {
-    changeLoginStatus(state, { payload }) {
-      setAuthority(payload.roles);
-      // setToken(payload.token);
-      setPermissions(payload.permissions);
-      localStorage.setItem('login_name', payload.username);
+    relogin(state) {
       return {
         ...state,
-        status: payload.status,
-        type: payload.type,
-        loginError: null,
+        showPasswordUpdate: false,
+        loginFormData: {
+          ...state.loginFormData,
+          password: undefined,
+          captcha: undefined,
+        },
       };
     },
+
+    changeForm(state, { payload }) {
+      return {
+        ...state,
+        loginFormData: payload,
+      };
+    },
+
     loginFailed(state, { payload }) {
       return {
         ...state,

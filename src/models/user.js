@@ -1,4 +1,5 @@
-import { queryUserInfo } from '@/services/user';
+import { getUser, setUser } from '@/lib/utils/authority';
+import router from 'umi/router';
 
 export default {
   namespace: 'user',
@@ -9,37 +10,49 @@ export default {
   },
 
   effects: {
-    // *fetch(_, { call, put }) {
-    //   const response = yield call(queryUsers);
-    //   yield put({
-    //     type: 'save',
-    //     payload: response,
-    //   });
-    // },
-    *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryUserInfo);
-      if (response.error) return;
+    *replenishUserInfo(_, { put }) {
+      const userInfo = getUser();
+
+      if (!userInfo) {
+        router.push('/user/login');
+        return;
+      }
+
       yield put({
-        type: 'saveCurrentUser',
-        payload: response.data,
+        type: 'saveUserData',
+        payload: userInfo,
+      });
+      yield put({
+        type: 'menu/initMenu',
+        payload: userInfo,
+      });
+    },
+
+    *cleanCurrentUser(_, { put }) {
+      yield put({
+        type: 'saveUserData',
+        payload: {},
+      });
+    },
+
+    *saveCurrentUser(action, { put }) {
+      const { payload: userInfo = {} } = action;
+
+      yield put({
+        type: 'saveUserData',
+        payload: userInfo,
+      });
+      yield put({
+        type: 'menu/initMenu',
+        payload: userInfo,
       });
     },
   },
 
   reducers: {
-    save(state, action) {
-      return {
-        ...state,
-        list: action.payload,
-      };
-    },
-    saveCurrentUser(state, action) {
-      return {
-        ...state,
-        currentUser: action.payload || {},
-      };
-    },
-    changeNotifyCount(state, action) {
+    saveUserData(state, action) {
+      setUser(action.payload);
+
       return {
         ...state,
         currentUser: {
