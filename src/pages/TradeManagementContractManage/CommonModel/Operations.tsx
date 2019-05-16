@@ -115,7 +115,10 @@ class Operations extends PureComponent<{ record: any; onSearch: any; rowId: stri
         throw new Error('position 没有找到！');
       }
       const tableFormData = getTradeCreateModalData(this.props.record);
-      const leg = getLegByProductType(this.props.record.productType);
+      const leg = getLegByProductType(
+        this.props.record.productType,
+        this.props.record.exerciseType
+      );
       const record = createLegRecordByPosition(leg, position, LEG_ENV.BOOKING);
 
       if (this.$lcmEventModal) {
