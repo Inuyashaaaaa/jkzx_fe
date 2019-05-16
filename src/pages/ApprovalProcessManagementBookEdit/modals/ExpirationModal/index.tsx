@@ -240,7 +240,7 @@ class ExpirationModal extends PureComponent<
         : isAutocallSnow(this.data)
         ? LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE
         : LCM_EVENT_TYPE_MAP.EXPIRATION,
-      userLoginId: this.currentUser.userName,
+      userLoginId: this.currentUser.username,
       eventDetail: this.getEventDetail(usedFormData),
     });
 

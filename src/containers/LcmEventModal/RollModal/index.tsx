@@ -49,7 +49,7 @@ class RollModal extends PureComponent<{ visible?: boolean; data?: any }> {
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.ROLL,
-      userLoginId: this.currentUser.userName,
+      userLoginId: this.currentUser.username,
       eventDetail: {
         expirationDate: this.state.formData.expirationDate
           ? this.state.formData.expirationDate.format('YYYY-MM-DD')
