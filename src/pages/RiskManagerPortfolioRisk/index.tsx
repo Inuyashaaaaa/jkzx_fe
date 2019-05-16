@@ -3,10 +3,14 @@ import RiskCommonTable from '@/containers/RiskCommonTable';
 import React, { memo } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
+import { socketHOC } from '@/tools/socketHOC';
+
+const Wrapper = socketHOC('PORTFOLIO_RISK')(RiskCommonTable);
 
 const RiskManagerPortfolioRisk = memo<any>(props => {
   return (
-    <RiskCommonTable
+    <Wrapper
+      id="real_time_portfolio_risk_dag"
       tableColDefs={TABLE_COL_DEFS}
       searchFormControls={searchFormControls}
       defaultSort={'portfolioName'}
@@ -14,7 +18,6 @@ const RiskManagerPortfolioRisk = memo<any>(props => {
       searchMethod={rptIntradayPortfolioRiskReportSearchPaged}
       downloadName={'投资组合风险'}
       scrollWidth={1350}
-      hideReload={true}
     />
   );
 });

@@ -63,9 +63,16 @@ export async function rptIntradayTradeExpiringReportPaged(params = {}) {
 
 export async function reloadAirflowTrigger(id) {
   return request(
-    `${location.protocol}//${location.hostname}:8080/admin/airflow/trigger?dag_id=${id}`,
+    `${HOST_TEST}report-service/api/rpc`,
     {
       method: `POST`,
+      body: {
+        method: 'rptTriggerAirflowDag',
+        params: {
+          ip: location.hostname,
+          dagId: id,
+        },
+      },
     },
     true
   );
