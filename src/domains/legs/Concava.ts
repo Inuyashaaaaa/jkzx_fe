@@ -208,7 +208,7 @@ export const Concava: ILeg = {
 
     return nextPosition;
   },
-  getPageData: (nextDataSourceItem, position) => {},
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,

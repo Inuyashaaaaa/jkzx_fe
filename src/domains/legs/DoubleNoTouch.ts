@@ -197,7 +197,7 @@ export const DoubleNoTouch: ILeg = {
     nextPosition.asset.touched = false;
     return nextPosition;
   },
-  getPageData: (nextDataSourceItem, position) => {},
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
