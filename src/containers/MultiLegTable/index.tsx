@@ -16,8 +16,7 @@ import { Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
-
-const TOTAL_FIELD = 'TOTAL_FIELD';
+import { TOTAL_FIELD } from '@/constants/global';
 
 const MultiLegTable = memo<
   {

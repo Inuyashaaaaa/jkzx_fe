@@ -85,3 +85,5 @@ export const COMPUTED_LEG_FIELD_MAP = {
 };
 
 export const COMPUTED_LEG_FIELDS = _.map(COMPUTED_LEG_FIELD_MAP, val => val);
+
+export const TOTAL_FIELD = 'TOTAL_FIELD';
