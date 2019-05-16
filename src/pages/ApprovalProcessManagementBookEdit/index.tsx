@@ -113,7 +113,7 @@ const TradeManagementBooking = props => {
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
       Form2.getFieldsValue(createFormData),
-      currentUser.userName,
+      currentUser.username,
       LEG_ENV.BOOKING
     );
     props.tbookEditCancel();
