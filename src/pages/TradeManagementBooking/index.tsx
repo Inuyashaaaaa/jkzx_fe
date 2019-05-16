@@ -53,9 +53,11 @@ const ActionBar = memo<any>(props => {
   };
 
   const handelTrdTradeCreate = async () => {
-    let _createFormData = Form2.getFieldsValue(createFormData);
+    const _createFormData = Form2.getFieldsValue(createFormData);
     Object.keys(_createFormData).forEach(item => {
-      _createFormData[item] = _.trim(_createFormData[item]);
+      if (!_.endsWith(item, 'Date')) {
+        _createFormData[item] = _.trim(_createFormData[item]);
+      }
     });
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
