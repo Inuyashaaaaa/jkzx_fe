@@ -21,7 +21,14 @@ import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 import { getMoment } from '@/utils';
-const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
+const DATE_ARRAY = [
+  LEG_FIELD.SETTLEMENT_DATE,
+  LEG_FIELD.EFFECTIVE_DATE,
+  LEG_FIELD.EXPIRATION_DATE,
+  LEG_FIELD.DOWN_BARRIER_DATE,
+  LEG_FIELD.OBSERVE_START_DAY,
+  LEG_FIELD.OBSERVE_END_DAY,
+];
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
