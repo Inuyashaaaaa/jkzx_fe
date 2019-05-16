@@ -205,12 +205,10 @@ export const Straddle: ILeg = {
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = true;
+    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
     return nextPosition;
   },
-  getPageData: (nextDataSourceItem, position) => {
-    return nextDataSourceItem;
-  },
+  getPageData: (nextDataSourceItem, position) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
