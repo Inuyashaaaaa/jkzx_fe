@@ -652,10 +652,10 @@ const EditModalButton = memo<any>(props => {
                     },
                     {
                       title: '主协议编号版本',
-                      dataIndex: 'banben',
+                      dataIndex: 'masterAgreementNoVersion',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={true}>
+                          <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -695,10 +695,10 @@ const EditModalButton = memo<any>(props => {
                     },
                     {
                       title: '主协议签证日期',
-                      dataIndex: 'xDate',
+                      dataIndex: 'masterAgreementSignDate',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={true}>
+                          <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -712,10 +712,10 @@ const EditModalButton = memo<any>(props => {
                     },
                     {
                       title: '营业执照',
-                      dataIndex: 'zhizhao',
+                      dataIndex: 'businessLicense',
                       render: (val, record, index, { form }) => {
                         return (
-                          <FormItem hasFeedback={true}>
+                          <FormItem hasFeedback={!disabled ? true : false}>
                             {form.getFieldDecorator({
                               rules: [
                                 {
