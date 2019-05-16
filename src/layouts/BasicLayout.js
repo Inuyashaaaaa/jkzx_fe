@@ -58,7 +58,7 @@ class BasicLayout extends React.PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'user/replenishUserInfo',
+      type: 'user/replenish',
     });
   }
 

@@ -2,7 +2,7 @@ import { getPageQuery } from '@/lib/utils';
 import { initPagePermissions } from '@/services/role';
 import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
 import { notification } from 'antd';
-import router from 'umi/router';
+import { stringify } from 'qs';
 import pageRouters from '../../config/router.config';
 
 function setPagePermissions(user, roles, rolePagesPermission, pagePermissionTree, userPermissions) {
@@ -58,13 +58,15 @@ export default {
   namespace: 'login',
 
   state: {
-    status: undefined,
+    loginFormData: {},
+    img: null,
   },
 
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(login, payload);
       const { data: userInfo, error } = response;
+
       if (error) {
         notification.error({
           message: '请求失败',
@@ -72,14 +74,20 @@ export default {
         });
 
         if (userInfo.expired) {
+          // 首先设置一次用户信息，保存 token 内容到本地，因为修改密码接口需要 token
+          yield put({
+            type: 'user/saveUserData',
+            payload: userInfo,
+          });
+
           yield put({
             type: 'showUpdatePassword',
           });
-        } else if (userInfo.captcha) {
-          yield put({
-            type: 'queryCaptcha',
-          });
         }
+
+        yield put({
+          type: 'queryCaptcha',
+        });
 
         return;
       }
@@ -102,7 +110,7 @@ export default {
       );
 
       yield put({
-        type: 'user/saveCurrentUser',
+        type: 'user/replenishUserInfo',
         payload: {
           ...userInfo,
           roles,
@@ -133,9 +141,19 @@ export default {
         redirect = '/welcome-page';
       }
 
-      router.push({
-        pathname: redirect,
+      // router.push({
+      //   pathname: redirect,
+      // });
+      // yield put({
+      //   type: 'changeForm',
+      //   payload: {}
+      // })
+
+      const nextQueryStr = stringify({
+        _random: Math.random(),
       });
+
+      window.location.href = `/?${nextQueryStr}/#${redirect || ''}`;
     },
 
     *queryCaptcha(_, { call, put }) {
@@ -154,34 +172,53 @@ export default {
         type: 'user/cleanCurrentUser',
       });
 
-      router.push({
-        pathname: '/user/login',
-        query: {
-          redirect: window.location.href,
-        },
-      });
+      // router.push({
+      //   pathname: '/user/login',
+      //   query: {
+      //     redirect: window.location.href,
+      //   },
+      // });
+
+      window.location.href = `/#/user/login?${stringify({
+        redirect: window.location.href,
+      })}`;
     },
 
     *updatePassword({ payload }, { call, put }) {
-      const response = yield call(updateOwnPassword, payload);
-      const error = (response.data && response.data.error) || '';
-      if (error) {
-        notification.error({
-          message: `请求失败`,
-          description: error.message,
-        });
-        return;
-      }
+      const { error } = yield call(updateOwnPassword, payload);
+      if (error) return;
       notification.success({
         message: `更新成功`,
       });
       yield put({
-        type: 'hideUpdatePassword',
+        type: 'queryCaptcha',
+      });
+      yield put({
+        type: 'relogin',
       });
     },
   },
 
   reducers: {
+    relogin(state) {
+      return {
+        ...state,
+        showPasswordUpdate: false,
+        loginFormData: {
+          ...state.loginFormData,
+          password: undefined,
+          captcha: undefined,
+        },
+      };
+    },
+
+    changeForm(state, { payload }) {
+      return {
+        ...state,
+        loginFormData: payload,
+      };
+    },
+
     loginFailed(state, { payload }) {
       return {
         ...state,
