@@ -203,6 +203,7 @@ export const DoubleDigital: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.DOUBLE_DIGITAL;

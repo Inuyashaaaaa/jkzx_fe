@@ -228,6 +228,7 @@ export const Asia: ILeg = {
       LEG_FIELD.OBSERVE_START_DAY,
       LEG_FIELD.OBSERVE_END_DAY,
       LEG_FIELD.OBSERVATION_DATES,
+      LEG_FIELD.UNIT,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
         : [

@@ -221,6 +221,7 @@ export const DoubleSharkFin: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.DOUBLE_SHARK_FIN;

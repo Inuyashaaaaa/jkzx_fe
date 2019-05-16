@@ -176,7 +176,7 @@ export const Concava: ILeg = {
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [];
+    const COMPUTED_FIELDS = [LEG_FIELD.UNIT];
 
     nextPosition.productType = LEG_TYPE_MAP.CONCAVA;
     nextPosition.lcmEventType = 'OPEN';
