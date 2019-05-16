@@ -411,6 +411,7 @@ const TradeManagementBooking = props => {
               return val ? new BigNumber(val).multipliedBy(0.01).toNumber() : val;
             }
           ),
+          ...(item.productType === LEG_TYPE_MAP.FORWARD ? { vol: 1 } : undefined),
           pricingEnvironmentId: curPricingEnv,
         });
       })

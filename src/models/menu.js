@@ -1,75 +1,6 @@
-import Authorized from '@/lib/utils/Authorized';
-import isEqual from 'lodash/isEqual';
-import memoizeOne from 'memoize-one';
+import { mapTree } from '@/lib/utils';
 import { formatMessage } from 'umi/locale';
-
-const { check } = Authorized;
-
-// Conversion router to menu.
-function formatter(data, parentAuthority, parentName) {
-  return data
-    .map(item => {
-      if (!item.name || !item.path) {
-        return null;
-      }
-
-      let locale = 'menu';
-      if (parentName) {
-        locale = `${parentName}.${item.name}`;
-      } else {
-        locale = `menu.${item.name}`;
-      }
-
-      const result = {
-        ...item,
-        name: formatMessage({ id: locale, defaultMessage: item.name }),
-        locale,
-        authority: item.authority || parentAuthority,
-      };
-      if (item.routes) {
-        const children = formatter(item.routes, item.authority, locale);
-        // Reduce memory usage
-        result.children = children;
-      }
-      delete result.routes;
-      return result;
-    })
-    .filter(item => item);
-}
-
-const memoizeOneFormatter = memoizeOne(formatter, isEqual);
-
-/**
- * get SubMenu or Item
- */
-const getSubMenu = item => {
-  // doc: add hideChildrenInMenu
-  if (item.children && !item.hideChildrenInMenu && item.children.some(child => child.name)) {
-    return {
-      ...item,
-      children: filterMenuData(item.children), // eslint-disable-line
-    };
-  }
-  return item;
-};
-
-/**
- * filter menuData
- */
-const filterMenuData = menuData => {
-  if (!menuData) {
-    return [];
-  }
-  return menuData
-    .filter(item => item.name && !item.hideInMenu)
-    .map(item => {
-      // make dom
-      const ItemDom = getSubMenu(item);
-      const data = check(item.authority, ItemDom);
-      return data;
-    })
-    .filter(item => item);
-};
+import pageRouters from '../../config/router.config';
 
 export default {
   namespace: 'menu',
@@ -79,11 +10,54 @@ export default {
   },
 
   effects: {
-    *getMenuData({ payload }, { put }) {
-      const { routes, authority } = payload;
+    *initMenu({ payload }, { put }) {
+      const appRoute = pageRouters.find(item => item.appRoute);
+      const { permissions } = payload;
+
+      if (!appRoute) {
+        throw new Error('appRoute is not defiend!');
+      }
+
+      const getLocaleId = (parent, item) => {
+        const parentName = parent && parent.name;
+        if (parentName) {
+          return `menu.${parentName}.${item.name}`;
+        }
+        return `menu.${item.name}`;
+      };
+
+      const menuData = mapTree(
+        appRoute,
+        (item, parent) => {
+          const getNoPermission = () => {
+            if (
+              item.routes &&
+              item.routes.some(route => permissions[route.name] || route.noAccess === false)
+            ) {
+              return false;
+            }
+            return (
+              !permissions[item.name] ||
+              (item.routes && item.routes.every(route => !permissions[route.name]))
+            );
+          };
+
+          return {
+            noPermission: getNoPermission(),
+            ...item,
+            label:
+              item &&
+              item.name &&
+              formatMessage({ id: getLocaleId(parent, item), defaultMessage: item.name }),
+            children: item.routes,
+          };
+        },
+        'routes'
+      );
+
       yield put({
         type: 'save',
-        payload: filterMenuData(memoizeOneFormatter(routes, authority)),
+        payload: menuData.children || [],
       });
     },
   },

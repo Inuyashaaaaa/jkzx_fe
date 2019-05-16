@@ -4,7 +4,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
-class UpdatePassword extends PureComponent {
+class UpdatePassword extends PureComponent<any> {
   public state = {
     formData: {},
   };

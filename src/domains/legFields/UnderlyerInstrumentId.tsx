@@ -1,6 +1,10 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { Input, Select } from '@/design/components';
-import { mktInstrumentSearch } from '@/services/market-data-service';
+import {
+  mktInstrumentSearch,
+  mktInstrumentWhitelistListPaged,
+  mktInstrumentWhitelistSearch,
+} from '@/services/market-data-service';
 import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
@@ -37,7 +41,10 @@ export const UnderlyerInstrumentId: ILegColDef = {
                 autoSelect: true,
                 showSearch: true,
                 options: async (value: string) => {
-                  const { data, error } = await mktInstrumentSearch({
+                  // const { data, error } = await mktInstrumentSearch({
+                  //   instrumentIdPart: value,
+                  // });
+                  const { data, error } = await mktInstrumentWhitelistSearch({
                     instrumentIdPart: value,
                   });
                   if (error) return [];

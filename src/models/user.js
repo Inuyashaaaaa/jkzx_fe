@@ -5,18 +5,25 @@ export default {
   namespace: 'user',
 
   state: {
-    list: [],
     currentUser: {},
   },
 
   effects: {
-    *replenishUserInfo(_, { put }) {
+    *replenish(_, { put }) {
       const userInfo = getUser();
-
       if (!userInfo) {
         router.push('/user/login');
         return;
       }
+
+      yield put({
+        type: 'replenishUserInfo',
+        payload: userInfo,
+      });
+    },
+
+    *replenishUserInfo(action, { put }) {
+      const { payload: userInfo = {} } = action;
 
       yield put({
         type: 'saveUserData',
@@ -34,19 +41,6 @@ export default {
         payload: {},
       });
     },
-
-    *saveCurrentUser(action, { put }) {
-      const { payload: userInfo = {} } = action;
-
-      yield put({
-        type: 'saveUserData',
-        payload: userInfo,
-      });
-      yield put({
-        type: 'menu/initMenu',
-        payload: userInfo,
-      });
-    },
   },
 
   reducers: {
@@ -55,11 +49,7 @@ export default {
 
       return {
         ...state,
-        currentUser: {
-          ...state.currentUser,
-          notifyCount: action.payload.totalCount,
-          unreadCount: action.payload.unreadCount,
-        },
+        currentUser: action.payload,
       };
     },
   },

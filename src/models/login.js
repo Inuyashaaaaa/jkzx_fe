@@ -1,8 +1,6 @@
 import { getPageQuery } from '@/lib/utils';
-import { setToken } from '@/lib/utils/authority';
-import { reloadAuthorized } from '@/lib/utils/Authorized';
 import { initPagePermissions } from '@/services/role';
-import { login, permissions, queryCaptcha, updateOwnPassword } from '@/services/user';
+import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
 import { notification } from 'antd';
 import { stringify } from 'qs';
 import pageRouters from '../../config/router.config';
@@ -39,8 +37,8 @@ function validateRedirect(routers, redirect, userPermissions) {
   if (!redirect || redirect === '/user/login') {
     return false;
   }
-  function inner(router) {
-    const { name, path, routes } = router;
+  function inner(_router) {
+    const { name, path, routes } = _router;
     if (valid) {
       return;
     }
@@ -71,8 +69,8 @@ export default {
 
       if (error) {
         notification.error({
-          message: `请求失败`,
-          description: response.error.message,
+          message: '请求失败',
+          description: userInfo.message,
         });
 
         if (userInfo.expired) {
@@ -93,36 +91,32 @@ export default {
 
         return;
       }
-      setToken(userInfo.token);
-      // yield put({
-      //   type: 'queryCurrentPagePermissions',
-      //   payload: {
-      //     ...userInfo,
-      //   },
-      // });
 
-      const permissionInfo = yield call(initPagePermissions);
-      const allRolePermissions = permissionInfo[0].data;
-      const allPagePermissions = permissionInfo[1].data;
-      const roles = permissionInfo[2].data;
+      const permissionRsps = yield call(initPagePermissions, userInfo.token);
 
-      const newPermissions = Object.assign({}, permissions);
-      Object.keys(newPermissions).forEach(key => (newPermissions[key] = false));
-      // newPermissions.booking = true;
+      const allRolePermissions = permissionRsps[0].data;
+      const allPagePermissions = permissionRsps[1].data;
+      const roles = permissionRsps[2].data;
+      const permissions = {
+        welcomePage: true,
+      };
+
       setPagePermissions(
         userInfo,
         roles || [],
         allRolePermissions || [],
         allPagePermissions,
-        newPermissions
+        permissions
       );
 
       yield put({
-        type: 'changeLoginStatus',
-        payload: { ...userInfo, permissions: newPermissions },
+        type: 'user/replenishUserInfo',
+        payload: {
+          ...userInfo,
+          roles,
+          permissions,
+        },
       });
-
-      reloadAuthorized();
 
       const urlParams = new URL(window.location.href);
       const params = getPageQuery();
@@ -143,7 +137,7 @@ export default {
       }
 
       const appRoutes = pageRouters.find(item => !!item.appRoute);
-      if (!validateRedirect(appRoutes, redirect, newPermissions)) {
+      if (!validateRedirect(appRoutes, redirect, permissions)) {
         redirect = '/welcome-page';
       }
 
@@ -174,7 +168,6 @@ export default {
     },
 
     *logout(_, { put }) {
-      setToken('');
       yield put({
         type: 'user/cleanCurrentUser',
       });
@@ -232,6 +225,7 @@ export default {
         loginError: payload,
       };
     },
+
     setCaptcha(state, { payload }) {
       return {
         ...state,
@@ -239,12 +233,14 @@ export default {
         showImage: true,
       };
     },
+
     showUpdatePassword(state) {
       return {
         ...state,
         showPasswordUpdate: true,
       };
     },
+
     hideUpdatePassword(state) {
       return {
         ...state,

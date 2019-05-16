@@ -459,6 +459,7 @@ class ApprovalForm extends PureComponent<any, any> {
           ? '审核完成'
           : '待审批';
     }
+
     return (
       <div>
         {!loading && (
@@ -541,7 +542,9 @@ class ApprovalForm extends PureComponent<any, any> {
                   dataIndex: 'tradeDate',
                   render: (value, record, index, { form, editing }) => {
                     return (
-                      <FormItem>{value.indexOf('T') >= 0 ? value.split('T')[0] : value}</FormItem>
+                      <FormItem>
+                        {value && value.indexOf('T') >= 0 ? value.split('T')[0] : value}
+                      </FormItem>
                     );
                   },
                 },
@@ -632,6 +635,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 size="small"
                 pagination={false}
                 bordered={false}
+                rowKey="operateTime"
               />
             </div>
             {status === 'pending' && (

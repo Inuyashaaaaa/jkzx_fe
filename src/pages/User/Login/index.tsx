@@ -47,21 +47,18 @@ class LoginPage extends Component<any> {
     });
   };
 
-  public handleModalOK = () => {
-    this.$updatePassword.validate((err, values) => {
-      if (!err) {
-        const { username, oldPassword, password } = values;
-        const params = {
-          username,
-          newPassword: password,
-          oldPassword,
-        };
-        const { dispatch } = this.props;
-        dispatch({
-          type: 'login/updatePassword',
-          payload: params,
-        });
-      }
+  public handleModalOK = async () => {
+    const { error, values } = await this.$updatePassword.validate();
+    const { username, oldPassword, password } = values;
+    const params = {
+      username,
+      newPassword: password,
+      oldPassword,
+    };
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'login/updatePassword',
+      payload: params,
     });
   };
 
@@ -144,7 +141,12 @@ class LoginPage extends Component<any> {
                         />
                       )}
 
-                      <img style={{ width: 150 }} src={login.img} alt="验证码" />
+                      <img
+                        style={{ width: 150, cursor: 'pointer' }}
+                        src={login.img}
+                        alt="验证码"
+                        onClick={() => this.queryCaptcha()}
+                      />
                     </Row>
                   </FormItem>
                 );

@@ -75,7 +75,7 @@ class BarrierIn extends PureComponent<
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.KNOCK_IN,
-      userLoginId: this.currentUser.userName,
+      userLoginId: this.currentUser.username,
       eventDetail: {},
     });
     this.switchConfirmLoading();

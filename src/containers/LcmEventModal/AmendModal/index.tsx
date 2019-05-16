@@ -23,7 +23,14 @@ const UN_EDITDIR = [
   LEG_FIELD.ALREADY_BARRIER,
 ];
 
-const DATE_ARRAY = [LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE, LEG_FIELD.SETTLEMENT_DATE];
+const DATE_ARRAY = [
+  LEG_FIELD.EFFECTIVE_DATE,
+  LEG_FIELD.EXPIRATION_DATE,
+  LEG_FIELD.SETTLEMENT_DATE,
+  LEG_FIELD.DOWN_BARRIER_DATE,
+  LEG_FIELD.OBSERVE_START_DAY,
+  LEG_FIELD.OBSERVE_END_DAY,
+];
 
 export interface IAmendModalEl {
   show: (record, tableFormData, currentUser, reload) => void;
@@ -86,7 +93,7 @@ const AmendModal = memo<IAmendModal>(props => {
           positionId: store.record[LEG_ID_FIELD],
           tradeId: store.tableFormData.tradeId,
           eventType: LCM_EVENT_TYPE_MAP.AMEND,
-          userLoginId: store.currentUser.userName,
+          userLoginId: store.currentUser.username,
           eventDetail: {
             asset: _.get(position, 'asset'),
             productType: position.productType,

@@ -1,6 +1,8 @@
 import { IColDef } from '@/design/components/Table/types';
 import _ from 'lodash';
 
+export const USER_LOCAL_FIELD = 'tongyu_USER_LOCAL_FIELD';
+
 export const ROLE_LOCAL_FIELD = 'tongyu_ROLE_LOCAL_FIELD';
 
 export const TOKEN_LOCAL_FIELD = 'tongyu_TOKEN_LOCAL_FIELD';

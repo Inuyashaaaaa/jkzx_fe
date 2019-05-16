@@ -21,7 +21,14 @@ import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 import { getMoment } from '@/utils';
-const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
+const DATE_ARRAY = [
+  LEG_FIELD.SETTLEMENT_DATE,
+  LEG_FIELD.EFFECTIVE_DATE,
+  LEG_FIELD.EXPIRATION_DATE,
+  LEG_FIELD.DOWN_BARRIER_DATE,
+  LEG_FIELD.OBSERVE_START_DAY,
+  LEG_FIELD.OBSERVE_END_DAY,
+];
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
@@ -44,7 +51,7 @@ const TradeManagementBooking = props => {
     });
   };
   const useEnv = props.editable ? LEG_ENV.BOOKING : LEG_ENV.EDITING;
-
+  let currentCreateFormRef = useRef<Form2>(null);
   const [tableLoading, setTableLoading] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
@@ -101,10 +108,12 @@ const TradeManagementBooking = props => {
   };
 
   const handelSave = async () => {
+    const res = await currentCreateFormRef.validate();
+    if (res.error) return;
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
       Form2.getFieldsValue(createFormData),
-      currentUser.userName,
+      currentUser.username,
       LEG_ENV.BOOKING
     );
     props.tbookEditCancel();
@@ -136,6 +145,9 @@ const TradeManagementBooking = props => {
           <Divider />
           <Loading loading={tableLoading}>
             <BookingBaseInfoForm
+              currentCreateFormRef={node => {
+                currentCreateFormRef = node;
+              }}
               columnNumberOneRow={2}
               editableStatus={
                 props.editable ? FORM_EDITABLE_STATUS.EDITING_NO_CONVERT : FORM_EDITABLE_STATUS.SHOW
