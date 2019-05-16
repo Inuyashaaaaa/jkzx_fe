@@ -11,6 +11,7 @@ import {
   COMPUTED_LEG_FIELDS,
   TRADESCOLDEFS_LEG_FIELD_MAP,
   TRADESCOL_FIELDS,
+  TOTAL_FIELD,
 } from '@/constants/global';
 import { COMPUTED_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
@@ -561,6 +562,11 @@ const TradeManagementBooking = props => {
         }}
         dataSource={tableData}
         getContextMenu={params => {
+          const { record } = params;
+          if (record[TOTAL_FIELD]) {
+            return null;
+          }
+
           return (
             <Menu
               onClick={event => {
