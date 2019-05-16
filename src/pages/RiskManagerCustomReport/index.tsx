@@ -202,4 +202,4 @@ const RiskManagerCustomReport = memo<any>(props => {
   );
 });
 
-export default socketHOC(RiskManagerCustomReport);
+export default RiskManagerCustomReport;
