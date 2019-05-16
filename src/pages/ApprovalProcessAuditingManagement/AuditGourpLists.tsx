@@ -127,20 +127,16 @@ class AuditLists extends PureComponent {
       const { message } = error;
       if (error) {
         return;
-      } else {
-        notification.success({
-          message: `编辑成功`,
-          description: message,
-        });
       }
 
-      const approveGroupList = this.state.approveGroupList.map(item => {
-        if (item.approveGroupId === this.state.approveGroupId) {
-          item.approveGroupName = data.approveGroupName;
-          item.approveGroupId = data.approveGroupId;
-          item.description = data.description;
-        }
-        return item;
+      notification.success({
+        message: `编辑成功`,
+        description: message,
+      });
+
+      const approveGroupList = [...data];
+      approveGroupList.sort((a, b) => {
+        return a.approveGroupName.localeCompare(b.approveGroupName);
       });
       this.setState(
         {
