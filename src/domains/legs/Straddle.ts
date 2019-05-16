@@ -208,9 +208,7 @@ export const Straddle: ILeg = {
     nextPosition.asset.annualized = true;
     return nextPosition;
   },
-  getPageData: (nextDataSourceItem, position) => {
-    return nextDataSourceItem;
-  },
+  getPageData: (nextDataSourceItem, position) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
