@@ -197,13 +197,11 @@ export const DoubleNoTouch: ILeg = {
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = true;
+    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
     nextPosition.asset.touched = false;
     return nextPosition;
   },
-  getPageData: (nextDataSourceItem, position) => {
-    return nextDataSourceItem;
-  },
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,

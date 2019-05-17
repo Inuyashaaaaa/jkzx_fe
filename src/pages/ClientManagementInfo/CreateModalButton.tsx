@@ -991,7 +991,7 @@ const CreateModalButton = memo<any>(props => {
                 });
               }}
               dataSource={attachFormData}
-              style={{ paddingTop: 20 }}
+              style={{ paddingTop: 20, paddingLeft: 30 }}
               footer={false}
               columnNumberOneRow={3}
               layout="vertical"
@@ -1001,7 +1001,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'masterAgreementDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1029,7 +1029,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'supplementalAgreementDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1057,7 +1057,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskSurveyDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1085,7 +1085,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'tradeAuthDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1113,7 +1113,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'dueDiligenceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1141,7 +1141,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskPreferenceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1169,7 +1169,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'complianceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1197,7 +1197,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskRevelationDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1225,7 +1225,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'qualificationWarningDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1253,7 +1253,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'creditAgreement',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1281,7 +1281,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'performanceGuaranteeDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {

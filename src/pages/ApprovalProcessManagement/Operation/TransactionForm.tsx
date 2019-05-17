@@ -58,6 +58,8 @@ class ApprovalForm extends PureComponent<any, any> {
       attachmentId: null,
       bookEditVisible: false,
       editable: false,
+      isCompleted: null,
+      tableData: {},
     };
   }
   public componentDidMount() {
@@ -99,7 +101,7 @@ class ApprovalForm extends PureComponent<any, any> {
       loading: true,
     });
     const isCompleted = params.status
-      ? !params.status.includes('unfinished') || this.props.status === 'pending'
+      ? !params.status.includes('unfinished') && this.props.status !== 'pending'
       : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
@@ -126,9 +128,11 @@ class ApprovalForm extends PureComponent<any, any> {
         data,
         'process._business_payload.trade.positions[0].counterPartyName'
       ),
+      trader: _.get(data, 'process._business_payload.trade.trader'),
     };
     this.setState({
       detailData: _detailData,
+      isCompleted,
     });
 
     if (!isCheckBtn) {
@@ -258,6 +262,10 @@ class ApprovalForm extends PureComponent<any, any> {
     //   obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
     //   obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
     //   obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+    const { data, error } = await wkProcessInstanceFormGet({
+      processInstanceId: this.props.formData.processInstanceId,
+    });
+    if (error) return;
     const { formData } = this.props;
     const { modifyComment } = this.state;
     const params = {
@@ -265,7 +273,7 @@ class ApprovalForm extends PureComponent<any, any> {
       ctlProcessData: {
         abandon: true,
       },
-      businessProcessData: {},
+      businessProcessData: _.get(data, 'process._business_payload'),
     };
     this.executeModify(params, 'abandon');
     // });
@@ -286,28 +294,23 @@ class ApprovalForm extends PureComponent<any, any> {
     this.executeModify(params, 'pass');
   };
 
-  public confirmModify = async (e, param) => {
+  public confirmModify = async () => {
     const { passComment } = this.state;
-    if (param) {
-      param.ctlProcessData = {
-        comment: passComment,
-        abandon: false,
-      };
-      return this.executeModify(_.cloneDeep(param), 'pass');
-    }
-    const { data, error } = await wkProcessInstanceFormGet({
-      processInstanceId: this.props.formData.processInstanceId,
-    });
-    if (error) return;
+    // if (param) {
+    //   param.ctlProcessData = {
+    //     comment: passComment,
+    //     abandon: false,
+    //   };
+    //   return this.executeModify(_.cloneDeep(param), 'pass');
+    // }
     const { formData } = this.props;
-    const { modifyComment } = this.state;
     const params = {
       taskId: formData.taskId,
       ctlProcessData: {
-        comment: modifyComment,
+        comment: passComment,
         abandon: false,
       },
-      businessProcessData: data.process._business_payload,
+      businessProcessData: { trade: this.state.tableData, validTime: '2018-01-01T10:10:10' },
     };
     this.executeModify(params, 'modify');
   };
@@ -407,8 +410,19 @@ class ApprovalForm extends PureComponent<any, any> {
     window.open(`${downloadTradeAttachment}${_data[0].attachmentId}`);
   };
 
-  public handleConfirmModify = (e, data) => {
-    return this.confirmModify(e, data);
+  public handleConfirmModify = data => {
+    const detailData = {
+      tradeId: _.get(data, 'tradeId'),
+      bookName: _.get(data, 'bookName'),
+      tradeDate: _.get(data, 'tradeDate'),
+      salesName: _.get(data, 'salesName'),
+      counterPartyName: _.get(data, 'positions[0].counterPartyName'),
+      trader: _.get(data, 'trader'),
+    };
+    this.setState({
+      tableData: data,
+      detailData,
+    });
   };
 
   public render() {
@@ -445,6 +459,7 @@ class ApprovalForm extends PureComponent<any, any> {
           ? '审核完成'
           : '待审批';
     }
+
     return (
       <div>
         {!loading && (
@@ -483,7 +498,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
                 {
                   title: '发起人',
-                  dataIndex: 'operatorName',
+                  dataIndex: `${!!_data.initiatorName ? 'initiatorName' : 'operatorName'}`,
                   render: (value, record, index, { form, editing }) => {
                     return <FormItem>{value}</FormItem>;
                   },
@@ -526,7 +541,11 @@ class ApprovalForm extends PureComponent<any, any> {
                   title: '交易日',
                   dataIndex: 'tradeDate',
                   render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
+                    return (
+                      <FormItem>
+                        {value && value.indexOf('T') >= 0 ? value.split('T')[0] : value}
+                      </FormItem>
+                    );
                   },
                 },
                 {
@@ -553,7 +572,7 @@ class ApprovalForm extends PureComponent<any, any> {
               ]}
             />
             <Divider type="horizontal" />
-            {_data.status === '待审批' || _data.status === '审核完成' ? (
+            {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
               <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
                 <Button
                   style={{ marginRight: '20px' }}
@@ -616,6 +635,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 size="small"
                 pagination={false}
                 bordered={false}
+                rowKey="operateTime"
               />
             </div>
             {status === 'pending' && (
@@ -686,7 +706,7 @@ class ApprovalForm extends PureComponent<any, any> {
                             <TextArea onChange={this.setModifyComment} value={modifyComment} />
                           </div>
                         }
-                        onConfirm={e => this.confirmModify(e, null)}
+                        onConfirm={e => this.confirmModify()}
                       >
                         <Button
                           type="primary"
@@ -722,7 +742,11 @@ class ApprovalForm extends PureComponent<any, any> {
           </div>
         )}
         <Modal
-          title="发起审批"
+          title={
+            _data.status === '待审批' || _data.status === '审核完成' || status !== 'pending'
+              ? '查看合约详情'
+              : '修改合约详情'
+          }
           visible={this.state.bookEditVisible}
           onOk={this.bookEditHandleOk}
           onCancel={this.tbookEditCancel}
@@ -736,6 +760,7 @@ class ApprovalForm extends PureComponent<any, any> {
             taskId={this.props.formData.taskId}
             res={this.state.res}
             confirmModify={this.handleConfirmModify}
+            isCompleted={this.state.isCompleted}
           />
         </Modal>
       </div>

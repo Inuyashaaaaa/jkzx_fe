@@ -150,7 +150,7 @@ class AsianExerciseModal extends PureComponent<
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
-      userLoginId: this.currentUser.userName,
+      userLoginId: this.currentUser.username,
       eventDetail: {
         underlyerPrice: String(this.state.formData[SUBJECT_MATTER_AVG]),
         settleAmount: String(this.state.formData[SETTLEA_MOUNT]),

@@ -123,7 +123,7 @@ class ExerciseModal extends PureComponent<
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
-      userLoginId: this.currentUser.userName,
+      userLoginId: this.currentUser.username,
       eventDetail: {
         underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
         settleAmount: String(dataSource[SETTLE_AMOUNT]),

@@ -71,7 +71,6 @@ const CreateForm = memo<any>(props => {
   };
 
   const [loading, setLoading] = useState(false);
-
   return (
     <Form2
       footer={false}

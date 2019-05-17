@@ -22,7 +22,7 @@ export const TABLE_COL_DEF = [
   },
   {
     title: '我方可用授信 (¥)',
-    dataIndex: 'counterPartyCredit',
+    dataIndex: 'counterPartyCreditBalance',
   },
   {
     title: '我方可用资金 (¥)',

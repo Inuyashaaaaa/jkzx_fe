@@ -19,23 +19,6 @@
 
 <body>
   <div id="root"></div>
-  <% if (context.env === 'production') { %>
-  <!-- sentry -->
-  <script src="https://browser.sentry-cdn.com/5.2.0/bundle.min.js" crossorigin="anonymous"></script>
-  <script>
-    Sentry.init({ dsn: 'https://4d5930a8f59e4d6e8087b78d16430a77@sentry.io/1455268' });
-  </script>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-139977154-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-139977154-1');
-  </script>
-  <% } %>
 </body>
 
 </html>

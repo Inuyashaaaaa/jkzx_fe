@@ -6,6 +6,7 @@ import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import { OVERVIEW_TABLE_COLUMNDEFS, ROW_KEY } from './constants';
+import moment from 'moment';
 
 class LifeModalTable extends PureComponent<
   {
