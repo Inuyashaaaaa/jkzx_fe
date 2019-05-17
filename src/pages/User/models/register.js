@@ -1,6 +1,3 @@
-import { setAuthority } from '@/lib/utils/authority';
-import { reloadAuthorized } from '@/lib/utils/Authorized';
-
 export default {
   namespace: 'register',
 
@@ -20,8 +17,6 @@ export default {
 
   reducers: {
     registerHandle(state, { payload }) {
-      setAuthority('user');
-      reloadAuthorized();
       return {
         ...state,
         status: payload.status,

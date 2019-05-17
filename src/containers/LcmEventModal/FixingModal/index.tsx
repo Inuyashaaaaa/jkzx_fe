@@ -215,7 +215,7 @@ class FixingModal extends PureComponent<
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.OBSERVE,
-      userLoginId: this.currentUser.userName,
+      userLoginId: this.currentUser.username,
       eventDetail: {
         observationDate: data[OB_DAY_FIELD],
         observationPrice: String(data[OB_PRICE_FIELD]),

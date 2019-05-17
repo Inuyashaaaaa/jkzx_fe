@@ -332,6 +332,7 @@ class TradeConfirmation extends PureComponent {
         <Divider type="horizontal" />
         <Table
           dataSource={this.state.dataSource}
+          rowKey="tradeId"
           columns={[
             {
               dataIndex: 'tradeId',

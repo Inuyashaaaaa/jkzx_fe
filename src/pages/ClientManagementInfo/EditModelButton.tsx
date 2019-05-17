@@ -52,7 +52,7 @@ const useTableData = props => {
       if (_.includes(ALL_DATE_FIELD_KEYS, item)) {
         newData[item].value = data[item] ? getMoment(data[item]) : undefined;
       }
-      if (item.endsWith('Doc')) {
+      if (item.endsWith('Doc') || item === 'creditAgreement') {
         newData[item].value = [];
         if (data[item]) {
           return getPartyDoc({ uuid: data[item] });
@@ -67,7 +67,7 @@ const useTableData = props => {
     res.forEach((item, index) => {
       if (!item) return;
       const _item = Object.keys(data)[index];
-      if (_item.endsWith('Doc')) {
+      if (_item.endsWith('Doc') || _item === 'creditAgreement') {
         const { error, data } = item;
         if (!error && data.name) {
           newData[_item].value.push({
@@ -239,7 +239,25 @@ const EditModalButton = memo<any>(props => {
     columns = cloneColumns;
   }
 
-  console.log(baseFormData);
+  const handleValue = val => {
+    if (_.isArray(val)) {
+      val = (val || []).map(item => {
+        item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
+        return item;
+      });
+    }
+    if (!_.isArray(val)) {
+      val = [
+        {
+          name: val,
+          id: val,
+          uid: val,
+        },
+      ];
+    }
+    return val;
+  };
+
   return (
     <ModalButton
       text={true}
@@ -749,7 +767,7 @@ const EditModalButton = memo<any>(props => {
                   columns={[
                     {
                       title: '产品名称',
-                      dataIndex: BASE_FORM_FIELDS.LEGALNAME,
+                      dataIndex: BASE_FORM_FIELDS.PRODUCTNAME,
                       render: (val, record, index, { form }) => {
                         return (
                           <FormItem hasFeedback={!disabled ? true : false}>
@@ -1087,12 +1105,7 @@ const EditModalButton = memo<any>(props => {
                       title: '主协议',
                       dataIndex: 'masterAgreementDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1123,12 +1136,7 @@ const EditModalButton = memo<any>(props => {
                       title: '补充协议',
                       dataIndex: 'supplementalAgreementDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1159,12 +1167,7 @@ const EditModalButton = memo<any>(props => {
                       title: '风险问卷调查',
                       dataIndex: 'riskSurveyDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1195,12 +1198,7 @@ const EditModalButton = memo<any>(props => {
                       title: '交易授权书',
                       dataIndex: 'tradeAuthDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1231,12 +1229,7 @@ const EditModalButton = memo<any>(props => {
                       title: '对手尽职调查',
                       dataIndex: 'dueDiligenceDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1267,12 +1260,7 @@ const EditModalButton = memo<any>(props => {
                       title: '风险承受能力调查问卷',
                       dataIndex: 'riskPreferenceDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1303,12 +1291,7 @@ const EditModalButton = memo<any>(props => {
                       title: '合规性承诺书',
                       dataIndex: 'complianceDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1339,12 +1322,7 @@ const EditModalButton = memo<any>(props => {
                       title: '风险揭示书',
                       dataIndex: 'riskRevelationDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1375,12 +1353,7 @@ const EditModalButton = memo<any>(props => {
                       title: '适当性警示书',
                       dataIndex: 'qualificationWarningDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1411,12 +1384,7 @@ const EditModalButton = memo<any>(props => {
                       title: '授信协议',
                       dataIndex: 'creditAgreement',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1447,12 +1415,7 @@ const EditModalButton = memo<any>(props => {
                       title: '履约保障协议',
                       dataIndex: 'performanceGuaranteeDoc',
                       render: (val, record, index, { form }) => {
-                        if (_.isArray(val)) {
-                          val = (val || []).map(item => {
-                            item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
-                            return item;
-                          });
-                        }
+                        val = handleValue(val);
                         return (
                           <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
                             {form.getFieldDecorator({
@@ -1516,7 +1479,7 @@ const EditModalButton = memo<any>(props => {
                   if (item.endsWith('Date') && baseData[item]) {
                     baseData[item] = getMoment(baseData[item]).format('YYYY-MM-DD');
                   }
-                  if (item.endsWith('Doc')) {
+                  if (item.endsWith('Doc') || item === 'creditAgreement') {
                     baseData[item] = baseFormData[item].value
                       .map(param => {
                         if (param.id) {

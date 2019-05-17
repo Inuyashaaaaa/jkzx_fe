@@ -5,6 +5,7 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import { getRequiredRule } from '@/tools';
 
 export const AlUnwindNotionalAmount: ILegColDef = {
   editable: record => {

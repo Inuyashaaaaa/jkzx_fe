@@ -202,6 +202,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 x: 2300,
               }}
               dataSource={this.state.tableDataSource}
+              rowKey="tradeId"
               columns={[
                 {
                   title: () => (
