@@ -2,10 +2,11 @@ import SourceTable from '@/design/components/SourceTable';
 import { trdTradeLCMEventList } from '@/services/general-service';
 import { Modal } from 'antd';
 import produce from 'immer';
-import moment from 'moment';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import { OVERVIEW_TABLE_COLUMNDEFS, ROW_KEY } from './constants';
+import moment from 'moment';
 
 class LifeModalTable extends PureComponent<
   {
@@ -72,6 +73,8 @@ class LifeModalTable extends PureComponent<
   };
 
   public render() {
+    let { lifeTableData } = this.props;
+    lifeTableData = _.reverse(_.sortBy(lifeTableData, 'createdAt'));
     return (
       <Modal
         width={1200}
@@ -85,7 +88,7 @@ class LifeModalTable extends PureComponent<
         <SourceTable
           rowKey={'uuid'}
           loading={this.state.lifeLoading}
-          dataSource={this.props.lifeTableData}
+          dataSource={lifeTableData}
           columnDefs={OVERVIEW_TABLE_COLUMNDEFS}
           pagination={false}
         />

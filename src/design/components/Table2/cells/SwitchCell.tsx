@@ -4,12 +4,18 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import _, { omit } from 'lodash';
-import React, { KeyboardEvent, PureComponent } from 'react';
+import React, { KeyboardEvent, PureComponent, CSSProperties } from 'react';
 import { EMPTY_VALUE } from '../../constants';
 import Form2 from '../../Form2';
 import { ITableCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../utils';
-import { TABLE_CELL_EDITING_CHANGED } from '../constants/EVENT';
+import {
+  TABLE_CELL_EDITING_CHANGED,
+  TABLE_KEY_DOWN,
+  TABLE_STOP_ACTIVE,
+  TABLE_ARROW_KEY_CODE_OPTIONS,
+  TABLE_ARROW_KEY_CODE_MAP,
+} from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
@@ -24,6 +30,7 @@ class SwitchCell extends PureComponent<
     editing: boolean;
     editable: boolean;
     editableChanged: boolean;
+    active: boolean;
   }
 > {
   public static defaultProps = {
@@ -36,10 +43,19 @@ class SwitchCell extends PureComponent<
     const editable = getEditable(props.colDef.editable, colDef, record, rowIndex);
     const editableChanged = editable !== state.editable;
 
+    const defaultEditing =
+      typeof colDef.defaultEditing === 'function'
+        ? colDef.defaultEditing(record, rowIndex)
+        : colDef.defaultEditing;
+
     return {
       editableChanged,
       editable,
-      editing: editableChanged ? _.get(colDef, 'defaultEditing', !editable) : state.editing,
+      editing: editableChanged
+        ? defaultEditing == null
+          ? !editable
+          : defaultEditing
+        : state.editing,
     };
   };
 
@@ -59,15 +75,20 @@ class SwitchCell extends PureComponent<
       editing: null,
       editable: null,
       editableChanged: null,
+      active: false,
     };
   }
 
   public componentDidMount = () => {
     this.registeCell();
+    this.props.api.eventBus.listen(TABLE_KEY_DOWN, this.onTableKeyDown);
+    this.props.api.eventBus.listen(TABLE_STOP_ACTIVE, this.onStopActive);
   };
 
   public componentWillUnmount = () => {
     this.deleteCell();
+    this.props.api.eventBus.unListen(TABLE_KEY_DOWN, this.onTableKeyDown);
+    this.props.api.eventBus.unListen(TABLE_STOP_ACTIVE, this.onStopActive);
   };
 
   public valueHasChanged = () => {
@@ -150,9 +171,14 @@ class SwitchCell extends PureComponent<
   public startEditing = async () => {
     if (!this.getEditable()) return;
     if (!this.getEditing()) {
-      return this.setState({
-        editing: !this.getEditing(),
-      });
+      return this.setState(
+        {
+          editing: true,
+        },
+        () => {
+          this.setAcitve();
+        }
+      );
     }
   };
 
@@ -253,45 +279,136 @@ class SwitchCell extends PureComponent<
     }
   };
 
-  public onKeyDown = (e: KeyboardEvent<HTMLTableDataCellElement>) => {
-    if (!this.getEditable()) return;
+  public onTableKeyDown = (e: KeyboardEvent) => {
+    // Tab
+    if (e.keyCode === 9) {
+      this.handleTabTableKeyDown();
+    }
     // Enter
     if (e.keyCode === 13) {
-      if (!this.getEditing()) {
-        this.startEditing();
-        return;
-      }
-      setTimeout(() => {
-        this.saveCell();
+      this.handleEnterTableKeyDown();
+    }
+    if (e.keyCode >= 37 && e.keyCode <= 40) {
+      this.handleDirectionTableKeyDown(e.keyCode);
+    }
+  };
+
+  public handleDirectionTableKeyDown = directionCode => {
+    if (!this.getActive()) return;
+    if (!this.getEditable()) return;
+    if (this.getEditing()) return;
+
+    // setState 的队列执行优先级大于 window.addEventListener，会导致一直 moveNext
+    setTimeout(() => {
+      this.moveNextCell(directionCode);
+    });
+  };
+
+  public handleEnterTableKeyDown = () => {
+    if (!this.getActive()) return;
+    if (!this.getEditable()) return;
+
+    if (!this.getEditing()) {
+      this.startEditing();
+      return;
+    }
+    // 不在编辑状态，但是处在active状态
+    // 本次事件触发修改了 next cell 的状态，next cell 的事件还没有触发
+    setTimeout(() => {
+      this.saveCell();
+    });
+  };
+
+  public handleTabTableKeyDown = () => {
+    if (!this.getActive()) return;
+    if (!this.getEditable()) return;
+    if (this.getEditing()) {
+      this.saveCell(() => {
+        setTimeout(() => {
+          this.nextCellStartEditing(TABLE_ARROW_KEY_CODE_MAP.NEXT);
+        });
       });
       return;
     }
+    // 不在编辑状态，但是处在active状态
+    // 本次事件触发修改了 next cell 的状态，next cell 的事件还没有触发
+    setTimeout(() => {
+      this.nextCellStartEditing(TABLE_ARROW_KEY_CODE_MAP.NEXT);
+    });
+  };
 
-    // Tab
-    if (e.keyCode === 9) {
-      if (this.getEditing()) {
-        this.saveCell(() => {
-          setTimeout(() => {
-            this.nextCellStartEditing();
-          });
-        });
-      }
-      return;
+  public onStopActive = self => {
+    if (self === this) return;
+    this.setState({
+      active: false,
+    });
+  };
+
+  public looseActive = () => {
+    if (this.getActive()) {
+      this.setState({
+        active: false,
+      });
     }
   };
 
-  public nextCellStartEditing = () => {
-    this._nextCellStartEditing(this.getRowId(), this.getDataIndex());
+  public setAcitve = () => {
+    this.props.api.eventBus.emit(TABLE_STOP_ACTIVE, this);
+    this.setState({
+      active: true,
+    });
   };
 
-  public _nextCellStartEditing = (rowId: string, colId: string) => {
-    const cell = this.props.api.tableManager.getNextCell(rowId, colId);
-    if (!cell) return;
+  public getActive = () => {
+    return this.state.active;
+  };
+
+  public _getNextCell = (rowId: string, colId: string, directionCode: number) => {
+    const cell = this.getNextCellInstance(rowId, colId, directionCode);
+    if (!cell) return null;
     if (!cell.getEditable()) {
-      return this._nextCellStartEditing(cell.getRowId(), cell.getDataIndex());
+      return this._getNextCell(cell.getRowId(), cell.getDataIndex(), directionCode);
     }
-    if (!cell.isEditing()) {
-      return cell.startEditing();
+    return cell;
+  };
+
+  public getNextCell = directionCode => {
+    return this._getNextCell(this.getRowId(), this.getDataIndex(), directionCode);
+  };
+
+  public nextCellStartEditing = directionCode => {
+    const nextCell = this.getNextCell(directionCode);
+    if (nextCell && !nextCell.isEditing()) {
+      return nextCell.startEditing();
+    }
+  };
+
+  public moveNextCell = directionCode => {
+    const nextCell = this.getNextCell(directionCode);
+    if (nextCell) {
+      return nextCell.setAcitve();
+    }
+  };
+
+  public getNextCellInstance = (rowId: string, colId: string, directionCode: number) => {
+    if (directionCode === TABLE_ARROW_KEY_CODE_MAP.NEXT) {
+      return this.props.api.tableManager.getNextCell(rowId, colId);
+    }
+
+    if (directionCode === TABLE_ARROW_KEY_CODE_MAP.DOWN) {
+      return this.props.api.tableManager.getDownCell(rowId, colId);
+    }
+
+    if (directionCode === TABLE_ARROW_KEY_CODE_MAP.UP) {
+      return this.props.api.tableManager.getUpCell(rowId, colId);
+    }
+
+    if (directionCode === TABLE_ARROW_KEY_CODE_MAP.LEFT) {
+      return this.props.api.tableManager.getLeftCell(rowId, colId);
+    }
+
+    if (directionCode === TABLE_ARROW_KEY_CODE_MAP.RIGHT) {
+      return this.props.api.tableManager.getRightCell(rowId, colId);
     }
   };
 
@@ -306,7 +423,7 @@ class SwitchCell extends PureComponent<
     }
   };
 
-  public getTdStyle = () => {
+  public getTdStyle = (): CSSProperties => {
     const { style } = this.props;
     if (this.isSelectionCell()) {
       return {
@@ -335,11 +452,11 @@ class SwitchCell extends PureComponent<
           'rowId',
         ])}
         onClick={this.onCellClick}
-        onKeyDown={this.onKeyDown}
         className={classNames('tongyu-cell', 'tongyu-table-cell', {
           editable: this.getEditable(),
           editing: this.getEditing(),
           rendering: !this.getEditing(),
+          active: this.getActive(),
         })}
         style={this.getTdStyle()}
       >

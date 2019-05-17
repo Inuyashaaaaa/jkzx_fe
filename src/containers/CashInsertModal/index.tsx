@@ -18,7 +18,10 @@ import {
   TABLE_COL_DEF,
 } from './constants';
 
-const CashInsertModal = memo<any>(props => {
+const CashInsertModal = memo<{
+  record: object;
+  fetchTable: any;
+}>(props => {
   const formEl = useRef<Form2>(null);
   const formTrade = useRef<Form2>(null);
   const partyForm = useRef<Form2>(null);

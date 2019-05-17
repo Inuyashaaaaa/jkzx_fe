@@ -1,4 +1,7 @@
 import { IColDef } from '@/design/components/Table/types';
+import _ from 'lodash';
+
+export const USER_LOCAL_FIELD = 'tongyu_USER_LOCAL_FIELD';
 
 export const ROLE_LOCAL_FIELD = 'tongyu_ROLE_LOCAL_FIELD';
 
@@ -48,3 +51,39 @@ export interface ILegType {
   getPosition?: any;
   getPageData?: any;
 }
+export const CNY_FORMAT = '¥ 0,0.0000';
+
+export const FORM_EDITABLE_STATUS = {
+  // 编辑表单
+  EDITING_NO_CONVERT: 'EDITING_NO_CONVERT',
+  // 展示可编辑表单
+  NO_EDITING_CAN_CONVERT: 'NO_EDITING_CAN_CONVERT',
+  // 展示表单
+  SHOW: 'SHOW',
+};
+
+export const TRADESCOLDEFS_LEG_FIELD_MAP = {
+  UNDERLYER_PRICE: 'underlyerPrice',
+  VOL: 'vol',
+  R: 'r',
+  Q: 'q',
+};
+
+export const TRADESCOL_FIELDS = _.map(TRADESCOLDEFS_LEG_FIELD_MAP, val => val);
+
+export const COMPUTED_LEG_FIELD_MAP = {
+  PRICE_PER: 'PRICE_PER',
+  PRICE: 'PRICE',
+  STD_DELTA: 'STD_DELTA',
+  DELTA: 'DELTA',
+  DELTA_CASH: 'DELTA_CASH',
+  GAMMA: 'GAMMA',
+  GAMMA_CASH: 'GAMMA_CASH',
+  VEGA: 'VEGA',
+  THETA: 'THETA',
+  RHO_R: 'RHO_R',
+};
+
+export const COMPUTED_LEG_FIELDS = _.map(COMPUTED_LEG_FIELD_MAP, val => val);
+
+export const TOTAL_FIELD = 'TOTAL_FIELD';

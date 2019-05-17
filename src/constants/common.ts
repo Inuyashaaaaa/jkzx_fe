@@ -1,5 +1,8 @@
 import { AllInputProps } from '@/lib/components/_Form2/Input';
 import { convertOptions } from '@/utils';
+import { COMPUTED_LEG_FIELD_MAP, TRADESCOLDEFS_LEG_FIELD_MAP } from './global';
+
+export const OB_PRICE_FIELD = 'price';
 
 export const OB_DAY_FIELD = 'obDay';
 
@@ -8,6 +11,8 @@ export const BOOK_NAME_FIELD = 'bookName';
 export const TRADE_ID_FIELD = 'tradeId';
 
 export const LEG_TYPE_FIELD = '$legType';
+
+export const LEG_ENV_FIELD = '$legEnv';
 
 export const LEG_ID_FIELD = 'id';
 
@@ -209,10 +214,7 @@ export const LCM_EVENT_TYPE_MAP = {
   EXERCISE: 'EXERCISE',
   KNOCK_OUT: 'KNOCK_OUT',
   KNOCK_IN: 'KNOCK_IN',
-  DIVIDEND: 'DIVIDEND',
-  PAYMENT: 'PAYMENT',
   ROLL: 'ROLL',
-  CLOSED: 'CLOSED',
   UNWIND_PARTIAL: 'UNWIND_PARTIAL',
   OBSERVE: 'OBSERVE',
   SNOW_BALL_EXERCISE: 'SNOW_BALL_EXERCISE',
@@ -224,15 +226,11 @@ export const LCM_EVENT_TYPE_MAP = {
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
-  PAYMENT: '支付',
-  OBSERVATION: '观察',
   OPEN: '开仓',
   UNWIND: '平仓',
   EXERCISE: '行权',
   KNOCK_IN: '敲入',
-  DIVIDEND: '分红',
   ROLL: '展期',
-  CLOSED: '结束',
   UNWIND_PARTIAL: '部分平仓',
   OBSERVE: '观察',
   SNOW_BALL_EXERCISE: '雪球式到期结算',
@@ -332,13 +330,13 @@ export const KNOCK_DIRECTION_ZHCN_MAP = {
 };
 
 export const DIRECTION_MAP = {
-  BUY: 'BUYER',
-  SELL: 'SELLER',
+  BUYER: 'BUYER',
+  SELLER: 'SELLER',
 };
 
 export const DIRECTION_ZHCN_MAP = {
-  BUY: '买',
-  SELL: '卖',
+  BUYER: '买',
+  SELLER: '卖',
 };
 
 export const DIRECTION_OPTIONS = convertOptions(DIRECTION_MAP, DIRECTION_ZHCN_MAP);
@@ -443,6 +441,11 @@ export const SPECIFIED_PRICE_ZHCN_MAP = {
   DERIVATIVES_CLOSE: '标的收盘价',
 };
 
+export const SPECIFIED_PRICE_OPTIONS = Object.keys(SPECIFIED_PRICE_MAP).map(key => ({
+  label: SPECIFIED_PRICE_ZHCN_MAP[key],
+  value: SPECIFIED_PRICE_MAP[key],
+}));
+
 export const REBATETYPE_TYPE_MAP = {
   PAY_NONE: 'PAY_NONE',
   PAY_WHEN_HIT: 'PAY_WHEN_HIT',
@@ -468,13 +471,18 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
  * 多腿字段名
  */
 export const LEG_FIELD = {
+  ...COMPUTED_LEG_FIELD_MAP,
+  ...TRADESCOLDEFS_LEG_FIELD_MAP,
+  POSITION_ID: 'POSITION_ID',
+  LEG_META: 'LEG_META',
+  IS_ANNUAL: 'IS_ANNUAL', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
   DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
   ALREADY_BARRIER: 'AlreadyBarrier', // 已经敲入
   COUPON_BARRIER: 'couponBarrier', // coupon障碍
   OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日
   OBSERVATION_STEP: 'observationStep', // 观察频率
-  UP_OBSERVATION_STEP: 'UP_OBSERVATION_STEP', // 观察频率
+  UP_OBSERVATION_STEP: 'knockOutObservationStep', // 观察频率
   DOWN_OBSERVATION_STEP: 'knockInObservationStep', // 观察频率
   OBSERVE_START_DAY: 'OBSERVE_START_DAY',
   OBSERVE_END_DAY: 'OBSERVE_END_DAY',
@@ -551,6 +559,7 @@ export const LEG_FIELD = {
   HIGH_BARRIER: 'highBarrier',
   UNDERLYER_INSTRUMENT_PRICE: 'UNDERLYER_INSTRUMENT_PRICE',
   COMMENT: 'comment',
+  VOL: 'vol',
 };
 
 /**
@@ -590,6 +599,11 @@ export const INSTRUMENT_TYPE_ZHCN_MAP = {
   FUTURES: '期货',
 };
 
+export const INSTRUMENT_TYPE_OPTIONS = convertOptions(
+  INSTRUMENT_TYPE_MAP,
+  INSTRUMENT_TYPE_ZHCN_MAP
+);
+
 export const ASSET_TYPE_MAP = {
   STOCK: 'STOCK',
   COMMODITY: 'COMMODITY',
@@ -602,23 +616,6 @@ export const ASSET_TYPE_ZHCN_MAP = {
 
 export const ASSET_TYPE_OPTIONS = convertOptions(ASSET_TYPE_MAP, ASSET_TYPE_ZHCN_MAP);
 
-// export const SURVIVAL_STATUS_MAP = {
-//   LIVE: 'LIVE',
-//   MATURED: 'MATURED',
-//   CLOSED: 'CLOSED',
-// };
-
-// export const SURVIVAL_STATUS_ZHCN_MAP = {
-//   LIVE: '股票',
-//   MATURED: '商品',
-//   CLOSED: '',
-// };
-
-// export const SURVIVAL_STATUS_OPTIONS = convertOptions(
-//   SURVIVAL_STATUS_MAP,
-//   SURVIVAL_STATUS_ZHCN_MAP
-// );
-
 export const EXERCISETYPE_MAP = {
   EUROPEAN: 'EUROPEAN',
   AMERICAN: 'AMERICAN',
@@ -626,13 +623,7 @@ export const EXERCISETYPE_MAP = {
 
 export const EXTRA_FIELDS = ['positionId', 'quantity', 'lcmEventType', 'productType'];
 
-export const LEG_INJECT_FIELDS = [
-  LEG_ID_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_NAME_FIELD,
-  LEG_ANNUALIZED_FIELD,
-  LEG_PRICING_FIELD,
-];
+export const LEG_INJECT_FIELDS = [LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_NAME_FIELD, LEG_ENV_FIELD];
 
 export const BIG_NUMBER_CONFIG = {
   DECIMAL_PLACES: 4,
@@ -642,6 +633,7 @@ export const BIG_NUMBER_CONFIG = {
  * 多腿类型
  */
 export const LEG_TYPE_MAP = {
+  CALL_SPREAD: 'CALL_SPREAD',
   ASIAN: 'ASIAN',
   ASIAN_ANNUAL: 'ASIAN_ANNUAL',
   ASIAN_UNANNUAL: 'ASIAN_UNANNUAL',
@@ -659,8 +651,10 @@ export const LEG_TYPE_MAP = {
   VANILLA_AMERICAN_ANNUAL: 'VANILLA_AMERICAN_ANNUAL',
   VANILLA_AMERICAN_UNANNUAL: 'VANILLA_AMERICAN_UNANNUAL',
   DIGITAL: 'DIGITAL',
+  DIGITAL_AMERICAN: 'DIGITAL_AMERICAN',
   DIGITAL_AMERICAN_ANNUAL: 'DIGITAL_AMERICAN_ANNUAL',
   DIGITAL_AMERICAN_UNANNUAL: 'DIGITAL_AMERICAN_UNANNUAL',
+  DIGITAL_EUROPEAN: 'DIGITAL_EUROPEAN',
   DIGITAL_EUROPEAN_ANNUAL: 'DIGITAL_EUROPEAN_ANNUAL',
   DIGITAL_EUROPEAN_UNANNUAL: 'DIGITAL_EUROPEAN_UNANNUAL',
   VERTICAL_SPREAD: 'VERTICAL_SPREAD',
@@ -718,7 +712,7 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL]: '凤凰式AutoCall - 年化',
   [LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL]: '雪球式AutoCall - 非年化',
   [LEG_TYPE_MAP.AUTOCALL_UNANNUAL]: '凤凰式AutoCall - 年化',
-  [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
+  [LEG_TYPE_MAP.AUTOCALL]: '雪球式AutoCall',
   [LEG_TYPE_MAP.AUTOCALL_ANNUAL]: '雪球式AutoCall - 年化',
   [LEG_TYPE_MAP.AUTOCALL_UNANNUAL]: '凤凰式AutoCall - 年化',
   [LEG_TYPE_MAP.GENERIC_SINGLE_ASSET_OPTION]: '其他单资产期权',
@@ -728,13 +722,15 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.VANILLA_AMERICAN]: '美式',
   [LEG_TYPE_MAP.VANILLA_AMERICAN_ANNUAL]: '美式 - 年化',
   [LEG_TYPE_MAP.VANILLA_AMERICAN_UNANNUAL]: '美式 - 非年化',
-  [LEG_TYPE_MAP.AUTOCALL]: 'AutoCall',
   [LEG_TYPE_MAP.DIGITAL]: '二元',
+  [LEG_TYPE_MAP.CALL_SPREAD]: '欧式价差',
+  [LEG_TYPE_MAP.DIGITAL_AMERICAN]: '一触即付',
   [LEG_TYPE_MAP.DIGITAL_AMERICAN_ANNUAL]: '一触即付 - 年化',
   [LEG_TYPE_MAP.DIGITAL_AMERICAN_UNANNUAL]: '一触即付 - 非年化',
+  [LEG_TYPE_MAP.DIGITAL_EUROPEAN]: '欧式二元',
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN_ANNUAL]: '欧式二元 - 年化',
   [LEG_TYPE_MAP.DIGITAL_EUROPEAN_UNANNUAL]: '欧式二元 - 非年化',
-  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '价差',
+  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '欧式价差',
   [LEG_TYPE_MAP.VERTICAL_SPREAD_UNANNUAL]: '欧式价差 - 非年化',
   [LEG_TYPE_MAP.VERTICAL_SPREAD_ANNUAL]: '欧式价差 - 年化',
   [LEG_TYPE_MAP.BARRIER]: '单鲨',
@@ -838,6 +834,7 @@ export const IOGLOD_EVENT_TYPE_ZHCN_MAP = {
   DEPOSIT: '入金',
   WITHDRAW: '出金',
   CHANGE_PREMIUM: '权利金变更',
+  REEVALUATE_MARGIN: '保证金变更',
 };
 
 export const IOGLOD_EVENT_TYPE_MAP = {
@@ -849,6 +846,7 @@ export const IOGLOD_EVENT_TYPE_MAP = {
   DEPOSIT: 'DEPOSIT',
   WITHDRAW: 'WITHDRAW',
   CHANGE_PREMIUM: 'CHANGE_PREMIUM',
+  REEVALUATE_MARGIN: 'REEVALUATE_MARGIN',
 };
 
 export const IOGLOD_EVENT_TYPE_OPTIONS = convertOptions(
@@ -879,4 +877,40 @@ export const ACCOUNT_EVENT_TYPE_ZHCN_MAP = {
 export const ACCOUNT_EVENT_TYPE_OPTIONS = convertOptions(
   ACCOUNT_EVENT_TYPE_MAP,
   ACCOUNT_EVENT_TYPE_ZHCN_MAP
+);
+
+export const COMMODITY_EXCHANGE_MAP = {
+  SHFE: 'SHFE',
+  DCE: 'DCE',
+  CZCE: 'CZCE',
+  SGE: 'SGE',
+};
+
+export const COMMODITY_EXCHANGE_ZHCN_MAP = {
+  SHFE: '上期所',
+  DCE: '大商所',
+  CZCE: '郑商所',
+  SGE: '金交所',
+};
+
+export const COMMODITY_EXCHANGE_OPTIONS = convertOptions(
+  COMMODITY_EXCHANGE_MAP,
+  COMMODITY_EXCHANGE_ZHCN_MAP
+);
+
+export const EQUITY_EXCHANGE_MAP = {
+  SSE: 'SSE',
+  SZSE: 'SZSE',
+  CFFEX: 'CFFEX',
+};
+
+export const EQUITY_EXCHANGE_ZHCN_MAP = {
+  SSE: '上交所',
+  SZSE: '深交所',
+  CFFEX: '中金所',
+};
+
+export const EQUITY_EXCHANGE_OPTIONS = convertOptions(
+  EQUITY_EXCHANGE_MAP,
+  EQUITY_EXCHANGE_ZHCN_MAP
 );

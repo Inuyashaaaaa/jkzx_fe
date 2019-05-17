@@ -105,12 +105,7 @@ class Operation extends PureComponent {
     const cloneDepartments = JSON.parse(JSON.stringify(departments));
 
     const array = this.toArray(cloneDepartments);
-    let dataSource = users.data.map(item => {
-      const department = array.find(obj => obj.id === item.departmentId);
-      item.departmentName = department.departmentName;
-      return item;
-    });
-    dataSource = dataSource.filter(item => {
+    const dataSource = users.data.filter(item => {
       return !currentGroup.userList.find(items => item.username === items.username);
     });
 
@@ -142,9 +137,10 @@ class Operation extends PureComponent {
     }
 
     const { currentGroup } = this.props;
+
     let { dataSource } = this.state;
     dataSource = dataSource.filter(item => {
-      return !currentGroup.userList.find(items => item.username === items.username);
+      return !(currentGroup.userList || []).find(items => item.username === items.username);
     });
     this.setState({
       dataSource,
@@ -236,8 +232,8 @@ class Operation extends PureComponent {
       return {
         userApproveGroupId: item.id,
         username: item.username,
-        department_id: item.departmentId,
-        nick_name: item.nickName,
+        departmentId: item.departmentId,
+        nickName: item.nickName,
       };
     });
     this.props.onBatchAdd(selectArray, false);
@@ -249,8 +245,8 @@ class Operation extends PureComponent {
       return {
         userApproveGroupId: item.id,
         username: item.username,
-        department_id: item.departmentId,
-        nick_name: item.nickName,
+        departmentId: item.departmentId,
+        nickName: item.nickName,
       };
     });
     this.setState({ selectArray, selectedRowKeys });

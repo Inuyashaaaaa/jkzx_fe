@@ -1,4 +1,7 @@
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
+import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
+import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
+import { ILeg } from '@/types/leg';
 import { LEG_TYPE_MAP } from './common';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanAnnual';
 import { AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual } from './legColDefs/AnnualizedVerticalSpreadOptionDTOEuropeanUnAnnual';
@@ -39,10 +42,12 @@ import { StraddleAnnual } from './legColDefs/StraddleAnnual';
 import { StraddleUnAnnual } from './legColDefs/StraddleUnAnnual';
 import { TripleDigitalAnnual } from './legColDefs/TripleDigitalAnnual';
 import { TripleDigitalUnAnnual } from './legColDefs/TripleDigitalUnAnnual';
+import { DigitalLegAmerican } from '@/domains/legs/DigitalLegAmerican';
 
 export const LEG_MAP: {
-  [key: string]: ILegType;
+  [key: string]: ILeg;
 } = {
+  // @todo 删除以下
   [LEG_TYPE_MAP.ASIAN_ANNUAL]: AsiaAnnual,
   [LEG_TYPE_MAP.ASIAN_UNANNUAL]: AsiaUnAnnual,
 

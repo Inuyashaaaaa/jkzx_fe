@@ -13,11 +13,11 @@ cache:
 before_script:
   - source ~/.bashrc
   - tail ~/.bashrc
-  # - nvm -v
   - whoami
-  # - echo $NVM_DIR
-  - export PATH=/home/gitlab-runner/.nvm/versions/node/v10.15.1/bin:$PATH
+  - export PATH=/home/gitlab-runner/.nvm/versions/node/v10.15.3/bin:$PATH
+  - node -v
   - yarn -v
+  - export
 
 # 安装依赖
 Install:
@@ -28,6 +28,7 @@ Install:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Lint:
   stage: test
@@ -37,6 +38,7 @@ Lint:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Test:
   stage: test
@@ -46,6 +48,7 @@ Test:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Build:
   stage: build
@@ -55,6 +58,7 @@ Build:
     - master
     - master-staging
     - /release.*/
+    - /hotfix.*/
 
 Deploy-Release:
   stage: deploy
@@ -69,6 +73,13 @@ Deploy-Test:
     - yarn run deploy:test
   only:
     - master-staging
+
+Deploy-Hotfix:
+  stage: deploy
+  script:
+    - yarn run deploy:hotfix
+  only:
+    - /hotfix.*/
 
 Deploy-Prod:
   stage: deploy

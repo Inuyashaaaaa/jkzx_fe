@@ -11,7 +11,7 @@ import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { DatePicker, Divider, Pagination, Row, Table } from 'antd';
+import { DatePicker, Divider, Table, Pagination, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
@@ -152,6 +152,8 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public render() {
+    const { tableDataSource } = this.state;
+    // tableDataSource = _.reverse(_.sortBy(tableDataSource, 'createdAt'));
     return (
       <>
         <Form2
@@ -418,7 +420,7 @@ class CommonModel extends PureComponent<{ status: any }> {
               pagination={false}
               rowKey={'positionId'}
               scroll={{ x: 2500 }}
-              dataSource={this.state.tableDataSource}
+              dataSource={tableDataSource}
               columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}
               onRow={record => {
                 return record.style ? { style: record.style } : null;

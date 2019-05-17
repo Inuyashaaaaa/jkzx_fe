@@ -9,20 +9,19 @@ import {
   mktQuotesListPaged,
 } from '@/services/market-data-service';
 import {
+  downloadUrl,
   exeTradeRecordSave,
   queryDetail,
   querySummary,
   queryTradeRecord,
   uploadUrl,
 } from '@/services/onBoardTransaction';
-import { Button, message, Modal, Radio, Tabs } from 'antd';
+import { Button, message, Modal, Radio, Tabs, Table, Divider } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
-import XLSX from 'xlsx';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import RowForm from './components/RowForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
 
 const { TabPane } = Tabs;
@@ -30,16 +29,6 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 
 const reg = /^[+-]?\d+\.?\d*$/;
-
-function handleObjNumber(obj) {
-  const keys = Object.keys(obj);
-  keys.forEach(key => {
-    const value = obj[key];
-    if (reg.test(value)) {
-      obj[key] = value.toLocaleString();
-    }
-  });
-}
 
 class TradeManagementOnBoardTansaction extends PureComponent {
   constructor(props) {
@@ -142,11 +131,21 @@ class TradeManagementOnBoardTansaction extends PureComponent {
           : '-';
         obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
       }
-      handleObjNumber(obj);
       return obj;
     });
 
-    if (!isFlow && positionMode === 'summary') {
+    if (isFlow) {
+      finalData.sort((a, b) => {
+        const dealTime = moment(a.dealTime).valueOf() - moment(b.dealTime).valueOf();
+        if (dealTime > 0) {
+          return -1;
+        } else if (dealTime < 0) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    } else if (!isFlow && positionMode === 'summary') {
       finalData.sort((a, b) => {
         const aStr = a.instrumentId;
         const bStr = b.instrumentId;
@@ -235,14 +234,9 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       }
     });
 
-    // return Object.values(obj).map(value => {
-    //   handleObjNumber(value);
-    //   return value;
-    // });
     const keys = Object.keys(obj);
     const finalData = keys.map(key => {
       const value = obj[key];
-      handleObjNumber(value);
       return value;
     });
     return finalData;
@@ -391,77 +385,8 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  public downloadFormModal = () => {
-    const cols = ['sheet'];
-    const colData = cols.map(() => {
-      const tabData = [
-        [
-          'book1',
-          'trade1',
-          'account1',
-          'instrument1',
-          '100',
-          '100',
-          'OPEN',
-          'BUYER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          'book2',
-          'trade2',
-          'account2',
-          'instrument2',
-          '100',
-          '100',
-          'CLOSE',
-          'SELLER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          'book3',
-          'trade3',
-          'account3',
-          'instrument3',
-          '100',
-          '100',
-          'OPEN',
-          'BUYER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          'book4',
-          'trade4',
-          'account4',
-          'instrument4',
-          '100',
-          '100',
-          'OPEN',
-          'BUYER',
-          '2018-10-10T01:10:10',
-        ],
-        [
-          '推荐使用MS Excel编辑本模板，保存时请选择CSV格式。编辑时请务必删除以下备注文字（包括本行）：',
-        ],
-        [
-          '交易簿',
-          '成交ID',
-          '交易账号',
-          '合约代码',
-          '手数股数',
-          '价格',
-          'OPEN/CLOSE',
-          'BUYER/SELLER',
-          '交易时间',
-        ],
-      ];
-      return tabData;
-    });
-    const wb = XLSX.utils.book_new();
-    cols.forEach((item, index) => {
-      const ws = XLSX.utils.aoa_to_sheet(colData[index]);
-      XLSX.utils.book_append_sheet(wb, ws, item);
-    });
-    XLSX.writeFile(wb, `导入场内场内流水模板.csv`);
+  public downloadFormModal = async () => {
+    window.open(`${downloadUrl}position.csv`);
   };
 
   public handleFlowChange = value => {
@@ -504,8 +429,6 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       modalVisible,
       formItems,
       modalLoading,
-      flowData,
-      positionData,
       loading,
       instrumentIds,
       positionMode,
@@ -513,6 +436,8 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       createModalDataSource,
       searchFormDataFlow,
       searchFormDataPosition,
+      flowData,
+      positionData,
     } = this.state;
     const flowColumns = generateColumns('flow');
     const detailColumns = generateColumns('detail');
@@ -568,29 +493,22 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               <Button onClick={this.showModal} type="primary" style={{ marginTop: 10 }}>
                 导入场内流水
               </Button>
-              <Button onClick={this.downloadFormModal} type="default" style={{ marginTop: 10 }}>
-                下载导入模板
-              </Button>
+
               <Button onClick={this.createFormModal} type="default" style={{ marginTop: 10 }}>
                 新建
               </Button>
             </div>
-            <SourceTable
-              loading={loading}
-              searchable={false}
-              removeable={false}
-              // saveDisabled
-              rowKey="uuid"
+            <Divider type="horizontal" />
+            <Table
               dataSource={flowData}
-              columnDefs={flowColumns}
-              autoSizeColumnsToFit={true}
+              columns={flowColumns}
+              loading={loading}
+              size="middle"
+              rowKey="uuid"
+              scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
             />
           </TabPane>
           <TabPane tab="场内持仓统计" key="2">
-            {/* <RowForm
-              mode="position"
-              handleQuery={positionMode === 'detail' ? this.queryDetail : this.querySummary}
-            /> */}
             <Form
               submitText="查询"
               dataSource={searchFormDataPosition}
@@ -620,27 +538,23 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               <RadioButton value="b">按合约代码统计</RadioButton>
             </RadioGroup>
             {positionMode === 'detail' && (
-              <SourceTable
-                loading={loading}
-                searchable={false}
-                removeable={false}
-                // saveDisabled
-                rowKey="uuid"
+              <Table
                 dataSource={positionData}
-                columnDefs={detailColumns}
-                autoSizeColumnsToFit={true}
+                columns={detailColumns}
+                loading={loading}
+                rowKey="uuid"
+                size="middle"
+                scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
               />
             )}
             {positionMode === 'summary' && (
-              <SourceTable
-                loading={loading}
-                searchable={false}
-                removeable={false}
-                // saveDisabled
-                rowKey="uuid"
+              <Table
                 dataSource={positionData}
-                columnDefs={summaryColumns}
-                autoSizeColumnsToFit={true}
+                columns={summaryColumns}
+                loading={loading}
+                scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
+                rowKey="uuid"
+                size="middle"
               />
             )}
           </TabPane>
@@ -663,6 +577,12 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               uploadDisabled={modalLoading}
             />
           )}
+          <p style={{ marginTop: '20px' }}>操作说明:</p>
+          <p style={{ marginLeft: '20px' }}>1.仅支持导入.csv格式的文件</p>
+          <p style={{ marginLeft: '20px' }}>
+            2.导入模板下载:
+            <a onClick={this.downloadFormModal}>导入场内流水模板.csv</a>
+          </p>
         </Modal>
         <Modal
           visible={createFormVisible}

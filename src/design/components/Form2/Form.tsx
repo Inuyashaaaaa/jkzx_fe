@@ -26,8 +26,11 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     };
   };
 
-  public static createFields = (data: any) => {
-    return _.mapValues(data, val => Form.createField(val));
+  public static createFields = (data: any, omits?: string[]) => {
+    return _.mapValues(data, (val, key) => {
+      if (omits && Array.isArray(omits) && omits.indexOf(key) !== -1) return val;
+      return Form.createField(val);
+    });
   };
 
   public static getFieldValue = (field: any, defaultVal?: any) => {
@@ -41,8 +44,17 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     return _.mapValues(fields, val => Form.getFieldValue(val));
   };
 
-  public static fieldIsEffective = (field: any) => {
+  public static fieldValueIsEffective = (field: any) => {
     return field && !_.get(field, 'validating') && !_.get(field, 'errors');
+  };
+
+  public static fieldValueIsChange = (dataIndex: string, changedFields: any[]) => {
+    if (Object.keys(changedFields).length > 1) {
+      // form validate 会触发大量的修改，暂时根据数量判断
+      return false;
+    }
+
+    return Form.fieldValueIsEffective(changedFields[dataIndex]);
   };
 
   public DecoratorForm: ComponentClass<IFormBaseProps>;

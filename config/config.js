@@ -13,7 +13,6 @@ export default {
         antd: true,
         dva: {
           hmr: true,
-          immer: true,
         },
         targets: {
           ie: 11,

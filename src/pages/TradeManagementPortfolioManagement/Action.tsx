@@ -281,7 +281,7 @@ class Action extends PureComponent<any, any> {
   public render() {
     const { params } = this.props;
     return (
-      <Row type="flex" align="middle" style={{ height: params.node.rowHeight }}>
+      <Row type="flex" align="middle">
         <Button.Group>
           <Button size="small" type="primary" onClick={this.showModal}>
             查看/修改

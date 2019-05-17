@@ -53,7 +53,7 @@ class MarketSourceTable extends PureComponent<MarketSourceTableProps> {
   };
 
   public startFetch = async () => {
-    const userName = this.props.currentUser.userName;
+    const userName = this.props.currentUser.username;
     if (!(this.cache === false && userName)) {
       return;
     }
@@ -107,7 +107,7 @@ class MarketSourceTable extends PureComponent<MarketSourceTableProps> {
   };
 
   public addMarket = async formData => {
-    const userName = this.props.currentUser.userName;
+    const userName = this.props.currentUser.username;
     if (!userName) return;
     if (_.some(this.state.marketList, formData)) {
       message.error('不能重复添加标的物');
@@ -136,7 +136,7 @@ class MarketSourceTable extends PureComponent<MarketSourceTableProps> {
   };
 
   public removeMarket = async (record, index) => {
-    const userName = this.props.currentUser.userName;
+    const userName = this.props.currentUser.username;
     if (!userName) return;
 
     const { error } = await (this.props.marketType === 'volInstrumnent'

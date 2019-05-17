@@ -1,40 +1,39 @@
-import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { formatNumber } from '@/tools';
 
-export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '投资组合',
-    field: 'portfolioName',
+    title: '投资组合',
+    dataIndex: 'portfolioName',
     width: 130,
   },
   {
-    headerName: 'Delta 金额 (¥)',
-    field: 'deltaCash',
+    title: 'Delta 金额 (¥)',
+    dataIndex: 'deltaCash',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
   {
-    headerName: 'Gamma 金额 (¥)',
-    field: 'gammaCash',
+    title: 'Gamma 金额 (¥)',
+    dataIndex: 'gammaCash',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
   {
-    headerName: 'Vega/1% (¥)',
-    field: 'vega',
+    title: 'Vega/1% (¥)',
+    dataIndex: 'vega',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
   {
-    headerName: 'Theta/1天 (¥)',
-    field: 'theta',
+    title: 'Theta/1天 (¥)',
+    dataIndex: 'theta',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
   {
-    headerName: 'Rho/1% (¥)',
-    field: 'rho',
+    title: 'Rho/1% (¥)',
+    dataIndex: 'rho',
     width: 130,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    render: (value, record, index) => formatNumber(value, 4),
   },
 ];

@@ -3,11 +3,11 @@ import ImportExcelButton from '@/lib/components/_ImportExcelButton';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
 import { delay, mockData } from '@/lib/utils';
 import { mgnMarginSearch, mgnMarginsUpdate } from '@/services/reference-data-service';
-import { message, Modal } from 'antd';
+import { message, Modal, Button, Icon } from 'antd';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid';
 import { PAGE_TABLE_COL_DEFS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
-
+import { docBctTemplateList, downloadUrl } from '@/services/onBoardTransaction';
 class ClientManagementMarginManagement extends PureComponent {
   public $marginSourceTable: SourceTable = null;
 
@@ -17,6 +17,7 @@ class ClientManagementMarginManagement extends PureComponent {
     searchFormData: {},
     excelVisible: false,
     excelData: [],
+    modalVisible: false,
   };
 
   public componentDidMount = () => {
@@ -87,6 +88,19 @@ class ClientManagementMarginManagement extends PureComponent {
     });
   };
 
+  public hideModal = () => {
+    this.editDate = {};
+    this.setState({
+      modalVisible: false,
+      formItems: [],
+      modalLoading: false,
+    });
+  };
+
+  public downloadFormModal = async () => {
+    window.open(`${downloadUrl}margin.xlsx`);
+  };
+
   public render() {
     return (
       <PageHeaderWrapper>
@@ -104,12 +118,48 @@ class ClientManagementMarginManagement extends PureComponent {
           searchFormData={this.state.searchFormData}
           onSearchFormChange={this.onSearchFormChange}
           header={
+            <Button
+              style={{
+                marginBottom: '20px',
+              }}
+              type="primary"
+              onClick={() => {
+                this.setState({ modalVisible: true });
+              }}
+            >
+              批量更新
+            </Button>
+          }
+        />
+        <Modal
+          title="导入预览"
+          visible={this.state.excelVisible}
+          onOk={this.handleConfirmExcel}
+          onCancel={this.handleCancelExcel}
+        >
+          <SourceTable
+            rowKey="uuid"
+            columnDefs={PAGE_TABLE_COL_DEFS}
+            dataSource={this.state.excelData}
+          />
+        </Modal>
+        <Modal
+          title="批量更新维持保证金"
+          visible={this.state.modalVisible}
+          onCancel={this.hideModal}
+          onOk={this.hideModal}
+          footer={[
+            <Button key="back" type="primary" onClick={this.hideModal}>
+              {this.state.modalLoading ? '上传中' : '取消'}
+            </Button>,
+          ]}
+        >
+          <p style={{ textAlign: 'center', margin: '30px' }}>
             <ImportExcelButton
               key="import"
               style={{
                 marginBottom: '20px',
               }}
-              type="primary"
               onImport={data => {
                 const _data = data.data[0][Object.keys(data.data[0])[0]];
                 this.setState({
@@ -124,21 +174,16 @@ class ClientManagementMarginManagement extends PureComponent {
                 });
               }}
             >
-              批量更新
+              <Icon type="upload" />
+              选择文件
             </ImportExcelButton>
-          }
-        />
-        <Modal
-          title="导入预览"
-          visible={this.state.excelVisible}
-          onOk={this.handleConfirmExcel}
-          onCancel={this.handleCancelExcel}
-        >
-          <SourceTable
-            rowKey="uuid"
-            columnDefs={PAGE_TABLE_COL_DEFS}
-            dataSource={this.state.excelData}
-          />
+          </p>
+          <p style={{ marginTop: '20px' }}>操作说明:</p>
+          <p style={{ marginLeft: '20px' }}>1.仅支持导入.xlsx格式的文件</p>
+          <p style={{ marginLeft: '20px' }}>
+            2.导入模板下载:
+            <a onClick={this.downloadFormModal}>批量更新维持保证金.xlsx</a>
+          </p>
         </Modal>
       </PageHeaderWrapper>
     );

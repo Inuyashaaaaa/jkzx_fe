@@ -1,2 +1,4 @@
 // 从定价转到簿记页面的 url tag
-export const PRICING_FROM_TAG = 'pricing';
+export const BOOKING_FROM_PRICING = 'BOOKING_FROM_PRICING';
+
+export const PRICING_FROM_EDITING = 'PRICING_FROM_EDITING';

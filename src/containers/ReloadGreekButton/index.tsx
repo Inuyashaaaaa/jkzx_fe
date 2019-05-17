@@ -1,6 +1,6 @@
 import { delay } from '@/design/utils';
 import { reloadAirflowTrigger } from '@/services/report-service';
-import { Button } from 'antd';
+import { Button, notification, message } from 'antd';
 import React, { PureComponent } from 'react';
 
 class ReloadGreekButton extends PureComponent<any, any> {
@@ -13,7 +13,19 @@ class ReloadGreekButton extends PureComponent<any, any> {
       reloading: true,
     });
     await delay(250);
-    await reloadAirflowTrigger(this.props.id);
+    const { raw = {} } = await reloadAirflowTrigger(this.props.id);
+    if (raw.error) {
+      notification.error({
+        message: '请求失败',
+        description: raw.error,
+      });
+    }
+    if (raw.message) {
+      notification.success({
+        message: '触发成功',
+        description: '计算过程可能需要一段时间',
+      });
+    }
     this.setState({
       reloading: false,
     });
@@ -29,9 +41,11 @@ class ReloadGreekButton extends PureComponent<any, any> {
 
     return (
       <Button.Group>
-        {/* <Button loading={reloading} icon="reload" onClick={this.onReload}>
-          重新计算
-        </Button> */}
+        {!this.props.hideReload && (
+          <Button loading={reloading} icon="reload" onClick={this.onReload}>
+            重新计算
+          </Button>
+        )}
         <Button type="primary" onClick={this.onReloadButtonClick}>
           刷新计算结果
         </Button>

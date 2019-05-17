@@ -138,7 +138,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
     dataIndex: 'action',
     width: 150,
     render: (value, record, index) => {
-      return <Operations record={record} onSearch={onSearch} />;
+      return <Operations record={record} onSearch={onSearch} rowId={record.positionId} />;
     },
   },
 ];

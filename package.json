@@ -1,18 +1,18 @@
 {
-  "name": "ant-design-pro",
-  "version": "2.1.1",
-  "description": "An out-of-box UI solution for enterprise applications",
   "private": true,
   "scripts": {
+    "check-env": "node ./scripts/node-env.js",
     "jsdoc": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md",
     "precommit": "yarn run lint-staged",
     "dev": "umi dev",
-    "start": "yarn run dev",
+    "start": "yarn run check-env && yarn run dev",
     "start:no-mock": "cross-env MOCK=none yarn run start",
-    "build": "cross-env UMI_ENV=prod umi build",
+    "build": "yarn run check-env && cross-env UMI_ENV=prod umi build",
+    "build:zero": "npm run check-env && yarn install && cross-env UMI_ENV=prod umi build",
     "deploy:test": "cross-env DEPLOY_DIST=test node ./scripts/deploy.js",
     "deploy:release": "cross-env DEPLOY_DIST=release node ./scripts/deploy.js",
     "deploy:prod": "cross-env DEPLOY_DIST=prod node ./scripts/deploy.js",
+    "deploy:hotfix": "cross-env DEPLOY_DIST=hotfix node ./scripts/deploy.js",
     "deploy:doc": "yarn run jsdoc && cross-env DEPLOY_DIST=doc node ./scripts/deploy.js",
     "analyze": "cross-env ANALYZE=1 umi build",
     "lint-staged": "lint-staged",
@@ -33,8 +33,8 @@
     "ag-grid-enterprise": "^20.0.0",
     "ag-grid-react": "^20.0.0",
     "animate.css": "^3.7.0",
-    "antd": "^3.16.1",
-    "bignumber.js": "^7.2.1",
+    "antd": "^3.17.0",
+    "bignumber.js": "^8.1.1",
     "bizcharts": "^3.2.4",
     "bizcharts-plugin-slider": "^2.0.3",
     "classnames": "^2.2.6",
@@ -47,6 +47,7 @@
     "immer": "^1.7.2",
     "immutability-helper": "^2.8.1",
     "import-all.macro": "^2.0.3",
+    "invariant": "^2.2.4",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
     "lodash-decorators": "^6.0.0",
@@ -150,12 +151,16 @@
       "**/*.min.*"
     ]
   },
-  "engines": {
-    "node": ">=8.0.0"
-  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "hope-env": {
+    "node": "v10.15.3",
+    "yarn": "1.16.0"
+  }
 }

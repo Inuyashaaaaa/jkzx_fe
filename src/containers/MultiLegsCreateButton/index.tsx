@@ -1,11 +1,13 @@
-import { allLegTypes } from '@/constants/legColDefs';
+import { TOTAL_LEGS } from '@/constants/legs';
+import { ILeg } from '@/types/leg';
 import { Button, Dropdown, Menu } from 'antd';
-import { ClickParam } from 'antd/lib/menu';
-import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import { getLegByType } from '@/tools';
+import { LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import _ from 'lodash';
 
 export default class MultilLegCreateButton extends PureComponent<{
-  handleAddLeg?: (params: ClickParam) => void;
+  handleAddLeg?: (leg: ILeg) => void;
   isPricing?: boolean;
 }> {
   public static defaultProps = {
@@ -13,27 +15,12 @@ export default class MultilLegCreateButton extends PureComponent<{
   };
 
   public normalLegMenus = () => {
-    const filterLegs = _.reject(allLegTypes, item => {
+    const filterLegs = _.reject(TOTAL_LEGS, item => {
       if (!item) return true;
-      return item.type === 'MODEL_XY_ANNUAL' || item.type === 'MODEL_XY_UNANNUAL';
+      return item.type === LEG_TYPE_MAP.MODEL_XY;
     });
-    const usedLegs = this.props.isPricing ? filterLegs : allLegTypes;
-    if (!usedLegs) return;
-    const items = [
-      {
-        name: '年化',
-        children: usedLegs
-          .filter(leg => leg.isAnnualized)
-          .map(item => ({ ...item, name: item.name.replace(' - 年化', '') })),
-      },
-      {
-        name: '非年化',
-        children: usedLegs
-          .filter(leg => !leg.isAnnualized)
-          .map(item => ({ ...item, name: item.name.replace(' - 非年化', '') })),
-      },
-    ];
-    return items;
+    const usedLegs = this.props.isPricing ? filterLegs : TOTAL_LEGS;
+    return usedLegs;
   };
 
   public getLegMenuNodes = menus => {
@@ -53,12 +40,12 @@ export default class MultilLegCreateButton extends PureComponent<{
     return (
       <Dropdown
         trigger={['click']}
-        // disabled={this.state.dataSource.length >= 1}
-        key="add"
         overlay={
           <Menu
-            onClick={this.props.handleAddLeg}
-            style={{ display: 'flex', justifyContent: 'start' }}
+            onClick={event => {
+              const leg = getLegByType(event.key);
+              this.props.handleAddLeg(leg);
+            }}
           >
             {this.getLegMenuNodes(this.normalLegMenus())}
           </Menu>

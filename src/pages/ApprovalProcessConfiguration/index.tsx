@@ -22,7 +22,7 @@ import {
 } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
-
+import _ from 'lodash';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
@@ -32,7 +32,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     taskApproveGroupList: [],
     processList: [],
     loading: false,
-    currentProcessName: '资金录入经办复合流程',
+    currentProcessName: '',
     status: false,
     resetVisible: false,
     globalConfigList: [],
@@ -47,19 +47,35 @@ class ApprovalProcessConfiguration extends PureComponent {
     this.fetchData();
   };
 
-  public fetchData = async () => {
+  public fetchData = async currentProcessName => {
     this.setState({
       loading: true,
     });
+    const { data: processList, error: pError } = await wkProcessList();
+    if (pError) {
+      return this.setState({
+        loading: false,
+      });
+    }
+
+    if (!this.state.currentProcessName) {
+      this.setState({
+        currentProcessName: processList[0].processName,
+      });
+    }
+
     const requests = () =>
       Promise.all([
-        wkTaskApproveGroupList({ processName: this.state.currentProcessName }),
+        wkTaskApproveGroupList({
+          processName: currentProcessName ? currentProcessName : processList[0].processName,
+        }),
         wkApproveGroupList(),
-        wkProcessList(),
-        wkGlobalConfigList({ processName: this.state.currentProcessName }),
+        wkGlobalConfigList({
+          processName: currentProcessName ? currentProcessName : processList[0].processName,
+        }),
       ]);
     const res = await requests();
-    const [taskApproveGroupList, approveGroupList, processList, globalConfigList] = res;
+    const [taskApproveGroupList, approveGroupList, globalConfigList] = res;
     const error = res.some(item => {
       return item.error;
     });
@@ -71,18 +87,21 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    let tabsData = processList.data.map(item => {
+    const tabsData = processList.map(item => {
       item.tabName = item.processName.split('经办复合流程')[0] + '审批';
       return item;
     });
 
-    tabsData = tabsData.filter(item => item.tabName.indexOf('资金录入') >= 0);
-
-    const taskData = (taskApproveGroupList.data || []).map(item => {
+    let editTask = {};
+    let taskData = (taskApproveGroupList.data || []).map((item, index) => {
       item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
+      if (item.taskType === '修改') {
+        editTask = item;
+        return null;
+      }
       return item;
     });
-
+    taskData = taskData.concat(editTask).filter(item => !!item);
     this.setState({
       loading: false,
       approveGroupList: approveGroupList.data || [],
@@ -126,15 +145,22 @@ class ApprovalProcessConfiguration extends PureComponent {
         processList,
       },
       () => {
-        this.fetchData();
+        this.fetchData(e);
       }
     );
   };
 
   public handleApproveGroup = (e, taskId) => {
     let { taskApproveGroupList } = this.state;
-    taskApproveGroupList = taskApproveGroupList.map(item => {
+    let fristChange = false;
+    taskApproveGroupList = taskApproveGroupList.map((item, index) => {
       if (item.taskId === taskId) {
+        item.approveGroupList = e;
+        if (index === 0) {
+          fristChange = true;
+        }
+      }
+      if (fristChange && index === taskApproveGroupList.length - 1) {
         item.approveGroupList = e;
       }
       return item;
@@ -163,7 +189,22 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public onConfirm = async () => {
-    const { currentProcessName, taskApproveGroupList, status, globalConfig } = this.state;
+    const {
+      currentProcessName,
+      taskApproveGroupList,
+      status,
+      globalConfig,
+      globalConfigList,
+    } = this.state;
+    const noneGroupIndex = _.findIndex(
+      taskApproveGroupList,
+      item => item && item.approveGroupList.length <= 0
+    );
+    if (noneGroupIndex >= 0) {
+      return notification.success({
+        message: `请至少选择一个审批组`,
+      });
+    }
     const requests = () =>
       Promise.all([
         wkProcessStatusModify({ processName: currentProcessName, status }),
@@ -171,7 +212,8 @@ class ApprovalProcessConfiguration extends PureComponent {
           processName: currentProcessName,
           taskList: taskApproveGroupList,
         }),
-        wkGlobalConfigModify(globalConfig),
+        // wkGlobalConfigModify(globalConfig)
+        ...globalConfigList.map(item => wkGlobalConfigModify(item)),
       ]);
     const res = await requests();
     const [modify, batch, globalConfigModify] = res;
@@ -186,7 +228,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public handleResetOk = async () => {
-    this.fetchData();
+    this.fetchData(this.state.currentProcessName);
     this.setState({
       resetVisible: false,
     });
@@ -199,12 +241,19 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public configListChange = (e, param) => {
+    const globalConfigList = this.state.globalConfigList.map(item => {
+      if (item.id === param.id) {
+        item.status = e.target.checked;
+      }
+      return item;
+    });
     this.setState({
       globalConfig: {
         processName: param.processName,
         id: param.id,
         status: e.target.checked,
       },
+      globalConfigList,
     });
   };
 
@@ -233,10 +282,7 @@ class ApprovalProcessConfiguration extends PureComponent {
           {this.state.globalConfigList.map(item => {
             return (
               <p key={item.id}>
-                <Checkbox
-                  onChange={e => this.configListChange(e, item)}
-                  defaultChecked={!!item.status}
-                >
+                <Checkbox onChange={e => this.configListChange(e, item)} checked={!!item.status}>
                   {item.globalName}
                 </Checkbox>
               </p>
@@ -268,10 +314,8 @@ class ApprovalProcessConfiguration extends PureComponent {
     return (
       <div className={styles.approvalProcessConfiguration}>
         <PageHeaderWrapper>
-          <Tabs defaultActiveKey="交易录入经办复合流程" onChange={this.tabsChange}>
+          <Tabs defaultActiveKey="资金录入经办复合流程" onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
-              // 只显示第二条数据
-              // if (index !== 1) return null;
               return (
                 <TabPane tab={tab.tabName} key={tab.processName}>
                   <div
@@ -295,7 +339,8 @@ class ApprovalProcessConfiguration extends PureComponent {
                           {/* <Icon type="plus-circle" /> */}
                         </span>
                       </List.Item>
-                      {this.state.taskApproveGroupList.map(group => {
+                      {this.state.taskApproveGroupList.map((group, gIndex) => {
+                        if (!group) return;
                         return (
                           <List.Item key={group.taskId}>
                             <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
@@ -323,6 +368,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                                   className={styles.select}
                                   value={group.approveGroupList}
                                   mode="multiple"
+                                  disabled={gIndex === this.state.taskApproveGroupList.length - 1}
                                   onChange={e => this.handleApproveGroup(e, group.taskId)}
                                   optionFilterProp="children"
                                   filterOption={(input, option) =>

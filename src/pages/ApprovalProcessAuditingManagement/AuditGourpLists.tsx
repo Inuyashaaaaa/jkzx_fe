@@ -127,20 +127,16 @@ class AuditLists extends PureComponent {
       const { message } = error;
       if (error) {
         return;
-      } else {
-        notification.success({
-          message: `编辑成功`,
-          description: message,
-        });
       }
 
-      const approveGroupList = this.state.approveGroupList.map(item => {
-        if (item.approveGroupId === this.state.approveGroupId) {
-          item.approveGroupName = data.approveGroupName;
-          item.approveGroupId = data.approveGroupId;
-          item.description = data.description;
-        }
-        return item;
+      notification.success({
+        message: `编辑成功`,
+        description: message,
+      });
+
+      const approveGroupList = [...data];
+      approveGroupList.sort((a, b) => {
+        return a.approveGroupName.localeCompare(b.approveGroupName);
       });
       this.setState(
         {
@@ -169,7 +165,7 @@ class AuditLists extends PureComponent {
         description: message,
       });
       let { approveGroupList } = this.state;
-      approveGroupList = approveGroupList.concat(data);
+      approveGroupList = data;
       this.setState(
         {
           visible: false,
@@ -205,6 +201,7 @@ class AuditLists extends PureComponent {
   };
 
   public handleMenber = param => {
+    if (!param) return;
     this.setState({
       indexGroupId: param.approveGroupId,
     });

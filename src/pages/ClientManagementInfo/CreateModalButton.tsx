@@ -16,6 +16,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
+import EmailInput from '@/containers/EmailInput';
 
 const CreateModalButton = memo<any>(props => {
   const { salesCascaderList, fetchTableData } = props;
@@ -33,7 +34,7 @@ const CreateModalButton = memo<any>(props => {
   const [currenStep, setCurrentStep] = useState(0);
   const editable = true;
   const [modalVisible, setModalVisible] = useState(false);
-  const [trustorSource, setTrustorSourceSource] = useState([]);
+  const [trustorSource, setTrustorSource] = useState([]);
   const [tradeSource, setTradeSource] = useState([]);
 
   const getProduceIcon = () => {
@@ -59,7 +60,7 @@ const CreateModalButton = memo<any>(props => {
     if (!value || value.indexOf('@') >= 0) {
       const trustorSource = [];
     }
-    setTrustorSourceSource(trustorSource);
+    setTrustorSource(trustorSource);
   };
 
   const tradeChange = value => {
@@ -89,7 +90,10 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setBaseFormData(allFields);
+                setBaseFormData({
+                  ...baseFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={baseFormData}
               style={{ paddingTop: 20 }}
@@ -310,16 +314,7 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(
-                          <span>
-                            {/* <Input editing={editable}/> */}
-                            <AutoComplete
-                              dataSource={trustorSource}
-                              style={{ width: '100%' }}
-                              onChange={trustorChange}
-                            />
-                          </span>
-                        )}
+                        })(<EmailInput style={{ width: '100%' }} />)}
                       </FormItem>
                     );
                   },
@@ -374,14 +369,7 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(
-                          // <Input editing={editable} />
-                          <AutoComplete
-                            dataSource={tradeSource}
-                            style={{ width: '100%' }}
-                            onChange={tradeChange}
-                          />
-                        )}
+                        })(<EmailInput style={{ width: '100%' }} />)}
                       </FormItem>
                     );
                   },
@@ -498,7 +486,10 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setProductFormData(allFields);
+                setProductFormData({
+                  ...productFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={productFormData}
               style={{ paddingTop: 20 }}
@@ -634,7 +625,10 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setAuthFormData(allFields);
+                setAuthFormData({
+                  ...authFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={authFormData}
               style={{ paddingTop: 20 }}
@@ -916,10 +910,13 @@ const CreateModalButton = memo<any>(props => {
                 formRef.current = node;
               }}
               onFieldsChange={(props, changedFields, allFields) => {
-                setAttachFormData(allFields);
+                setAttachFormData({
+                  ...attachFormData,
+                  ...changedFields,
+                });
               }}
               dataSource={attachFormData}
-              style={{ paddingTop: 20 }}
+              style={{ paddingTop: 20, paddingLeft: 30 }}
               footer={false}
               columnNumberOneRow={3}
               layout="vertical"
@@ -929,7 +926,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'masterAgreementDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -957,7 +954,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'supplementalAgreementDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -985,7 +982,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskSurveyDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1013,7 +1010,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'tradeAuthDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1041,7 +1038,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'dueDiligenceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1069,7 +1066,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskPreferenceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1097,7 +1094,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'complianceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1125,7 +1122,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskRevelationDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1153,7 +1150,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'qualificationWarningDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1181,7 +1178,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'creditAgreement',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1209,7 +1206,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'performanceGuaranteeDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1296,8 +1293,8 @@ const CreateModalButton = memo<any>(props => {
                     }
                   });
                   Object.keys(attachFormData).forEach(item => {
-                    baseData[item] = attachFormData[item].value;
-                    if (attachFormData[item].value) {
+                    if (attachFormData[item].value && attachFormData[item].value.length > 0) {
+                      baseData[item] = attachFormData[item].value;
                       baseData[item] = attachFormData[item].value[0].response.result.uuid;
                     }
                   });
@@ -1318,6 +1315,12 @@ const CreateModalButton = memo<any>(props => {
                   const { data, error } = await createRefParty(baseData);
                   if (error) return;
                   setModalVisible(false);
+                  setCurrentStep(0);
+                  setBaseFormData({});
+                  setProductFormData({});
+                  setAuthFormData({});
+                  setTraderList([]);
+                  setAttachFormData({});
                   fetchTableData({});
                   notification.success({
                     message: '新建交易对手成功',
@@ -1325,9 +1328,12 @@ const CreateModalButton = memo<any>(props => {
                   return;
                 }
 
-                if ([0, 1, 2, 5].findIndex(item => item === currenStep) !== -1) {
-                  const { error } = await formRef.current.validate();
-                  if (error) return;
+                const ref = currenStep === 3 ? tableEl : formRef;
+                const res = await ref.current.validate();
+                if (_.isArray(res)) {
+                  if (res.some(value => value.error)) return;
+                } else if (res.error) {
+                  return;
                 }
 
                 if (

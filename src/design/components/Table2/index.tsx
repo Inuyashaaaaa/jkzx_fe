@@ -1,7 +1,7 @@
 import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, KeyboardEvent } from 'react';
 import { createEventBus, EVERY_EVENT_TYPE, uuid } from '../../utils';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
@@ -10,9 +10,11 @@ import {
   TABLE_CELL_EDITING_CHANGED,
   TABLE_CELL_FIELDS_CHANGE,
   TABLE_CELL_VALUES_CHANGE,
+  TABLE_KEY_DOWN,
 } from './constants/EVENT';
 import FormRow from './rows/FormRow';
 import './styles.less';
+import { hasElement } from '@/design/utils/hasElement';
 
 class Table2 extends PureComponent<ITableProps> {
   public static defaultProps = {
@@ -47,37 +49,57 @@ class Table2 extends PureComponent<ITableProps> {
     this.context = this.getContext();
   }
 
-  public getTbody = () => {
+  public getTbody = (): HTMLElement => {
     return this.$dom.querySelector('.ant-table-tbody');
   };
 
-  public getThead = () => {
+  public getThead = (): HTMLElement => {
     return this.$dom.querySelector('.ant-table-thead');
   };
 
   public componentDidMount = () => {
     this.$dom = document.getElementById(this.domId);
-    this.getTbody().addEventListener('click', this.onTbodyClick, false);
-    this.getThead().addEventListener('click', this.onTheadClick, false);
+    window.addEventListener('keydown', this.onKeyDown, false);
+    window.addEventListener('click', this.onWindowClick, false);
   };
 
   public componentWillUnmount = () => {
-    this.getTbody().removeEventListener('click', this.onTbodyClick, false);
-    this.getThead().removeEventListener('click', this.onTheadClick, false);
+    window.removeEventListener('keydown', this.onKeyDown, false);
+    window.removeEventListener('click', this.onWindowClick, false);
   };
 
-  public onTbodyClick = (event: Event) => {
+  public onWindowClick = (event: MouseEvent) => {
+    if (
+      event.target instanceof HTMLElement &&
+      !hasElement(document.getElementById(this.domId), event.target)
+    ) {
+      this.looseActive();
+      this.save();
+    }
+
     if (event.target === this.getTbody()) {
+      this.save();
+    }
+
+    if (event.target instanceof HTMLElement && hasElement(this.getThead(), event.target)) {
       this.save();
     }
   };
 
-  public onTheadClick = (event: Event) => {
-    this.save();
+  public onKeyDown = (event: Event) => {
+    this.api.eventBus.emit(TABLE_KEY_DOWN, event);
   };
 
   public getFieldNames = () => {
     return this.props.columns.map(item => item.dataIndex);
+  };
+
+  public looseActive = () => {
+    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+      items.forEach(item => {
+        item.node.looseActive();
+      });
+    });
   };
 
   public validate = (

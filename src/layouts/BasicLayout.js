@@ -13,6 +13,7 @@ import { formatMessage } from 'umi/locale';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
+import ErrorBoundary from '@/containers/ErrorBoundary';
 
 const logoPath = '/logo.svg';
 
@@ -55,19 +56,9 @@ class BasicLayout extends React.PureComponent {
   }
 
   componentDidMount() {
-    const {
-      dispatch,
-      route: { routes, authority },
-    } = this.props;
+    const { dispatch } = this.props;
     dispatch({
-      type: 'user/fetchCurrent',
-    });
-    dispatch({
-      type: 'setting/getSetting',
-    });
-    dispatch({
-      type: 'menu/getMenuData',
-      payload: { routes, authority },
+      type: 'user/replenish',
     });
   }
 
@@ -144,6 +135,7 @@ class BasicLayout extends React.PureComponent {
     return {
       margin: '24px 24px 0',
       paddingTop: fixedHeader ? 64 : 0,
+      position: 'relative',
     };
   };
 
@@ -190,23 +182,23 @@ class BasicLayout extends React.PureComponent {
             isMobile={isMobile}
             {...this.props}
           />
-          <Content style={this.getContentStyle()}>{children}</Content>
+          <ErrorBoundary>
+            <Content style={this.getContentStyle()}>{children}</Content>
+          </ErrorBoundary>
           <Footer />
         </Layout>
       </Layout>
     );
     return (
-      <React.Fragment>
-        <DocumentTitle title={this.getPageTitle(pathname)}>
-          <ContainerQuery query={query}>
-            {params => (
-              <Context.Provider value={this.getContext()}>
-                <div className={classNames(params)}>{layout}</div>
-              </Context.Provider>
-            )}
-          </ContainerQuery>
-        </DocumentTitle>
-      </React.Fragment>
+      <DocumentTitle title={this.getPageTitle(pathname)}>
+        <ContainerQuery query={query}>
+          {params => (
+            <Context.Provider value={this.getContext()}>
+              <div className={classNames(params)}>{layout}</div>
+            </Context.Provider>
+          )}
+        </ContainerQuery>
+      </DocumentTitle>
     );
   }
 }

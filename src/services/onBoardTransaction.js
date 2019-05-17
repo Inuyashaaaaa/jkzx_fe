@@ -46,3 +46,16 @@ export async function exeTradeRecordSave(params) {
 }
 
 export const uploadUrl = `${HOST_TEST}exchange-service/api/upload/rpc`;
+
+// 模板下载
+export async function docBctTemplateList(params) {
+  return request(`${HOST_TEST}document-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'docBctTemplateList',
+      params,
+    },
+  });
+}
+
+export const downloadUrl = `${HOST_TEST}document-service/bct/download/template?fileName=`;

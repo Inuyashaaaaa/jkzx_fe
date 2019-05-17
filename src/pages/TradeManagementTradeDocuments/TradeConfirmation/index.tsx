@@ -1,10 +1,28 @@
 import SourceTable from '@/design/components/SourceTable';
-import { trdTradeListByBook } from '@/services/general-service';
-import { tradeDocSearch } from '@/services/trade-service';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { SEARCH_FORM_CONTROLS_TRADE, TRADE_COLUMN_DEFS } from './constants';
+import { SEARCH_FORM_CONTROLS_TRADE, TRADE_COLUMN_DEFS, columns } from './constants';
+import { Button, Divider, Row, Table, DatePicker } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import { Form2, Select } from '@/design/components';
+import {
+  trdBookListBySimilarBookName,
+  trdPortfolioListBySimilarPortfolioName,
+  tradeDocSearch,
+} from '@/services/trade-service';
+import {
+  trdTradeListBySimilarTradeId,
+  trdTradeSearchIndexPaged,
+  trdTradeListByBook,
+} from '@/services/general-service';
+import {
+  refSimilarLegalNameList,
+  refSimilarSalesNameList,
+} from '@/services/reference-data-service';
+import TradeModal from './TradeModal';
+
+const { RangePicker } = DatePicker;
 
 class TradeConfirmation extends PureComponent {
   public $sourceTable: SourceTable = null;
@@ -12,25 +30,69 @@ class TradeConfirmation extends PureComponent {
   public state = {
     loading: false,
     dataSource: [],
-    searchFormData: {
-      tradeDate: [moment().subtract(1, 'day'), moment()],
-    },
+    searchFormData: {},
     pagination: {
       current: 1,
       pageSize: 10,
+      showSizeChanger: true,
+      showQuickJumper: true,
+      onChange: (page, pagesize) => {
+        return this.onTablePaginationChange(page, pagesize);
+      },
+      onShowSizeChange: (page, pagesize) => {
+        return this.onTablePaginationChange(page, pagesize);
+      },
     },
     bookIdList: [],
   };
 
+  public onTablePaginationChange = (page, pagesize) => {
+    const { pagination } = this.state;
+    this.setState(
+      {
+        pagination: {
+          ...pagination,
+          current: page,
+          pageSize: pagesize,
+        },
+      },
+      () => {
+        this.onFetch({
+          current: page,
+          pageSize: pagesize,
+        });
+      }
+    );
+  };
+
   public componentDidMount = () => {
-    this.onFetch();
+    let { searchFormData } = this.state;
+    searchFormData = {
+      ...searchFormData,
+      ...Form2.createFields({ tradeDate: [moment().subtract(1, 'day'), moment()] }),
+    };
+    this.setState(
+      {
+        searchFormData,
+      },
+      () => {
+        this.onFetch();
+      }
+    );
+  };
+
+  public getFormData = data => {
+    return _.mapValues(data, item => {
+      return _.get(item, 'value');
+    });
   };
 
   public onFetch = async (paramsPagination?) => {
+    console.log(paramsPagination);
     const formValues = {
-      startDate: this.state.searchFormData.tradeDate[0].format('YYYY-MM-DD'),
-      endDate: this.state.searchFormData.tradeDate[1].format('YYYY-MM-DD'),
-      ..._.omit(this.state.searchFormData, 'tradeDate'),
+      startDate: _.get(this.state.searchFormData, 'tradeDate.value[0]').format('YYYY-MM-DD'),
+      endDate: _.get(this.state.searchFormData, 'tradeDate.value[1]').format('YYYY-MM-DD'),
+      ...this.getFormData(_.omit(this.state.searchFormData, 'tradeDate')),
     };
     const pagination = this.state.pagination;
     this.setState({
@@ -67,11 +129,13 @@ class TradeConfirmation extends PureComponent {
   };
 
   public onReset = () => {
+    let { searchFormData } = this.state;
+    searchFormData = {
+      ...Form2.createFields({ tradeDate: [moment().subtract(1, 'day'), moment()] }),
+    };
     this.setState(
       {
-        searchFormData: {
-          tradeDate: [moment().subtract(1, 'day'), moment()],
-        },
+        searchFormData,
       },
       () => {
         this.onFetch({ current: 1, pageSize: 10 });
@@ -79,21 +143,27 @@ class TradeConfirmation extends PureComponent {
     );
   };
 
-  public onSearchFormChange = async params => {
-    if (Object.keys(params.changedValues)[0] === 'bookName' && params.changedValues.bookName) {
+  public onSearchFormChange = async (props, changedFields) => {
+    if (changedFields.name === 'bookName' && changedFields.value) {
       const { error, data } = await trdTradeListByBook({
-        bookName: params.changedValues.bookName,
+        bookName: changedFields.value,
       });
       if (error) return;
       this.setState({
         bookIdList: data,
-        searchFormData: params.values,
+        searchFormData: {
+          ...this.state.searchFormData,
+          ...changedFields,
+        },
       });
       return;
     }
     this.setState({
       bookIdList: [],
-      searchFormData: params.values,
+      searchFormData: {
+        ...this.state.searchFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -101,39 +171,210 @@ class TradeConfirmation extends PureComponent {
     this.onFetch({ current: 1, pageSize: 10 });
   };
 
-  public onTablePaginationChange = ({ pagination }) => {
-    this.setState(
-      {
-        pagination,
-      },
-      () => {
-        this.onFetch();
-      }
-    );
-  };
-
   public render() {
+    const { searchFormData } = this.state;
     return (
       <>
-        <SourceTable
-          rowKey="uuid"
+        <Form2
           ref={node => (this.$sourceTable = node)}
-          columnDefs={TRADE_COLUMN_DEFS(this.onFetch)}
-          searchFormControls={SEARCH_FORM_CONTROLS_TRADE(this.state.bookIdList)}
-          searchable={true}
-          resetable={true}
-          loading={this.state.loading}
-          onSearchButtonClick={this.onSearch}
-          onResetButtonClick={this.onReset}
-          dataSource={this.state.dataSource}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          paginationProps={{
-            backend: true,
+          layout="inline"
+          dataSource={searchFormData}
+          submitText={`搜索`}
+          submitButtonProps={{
+            icon: 'search',
           }}
+          onSubmitButtonClick={this.onSearch}
+          onResetButtonClick={this.onReset}
+          onFieldsChange={this.onSearchFormChange}
+          columns={[
+            {
+              title: '交易日',
+              dataIndex: 'tradeDate',
+              render: (value, record, index, { form, editing }) => {
+                return <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>;
+              },
+            },
+            {
+              title: '交易确认书处理状态',
+              dataIndex: 'docProcessStatus',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        fetchOptionsOnSearch={true}
+                        options={[
+                          {
+                            label: '未处理',
+                            value: 'UN_PROCESSED',
+                          },
+                          {
+                            label: '已下载',
+                            value: 'DOWNLOADED',
+                          },
+                          {
+                            label: '已发送',
+                            value: 'SENT',
+                          },
+                        ]}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '交易簿',
+              dataIndex: 'bookName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        fetchOptionsOnSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await trdBookListBySimilarBookName({
+                            similarBookName: value,
+                          });
+                          if (error) return [];
+                          return data
+                            .sort((a, b) => {
+                              return a.localeCompare(b);
+                            })
+                            .map(item => ({
+                              label: item,
+                              value: item,
+                            }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '交易ID',
+              dataIndex: 'tradeId',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        fetchOptionsOnSearch={true}
+                        options={
+                          this.state.bookIdList.length
+                            ? this.state.bookIdList.map(item => {
+                                return {
+                                  label: item,
+                                  value: item,
+                                };
+                              })
+                            : async (value: string = '') => {
+                                const { data, error } = await trdTradeListBySimilarTradeId({
+                                  similarTradeId: value,
+                                });
+                                if (error) return [];
+                                return data.map(item => ({
+                                  label: item,
+                                  value: item,
+                                }));
+                              }
+                        }
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '交易对手',
+              dataIndex: 'partyName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        fetchOptionsOnSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await refSimilarLegalNameList({
+                            similarLegalName: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+          ]}
+        />
+        <Divider type="horizontal" />
+        <Table
+          dataSource={this.state.dataSource}
+          rowKey="tradeId"
+          columns={[
+            {
+              dataIndex: 'tradeId',
+              title: '交易ID',
+            },
+            {
+              dataIndex: 'bookName',
+              title: '交易簿',
+            },
+            {
+              dataIndex: 'partyName',
+              title: '交易对手',
+            },
+            {
+              dataIndex: 'salesName',
+              title: '销售',
+            },
+            {
+              dataIndex: 'tradeDate',
+              title: '交易日',
+            },
+            {
+              dataIndex: 'tradeEmail',
+              title: '交易邮箱',
+            },
+            {
+              dataIndex: 'status',
+              title: '交易确认书处理状态',
+            },
+            {
+              title: '操作',
+              render: (text, record, index) => {
+                return (
+                  <Row type="flex" align="middle">
+                    <TradeModal data={text} onFetch={this.onFetch} />
+                  </Row>
+                );
+              },
+            },
+          ]}
           pagination={this.state.pagination}
-          onPaginationChange={this.onTablePaginationChange}
-          onPaginationShowSizeChange={this.onTablePaginationChange}
+          loading={this.state.loading}
         />
       </>
     );

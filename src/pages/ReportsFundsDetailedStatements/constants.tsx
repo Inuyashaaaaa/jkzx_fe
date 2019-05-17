@@ -1,33 +1,39 @@
-import { INPUT_NUMBER_DATE_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { formatNumber } from '@/tools';
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS = [
   {
-    headerName: '客户名称',
-    field: 'clientName',
+    title: '客户名称',
+    dataIndex: 'clientName',
+    width: 100,
   },
   {
-    headerName: 'SAC协议编码',
-    field: 'masterAgreementId',
+    title: 'SAC协议编码',
+    dataIndex: 'masterAgreementId',
+    width: 100,
   },
   {
-    headerName: '出入金日期 (¥)',
-    field: 'paymentDate',
-    input: INPUT_NUMBER_DATE_CONFIG,
+    title: '出入金日期 (¥)',
+    dataIndex: 'paymentDate',
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
+    width: 100,
   },
   {
-    headerName: '入金 (¥)',
-    field: 'paymentIn',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '入金 (¥)',
+    dataIndex: 'paymentIn',
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 100,
   },
   {
-    headerName: '出金 (¥)',
-    field: 'paymentOut',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '出金 (¥)',
+    dataIndex: 'paymentOut',
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 100,
   },
   {
-    headerName: '出入金净额 (¥)',
-    field: 'paymentAmount',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '出入金净额 (¥)',
+    dataIndex: 'paymentAmount',
+    render: (value, record, index) => formatNumber(value, 4),
+    width: 100,
   },
 ];

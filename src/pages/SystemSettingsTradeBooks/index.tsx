@@ -8,9 +8,10 @@ import {
   queryNonGroupResource,
   updateNonGroupResource,
 } from '@/services/tradeBooks';
-import { Button, Modal } from 'antd';
+import { Button, Modal, message } from 'antd';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS } from './constants';
+import { trdTradeListByBook } from '@/services/general-service';
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -99,7 +100,23 @@ class SystemSettingsTradeBooks extends PureComponent {
       resourceName: oldValue,
       newResourceName: newValue,
     };
+    const trdTradeListByBookRsp = await trdTradeListByBook({
+      bookName: oldValue,
+    });
+    if (trdTradeListByBookRsp.error) {
+      return;
+    }
+    if (trdTradeListByBookRsp.data.length) {
+      message.error('该交易簿下已存在交易，不允许修改');
+      this.fetchTable();
+      return;
+    }
     const res = await updateNonGroupResource(params);
+    if (res.error) {
+      message.error('修改失败');
+      return;
+    }
+    message.success('修改成功');
   };
 
   public switchModal = () => {
