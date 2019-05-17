@@ -29,7 +29,6 @@ class ClientManagementFundStatistics extends PureComponent {
   };
 
   public componentDidMount = async () => {
-    this.fetchBranchSalesList();
     this.fetchSimilarLegalName();
     this.fetchTable();
   };
@@ -44,36 +43,6 @@ class ClientManagementFundStatistics extends PureComponent {
       value: item,
     }));
     this.setState({ markets });
-  };
-
-  public fetchBranchSalesList = async () => {
-    const { error, data } = await queryCompleteCompanys();
-    if (error) return false;
-    const newData = arr2treeOptions(
-      data,
-      ['subsidiary', 'branch', 'salesName'],
-      ['subsidiary', 'branch', 'salesName']
-    );
-    const branchSalesList = newData.map(subsidiaryName => {
-      return {
-        value: subsidiaryName.value,
-        label: subsidiaryName.label,
-        children: subsidiaryName.children.map(branchName => {
-          return {
-            value: branchName.value,
-            label: branchName.label,
-            children: branchName.children.map(salesName => {
-              return {
-                value: salesName.value,
-                label: salesName.label,
-              };
-            }),
-          };
-        }),
-      };
-    });
-    this.setState({ branchSalesList });
-    return true;
   };
 
   public fetchTable = async () => {

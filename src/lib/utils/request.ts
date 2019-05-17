@@ -81,7 +81,8 @@ const cachedSave = (response, hashcode) => {
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request(url, options = {}, passError = false) {
+export default function request(url, _options = {}, passError = false) {
+  const { token, ...options } = _options;
   /**
    * Produce fingerprints based on url and parameters
    * Maybe url has the same parameters
@@ -108,7 +109,7 @@ export default function request(url, options = {}, passError = false) {
       newOptions.headers = {
         Accept: 'application/json',
         'Content-Type': 'application/json; charset=utf-8',
-        Authorization: `Bearer ${getToken()}`,
+        Authorization: `Bearer ${token || getToken()}`,
         ...newOptions.headers,
       };
       newOptions.body = JSON.stringify(newOptions.body);
@@ -116,7 +117,7 @@ export default function request(url, options = {}, passError = false) {
       // newOptions.body is FormData
       newOptions.headers = {
         Accept: 'application/json',
-        Authorization: `Bearer ${getToken()}`,
+        Authorization: `Bearer ${token || getToken()}`,
         ...newOptions.headers,
       };
     }
@@ -151,11 +152,12 @@ export default function request(url, options = {}, passError = false) {
       onCatch ||
         (error => {
           const { code, message } = error;
-          !passError &&
+          if (!passError) {
             notification.error({
               message: `请求失败`,
               description: message,
             });
+          }
 
           const failAction = { error };
 

@@ -151,7 +151,6 @@ export default class AuthTable extends Component {
     } else {
       authList = [...this.auth_list];
     }
-    console.log(authList);
     this.setState({
       authorities: authList,
     });
@@ -168,6 +167,7 @@ export default class AuthTable extends Component {
       typeDescription = ` （${typeNames[index]}）`;
     }
     const { currentLogin, changed, authorities, loading } = this.state;
+
     return (
       <div style={{ marginLeft: 100, width: 700 }}>
         <h2>
@@ -228,6 +228,7 @@ export default class AuthTable extends Component {
           <Button onClick={this.cancelSearch}>取消筛选</Button>
         </div>
         <Table
+          rowKey="value"
           style={{ marginTop: 10 }}
           bordered={false}
           size="middle"

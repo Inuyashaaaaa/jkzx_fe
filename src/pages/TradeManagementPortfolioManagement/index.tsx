@@ -170,7 +170,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
           dataSource={this.state.searchFormData}
           submitText="搜索"
           submitButtonProps={{
-            icon: 'reload',
+            icon: 'search',
           }}
           onSubmitButtonClick={this.onSearchButtonClick}
           onFieldsChange={this.onFieldsChange}
@@ -191,8 +191,8 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
                           },
                           placeholder: '请输入内容搜索',
                           allowClear: true,
-                          type: 'select',
                           showSearch: true,
+                          fetchOptionsOnSearch: true,
                           options: async (value: string) => {
                             const { data, error } = await trdPortfolioListBySimilarPortfolioName({
                               similarPortfolioName: value,
@@ -234,6 +234,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
           </ModalButton>
         </Row>
         <Table
+          size="middle"
           rowKey="uuid"
           dataSource={this.state.dataSource}
           columns={[
@@ -244,6 +245,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
             {
               title: '操作',
               dataIndex: '操作',
+              width: 250,
               render: (text, record, index) => {
                 return <Action params={{ data: record }} reload={this.search} />;
               },

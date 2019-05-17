@@ -54,7 +54,6 @@ const LcmEventModal = memo<{
       const { eventType, record, createFormData, currentUser, loadData } = event;
       const legType = record[LEG_TYPE_FIELD];
       const data = Form2.getFieldsValue(record);
-
       const tableFormData = Form2.getFieldsValue(createFormData);
       if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
         return $expirationModal.current.show(data, tableFormData, currentUser, loadData);

@@ -34,28 +34,29 @@ export async function queryCompleteCompanys() {
 
   const [{ data: salersData }, { data: companysData }] = results;
 
-  const companysDataOtherIdName = companysData.map(item => {
+  const salesData = salersData.map(item => {
     return {
-      ..._.omit(item, ['uuid']),
-      companyUuid: item.uuid,
+      ...item,
+      salesId: item.uuid,
     };
   });
 
-  companysDataOtherIdName.forEach(item => {
+  companysData.forEach(item => {
     const findedItem = salersData.find(
-      it => it.subsidiary === item.subsidiary && it.branch === item.branch
+      it => it.subsidiaryId === item.subsidiaryId && it.branchId === item.branchId
     );
     if (findedItem) return;
 
-    salersData.push({
+    salesData.push({
       ...item,
-      salesName: undefined,
+      salesName: '',
+      salesId: null,
     });
   });
 
   return {
     error: false,
-    data: salersData,
+    data: salesData,
   };
 }
 

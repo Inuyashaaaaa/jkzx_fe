@@ -180,7 +180,7 @@ class UnwindModal extends PureComponent<
         positionId: this.data.id,
         tradeId: this.tableFormData.tradeId,
         eventType: LCM_EVENT_TYPE_MAP.UNWIND,
-        userLoginId: this.currentUser.userName,
+        userLoginId: this.currentUser.username,
         eventDetail: {
           unWindAmount: String(usedFormData[UNWIND_PRICE]),
           unWindLot: String(usedFormData[UNWIND_NUM]),

@@ -273,6 +273,7 @@ class ClientManagementDocument extends PureComponent {
               loading={loading}
               columns={tradeColumns}
               dataSource={tradeData}
+              rowKey="uuid"
               pagination={{
                 pageSizeOptions: ['10', '20', '30'],
                 showSizeChanger: true,
@@ -292,6 +293,7 @@ class ClientManagementDocument extends PureComponent {
             <Table
               loading={loading}
               columns={customerColumns}
+              rowKey="uuid"
               dataSource={customerData}
               pagination={{
                 pageSizeOptions: ['10', '20', '30'],

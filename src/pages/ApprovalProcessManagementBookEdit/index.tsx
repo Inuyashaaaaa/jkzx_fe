@@ -1,4 +1,4 @@
-import { LEG_ID_FIELD } from '@/constants/common';
+import { LEG_ID_FIELD, LEG_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV, TOTAL_EDITING_FIELDS, ILegColDef } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
@@ -7,7 +7,7 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/design/components';
 import { ITableData } from '@/design/components/type';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { wkProcessInstanceFormGet } from '@/services/approval';
+import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 import { convertTradePageData2ApiData } from '@/services/pages';
 import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
 import { ILeg } from '@/types/leg';
@@ -19,11 +19,31 @@ import useLifecycles from 'react-use/lib/useLifecycles';
 import './index.less';
 import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import moment from 'moment';
+import uuidv4 from 'uuid/v4';
+import { getMoment } from '@/utils';
+const DATE_ARRAY = [
+  LEG_FIELD.SETTLEMENT_DATE,
+  LEG_FIELD.EFFECTIVE_DATE,
+  LEG_FIELD.EXPIRATION_DATE,
+  LEG_FIELD.DOWN_BARRIER_DATE,
+  LEG_FIELD.OBSERVE_START_DAY,
+  LEG_FIELD.OBSERVE_END_DAY,
+];
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
-  const { tradeManagementBookEditPageData, dispatch } = props;
-  const { tableData } = tradeManagementBookEditPageData;
+  const { tradeManagementBookEditPageData, dispatch, isCompleted } = props;
+  const tableData = _.map(tradeManagementBookEditPageData.tableData, iitem => {
+    return _.mapValues(iitem, (item, key) => {
+      if (_.includes(DATE_ARRAY, key)) {
+        return {
+          type: 'field',
+          value: getMoment(item.value),
+        };
+      }
+      return item;
+    });
+  });
   const setTableData = payload => {
     dispatch({
       type: 'tradeManagementBookEdit/setTableData',
@@ -31,7 +51,7 @@ const TradeManagementBooking = props => {
     });
   };
   const useEnv = props.editable ? LEG_ENV.BOOKING : LEG_ENV.EDITING;
-
+  let currentCreateFormRef = useRef<Form2>(null);
   const [tableLoading, setTableLoading] = useState(false);
   const [createFormData, setCreateFormData] = useState({});
   const tableEl = useRef<IMultiLegTableEl>(null);
@@ -41,7 +61,7 @@ const TradeManagementBooking = props => {
 
     setTableData(pre => {
       const next = {
-        ...createLegRecordByPosition(leg, position, useEnv),
+        ...createLegRecordByPosition(leg, { ...position, positionId: uuidv4() }, useEnv),
       };
       return pre.concat(next);
     });
@@ -56,8 +76,8 @@ const TradeManagementBooking = props => {
     }
 
     setTableLoading(true);
-
-    const { error, data } = await wkProcessInstanceFormGet({
+    const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
+    const { error, data } = await executeMethod({
       processInstanceId: props.id,
     });
     if (error) return;
@@ -73,10 +93,10 @@ const TradeManagementBooking = props => {
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
 
-    const { positions } = _.get(data, 'process._business_payload.trade');
-
+    const positions = _.get(data, 'process._business_payload.trade.positions');
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
+    if (!positions) return;
     mockAddLegItem(positions, _detailData);
   };
 
@@ -88,18 +108,16 @@ const TradeManagementBooking = props => {
   };
 
   const handelSave = async () => {
+    const res = await currentCreateFormRef.validate();
+    if (res.error) return;
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
       Form2.getFieldsValue(createFormData),
-      currentUser.userName,
+      currentUser.username,
       LEG_ENV.BOOKING
     );
     props.tbookEditCancel();
-    props.confirmModify(null, {
-      taskId: props.taskId,
-      ctlProcessData: props.res,
-      businessProcessData: { trade, validTime: '2018-01-01T10:10:10' },
-    });
+    props.confirmModify(trade);
   };
 
   const handleEventAction = (eventType, params) => {
@@ -127,6 +145,9 @@ const TradeManagementBooking = props => {
           <Divider />
           <Loading loading={tableLoading}>
             <BookingBaseInfoForm
+              currentCreateFormRef={node => {
+                currentCreateFormRef = node;
+              }}
               columnNumberOneRow={2}
               editableStatus={
                 props.editable ? FORM_EDITABLE_STATUS.EDITING_NO_CONVERT : FORM_EDITABLE_STATUS.SHOW

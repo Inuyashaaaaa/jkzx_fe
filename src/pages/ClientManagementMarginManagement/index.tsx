@@ -256,7 +256,7 @@ class ClientManagementMarginManagement extends PureComponent {
           />
         </Modal>
         <Modal
-          title="导入场内流水"
+          title="批量更新维持保证金"
           visible={this.state.modalVisible}
           onCancel={this.hideModal}
           onOk={this.hideModal}
@@ -291,7 +291,7 @@ class ClientManagementMarginManagement extends PureComponent {
             </ImportExcelButton>
           </p>
           <p style={{ marginTop: '20px' }}>操作说明:</p>
-          <p style={{ marginLeft: '20px' }}>1.仅支持导入.csv格式的文件</p>
+          <p style={{ marginLeft: '20px' }}>1.仅支持导入.xlsx格式的文件</p>
           <p style={{ marginLeft: '20px' }}>
             2.导入模板下载:
             <a onClick={this.downloadFormModal}>批量更新维持保证金.xlsx</a>

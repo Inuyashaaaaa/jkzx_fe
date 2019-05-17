@@ -1,17 +1,18 @@
 import { HOST_TEST } from '@/constants/global';
 import request from '@/lib/utils/request';
 
-export async function authRolesList(params = {}) {
+export async function authRolesList(params = {}, token) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
+    token,
     method: `POST`,
     body: {
       method: 'authRoleList',
-      params: {},
+      params,
     },
   });
 }
 
-export async function createRole(params) {
+export async function createRole(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
@@ -21,7 +22,7 @@ export async function createRole(params) {
   });
 }
 
-export async function updateRole(params) {
+export async function updateRole(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
@@ -31,7 +32,7 @@ export async function updateRole(params) {
   });
 }
 
-export async function deleteRole(params) {
+export async function deleteRole(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
@@ -41,8 +42,9 @@ export async function deleteRole(params) {
   });
 }
 
-export async function queryAllPagePermissions(params) {
+export async function queryAllPagePermissions(params = {}, token) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
+    token,
     method: `POST`,
     body: {
       method: 'authPageComponentList',
@@ -51,8 +53,9 @@ export async function queryAllPagePermissions(params) {
   });
 }
 
-export async function queryRolePagePermissions(params) {
+export async function queryRolePagePermissions(params = {}, token) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
+    token,
     method: `POST`,
     body: {
       method: 'authPagePermissionGet',
@@ -61,7 +64,7 @@ export async function queryRolePagePermissions(params) {
   });
 }
 
-export async function updateRolePagePermissions(params) {
+export async function updateRolePagePermissions(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
@@ -71,7 +74,7 @@ export async function updateRolePagePermissions(params) {
   });
 }
 
-export async function authPagePermissionGetByRoleId(params) {
+export async function authPagePermissionGetByRoleId(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
@@ -81,10 +84,10 @@ export async function authPagePermissionGetByRoleId(params) {
   });
 }
 
-export async function initPagePermissions() {
+export async function initPagePermissions(token) {
   return Promise.all([
-    queryRolePagePermissions({}),
-    queryAllPagePermissions({}),
-    authRolesList({}),
+    queryRolePagePermissions({}, token),
+    queryAllPagePermissions({}, token),
+    authRolesList({}, token),
   ]);
 }
