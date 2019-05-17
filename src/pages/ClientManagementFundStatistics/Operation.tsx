@@ -112,7 +112,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     this.setState({
       modalVisible: false,
     });
-    const error = this.handleCreate();
+    const error = await this.handleCreate();
     if (error) return;
     router.push('/approval-process/process-manangement');
   };

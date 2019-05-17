@@ -37,7 +37,6 @@ class Input extends InputBase<IInputProps> {
 
   public renderRendering() {
     const { value, formatter } = this.props;
-    console.log(this.props);
     return (
       <span style={{ display: 'inline-block', width: '100%' }}>
         {formatter ? formatter(value) : value}

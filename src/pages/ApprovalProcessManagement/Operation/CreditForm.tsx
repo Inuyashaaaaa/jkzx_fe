@@ -10,7 +10,7 @@ import {
   downloadTradeAttachment,
 } from '@/services/approval';
 import moment from 'moment';
-import { Form2, Upload, Input as Input2 } from '@/design/components';
+import { Form2, Upload, Input as Input2, InputNumber } from '@/design/components';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import {
   Button,
@@ -54,11 +54,11 @@ class ApprovalForm extends PureComponent<any, any> {
       modifyComment: '',
       detailData: {},
       fileList: [],
-      transactionModalVisible: false,
       attachmentId: null,
       bookEditVisible: false,
       editable: false,
       creditForm: {},
+      isCompleted: null,
     };
   }
   public componentDidMount() {
@@ -99,9 +99,11 @@ class ApprovalForm extends PureComponent<any, any> {
     this.setState({
       loading: true,
     });
-    const isCompleted = params.status
-      ? !params.status.includes('unfinished') || this.props.status === 'pending'
+    const isCompleted = params.processInstanceStatusEnum
+      ? !_.toLower(params.processInstanceStatusEnum).includes('unfinished') &&
+        this.props.status !== 'pending'
       : false;
+
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
       processInstanceId,
@@ -138,6 +140,7 @@ class ApprovalForm extends PureComponent<any, any> {
     this.setState({
       detailData: Form2.createFields(_detailData),
       creditForm: Form2.createFields(_creditForm),
+      isCompleted,
     });
 
     if (!isCheckBtn) {
@@ -152,6 +155,14 @@ class ApprovalForm extends PureComponent<any, any> {
     } else {
       this.queryBankAccount(data, status);
     }
+
+    const AttachmentListRes = await wkAttachmentList({
+      processInstanceId: this.props.formData.processInstanceId,
+    });
+    if (AttachmentListRes.error) return;
+    this.setState({
+      attachmentId: _.get(AttachmentListRes, 'data[0].attachmentId'),
+    });
   };
 
   public handleConfirmModify = async e => {
@@ -170,9 +181,7 @@ class ApprovalForm extends PureComponent<any, any> {
     this.setState({
       loading: true,
     });
-    const isCompleted = this.props.formData.status
-      ? !this.props.formData.status.includes('unfinished') || this.props.status === 'pending'
-      : false;
+    const { isCompleted } = this.state;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
       processInstanceId,
@@ -184,14 +193,27 @@ class ApprovalForm extends PureComponent<any, any> {
       return;
     }
     const data = (res && res.data) || {};
-    return this.confirmModify(e, {
+    const { modifyComment } = this.state;
+    const param = {
       taskId: this.props.formData.taskId,
-      ctlProcessData: this.state.res,
+      ctlProcessData: {
+        comment: modifyComment,
+        abandon: false,
+      },
       businessProcessData: {
         ..._.get(data, 'process._business_payload'),
         ...Form2.getFieldsValue(this.state.creditForm),
       },
-    });
+    };
+    return this.executeModify(param, 'modify');
+    // return this.confirmModify(e, {
+    //   taskId: this.props.formData.taskId,
+    //   ctlProcessData: this.state.res,
+    //   businessProcessData: {
+    //     ..._.get(data, 'process._business_payload'),
+    //     ...Form2.getFieldsValue(this.state.creditForm),
+    //   },
+    // });
   };
 
   public queryBankAccount = async (data, status) => {
@@ -302,11 +324,9 @@ class ApprovalForm extends PureComponent<any, any> {
   };
 
   public confirmAbandon = async () => {
-    // this.$formBuilder.validateForm(values => {
-    //   const obj = { ...values };
-    //   obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
-    //   obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
-    //   obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+    const { data, error } = await wkProcessInstanceFormGet({
+      processInstanceId: this.props.formData.processInstanceId,
+    });
     const { formData } = this.props;
     const { modifyComment } = this.state;
     const params = {
@@ -314,29 +334,41 @@ class ApprovalForm extends PureComponent<any, any> {
       ctlProcessData: {
         abandon: true,
       },
-      businessProcessData: {},
+      businessProcessData: _.get(data, 'process._business_payload'),
     };
     this.executeModify(params, 'abandon');
-    // });
   };
 
   public confirmPass = async () => {
     const { formData } = this.props;
     const { passComment } = this.state;
-
+    const { isCompleted } = this.state;
+    const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
+    const res = await executeMethod({
+      processInstanceId: formData.processInstanceId,
+    });
+    if (!res || res.error) {
+      this.setState({
+        loading: false,
+      });
+      return;
+    }
+    const data = (res && res.data) || {};
     const params = {
       taskId: formData.taskId,
       ctlProcessData: {
         confirmed: true,
         comment: passComment,
       },
-      businessProcessData: {},
+      businessProcessData: {
+        ..._.get(data, 'process._business_payload'),
+        ...Form2.getFieldsValue(this.state.creditForm),
+      },
     };
     this.executeModify(params, 'pass');
   };
 
   public confirmModify = async (e, param) => {
-    console.log(param);
     const { passComment } = this.state;
     if (param) {
       param.ctlProcessData = {
@@ -357,7 +389,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: modifyComment,
         abandon: false,
       },
-      businessProcessData: data.process._business_payload,
+      businessProcessData: _.get(data, 'process._business_payload'),
     };
     this.executeModify(params, 'modify');
   };
@@ -410,27 +442,6 @@ class ApprovalForm extends PureComponent<any, any> {
     }
     const { handleFormChange } = this.props;
     handleFormChange();
-  };
-
-  public transactionHandleOk = async attachmentName => {
-    if (this.state.attachmentId) {
-      const { error, data } = await wkAttachmentProcessInstanceModify({
-        attachmentId: this.state.attachmentId,
-        processInstanceId: this.props.formData.processInstanceId,
-      });
-      if (error) return;
-      message.success(`${attachmentName}上传成功`);
-    }
-
-    this.setState({
-      transactionModalVisible: false,
-    });
-  };
-
-  public transactionHandleCancel = () => {
-    this.setState({
-      transactionModalVisible: false,
-    });
   };
 
   public bookEditHandleOk = async () => {
@@ -641,7 +652,7 @@ class ApprovalForm extends PureComponent<any, any> {
                   render: (value, record, index, { form, editing }) => {
                     return (
                       <FormItem>
-                        {form.getFieldDecorator({})(<Input2 disabled={formStatus} />)}
+                        {form.getFieldDecorator({})(<InputNumber disabled={formStatus} />)}
                       </FormItem>
                     );
                   },
@@ -652,7 +663,7 @@ class ApprovalForm extends PureComponent<any, any> {
                   render: (value, record, index, { form, editing }) => {
                     return (
                       <FormItem>
-                        {form.getFieldDecorator({})(<Input2 disabled={formStatus} />)}
+                        {form.getFieldDecorator({})(<InputNumber disabled={formStatus} />)}
                       </FormItem>
                     );
                   },
@@ -675,7 +686,9 @@ class ApprovalForm extends PureComponent<any, any> {
                           action={UPLOAD_URL}
                           data={{
                             method: 'wkAttachmentUpload',
-                            params: JSON.stringify({}),
+                            params: JSON.stringify({
+                              attachmentId: this.state.attachmentId,
+                            }),
                           }}
                           headers={{ Authorization: `Bearer ${getToken()}` }}
                           onChange={fileList => {
@@ -683,16 +696,12 @@ class ApprovalForm extends PureComponent<any, any> {
                               fileList,
                             });
                             if (fileList[0].status === 'done') {
-                              this.setState(
-                                {
-                                  attachmentId: _.get(fileList, '[0].response.result.attachmentId'),
-                                },
-                                () => {
-                                  this.transactionHandleOk(
-                                    _.get(fileList, '[0].response.result.attachmentName')
-                                  );
-                                }
-                              );
+                              const res = _.get(fileList, '[0].response');
+                              if (!res.error) {
+                                message.success(
+                                  `${_.get(fileList, '[0].response.result.attachmentName')}上传成功`
+                                );
+                              }
                             }
                           }}
                           value={this.state.fileList}
@@ -796,19 +805,19 @@ class ApprovalForm extends PureComponent<any, any> {
                         </Button>
                       </Popconfirm>
                     </div>
+                    <div style={{ marginLeft: 10 }}>
+                      <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
+                        <Button
+                          type="danger"
+                          loading={modifying && modifyBtn === 'abandon'}
+                          disabled={modifying && modifyBtn !== 'abandon'}
+                        >
+                          废弃
+                        </Button>
+                      </Popconfirm>
+                    </div>
                   </>
                 )}
-                <div style={{ marginLeft: 10 }}>
-                  <Popconfirm title="确认废弃该审批单？" onConfirm={this.confirmAbandon}>
-                    <Button
-                      type="danger"
-                      loading={modifying && modifyBtn === 'abandon'}
-                      disabled={modifying && modifyBtn !== 'abandon'}
-                    >
-                      废弃
-                    </Button>
-                  </Popconfirm>
-                </div>
               </div>
             )}
           </div>

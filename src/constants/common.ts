@@ -190,10 +190,16 @@ export const EVENT_TYPE_ZHCN_MAP = {
 export const EVENT_TYPE_OPTIONS = convertOptions(EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP);
 
 // 流程状态类型
+export const PROCESS_STATUS_TYPE_MAP_LOW = {
+  PROCESS_FINISH: 'processFinish',
+  PROCESS_UNFINISHED: 'processUnfinished',
+  PROCESS_ABANDON: 'processAbandon',
+};
+
 export const PROCESS_STATUS_TYPE_MAP = {
-  PROCESS_FINISH: 'process_finish',
-  PROCESS_UNFINISHED: 'process_unfinished',
-  PROCESS_ABANDON: 'process_abandon',
+  PROCESS_FINISH: 'PROCESS_FINISH',
+  PROCESS_UNFINISHED: 'PROCESS_UNFINISHED',
+  PROCESS_ABANDON: 'PROCESS_ABANDON',
 };
 
 export const PROCESS_STATUS_TYPE_ZHCN_MAP = {
@@ -203,7 +209,7 @@ export const PROCESS_STATUS_TYPE_ZHCN_MAP = {
 };
 
 export const PROCESS_STATUS_TYPE_OPTIONS = convertOptions(
-  PROCESS_STATUS_TYPE_MAP,
+  PROCESS_STATUS_TYPE_MAP_LOW,
   PROCESS_STATUS_TYPE_ZHCN_MAP
 );
 
