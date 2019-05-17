@@ -302,25 +302,6 @@ const CreateModalButton = memo<any>(props => {
                   },
                 },
                 {
-                  title: '托管邮箱',
-                  dataIndex: 'trustorEmail',
-                  render: (val, record, index, { form }) => {
-                    return (
-                      <FormItem hasFeedback={true}>
-                        {form.getFieldDecorator({
-                          rules: [
-                            {
-                              required: true,
-                              message: '必填',
-                            },
-                          ],
-                        })(<EmailInput style={{ width: '100%' }} />)}
-                      </FormItem>
-                    );
-                  },
-                },
-
-                {
                   title: '联系人',
                   dataIndex: 'contact',
                   render: (val, record, index, { form }) => {
@@ -388,6 +369,23 @@ const CreateModalButton = memo<any>(props => {
                             },
                           ],
                         })(<Input editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '托管邮箱',
+                  dataIndex: 'trustorEmail',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<EmailInput style={{ width: '100%' }} />)}
                       </FormItem>
                     );
                   },
@@ -473,6 +471,83 @@ const CreateModalButton = memo<any>(props => {
                             },
                           ],
                         })(<DatePicker editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '主协议编号版本',
+                  dataIndex: 'masterAgreementNoVersion',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(
+                          <Select
+                            editing={editable}
+                            options={[
+                              {
+                                label: ' SAC2014',
+                                value: 'SAC2014',
+                              },
+                              {
+                                label: 'SAC2015',
+                                value: 'SAC2015',
+                              },
+                              {
+                                label: 'ISDA',
+                                value: 'ISDA',
+                              },
+                              {
+                                label: 'OTHER',
+                                value: 'OTHER',
+                              },
+                              {
+                                label: 'NAFMII',
+                                value: 'NAFMII',
+                              },
+                            ]}
+                          />
+                        )}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '主协议签证日期',
+                  dataIndex: 'masterAgreementSignDate',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<DatePicker editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '营业执照',
+                  dataIndex: 'businessLicense',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<Input editing={editable} />)}
                       </FormItem>
                     );
                   },
@@ -916,7 +991,7 @@ const CreateModalButton = memo<any>(props => {
                 });
               }}
               dataSource={attachFormData}
-              style={{ paddingTop: 20 }}
+              style={{ paddingTop: 20, paddingLeft: 30 }}
               footer={false}
               columnNumberOneRow={3}
               layout="vertical"
@@ -926,7 +1001,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'masterAgreementDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -954,7 +1029,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'supplementalAgreementDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -982,7 +1057,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskSurveyDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1010,7 +1085,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'tradeAuthDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1038,7 +1113,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'dueDiligenceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1066,7 +1141,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskPreferenceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1094,7 +1169,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'complianceDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1122,7 +1197,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'riskRevelationDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1150,7 +1225,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'qualificationWarningDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1178,7 +1253,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'creditAgreement',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1206,7 +1281,7 @@ const CreateModalButton = memo<any>(props => {
                   dataIndex: 'performanceGuaranteeDoc',
                   render: (val, record, index, { form }) => {
                     return (
-                      <FormItem hasFeedback={true}>
+                      <FormItem hasFeedback={val && val.length > 0 ? true : false}>
                         {form.getFieldDecorator({
                           rules: [
                             {
@@ -1315,6 +1390,12 @@ const CreateModalButton = memo<any>(props => {
                   const { data, error } = await createRefParty(baseData);
                   if (error) return;
                   setModalVisible(false);
+                  setCurrentStep(0);
+                  setBaseFormData({});
+                  setProductFormData({});
+                  setAuthFormData({});
+                  setTraderList([]);
+                  setAttachFormData({});
                   fetchTableData({});
                   notification.success({
                     message: '新建交易对手成功',

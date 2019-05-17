@@ -226,7 +226,7 @@ const BookingBaseInfoForm = memo<any>(props => {
         </Loading>
       </Modal>
       <Form2
-        ref={node => currentCreateFormRef(node)}
+        ref={node => (currentCreateFormRef ? currentCreateFormRef(node) : null)}
         columnNumberOneRow={columnNumberOneRow}
         footer={false}
         dataSource={createFormData}
@@ -367,7 +367,14 @@ const BookingBaseInfoForm = memo<any>(props => {
                       </InputGroup>
                     </>
                   ) : (
-                    form.getFieldDecorator()(<Input editing={editing} />)
+                    form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '交易对手为必填项',
+                        },
+                      ],
+                    })(<Input editing={editing} />)
                   )}
                 </FormItem>
               );

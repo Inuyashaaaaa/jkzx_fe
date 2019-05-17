@@ -2,60 +2,7 @@ import { HOST_TEST } from '@/constants/global';
 import { delay } from '@/lib/utils';
 import request from '@/lib/utils/request';
 import fetch from 'dva/fetch';
-
-export const permissions = {
-  notifications: false,
-  pricing: true,
-  pricingEnvironment: false,
-  clientManagement: true,
-  spotLadder: false,
-  pnlAttribution: false,
-  roles: true,
-  intradayGreeks: true,
-  intradayPnl: true,
-  bookEdit: true,
-  subjectStore: true,
-  marketManagement: true,
-  // bankAccount: true,
-  customSalesManage: true,
-  userInfo: true,
-  users: true,
-  booking: true,
-  contractManagement: true,
-  volSurface: true,
-  riskFreeCurve: true,
-  dividendCurve: true,
-  baseContractManagement: true,
-  workflowSettings: true,
-  processManagement: true,
-  risk: true,
-  eodPosition: true,
-  eodRiskByUnderlyer: true,
-  eodDailyPnlByUnderlyer: true,
-  eodHistoricalPnlByUnderlyer: true,
-  tradingStatements: true,
-  fundsDetailedStatements: true,
-  customerFundsSummaryStatements: true,
-  calendars: true,
-  riskSettings: true,
-  permissions: true,
-  dashboard: true,
-  department: true,
-  resources: true,
-  tradeBooks: true,
-  documentManagement: true,
-  roleManagement: true,
-  auditingManagement: true,
-  processConfiguration: true,
-  newClient: true,
-  fundStatistics: true,
-  marginManagement: true,
-  discrepancyManagement: true,
-  voluationManagement: true,
-  bankAccount: true,
-  ioglodManagement: true,
-  salesManagement: true,
-};
+import _ from 'lodash';
 
 /**
  * 登录
@@ -81,22 +28,47 @@ export const permissions = {
  * }
  */
 export async function login(params) {
+  const getLoginErrorMessage = data => {
+    const { expired, locked, message } = data;
+    if (expired) {
+      return '用户已过期';
+    }
+    if (locked) {
+      return '用户已锁定';
+    }
+
+    return message;
+  };
+
   return request(`${HOST_TEST}auth-service/users/login`, {
     method: `POST`,
     body: params,
   }).then(result => {
     const { data } = result;
-    let error = data && data.error;
-    const message = (data && data.message) || '';
-    if (message.includes('错误') || message.includes('失败') || data.expired || data.locked) {
-      error = new Error(message || '登录失败');
+
+    if (data.error) {
+      // 验证码错误
+      return {
+        error: true,
+        data: {
+          message: _.get(data, 'error.message'),
+          captcha: true,
+        },
+      };
+    } else if (!data.loginStatus) {
+      // 登录状态错误
+      return {
+        error: true,
+        data: {
+          ...data,
+          message: getLoginErrorMessage(data),
+        },
+      };
     }
+
     return {
-      ...result,
-      data: {
-        ...result.data,
-      },
-      error,
+      error: false,
+      data,
     };
   });
 }

@@ -41,4 +41,5 @@ export const ALL_DATE_FIELD_KEYS = [
   'signAuthorizerIdExpiryDate',
   'productFoundDate',
   'productExpiringDate',
+  'masterAgreementSignDate',
 ];

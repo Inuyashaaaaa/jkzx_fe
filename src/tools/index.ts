@@ -105,40 +105,56 @@ export const getRequiredRule = (message: string = '必填') => {
 
 export function arr2treeOptions(arr, paths, labelPaths) {
   if (!arr || arr.length === 0) return [];
-
+  const length = paths.length;
   if (paths.length !== labelPaths.length) {
     throw new Error('arr2treeOptions: paths.length should be equal with labelPaths.length.');
   }
-
-  const deeps = paths.map((path, index) => {
-    return _.unionBy(arr, item => item[paths[index]]).filter(item => !!item[paths[index]]);
+  const deeps = _.unionBy(arr, paths[0]).map(item => item[paths[0]]);
+  function getTreeData(a, index) {
+    if (index === length) {
+      return;
+    }
+    if (a === null) return;
+    const data = _.uniq(
+      arr
+        .filter(iitem => {
+          return iitem[paths[index]] === a;
+        })
+        .map(value => value[paths[index + 1]])
+    );
+    return {
+      [a]: data.map(c => getTreeData(c, index + 1)),
+    };
+  }
+  const x = deeps.map(item => {
+    return getTreeData(item, 0);
   });
-
-  function getTree(deeps, _item?, index = 0) {
-    const deep = deeps[index];
-
+  function getTree(deep, index = 0) {
     if (!deep) return [];
 
-    return deep
-      .filter(item => {
-        if (!_item) {
-          return true;
-        }
-
-        return _.range(index).every(iindex => {
-          return item[paths[iindex]] === _item[paths[iindex]];
-        });
-      })
-      .map(item => {
+    return deep.map(value => {
+      if (Object.keys(value)[0] === undefined) return;
+      if (_.values(value)[0][0] === undefined) {
         return {
-          data: item,
-          label: item[labelPaths[index]],
-          value: item[paths[index]],
-          children: getTree(deeps, item, index + 1),
+          data: _.values(value)[0],
+          label: arr.find(params => params[paths[index]] === Object.keys(value)[0])[
+            labelPaths[index]
+          ],
+          value: Object.keys(value)[0],
+          children: [],
         };
-      });
+      }
+      return {
+        data: _.values(value)[0],
+        label: arr.find(params => params[paths[index]] === Object.keys(value)[0])[
+          labelPaths[index]
+        ],
+        value: Object.keys(value)[0],
+        children: getTree(_.values(value)[0], index + 1),
+      };
+    });
   }
-  return getTree(deeps);
+  return getTree(x);
 }
 
 export const getLegByRecord = record => {

@@ -17,7 +17,6 @@ import {
   wkAttachmentProcessInstanceModify,
   wkProcessGet,
   wkProcessInstanceCreate,
-  wkAttachmentCreateOrUpdate,
 } from '@/services/approval';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
 import { getLegByRecord } from '@/tools';
@@ -57,10 +56,16 @@ const ActionBar = memo<any>(props => {
   };
 
   const handelTrdTradeCreate = async () => {
+    const _createFormData = Form2.getFieldsValue(createFormData);
+    Object.keys(_createFormData).forEach(item => {
+      if (!_.endsWith(item, 'Date')) {
+        _createFormData[item] = _.trim(_createFormData[item]);
+      }
+    });
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
-      Form2.getFieldsValue(createFormData),
-      currentUser.userName,
+      _createFormData,
+      currentUser.username,
       LEG_ENV.BOOKING
     );
 
@@ -196,8 +201,13 @@ const ActionBar = memo<any>(props => {
                 params: JSON.stringify({}),
               }}
               headers={{ Authorization: `Bearer ${getToken()}` }}
+              onRemove={() => {
+                message.info('请重新选择上传文件');
+                return false;
+              }}
               onChange={fileList => {
                 setFileList(fileList);
+                if (!fileList || fileList.length <= 0) return;
                 if (fileList[0].status === 'done') {
                   setAttachmentId(fileList[0].response.result.attachmentId);
                 }

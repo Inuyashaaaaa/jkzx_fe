@@ -136,6 +136,7 @@ export const DoubleDigital: ILeg = {
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
         Unit,
+        DaysInYear,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -166,6 +167,7 @@ export const DoubleDigital: ILeg = {
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
         Unit,
+        DaysInYear,
       ];
     }
     throw new Error('getColumns get unknow leg env!');

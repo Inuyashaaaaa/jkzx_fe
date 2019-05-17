@@ -167,6 +167,13 @@ export const commonLinkage = (
     }
   }
 
+  if (Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields)) {
+    const expirationDate = Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]);
+    if (expirationDate !== undefined) {
+      record[LEG_FIELD.SETTLEMENT_DATE] = Form2.createField(getMoment(expirationDate, true));
+    }
+  }
+
   if (
     Form2.fieldValueIsChange(LEG_FIELD.PREMIUM, changedFields) ||
     Form2.fieldValueIsChange(LEG_FIELD.MINIMUM_PREMIUM, changedFields)

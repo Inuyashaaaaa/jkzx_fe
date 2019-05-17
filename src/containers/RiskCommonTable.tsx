@@ -4,7 +4,6 @@ import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import { Form2 } from '@/design/components';
 import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { socketHOC } from '@/tools/socketHOC';
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useRef, useState, memo } from 'react';
@@ -151,7 +150,6 @@ const RiskCommonTable = memo<any>(props => {
     },
     [dataSource]
   );
-
   return (
     <PageHeaderWrapper>
       {searchFormControls && (
@@ -195,7 +193,7 @@ const RiskCommonTable = memo<any>(props => {
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
         <Table
           size="middle"
-          rowKey="uuid"
+          rowKey={(data, index) => index}
           loading={loading}
           dataSource={dataSource}
           pagination={{
