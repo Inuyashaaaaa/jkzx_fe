@@ -45,7 +45,6 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public onConfirm = async () => {
     const { error: _error } = await this.$form.validate();
     if (_error) return;
-
     const { error: perror, data: pdata } = await wkProcessGet({
       processName: '授信额度变更',
     });
@@ -218,6 +217,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
                 }}
                 value={this.state.fileList}
                 onRemove={() => {
+                  // this.setState({
+                  //   fileList: [],
+                  // })
                   message.info('请重新选择上传文件');
                   return false;
                 }}
