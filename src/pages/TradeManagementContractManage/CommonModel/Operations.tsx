@@ -1,26 +1,12 @@
-import {
-  LCM_EVENT_TYPE_MAP,
-  LCM_EVENT_TYPE_ZHCN_MAP,
-  LEG_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
-} from '@/constants/common';
+import { LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
+import { LEG_ENV } from '@/constants/legs';
+import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import ModalButton from '@/lib/components/_ModalButton2';
-import AsianExerciseModal from '@/pages/TradeManagementBookEdit/modals/AsianExerciseModal';
-import BarrierIn from '@/pages/TradeManagementBookEdit/modals/BarrierIn';
-import ExerciseModal from '@/pages/TradeManagementBookEdit/modals/ExerciseModal';
-import ExpirationModal from '@/pages/TradeManagementBookEdit/modals/ExpirationModal';
-import FixingModal from '@/pages/TradeManagementBookEdit/modals/FixingModal';
-import KnockOutModal from '@/pages/TradeManagementBookEdit/modals/KnockOutModal';
-import SettleModal from '@/pages/TradeManagementBookEdit/modals/SettleModal';
-import UnwindModal from '@/pages/TradeManagementBookEdit/modals/UnwindModal';
-import { modalFormControls } from '@/pages/TradeManagementBookEdit/services';
-import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
-import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventList } from '@/services/general-service';
 import { getTradeCreateModalData } from '@/services/pages';
-import { trdPositionLCMEventTypes, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { Divider, Dropdown, Icon, Menu, message } from 'antd';
+import { trdPositionLCMEventTypes } from '@/services/trade-service';
+import { createLegRecordByPosition, getLegByProductType } from '@/tools';
+import { Divider, Dropdown, Icon, Menu } from 'antd';
 import { connect } from 'dva';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -28,29 +14,10 @@ import router from 'umi/router';
 import uuidv4 from 'uuid';
 import LifeModalTable from '../LifeModalTable';
 import PortfolioModalTable from '../PortfolioModalTable';
-import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
-import { createLegRecordByPosition, getLegByRecord, getLegByProductType } from '@/tools';
-import { LEG_ENV } from '@/constants/legs';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 
 class Operations extends PureComponent<{ record: any; onSearch: any; rowId: string }> {
-  public $unwindModal: UnwindModal;
-
-  public $exerciseModal: ExerciseModal;
-
-  public $expirationModal: ExpirationModal;
-
-  public $knockOutModal: KnockOutModal;
-
-  public $fixingModal: FixingModal;
-
-  public $asianExerciseModal: AsianExerciseModal;
-
-  public $barrierIn: BarrierIn;
-
-  public $settleModal: SettleModal;
-
   public $modelButton: ModalButton = null;
 
   public activeRowData: any;
