@@ -12,8 +12,8 @@ import {
   TRADESCOLDEFS_LEG_FIELD_MAP,
   TRADESCOL_FIELDS,
   TOTAL_FIELD,
+  COMPUTED_LEG_FIELD_MAP,
 } from '@/constants/global';
-import { COMPUTED_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
 import { BOOKING_FROM_PRICING, PRICING_FROM_EDITING } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
