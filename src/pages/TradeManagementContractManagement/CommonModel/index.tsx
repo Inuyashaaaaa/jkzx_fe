@@ -1,5 +1,5 @@
 import { BOOK_NAME_FIELD } from '@/constants/common';
-import SourceTable from '@/design/components/SourceTable';
+import SourceTable from '@/components/SourceTable';
 import { trdBookList, trdTradeListByBook, trdTradeSearchPaged } from '@/services/general-service';
 import { refSalesGetByLegalName } from '@/services/reference-data-service';
 import _ from 'lodash';

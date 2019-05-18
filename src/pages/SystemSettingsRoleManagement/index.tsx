@@ -1,7 +1,7 @@
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { authRolesList, createRole, queryAllPagePermissions, updateRole } from '@/services/role';
 import { Button, message, Row } from 'antd';
 import React, { PureComponent } from 'react';

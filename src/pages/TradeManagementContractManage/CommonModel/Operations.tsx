@@ -1,7 +1,7 @@
 import { LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
-import ModalButton from '@/lib/components/_ModalButton2';
+import ModalButton from '@/components/_ModalButton2';
 import { trdTradeLCMEventList } from '@/services/general-service';
 import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes } from '@/services/trade-service';

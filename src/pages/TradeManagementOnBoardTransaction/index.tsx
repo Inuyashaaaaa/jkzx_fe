@@ -1,7 +1,7 @@
 import { BIG_NUMBER_CONFIG } from '@/constants/common';
-import Form from '@/design/components/Form';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Form from '@/components/Form';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   mktInstrumentInfo,
   mktInstrumentSearch,
@@ -22,7 +22,7 @@ import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { CREATE_FORM_CONTROLS, generateColumns } from './constants.tsx';
+import { CREATE_FORM_CONTROLS, generateColumns } from './constants';
 
 const { TabPane } = Tabs;
 const RadioButton = Radio.Button;

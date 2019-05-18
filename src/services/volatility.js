@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/utils/request';
 // 查询所有交易日历列表
 export async function queryVolatilityCalendars(params = {}) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {

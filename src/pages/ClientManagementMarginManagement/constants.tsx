@@ -3,8 +3,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   MARGIN_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IFormControl } from '@/components/Form/types';
+import { IColumnDef } from '@/components/Table/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,

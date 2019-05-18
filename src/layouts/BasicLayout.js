@@ -1,4 +1,4 @@
-import SiderMenu from '@/lib/components/SiderMenu';
+import SiderMenu from '@/components/SiderMenu';
 import { Layout } from 'antd';
 import classNames from 'classnames';
 import { connect } from 'dva';

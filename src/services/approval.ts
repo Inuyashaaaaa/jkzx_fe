@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/utils/request';
 
 // 创建审批流程
 export async function createApprovalProcess(params = {}) {

@@ -3,7 +3,7 @@ import {
   ITableColDef,
   ITableData,
   ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+} from '@/components/type';
 
 export interface ILegColDef extends ITableColDef {
   linkage?: boolean;

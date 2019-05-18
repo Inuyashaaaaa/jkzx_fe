@@ -1,6 +1,6 @@
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions } from '@/lib/utils';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { arr2treeOptions } from '@/utils';
 import {
   clientAccountSearch,
   refSalesGetByLegalName,
@@ -12,7 +12,7 @@ import { sortByCreateAt } from '@/services/sort';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { ADDRESS_CASCADER, SEARCH_FORM_CONTROLS, TABLE_COL_DEF } from './constants';
-import { Form2, Select } from '@/design/components';
+import { Form2, Select } from '@/components';
 import FormItem from 'antd/lib/form/FormItem';
 import { Button, Divider, Row, Table } from 'antd';
 import Operation from './Operation';

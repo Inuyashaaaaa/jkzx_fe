@@ -1,4 +1,4 @@
-import { IFormControl } from '@/lib/components/_Form2';
+import { IFormControl } from '@/components/_Form2';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
 export const CREATE_FORM_CONTROLS: IFormControl[] = [

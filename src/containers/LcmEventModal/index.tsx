@@ -5,7 +5,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
 } from '@/constants/common';
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/components';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
 import { convertObservetions } from '@/services/common';
 import { message } from 'antd';

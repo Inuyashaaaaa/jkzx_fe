@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import React, { PureComponent } from 'react';
 import Pending from './Pending';
 import Related from './Related';

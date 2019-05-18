@@ -1,5 +1,5 @@
 import ObserveModalInput from '@/containers/ObserveModalInput';
-import { IColDef } from '@/design/components/Table/types';
+import { IColDef } from '@/components/Table/types';
 import {
   mktInstrumentInfo,
   mktInstrumentSearch,
@@ -51,7 +51,7 @@ import {
   UP_BARRIER_TYPE_MAP,
   UP_BARRIER_TYPE_OPTIONS,
 } from '../../common';
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/components';
 
 export const OptionType: IColDef = {
   title: '类型',

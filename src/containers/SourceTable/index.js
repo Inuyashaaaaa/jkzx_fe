@@ -1,9 +1,9 @@
-import ButtonGroup from '@/lib/components/_ButtonGroup';
-import ButtonPlus from '@/lib/components/_ButtonPlus';
-import FormPlus from '@/lib/components/_FormPlus';
-import Loading from '@/lib/components/_Loading';
-import TablePlus from '@/lib/components/_TablePlus';
-import { wrapType } from '@/lib/utils';
+import ButtonGroup from '@/components/ButtonGroup';
+import ButtonPlus from '@/components/ButtonPlus';
+import FormPlus from '@/components/_FormPlus';
+import Loading from '@/components/_Loading';
+import TablePlus from '@/components/_TablePlus';
+import { wrapType } from '@/utils';
 import { Icon, Row } from 'antd';
 import { array, bool, func, object, objectOf, oneOfType, string } from 'prop-types';
 import React, { PureComponent } from 'react';

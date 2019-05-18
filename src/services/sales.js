@@ -1,6 +1,6 @@
 // 销售相关
 import { HOST_TEST } from '@/constants/global';
-import { request, arr2treeOptions } from '@/lib/utils';
+import { request, arr2treeOptions } from '@/utils';
 import _ from 'lodash';
 import { COMPANY_KEY, BRANCH_KEY, SALES_KEY, SALES_SHOW_KEY } from '@/constants/sales';
 

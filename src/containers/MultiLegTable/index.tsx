@@ -8,9 +8,9 @@ import {
 } from '@/constants/common';
 import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { TOTAL_LEGS, LEG_ENV } from '@/constants/legs';
-import { Form2, Loading, Table2 } from '@/design/components';
-import { ITableProps } from '@/design/components/type';
-import { remove, uuid } from '@/design/utils';
+import { Form2, Loading, Table2 } from '@/components';
+import { ITableProps } from '@/components/type';
+import { remove, uuid } from '@/utils';
 import { getLegByRecord } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Tag } from 'antd';

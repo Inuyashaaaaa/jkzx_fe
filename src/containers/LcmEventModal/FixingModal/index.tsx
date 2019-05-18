@@ -13,9 +13,9 @@ import {
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
-import SourceTable from '@/design/components/SourceTable';
-import { IColumnDef } from '@/design/components/Table/types';
+import Form from '@/components/Form';
+import SourceTable from '@/components/SourceTable';
+import { IColumnDef } from '@/components/Table/types';
 import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
 import { getObservertionFieldData } from '../tools';
 import { countAvg, filterObDays } from '../utils';

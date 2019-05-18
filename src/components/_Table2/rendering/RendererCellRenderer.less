@@ -1,0 +1,73 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/utils/utils.less';
+@import '../../style/themes.less';
+
+@prefix: ~'@{tongyu-prefix}-table';
+
+:global {
+  .ag-theme-balham .ag-cell-data-changed {
+    background-color: rgba(0, 145, 234, 0.43) !important;
+  }
+
+  .ag-cell-data-changed {
+    .@{prefix}-dark {
+      background-color: rgba(0, 145, 234, 0.43);
+    }
+  }
+
+  .ag-cell-data-changed-animation {
+    .@{prefix}-dark {
+      background: #eee;
+      transition: background-color 1s;
+    }
+  }
+
+  .@{prefix}-dark {
+    background: #eee;
+  }
+
+  .@{prefix}-spread {
+    margin-left: -11px;
+    margin-right: -11px;
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+  .@{prefix}-status {
+    .tongyu-input-status {
+      right: 0 !important;
+    }
+  }
+
+  .@{prefix}-notexsit {
+    background: url('/empty-cell-bg.png');
+  }
+
+  .@{prefix}-corner {
+    &::after {
+      content: ' ';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: -11px;
+      border-top: 5px solid green;
+      border-right: 5px solid green;
+      border-left: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+  }
+
+  .@{prefix}-delta {
+    position: absolute;
+    right: 11px;
+    bottom: 1px;
+    display: flex;
+    align-items: center;
+    &.delta-up {
+      color: green;
+    }
+    &.delta-down {
+      color: red;
+    }
+  }
+}

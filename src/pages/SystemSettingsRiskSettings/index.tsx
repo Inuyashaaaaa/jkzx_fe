@@ -1,7 +1,7 @@
-import ImportExcelButton from '@/lib/components/_ImportExcelButton';
-import SourceTable, { SourceTableState } from '@/lib/components/_SourceTable';
-import Table from '@/lib/components/_Table2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import ImportExcelButton from '@/components/_ImportExcelButton';
+import SourceTable, { SourceTableState } from '@/components/_SourceTable';
+import Table from '@/components/_Table2';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   mktAllInstrumentWhitelistSave,
   mktInstrumentWhitelistDelete,

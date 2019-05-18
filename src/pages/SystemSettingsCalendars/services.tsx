@@ -1,5 +1,5 @@
-import { DatePicker, Input } from '@/design/components';
-import { IFormColDef } from '@/design/components/type';
+import { DatePicker, Input } from '@/components';
+import { IFormColDef } from '@/components/type';
 import { getMoment } from '@/utils';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';

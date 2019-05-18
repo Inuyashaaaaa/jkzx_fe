@@ -1,12 +1,11 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2 } from '@/design/components';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay } from '@/lib/utils';
+import { Form2 } from '@/components';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { delay, getMoment } from '@/utils';
 import { createCalendar, queryCalendar, removeCalendar } from '@/services/calendars';
-import { getMoment } from '@/utils';
 import { Button, Col, DatePicker, message, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';

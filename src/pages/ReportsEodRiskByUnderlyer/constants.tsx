@@ -1,5 +1,5 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IColumnDef } from '@/components/Table/types';
 import { formatNumber, formatMoney } from '@/tools';
 
 export const TABLE_COL_DEFS = [

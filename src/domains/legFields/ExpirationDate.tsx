@@ -1,5 +1,5 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
-import { DatePicker, Form2 } from '@/design/components';
+import { DatePicker, Form2 } from '@/components';
 import {
   legEnvIsBooking,
   legEnvIsPricing,

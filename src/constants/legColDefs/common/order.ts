@@ -1,6 +1,6 @@
 import { LEG_FIELD } from '@/constants/common';
 import { DEFAULT_DAYS_IN_YEAR, DEFAULT_TERM, ILegType } from '@/constants/global';
-import { IColDef } from '@/design/components/Table/types';
+import { IColDef } from '@/components/Table/types';
 import _ from 'lodash';
 
 export const LEG_FIELD_ORDERS = [

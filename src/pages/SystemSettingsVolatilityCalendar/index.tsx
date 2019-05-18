@@ -1,7 +1,7 @@
-// import Table from '@/lib/components/_Table2';
+// import Table from '@/components/_Table2';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   addVolSpecialDates,
   deleteVolSpecialDates,

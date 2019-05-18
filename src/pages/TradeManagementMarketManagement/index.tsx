@@ -1,6 +1,6 @@
-import { Form2, Select } from '@/design/components';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select } from '@/components';
+import SourceTable from '@/components/_SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
 import { Button, Divider, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';

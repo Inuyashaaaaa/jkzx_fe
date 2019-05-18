@@ -1,7 +1,7 @@
 import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
-import { Form2, Select } from '@/design/components';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select } from '@/components';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { removeCalendar } from '@/services/calendars';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 import { DatePicker, Divider, Table, Icon, Tooltip } from 'antd';

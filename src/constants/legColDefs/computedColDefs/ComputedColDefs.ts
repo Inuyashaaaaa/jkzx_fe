@@ -4,7 +4,7 @@ import {
   INPUT_NUMBER_LOT_CONFIG,
   INPUT_NUMBER_PERCENTAGE_CONFIG,
 } from '@/constants/common';
-import { IColDef } from '@/lib/components/_Table2/interface';
+import { IColDef } from '@/components/_Table2/interface';
 import _ from 'lodash';
 
 export const COMPUTED_LEG_FIELD_MAP = {

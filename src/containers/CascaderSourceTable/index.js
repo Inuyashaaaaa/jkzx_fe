@@ -1,5 +1,5 @@
 import SourceTable from '@/containers/SourceTable';
-import { wrapType } from '@/lib/utils';
+import { wrapType } from '@/utils';
 import { Col } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';

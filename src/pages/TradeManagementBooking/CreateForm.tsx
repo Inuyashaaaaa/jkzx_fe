@@ -1,12 +1,4 @@
-import {
-  DatePicker,
-  Form2,
-  Input,
-  Loading,
-  ModalButton,
-  Select,
-  Table2,
-} from '@/design/components';
+import { DatePicker, Form2, Input, Loading, ModalButton, Select, Table2 } from '@/components';
 import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,

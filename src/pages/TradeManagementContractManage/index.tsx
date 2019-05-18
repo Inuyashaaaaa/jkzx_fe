@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { trdExpiringTradeList } from '@/services/general-service';
 import { connect } from 'dva';
 import produce from 'immer';

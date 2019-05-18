@@ -1,5 +1,5 @@
-import { IColumnDef } from '@/design/components/Table/types';
-import { IFormControl } from '@/lib/components/_Form2';
+import { IColumnDef } from '@/components/Table/types';
+import { IFormControl } from '@/components/_Form2';
 
 export const createPageTableColDefs: (roleOptions) => IColumnDef[] = roleOptions => [
   {

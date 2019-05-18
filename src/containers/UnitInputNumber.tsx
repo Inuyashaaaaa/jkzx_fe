@@ -1,6 +1,6 @@
-import { InputNumber } from '@/design/components';
-import { IInputNumberProps } from '@/design/components/Input/InputNumber';
-import { IInputBaseProps } from '@/design/components/type';
+import { InputNumber } from '@/components';
+import { IInputNumberProps } from '@/components/Input/InputNumber';
+import { IInputBaseProps } from '@/components/type';
 import React, { memo } from 'react';
 import { formatMoney, parseMoney } from '@/tools';
 import _ from 'lodash';
