@@ -4,7 +4,6 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
 } from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
 import { LEG_ENV } from '@/constants/legs';
 import { Form2 } from '@/components';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
@@ -13,6 +12,7 @@ import { legEnvIsPricing, getLegByRecord } from '@/tools';
 import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/global';
 
 const fetchUnderlyerMultiplierAndUnit = _.debounce(
   (

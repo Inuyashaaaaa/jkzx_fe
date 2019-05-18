@@ -1,13 +1,6 @@
-import {
-  LEG_ANNUALIZED_FIELD,
-  LEG_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
-  NOTIONAL_AMOUNT_TYPE_MAP,
-} from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { Form2 } from '@/components';
+import { LEG_FIELD, LEG_TYPE_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
 import BigNumber from 'bignumber.js';
+import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/global';
 
 export const judgeLegTypeExsit = (colDef, data, computedAllLegTypes) => {
   // 纵向表格，删除一行数据时，已删除 colDef 会执行一次 render ？

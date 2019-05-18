@@ -6,7 +6,6 @@ import {
   LEG_TYPE_ZHCH_MAP,
   LEG_ENV_FIELD,
 } from '@/constants/common';
-import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
 import { TOTAL_LEGS, LEG_ENV } from '@/constants/legs';
 import { Form2, Loading, Table2 } from '@/components';
 import { ITableProps } from '@/components/type';
@@ -18,6 +17,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { TOTAL_FIELD } from '@/constants/global';
+import { LEG_FIELD_ORDERS } from '@/constants/legType';
 
 const MultiLegTable = memo<
   {
