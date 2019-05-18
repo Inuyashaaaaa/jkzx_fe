@@ -1,8 +1,7 @@
-import { Form2, Input } from '@/design/components';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions } from '@/lib/utils';
+import { Form2, Input } from '@/components';
+import ModalButton from '@/components/ModalButton';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import SourceTable from '@/components/SourceTable';
 import {
   queryCompanys,
   querySalers,
@@ -10,19 +9,16 @@ import {
   refBranchDelete,
   refBranchUpdate,
   refSalesCreate,
-  refSalesDelete,
-  refSalesUpdate,
   refSubsidiaryCreate,
   refSubsidiaryDelete,
   refSubsidiaryUpdate,
 } from '@/services/sales';
-import { Col, Icon, message, Modal, Popconfirm, Row, Tree, Table, Divider } from 'antd';
+import { arr2treeOptions, getMoment } from '@/utils';
+import { Col, Divider, Icon, message, Modal, Popconfirm, Row, Table, Tree } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
-import { TABLE_COL_DEF } from './constants';
 import CreateFormModal from './CreateFormModal';
 import Operation from './Operation';
-import { getMoment } from '@/utils';
 
 const { TreeNode } = Tree;
 

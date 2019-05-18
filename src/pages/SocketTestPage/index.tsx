@@ -1,4 +1,4 @@
-import { Form2, Input } from '@/design/components';
+import { Form2, Input } from '@/components';
 import { message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import produce from 'immer';

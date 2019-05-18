@@ -1,4 +1,4 @@
-import ModalButton from '@/design/components/ModalButton';
+import ModalButton from '@/components/ModalButton';
 import { DOWN_LOAD_SETTLEMENT_URL, emlSendSettleReport } from '@/services/document';
 import { Alert, Button, Col, message, Row } from 'antd';
 import moment from 'moment';

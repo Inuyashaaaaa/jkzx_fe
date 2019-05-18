@@ -1,7 +1,7 @@
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { Form2, Select } from '@/design/components';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { Form2, Select } from '@/components';
 import { message, Divider, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';

@@ -1,6 +1,6 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2 } from '@/design/components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2 } from '@/components';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
 import { Button, Divider, message, Modal, Table } from 'antd';
 import _ from 'lodash';

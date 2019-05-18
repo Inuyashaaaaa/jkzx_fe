@@ -1,6 +1,6 @@
 import { ALL_OPTIONS_VALUE, VERTICAL_GUTTER } from '@/constants/global';
-import { Cascader, Form2, Input, Select, Table2 } from '@/design/components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Cascader, Form2, Input, Select, Table2 } from '@/components';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   clientAccountDel,
   refPartyList,

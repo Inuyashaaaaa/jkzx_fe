@@ -1,7 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/design/components';
-import ModalButton from '@/design/components/ModalButton';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select, Table2 } from '@/components';
+import ModalButton from '@/components/ModalButton';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,

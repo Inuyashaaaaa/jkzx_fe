@@ -5,7 +5,7 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
   RULES_REQUIRED,
 } from '@/constants/common';
-import { Select, Form2 } from '@/design/components';
+import { Select, Form2 } from '@/components';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

@@ -1,8 +1,8 @@
-import CascaderSourceList from '@/lib/components/_CascaderSourceList';
-import { PureStateComponent } from '@/lib/components/_Components';
-import Form from '@/lib/components/_Form2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { baseTree, delay, isAllSame, mockData } from '@/lib/utils';
+import CascaderSourceList from '@/components/_CascaderSourceList';
+import { PureStateComponent } from '@/components/Components';
+import Form from '@/components/_Form2';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { baseTree, delay, isAllSame, mockData } from '@/utils';
 import {
   mktInstrumentsListPaged,
   prcBaseContractsList,

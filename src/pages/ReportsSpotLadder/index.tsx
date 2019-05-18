@@ -7,10 +7,10 @@ import {
 } from '@/constants/common';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import RangeNumberInput from '@/containers/RangeNumberInput';
-import Form from '@/design/components/Form';
-import SourceTable from '@/design/components/SourceTable';
-import { IColDef } from '@/design/components/Table/types';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Form from '@/components/Form';
+import SourceTable from '@/components/SourceTable';
+import { IColDef } from '@/components/Table/types';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   countDelta,
   countDeltaCash,

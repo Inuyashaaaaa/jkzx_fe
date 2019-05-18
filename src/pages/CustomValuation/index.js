@@ -1,11 +1,11 @@
 import React from 'react';
-import { PureStateComponent } from '@/lib/components/_Components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { PureStateComponent } from '@/components/Components';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { Card } from 'antd';
 import Mock from 'mockjs';
-import BackBtn from '@/lib/components/_BackBtn';
-import StandardTable from '@/lib/components/_StandardTable';
-import { delay } from '@/lib/utils';
+import BackBtn from '@/components/BackBtn';
+import StandardTable from '@/components/_StandardTable';
+import { delay } from '@/utils';
 
 class CustomValuation extends PureStateComponent {
   constructor(props) {

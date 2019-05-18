@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import Form from '@/design/components/Form';
+import Form from '@/components/Form';
 import { Modal, message } from 'antd';
 import { LCM_EVENT_TYPE_MAP } from '@/constants/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';

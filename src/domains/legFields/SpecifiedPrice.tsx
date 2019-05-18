@@ -7,8 +7,8 @@ import {
   SPECIFIED_PRICE_OPTIONS,
   SPECIFIED_PRICE_ZHCN_MAP,
 } from '@/constants/common';
-import { Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
+import { Select } from '@/components';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

@@ -1,7 +1,7 @@
-import SourceTable from '@/design/components/SourceTable';
-import ImportExcelButton from '@/lib/components/_ImportExcelButton';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay, mockData } from '@/lib/utils';
+import SourceTable from '@/components/SourceTable';
+import ImportExcelButton from '@/components/_ImportExcelButton';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { delay, mockData } from '@/utils';
 import { message, Modal, Button, Icon, Divider, Table, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid';
@@ -12,7 +12,7 @@ import {
   TABLE_COLUMNS,
 } from './constants';
 import { docBctTemplateList, downloadUrl } from '@/services/onBoardTransaction';
-import { Form2, Select } from '@/design/components';
+import { Form2, Select } from '@/components';
 import FormItem from 'antd/lib/form/FormItem';
 import {
   refMasterAgreementSearch,

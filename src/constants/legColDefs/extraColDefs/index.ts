@@ -4,7 +4,7 @@ import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
-import { IColDef } from '@/design/components/Table/types';
+import { IColDef } from '@/components/Table/types';
 
 export const AlUnwindNotionalAmount: IColDef = {
   headerName: '已平仓名义本金',

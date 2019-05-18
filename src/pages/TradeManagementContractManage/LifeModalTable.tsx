@@ -1,4 +1,4 @@
-import SourceTable from '@/design/components/SourceTable';
+import SourceTable from '@/components/SourceTable';
 import { trdTradeLCMEventList } from '@/services/general-service';
 import { Modal } from 'antd';
 import produce from 'immer';

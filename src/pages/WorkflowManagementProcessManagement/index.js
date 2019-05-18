@@ -1,7 +1,7 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { PureStateComponent } from '@/lib/components/_Components';
-import StandardTable from '@/lib/components/_StandardTable';
-import { delay, mockData } from '@/lib/utils';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { PureStateComponent } from '@/components/Components';
+import StandardTable from '@/components/_StandardTable';
+import { delay, mockData } from '@/utils';
 import { Divider, Tag } from 'antd';
 import React from 'react';
 

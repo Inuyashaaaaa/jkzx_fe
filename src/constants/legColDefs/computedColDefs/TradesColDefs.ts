@@ -5,7 +5,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
 } from '@/constants/common';
-import { IColDef } from '@/design/components/Table/types';
+import { IColDef } from '@/components/Table/types';
 import _ from 'lodash';
 
 export const TRADESCOLDEFS_LEG_FIELD_MAP = {

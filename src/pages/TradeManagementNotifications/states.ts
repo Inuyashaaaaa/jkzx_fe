@@ -1,4 +1,4 @@
-import { IFormControl } from '@/design/components/Form/types';
+import { IFormControl } from '@/components/Form/types';
 import _ from 'lodash';
 import { HOLIDAY_FORMAT } from './constants';
 

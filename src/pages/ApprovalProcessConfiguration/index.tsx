@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   wkGlobalConfigList,
   wkGlobalConfigModify,

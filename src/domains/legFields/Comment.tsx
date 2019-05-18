@@ -1,6 +1,6 @@
 import { LEG_FIELD } from '@/constants/common';
-import { Input } from '@/design/components/Input';
-import { getLegEnvs, getRequiredRule, getRequiredRule } from '@/tools';
+import { Input } from '@/components/Input';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

@@ -1,6 +1,6 @@
 import React from 'react';
 import ResourceManage from './ResourceManage';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 export default function Resource() {
   return (

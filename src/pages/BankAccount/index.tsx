@@ -1,8 +1,8 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { refBankAccountSave, refBankAccountSearch } from '@/services/reference-data-service';
 import { message } from 'antd';
 import React, { PureComponent } from 'react';

@@ -1,8 +1,8 @@
 import { PROCESS_STATUS_TYPE_MAP, PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Table2 } from '@/design/components';
-import Form from '@/design/components/Form';
-import { IFormControl } from '@/design/components/Form/types';
+import { Table2 } from '@/components';
+import Form from '@/components/Form';
+import { IFormControl } from '@/components/Form/types';
 import { wkProcessInstanceComplexList } from '@/services/approval';
 import { Switch } from 'antd';
 import _ from 'lodash';

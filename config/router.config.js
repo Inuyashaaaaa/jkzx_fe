@@ -1,4 +1,4 @@
-import mapTree from '../src/lib/utils/mapTree';
+import mapTree from '../src/utils/mapTree';
 
 export default [
   {
@@ -23,10 +23,6 @@ export default [
   {
     path: '/',
     redirect: '/user/login',
-  },
-  {
-    path: '/test',
-    component: '../layouts/TestLayout',
   },
   mapTree(
     {

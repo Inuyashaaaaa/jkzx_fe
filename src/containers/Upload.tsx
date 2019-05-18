@@ -1,4 +1,4 @@
-import { Upload } from '@/design/components';
+import { Upload } from '@/components';
 import _ from 'lodash';
 import React from 'react';
 class SaveUpload extends Upload {

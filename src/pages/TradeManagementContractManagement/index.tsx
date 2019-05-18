@@ -1,5 +1,5 @@
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { trdExpiringTradeList } from '@/services/general-service';
 import { connect } from 'dva';
 import produce from 'immer';

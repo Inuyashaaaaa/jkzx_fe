@@ -6,7 +6,7 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/TradesColDefs';
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/components';
 import BigNumber from 'bignumber.js';
 
 export const judgeLegTypeExsit = (colDef, data, computedAllLegTypes) => {
