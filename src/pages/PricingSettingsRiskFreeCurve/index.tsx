@@ -1,10 +1,10 @@
 import { INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
-import { PureStateComponent } from '@/lib/components/_Components';
-import { IFormControl } from '@/lib/components/_Form2';
-import ModalButton from '@/lib/components/_ModalButton2';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { PureStateComponent } from '@/components/Components';
+import { IFormControl } from '@/components/_Form2';
+import ModalButton from '@/components/_ModalButton2';
+import SourceTable from '@/components/_SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,

@@ -11,9 +11,9 @@ import {
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
-import SourceTable from '@/design/components/SourceTable';
-import { IColumnDef } from '@/design/components/Table/types';
+import Form from '@/components/Form';
+import SourceTable from '@/components/SourceTable';
+import { IColumnDef } from '@/components/Table/types';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { isRangeAccruals } from '@/tools';
 import { Button, Col, message, Modal, Row, Tag } from 'antd';

@@ -1,4 +1,4 @@
-import SourceList from '@/lib/components/_SourceList';
+import SourceList from '@/components/_SourceList';
 import {
   prefPreferenceCreate,
   prefPreferenceDividendInstrumentAdd,

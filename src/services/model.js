@@ -1,7 +1,7 @@
 import { BIG_NUMBER_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { HOST_TEST } from '@/constants/global';
 import { TRNORS_OPTS } from '@/constants/model';
-import { request } from '@/lib/utils';
+import { request } from '@/utils';
 import { BigNumber } from 'bignumber.js';
 import lodash from 'lodash';
 import uuidv4 from 'uuid/v4';

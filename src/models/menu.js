@@ -1,4 +1,4 @@
-import { mapTree } from '@/lib/utils';
+import { mapTree } from '@/utils';
 import { formatMessage } from 'umi/locale';
 import pageRouters from '../../config/router.config';
 

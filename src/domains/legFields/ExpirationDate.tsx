@@ -1,5 +1,5 @@
 import { LEG_FIELD } from '@/constants/common';
-import { DatePicker, Form2 } from '@/design/components';
+import { DatePicker, Form2 } from '@/components';
 import { qlIsHoliday } from '@/services/volatility';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';

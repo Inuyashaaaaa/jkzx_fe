@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import CommonForm from './components/CommonForm';
 import { Modal, Button, notification, Table, Popconfirm } from 'antd';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import {
   queryAuthDepartmentList,

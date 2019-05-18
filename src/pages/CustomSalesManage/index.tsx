@@ -1,7 +1,7 @@
-import CascaderSourceList from '@/lib/components/_CascaderSourceList';
-import { PureStateComponent } from '@/lib/components/_Components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions } from '@/lib/utils';
+import CascaderSourceList from '@/components/_CascaderSourceList';
+import { PureStateComponent } from '@/components/Components';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { arr2treeOptions } from '@/utils';
 import {
   createCompany,
   createSaler,

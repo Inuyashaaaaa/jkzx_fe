@@ -1,11 +1,11 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 import MarketSourceTable from '@/containers/MarketSourceTable';
-import { IFormControl } from '@/lib/components/_Form2';
-import InputButton from '@/lib/components/_InputButton';
-import ModalButton from '@/lib/components/_ModalButton2';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { IFormControl } from '@/components/_Form2';
+import InputButton from '@/components/_InputButton';
+import ModalButton from '@/components/_ModalButton2';
+import SourceTable from '@/components/_SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   getCanUsedTranors,
   getCanUsedTranorsOtions,

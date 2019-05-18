@@ -12,7 +12,7 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
+import Form from '@/components/Form';
 import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMoment } from '@/utils';

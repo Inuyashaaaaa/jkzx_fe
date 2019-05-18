@@ -5,7 +5,7 @@ import {
   NOTION_ENUM_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
+import { IFormControl } from '@/components/Form/types';
 import { Button } from 'antd';
 import React from 'react';
 

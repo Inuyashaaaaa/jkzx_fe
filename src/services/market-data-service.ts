@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/utils/request';
 
 export async function mktInstrumentWhitelistSearch(params = {}) {
   return request(`${HOST_TEST}market-data-service/api/rpc`, {

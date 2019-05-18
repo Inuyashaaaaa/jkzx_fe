@@ -1,8 +1,8 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import { Form2 } from '@/design/components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2 } from '@/components';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { rptReportNameList } from '@/services/report-service';
 import { getMoment } from '@/utils';
 import { ConfigProvider, Divider, message, Table } from 'antd';

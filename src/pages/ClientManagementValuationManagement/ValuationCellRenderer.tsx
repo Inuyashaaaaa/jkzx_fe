@@ -1,4 +1,4 @@
-import ModalButton from '@/design/components/ModalButton';
+import ModalButton from '@/components/ModalButton';
 import { DOWN_LOAD_VALUATION_URL } from '@/services/document';
 import { emlSendValuationReport } from '@/services/report-service';
 import { Button, Col, message, Row } from 'antd';

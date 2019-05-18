@@ -1,8 +1,8 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import CascaderSourceList from '@/lib/components/_CascaderSourceList';
-import Form, { IFormControl } from '@/lib/components/_Form2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay } from '@/lib/utils';
+import CascaderSourceList from '@/components/_CascaderSourceList';
+import Form, { IFormControl } from '@/components/_Form2';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { delay } from '@/utils';
 import { Col, Row } from 'antd';
 import memo from 'memoize-one';
 import React, { PureComponent } from 'react';

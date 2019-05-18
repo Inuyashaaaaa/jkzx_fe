@@ -1,6 +1,6 @@
-import SourceTable from '@/lib/components/_SourceTable';
-import Table from '@/lib/components/_Table2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import SourceTable from '@/components/_SourceTable';
+import Table from '@/components/_Table2';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   authRolesList,
   createRole,

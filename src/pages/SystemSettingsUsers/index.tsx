@@ -1,7 +1,7 @@
 import PopconfirmButton from '@/components/PopconfirmButton';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
 import {

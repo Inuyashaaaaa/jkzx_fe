@@ -12,17 +12,17 @@ import {
   TRADESCOLDEFS_LEG_FIELD_MAP,
   TRADESCOL_FIELDS,
   TOTAL_FIELD,
+  COMPUTED_LEG_FIELD_MAP,
 } from '@/constants/global';
-import { COMPUTED_LEG_FIELD_MAP } from '@/constants/legColDefs/computedColDefs/ComputedColDefs';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
 import { BOOKING_FROM_PRICING, PRICING_FROM_EDITING } from '@/constants/trade';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, Loading } from '@/design/components';
-import { IFormField } from '@/design/components/type';
-import { insert, remove, uuid } from '@/design/utils';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Loading } from '@/components';
+import { IFormField } from '@/components/type';
+import { insert, remove, uuid, getMoment } from '@/utils';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import {
   countDelta,
   countDeltaCash,
@@ -61,7 +61,6 @@ import React, { memo, useRef, useState, useEffect } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import router from 'umi/router';
 import './index.less';
-import { getMoment } from '@/utils';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 

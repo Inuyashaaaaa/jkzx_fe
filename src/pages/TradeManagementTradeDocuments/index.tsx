@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import React, { PureComponent } from 'react';
 import SettlementAdvice from './SettlementAdvice';
 import TradeConfirmation from './TradeConfirmation';

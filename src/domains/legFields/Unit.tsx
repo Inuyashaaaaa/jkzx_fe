@@ -1,5 +1,5 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
-import { Input } from '@/design/components/Input';
+import { Input } from '@/components/Input';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

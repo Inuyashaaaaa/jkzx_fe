@@ -1,6 +1,6 @@
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay, mockData } from '@/lib/utils';
+import SourceTable from '@/components/SourceTable';
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { delay, mockData } from '@/utils';
 import React, { PureComponent } from 'react';
 import History from './History';
 import Processed from './Processed';

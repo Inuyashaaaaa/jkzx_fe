@@ -1,5 +1,5 @@
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { DatePicker, Form2, Input, Loading, Select, Table2 } from '@/design/components';
+import { DatePicker, Form2, Input, Loading, Select, Table2 } from '@/components';
 import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,

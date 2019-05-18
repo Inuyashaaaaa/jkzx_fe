@@ -1,4 +1,4 @@
-import { Form2, InputNumber } from '@/design/components';
+import { Form2, InputNumber } from '@/components';
 import { clientUpdateCredit } from '@/services/reference-data-service';
 import { Button, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';

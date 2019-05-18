@@ -7,8 +7,8 @@ import {
   Select,
   Table2,
   Upload,
-} from '@/design/components';
-import { remove, uuid } from '@/design/utils';
+} from '@/components';
+import { remove, uuid } from '@/utils';
 import { UPLOAD_URL } from '@/services/document';
 import { createRefParty } from '@/services/reference-data-service';
 import { AutoComplete, Button, Cascader, Divider, Icon, notification, Row, Steps } from 'antd';

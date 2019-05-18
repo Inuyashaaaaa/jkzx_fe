@@ -1,4 +1,4 @@
-import { delay } from '@/design/utils';
+import { delay } from '@/utils';
 import { reloadAirflowTrigger } from '@/services/report-service';
 import { Button, notification, message } from 'antd';
 import React, { PureComponent } from 'react';

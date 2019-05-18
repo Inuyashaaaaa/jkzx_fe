@@ -1,5 +1,5 @@
-import { Omit } from '@/design/components/common/types';
-import StationalComponent from '@/design/components/StationalComponent';
+import { Omit } from '@/components/common/types';
+import StationalComponent from '@/components/StationalComponent';
 import { Popconfirm } from 'antd';
 import Button, { ButtonProps } from 'antd/lib/button';
 import { PopconfirmProps } from 'antd/lib/popconfirm';
