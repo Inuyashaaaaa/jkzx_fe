@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import CommonForm from './components/CommonForm';
 import { Modal, Button, notification, Table, Popconfirm } from 'antd';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 
 import {
   queryAuthDepartmentList,
@@ -408,7 +408,7 @@ export default class DepartmentManagement extends PureComponent {
     }
     const { modalVisible, loading, formItems, tableLoading } = this.state;
     return (
-      <PageHeaderWrapper>
+      <Page>
         <div style={{ marginTop: 10, marginBottom: 10 }}>
           <Button type="primary" onClick={() => this.showModal('create')}>
             创建部门
@@ -451,7 +451,7 @@ export default class DepartmentManagement extends PureComponent {
             />
           )}
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

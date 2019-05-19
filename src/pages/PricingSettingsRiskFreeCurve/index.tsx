@@ -4,7 +4,7 @@ import { PureStateComponent } from '@/components/Components';
 import { IFormControl } from '@/components/_Form2';
 import ModalButton from '@/components/_ModalButton2';
 import SourceTable from '@/components/_SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
@@ -185,7 +185,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <SourceTable
           ref={node => (this.$sourceTable = node)}
           rowKey="id"
@@ -261,7 +261,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             </ModalButton>,
           ]}
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

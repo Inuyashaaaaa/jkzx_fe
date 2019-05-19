@@ -1,7 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/components/Form';
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import {
   addNonGroupResource,
@@ -135,7 +135,7 @@ class SystemSettingsTradeBooks extends PureComponent {
   public render() {
     const { books, loading } = this.state;
     return (
-      <PageHeaderWrapper>
+      <Page>
         <SourceTable
           loading={loading}
           rowKey={'id'}
@@ -167,7 +167,7 @@ class SystemSettingsTradeBooks extends PureComponent {
             onValueChange={this.onValueChange}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

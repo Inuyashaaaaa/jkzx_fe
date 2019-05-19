@@ -1,7 +1,7 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import CascaderSourceList from '@/components/_CascaderSourceList';
 import Form, { IFormControl } from '@/components/_Form2';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { delay } from '@/utils';
 import { Col, Row } from 'antd';
 import memo from 'memoize-one';
@@ -251,7 +251,7 @@ class PricingSettingsPricingEnvironment extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row type="flex" justify="space-between" align="top">
           <Col sm={18} xs={24}>
             {/* <BigCascader {...bigCascaderProps} /> */}
@@ -292,7 +292,7 @@ class PricingSettingsPricingEnvironment extends PureComponent {
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

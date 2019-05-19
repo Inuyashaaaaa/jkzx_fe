@@ -1,7 +1,7 @@
 import PopconfirmButton from '@/components/PopconfirmButton';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
 import {
@@ -484,7 +484,7 @@ class SystemSettingsUsers extends PureComponent {
       loading,
     } = this.state;
     return (
-      <PageHeaderWrapper>
+      <Page>
         {!displayResources && (
           <SourceTable
             header={
@@ -565,7 +565,7 @@ class SystemSettingsUsers extends PureComponent {
             )
           )}
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

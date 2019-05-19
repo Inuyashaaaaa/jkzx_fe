@@ -10,7 +10,7 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, ModalButton, Upload } from '@/components';
 import { IFormField } from '@/components/type';
 import { insert, remove, uuid } from '@/utils';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { getToken } from '@/utils/authority';
 import {
   UPLOAD_URL,
@@ -258,7 +258,7 @@ const TradeManagementBooking = props => {
 
   const tableEl = useRef<IMultiLegTableEl>(null);
   return (
-    <PageHeaderWrapper>
+    <Page>
       <ActionBar
         setTableData={setTableData}
         tableData={tableData}
@@ -340,7 +340,7 @@ const TradeManagementBooking = props => {
           );
         }}
       />
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 

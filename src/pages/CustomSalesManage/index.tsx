@@ -1,6 +1,6 @@
 import CascaderSourceList from '@/components/_CascaderSourceList';
 import { PureStateComponent } from '@/components/Components';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { arr2treeOptions } from '@/utils';
 import {
   createCompany,
@@ -204,7 +204,7 @@ class CustomSalesManage extends PureStateComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper back={true}>
+      <Page back={true}>
         <Row gutter={16}>
           <Col span={24}>
             <CascaderSourceList
@@ -338,7 +338,7 @@ class CustomSalesManage extends PureStateComponent {
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

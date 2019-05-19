@@ -1,6 +1,6 @@
 import SourceTable from '@/components/_SourceTable';
 import Table from '@/components/_Table2';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   authRolesList,
   createRole,
@@ -214,7 +214,7 @@ class SystemSettingsPermissions extends PureComponent {
   public render() {
     const { roles, loading, displayResources, choosedRole } = this.state;
     return (
-      <PageHeaderWrapper>
+      <Page>
         {!displayResources && (
           <SourceTable
             loading={loading}
@@ -266,7 +266,7 @@ class SystemSettingsPermissions extends PureComponent {
             <ResourceManagement info={{ type: 'role', detail: choosedRole }} />
           </div>
         )}
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

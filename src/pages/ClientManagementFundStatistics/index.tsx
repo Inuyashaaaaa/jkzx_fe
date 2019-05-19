@@ -1,5 +1,5 @@
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { arr2treeOptions } from '@/utils';
 import {
   clientAccountSearch,
@@ -107,7 +107,7 @@ class ClientManagementFundStatistics extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
           ref={node => (this.$sourceTable = node)}
           layout="inline"
@@ -353,7 +353,7 @@ class ClientManagementFundStatistics extends PureComponent {
           onSearchButtonClick={this.fetchTable}
           onSearchFormChange={this.onSearchFormChange}
         /> */}
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }
