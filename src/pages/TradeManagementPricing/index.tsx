@@ -22,7 +22,7 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/components';
 import { IFormField } from '@/components/type';
 import { insert, remove, uuid, getMoment } from '@/utils';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   countDelta,
   countDeltaCash,
@@ -496,7 +496,7 @@ const TradeManagementBooking = props => {
   };
 
   return (
-    <PageHeaderWrapper>
+    <Page>
       <ActionBar
         setTableData={setTableData}
         curPricingEnv={curPricingEnv}
@@ -592,7 +592,7 @@ const TradeManagementBooking = props => {
           );
         }}
       />
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 

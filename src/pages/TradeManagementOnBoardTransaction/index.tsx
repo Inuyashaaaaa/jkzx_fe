@@ -1,7 +1,7 @@
 import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import Form from '@/components/Form';
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   mktInstrumentInfo,
   mktInstrumentSearch,
@@ -443,7 +443,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     const detailColumns = generateColumns('detail');
     const summaryColumns = generateColumns('summary');
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
           <TabPane tab="场内流水" key="1">
             {/* <RowForm mode="flow" codeOptions={instrumentIds} handleQuery={this.queryRecords} /> */}
@@ -598,7 +598,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
             controls={CREATE_FORM_CONTROLS}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

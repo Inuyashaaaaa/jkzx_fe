@@ -1,6 +1,6 @@
 import SourceTable from '@/components/SourceTable';
 import ImportExcelButton from '@/components/_ImportExcelButton';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { delay, mockData } from '@/utils';
 import { message, Modal, Button, Icon, Divider, Table, Row } from 'antd';
 import React, { PureComponent } from 'react';
@@ -115,7 +115,7 @@ class ClientManagementMarginManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
           ref={node => (this.$sourceTable = node)}
           layout="inline"
@@ -297,7 +297,7 @@ class ClientManagementMarginManagement extends PureComponent {
             <a onClick={this.downloadFormModal}>批量更新维持保证金.xlsx</a>
           </p>
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

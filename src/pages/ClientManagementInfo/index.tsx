@@ -1,6 +1,6 @@
 import { ALL_OPTIONS_VALUE, VERTICAL_GUTTER } from '@/constants/global';
 import { Cascader, Form2, Input, Select, Table2 } from '@/components';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   clientAccountDel,
   refPartyList,
@@ -129,7 +129,7 @@ const ClientManagementInfo = memo(() => {
   );
 
   return (
-    <PageHeaderWrapper title="客户信息管理" card={false}>
+    <Page title="客户信息管理" card={false}>
       <Card>
         <Form2
           ref={node => (formEl.current = node)}
@@ -331,7 +331,7 @@ const ClientManagementInfo = memo(() => {
           ]}
         />
       </Card>
-    </PageHeaderWrapper>
+    </Page>
   );
 });
 

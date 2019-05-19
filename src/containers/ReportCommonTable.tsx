@@ -2,7 +2,7 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import { Form2 } from '@/components';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { rptReportNameList } from '@/services/report-service';
 import { getMoment } from '@/utils';
 import { ConfigProvider, Divider, message, Table } from 'antd';
@@ -172,7 +172,7 @@ const ReportCommonTable = memo<any>(props => {
   );
 
   return (
-    <PageHeaderWrapper>
+    <Page>
       <Form2
         ref={node => (form.current = node)}
         dataSource={searchFormData}
@@ -224,7 +224,7 @@ const ReportCommonTable = memo<any>(props => {
           bordered={bordered}
         />
       </ConfigProvider>
-    </PageHeaderWrapper>
+    </Page>
   );
 });
 

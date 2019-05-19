@@ -2,7 +2,7 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/components/Form';
 import ModalButton from '@/components/ModalButton';
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { createApprovalProcess } from '@/services/approval';
 import { cliFundEventSearch, refBankAccountSearch } from '@/services/reference-data-service';
 import { message } from 'antd';
@@ -163,7 +163,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <SourceTable
           rowKey="uuid"
           columnDefs={TABLE_COL_DEFS}
@@ -203,7 +203,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
             </ModalButton>
           }
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

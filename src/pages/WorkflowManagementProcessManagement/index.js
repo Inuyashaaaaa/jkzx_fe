@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { PureStateComponent } from '@/components/Components';
 import StandardTable from '@/components/_StandardTable';
 import { delay, mockData } from '@/utils';
@@ -13,7 +13,7 @@ class WorkflowManagementProcessManagement extends PureStateComponent {
 
   render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <StandardTable
           {...{
             selectedRowKeys: false,
@@ -113,7 +113,7 @@ class WorkflowManagementProcessManagement extends PureStateComponent {
             },
           }}
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

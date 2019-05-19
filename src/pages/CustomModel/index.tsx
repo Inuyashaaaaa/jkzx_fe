@@ -1,5 +1,5 @@
 import ImportExcelButton from '@/components/_ImportExcelButton';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mdlModelDataGet, mdlModelXYCreate } from '@/services/model';
 import { Button, Input, message, Modal, notification, Row, Select, Spin, Table, Tabs } from 'antd';
@@ -394,7 +394,7 @@ const CustomModel = memo(() => {
 
   return (
     <div className={styles.customModel}>
-      <PageHeaderWrapper title="自定义模型（MODEL_XY）">
+      <Page title="自定义模型（MODEL_XY）">
         <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
           <p>
             <Search
@@ -484,7 +484,7 @@ const CustomModel = memo(() => {
             <span className={styles.center}>请先选中一个标的物</span>
           )}
         </div>
-      </PageHeaderWrapper>
+      </Page>
       <Modal title="导入模型数据" visible={visible} onOk={handleOk} onCancel={handleCancel}>
         <p>
           <ImportExcelButton

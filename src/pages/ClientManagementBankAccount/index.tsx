@@ -1,6 +1,6 @@
 import ModalButton from '@/components/ModalButton';
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { Form2, Select } from '@/components';
 import { message, Divider, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -149,7 +149,7 @@ class ClientManagementBankAccount extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
           ref={node => (this.$sourceTable = node)}
           layout="inline"
@@ -313,7 +313,7 @@ class ClientManagementBankAccount extends PureComponent {
           size="middle"
           scroll={this.state.dataSource.length ? { x: '1000px' } : { x: false }}
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

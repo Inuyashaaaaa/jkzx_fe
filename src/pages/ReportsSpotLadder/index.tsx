@@ -10,7 +10,7 @@ import RangeNumberInput from '@/containers/RangeNumberInput';
 import Form from '@/components/Form';
 import SourceTable from '@/components/SourceTable';
 import { IColDef } from '@/components/Table/types';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   countDelta,
   countDeltaCash,
@@ -301,7 +301,7 @@ class Component extends PureComponent<
     cols.unshift('scenarioId');
     const _data = this.handleData(this.state.instruments, cols, headers);
     return (
-      <PageHeaderWrapper title="标的物情景分析" card={false}>
+      <Page title="标的物情景分析" card={false}>
         <Card>
           <Form
             layout="inline"
@@ -447,7 +447,7 @@ class Component extends PureComponent<
             <Empty style={{ padding: 100 }} description={<span>暂无分析结果</span>} />
           )}
         </Card>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

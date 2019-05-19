@@ -4,7 +4,7 @@ import MarketSourceTable from '@/containers/MarketSourceTable';
 import { IFormControl } from '@/components/_Form2';
 import ModalButton from '@/components/_ModalButton2';
 import SourceTable from '@/components/_SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
@@ -215,7 +215,7 @@ class PricingSettingsDividendCurve extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row gutter={16 + 8}>
           <Col xs={24} sm={4}>
             <MarketSourceTable
@@ -320,7 +320,7 @@ class PricingSettingsDividendCurve extends PureComponent {
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

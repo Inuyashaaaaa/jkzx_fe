@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { trdExpiringTradeList } from '@/services/general-service';
 import { connect } from 'dva';
 import produce from 'immer';
@@ -91,7 +91,7 @@ class TradeManagementContractManage extends PureComponent {
   public render() {
     const activeTabKey = this.props.tradeManagementContractManage.activeTabKey;
     return (
-      <PageHeaderWrapper
+      <Page
         title="合约管理"
         tabList={[
           { key: 'contractManagement', tab: '合约管理' },
@@ -108,7 +108,7 @@ class TradeManagementContractManage extends PureComponent {
         {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" />}
         {activeTabKey === 'expiration' && <CommonModel status="EXPIRATION_TODAY" />}
         {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" />}
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

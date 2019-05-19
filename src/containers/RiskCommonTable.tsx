@@ -3,7 +3,7 @@ import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import { Form2 } from '@/components';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useRef, useState, memo } from 'react';
@@ -151,7 +151,7 @@ const RiskCommonTable = memo<any>(props => {
     [dataSource]
   );
   return (
-    <PageHeaderWrapper>
+    <Page>
       {searchFormControls && (
         <>
           <Form2
@@ -209,7 +209,7 @@ const RiskCommonTable = memo<any>(props => {
           scroll={{ x: scrollWidth }}
         />
       </ConfigProvider>
-    </PageHeaderWrapper>
+    </Page>
   );
 });
 

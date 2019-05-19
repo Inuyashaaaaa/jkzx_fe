@@ -1,7 +1,7 @@
 import CascaderSourceList from '@/components/_CascaderSourceList';
 import { PureStateComponent } from '@/components/Components';
 import Form from '@/components/_Form2';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { baseTree, delay, isAllSame, mockData } from '@/utils';
 import {
   mktInstrumentsListPaged,
@@ -232,7 +232,7 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row gutter={16}>
           <Col xs={24} sm={18}>
             <CascaderSourceList
@@ -293,7 +293,7 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
         >
           <p>确定要对选中的{this.state.count}个持仓执行操作吗？</p>
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

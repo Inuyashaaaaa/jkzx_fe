@@ -7,7 +7,7 @@ import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/components';
 import { ITableData } from '@/components/type';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { trdTradeGet } from '@/services/general-service';
 import { mktInstrumentInfo } from '@/services/market-data-service';
 import { getTradeCreateModalData } from '@/services/pages';
@@ -175,21 +175,22 @@ const TradeManagementBooking = props => {
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
-    <PageHeaderWrapper back={true}>
+    <Page back={true}>
       {tableLoading ? (
         <Skeleton active={true} paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
           <Divider />
-          <Loading loading={tableLoading}>
+          <div style={{ padding: 30 }}>
             <BookingBaseInfoForm
+              hideRequiredMark={true}
               columnNumberOneRow={2}
               editableStatus={FORM_EDITABLE_STATUS.SHOW}
               createFormData={createFormData}
               setCreateFormData={setCreateFormData}
             />
-          </Loading>
+          </div>
           <Typography.Title style={{ marginTop: 20 }} level={4}>
             交易结构信息
           </Typography.Title>
@@ -248,7 +249,7 @@ const TradeManagementBooking = props => {
         </>
       )}
       <ActionBar tableData={tableData} />
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 
