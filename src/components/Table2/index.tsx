@@ -1,7 +1,8 @@
+import { hasElement } from '@/utils/hasElement';
 import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
-import React, { PureComponent, KeyboardEvent } from 'react';
+import React, { PureComponent } from 'react';
 import { createEventBus, EVERY_EVENT_TYPE, uuid } from '../../utils';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
@@ -14,7 +15,6 @@ import {
 } from './constants/EVENT';
 import FormRow from './rows/FormRow';
 import './styles.less';
-import { hasElement } from '@/utils/hasElement';
 
 class Table2 extends PureComponent<ITableProps> {
   public static defaultProps = {

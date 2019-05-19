@@ -196,7 +196,6 @@ export interface ITableTriggerCellFieldsChangeParams<T = any> {
   rowId?: string;
   changedFields?: any;
   allFields?: any;
-  add?: string;
 }
 
 export interface IFormTriggerCellValueChangeParams<T = any> {
