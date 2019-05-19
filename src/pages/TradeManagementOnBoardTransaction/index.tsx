@@ -1,7 +1,6 @@
-import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import Form from '@/components/Form';
-import SourceTable from '@/components/SourceTable';
 import Page from '@/containers/Page';
+import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import {
   mktInstrumentInfo,
   mktInstrumentSearch,
@@ -16,7 +15,7 @@ import {
   queryTradeRecord,
   uploadUrl,
 } from '@/services/onBoardTransaction';
-import { Button, message, Modal, Radio, Tabs, Table, Divider } from 'antd';
+import { Button, Divider, message, Modal, Radio, Row, Table, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
@@ -444,7 +443,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     const summaryColumns = generateColumns('summary');
     return (
       <Page>
-        <Tabs defaultActiveKey="1" onChange={this.changeTab}>
+        <Tabs type="card" defaultActiveKey="1" onChange={this.changeTab}>
           <TabPane tab="场内流水" key="1">
             {/* <RowForm mode="flow" codeOptions={instrumentIds} handleQuery={this.queryRecords} /> */}
             <Form
@@ -489,16 +488,16 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               onValueChange={this.handleFlowChange}
               layout="inline"
             />
+            <Divider type="horizontal" />
             <div style={{ marginBottom: '20px' }}>
-              <Button onClick={this.showModal} type="primary" style={{ marginTop: 10 }}>
+              <Button onClick={this.showModal} type="primary">
                 导入场内流水
               </Button>
 
-              <Button onClick={this.createFormModal} type="default" style={{ marginTop: 10 }}>
+              <Button onClick={this.createFormModal} type="default">
                 新建
               </Button>
             </div>
-            <Divider type="horizontal" />
             <Table
               dataSource={flowData}
               columns={flowColumns}
@@ -529,14 +528,17 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               onValueChange={this.handlePositionChange}
               layout="inline"
             />
-            <RadioGroup
-              onChange={this.changePosition}
-              defaultValue="a"
-              style={{ marginBottom: '20px', marginTop: '20px' }}
-            >
-              <RadioButton value="a">按明细统计</RadioButton>
-              <RadioButton value="b">按合约代码统计</RadioButton>
-            </RadioGroup>
+            <Divider type="horizontal" />
+            <Row type="flex" justify="end">
+              <RadioGroup
+                onChange={this.changePosition}
+                defaultValue="a"
+                style={{ marginBottom: '20px' }}
+              >
+                <RadioButton value="a">按明细统计</RadioButton>
+                <RadioButton value="b">按合约代码统计</RadioButton>
+              </RadioGroup>
+            </Row>
             {positionMode === 'detail' && (
               <Table
                 dataSource={positionData}
