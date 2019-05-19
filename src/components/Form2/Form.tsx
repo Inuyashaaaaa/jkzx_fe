@@ -105,7 +105,10 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
     const event: IFormTriggerCellValueChangeParams = {
       changedValues,
       allValues,
-      record,
+      record: {
+        ...record,
+        ...changedValues,
+      },
     };
     this.eventBus.emit(FORM_CELL_VALUES_CHANGE, event);
   };
@@ -113,16 +116,14 @@ class Form extends PureComponent<IFormProps & FormCreateOption<IFormProps>> {
   public onFieldsChange = (
     props: IFormProps & FormCreateOption<IFormProps>,
     fields: object,
-    allFields: any,
-    add: string
+    allFields: any
   ) => {
     const { onFieldsChange } = props;
     if (onFieldsChange) {
       onFieldsChange(
         props,
         _.mapValues(fields, (val: IFormField) => ({ ...val, type: 'field' })),
-        _.mapValues(allFields, (val: IFormField) => ({ ...val, type: 'field' })),
-        add
+        _.mapValues(allFields, (val: IFormField) => ({ ...val, type: 'field' }))
       );
     }
   };

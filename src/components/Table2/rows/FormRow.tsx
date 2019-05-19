@@ -139,21 +139,30 @@ const FormRow = Form.create({
     const event: ITableTriggerCellValueChangeParams = {
       changedValues,
       allValues,
-      record,
+      record: {
+        ...record,
+        ...changedValues,
+      },
       rowIndex,
       rowId: record[getRowKey()],
     };
     api.eventBus.emit(TABLE_CELL_VALUES_CHANGE, event);
   },
-  onFieldsChange(props: ITableRowProps, changedFields: object, allFields: any, add: string) {
+  onFieldsChange(props: ITableRowProps, changedFields: object, allFields: any) {
     const { record, rowIndex, api, getRowKey } = props;
+    const fieldedChangedFields = _.mapValues(changedFields, (val: IFormField) => ({
+      ...val,
+      type: 'field',
+    }));
     const event: ITableTriggerCellFieldsChangeParams = {
-      changedFields: _.mapValues(changedFields, (val: IFormField) => ({ ...val, type: 'field' })),
+      changedFields: fieldedChangedFields,
       allFields: _.mapValues(allFields, (val: IFormField) => ({ ...val, type: 'field' })),
-      record,
+      record: {
+        ...record,
+        ...fieldedChangedFields,
+      },
       rowIndex,
       rowId: record[getRowKey()],
-      add,
     };
     api.eventBus.emit(TABLE_CELL_FIELDS_CHANGE, event);
   },
