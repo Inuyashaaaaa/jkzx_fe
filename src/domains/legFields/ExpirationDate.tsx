@@ -1,73 +1,60 @@
-import { LEG_FIELD } from '@/constants/common';
 import { DatePicker, Form2 } from '@/components';
+import { LEG_FIELD } from '@/constants/common';
 import { qlIsHoliday } from '@/services/volatility';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Icon, Tooltip } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';
-import _ from 'lodash';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 
-const Cpt = memo<any>(
+const ExpirationDateInput = memo<any>(
   connect(state => {
     return {
       expirationDate: state.expirationDate,
     };
   })(props => {
-    const { form, editing, value, expirationDate, record } = props;
+    const { form, editing, expirationDate } = props;
     const { volatilityCalendars } = expirationDate;
     const [showTip, setShowTip] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleDatePickerChange = _.debounce(async () => {
+    const handleDatePickerChange = async date => {
       if (!volatilityCalendars) return;
+      setLoading(true);
       const { error, data } = await qlIsHoliday({
         calendars: volatilityCalendars,
-        date: value.format('YYYY-MM-DD'),
+        date: date.format('YYYY-MM-DD'),
       });
+      setLoading(false);
 
       if (error) return;
       setShowTip(!data);
-    }, 350);
-
-    useEffect(() => {
-      console.log(record);
-      if (!editing && Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, record)) {
-        console.log(form.getFieldValue(LEG_FIELD.EXPIRATION_DATE), value);
-        handleDatePickerChange();
-      }
-    });
+    };
 
     const visible = volatilityCalendars && showTip;
 
     return (
       <FormItem>
-        {visible ? (
-          <Tooltip
-            title="该到期日并非交易日"
-            trigger="hover"
-            placement="right"
-            arrowPointAtCenter={true}
-          >
-            {form.getFieldDecorator(LEG_FIELD.EXPIRATION_DATE, {
-              rules: [getRequiredRule()],
-            })(<DatePicker defaultOpen={true} editing={editing} format={'YYYY-MM-DD'} />)}
-            <Icon
-              type="alert"
-              theme="twoTone"
-              style={{
-                position: 'absolute',
-                right: 10,
-                transform: 'translateY(-50%)',
-                top: '50%',
-              }}
-            />
-          </Tooltip>
-        ) : (
-          form.getFieldDecorator(LEG_FIELD.EXPIRATION_DATE, {
+        <Tooltip
+          title="该到期日并非交易日"
+          trigger="hover"
+          placement="right"
+          arrowPointAtCenter={true}
+          visible={visible}
+        >
+          {form.getFieldDecorator({
             rules: [getRequiredRule()],
-          })(<DatePicker defaultOpen={true} editing={editing} format={'YYYY-MM-DD'} />)
-        )}
+          })(
+            <DatePicker
+              onChange={handleDatePickerChange}
+              defaultOpen={true}
+              editing={editing}
+              format={'YYYY-MM-DD'}
+              suffixIcon={loading ? <Icon type="loading" /> : null}
+            />
+          )}
+        </Tooltip>
       </FormItem>
     );
   })
@@ -96,6 +83,6 @@ export const ExpirationDate: ILegColDef = {
   },
   defaultEditing: false,
   render: (value, record, index, { form, editing, colDef }) => {
-    return <Cpt value={value} form={form} editing={editing} record={record} />;
+    return <ExpirationDateInput value={value} form={form} editing={editing} record={record} />;
   },
 };
