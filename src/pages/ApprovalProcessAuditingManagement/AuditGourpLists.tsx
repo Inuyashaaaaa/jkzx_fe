@@ -122,7 +122,7 @@ class AuditLists extends PureComponent {
       const { data, error } = await wkApproveGroupModify({
         approveGroupId: this.state.approveGroupId,
         approveGroupName: this.state.approveGroupName,
-        description: this.state.description,
+        description: this.state.description ? this.state.description : '',
       });
       const { message } = error;
       if (error) {
