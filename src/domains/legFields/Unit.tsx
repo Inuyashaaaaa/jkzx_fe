@@ -12,12 +12,6 @@ export const Unit: ILegColDef = {
   },
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: RULES_REQUIRED,
-        })(<Input editing={false} />)}
-      </FormItem>
-    );
+    return <FormItem>{form.getFieldDecorator()(<Input editing={false} />)}</FormItem>;
   },
 };
