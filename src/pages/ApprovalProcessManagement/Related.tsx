@@ -28,7 +28,7 @@ class Related extends PureComponent {
     });
     const { error, data } = await wkProcessInstanceComplexList({
       processInstanceUserPerspective: this.state.type,
-      keyword:
+      processInstanceStatus:
         this.state.formData.status && this.state.formData.status.length
           ? this.state.formData.status
           : _.values(PROCESS_STATUS_TYPE_MAP),

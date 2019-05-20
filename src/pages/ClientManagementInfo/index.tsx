@@ -74,7 +74,7 @@ const ClientManagementInfo = memo(() => {
     if (error) return;
     const newData = arr2treeOptions(
       data,
-      ['subsidiaryId', 'branchId', 'salesId'],
+      ['subsidiaryName', 'branchName', 'salesName'],
       ['subsidiaryName', 'branchName', 'salesName']
     );
     const branchSalesList = newData.map(subsidiary => {

@@ -172,6 +172,7 @@ export const VerticalSpread: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;

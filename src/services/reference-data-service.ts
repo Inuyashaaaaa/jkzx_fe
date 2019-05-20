@@ -477,3 +477,14 @@ export async function refEnablePartyByLegalName(params) {
     },
   });
 }
+
+// 授信审批绑定附件
+export async function wkAttachmentProcessInstanceBind(params) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentProcessInstanceBind',
+      params,
+    },
+  });
+}

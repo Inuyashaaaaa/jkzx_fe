@@ -261,6 +261,36 @@ const MultiLegTable = memo<
           setLoadingsByRow,
         })
       }
+      onCellFieldsChange={(...args) => {
+        if (tableProps.onCellFieldsChange) {
+          tableProps.onCellFieldsChange(...args);
+        }
+        columns.forEach(col => {
+          if (col.onCellFieldsChange) {
+            col.onCellFieldsChange(...args);
+          }
+        });
+      }}
+      onCellEditingChanged={(...args) => {
+        if (tableProps.onCellEditingChanged) {
+          tableProps.onCellEditingChanged(...args);
+        }
+        columns.forEach(col => {
+          if (col.onCellEditingChanged) {
+            col.onCellEditingChanged(...args);
+          }
+        });
+      }}
+      onCellValuesChange={(...args) => {
+        if (tableProps.onCellValuesChange) {
+          tableProps.onCellValuesChange(...args);
+        }
+        columns.forEach(col => {
+          if (col.onCellValuesChange) {
+            col.onCellValuesChange(...args);
+          }
+        });
+      }}
     />
   );
 });

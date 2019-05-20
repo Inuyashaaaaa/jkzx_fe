@@ -214,6 +214,7 @@ export const AutoCallPhoenix: ILeg = {
       LEG_FIELD.UP_BARRIER_TYPE,
       AlreadyBarrier.dataIndex,
       LEG_FIELD.IS_ANNUAL,
+      LEG_FIELD.UNIT,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL_PHOENIX;
