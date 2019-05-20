@@ -1,7 +1,7 @@
 import BackBtn from '@/containers/BackBtn';
 import MenuContext from '@/layouts/MenuContext';
 import { urlToList } from '@/utils';
-import { Card, PageHeader, Tabs } from 'antd';
+import { Card, PageHeader } from 'antd';
 import { connect } from 'dva';
 import React, { memo } from 'react';
 import GridContent from './GridContent';
@@ -23,9 +23,6 @@ const Page = ({
   extra,
   footer,
   onBack,
-  tabList,
-  tabActiveKey,
-  onTabChange,
 }) => {
   const itemRender = (route, params, routes) => {
     const last = routes.indexOf(route) === routes.length - 1;
@@ -58,16 +55,7 @@ const Page = ({
               tags={tags}
               extra={extra || (back && <BackBtn />)}
               breadcrumb={{ routes: breadcrumbRoutes, itemRender }}
-              footer={
-                footer ||
-                (tabList && (
-                  <Tabs activeKey={tabActiveKey} onChange={onTabChange}>
-                    {tabList.map(item => {
-                      return <Tabs.TabPane tab={item.tab} key={item.key} />;
-                    })}
-                  </Tabs>
-                ))
-              }
+              footer={footer}
               onBack={onBack}
             />
           );

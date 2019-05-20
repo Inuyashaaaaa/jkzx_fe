@@ -9,11 +9,11 @@ import {
 import { IColumnDef } from '@/components/Table/types';
 import { Timeline, Typography } from 'antd';
 import React from 'react';
-import Operations from './CommonModel/Operations';
+import Operations from './containers/CommonModel/Operations';
 import styles from './index.less';
 const TimelineItem = Timeline.Item;
 
-export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
+export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
   {
     title: '交易ID',
     dataIndex: 'tradeId',
@@ -138,7 +138,9 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
     dataIndex: 'action',
     width: 150,
     render: (value, record, index) => {
-      return <Operations record={record} onSearch={onSearch} rowId={record.positionId} />;
+      return (
+        <Operations name={name} record={record} onSearch={onSearch} rowId={record.positionId} />
+      );
     },
   },
 ];

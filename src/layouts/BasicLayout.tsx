@@ -108,6 +108,15 @@ class BasicLayout extends React.PureComponent {
     if (isMobile && !preProps.isMobile && !collapsed) {
       this.handleMenuCollapse(false);
     }
+    const { location, dispatch } = this.props;
+
+    const locationChanged = location !== preProps.location;
+    if (locationChanged) {
+      dispatch({
+        type: 'preRouting/save',
+        payload: preProps.location,
+      });
+    }
   }
 
   public getContext() {
