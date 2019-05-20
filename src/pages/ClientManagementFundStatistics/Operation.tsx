@@ -4,7 +4,7 @@ import { Button, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { getToken } from '@/lib/utils/authority';
+import { getToken } from '@/utils/authority';
 import {
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
