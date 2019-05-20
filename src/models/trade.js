@@ -1,20 +1,57 @@
 export default {
   namespace: 'trade',
   state: {
-    tableDataSource: [],
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      total: 0,
+    contractManagement: {
+      tableDataSource: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
     },
-    bookEdit: false,
+    open: {
+      tableDataSource: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    unwind: {
+      tableDataSource: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    expiration: {
+      tableDataSource: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    overlate: {
+      tableDataSource: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    // activeTabKey: 'contractManagement',
   },
   reducers: {
     save(state, action) {
+      const { activeTabKey, tableDataSource, pagination } = action.payload;
       return {
         ...state,
-        tableDataSource: action.payload.tableDataSource,
-        pagination: action.payload.pagination,
+        [activeTabKey]: {
+          tableDataSource,
+          pagination,
+        },
       };
     },
   },

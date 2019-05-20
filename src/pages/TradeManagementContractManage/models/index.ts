@@ -13,5 +13,12 @@ export default {
         activeTabKey: key,
       };
     },
+    initKey(state, action) {
+      console.log(action);
+      return {
+        ...state,
+        activeTabKey: action.payload,
+      };
+    },
   },
 };

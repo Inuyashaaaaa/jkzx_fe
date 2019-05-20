@@ -64,7 +64,8 @@ class CommonModel extends PureComponent<{ status: any }> {
       loading: true,
     });
     const { searchFormData } = this.state;
-    const { pagination } = this.props;
+    const { activeTabKey } = this.props;
+    const { pagination } = this.props[activeTabKey];
     const newFormData = this.getFormData();
     const formatValues = _.mapValues(newFormData, (val, key) => {
       if (isMoment(val)) {
@@ -110,11 +111,11 @@ class CommonModel extends PureComponent<{ status: any }> {
       },
       []
     );
-
-    const { dispatch } = this.props;
+    const { dispatch, name } = this.props;
     dispatch({
       type: 'trade/save',
       payload: {
+        activeTabKey: name,
         tableDataSource,
         pagination: {
           ...pagination,
@@ -168,7 +169,8 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public render() {
-    const { tableDataSource, pagination } = this.props;
+    const { activeTabKey } = this.props;
+    const { tableDataSource, pagination } = this.props[activeTabKey];
     return (
       <>
         <Form2
@@ -462,11 +464,16 @@ class CommonModel extends PureComponent<{ status: any }> {
   }
 }
 
-export default withRouter(
-  connect(({ trade, preRouting }) => ({
-    tableDataSource: trade.tableDataSource,
-    pagination: trade.pagination,
-    bookEdit: trade.bookEdit,
-    location: preRouting.location,
-  }))(CommonModel)
-);
+export default connect(({ trade, preRouting, tradeManagementContractManage }) => ({
+  // tableDataSource: trade.tableDataSource,
+  // pagination: trade.pagination,
+  // bookEdit: trade.bookEdit,
+  contractManagement: trade.contractManagement,
+  open: trade.open,
+  unwind: trade.unwind,
+  expiration: trade.expiration,
+  overlate: trade.overlate,
+  // activeTabKey: trade.activeTabKey,
+  location: preRouting.location,
+  activeTabKey: tradeManagementContractManage.activeTabKey,
+}))(CommonModel);

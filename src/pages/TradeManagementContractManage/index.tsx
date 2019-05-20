@@ -30,6 +30,13 @@ class TradeManagementContractManage extends PureComponent {
   };
 
   public componentDidMount = () => {
+    const { preRouting, dispatch } = this.props;
+    if (preRouting && preRouting.pathname !== '/trade-management/book-edit') {
+      dispatch({
+        type: 'tradeManagementContractManage/initKey',
+        payload: 'contractManagement',
+      });
+    }
     this.onFetchTradeTableData();
   };
 
@@ -103,11 +110,13 @@ class TradeManagementContractManage extends PureComponent {
         tabActiveKey={activeTabKey}
         onTabChange={this.onTabChange}
       >
-        {activeTabKey === 'contractManagement' && <CommonModel />}
-        {activeTabKey === 'open' && <CommonModel status="OPEN_TODAY" />}
-        {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" />}
-        {activeTabKey === 'expiration' && <CommonModel status="EXPIRATION_TODAY" />}
-        {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" />}
+        {activeTabKey === 'contractManagement' && <CommonModel name="contractManagement" />}
+        {activeTabKey === 'open' && <CommonModel status="OPEN_TODAY" name="open" />}
+        {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" name="unwind" />}
+        {activeTabKey === 'expiration' && (
+          <CommonModel status="EXPIRATION_TODAY" name="expiration" />
+        )}
+        {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" name="overlate" />}
       </Page>
     );
   }
@@ -116,5 +125,6 @@ class TradeManagementContractManage extends PureComponent {
 export default connect(state => {
   return {
     tradeManagementContractManage: state.tradeManagementContractManage,
+    preRouting: state.preRouting.location,
   };
 })(TradeManagementContractManage);
