@@ -13,8 +13,8 @@ const START = '前端模块开始更新';
 const FINISH = '前端模块更新完毕';
 const BUNDLE_NAME = 'dist';
 
-const exists = (src, dst) => {
-  return fs.existsSync(dst);
+const exists = src => {
+  return fs.existsSync(src);
 };
 
 const remove = src => {
