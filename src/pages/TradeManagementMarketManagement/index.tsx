@@ -1,6 +1,6 @@
-import { Form2, Select } from '@/design/components';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select } from '@/components';
+import SourceTable from '@/components/_SourceTable';
+import Page from '@/containers/Page';
 import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
 import { Button, Divider, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -125,7 +125,7 @@ class TradeManagementMarketManagement extends PureComponent {
   public render() {
     console.log(this.state.tableDataSource);
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
           ref={node => (this.$sourceTable = node)}
           layout="inline"
@@ -193,7 +193,7 @@ class TradeManagementMarketManagement extends PureComponent {
           size="middle"
           scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

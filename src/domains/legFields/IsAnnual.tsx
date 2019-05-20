@@ -1,5 +1,5 @@
 import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
-import { Checkbox, Form2 } from '@/design/components';
+import { Checkbox, Form2 } from '@/components';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

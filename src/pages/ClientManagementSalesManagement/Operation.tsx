@@ -1,6 +1,6 @@
 import PopconfirmButton from '@/components/PopconfirmButton';
-import ModalButton from '@/design/components/ModalButton';
-import { arr2treeOptions } from '@/lib/utils';
+import ModalButton from '@/components/ModalButton';
+import { arr2treeOptions } from '@/utils';
 import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales';
 import { Col, message, Row } from 'antd';
 import React, { PureComponent } from 'react';

@@ -1,5 +1,5 @@
 import { DIRECTION_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
-import { Form2, Input } from '@/design/components';
+import { Form2, Input } from '@/components';
 import { clientChangePremium, clientSettleTrade } from '@/services/client-service';
 import {
   clientAccountGetByLegalName,

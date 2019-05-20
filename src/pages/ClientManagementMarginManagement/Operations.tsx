@@ -1,5 +1,5 @@
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
 import { clientTradeCashFlow, mgnMarginUpdate } from '@/services/reference-data-service';
 import { message } from 'antd';
 import React, { PureComponent } from 'react';

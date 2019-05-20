@@ -1,5 +1,5 @@
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { DatePicker, Form2, Input, Loading, Select, Table2 } from '@/design/components';
+import { DatePicker, Form2, Input, Loading, Select, Table2 } from '@/components';
 import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,
@@ -25,6 +25,7 @@ const BookingBaseInfoForm = memo<any>(props => {
     editableStatus = FORM_EDITABLE_STATUS.EDITING_NO_CONVERT,
     columnNumberOneRow = 1,
     currentCreateFormRef,
+    hideRequiredMark,
   } = props;
   const [tradeInfo, settradeInfo] = useState({});
   const [tradeTableData, settradeTableData] = useState([]);
@@ -226,6 +227,7 @@ const BookingBaseInfoForm = memo<any>(props => {
         </Loading>
       </Modal>
       <Form2
+        hideRequiredMark={hideRequiredMark}
         ref={node => (currentCreateFormRef ? currentCreateFormRef(node) : null)}
         columnNumberOneRow={columnNumberOneRow}
         footer={false}

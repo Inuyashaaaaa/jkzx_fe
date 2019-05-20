@@ -1,3 +1,3 @@
-import { IFormColDef } from '@/design/components/type';
+import { IFormColDef } from '@/components/type';
 
 export const SelectColumnType: IFormColDef = () => {};

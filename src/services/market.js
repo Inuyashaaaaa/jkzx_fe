@@ -1,4 +1,4 @@
-import { request } from '@/lib/utils';
+import { request } from '@/utils';
 import { HOST_TEST } from '@/constants/global';
 
 export async function queryMarket(params = {}) {

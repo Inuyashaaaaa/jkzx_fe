@@ -4,9 +4,9 @@ import { LEG_ENV, TOTAL_EDITING_FIELDS, ILegColDef } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, Loading } from '@/design/components';
-import { ITableData } from '@/design/components/type';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Loading } from '@/components';
+import { ITableData } from '@/components/type';
+import Page from '@/containers/Page';
 import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 import { convertTradePageData2ApiData } from '@/services/pages';
 import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
@@ -136,14 +136,14 @@ const TradeManagementBooking = props => {
 
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
   return (
-    <PageHeaderWrapper>
+    <Page>
       {tableLoading ? (
         <Skeleton active={true} paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
           <Divider />
-          <Loading loading={tableLoading}>
+          <div>
             <BookingBaseInfoForm
               currentCreateFormRef={node => {
                 currentCreateFormRef = node;
@@ -155,7 +155,7 @@ const TradeManagementBooking = props => {
               createFormData={createFormData}
               setCreateFormData={setCreateFormData}
             />
-          </Loading>
+          </div>
           <Typography.Title style={{ marginTop: 20 }} level={4}>
             交易结构信息
           </Typography.Title>
@@ -234,7 +234,7 @@ const TradeManagementBooking = props => {
           </Button>
         </Row>
       ) : null}
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 

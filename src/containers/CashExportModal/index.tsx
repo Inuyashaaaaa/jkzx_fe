@@ -1,6 +1,6 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import CashInsertModal from '@/containers/CashInsertModal';
-import { Table2 } from '@/design/components';
+import { Table2 } from '@/components';
 import {
   cliTasksGenerateByTradeId,
   cliUnProcessedTradeTaskListByTradeId,

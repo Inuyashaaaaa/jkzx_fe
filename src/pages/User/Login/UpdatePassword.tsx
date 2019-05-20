@@ -1,4 +1,4 @@
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/components';
 import { Input } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';

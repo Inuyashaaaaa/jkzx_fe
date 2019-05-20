@@ -1,7 +1,7 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { PureStateComponent } from '@/lib/components/_Components';
+import Page from '@/containers/Page';
+import { PureStateComponent } from '@/components/Components';
 import React from 'react';
-import FormPlus from '@/lib/components/_FormPlus';
+import FormPlus from '@/components/_FormPlus';
 
 class CustomInfo extends PureStateComponent {
   constructor(props) {
@@ -225,9 +225,9 @@ class CustomInfo extends PureStateComponent {
     };
 
     return (
-      <PageHeaderWrapper>
+      <Page>
         <FormPlus {...formProps} />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

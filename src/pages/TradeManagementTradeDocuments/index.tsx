@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import React, { PureComponent } from 'react';
 import SettlementAdvice from './SettlementAdvice';
 import TradeConfirmation from './TradeConfirmation';
@@ -19,7 +19,7 @@ class TradeManagementTradeDocuments extends PureComponent {
   public render() {
     return (
       <>
-        <PageHeaderWrapper
+        <Page
           title="交易文档"
           tabList={[
             { key: 'tradeConfirmation', tab: '交易确认书' },
@@ -30,7 +30,7 @@ class TradeManagementTradeDocuments extends PureComponent {
         >
           {this.state.activeTabKey === 'tradeConfirmation' && <TradeConfirmation />}
           {this.state.activeTabKey === 'settlementAdvice' && <SettlementAdvice />}
-        </PageHeaderWrapper>
+        </Page>
       </>
     );
   }

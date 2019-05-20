@@ -1,5 +1,5 @@
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/design/components/SourceTable/types';
+import { IFormControl } from '@/components/Form/types';
+import { IColumnDef } from '@/components/SourceTable/types';
 import React from 'react';
 import Operation from './Operation';
 

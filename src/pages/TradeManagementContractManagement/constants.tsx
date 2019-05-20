@@ -1,6 +1,6 @@
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IFormControl } from '@/components/Form/types';
+import { IColumnDef } from '@/components/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import {

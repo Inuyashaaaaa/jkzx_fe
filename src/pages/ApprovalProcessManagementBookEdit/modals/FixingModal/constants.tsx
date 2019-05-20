@@ -1,5 +1,5 @@
 import { INPUT_NUMBER_CURRENCY_CNY_CONFIG } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
+import { IFormControl } from '@/components/Form/types';
 
 export const EXERCISE_FORM_CONTROLS: IFormControl[] = [
   {

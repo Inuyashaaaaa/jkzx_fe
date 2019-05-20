@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/utils/request';
 
 // 获取场内流水
 export async function queryTradeRecord(params = {}) {

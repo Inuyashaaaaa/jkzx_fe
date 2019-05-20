@@ -1,10 +1,10 @@
 import { INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 import MarketSourceTable from '@/containers/MarketSourceTable';
-import { IFormControl } from '@/lib/components/_Form2';
-import ModalButton from '@/lib/components/_ModalButton2';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { IFormControl } from '@/components/_Form2';
+import ModalButton from '@/components/_ModalButton2';
+import SourceTable from '@/components/_SourceTable';
+import Page from '@/containers/Page';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
@@ -215,7 +215,7 @@ class PricingSettingsDividendCurve extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row gutter={16 + 8}>
           <Col xs={24} sm={4}>
             <MarketSourceTable
@@ -320,7 +320,7 @@ class PricingSettingsDividendCurve extends PureComponent {
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

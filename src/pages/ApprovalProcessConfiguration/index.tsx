@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   wkGlobalConfigList,
   wkGlobalConfigModify,
@@ -313,7 +313,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   public render() {
     return (
       <div className={styles.approvalProcessConfiguration}>
-        <PageHeaderWrapper>
+        <Page>
           <Tabs defaultActiveKey="资金录入经办复合流程" onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
               return (
@@ -409,7 +409,7 @@ class ApprovalProcessConfiguration extends PureComponent {
           >
             <p>重置后即放弃当前页面的编辑，恢复到编辑前的状态。是否确定重置？</p>
           </Modal>
-        </PageHeaderWrapper>
+        </Page>
       </div>
     );
   }

@@ -1,5 +1,5 @@
-import { IFormControl } from '@/lib/components/_Form2';
-import { isAllSame } from '@/lib/utils';
+import { IFormControl } from '@/components/_Form2';
+import { isAllSame } from '@/utils';
 import _ from 'lodash';
 
 export const INSTRUMENT_KEY = 'instrumentId';

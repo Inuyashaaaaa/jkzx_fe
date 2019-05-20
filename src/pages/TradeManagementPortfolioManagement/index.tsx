@@ -1,10 +1,10 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Input, Select } from '@/design/components';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import { IFormColDef } from '@/design/components/type';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Input, Select } from '@/components';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import { IFormColDef } from '@/components/type';
+import Page from '@/containers/Page';
 import {
   trdPortfolioCreate,
   trdPortfolioListBySimilarPortfolioName,
@@ -163,7 +163,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     console.log(this.state.dataSource);
 
     return (
-      <PageHeaderWrapper title="投资组合管理">
+      <Page title="投资组合管理">
         <Form2
           ref={node => (this.$sourceTable = node)}
           layout="inline"
@@ -254,7 +254,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
           pagination={this.state.pagination}
           loading={this.state.loading}
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

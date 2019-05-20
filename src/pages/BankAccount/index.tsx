@@ -1,8 +1,8 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import Page from '@/containers/Page';
 import { refBankAccountSave, refBankAccountSearch } from '@/services/reference-data-service';
 import { message } from 'antd';
 import React, { PureComponent } from 'react';
@@ -154,7 +154,7 @@ class BankAccount extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper back={true}>
+      <Page back={true}>
         <SourceTable
           rowKey="uuid"
           loading={this.state.loading}
@@ -195,7 +195,7 @@ class BankAccount extends PureComponent {
             </ModalButton>
           }
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

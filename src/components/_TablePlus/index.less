@@ -1,0 +1,211 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/utils/utils.less';
+@import '../style/themes.less';
+
+@table-vertical-gutter: 8px;
+@table-plus-prefix-cls: ~'@{tongyu-prefix}-table-plus';
+
+.size() {
+  &.middle {
+    margin-left: -@input-padding-horizontal-base;
+    margin-right: -@input-padding-horizontal-base;
+  }
+
+  &.large {
+    margin-left: -@input-padding-horizontal-lg;
+    margin-right: -@input-padding-horizontal-lg;
+  }
+
+  &.small {
+    margin-left: -@input-padding-horizontal-sm;
+    margin-right: -@input-padding-horizontal-sm;
+  }
+}
+
+:global {
+  .@{table-plus-prefix-cls} {
+    &.createable {
+      .ant-table-placeholder {
+        display: none;
+      }
+    }
+
+    &.hide-table-header {
+      .ant-table-thead {
+        display: none;
+      }
+    }
+
+    .ant-table-middle {
+      th,
+      td {
+        height: @input-height-base + 1px; // 留给 td border-bottom: 1px
+        padding: 0 @input-padding-horizontal-base !important;
+      }
+    }
+
+    .ant-table-small {
+      th,
+      td {
+        height: @input-height-sm + 1px;
+        padding: 0 @input-padding-horizontal-sm !important;
+      }
+    }
+
+    .ant-table-large {
+      th,
+      td {
+        height: @input-height-lg + 1px;
+        padding: 0 @input-padding-horizontal-lg !important;
+      }
+    }
+
+    .ant-table {
+      &.vertical {
+        &.bordered {
+          thead {
+            border-top: 1px solid @border-color-split;
+            border-left: 1px solid @border-color-split;
+            border-bottom: 1px solid @border-color-split;
+            tr {
+              border-right: 1px solid @border-color-split;
+              th {
+                &:last-child {
+                  border-bottom: none;
+                }
+              }
+            }
+          }
+          tbody {
+            border-top: 1px solid @border-color-split;
+            border-right: 1px solid @border-color-split;
+            border-bottom: 1px solid @border-color-split;
+            tr {
+              border-right: 1px solid @border-color-split;
+              border-left: 1px solid @border-color-split;
+              margin-left: -1px;
+              &:last-child {
+                border-right: none;
+              }
+              td {
+                &:last-child {
+                  border-bottom: none;
+                }
+              }
+            }
+          }
+        }
+
+        table {
+          display: flex;
+          justify-content: flex-start;
+
+          tbody,
+          thead {
+            display: flex;
+            justify-content: flex-start;
+          }
+
+          th,
+          td {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-content: stretch;
+          }
+        }
+      }
+    }
+
+    &-alert {
+      height: 39px;
+      border: 1px solid @alert-info-border-color;
+      background: @alert-info-bg-color;
+      padding: 0 16px;
+      margin-bottom: @table-vertical-gutter;
+
+      &-icon {
+        color: @primary-color;
+        margin-right: 37 - 16 - 14px;
+      }
+    }
+
+    &-col-selected {
+      background: @table-selected-row-bg !important;
+      .static {
+        background: @table-selected-row-bg !important;
+      }
+    }
+
+    &-top-action {
+      margin-bottom: @table-vertical-gutter;
+    }
+
+    &-bottom-action {
+      margin-top: @table-vertical-gutter;
+      position: relative;
+      &.rise {
+        top: -56px;
+      }
+    }
+
+    .cell-placeholder {
+      height: 100%;
+      background: url('/empty-cell-bg.png');
+      .size();
+    }
+
+    .editable-row:hover {
+      .tongyu-input-static {
+        background: @table-row-hover-bg;
+      }
+    }
+
+    .ant-table-row-selected {
+      .tongyu-input-static {
+        background: @table-selected-row-bg !important;
+      }
+    }
+
+    .editable-cell-inner {
+      position: relative;
+      box-sizing: border-box;
+      .size();
+
+      &.changed {
+        outline: 1px solid @success-color;
+      }
+
+      &.error {
+        outline: 1px solid @error-color;
+      }
+
+      &.depend {
+        &::after {
+          display: block;
+          content: '';
+          border-width: 4px 4px 4px 4px;
+          border-style: solid;
+          border-color: @primary-color @primary-color transparent transparent;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+      }
+    }
+
+    .react-resizable {
+      position: relative;
+    }
+
+    .react-resizable-handle {
+      position: absolute;
+      width: 3px;
+      height: 100%;
+      bottom: 0;
+      right: -1.5px;
+      cursor: col-resize;
+      background: @border-color-split;
+    }
+  }
+}

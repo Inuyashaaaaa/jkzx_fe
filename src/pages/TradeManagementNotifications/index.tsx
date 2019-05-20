@@ -1,7 +1,7 @@
 import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
-import { Form2, Select } from '@/design/components';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select } from '@/components';
+import SourceTable from '@/components/SourceTable';
+import Page from '@/containers/Page';
 import { removeCalendar } from '@/services/calendars';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 import { DatePicker, Divider, Table, Icon, Tooltip } from 'antd';
@@ -132,7 +132,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
 
   public render() {
     return (
-      <PageHeaderWrapper
+      <Page
         title="事件提醒"
         tabList={[
           {
@@ -291,7 +291,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
         {this.state.activeTabKey === 'calendars' && (
           <Calendars dataSource={this.state.tableDataSource} />
         )}
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

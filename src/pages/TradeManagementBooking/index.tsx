@@ -7,11 +7,11 @@ import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, ModalButton, Upload } from '@/design/components';
-import { IFormField } from '@/design/components/type';
-import { insert, remove, uuid } from '@/design/utils';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { getToken } from '@/lib/utils/authority';
+import { Form2, ModalButton, Upload } from '@/components';
+import { IFormField } from '@/components/type';
+import { insert, remove, uuid } from '@/utils';
+import Page from '@/containers/Page';
+import { getToken } from '@/utils/authority';
 import {
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
@@ -26,7 +26,7 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import './index.less';
-import ImportExcelButton from '@/lib/components/_ImportExcelButton';
+import ImportExcelButton from '@/components/_ImportExcelButton';
 import router from 'umi/router';
 
 const ActionBar = memo<any>(props => {
@@ -258,7 +258,7 @@ const TradeManagementBooking = props => {
 
   const tableEl = useRef<IMultiLegTableEl>(null);
   return (
-    <PageHeaderWrapper>
+    <Page>
       <ActionBar
         setTableData={setTableData}
         tableData={tableData}
@@ -340,7 +340,7 @@ const TradeManagementBooking = props => {
           );
         }}
       />
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 

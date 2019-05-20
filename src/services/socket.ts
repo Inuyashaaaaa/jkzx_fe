@@ -1,6 +1,6 @@
 import { SOCKET_EVENT_TYPE } from '@/constants/socket';
-import { createEventBus } from '@/design/utils';
-import { getToken } from '@/lib/utils/authority';
+import { createEventBus } from '@/utils';
+import { getToken } from '@/utils/authority';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 

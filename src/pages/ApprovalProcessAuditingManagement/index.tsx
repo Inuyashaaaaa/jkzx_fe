@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   wkApproveGroupList,
   wkApproveGroupModify,
@@ -253,7 +253,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     return (
       <>
         <div className={styles.auditingWrapper}>
-          <PageHeaderWrapper>
+          <Page>
             <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
               <p>审批组列表</p>
               <AuditGourpLists
@@ -309,7 +309,7 @@ class SystemSettingsRoleManagement extends PureComponent {
                 currentGroup={this.state.currentGroup}
               />
             </Drawer>
-          </PageHeaderWrapper>
+          </Page>
         </div>
       </>
     );

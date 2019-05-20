@@ -1,0 +1,173 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/utils/utils.less';
+
+@row-hover-border-color: @primary-color;
+@cell-width: 150px;
+@table-border: 1px solid @border-color-split;
+
+.standardForm {
+  margin-bottom: 20px;
+}
+
+.cellCommon(@padding-vertical, @padding-horizontal) {
+  transition: background-color 0.2s;
+  transition: border 0.2s;
+  &.light {
+    background: @primary-color;
+    color: #fff;
+  }
+
+  width: @cell-width;
+  min-width: @cell-width;
+  height: @input-height-base + 1;
+  padding: @padding-vertical @padding-horizontal;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.addRow {
+  transition: border 0.2s;
+  border-right: @table-border;
+}
+
+.commonRow {
+  transition: border 0.2s;
+  &.lightLeft {
+    border-left: 1px solid @row-hover-border-color !important;
+  }
+  &.lightRight {
+    border-right: 1px solid @row-hover-border-color !important;
+  }
+  &.borderLeft {
+    border-left: @table-border;
+  }
+  border-right: @table-border;
+}
+
+.headerCell {
+  &.lightTop {
+    border-top: 1px solid @row-hover-border-color;
+  }
+  .cellCommon(0, @table-padding-horizontal);
+  display: flex;
+  align-items: center;
+  background: @table-header-bg;
+  border-bottom: @table-border;
+  border-top: @table-border;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.groupColumnCell {
+  .cellCommon(0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:first-child {
+    border-top: @table-border;
+    height: @input-height-base + 2;
+  }
+  border-bottom: @table-border;
+  text-align: center;
+}
+
+.columnCell {
+  .cellCommon(0, @table-padding-horizontal);
+  display: flex;
+  align-items: center;
+  &:first-child {
+    border-top: @table-border;
+    height: @input-height-base + 2;
+  }
+  &.lightBit {
+    background: @primary-1;
+  }
+  border-bottom: @table-border;
+  font-weight: bold;
+}
+
+.commonCell {
+  .cellCommon(0, 0);
+  &:first-child {
+    border-top: @table-border;
+    height: @input-height-base + 2;
+  }
+  &.lightBottom {
+    border-bottom: 1px solid @row-hover-border-color !important;
+  }
+  border-bottom: @table-border;
+
+  .emptyContent {
+    background: url('/empty-cell-bg.png');
+    height: @input-height-base;
+  }
+
+  :global {
+    .ant-input-number,
+    .ant-input {
+      &:focus {
+        box-shadow: none;
+        background: @primary-1;
+      }
+    }
+
+    .ant-input-number-focused {
+      background: @primary-1;
+      box-shadow: none;
+    }
+
+    .ant-select-focused {
+      .ant-select-selection {
+        box-shadow: none;
+      }
+    }
+
+    .ant-input {
+      border: none;
+    }
+    .ant-select {
+      width: 100%;
+    }
+    .ant-select-selection {
+      border: none;
+    }
+    .ant-time-picker {
+      width: 100%;
+    }
+    .ant-input-number {
+      width: 100%;
+      border: none;
+    }
+    .ant-time-picker-input {
+      border: none;
+    }
+  }
+}
+
+.table {
+  display: flex;
+  justify-content: flex-start;
+
+  :global {
+    .ant-input-disabled,
+    .ant-input-number-disabled {
+      color: @text-color;
+    }
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-start;
+    z-index: 999;
+    background: #fff;
+  }
+
+  .body {
+    display: flex;
+    justify-content: flex-start;
+    flex-grow: 1;
+    overflow: scroll;
+  }
+}

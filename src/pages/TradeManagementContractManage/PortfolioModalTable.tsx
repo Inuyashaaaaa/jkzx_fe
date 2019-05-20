@@ -1,5 +1,5 @@
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
 import {
   trdPortfolioListBySimilarPortfolioName,
   trdTradePortfolioCreateBatch,

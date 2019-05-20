@@ -1,4 +1,4 @@
-import { IColumnDef } from '@/lib/components/_Table2';
+import { IColumnDef } from '@/components/_Table2';
 
 export const DEFAULT_CALENDAR = 'DEFAULT_CALENDAR';
 

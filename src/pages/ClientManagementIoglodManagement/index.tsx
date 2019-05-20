@@ -1,6 +1,6 @@
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay, mockData } from '@/lib/utils';
+import SourceTable from '@/components/SourceTable';
+import Page from '@/containers/Page';
+import { delay, mockData } from '@/utils';
 import React, { PureComponent } from 'react';
 import History from './History';
 import Processed from './Processed';
@@ -54,7 +54,7 @@ class ClientManagementIoglodManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper
+      <Page
         title="台账管理"
         tabList={[
           {
@@ -71,7 +71,7 @@ class ClientManagementIoglodManagement extends PureComponent {
       >
         {this.state.activeTabKey === 'processed' && <Processed />}
         {this.state.activeTabKey === 'history' && <History />}
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }
