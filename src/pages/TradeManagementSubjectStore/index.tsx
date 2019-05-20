@@ -1,6 +1,6 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2 } from '@/components';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
 import { Button, Divider, message, Modal, Table } from 'antd';
 import _ from 'lodash';
@@ -194,7 +194,7 @@ class TradeManagementMarketManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper back={true}>
+      <Page back={true}>
         <Form2
           columns={searchFormControls()}
           dataSource={this.state.searchFormData}
@@ -235,7 +235,7 @@ class TradeManagementMarketManagement extends PureComponent {
             footer={false}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

@@ -28,3 +28,4 @@ export * from './uuid';
 export * from './utils';
 export * from './toggleItem';
 export * from './getDiffAttrs';
+export * from './pathTools';

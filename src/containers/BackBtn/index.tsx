@@ -18,7 +18,7 @@ class BackBtn extends PureComponent<BackBtnProps, {}> {
   public render() {
     const { name } = this.props;
     return (
-      <Button type="primary" icon="rollback" onClick={this.handleBack}>
+      <Button size="small" icon="arrow-left" onClick={this.handleBack}>
         {name}
       </Button>
     );

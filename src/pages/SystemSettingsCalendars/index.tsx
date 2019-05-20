@@ -3,7 +3,7 @@ import { Form2 } from '@/components';
 import Form from '@/components/Form';
 import ModalButton from '@/components/ModalButton';
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { delay, getMoment } from '@/utils';
 import { createCalendar, queryCalendar, removeCalendar } from '@/services/calendars';
 import { Button, Col, DatePicker, message, Row } from 'antd';
@@ -183,7 +183,7 @@ class SystemTradeDate extends PureComponent<any, any> {
     ];
 
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row type="flex" justify="space-around" align="top" gutter={8}>
           <Col xs={24} sm={12}>
             <RangePicker
@@ -235,7 +235,7 @@ class SystemTradeDate extends PureComponent<any, any> {
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

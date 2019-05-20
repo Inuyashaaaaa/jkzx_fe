@@ -1,6 +1,6 @@
 import { Form2, Input } from '@/components';
 import ModalButton from '@/components/ModalButton';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import SourceTable from '@/components/SourceTable';
 import {
   queryCompanys,
@@ -450,7 +450,7 @@ class ClientManagementSalesManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper title="销售管理">
+      <Page title="销售管理">
         <Row type="flex" justify="space-between" gutter={32}>
           <Col>
             <Tree showLine={true} onSelect={this.onSelect} blockNode={false}>
@@ -612,7 +612,7 @@ class ClientManagementSalesManagement extends PureComponent {
             ]}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

@@ -1,7 +1,7 @@
 // import Table from '@/components/_Table2';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import SourceTable from '@/components/SourceTable';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   addVolSpecialDates,
   deleteVolSpecialDates,
@@ -262,7 +262,7 @@ class VolatilityCalendar extends PureComponent {
       modalLoading,
     } = this.state;
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row>
           <Col span={8}>
             <Calendar
@@ -334,7 +334,7 @@ class VolatilityCalendar extends PureComponent {
         >
           {modalVisible && <CommonForm data={formItems} ref={ele => (this.$formBuilder = ele)} />}
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

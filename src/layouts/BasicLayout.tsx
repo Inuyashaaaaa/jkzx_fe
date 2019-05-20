@@ -1,19 +1,17 @@
 import SiderMenu from '@/components/SiderMenu';
+import ErrorBoundary from '@/containers/ErrorBoundary';
 import { Layout } from 'antd';
 import classNames from 'classnames';
 import { connect } from 'dva';
-import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
 import pathToRegexp from 'path-to-regexp';
 import React from 'react';
 import { ContainerQuery } from 'react-container-query';
 import DocumentTitle from 'react-document-title';
 import Media from 'react-media';
-import { formatMessage } from 'umi/locale';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
-import ErrorBoundary from '@/containers/ErrorBoundary';
 
 const logoPath = '/logo.svg';
 
@@ -46,81 +44,81 @@ const query = {
   },
 };
 
-class BasicLayout extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.getPageTitle = memoizeOne(this.getPageTitle);
-    this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual);
-    this.breadcrumbNameMap = this.getBreadcrumbNameMap();
-    this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
-  }
+/**
+ * 获取面包屑映射
+ * @param {Object} menuData 菜单配置
+ */
+const getBreadcrumbNameMap = memoizeOne(menuData => {
+  const routerMap = {};
+  const flattenMenuData = data => {
+    data.forEach(menuItem => {
+      if (menuItem.children) {
+        flattenMenuData(menuItem.children);
+      }
+      // Reduce memory usage
+      routerMap[menuItem.path] = menuItem;
+    });
+  };
+  flattenMenuData(menuData);
+  return routerMap;
+});
 
-  componentDidMount() {
+const matchParamsPath = memoizeOne((pathname, breadcrumbNameMap) => {
+  const pathKey = Object.keys(breadcrumbNameMap).find(key => pathToRegexp(key).test(pathname));
+  return breadcrumbNameMap[pathKey];
+});
+
+const getPageTitle = memoizeOne((pathname, breadcrumbNameMap) => {
+  const currRouterData = matchParamsPath(pathname, breadcrumbNameMap);
+
+  if (!currRouterData) {
+    return '同余场外衍生品交易系统';
+  }
+  return `${currRouterData.label} - 同余场外衍生品交易系统`;
+});
+
+class BasicLayout extends React.PureComponent {
+  public static getDerivedStateFromProps(props) {
+    const {
+      location: { pathname },
+    } = props;
+    const breadcrumbNameMap = getBreadcrumbNameMap(props.menuData);
+    return {
+      breadcrumbNameMap,
+      pageTitle: getPageTitle(pathname, breadcrumbNameMap),
+    };
+  }
+  public state = {
+    pageTitle: '',
+    // eslint-disable-next-line react/no-unused-state
+    breadcrumbNameMap: {},
+  };
+
+  public componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'user/replenish',
     });
   }
 
-  componentDidUpdate(preProps) {
+  public componentDidUpdate(preProps) {
     // After changing to phone mode,
     // if collapsed is true, you need to click twice to display
-    this.breadcrumbNameMap = this.getBreadcrumbNameMap();
     const { collapsed, isMobile } = this.props;
     if (isMobile && !preProps.isMobile && !collapsed) {
       this.handleMenuCollapse(false);
     }
   }
 
-  getContext() {
+  public getContext() {
     const { location } = this.props;
     return {
       location,
-      breadcrumbNameMap: this.breadcrumbNameMap,
+      breadcrumbNameMap: this.state.breadcrumbNameMap,
     };
   }
 
-  /**
-   * 获取面包屑映射
-   * @param {Object} menuData 菜单配置
-   */
-  getBreadcrumbNameMap() {
-    const routerMap = {};
-    const { menuData } = this.props;
-    const flattenMenuData = data => {
-      data.forEach(menuItem => {
-        if (menuItem.children) {
-          flattenMenuData(menuItem.children);
-        }
-        // Reduce memory usage
-        routerMap[menuItem.path] = menuItem;
-      });
-    };
-    flattenMenuData(menuData);
-    return routerMap;
-  }
-
-  matchParamsPath = pathname => {
-    const pathKey = Object.keys(this.breadcrumbNameMap).find(key =>
-      pathToRegexp(key).test(pathname)
-    );
-    return this.breadcrumbNameMap[pathKey];
-  };
-
-  getPageTitle = pathname => {
-    const currRouterData = this.matchParamsPath(pathname);
-
-    if (!currRouterData) {
-      return '同余场外衍生品交易系统';
-    }
-    const pageName = formatMessage({
-      id: currRouterData.locale || currRouterData.name,
-      defaultMessage: currRouterData.name,
-    });
-    return `${pageName} - 同余场外衍生品交易系统`;
-  };
-
-  getLayoutStyle = () => {
+  public getLayoutStyle = () => {
     const { fixSiderbar, isMobile, collapsed, layout } = this.props;
     if (fixSiderbar && layout !== 'topmenu' && !isMobile) {
       return {
@@ -130,7 +128,7 @@ class BasicLayout extends React.PureComponent {
     return null;
   };
 
-  getContentStyle = () => {
+  public getContentStyle = () => {
     const { fixedHeader } = this.props;
     return {
       margin: '24px 24px 0',
@@ -139,7 +137,7 @@ class BasicLayout extends React.PureComponent {
     };
   };
 
-  handleMenuCollapse = collapsed => {
+  public handleMenuCollapse = collapsed => {
     const { dispatch } = this.props;
     dispatch({
       type: 'global/changeLayoutCollapsed',
@@ -147,7 +145,7 @@ class BasicLayout extends React.PureComponent {
     });
   };
 
-  render() {
+  public render() {
     const {
       navTheme,
       layout: PropsLayout,
@@ -190,7 +188,7 @@ class BasicLayout extends React.PureComponent {
       </Layout>
     );
     return (
-      <DocumentTitle title={this.getPageTitle(pathname)}>
+      <DocumentTitle title={this.state.pageTitle}>
         <ContainerQuery query={query}>
           {params => (
             <Context.Provider value={this.getContext()}>

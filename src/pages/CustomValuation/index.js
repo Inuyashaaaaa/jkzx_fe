@@ -1,9 +1,9 @@
 import React from 'react';
 import { PureStateComponent } from '@/components/Components';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { Card } from 'antd';
 import Mock from 'mockjs';
-import BackBtn from '@/components/BackBtn';
+import BackBtn from '@/containers/BackBtn';
 import StandardTable from '@/components/_StandardTable';
 import { delay } from '@/utils';
 
@@ -77,11 +77,11 @@ class CustomValuation extends PureStateComponent {
       ],
     };
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Card bordered={false} extra={<BackBtn />}>
           <StandardTable {...tableProps} />
         </Card>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

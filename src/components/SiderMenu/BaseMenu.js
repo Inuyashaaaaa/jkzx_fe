@@ -3,9 +3,8 @@ import { Menu, Icon } from 'antd';
 import Link from 'umi/link';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
-import { urlToList } from '../_utils/pathTools';
+import { urlToList, isUrl } from '@/utils';
 import { getMenuMatches } from './SiderMenuUtils';
-import { isUrl } from '@/utils';
 import styles from './index.less';
 
 const { SubMenu } = Menu;

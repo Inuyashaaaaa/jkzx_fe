@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { PureStateComponent } from '@/components/Components';
 import StandardForm from '@/components/_StandardForm';
 import StandardTable from '@/components/_StandardTable';
@@ -103,7 +103,7 @@ class Component extends PureStateComponent {
     };
 
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Tabs animated={false} defaultActiveKey="1">
           <TabPane tab="录入核对管理" key="1">
             <StandardTable {...inputTableProps} />
@@ -189,7 +189,7 @@ class Component extends PureStateComponent {
             }}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

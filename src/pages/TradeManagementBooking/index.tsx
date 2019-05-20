@@ -1,5 +1,4 @@
 import { Form2, ModalButton, Upload } from '@/components';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { IFormField } from '@/components/type';
 import { LEG_FIELD, LEG_ID_FIELD, LEG_INJECT_FIELDS, PREMIUM_TYPE_MAP } from '@/constants/common';
 import { COMPUTED_LEG_FIELD_MAP, FORM_EDITABLE_STATUS } from '@/constants/global';
@@ -10,6 +9,7 @@ import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
+import Page from '@/containers/Page';
 import {
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
@@ -257,7 +257,7 @@ const TradeManagementBooking = props => {
 
   const tableEl = useRef<IMultiLegTableEl>(null);
   return (
-    <PageHeaderWrapper>
+    <Page>
       <ActionBar
         setTableData={setTableData}
         tableData={tableData}
@@ -339,7 +339,7 @@ const TradeManagementBooking = props => {
           );
         }}
       />
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 
