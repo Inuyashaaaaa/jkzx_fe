@@ -12,6 +12,7 @@ import moment from 'moment';
 import React, { PureComponent } from 'react';
 import Calendars from './Calendars';
 import { DEFAULT_CALENDAR } from './constants';
+import TabHeader from '@/containers/TabHeader';
 
 const { RangePicker } = DatePicker;
 
@@ -134,18 +135,22 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     return (
       <Page
         title="事件提醒"
-        tabList={[
-          {
-            key: 'list',
-            tab: '以列表展示',
-          },
-          {
-            key: 'calendars',
-            tab: '以日历展示',
-          },
-        ]}
-        tabActiveKey={this.state.activeTabKey}
-        onTabChange={this.onHeaderTabChange}
+        footer={
+          <TabHeader
+            activeKey={this.state.activeTabKey}
+            onChange={this.onHeaderTabChange}
+            tabList={[
+              {
+                key: 'list',
+                tab: '以列表展示',
+              },
+              {
+                key: 'calendars',
+                tab: '以日历展示',
+              },
+            ]}
+          />
+        }
       >
         {this.state.activeTabKey === 'list' && (
           <div>

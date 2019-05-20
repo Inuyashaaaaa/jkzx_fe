@@ -1,16 +1,14 @@
-import { Form2, InputNumber } from '@/components';
-import { clientUpdateCredit } from '@/services/reference-data-service';
-import { Button, message, Modal } from 'antd';
+import { Form2, InputNumber, Upload } from '@/components';
+import { UPLOAD_URL, wkProcessGet, wkProcessInstanceCreate } from '@/services/approval';
+import {
+  clientUpdateCredit,
+  wkAttachmentProcessInstanceBind,
+} from '@/services/reference-data-service';
+import { getToken } from '@/utils/authority';
+import { Alert, Button, Icon, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { getToken } from '@/utils/authority';
-import {
-  UPLOAD_URL,
-  wkAttachmentProcessInstanceModify,
-  wkProcessGet,
-  wkProcessInstanceCreate,
-} from '@/services/approval';
 import router from 'umi/router';
 
 class Operation extends PureComponent<{ record: any; fetchTable: any }> {

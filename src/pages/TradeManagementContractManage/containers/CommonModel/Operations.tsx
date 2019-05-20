@@ -12,12 +12,18 @@ import moment from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
 import uuidv4 from 'uuid';
-import LifeModalTable from '../LifeModalTable';
-import PortfolioModalTable from '../PortfolioModalTable';
+import LifeModalTable from '../../LifeModalTable';
+import PortfolioModalTable from '../../PortfolioModalTable';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 
-class Operations extends PureComponent<{ record: any; onSearch: any; rowId: string }> {
+class Operations extends PureComponent<{
+  record: any;
+  onSearch: any;
+  rowId: string;
+  name: string;
+  dispatch: any;
+}> {
   public $modelButton: ModalButton = null;
 
   public activeRowData: any;
@@ -47,6 +53,10 @@ class Operations extends PureComponent<{ record: any; onSearch: any; rowId: stri
   };
 
   public handleBookEdit = () => {
+    this.props.dispatch({
+      type: 'tradeManagementContractManage/setEntryTabKey',
+      payload: this.props.name,
+    });
     router.push({
       pathname: '/trade-management/book-edit',
       query: {

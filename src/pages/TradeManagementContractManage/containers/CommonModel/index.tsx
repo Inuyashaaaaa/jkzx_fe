@@ -1,6 +1,6 @@
+import { Form2, Loading, Select, Table2 } from '@/components';
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Loading, Select, Table2 } from '@/components';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
@@ -11,17 +11,15 @@ import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { DatePicker, Divider, Table, Pagination, Row } from 'antd';
+import { DatePicker, Divider, Pagination, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
+import { connect } from 'dva';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
-import { BOOKING_TABLE_COLUMN_DEFS } from '../constants';
-import styles from '../index.less';
-import { connect } from 'dva';
-import { withRouter } from 'react-router';
+import { BOOKING_TABLE_COLUMN_DEFS } from '../../constants';
 
-class CommonModel extends PureComponent<{ status: any }> {
+class CommonModel extends PureComponent<any> {
   public $table2: Table2 = null;
 
   public status: any;
@@ -35,13 +33,18 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public componentDidMount = () => {
-    this.status = this.props.status;
-    const { location } = this.props;
-    if (location && location.pathname === '/trade-management/book-edit') {
-      this.onTradeTableSearch();
-    } else {
-      this.onTradeTableSearch({ current: 1, pageSize: 10 });
+    const { preLocation } = this.props;
+    if (
+      preLocation &&
+      preLocation.pathname === '/trade-management/book-edit' &&
+      this.props.entryTabKey === this.props.name
+    ) {
+      return this.props.dispatch({
+        type: 'tradeManagementContractManage/setEntryTabKey',
+        payload: null,
+      });
     }
+    this.onTradeTableSearch({ current: 1, pageSize: 10 });
   };
 
   public onSearch = ({ domEvent }) => {
@@ -80,7 +83,7 @@ class CommonModel extends PureComponent<{ status: any }> {
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
       ...formatValues,
-      ...(this.status ? { status: this.status } : null),
+      status: this.props.status,
     });
     this.setState({ loading: false });
 
@@ -113,7 +116,7 @@ class CommonModel extends PureComponent<{ status: any }> {
     );
     const { dispatch, name } = this.props;
     dispatch({
-      type: 'trade/save',
+      type: 'tradeManagementContractManage/save',
       payload: {
         activeTabKey: name,
         tableDataSource,
@@ -122,16 +125,8 @@ class CommonModel extends PureComponent<{ status: any }> {
           ...paramsPagination,
           total: data.totalCount,
         },
+        pageSizeCurrent: (paramsPagination || pagination).pageSize,
       },
-    });
-
-    this.setState({
-      pagination: {
-        ...pagination,
-        ...paramsPagination,
-        total: data.totalCount,
-      },
-      pageSizeCurrent: (paramsPagination || pagination).pageSize,
     });
   };
 
@@ -170,7 +165,7 @@ class CommonModel extends PureComponent<{ status: any }> {
 
   public render() {
     const { activeTabKey } = this.props;
-    const { tableDataSource, pagination } = this.props[activeTabKey];
+    const { tableDataSource, pagination, pageSizeCurrent } = this.props[activeTabKey];
     return (
       <>
         <Form2
@@ -438,7 +433,7 @@ class CommonModel extends PureComponent<{ status: any }> {
               rowKey={'positionId'}
               scroll={{ x: 2500 }}
               dataSource={tableDataSource}
-              columns={BOOKING_TABLE_COLUMN_DEFS(this.search)}
+              columns={BOOKING_TABLE_COLUMN_DEFS(this.search, this.props.name)}
               onRow={record => {
                 return record.style ? { style: record.style } : null;
               }}
@@ -451,7 +446,7 @@ class CommonModel extends PureComponent<{ status: any }> {
                   onShowSizeChange: this.onShowSizeChange,
                   showQuickJumper: true,
                   current: pagination.current,
-                  pageSize: this.state.pageSizeCurrent,
+                  pageSize: pageSizeCurrent,
                   onChange: this.onChange,
                   total: pagination.total,
                 }}
@@ -464,16 +459,13 @@ class CommonModel extends PureComponent<{ status: any }> {
   }
 }
 
-export default connect(({ trade, preRouting, tradeManagementContractManage }) => ({
-  // tableDataSource: trade.tableDataSource,
-  // pagination: trade.pagination,
-  // bookEdit: trade.bookEdit,
-  contractManagement: trade.contractManagement,
-  open: trade.open,
-  unwind: trade.unwind,
-  expiration: trade.expiration,
-  overlate: trade.overlate,
-  // activeTabKey: trade.activeTabKey,
-  location: preRouting.location,
+export default connect(({ preRouting, tradeManagementContractManage }) => ({
+  contractManagement: tradeManagementContractManage.contractManagement,
+  open: tradeManagementContractManage.open,
+  unwind: tradeManagementContractManage.unwind,
+  expiration: tradeManagementContractManage.expiration,
+  overlate: tradeManagementContractManage.overlate,
+  preLocation: preRouting.location,
   activeTabKey: tradeManagementContractManage.activeTabKey,
+  entryTabKey: tradeManagementContractManage.entryTabKey,
 }))(CommonModel);

@@ -4,6 +4,7 @@ import { delay, mockData } from '@/utils';
 import React, { PureComponent } from 'react';
 import History from './History';
 import Processed from './Processed';
+import TabHeader from '@/containers/TabHeader';
 
 class ClientManagementIoglodManagement extends PureComponent {
   public state = {
@@ -56,18 +57,22 @@ class ClientManagementIoglodManagement extends PureComponent {
     return (
       <Page
         title="台账管理"
-        tabList={[
-          {
-            key: 'processed',
-            tab: '待处理台账',
-          },
-          {
-            key: 'history',
-            tab: '历史台账',
-          },
-        ]}
-        tabActiveKey={this.state.activeTabKey}
-        onTabChange={this.onHeaderTabChange}
+        footer={
+          <TabHeader
+            activeKey={this.state.activeTabKey}
+            onChange={this.onHeaderTabChange}
+            tabList={[
+              {
+                key: 'processed',
+                tab: '待处理台账',
+              },
+              {
+                key: 'history',
+                tab: '历史台账',
+              },
+            ]}
+          />
+        }
       >
         {this.state.activeTabKey === 'processed' && <Processed />}
         {this.state.activeTabKey === 'history' && <History />}
