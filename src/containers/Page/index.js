@@ -26,6 +26,7 @@ const Page = ({
   tabList,
   tabActiveKey,
   onTabChange,
+  headerContent,
 }) => {
   const itemRender = (route, params, routes) => {
     const last = routes.indexOf(route) === routes.length - 1;
@@ -52,7 +53,7 @@ const Page = ({
           });
           return (
             <PageHeader
-              title={title || _.get(_.last(breadcrumbRoutes), 'breadcrumbName')}
+              title={title == null ? _.get(_.last(breadcrumbRoutes), 'breadcrumbName') : title}
               subTitle={subTitle}
               backIcon={backIcon}
               tags={tags}
@@ -69,7 +70,9 @@ const Page = ({
                 ))
               }
               onBack={onBack}
-            />
+            >
+              {headerContent}
+            </PageHeader>
           );
         }}
       </MenuContext.Consumer>

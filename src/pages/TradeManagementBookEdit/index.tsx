@@ -19,7 +19,7 @@ import { connect } from 'dva';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
-import './index.less';
+import styles from './index.less';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
@@ -175,14 +175,14 @@ const TradeManagementBooking = props => {
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
-    <Page back={true}>
+    <Page back={true} title={'交易详情'}>
       {tableLoading ? (
         <Skeleton active={true} paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
           <Divider />
-          <div style={{ padding: 30 }}>
+          <div className={styles.bookingBaseInfoFormWrapper}>
             <BookingBaseInfoForm
               hideRequiredMark={true}
               columnNumberOneRow={2}
@@ -191,8 +191,8 @@ const TradeManagementBooking = props => {
               setCreateFormData={setCreateFormData}
             />
           </div>
-          <Typography.Title style={{ marginTop: 20 }} level={4}>
-            交易结构信息
+          <Typography.Title style={{ marginTop: 40 }} level={4}>
+            结构信息
           </Typography.Title>
           <Divider />
           <MultiLegTable
