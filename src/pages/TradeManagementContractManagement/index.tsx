@@ -1,5 +1,5 @@
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import SourceTable from '@/components/SourceTable';
+import Page from '@/containers/Page';
 import { trdExpiringTradeList } from '@/services/general-service';
 import { connect } from 'dva';
 import produce from 'immer';
@@ -94,7 +94,7 @@ class TradeManagementContractManagement extends PureComponent {
   public render() {
     const activeTabKey = this.props.tradeManagementContractManagement.activeTabKey;
     return (
-      <PageHeaderWrapper
+      <Page
         title="合约管理"
         tabList={[
           { key: 'contractManagement', tab: '合约管理' },
@@ -111,7 +111,7 @@ class TradeManagementContractManagement extends PureComponent {
         {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" />}
         {activeTabKey === 'expiration' && <CommonModel status="EXPIRATION_TODAY" />}
         {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" />}
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

@@ -1,7 +1,7 @@
-import CascaderSourceList from '@/lib/components/_CascaderSourceList';
-import { PureStateComponent } from '@/lib/components/_Components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions } from '@/lib/utils';
+import CascaderSourceList from '@/components/_CascaderSourceList';
+import { PureStateComponent } from '@/components/Components';
+import Page from '@/containers/Page';
+import { arr2treeOptions } from '@/utils';
 import {
   createCompany,
   createSaler,
@@ -204,7 +204,7 @@ class CustomSalesManage extends PureStateComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper back={true}>
+      <Page back={true}>
         <Row gutter={16}>
           <Col span={24}>
             <CascaderSourceList
@@ -338,7 +338,7 @@ class CustomSalesManage extends PureStateComponent {
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

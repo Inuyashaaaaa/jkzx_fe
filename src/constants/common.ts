@@ -1,4 +1,4 @@
-import { AllInputProps } from '@/lib/components/_Form2/Input';
+import { AllInputProps } from '@/components/_Form2/Input';
 import { convertOptions } from '@/utils';
 import { COMPUTED_LEG_FIELD_MAP, TRADESCOLDEFS_LEG_FIELD_MAP } from './global';
 

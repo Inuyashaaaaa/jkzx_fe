@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Popconfirm, Divider, Modal, message } from 'antd';
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/components';
 import { editFormControls } from './services';
 import { mktInstrumentCreate, mktInstrumentDelete } from '@/services/market-data-service';
 import _ from 'lodash';

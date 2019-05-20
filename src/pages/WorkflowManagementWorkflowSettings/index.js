@@ -1,8 +1,8 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { PureStateComponent } from '@/lib/components/_Components';
-import StandardForm from '@/lib/components/_StandardForm';
-import StandardTable from '@/lib/components/_StandardTable';
-import { delay } from '@/lib/utils';
+import Page from '@/containers/Page';
+import { PureStateComponent } from '@/components/Components';
+import StandardForm from '@/components/_StandardForm';
+import StandardTable from '@/components/_StandardTable';
+import { delay } from '@/utils';
 import { Modal, Tabs } from 'antd';
 import lodash from 'lodash';
 import Mock from 'mockjs';
@@ -103,7 +103,7 @@ class Component extends PureStateComponent {
     };
 
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Tabs animated={false} defaultActiveKey="1">
           <TabPane tab="录入核对管理" key="1">
             <StandardTable {...inputTableProps} />
@@ -189,7 +189,7 @@ class Component extends PureStateComponent {
             }}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

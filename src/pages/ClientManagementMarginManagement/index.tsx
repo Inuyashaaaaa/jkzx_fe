@@ -1,7 +1,7 @@
-import SourceTable from '@/design/components/SourceTable';
-import ImportExcelButton from '@/lib/components/_ImportExcelButton';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay, mockData } from '@/lib/utils';
+import SourceTable from '@/components/SourceTable';
+import ImportExcelButton from '@/components/_ImportExcelButton';
+import Page from '@/containers/Page';
+import { delay, mockData } from '@/utils';
 import { message, Modal, Button, Icon, Divider, Table, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid';
@@ -12,7 +12,7 @@ import {
   TABLE_COLUMNS,
 } from './constants';
 import { docBctTemplateList, downloadUrl } from '@/services/onBoardTransaction';
-import { Form2, Select } from '@/design/components';
+import { Form2, Select } from '@/components';
 import FormItem from 'antd/lib/form/FormItem';
 import {
   refMasterAgreementSearch,
@@ -115,7 +115,7 @@ class ClientManagementMarginManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
           ref={node => (this.$sourceTable = node)}
           layout="inline"
@@ -297,7 +297,7 @@ class ClientManagementMarginManagement extends PureComponent {
             <a onClick={this.downloadFormModal}>批量更新维持保证金.xlsx</a>
           </p>
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

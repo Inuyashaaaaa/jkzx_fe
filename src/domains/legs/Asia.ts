@@ -24,12 +24,8 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/components';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -228,6 +224,7 @@ export const Asia: ILeg = {
       LEG_FIELD.OBSERVE_START_DAY,
       LEG_FIELD.OBSERVE_END_DAY,
       LEG_FIELD.OBSERVATION_DATES,
+      LEG_FIELD.UNIT,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
         : [

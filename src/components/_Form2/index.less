@@ -1,0 +1,22 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/utils/utils.less';
+@import '../style/themes.less';
+
+@form-plus-prefix-cls: ~'@{tongyu-prefix}-form-plus';
+
+:global {
+  .@{form-plus-prefix-cls} {
+    width: 100%;
+
+    &-interval {
+      margin-bottom: 24px;
+    }
+
+    .ant-form-item {
+      width: 100%;
+      &.ant-form-item-with-help {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

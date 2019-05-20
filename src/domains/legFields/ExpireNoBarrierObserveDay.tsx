@@ -10,13 +10,13 @@ import {
   RULES_REQUIRED,
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
-import { Form2 } from '@/design/components';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import { IColumnDef } from '@/design/components/Table/types';
-import { InputBase } from '@/design/components/type';
-import { remove } from '@/design/utils';
+import { Form2 } from '@/components';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import { IColumnDef } from '@/components/Table/types';
+import { InputBase } from '@/components/type';
+import { remove, getMoment } from '@/utils';
 import { qlDateScheduleCreate } from '@/services/quant-service';
 import {
   getLegEnvs,
@@ -27,7 +27,6 @@ import {
   getRequiredRule,
 } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { getMoment } from '@/utils';
 import { Button, Col, message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';

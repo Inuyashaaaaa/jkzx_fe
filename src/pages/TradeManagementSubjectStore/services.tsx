@@ -1,4 +1,4 @@
-import { DatePicker, Input, InputNumber, Select } from '@/design/components';
+import { DatePicker, Input, InputNumber, Select } from '@/components';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

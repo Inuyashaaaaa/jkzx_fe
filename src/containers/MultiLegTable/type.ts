@@ -1,4 +1,4 @@
-import { Table2 } from '@/design/components';
+import { Table2 } from '@/components';
 
 export interface IMultiLegTableEl {
   table: Table2;

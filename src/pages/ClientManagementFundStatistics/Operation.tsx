@@ -1,9 +1,6 @@
-import { Form2, InputNumber, Upload } from '@/design/components';
-import {
-  clientUpdateCredit,
-  wkAttachmentProcessInstanceBind,
-} from '@/services/reference-data-service';
-import { Button, message, Modal, Affix, Alert, Icon } from 'antd';
+import { Form2, InputNumber } from '@/components';
+import { clientUpdateCredit } from '@/services/reference-data-service';
+import { Button, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';

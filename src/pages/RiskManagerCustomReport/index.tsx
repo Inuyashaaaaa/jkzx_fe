@@ -2,8 +2,8 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
-import { Form2, Select } from '@/design/components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select } from '@/components';
+import Page from '@/containers/Page';
 import { socketHOC } from '@/tools/socketHOC';
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
@@ -115,7 +115,7 @@ const RiskManagerCustomReport = memo<any>(props => {
   );
 
   return (
-    <PageHeaderWrapper>
+    <Page>
       <Form2
         ref={node => (form.current = node)}
         dataSource={searchFormData}
@@ -198,7 +198,7 @@ const RiskManagerCustomReport = memo<any>(props => {
           scroll={{ x: 1350 }}
         />
       </ConfigProvider>
-    </PageHeaderWrapper>
+    </Page>
   );
 });
 

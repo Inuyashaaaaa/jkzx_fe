@@ -1,7 +1,7 @@
-import ImportExcelButton from '@/lib/components/_ImportExcelButton';
-import SourceTable, { SourceTableState } from '@/lib/components/_SourceTable';
-import Table from '@/lib/components/_Table2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import ImportExcelButton from '@/components/_ImportExcelButton';
+import SourceTable, { SourceTableState } from '@/components/_SourceTable';
+import Table from '@/components/_Table2';
+import Page from '@/containers/Page';
 import {
   mktAllInstrumentWhitelistSave,
   mktInstrumentWhitelistDelete,
@@ -144,7 +144,7 @@ class SystemSettingsRiskSettings extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Tabs defaultActiveKey="1">
           <TabPane tab="白名单" key="1">
             <SourceTable
@@ -204,7 +204,7 @@ class SystemSettingsRiskSettings extends PureComponent {
             editable={false}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

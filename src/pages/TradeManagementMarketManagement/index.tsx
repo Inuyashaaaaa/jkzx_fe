@@ -1,14 +1,13 @@
-import { Form2, Select } from '@/design/components';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select } from '@/components';
+import SourceTable from '@/components/_SourceTable';
+import Page from '@/containers/Page';
 import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
-import { Button, Divider, Row, Table } from 'antd';
+import { Button, Divider, Row, Table, Tooltip, Icon } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
-import { columns, searchFormControls, TABLE_COLUMN_DEFS } from './constants';
+import { columns } from './constants';
 class TradeManagementMarketManagement extends PureComponent {
   public $sourceTable: SourceTable = null;
 
@@ -42,10 +41,6 @@ class TradeManagementMarketManagement extends PureComponent {
     );
   };
 
-  public componentWillMount = () => {
-    this.fetchTable(true);
-  };
-
   public componentDidMount = () => {
     this.clean = setInterval(() => {
       this.setState({
@@ -53,6 +48,8 @@ class TradeManagementMarketManagement extends PureComponent {
       });
       this.fetchTable(false);
     }, 1000 * 30);
+
+    this.fetchTable(true);
   };
 
   public componentWillUnmount = () => {
@@ -125,7 +122,7 @@ class TradeManagementMarketManagement extends PureComponent {
   public render() {
     console.log(this.state.tableDataSource);
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
           ref={node => (this.$sourceTable = node)}
           layout="inline"
@@ -146,7 +143,9 @@ class TradeManagementMarketManagement extends PureComponent {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
-                        style={{ minWidth: 180 }}
+                        fetchOptionsOnSearch={true}
+                        editing={editing}
+                        style={{ minWidth: 180, maxWidth: 400 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -156,7 +155,7 @@ class TradeManagementMarketManagement extends PureComponent {
                             instrumentIdPart: value,
                           });
                           if (error) return [];
-                          return data.map(item => ({
+                          return data.slice(0, 50).map(item => ({
                             label: item,
                             value: item,
                           }));
@@ -170,13 +169,16 @@ class TradeManagementMarketManagement extends PureComponent {
           ]}
         />
         <Divider type="horizontal" />
-        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
+        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between" align="bottom">
           <Button type="primary" onClick={this.handleSubjectBtnClick}>
             标的物管理
           </Button>
-          <Button type="primary" onClick={this.onSearchFormChange}>
-            {`刷新 ${this.state.lastUpdateTime}`}
-          </Button>
+          <span>
+            {`最近刷新时间 ${this.state.lastUpdateTime}`}
+            <Tooltip title="每隔30秒自动刷新行情" placement="topRight" arrowPointAtCenter={true}>
+              <Icon style={{ marginLeft: 4 }} type="info-circle" theme="twoTone" />
+            </Tooltip>
+          </span>
         </Row>
         <Table
           dataSource={this.state.tableDataSource}
@@ -189,11 +191,11 @@ class TradeManagementMarketManagement extends PureComponent {
             onChange: this.paginationChange,
           }}
           loading={this.state.loading}
-          rowKey={(data, index) => index}
+          rowKey={'instrumentId'}
           size="middle"
           scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
         />
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

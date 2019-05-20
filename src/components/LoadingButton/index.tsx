@@ -1,4 +1,4 @@
-import StationalComponent from '@/design/components/StationalComponent';
+import StationalComponent from '@/components/StationalComponent';
 import Button, { ButtonProps } from 'antd/lib/button';
 import React from 'react';
 

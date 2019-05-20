@@ -1,11 +1,23 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/utils/request';
 // 查询所有交易日历列表
-export async function queryVolatilityCalendars(params = {}) {
+export async function queryVolatilityCalendars(token) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,
     body: {
       method: 'refTradingCalendarsList',
+      params: {},
+    },
+    token,
+  });
+}
+
+// 查询到期日是否是交易日
+export async function qlIsHoliday(params = {}) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'qlIsHoliday',
       params,
     },
   });

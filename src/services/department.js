@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/utils/request';
 
 // 获取部门列表
 export async function queryAuthDepartmentList(params = {}) {

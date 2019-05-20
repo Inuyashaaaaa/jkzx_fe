@@ -5,7 +5,7 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/components';
 
 export const DownBarrierOptionsStrike: ILegColDef = {
   title: '敲入期权行权价',

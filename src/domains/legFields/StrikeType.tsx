@@ -5,8 +5,8 @@ import {
   RULES_REQUIRED,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
-import { Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
+import { Select } from '@/components';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';

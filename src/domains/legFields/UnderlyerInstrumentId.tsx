@@ -1,5 +1,5 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
-import { Input, Select } from '@/design/components';
+import { Input, Select } from '@/components';
 import {
   mktInstrumentSearch,
   mktInstrumentWhitelistListPaged,

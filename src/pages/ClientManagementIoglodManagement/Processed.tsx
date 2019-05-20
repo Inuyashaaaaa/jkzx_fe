@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/design/components/SourceTable';
+import SourceTable from '@/components/SourceTable';
 import { cliTradeTaskSearch } from '@/services/reference-data-service';
 import { sortByCreateAt } from '@/services/sort';
 import React, { PureComponent } from 'react';

@@ -1,11 +1,11 @@
 import React from 'react';
 import ResourceManage from './ResourceManage';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 
 export default function Resource() {
   return (
-    <PageHeaderWrapper>
+    <Page>
       <ResourceManage />
-    </PageHeaderWrapper>
+    </Page>
   );
 }

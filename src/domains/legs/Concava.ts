@@ -19,12 +19,8 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/components';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -176,7 +172,7 @@ export const Concava: ILeg = {
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [];
+    const COMPUTED_FIELDS = [LEG_FIELD.UNIT];
 
     nextPosition.productType = LEG_TYPE_MAP.CONCAVA;
     nextPosition.lcmEventType = 'OPEN';

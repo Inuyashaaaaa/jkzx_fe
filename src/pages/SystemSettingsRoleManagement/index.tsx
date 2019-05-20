@@ -1,7 +1,7 @@
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Form from '@/components/Form';
+import ModalButton from '@/components/ModalButton';
+import SourceTable from '@/components/SourceTable';
+import Page from '@/containers/Page';
 import { authRolesList, createRole, queryAllPagePermissions, updateRole } from '@/services/role';
 import { Button, message, Row } from 'antd';
 import React, { PureComponent } from 'react';
@@ -192,7 +192,7 @@ class SystemSettingsRoleManagement extends PureComponent {
   public render() {
     return (
       <>
-        <PageHeaderWrapper>
+        <Page>
           {!this.state.displayResources && (
             <SourceTable
               ref={node => (this.$sourceTable = node)}
@@ -261,7 +261,7 @@ class SystemSettingsRoleManagement extends PureComponent {
               <ResourceManagement info={{ type: 'role', detail: this.state.choosedRole }} />
             </div>
           )}
-        </PageHeaderWrapper>
+        </Page>
       </>
     );
   }

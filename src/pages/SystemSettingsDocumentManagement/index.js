@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import { Button, Modal, Table, Tabs, Popconfirm } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
@@ -266,7 +266,7 @@ class ClientManagementDocument extends PureComponent {
     const tradeColumns = this.generateTableColumns('trade');
     const customerColumns = this.generateTableColumns('customer');
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Tabs defaultActiveKey="1" onChange={this.changeTab}>
           <TabPane tab="交易模板" key="1">
             <Table
@@ -330,7 +330,7 @@ class ClientManagementDocument extends PureComponent {
             />
           )}
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

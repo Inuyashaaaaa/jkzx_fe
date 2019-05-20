@@ -20,12 +20,8 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/components';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -201,6 +197,7 @@ export const AutoCallSnow: ILeg = {
       LEG_FIELD.UP_BARRIER_TYPE,
       ExpireNoBarrierObserveDay.dataIndex,
       LEG_FIELD.IS_ANNUAL,
+      LEG_FIELD.UNIT,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;

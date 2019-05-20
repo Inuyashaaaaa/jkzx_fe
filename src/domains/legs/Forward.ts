@@ -25,12 +25,8 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/components';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -160,6 +156,7 @@ export const Forward: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.FORWARD;

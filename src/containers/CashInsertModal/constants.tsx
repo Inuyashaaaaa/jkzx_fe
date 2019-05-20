@@ -1,5 +1,5 @@
 import { ACCOUNT_EVENT_TYPE_OPTIONS, RULES_REQUIRED } from '@/constants/common';
-import { Input, InputNumber, Select } from '@/design/components';
+import { Input, InputNumber, Select } from '@/components';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 

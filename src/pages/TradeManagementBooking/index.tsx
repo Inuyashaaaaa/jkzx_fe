@@ -1,3 +1,5 @@
+import { Form2, ModalButton, Upload } from '@/components';
+import { IFormField } from '@/components/type';
 import { LEG_FIELD, LEG_ID_FIELD, LEG_INJECT_FIELDS, PREMIUM_TYPE_MAP } from '@/constants/common';
 import { COMPUTED_LEG_FIELD_MAP, FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
@@ -7,11 +9,7 @@ import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, ModalButton, Upload } from '@/design/components';
-import { IFormField } from '@/design/components/type';
-import { insert, remove, uuid } from '@/design/utils';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { getToken } from '@/lib/utils/authority';
+import Page from '@/containers/Page';
 import {
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
@@ -21,13 +19,14 @@ import {
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
 import { getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
+import { insert, remove, uuid } from '@/utils';
+import { getToken } from '@/utils/authority';
 import { Affix, Alert, Button, Divider, Menu, message, Modal, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
-import './index.less';
-import ImportExcelButton from '@/lib/components/_ImportExcelButton';
 import router from 'umi/router';
+import './index.less';
 
 const ActionBar = memo<any>(props => {
   const { setTableData, tableData, tableEl, currentUser } = props;
@@ -258,7 +257,7 @@ const TradeManagementBooking = props => {
 
   const tableEl = useRef<IMultiLegTableEl>(null);
   return (
-    <PageHeaderWrapper>
+    <Page>
       <ActionBar
         setTableData={setTableData}
         tableData={tableData}
@@ -340,7 +339,7 @@ const TradeManagementBooking = props => {
           );
         }}
       />
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 
