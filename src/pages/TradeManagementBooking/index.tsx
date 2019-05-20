@@ -348,5 +348,6 @@ export default memo(
   connect(state => ({
     currentUser: (state.user as any).currentUser,
     pricingData: state.pricingData,
+    tarde: state.tarde,
   }))(TradeManagementBooking)
 );

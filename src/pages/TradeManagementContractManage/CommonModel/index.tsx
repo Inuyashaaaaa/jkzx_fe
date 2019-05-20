@@ -18,6 +18,8 @@ import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import { BOOKING_TABLE_COLUMN_DEFS } from '../constants';
 import styles from '../index.less';
+import { connect } from 'dva';
+import { withRouter } from 'react-router';
 
 class CommonModel extends PureComponent<{ status: any }> {
   public $table2: Table2 = null;
@@ -28,19 +30,18 @@ class CommonModel extends PureComponent<{ status: any }> {
     loading: false,
     searchFormData: {},
     bookIdList: [],
-    pagination: {
-      current: 1,
-      pageSize: 10,
-      total: 0,
-    },
     pageSizeCurrent: 0,
     bookList: [],
-    tableDataSource: [],
   };
 
   public componentDidMount = () => {
     this.status = this.props.status;
-    this.onTradeTableSearch();
+    const { location } = this.props;
+    if (location && location.pathname === '/trade-management/book-edit') {
+      this.onTradeTableSearch();
+    } else {
+      this.onTradeTableSearch({ current: 1, pageSize: 10 });
+    }
   };
 
   public onSearch = ({ domEvent }) => {
@@ -62,7 +63,8 @@ class CommonModel extends PureComponent<{ status: any }> {
     this.setState({
       loading: true,
     });
-    const { searchFormData, pagination } = this.state;
+    const { searchFormData } = this.state;
+    const { pagination } = this.props;
     const newFormData = this.getFormData();
     const formatValues = _.mapValues(newFormData, (val, key) => {
       if (isMoment(val)) {
@@ -72,6 +74,7 @@ class CommonModel extends PureComponent<{ status: any }> {
     });
 
     this.setState({ loading: true });
+
     const { error, data } = await trdTradeSearchIndexPaged({
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
@@ -107,8 +110,21 @@ class CommonModel extends PureComponent<{ status: any }> {
       },
       []
     );
+
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'trade/save',
+      payload: {
+        tableDataSource,
+        pagination: {
+          ...pagination,
+          ...paramsPagination,
+          total: data.totalCount,
+        },
+      },
+    });
+
     this.setState({
-      tableDataSource,
       pagination: {
         ...pagination,
         ...paramsPagination,
@@ -152,8 +168,7 @@ class CommonModel extends PureComponent<{ status: any }> {
   };
 
   public render() {
-    const { tableDataSource } = this.state;
-    // tableDataSource = _.reverse(_.sortBy(tableDataSource, 'createdAt'));
+    const { tableDataSource, pagination } = this.props;
     return (
       <>
         <Form2
@@ -433,10 +448,10 @@ class CommonModel extends PureComponent<{ status: any }> {
                   showSizeChanger: true,
                   onShowSizeChange: this.onShowSizeChange,
                   showQuickJumper: true,
-                  current: this.state.pagination.current,
+                  current: pagination.current,
                   pageSize: this.state.pageSizeCurrent,
                   onChange: this.onChange,
-                  total: this.state.pagination.total,
+                  total: pagination.total,
                 }}
               />
             </Row>
@@ -447,4 +462,11 @@ class CommonModel extends PureComponent<{ status: any }> {
   }
 }
 
-export default CommonModel;
+export default withRouter(
+  connect(({ trade, preRouting }) => ({
+    tableDataSource: trade.tableDataSource,
+    pagination: trade.pagination,
+    bookEdit: trade.bookEdit,
+    location: preRouting.location,
+  }))(CommonModel)
+);
