@@ -3,11 +3,16 @@ import {
   ITableColDef,
   ITableData,
   ITableTriggerCellFieldsChangeParams,
+  ITableTriggerCellEditingChangedParams,
+  ITableTriggerCellValueChangeParams,
 } from '@/components/type';
 
 export interface ILegColDef extends ITableColDef {
   linkage?: boolean;
   exsitable?: (record: any) => boolean;
+  onCellEditingChanged?: (params: ITableTriggerCellEditingChangedParams) => void;
+  onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
+  onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
 }
 
 export interface ILeg {

@@ -175,6 +175,7 @@ export const Eagle: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.EAGLE;
