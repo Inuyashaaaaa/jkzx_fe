@@ -70,7 +70,7 @@ const ActionBar = memo<any>(props => {
 
     // 发起审批
     const { error: _error, data: _data } = await wkProcessInstanceCreate({
-      processName: '交易录入经办复合流程',
+      processName: '交易录入',
       processData: {
         trade,
         validTime: '2018-01-01T10:10:10',
@@ -147,7 +147,7 @@ const ActionBar = memo<any>(props => {
                 const res = await currentCreateFormRef.validate();
                 if (res.error) return;
                 const { error: _error, data: _data } = await wkProcessGet({
-                  processName: '交易录入经办复合流程',
+                  processName: '交易录入',
                 });
                 if (_error) return;
                 if (_data.status) {
