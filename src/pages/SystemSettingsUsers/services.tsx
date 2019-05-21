@@ -19,7 +19,12 @@ export const createPageTableColDefs: ITableColDef[] = (roleOptions, getRowAction
   {
     title: '拥有角色（可编辑）',
     dataIndex: 'roles',
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
     render: (value, record, index, { form, editing }) => {
+      console.log(value, editing);
       return (
         <FormItem>
           {form.getFieldDecorator({})(

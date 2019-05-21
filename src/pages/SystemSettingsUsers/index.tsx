@@ -23,7 +23,7 @@ import FormBuilder from '../SystemSettingDepartment/components/CommonForm';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
 import PasswordModify from './PasswordModify';
 import { createPageTableColDefs } from './services';
-import { Table2 } from '@/components';
+import { Table2, Form2 } from '@/components';
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -94,34 +94,36 @@ class SystemSettingsUsers extends PureComponent {
       const department = findDepartment(departments, user.departmentId);
       user.departmentName = department.departmentName || '';
       user.userTypeName = user.userType === 'SCRIPT' ? '脚本用户' : '普通用户';
-      user.roles = user.roleName.map(role => {
-        const hint = roles.find(item => item.roleName === role);
-        return hint && hint.roleName;
-      });
+      user.roles = {
+        type: 'field',
+        value: user.roleName.map(role => {
+          const hint = roles.find(item => item.roleName === role);
+          return hint && hint.id;
+        }),
+      };
     });
     this.setState({
       roleOptions: roles.map(item => {
         return {
           value: item.id,
           label: item.roleName,
-          ...item,
         };
       }),
       users: users.sort((a, b) => a.username.localeCompare(b.username)),
     });
   };
 
-  public fetchTable = async () => {
-    const { error, data } = await authUserList();
-    if (error) return false;
-    data.forEach(dataItem => {
-      dataItem.roles.forEach(item => {
-        item.value = item.uuid;
-        item.label = item.roleName;
-      });
-    });
-    return data;
-  };
+  // public fetchTable = async () => {
+  //   const { error, data } = await authUserList();
+  //   if (error) return false;
+  //   data.forEach(dataItem => {
+  //     dataItem.roles.forEach(item => {
+  //       item.value = item.uuid;
+  //       item.label = item.roleName;
+  //     });
+  //   });
+  //   return data;
+  // };
 
   public onRemove = async params => {
     const { id: rowId } = params;
@@ -454,8 +456,19 @@ class SystemSettingsUsers extends PureComponent {
   };
 
   public handleCellValueChanged = async params => {
-    const { changedFields } = params;
-
+    console.log(params);
+    const { changedFields, record } = params;
+    this.setState({
+      users: this.state.users.map(item => {
+        if (item.id === params.rowId) {
+          return {
+            ...item,
+            ...params.changedFields,
+          };
+        }
+        return item;
+      }),
+    });
     // const res = await updateUserRole({
     //   userId: data.id,
     //   roleIds: newValue,
@@ -496,10 +509,6 @@ class SystemSettingsUsers extends PureComponent {
               columns={createPageTableColDefs(this.state.roleOptions, this.getRowActions)}
               size={'middle'}
               scroll={{ x: 1680 }}
-              // onCellValuesChange={params => {
-              //   console.log(params);
-              //   debugger;
-              // }}
               onCellFieldsChange={this.handleCellValueChanged}
             />
           </>
