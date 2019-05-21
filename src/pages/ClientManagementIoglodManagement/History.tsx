@@ -1,10 +1,20 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import SourceTable from '@/components/SourceTable';
-import { clientAccountOpRecordSearch } from '@/services/reference-data-service';
 import { sortByCreateAt } from '@/services/sort';
 import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
-import { HISTORY_COL_DEFS, PROCESSED_FORM_CONTROLS } from './constants';
+import { HISTORY_COL_DEFS, PROCESSED_FORM_CONTROLS, HISTORY_CLOUNMS } from './constants';
+import { Form2, Select } from '@/components';
+import { IOGLOD_EVENT_TYPE_OPTIONS } from '@/constants/common';
+import {
+  refMasterAgreementSearch,
+  refSimilarLegalNameList,
+  cliTradeTaskSearch,
+  clientAccountOpRecordSearch,
+} from '@/services/reference-data-service';
+import FormItem from 'antd/lib/form/FormItem';
+import { trdTradeListBySimilarTradeId } from '@/services/general-service';
+import { Button, Divider, Row, Table } from 'antd';
 
 class History extends PureComponent {
   public state = {
@@ -22,7 +32,7 @@ class History extends PureComponent {
       loading: true,
     });
     const { error, data } = await clientAccountOpRecordSearch({
-      ...this.state.searchFormData,
+      ...Form2.getFieldsValue(this.state.searchFormData),
     });
     this.setState({
       loading: false,
@@ -44,15 +54,148 @@ class History extends PureComponent {
     );
   };
 
-  public onSearchFormChange = params => {
+  public onSearchFormChange = (props, changedFields, allFields) => {
     this.setState({
-      searchFormData: params.values,
+      searchFormData: allFields,
     });
   };
 
   public render() {
     return (
-      <SourceTable
+      <>
+        <Form2
+          layout="inline"
+          dataSource={this.state.searchFormData}
+          submitText={'查询'}
+          submitButtonProps={{
+            icon: 'search',
+          }}
+          onSubmitButtonClick={this.fetchTable}
+          onResetButtonClick={this.onReset}
+          onFieldsChange={this.onSearchFormChange}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await refSimilarLegalNameList({
+                            similarLegalName: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '主协议编号',
+              dataIndex: 'masterAgreementId',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await refMasterAgreementSearch({
+                            masterAgreementId: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '交易ID',
+              dataIndex: 'tradeId',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await trdTradeListBySimilarTradeId({
+                            similarTradeId: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '事件类型',
+              dataIndex: 'event',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        options={IOGLOD_EVENT_TYPE_OPTIONS}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+          ]}
+        />
+        <Divider type="horizontal" />
+        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
+          <CapitalInputModal fetchTable={this.fetchTable} />
+        </Row>
+        <Table
+          dataSource={this.state.dataSource}
+          columns={HISTORY_CLOUNMS(this.fetchTable)}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+          }}
+          loading={this.state.loading}
+          size="middle"
+          rowKey="uuid"
+          scroll={this.state.dataSource ? { x: '3400px' } : { x: false }}
+        />
+        {/* <SourceTable
         rowKey="uuid"
         dataSource={this.state.dataSource}
         loading={this.state.loading}
@@ -66,7 +209,8 @@ class History extends PureComponent {
         onSearchFormChange={this.onSearchFormChange}
         autoSizeColumnsToFit={false}
         header={<CapitalInputModal fetchTable={this.fetchTable} />}
-      />
+      /> */}
+      </>
     );
   }
 }
