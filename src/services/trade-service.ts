@@ -190,3 +190,13 @@ export async function tradeDocSearch(params = {}) {
     },
   });
 }
+
+export async function quotePrcCreate(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'quotePrcCreate',
+      params,
+    },
+  });
+}

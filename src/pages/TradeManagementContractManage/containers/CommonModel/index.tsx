@@ -63,9 +63,6 @@ class CommonModel extends PureComponent<any> {
   };
 
   public onTradeTableSearch = async (paramsPagination?) => {
-    this.setState({
-      loading: true,
-    });
     const { searchFormData } = this.state;
     const { activeTabKey } = this.props;
     const { pagination } = this.props[activeTabKey];
@@ -132,7 +129,10 @@ class CommonModel extends PureComponent<any> {
 
   public onFieldsChange = (props, changedFields, allFields) => {
     this.setState({
-      searchFormData: allFields,
+      searchFormData: {
+        ...searchFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -357,7 +357,7 @@ class CommonModel extends PureComponent<any> {
                             instrumentIdPart: value,
                           });
                           if (error) return [];
-                          return data.map(item => ({
+                          return data.slice(0, 50).map(item => ({
                             label: item,
                             value: item,
                           }));

@@ -1,27 +1,24 @@
+import { Form2 } from '@/components';
+import { IFormField } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
   LEG_FIELD,
   LEG_ID_FIELD,
-  LEG_ENV_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
+  COMPUTED_LEG_FIELD_MAP,
+  TOTAL_FIELD,
   TRADESCOLDEFS_LEG_FIELD_MAP,
   TRADESCOL_FIELDS,
-  TOTAL_FIELD,
-  COMPUTED_LEG_FIELD_MAP,
 } from '@/constants/global';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
-import { BOOKING_FROM_PRICING, PRICING_FROM_EDITING } from '@/constants/trade';
-import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
+import { PRICING_FROM_EDITING } from '@/constants/trade';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, Loading } from '@/components';
-import { IFormField } from '@/components/type';
-import { insert, remove, uuid, getMoment } from '@/utils';
 import Page from '@/containers/Page';
 import {
   countDelta,
@@ -40,118 +37,17 @@ import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
 import { getLegByRecord } from '@/tools';
-import { ILeg } from '@/types/leg';
-import {
-  Affix,
-  Button,
-  Col,
-  Divider,
-  Input,
-  Menu,
-  message,
-  notification,
-  Row,
-  Select,
-  Icon,
-} from 'antd';
+import { getMoment, insert, remove, uuid } from '@/utils';
+import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useRef, useState, useEffect } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import router from 'umi/router';
+import ActionBar from './ActionBar';
 import './index.less';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
-
-const ActionBar = memo<any>(props => {
-  const {
-    setTableData,
-    curPricingEnv,
-    setCurPricingEnv,
-    tableData,
-    pricingEnvironmentsList,
-    fetchDefaultPricingEnvData,
-    testPricing,
-    pricingLoading,
-  } = props;
-
-  const onPricingEnvSelectChange = val => {
-    setCurPricingEnv(val);
-    tableData.forEach(item => fetchDefaultPricingEnvData(item, true));
-  };
-
-  const [affix, setAffix] = useState(false);
-
-  return (
-    <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
-      <Row
-        type="flex"
-        justify="space-between"
-        style={{
-          background: '#fff',
-          borderBottom: affix ? '1px solid #ddd' : 'none',
-          padding: affix ? '20px 0' : 0,
-        }}
-      >
-        <Row type="flex" align="middle">
-          <Col>
-            <MultilLegCreateButton
-              isPricing={true}
-              key="create"
-              handleAddLeg={(leg: ILeg) => {
-                if (!leg) return;
-
-                setTableData(pre =>
-                  pre.concat({
-                    ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-                    ...leg.getDefaultData(LEG_ENV.PRICING),
-                  })
-                );
-              }}
-            />
-          </Col>
-          <Col style={{ marginLeft: 15 }}>定价环境:</Col>
-          <Col style={{ marginLeft: 10, width: 400 }}>
-            <Input.Group compact={true}>
-              <Select
-                loading={curPricingEnv === null}
-                onChange={onPricingEnvSelectChange}
-                value={curPricingEnv}
-                style={{ width: 200 }}
-              >
-                {pricingEnvironmentsList.map(item => {
-                  return (
-                    <Select.Option key={item} value={item}>
-                      {item}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-              <Button loading={pricingLoading} key="试定价" type="primary" onClick={testPricing}>
-                试定价
-              </Button>
-            </Input.Group>
-          </Col>
-        </Row>
-        <Button
-          key="转换簿记"
-          type="primary"
-          onClick={() => {
-            router.push({
-              pathname: '/trade-management/booking',
-              query: {
-                from: BOOKING_FROM_PRICING,
-              },
-            });
-          }}
-        >
-          转换簿记
-        </Button>
-      </Row>
-    </Affix>
-  );
-});
 
 const TradeManagementBooking = props => {
   const tableData = _.map(props.pricingData.tableData, iitem => {
