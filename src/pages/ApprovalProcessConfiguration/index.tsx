@@ -126,8 +126,8 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public tabsChange = async e => {
-    let status = false;
-    let { processList } = this.state;
+    const status = false;
+    const { processList } = this.state;
     this.setState({
       loading: true,
     });
