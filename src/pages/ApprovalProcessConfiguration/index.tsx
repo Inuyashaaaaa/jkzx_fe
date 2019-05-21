@@ -128,38 +128,11 @@ class ApprovalProcessConfiguration extends PureComponent {
   public tabsChange = async e => {
     const status = false;
     const { processList } = this.state;
-    this.setState({
-      loading: true,
-    });
-    const { error, data } = await wkProcessGet({ processName: e });
-
-    if (error) {
-      return this.setState({
-        loading: false,
-        taskApproveGroupList: [],
-      });
-    }
-    const { tasks } = data;
-    let taskData = tasks.map((item, index) => {
-      item.approveGroupList = (item.approveGroups || []).map(item => item.approveGroupId);
-      if (item.taskType === 'modifyData') {
-        item.index = 2;
-      } else if (item.taskType === 'reviewData') {
-        item.index = 1;
-      } else if (item.taskType === 'insertData') {
-        item.index = 0;
-      } else {
-        item.index = 4;
-      }
-      return item;
-    });
-    taskData = _.sortBy(taskData, ['index']);
     this.setState(
       {
         currentProcessName: e,
         status,
         processList,
-        taskApproveGroupList: taskData,
       },
       () => {
         this.fetchData(e);
