@@ -64,7 +64,9 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
     const res = await Promise.all([
-      wkProcessGet({ processName: processList[0].processName }),
+      wkProcessGet({
+        processName: currentProcessName ? currentProcessName : processList[0].processName,
+      }),
       wkApproveGroupList(),
     ]);
     const [process, approveGroupList] = res;
