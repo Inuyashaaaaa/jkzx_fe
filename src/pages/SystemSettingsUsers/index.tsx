@@ -508,7 +508,7 @@ class SystemSettingsUsers extends PureComponent {
               dataSource={users}
               columns={createPageTableColDefs(this.state.roleOptions, this.getRowActions)}
               size={'middle'}
-              scroll={{ x: 1680 }}
+              scroll={{ x: 2000 }}
               onCellFieldsChange={this.handleCellValueChanged}
             />
           </>

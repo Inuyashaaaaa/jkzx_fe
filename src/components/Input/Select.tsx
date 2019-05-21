@@ -1,5 +1,5 @@
 import { uuid } from '@/utils';
-import { Select as AntdSelect } from 'antd';
+import { Select as AntdSelect, Tag } from 'antd';
 import { OptionProps, SelectProps } from 'antd/lib/select';
 import _, { debounce, omit } from 'lodash';
 import React from 'react';
@@ -150,7 +150,7 @@ class Select extends InputBase<
                   : this.props.options.find(item => item.value === val);
               return _.get(findItem, 'label', this.props.value);
             })
-            .join(',')}
+            .map(item => <Tag key={item}>{item}</Tag>)}
       </span>
     );
   }

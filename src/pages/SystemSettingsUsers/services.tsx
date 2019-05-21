@@ -28,7 +28,13 @@ export const createPageTableColDefs: ITableColDef[] = (roleOptions, getRowAction
       return (
         <FormItem>
           {form.getFieldDecorator({})(
-            <Select editing={editing} autoSelect={true} options={roleOptions} mode={'multiple'} />
+            <Select
+              defaultOpen={true}
+              editing={editing}
+              autoSelect={true}
+              options={roleOptions}
+              mode={'multiple'}
+            />
           )}
         </FormItem>
       );
