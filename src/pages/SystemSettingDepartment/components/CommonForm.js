@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { getToken } from '@/lib/utils/authority';
+import { getToken } from '@/utils/authority';
 
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
