@@ -1,5 +1,6 @@
 import { HOST_TEST } from '@/constants/global';
 import request from '@/utils/request';
+import { getToken } from '@/utils/authority';
 
 // 创建审批流程
 export async function createApprovalProcess(params = {}) {
@@ -155,7 +156,7 @@ export async function queryProcessDiagram(params) {
     method: `GET`,
     credentials: 'include',
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('tongyu_TOKEN_LOCAL_FIELD')}`,
+      Authorization: `Bearer ${getToken()}`,
     },
   })
     .then(response => response.blob())
