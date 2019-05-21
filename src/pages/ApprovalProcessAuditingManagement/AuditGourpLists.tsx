@@ -6,7 +6,7 @@ import {
 import { Button, Icon, Input, Modal, notification, Popconfirm } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './AuditGourpLists.less';
-
+import _ from 'lodash';
 class AuditLists extends PureComponent {
   public state = {
     approveGroupList: [],
@@ -164,8 +164,9 @@ class AuditLists extends PureComponent {
         message: `创建成功`,
         description: message,
       });
-      let { approveGroupList } = this.state;
-      approveGroupList = data;
+      let approveGroupList = [];
+      approveGroupList = _.sortBy(data, ['approveGroupName']);
+
       this.setState(
         {
           visible: false,

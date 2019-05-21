@@ -104,9 +104,8 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { data, error } = await wkApproveGroupList();
     if (error) return;
 
-    data.sort((a, b) => {
-      return a.approveGroupName.localeCompare(b.approveGroupName);
-    });
+    let approveGroupList = [];
+    approveGroupList = _.sortBy(data, ['approveGroupName']);
 
     const department = await queryAuthDepartmentList();
     if (department.error) {
@@ -121,7 +120,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     }
 
     this.setState({
-      approveGroupList: data,
+      approveGroupList,
       loading: false,
       department: array,
     });
