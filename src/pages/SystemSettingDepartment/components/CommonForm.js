@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { TOKEN_LOCAL_FIELD } from '@/constants/global';
+import { getToken } from '@/lib/utils/authority';
 
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
@@ -420,7 +420,7 @@ export default class CommonForm extends Component {
               showUploadList={false}
               action={attachData.url}
               headers={{
-                Authorization: `Bearer ${localStorage.getItem(TOKEN_LOCAL_FIELD)}`,
+                Authorization: `Bearer ${getToken()}`,
                 // Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ3YW5nbmFuIiwicm9sZXMiOlsidHJhZGVyIiwiYWRtaW4iXSwiaXNzIjoidG9uZ3l1LnRlY2giLCJleHAiOjE1NTk3MTI5MTc0MTIsImlhdCI6MTU1MTkzNjkxNzQxMiwidXNlcm5hbWUiOiJ3YW5nbmFuIn0.9b1zb6JG_XcaJSVukH2Num0djh5P9cEi3pvhHPYBJeU`,
               }}
               data={attachData.uploadData}

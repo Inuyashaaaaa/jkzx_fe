@@ -188,21 +188,6 @@ export async function unlockUser(params) {
   });
 }
 
-export async function queryUserInfo() {
-  // return request(`${HOST_TEST}auth-service/api/rpc`, {
-  //   method: `POST`,
-  //   body: {
-  //     method: `authCurrentUserGet`,
-  //     params: {},
-  //   },
-  // });
-  return {
-    data: {
-      userName: localStorage.getItem('login_name') || 'visitor',
-    },
-  };
-}
-
 // 获取某个用户页面权限
 export async function queryUserPagesByName(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
