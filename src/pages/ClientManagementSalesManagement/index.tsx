@@ -334,21 +334,27 @@ class ClientManagementSalesManagement extends PureComponent {
     console.log(selectedKeys);
     if (!selectedKeys.length) return;
     const arr = selectedKeys[0].split('/');
+    this.setState({
+      loading: true,
+    });
+    let salesRsp;
     if (arr.length === 3) {
-      this.setState({
-        loading: true,
-      });
-      const { error, data } = await querySalers({
+      salesRsp = await querySalers({
         branchId: arr[2],
       });
-      this.setState({
-        loading: false,
-      });
-      if (error) return;
-      return this.setState({
-        dataSource: data,
+    }
+    if (arr.length === 1) {
+      salesRsp = await querySalers({
+        subsidiaryId: arr[0],
       });
     }
+    this.setState({
+      loading: false,
+    });
+    if (salesRsp.error) return;
+    return this.setState({
+      dataSource: salesRsp.data,
+    });
   };
 
   public handleCancelSub = () => {
