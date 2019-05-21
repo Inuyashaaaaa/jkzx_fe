@@ -113,7 +113,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       return val;
     });
     const { error, data } = await createApprovalProcess({
-      processName: '资金录入经办复合流程',
+      processName: '财务出入金',
       processData: { ...formatValues },
     });
     this.setState({
