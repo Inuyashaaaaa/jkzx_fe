@@ -4,8 +4,9 @@ import React from 'react';
 import { ITableColDef } from '@/components/type';
 import FormItem from 'antd/lib/form/FormItem';
 import { Select } from '@/components';
+import Operation from './Operation';
 
-export const createPageTableColDefs: ITableColDef[] = (roleOptions, getRowActions) => [
+export const createPageTableColDefs: ITableColDef[] = (roleOptions, showResources) => [
   {
     title: '用户名',
     dataIndex: 'username',
@@ -33,12 +34,6 @@ export const createPageTableColDefs: ITableColDef[] = (roleOptions, getRowAction
         </FormItem>
       );
     },
-    // input: {
-    //   defaultOpen: true,
-    //   mode: 'multiple',
-    //   type: 'select',
-    //   options: roleOptions,
-    // },
   },
   {
     title: '部门',
@@ -61,7 +56,7 @@ export const createPageTableColDefs: ITableColDef[] = (roleOptions, getRowAction
     fixed: 'right',
     width: 480,
     render: (value, record, index) => {
-      return getRowActions(record);
+      return <Operation record={record} showResources={showResources} />;
     },
   },
 ];

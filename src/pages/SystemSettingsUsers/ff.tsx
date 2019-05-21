@@ -480,7 +480,16 @@ class SystemSettingsUsers extends PureComponent {
   };
 
   public render() {
-    const { displayResources, choosedUser, users, loading } = this.state;
+    const {
+      displayResources,
+      choosedUser,
+      modalVisible,
+      modalOKLoading,
+      modalTitle,
+      formBuilderItems,
+      users,
+      loading,
+    } = this.state;
     return (
       <Page>
         {!displayResources && (
@@ -497,7 +506,7 @@ class SystemSettingsUsers extends PureComponent {
               ref={node => (this.$sourceTable = node)}
               rowKey={this.rowKey}
               dataSource={users}
-              columns={createPageTableColDefs(this.state.roleOptions, this.showResources)}
+              columns={createPageTableColDefs(this.state.roleOptions, this.getRowActions)}
               size={'middle'}
               scroll={{ x: 1680 }}
               onCellFieldsChange={this.handleCellValueChanged}
@@ -529,6 +538,35 @@ class SystemSettingsUsers extends PureComponent {
             <ResourceManagement info={{ type: 'user', detail: choosedUser }} />
           </div>
         )}
+        <Modal
+          title={modalTitle}
+          visible={modalVisible}
+          onCancel={this.hideModal}
+          onOk={this.handleModalOK}
+          width={600}
+          footer={
+            <div>
+              <Button type="primary" onClick={this.hideModal}>
+                取消
+              </Button>
+              <Button type="primary" onClick={this.handleModalOK} loading={modalOKLoading}>
+                确认
+              </Button>
+            </div>
+          }
+        >
+          {modalTitle === '重置密码' ? (
+            <PasswordModify ref={node => (this.PwdModify = node)} />
+          ) : (
+            modalVisible && (
+              <FormBuilder
+                data={formBuilderItems}
+                handleChange={this.setFormBuilderInfo}
+                ref={ele => (this.$formBuilder = ele)}
+              />
+            )
+          )}
+        </Modal>
       </Page>
     );
   }
