@@ -64,7 +64,9 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
     const res = await Promise.all([
-      wkProcessGet({ processName: processList[0].processName }),
+      wkProcessGet({
+        processName: currentProcessName ? currentProcessName : processList[0].processName,
+      }),
       wkApproveGroupList(),
     ]);
     const [process, approveGroupList] = res;
@@ -123,20 +125,41 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public tabsChange = e => {
+  public tabsChange = async e => {
     let status = false;
     let { processList } = this.state;
-    processList = processList.map(item => {
-      if (item.processName === e) {
-        status = item.status;
+    this.setState({
+      loading: true,
+    });
+    const { error, data } = await wkProcessGet({ processName: e });
+
+    if (error) {
+      return this.setState({
+        loading: false,
+        taskApproveGroupList: [],
+      });
+    }
+    const { tasks } = data;
+    let taskData = tasks.map((item, index) => {
+      item.approveGroupList = (item.approveGroups || []).map(item => item.approveGroupId);
+      if (item.taskType === 'modifyData') {
+        item.index = 2;
+      } else if (item.taskType === 'reviewData') {
+        item.index = 1;
+      } else if (item.taskType === 'insertData') {
+        item.index = 0;
+      } else {
+        item.index = 4;
       }
       return item;
     });
+    taskData = _.sortBy(taskData, ['index']);
     this.setState(
       {
         currentProcessName: e,
         status,
         processList,
+        taskApproveGroupList: taskData,
       },
       () => {
         this.fetchData(e);
