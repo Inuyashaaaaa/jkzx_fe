@@ -1,4 +1,4 @@
-import { PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
+import { PROCESS_STATUS_TYPE_OPTIONS, PROCESS_STATUS_TYPE_OPTIONS_LOW } from '@/constants/common';
 import React from 'react';
 import Operation from './Operation';
 import _ from 'lodash';
@@ -88,11 +88,11 @@ export const RELATED_COL_DEFS = fetchTable => [
     width: 160,
     render: (text, params, index) => {
       if (!text) return text;
-      const _index = _.findIndex(PROCESS_STATUS_TYPE_OPTIONS, item => {
+      const _index = _.findIndex(PROCESS_STATUS_TYPE_OPTIONS_LOW, item => {
         return item.value === text;
       });
       if (_index < 0) return text;
-      return PROCESS_STATUS_TYPE_OPTIONS[_index].label;
+      return PROCESS_STATUS_TYPE_OPTIONS_LOW[_index].label;
     },
   },
   {
