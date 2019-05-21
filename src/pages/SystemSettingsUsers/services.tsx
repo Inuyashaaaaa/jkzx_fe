@@ -6,7 +6,12 @@ import FormItem from 'antd/lib/form/FormItem';
 import { Select } from '@/components';
 import Operation from './Operation';
 
-export const createPageTableColDefs: ITableColDef[] = (roleOptions, showResources) => [
+export const createPageTableColDefs: ITableColDef[] = (
+  roleOptions,
+  showResources,
+  departments,
+  fetchData
+) => [
   {
     title: '用户名',
     dataIndex: 'username',
@@ -54,9 +59,16 @@ export const createPageTableColDefs: ITableColDef[] = (roleOptions, showResource
     title: '操作',
     dataIndex: 'operation',
     fixed: 'right',
-    width: 480,
+    width: 300,
     render: (value, record, index) => {
-      return <Operation record={record} showResources={showResources} />;
+      return (
+        <Operation
+          record={record}
+          showResources={showResources}
+          departments={departments}
+          fetchData={fetchData}
+        />
+      );
     },
   },
 ];
