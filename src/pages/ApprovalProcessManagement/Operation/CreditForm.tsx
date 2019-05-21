@@ -548,7 +548,7 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
                 {
                   title: '发起人',
-                  dataIndex: 'operatorName',
+                  dataIndex: `${!!_data.initiatorName ? 'initiatorName' : 'operatorName'}`,
                   render: (value, record, index, { form, editing }) => {
                     return <FormItem>{value}</FormItem>;
                   },
@@ -576,15 +576,6 @@ class ApprovalForm extends PureComponent<any, any> {
                 {
                   title: '交易对手',
                   dataIndex: 'accountId',
-                  render: (value, record, index, { form, editing }) => {
-                    return (
-                      <FormItem>{form.getFieldDecorator({})(<Input2 editing={false} />)}</FormItem>
-                    );
-                  },
-                },
-                {
-                  title: '关联销售',
-                  dataIndex: 'salesName',
                   render: (value, record, index, { form, editing }) => {
                     return (
                       <FormItem>{form.getFieldDecorator({})(<Input2 editing={false} />)}</FormItem>
