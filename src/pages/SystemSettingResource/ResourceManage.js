@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Tree, Button, Modal, notification } from 'antd';
 import AuthTable from './AuthTable';
-import { getUser } from '@/lib/utils/authority';
+import { getUser } from '@/utils/authority';
 
 import CommonTree from '../SystemSettingDepartment/components/CommonTree';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
