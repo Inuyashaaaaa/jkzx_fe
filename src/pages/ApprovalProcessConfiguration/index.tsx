@@ -125,7 +125,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public tabsChange = async e => {
+  public tabsChange = e => {
     let status = false;
     let { processList } = this.state;
     processList = processList.map(item => {
@@ -134,7 +134,6 @@ class ApprovalProcessConfiguration extends PureComponent {
       }
       return item;
     });
-
     this.setState(
       {
         currentProcessName: e,
