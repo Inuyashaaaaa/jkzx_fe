@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Tree, Button, Modal, notification } from 'antd';
 import AuthTable from './AuthTable';
+import { getUser } from '@/lib/utils/authority';
 
 import CommonTree from '../SystemSettingDepartment/components/CommonTree';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
@@ -180,7 +181,8 @@ export default class ResourceManagement extends PureComponent {
     let { type, detail } = info;
     if (!type) {
       type = 'user';
-      const username = localStorage.getItem('login_name');
+      const upUserInfo = getUser() || {};
+      const { username } = upUserInfo;
       const { currentUser } = this;
       if (currentUser && currentUser.username === username) {
         detail = currentUser;
