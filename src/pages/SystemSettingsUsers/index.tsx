@@ -23,6 +23,7 @@ import FormBuilder from '../SystemSettingDepartment/components/CommonForm';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
 import PasswordModify from './PasswordModify';
 import { createPageTableColDefs } from './services';
+import { Table2 } from '@/components';
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -49,7 +50,7 @@ function findDepartment(departs, departId) {
 class SystemSettingsUsers extends PureComponent {
   public rowKey = 'id';
 
-  public $sourceTable: SourceTable = null;
+  public $sourceTable: Table2 = null;
 
   public initialFetchTableData = null;
 
@@ -95,7 +96,7 @@ class SystemSettingsUsers extends PureComponent {
       user.userTypeName = user.userType === 'SCRIPT' ? '脚本用户' : '普通用户';
       user.roles = user.roleName.map(role => {
         const hint = roles.find(item => item.roleName === role);
-        return hint && hint.id;
+        return hint && hint.roleName;
       });
     });
     this.setState({
@@ -107,7 +108,6 @@ class SystemSettingsUsers extends PureComponent {
         };
       }),
       users: users.sort((a, b) => a.username.localeCompare(b.username)),
-      loading: false,
     });
   };
 
@@ -124,22 +124,15 @@ class SystemSettingsUsers extends PureComponent {
   };
 
   public onRemove = async params => {
-    const { rowId, rowIndex } = params;
+    const { id: rowId } = params;
     const res = await deleteUser({ userId: rowId });
     if (res.error) {
       return;
     }
-
-    this.setState(
-      produce((state: any) => {
-        state.users.splice(rowIndex, 1);
-      }),
-      () => {
-        notification.success({
-          message: '删除成功',
-        });
-      }
-    );
+    notification.success({
+      message: '删除成功',
+    });
+    this.fetchData();
   };
 
   public onCreateUser = async stationalData => {
@@ -152,8 +145,8 @@ class SystemSettingsUsers extends PureComponent {
     };
   };
 
-  public lockUser = async event => {
-    const user = event.rowData;
+  public lockUser = async rowData => {
+    const user = rowData;
     const nextLockStatus = !user.locked;
     const params = {
       username: user.username,
@@ -170,24 +163,22 @@ class SystemSettingsUsers extends PureComponent {
     notification.success({
       message: tips,
     });
-
+    this.fetchData();
     return () => {
       this.setState(
         produce((state: any) => {
-          const user = state.users.find(user => user[this.rowKey] === event.rowId);
+          const user = state.users.find(user => user[this.rowKey] === rowData.id);
           if (!user) return;
           user.locked = nextLockStatus;
-        }),
-        () => this.$sourceTable && this.$sourceTable.refresh()
+        })
       );
     };
   };
 
-  public expireUser = async event => {
-    const user = event.rowData;
-    const nextExpireStatus = !user.expired;
+  public expireUser = async rowData => {
+    const nextExpireStatus = !rowData.expired;
     const params = {
-      username: user.username,
+      username: rowData.username,
     };
 
     const executeMethod = nextExpireStatus ? expireUser : unexpireUser;
@@ -199,19 +190,14 @@ class SystemSettingsUsers extends PureComponent {
     notification.success({
       message: tips,
     });
-
+    this.fetchData();
     return buttonContext => {
       this.setState(
         produce((state: any) => {
-          const user = state.users.find(user => user[this.rowKey] === event.rowId);
+          const user = state.users.find(user => user[this.rowKey] === rowData.id);
           if (!user) return;
           user.expired = nextExpireStatus;
-        }),
-        () => {
-          if (this.$sourceTable) {
-            this.$sourceTable.refresh();
-          }
-        }
+        })
       );
     };
   };
@@ -221,8 +207,8 @@ class SystemSettingsUsers extends PureComponent {
     this.showModal({ modalTitle: '重置密码' });
   };
 
-  public updateUser = async e => {
-    this.choosedUser = e.rowData;
+  public updateUser = async rowData => {
+    this.choosedUser = rowData;
     this.showModal({
       formBuilderItems: this.formatFormBuliderItems('modify', this.choosedUser),
       modalTitle: '更新用户',
@@ -423,36 +409,43 @@ class SystemSettingsUsers extends PureComponent {
   };
 
   public getRowActions = event => {
-    const { rowData } = event;
+    const rowData = event;
     const { locked, expired } = rowData;
-    return [
-      <PopconfirmButton
-        type="primary"
-        size="small"
-        key="remove"
-        popconfirmProps={{
-          title: '确定要删除吗?',
-          onConfirm: this.onRemove.bind(this, event),
-        }}
-      >
-        删除
-      </PopconfirmButton>,
-      <Button key="password" type="primary" onClick={this.resetPassword}>
-        重置密码
-      </Button>,
-      <Button key="lock" type="primary" onClick={this.lockUser}>
-        {!locked ? '锁定用户' : '解锁用户'}
-      </Button>,
-      <Button key="expire" type="primary" onClick={this.expireUser}>
-        {expired ? '使用户在期' : '过期用户'}
-      </Button>,
-      <Button key="user" type="primary" onClick={this.updateUser}>
-        修改用户
-      </Button>,
-      <Button key="resource" type="primary" onClick={async () => this.showResources(rowData)}>
-        数据权限
-      </Button>,
-    ];
+    return (
+      <>
+        <PopconfirmButton
+          type="primary"
+          size="small"
+          key="remove"
+          popconfirmProps={{
+            title: '确定要删除吗?',
+            onConfirm: this.onRemove.bind(this, event),
+          }}
+        >
+          删除
+        </PopconfirmButton>
+        <Button key="password" type="primary" onClick={this.resetPassword} size="small">
+          重置密码
+        </Button>
+        <Button key="lock" type="primary" onClick={() => this.lockUser(rowData)} size="small">
+          {!locked ? '锁定用户' : '解锁用户'}
+        </Button>
+        <Button key="expire" type="primary" onClick={() => this.expireUser(rowData)} size="small">
+          {expired ? '使用户在期' : '过期用户'}
+        </Button>
+        <Button key="user" type="primary" onClick={() => this.updateUser(rowData)} size="small">
+          修改用户
+        </Button>
+        <Button
+          key="resource"
+          type="primary"
+          onClick={async () => this.showResources(rowData)}
+          size="small"
+        >
+          数据权限
+        </Button>
+      </>
+    );
   };
   public hideResource = () => {
     this.setState({
@@ -461,15 +454,16 @@ class SystemSettingsUsers extends PureComponent {
   };
 
   public handleCellValueChanged = async params => {
-    const { newValue, data } = params;
-    const res = await updateUserRole({
-      userId: data.id,
-      roleIds: newValue,
-    });
-    if (res.error) return;
-    notification.success({
-      message: '更新角色成功',
-    });
+    const { changedFields } = params;
+
+    // const res = await updateUserRole({
+    //   userId: data.id,
+    //   roleIds: newValue,
+    // });
+    // if (res.error) return;
+    // notification.success({
+    //   message: '更新角色成功',
+    // });
   };
 
   public render() {
@@ -486,30 +480,29 @@ class SystemSettingsUsers extends PureComponent {
     return (
       <Page>
         {!displayResources && (
-          <SourceTable
-            header={
-              <Row type="flex" justify="start" style={{ marginBottom: VERTICAL_GUTTER }}>
-                <Col>
-                  <Button type="primary" onClick={this.createUser}>
-                    新建用户
-                  </Button>
-                </Col>
-              </Row>
-            }
-            loading={loading}
-            ref={node => (this.$sourceTable = node)}
-            searchable={false}
-            rowKey={this.rowKey}
-            dataSource={users}
-            columnDefs={createPageTableColDefs(this.state.roleOptions)}
-            rowActions={this.getRowActions}
-            actionColDef={{
-              width: 450,
-              pinned: 'right',
-            }}
-            autoSizeColumnsToFit={false}
-            onCellValueChanged={this.handleCellValueChanged}
-          />
+          <>
+            <Row type="flex" justify="start" style={{ marginBottom: VERTICAL_GUTTER }}>
+              <Col>
+                <Button type="primary" onClick={this.createUser}>
+                  新建用户
+                </Button>
+              </Col>
+            </Row>
+            <Table2
+              loading={loading}
+              ref={node => (this.$sourceTable = node)}
+              rowKey={this.rowKey}
+              dataSource={users}
+              columns={createPageTableColDefs(this.state.roleOptions, this.getRowActions)}
+              size={'middle'}
+              scroll={{ x: 1680 }}
+              // onCellValuesChange={params => {
+              //   console.log(params);
+              //   debugger;
+              // }}
+              onCellFieldsChange={this.handleCellValueChanged}
+            />
+          </>
         )}
         {displayResources && (
           <div>
