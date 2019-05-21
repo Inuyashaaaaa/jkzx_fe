@@ -27,6 +27,7 @@ const RiskManagerCustomReport = memo<any>(props => {
   const [total, setTotal] = useState(null);
   const [data, setData] = useState([]);
   const [tableColumnDefs, setTableColumnDefs] = useState([]);
+  const [excelFormData, setExcelFormData] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
     setPagination({
@@ -41,6 +42,7 @@ const RiskManagerCustomReport = memo<any>(props => {
 
   const fetchTable = async (paramsSearchFormData?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
+    setExcelFormData(usedFormData);
     const formValidateRsp = await form.current.validate();
     if (formValidateRsp.error) {
       return;
@@ -173,9 +175,12 @@ const RiskManagerCustomReport = memo<any>(props => {
         key="export"
         type="primary"
         data={{
-          dataSource: data,
-          cols: tableColumnDefs.map(item => item.title),
+          searchMethod: rptIntradayReportPaged,
+          cols: tableColumnDefs,
           name: '定制化报告',
+          argument: {
+            searchFormData: excelFormData,
+          },
         }}
       >
         导出Excel

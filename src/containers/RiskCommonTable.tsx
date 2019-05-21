@@ -35,6 +35,7 @@ const RiskCommonTable = memo<any>(props => {
   const [total, setTotal] = useState(null);
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
+  const [excelFormData, setExcelFormData] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
     setIsMount(true);
@@ -50,6 +51,8 @@ const RiskCommonTable = memo<any>(props => {
 
   const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
+    setExcelFormData(usedFormData);
+
     if (searchFormControls) {
       const formValidateRsp = await form.current.validate();
       if (formValidateRsp.error) {
@@ -181,9 +184,13 @@ const RiskCommonTable = memo<any>(props => {
           key="export"
           type="primary"
           data={{
-            dataSource: data,
-            cols: tableColDefs.map(item => item.title),
+            cols: tableColDefs,
             name: downloadName,
+            searchMethod,
+            argument: {
+              searchFormData: excelFormData,
+              sortField,
+            },
           }}
         >
           导出Excel

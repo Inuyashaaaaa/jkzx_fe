@@ -4,6 +4,8 @@ import { AnchorButtonProps, NativeButtonProps } from 'antd/lib/button/button';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import XLSX from 'xlsx';
+import { Form2 } from '@/components';
+import { getMoment } from '@/utils';
 
 /* list of supported file types */
 const SheetJSFT = [
@@ -43,18 +45,45 @@ const makeCols = refstr => {
 };
 
 class DownloadExcelButton extends PureComponent<ImportButtonProps> {
-  public exportFile = () => {
-    console.log(this.props.data);
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
 
+  public exportFile = async () => {
     /* convert state to workbook */
     if (!this.checkData(this.props.data)) {
       return;
     }
-
-    const { dataSource, cols, name } = this.props.data;
-    // dataSource = dataSource.unshift(cols)
-    console.log(dataSource, cols);
-
+    const { searchMethod, cols, name, argument } = this.props.data;
+    const { searchFormData, sortField = {} } = argument;
+    const { error, data: _data } = await searchMethod({
+      ..._.mapValues(Form2.getFieldsValue(searchFormData), (values, key) => {
+        if (key === 'valuationDate') {
+          return getMoment(values).format('YYYY-MM-DD');
+        }
+        return values;
+      }),
+      ...sortField,
+    });
+    if (error) return;
+    const dataSource = this.handleData(
+      _data.page,
+      cols.map(item => item.dataIndex),
+      cols.map(item => item.title)
+    );
     if (this.props.tabs) {
       // 多sheet表导出
       console.log(this.props.tabs);
