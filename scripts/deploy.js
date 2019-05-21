@@ -94,7 +94,7 @@ function release() {
 }
 
 function hotfix() {
-  upload('tongyu', '10.1.5.26', '/home/tongyu/');
+  upload('tongyu', '10.1.5.27', '/home/tongyu/');
 }
 
 function doc() {
