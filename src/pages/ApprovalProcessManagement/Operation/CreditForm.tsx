@@ -32,6 +32,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/utils/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
+import styles from '../index.less';
 
 const { TextArea } = AntdInput;
 const { Title } = Typography;
@@ -511,7 +512,7 @@ class ApprovalForm extends PureComponent<any, any> {
     const formStatus =
       _data.status === '待审批' || _data.status === '审核完成' || status !== 'pending';
     return (
-      <div>
+      <div className={styles.fromContainer}>
         {!loading && (
           <div>
             <Form2
@@ -645,6 +646,7 @@ class ApprovalForm extends PureComponent<any, any> {
               columnNumberOneRow={2}
               footer={false}
               onFieldsChange={this.onFieldsChange}
+              className={styles.creditEdit}
               columns={[
                 {
                   title: '客户授信额度',
@@ -716,7 +718,9 @@ class ApprovalForm extends PureComponent<any, any> {
               ]}
             />
             {/* <Divider type="horizontal" /> */}
-            <Title level={4}>流程记录</Title>
+            <Title level={4} style={{ marginTop: 50 }}>
+              流程记录
+            </Title>
             <div style={{ marginTop: 20 }}>
               <Table
                 columns={processColumns}

@@ -32,6 +32,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/utils/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
+import styles from '../index.less';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -461,7 +462,7 @@ class ApprovalForm extends PureComponent<any, any> {
     }
 
     return (
-      <div>
+      <div className={styles.fromContainer}>
         {!loading && (
           <div>
             <Form2
@@ -571,63 +572,66 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
               ]}
             />
-            <Divider type="horizontal" />
-            {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
-              <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
-                <Button
-                  style={{ marginRight: '20px' }}
-                  onClick={() => {
-                    this.setState({ bookEditVisible: true, editable: false });
-                  }}
-                >
-                  查看合约详情
-                </Button>
-                <Button onClick={this.download}>下载审批附件</Button>
-              </Row>
-            ) : (
-              <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
-                <Button
-                  style={{ marginRight: '20px' }}
-                  onClick={() => {
-                    this.setState({ bookEditVisible: true, editable: true });
-                  }}
-                >
-                  修改合约详情
-                </Button>
-                <Upload
-                  maxLen={1}
-                  action={UPLOAD_URL}
-                  data={{
-                    method: 'wkAttachmentUpload',
-                    params: JSON.stringify({}),
-                  }}
-                  headers={{ Authorization: `Bearer ${getToken()}` }}
-                  onChange={fileList => {
-                    this.setState({
-                      fileList,
-                    });
-                    if (fileList[0].status === 'done') {
-                      this.setState(
-                        {
-                          attachmentId: _.get(fileList, '[0].response.result.attachmentId'),
-                        },
-                        () => {
-                          this.transactionHandleOk(
-                            _.get(fileList, '[0].response.result.attachmentName')
-                          );
-                        }
-                      );
-                    }
-                  }}
-                  value={this.state.fileList}
-                  showUploadList={false}
-                >
-                  <Button>重新上传附件</Button>
-                </Upload>
-              </Row>
-            )}
-            <Divider type="horizontal" />
-            <Title level={4}>流程记录</Title>
+            <div style={{ marginLeft: 62, marginTop: 10 }}>
+              {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
+                <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
+                  <Button
+                    style={{ marginRight: '20px' }}
+                    onClick={() => {
+                      this.setState({ bookEditVisible: true, editable: false });
+                    }}
+                  >
+                    查看合约详情
+                  </Button>
+                  <Button onClick={this.download}>下载审批附件</Button>
+                </Row>
+              ) : (
+                <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
+                  <Button
+                    style={{ marginRight: '20px' }}
+                    onClick={() => {
+                      this.setState({ bookEditVisible: true, editable: true });
+                    }}
+                  >
+                    修改合约详情
+                  </Button>
+                  <Upload
+                    maxLen={1}
+                    action={UPLOAD_URL}
+                    data={{
+                      method: 'wkAttachmentUpload',
+                      params: JSON.stringify({}),
+                    }}
+                    headers={{ Authorization: `Bearer ${getToken()}` }}
+                    onChange={fileList => {
+                      this.setState({
+                        fileList,
+                      });
+                      if (fileList[0].status === 'done') {
+                        this.setState(
+                          {
+                            attachmentId: _.get(fileList, '[0].response.result.attachmentId'),
+                          },
+                          () => {
+                            this.transactionHandleOk(
+                              _.get(fileList, '[0].response.result.attachmentName')
+                            );
+                          }
+                        );
+                      }
+                    }}
+                    value={this.state.fileList}
+                    showUploadList={false}
+                  >
+                    <Button>重新上传附件</Button>
+                  </Upload>
+                </Row>
+              )}
+            </div>
+
+            <Title level={4} style={{ marginTop: 50 }}>
+              流程记录
+            </Title>
             <div style={{ marginTop: 20 }}>
               <Table
                 columns={processColumns}
