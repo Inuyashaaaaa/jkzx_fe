@@ -96,3 +96,4 @@ Deploy-Doc:
   when: manual
   only:
     - master
+    - master-staging
