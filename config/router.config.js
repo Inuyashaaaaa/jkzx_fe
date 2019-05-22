@@ -111,7 +111,6 @@ export default [
           path: '/pricingSettings',
           name: 'pricingSettings',
           icon: 'cluster',
-
           routes: [
             {
               path: '/pricingSettings/volSurface',
@@ -193,53 +192,9 @@ export default [
           ],
         },
         {
-          path: '/customer-sales-manage',
-          name: 'customSalesManage',
-          component: './CustomSalesManage/index',
-          hideInMenu: true,
-        },
-        {
-          path: '/customer-valuation',
-          name: 'customValuation',
-          component: './CustomValuation/index',
-          hideInMenu: true,
-        },
-        {
-          path: '/customer-info',
-          name: 'customInfo',
-          component: './CustomInfo/index',
-
-          hideInMenu: true,
-        },
-        // {
-        //   path: '/bank-account',
-        //   name: 'bankAccount',
-        //   component: './BankAccount/index',
-        //   hideInMenu: true,
-        // },
-        {
-          path: '/workflow-management',
-          name: 'workflowManagement',
-          icon: 'safety',
-          hideInMenu: true,
-          routes: [
-            {
-              path: '/workflow-management/workflow-settings',
-              name: 'workflowSettings',
-              component: './WorkflowManagementWorkflowSettings/index',
-            },
-            {
-              path: '/workflow-management/process-management',
-              name: 'processManagement',
-              component: './WorkflowManagementProcessManagement/index',
-            },
-          ],
-        },
-        {
           path: '/reports',
           name: 'reports',
           icon: 'table',
-
           routes: [
             {
               path: '/reports/spotLadder',
