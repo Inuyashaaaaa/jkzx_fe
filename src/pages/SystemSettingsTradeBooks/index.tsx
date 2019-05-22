@@ -170,14 +170,9 @@ class SystemSettingsTradeBooks extends PureComponent {
               },
             },
           ]}
-          pagination={{
-            showSizeChanger: true,
-            showQuickJumper: true,
-          }}
           rowKey="resourceName"
           size="middle"
           loading={loading}
-          hideOnSinglePage={true}
         />
         {/* <SourceTable
           loading={loading}
