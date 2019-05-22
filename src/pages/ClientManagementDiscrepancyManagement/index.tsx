@@ -165,6 +165,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
           dataSource={this.state.searchFormData}
           columns={SEARCH_FORM_CONTROLS}
           layout="inline"
+          submitText="搜索"
           onResetButtonClick={this.onReset}
           onFieldsChange={this.onSearchFormChange}
           onSubmitButtonClick={this.fetchTable}
