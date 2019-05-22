@@ -5,6 +5,7 @@ import {
   wkProcessGet,
   wkProcessConfigModify,
   wkTaskApproveGroupBind,
+  wkProcessModify,
 } from '@/services/approvalProcessConfiguration';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
@@ -18,14 +19,16 @@ import {
   Select,
   Switch,
   Tabs,
+  Typography,
 } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
 import _ from 'lodash';
-import { GTE_PROCESS_CONFIGS } from './constants';
+import { GTE_PROCESS_CONFIGS, TASKTYPE } from './constants';
 
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
+const { Paragraph } = Typography;
 
 class ApprovalProcessConfiguration extends PureComponent {
   public state = {
@@ -98,7 +101,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       }
       return item;
     });
-    taskData = _.sortBy(taskData, ['index']);
+    taskData = _.sortBy(taskData, ['index', 'sequence']);
     this.setState({
       loading: false,
       approveGroupList: approveGroupList.data || [],
@@ -185,22 +188,61 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public onConfirm = async () => {
-    const { currentProcessName, taskApproveGroupList, status, processConfigs } = this.state;
-    const noneGroupIndex = _.findIndex(
-      taskApproveGroupList,
-      item => item && item.approveGroupList.length <= 0
-    );
-    if (noneGroupIndex >= 0) {
-      return notification.success({
-        message: `请至少选择一个审批组`,
+    const { currentProcessName, status, processConfigs, taskApproveGroupList } = this.state;
+    const noneGroupIndex = _.findIndex(taskApproveGroupList, item => {
+      return (
+        !item ||
+        !item.approveGroupList ||
+        item.approveGroupList.length <= 0 ||
+        _.trim(item.taskName).length <= 3 ||
+        /^[0-9]/.test(_.trim(item.taskName))
+      );
+    });
+
+    const reviewLength = _.filter(this.state.taskApproveGroupList, item => {
+      return item.taskType === 'reviewData';
+    }).length;
+
+    if (reviewLength < 1) {
+      return notification.error({
+        message: `至少要有一个复合审批节点`,
       });
     }
+
+    if (noneGroupIndex >= 0) {
+      return notification.error({
+        message: `请为每个节点命名为首位不能为数字长度大于三位，并且至少选择一个审批组`,
+      });
+    }
+
+    const taskList = taskApproveGroupList.map((item, index) => {
+      item.sequence = index;
+      item.taskType = TASKTYPE[item.taskType];
+      item.actionClass =
+        item.taskType === 'REVIEW_DATA'
+          ? 'tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction'
+          : 'tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction';
+      return item;
+    });
+
+    const { error: merror, data } = await wkProcessModify({
+      processName: currentProcessName,
+      taskList,
+    });
+    const tasks = _.sortBy(data.tasks, ['sequence']);
+    const taskListData = taskApproveGroupList.map((item, index) => {
+      return {
+        ...tasks[index],
+        ...item,
+      };
+    });
+
     const requests = () =>
       Promise.all([
         wkProcessStatusModify({ processName: currentProcessName, status }),
         wkTaskApproveGroupBind({
           processName: currentProcessName,
-          taskList: taskApproveGroupList.map(item => {
+          taskList: taskListData.map(item => {
             return {
               taskId: item.taskId,
               approveGroupList: item.approveGroupList,
@@ -249,6 +291,55 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
     this.setState({
       processConfigs,
+    });
+  };
+
+  public handleClick = () => {
+    let taskName = '';
+    const length = _.filter(this.state.taskApproveGroupList, item => {
+      if (item.taskType === 'reviewData' && !taskName) {
+        taskName = item.taskName;
+      }
+      return item.taskType === 'reviewData';
+    }).length;
+    let taskApproveGroupList = this.state.taskApproveGroupList.concat({
+      taskName: `${taskName}${length + 1}`,
+      index: `1.${length}`,
+      taskType: 'reviewData',
+      taskId: _.random(10, true),
+      actionClass: 'tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction',
+    });
+    taskApproveGroupList = _.sortBy(taskApproveGroupList, ['index', 'sequence']);
+    this.setState({
+      taskApproveGroupList,
+    });
+  };
+
+  public handleGroupNamge = (e, param = {}) => {
+    const taskApproveGroupList = [...this.state.taskApproveGroupList];
+    taskApproveGroupList.map(item => {
+      if (item.taskId === param.taskId) {
+        item.taskName = e;
+      }
+      return item;
+    });
+    this.setState({
+      taskApproveGroupList,
+    });
+  };
+
+  public handleDeleteReview = (e, param = {}) => {
+    const { taskApproveGroupList } = this.state;
+    const reviewLength = _.filter(taskApproveGroupList, item => {
+      return item.taskType === 'reviewData';
+    }).length;
+
+    if (reviewLength <= 1) return;
+
+    this.setState({
+      taskApproveGroupList: _.filter(taskApproveGroupList, item => {
+        return item.taskId !== param.taskId;
+      }),
     });
   };
 
@@ -348,7 +439,22 @@ class ApprovalProcessConfiguration extends PureComponent {
                               >
                                 <Icon type="more" style={{ width: '4px', color: '#999' }} />
                                 <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                                <span style={{ marginLeft: '30px' }}>{group.taskName}</span>
+                                {/* <span style={{ marginLeft: '30px' }}>{group.taskName}</span> */}
+                                <span
+                                  style={{
+                                    marginLeft: '30px',
+                                    display: 'inline-block',
+                                    width: '150px',
+                                  }}
+                                >
+                                  <Paragraph
+                                    ellipsis={true}
+                                    editable={{ onChange: e => this.handleGroupNamge(e, group) }}
+                                    onChange={e => this.handleGroupNamge(e, group)}
+                                  >
+                                    {group.taskName}
+                                  </Paragraph>
+                                </span>
                               </div>
                               <div
                                 style={{
@@ -382,13 +488,34 @@ class ApprovalProcessConfiguration extends PureComponent {
                                 </Select>
                               </div>
                             </div>
-                            <span className={styles.approvalIcon}>
-                              {/* <Icon type="minus-circle" />  
-                                  <Icon type="plus-circle" /> */}
-                            </span>
+                            {group.taskType === 'reviewData' ? (
+                              <span className={styles.approvalIcon}>
+                                <Icon
+                                  type="minus-circle"
+                                  onClick={e => {
+                                    this.handleDeleteReview(e, group);
+                                  }}
+                                />
+                                {/* <Icon type="plus-circle" onClick={(e) => {this.handleAddReview(e, group)}}/> */}
+                              </span>
+                            ) : (
+                              <span className={styles.approvalIcon} />
+                            )}
                           </List.Item>
                         );
                       })}
+                      <List.Item>
+                        <div
+                          className={styles.approvalNode}
+                          style={{ border: '2px dashed #e8e5e5' }}
+                        >
+                          <Button onClick={this.handleClick} style={{ height: 60 }}>
+                            <Icon type="plus" style={{ fontSize: '12px' }} />
+                            增加审批节点
+                          </Button>
+                        </div>
+                        <span className={styles.approvalIcon} />
+                      </List.Item>
                     </List>
                   </div>
                   {this.renderTabs(tab)}
