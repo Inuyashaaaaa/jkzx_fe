@@ -9,14 +9,16 @@ import {
   PRODUCTTYPE_OPTIONS,
   PRODUCTTYPE_ZHCH_MAP,
   STRIKE_TYPES_MAP,
-  FROM_HISTORY_PRICING_TAG,
 } from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP, VERTICAL_GUTTER } from '@/constants/global';
-import Page from '@/containers/Page';
+import { TRADESCOLDEFS_LEG_FIELD_MAP, TRADESCOL_FIELDS, VERTICAL_GUTTER } from '@/constants/global';
+import { LEG_ENV } from '@/constants/legs';
+import { DATE_LEG_FIELDS } from '@/constants/legType';
 import { mktInstrumentSearch } from '@/services/market-data-service';
+import { createLegDataSourceItem } from '@/services/pages';
+import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
 import styles from '@/styles/index.less';
-import { formatMoney } from '@/tools';
+import { formatMoney, getLegByProductType } from '@/tools';
 import {
   DatePicker,
   Divider,
@@ -30,24 +32,16 @@ import {
 import FormItem from 'antd/lib/form/FormItem';
 import TimelineItem from 'antd/lib/timeline/TimelineItem';
 import _ from 'lodash';
-import { isMoment } from 'moment';
-import React, { useState, memo } from 'react';
+import moment, { isMoment } from 'moment';
+import React, { memo, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import { connect } from 'dva';
-import router from 'umi/router';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
 const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
 
 const TradeManagementPricingManagement = props => {
   const [searchFormData, setSearchFormData] = useState({});
-  const { tableDataSource, dispatch } = props;
-  const setTableDataSource = next => {
-    dispatch({
-      type: 'tradeManagementPricingManagement/setTableDataSource',
-      payload: next,
-    });
-  };
+  const { setTableData, setVisible } = props;
+  const [tableDataSource, setTableDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -146,7 +140,7 @@ const TradeManagementPricingManagement = props => {
   });
 
   return (
-    <Page back={true}>
+    <>
       <Form2
         submitText="搜索"
         onSubmitButtonClick={() => {
@@ -182,6 +176,7 @@ const TradeManagementPricingManagement = props => {
                         editing: true,
                         fetchOptionsOnSearch: true,
                         showSearch: true,
+                        allowClear: true,
                         placeholder: '请输入内容搜索',
                         options: async (value: string = '') => {
                           const { data, error } = await refSimilarLegalNameList({
@@ -360,6 +355,11 @@ const TradeManagementPricingManagement = props => {
                 },
               },
               {
+                title: '交易对手',
+                dataIndex: 'counterPartyCode',
+                width: 150,
+              },
+              {
                 title: '买/卖',
                 dataIndex: 'direction',
                 width: 150,
@@ -464,20 +464,39 @@ const TradeManagementPricingManagement = props => {
                 render: (val, record) => {
                   return (
                     <div>
-                      <a
-                        href="javascript:;"
-                        onClick={() => {
-                          router.push({
-                            pathname: '/trade-management/pricing',
-                            query: {
-                              from: FROM_HISTORY_PRICING_TAG,
-                              id: record.uuid,
-                            },
+                      <Popconfirm
+                        title="将会覆盖当前试定价数据，是否继续?"
+                        onConfirm={() => {
+                          const { quotePositions } = record as any;
+
+                          const next = quotePositions.map(position => {
+                            const { productType, asset } = position;
+                            const leg = getLegByProductType(productType);
+                            if (!leg) {
+                              throw new Error(`${productType} is not defiend!`);
+                            }
+                            return {
+                              ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+                              ...Form2.createFields({
+                                ..._.mapValues(asset, (val, key) => {
+                                  if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                                    return moment(val);
+                                  }
+                                  return val;
+                                }),
+                                ..._.pick(position, TRADESCOL_FIELDS),
+                              }),
+                            };
                           });
+
+                          setTableData(next);
+                          setVisible(false);
                         }}
+                        okText="是"
+                        cancelText="否"
                       >
-                        复用
-                      </a>
+                        <a href="javascript:;">复用</a>
+                      </Popconfirm>
                       <Divider type="vertical" />
                       <Popconfirm
                         title="确认删除本条数据吗?"
@@ -523,14 +542,8 @@ const TradeManagementPricingManagement = props => {
           </Row>
         </Loading>
       </div>
-    </Page>
+    </>
   );
 };
 
-export default memo(
-  connect(state => {
-    return {
-      tableDataSource: state.tradeManagementPricingManagement.tableDataSource,
-    };
-  })(TradeManagementPricingManagement)
-);
+export default memo(TradeManagementPricingManagement);
