@@ -139,10 +139,22 @@ export const MIDDLE_FORM_CONTROLS = tradeIds => [
     title: '交易编号',
     dataIndex: 'tradeId',
     render: (value, record, index, { form, editing }) => {
+      let newTrade;
+      const handle = value => {
+        newTrade = tradeIds.filter(item => item.value.includes(value));
+        console.log(newTrade);
+      };
       return (
         <FormItem>
           {form.getFieldDecorator({})(
-            <Select style={{ minWidth: 180 }} options={tradeIds} allowClear={true} />
+            <Select
+              style={{ minWidth: 180 }}
+              options={newTrade || tradeIds}
+              onSearch={handle}
+              allowClear={true}
+              showSearch={true}
+              fetchOptionsOnSearch={true}
+            />
           )}
         </FormItem>
       );
