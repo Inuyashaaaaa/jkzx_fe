@@ -82,7 +82,7 @@ export default [
               path: '/trade-management/subject-store',
               name: 'subjectStore',
               component: './TradeManagementSubjectStore/index',
-              hideInMenu: true,
+              // hideInMenu: true,
             },
             {
               path: '/trade-management/book-edit',
