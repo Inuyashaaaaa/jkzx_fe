@@ -200,3 +200,23 @@ export async function quotePrcCreate(params = {}) {
     },
   });
 }
+
+export async function quotePrcSearchPaged(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'quotePrcSearchPaged',
+      params,
+    },
+  });
+}
+
+export async function quotePrcPositionDelete(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'quotePrcPositionDelete',
+      params,
+    },
+  });
+}

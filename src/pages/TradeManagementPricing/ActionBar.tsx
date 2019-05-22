@@ -41,6 +41,7 @@ const ActionBar = memo<any>(props => {
   const [affix, setAffix] = useState(false);
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [comment, setComment] = useState('');
+  const [saveLoading, setSaveLoading] = useState(false);
 
   return (
     <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
@@ -120,7 +121,6 @@ const ActionBar = memo<any>(props => {
             保存试定价
           </Button>
           <Button
-            disabled={_.isEmpty(tableData)}
             key="历史试定价"
             type="primary"
             onClick={() => {
@@ -134,6 +134,7 @@ const ActionBar = memo<any>(props => {
         </Button.Group>
       </Row>
       <Modal
+        confirmLoading={saveLoading}
         visible={saveModalVisible}
         onCancel={() => {
           setSaveModalVisible(false);
@@ -153,6 +154,7 @@ const ActionBar = memo<any>(props => {
             LEG_ENV.PRICING
           );
 
+          setSaveLoading(true);
           const { error, data } = await quotePrcCreate({
             quotePrc: {
               pricingEnvironmentId: curPricingEnv,
@@ -173,10 +175,13 @@ const ActionBar = memo<any>(props => {
               }),
             },
           });
+          setSaveLoading(false);
 
           if (error) return;
 
           setSaveModalVisible(false);
+          setComment('');
+          setTableData([]);
 
           notification.success({
             message: '保存记录成功',

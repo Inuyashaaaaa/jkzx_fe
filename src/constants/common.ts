@@ -486,7 +486,7 @@ export const LEG_FIELD = {
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
-  IS_ANNUAL: 'IS_ANNUAL', // 是否年化
+  IS_ANNUAL: 'annualized', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
   DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
   ALREADY_BARRIER: 'AlreadyBarrier', // 已经敲入
@@ -925,3 +925,5 @@ export const EQUITY_EXCHANGE_OPTIONS = convertOptions(
   EQUITY_EXCHANGE_MAP,
   EQUITY_EXCHANGE_ZHCN_MAP
 );
+
+export const FROM_HISTORY_PRICING_TAG = 'FROM_HISTORY_PRICING_TAG';

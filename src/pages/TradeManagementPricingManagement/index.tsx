@@ -1,26 +1,53 @@
-import React, { PureComponent, useState } from 'react';
-import { Form2, Select, DatePicker, Input, Loading } from '@/components';
-import FormItem from 'antd/lib/form/FormItem';
-import { mktInstrumentSearch } from '@/services/market-data-service';
+import { Form2, Input, Loading, Select } from '@/components';
 import {
-  PRODUCTTYPE_OPTIONS,
-  OPTION_TYPE_OPTIONS,
   DIRECTION_OPTIONS,
-  LEG_FIELD,
+  DIRECTION_TYPE_ZHCN_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
+  LEG_FIELD,
+  NOTIONAL_AMOUNT_TYPE_MAP,
+  OPTION_TYPE_OPTIONS,
+  PRODUCTTYPE_OPTIONS,
   PRODUCTTYPE_ZHCH_MAP,
+  STRIKE_TYPES_MAP,
+  FROM_HISTORY_PRICING_TAG,
 } from '@/constants/common';
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { Table, Row, Divider, Pagination, Timeline } from 'antd';
+import { TRADESCOLDEFS_LEG_FIELD_MAP, VERTICAL_GUTTER } from '@/constants/global';
+import Page from '@/containers/Page';
+import { mktInstrumentSearch } from '@/services/market-data-service';
+import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
+import styles from '@/styles/index.less';
 import { formatMoney } from '@/tools';
+import {
+  DatePicker,
+  Divider,
+  notification,
+  Pagination,
+  Popconfirm,
+  Row,
+  Table,
+  Timeline,
+} from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import TimelineItem from 'antd/lib/timeline/TimelineItem';
-import { trdTradeSearchIndexPaged } from '@/services/general-service';
 import _ from 'lodash';
 import { isMoment } from 'moment';
+import React, { useState, memo } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import { connect } from 'dva';
+import router from 'umi/router';
+import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
-const TradeManagementPricingManagement = () => {
+const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
+
+const TradeManagementPricingManagement = props => {
   const [searchFormData, setSearchFormData] = useState({});
-  const [tableDataSource, setTableDataSource] = useState([]);
+  const { tableDataSource, dispatch } = props;
+  const setTableDataSource = next => {
+    dispatch({
+      type: 'tradeManagementPricingManagement/setTableDataSource',
+      payload: next,
+    });
+  };
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -31,18 +58,36 @@ const TradeManagementPricingManagement = () => {
 
   const [pageSizeCurrent, setPageSizeCurrent] = useState(1);
 
-  const onTradeTableSearch = async (paramsPagination?) => {
-    const newFormData = Form2.getFieldsValue(searchFormData);
-    const formatValues = _.mapValues(newFormData, (val, key) => {
-      if (isMoment(val)) {
-        return val.format('YYYY-MM-DD');
-      }
-      return val;
-    });
+  const onTradeTableSearch = async (params = {}) => {
+    const { paramsPagination, paramsSearchFormData } = params as any;
+    const newFormData = Form2.getFieldsValue(paramsSearchFormData || searchFormData);
+    const formatValues = _.reduce(
+      _.mapValues(newFormData, (val, key) => {
+        if (isMoment(val)) {
+          return val.format('YYYY-MM-DD');
+        }
+        return val;
+      }),
+      (prev, curr, key) => {
+        if (key === RANGE_DATE_KEY) {
+          const [expirationStartDate, expirationEndDate] = curr;
+          prev.expirationStartDate = isMoment(expirationStartDate)
+            ? expirationStartDate.format('YYYY-MM-DD')
+            : expirationStartDate;
+          prev.expirationEndDate = isMoment(expirationEndDate)
+            ? expirationEndDate.format('YYYY-MM-DD')
+            : expirationEndDate;
+        } else {
+          prev[key] = curr;
+        }
+        return prev;
+      },
+      {}
+    );
 
     setLoading(true);
 
-    const { error, data } = await trdTradeSearchIndexPaged({
+    const { error, data } = await quotePrcSearchPaged({
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
       ...formatValues,
@@ -53,30 +98,21 @@ const TradeManagementPricingManagement = () => {
     if (error) return;
     if (_.isEmpty(data)) return;
 
-    const dataSource = data.page.map(item => {
-      return [
-        ...item.positions.map((node, key) => {
+    const tableDataSource = _.flatten(
+      data.page.map(item => {
+        return item.quotePositions.map((node, key) => {
           return {
+            ...node,
             ...item,
-            ..._.omit(node, ['bookName']),
-            ...node.asset,
-            ...(item.positions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
-            ...(item.positions.length <= 1
+            ...(item.quotePositions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
+            ...(item.quotePositions.length <= 1
               ? null
               : key === 0
-              ? { timeLineNumber: item.positions.length }
+              ? { timeLineNumber: item.quotePositions.length }
               : null),
           };
-        }),
-      ];
-    });
-
-    const tableDataSource = _.reduce(
-      dataSource,
-      (result, next) => {
-        return result.concat(next);
-      },
-      []
+        });
+      })
     );
 
     setTableDataSource(tableDataSource);
@@ -90,8 +126,10 @@ const TradeManagementPricingManagement = () => {
 
   const onPagination = (current, pageSize) => {
     onTradeTableSearch({
-      current,
-      pageSize,
+      paramsPagination: {
+        current,
+        pageSize,
+      },
     });
   };
 
@@ -103,23 +141,68 @@ const TradeManagementPricingManagement = () => {
     onPagination(current, pageSize);
   };
 
+  useLifecycles(() => {
+    onTradeTableSearch();
+  });
+
   return (
-    <>
+    <Page back={true}>
       <Form2
+        submitText="搜索"
+        onSubmitButtonClick={() => {
+          onTradeTableSearch();
+        }}
+        onResetButtonClick={() => {
+          setSearchFormData({});
+          onTradeTableSearch({
+            paramsSearchFormData: {},
+          });
+        }}
         onFieldsChange={(props, changedFields, allFields) => {
-          this.setState({
-            searchFormData: {
-              ...searchFormData,
-              ...changedFields,
-            },
+          setSearchFormData({
+            ...searchFormData,
+            ...changedFields,
           });
         }}
         dataSource={searchFormData}
         layout="inline"
         columns={[
           {
+            title: '交易对手',
+            dataIndex: 'counterPartyCode',
+            render: (val, record, index, { form }) => {
+              return (
+                <FormItem>
+                  {form.getFieldDecorator()(
+                    <Select
+                      {...{
+                        style: {
+                          width: '180px',
+                        },
+                        editing: true,
+                        fetchOptionsOnSearch: true,
+                        showSearch: true,
+                        placeholder: '请输入内容搜索',
+                        options: async (value: string = '') => {
+                          const { data, error } = await refSimilarLegalNameList({
+                            similarLegalName: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        },
+                      }}
+                    />
+                  )}
+                </FormItem>
+              );
+            },
+          },
+          {
             title: '标的物',
-            dataIndex: 'instrumentId',
+            dataIndex: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
             render: (value, record, index, { form, editing }) => {
               return (
                 <FormItem>
@@ -167,15 +250,15 @@ const TradeManagementPricingManagement = () => {
             },
           },
           {
-            title: '到期日',
-            dataIndex: 'expirationDate',
+            title: '日期范围',
+            dataIndex: RANGE_DATE_KEY,
             render: (value, record, index, { form, editing }) => {
-              return <FormItem>{form.getFieldDecorator({})(<DatePicker />)}</FormItem>;
+              return <FormItem>{form.getFieldDecorator({})(<DatePicker.RangePicker />)}</FormItem>;
             },
           },
           {
-            title: '看涨看跌',
-            dataIndex: 'xxx',
+            title: '涨/跌',
+            dataIndex: LEG_FIELD.OPTION_TYPE,
             render: (value, record, index, { form, editing }) => {
               return (
                 <FormItem>
@@ -194,14 +277,14 @@ const TradeManagementPricingManagement = () => {
           },
           {
             title: '买卖方向',
-            dataIndex: 'xx333x',
+            dataIndex: LEG_FIELD.DIRECTION,
             render: (value, record, index, { form, editing }) => {
               return (
                 <FormItem>
                   {form.getFieldDecorator({})(
                     <Select
                       style={{ minWidth: 180 }}
-                      placeholder="请选择"
+                      placeholder="请选择内容"
                       allowClear={true}
                       showSearch={true}
                       options={DIRECTION_OPTIONS}
@@ -213,9 +296,13 @@ const TradeManagementPricingManagement = () => {
           },
           {
             title: '备注',
-            dataIndex: 'xx3323423433x',
+            dataIndex: LEG_FIELD.COMMENT,
             render: (value, record, index, { form, editing }) => {
-              return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
+              return (
+                <FormItem>
+                  {form.getFieldDecorator({})(<Input placeholder="请输入内容" />)}
+                </FormItem>
+              );
             },
           },
         ]}
@@ -226,14 +313,14 @@ const TradeManagementPricingManagement = () => {
           <Table
             size="middle"
             pagination={false}
-            rowKey={'positionId'}
+            rowKey={'uuid'}
             scroll={{ x: 2500 }}
             dataSource={tableDataSource}
             columns={[
               {
                 title: '期权类型',
                 dataIndex: 'productType',
-                width: 100,
+                width: 150,
                 fixed: 'left',
                 onCell: record => {
                   return {
@@ -254,11 +341,12 @@ const TradeManagementPricingManagement = () => {
                           style={{ position: 'absolute', left: '-20px', top: '5px' }}
                           className={styles.timelines}
                         >
-                          {record.positions.map((item, index) => {
+                          {record.quotePositions.map((item, index) => {
                             return (
                               <TimelineItem
                                 style={{
-                                  paddingBottom: index === record.positions.length - 1 ? 0 : 46,
+                                  paddingBottom:
+                                    index === record.quotePositions.length - 1 ? 0 : 46,
                                 }}
                                 key={index}
                               />
@@ -274,26 +362,26 @@ const TradeManagementPricingManagement = () => {
               {
                 title: '买/卖',
                 dataIndex: 'direction',
-                width: 100,
+                width: 150,
                 render: (text, record, index) => {
                   return DIRECTION_TYPE_ZHCN_MAP[text];
                 },
               },
               {
                 title: '标的物',
-                dataIndex: 'underlyerInstrumentId',
-                width: 100,
+                dataIndex: 'asset.underlyerInstrumentId',
+                width: 150,
                 // width: 150,
               },
               {
                 title: '期初价格（￥）',
-                dataIndex: LEG_FIELD.INITIAL_SPOT,
-                width: 250,
+                dataIndex: `asset.${LEG_FIELD.INITIAL_SPOT}`,
+                width: 150,
               },
               {
                 title: '涨/跌',
-                dataIndex: 'optionType',
-                width: 100,
+                dataIndex: 'asset.optionType',
+                width: 150,
                 // width: 60,
                 render: (text, record, index) => {
                   return EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[text];
@@ -301,62 +389,115 @@ const TradeManagementPricingManagement = () => {
               },
               {
                 title: '起始日',
-                dataIndex: 'expirationDate',
+                dataIndex: LEG_FIELD.EFFECTIVE_DATE,
                 width: 150,
               },
               {
                 title: '到期日',
-                dataIndex: 'expirationDate',
+                dataIndex: LEG_FIELD.EXPIRATION_DATE,
                 width: 150,
               },
               {
                 title: '行权价',
-                dataIndex: LEG_FIELD.STRIKE,
+                dataIndex: `asset.${LEG_FIELD.STRIKE}`,
                 width: 150,
-                render: val => {
-                  return formatMoney(val, {
-                    unit: 'xxxx',
-                  });
+                render: (val, record) => {
+                  if (val == null) return null;
+                  if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+                    return formatMoney(val, {
+                      unit: '￥',
+                    });
+                  }
+                  return `${val}%`;
                 },
               },
               {
                 title: '名义本金',
-                dataIndex: LEG_FIELD.NOTIONAL_AMOUNT,
+                dataIndex: `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`,
                 width: 150,
-                render: val => {
-                  return formatMoney(val, {
-                    unit: 'xxxx',
-                  });
+                render: (val, record) => {
+                  if (val == null) return null;
+                  if (record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
+                    return formatMoney(val, {
+                      unit: '￥',
+                    });
+                  }
+                  return `${val}手`;
                 },
               },
               {
-                title: 'vol,r,p(%)',
-                dataIndex: LEG_FIELD.NOTIONAL_AMOUNT,
+                title: 'vol（%）',
+                dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
                 width: 150,
                 render: (val, record) => {
-                  return [record.vol, record.r, record.p].map(item => item || '--').join(', ');
+                  return val;
+                },
+              },
+              {
+                title: 'r（%）',
+                dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.R,
+                width: 150,
+                render: (val, record) => {
+                  return val;
+                },
+              },
+              {
+                title: 'q（%）',
+                dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.Q,
+                width: 150,
+                render: (val, record) => {
+                  return val;
                 },
               },
               {
                 title: '备注',
-                dataIndex: LEG_FIELD.NOTIONAL_AMOUNT,
-                width: 150,
+                dataIndex: LEG_FIELD.COMMENT,
                 render: (val, record) => {
-                  return [record.vol, record.r, record.p].map(item => item || '--').join(', ');
+                  return val;
                 },
               },
               {
                 title: '操作',
                 dataIndex: 'action',
                 width: 150,
+                fixed: 'right',
                 render: (val, record) => {
                   return (
                     <div>
-                      <a href="javascript:;">复用</a>
-                      <Divider type="vertical" />
-                      <a href="javascript:;" style={{ color: 'red' }}>
-                        删除
+                      <a
+                        href="javascript:;"
+                        onClick={() => {
+                          router.push({
+                            pathname: '/trade-management/pricing',
+                            query: {
+                              from: FROM_HISTORY_PRICING_TAG,
+                              id: record.uuid,
+                            },
+                          });
+                        }}
+                      >
+                        复用
                       </a>
+                      <Divider type="vertical" />
+                      <Popconfirm
+                        title="确认删除本条数据吗?"
+                        onConfirm={async () => {
+                          const { error, data } = await quotePrcPositionDelete({
+                            uuid: record.uuid,
+                          });
+                          if (error) return;
+                          notification.success({ message: '删除成功' });
+                          setTimeout(() => {
+                            onTradeTableSearch();
+                          });
+                        }}
+                        okText="是"
+                        cancelText="否"
+                      >
+                        <a href="javascript:;" style={{ color: 'red' }}>
+                          删除
+                        </a>
+                      </Popconfirm>
                     </div>
                   );
                 },
@@ -382,8 +523,14 @@ const TradeManagementPricingManagement = () => {
           </Row>
         </Loading>
       </div>
-    </>
+    </Page>
   );
 };
 
-export default TradeManagementPricingManagement;
+export default memo(
+  connect(state => {
+    return {
+      tableDataSource: state.tradeManagementPricingManagement.tableDataSource,
+    };
+  })(TradeManagementPricingManagement)
+);

@@ -7,6 +7,7 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
+  FROM_HISTORY_PRICING_TAG,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -36,7 +37,7 @@ import { convertTradePositions, createLegDataSourceItem } from '@/services/pages
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
-import { getLegByRecord } from '@/tools';
+import { getLegByRecord, getLegByProductType } from '@/tools';
 import { getMoment, insert, remove, uuid } from '@/utils';
 import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
@@ -46,6 +47,8 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import './index.less';
+import { DATE_LEG_FIELDS } from '@/constants/legType';
+import moment from 'moment';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
@@ -61,7 +64,7 @@ const TradeManagementBooking = props => {
       return item;
     });
   });
-  const { location, tradeManagementBookEditPageData } = props;
+  const { location, tradeManagementBookEditPageData, tradeManagementPricingManagement } = props;
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [curPricingEnv, setCurPricingEnv] = useState(null);
 
@@ -73,12 +76,11 @@ const TradeManagementBooking = props => {
   };
 
   const { query } = location;
-  const { from } = query;
+  const { from, id } = query;
 
   useLifecycles(() => {
-    const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
-
     if (from === PRICING_FROM_EDITING) {
+      const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
       const recordTypeIsModelXY = record => {
         return Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
       };
@@ -103,6 +105,36 @@ const TradeManagementBooking = props => {
             [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
           };
         });
+      setTableData(next);
+    }
+
+    if (from === FROM_HISTORY_PRICING_TAG) {
+      const { tableDataSource: historyTableData } = tradeManagementPricingManagement;
+      const useItem = historyTableData.find(item => item.uuid === id);
+
+      if (!useItem) return;
+
+      const { quotePositions } = useItem;
+
+      const next = quotePositions.map(position => {
+        const { productType, asset } = position;
+        const leg = getLegByProductType(productType);
+        if (!leg) {
+          throw new Error(`${productType} is not defiend!`);
+        }
+        return {
+          ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+          ...Form2.createFields({
+            ..._.mapValues(asset, (val, key) => {
+              if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                return moment(val);
+              }
+              return val;
+            }),
+            ..._.pick(position, TRADESCOL_FIELDS),
+          }),
+        };
+      });
       setTableData(next);
     }
   });
@@ -497,5 +529,6 @@ export default memo(
     currentUser: (state.user as any).currentUser,
     pricingData: state.pricingData,
     tradeManagementBookEditPageData: state.tradeManagementBookEdit,
+    tradeManagementPricingManagement: state.tradeManagementPricingManagement,
   }))(TradeManagementBooking)
 );

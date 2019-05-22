@@ -87,13 +87,12 @@ class CommonModel extends PureComponent<any> {
     if (error) return;
     if (_.isEmpty(data)) return;
 
-    const dataSource = data.page.map(item => {
-      return [
-        ...item.positions.map((node, key) => {
+    const tableDataSource = _.flatten(
+      data.page.map(item => {
+        return item.positions.map((node, key) => {
           return {
+            ...node,
             ...item,
-            ..._.omit(node, ['bookName']),
-            ...node.asset,
             ...(item.positions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
             ...(item.positions.length <= 1
               ? null
@@ -101,16 +100,12 @@ class CommonModel extends PureComponent<any> {
               ? { timeLineNumber: item.positions.length }
               : null),
           };
-        }),
-      ];
-    });
-    const tableDataSource = _.reduce(
-      dataSource,
-      (result, next) => {
-        return result.concat(next);
-      },
-      []
+        });
+      })
     );
+
+    console.log(tableDataSource);
+
     const { dispatch, name } = this.props;
     dispatch({
       type: 'tradeManagementContractManage/save',
@@ -130,7 +125,7 @@ class CommonModel extends PureComponent<any> {
   public onFieldsChange = (props, changedFields, allFields) => {
     this.setState({
       searchFormData: {
-        ...searchFormData,
+        ...this.state.searchFormData,
         ...changedFields,
       },
     });

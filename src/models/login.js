@@ -99,6 +99,7 @@ export default {
       const roles = permissionRsps[2].data;
       const permissions = {
         welcomePage: true,
+        pricingManagement: true,
       };
 
       setPagePermissions(
