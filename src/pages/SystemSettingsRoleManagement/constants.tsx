@@ -1,70 +1,61 @@
-import { IFormControl } from '@/components/Form/types';
-import { IColumnDef } from '@/components/Table/types';
+import { IFormColDef, ITableColDef } from '@/components/type';
 import React from 'react';
 import Operation from './Operation';
+import FormItem from 'antd/lib/form/FormItem';
+import { Input } from 'antd';
+const { TextArea } = Input;
 
-export const TABLE_COL_DEF: (fetchTable, showResource) => IColumnDef[] = (
+export const TABLE_COL_DEF: (fetchTable, showResource) => ITableColDef[] = (
   fetchTable,
   showResource
 ) => [
   {
-    field: 'roleName',
-    headerName: '角色',
-    editable: true,
+    dataIndex: 'roleName',
+    title: '角色',
   },
   {
-    field: 'alias',
-    headerName: '别名',
-    editable: true,
+    dataIndex: 'alias',
+    title: '别名',
   },
   {
-    field: 'remark',
-    headerName: '备注',
-    editable: true,
+    dataIndex: 'remark',
+    title: '备注',
   },
   {
-    headerName: '操作',
-    render: params => {
-      return <Operation data={params.data} fetchTable={fetchTable} showResource={showResource} />;
+    dataIndex: 'operation',
+    title: '操作',
+    render: (val, record, index) => {
+      return <Operation data={record} fetchTable={fetchTable} showResource={showResource} />;
     },
   },
 ];
 
-export const FORM_CONTROL: IFormControl[] = [
+export const FORM_CONTROL: IFormColDef[] = [
   {
-    control: {
-      label: '角色名',
-    },
-    field: 'roleName',
-    input: {
-      type: 'input',
-    },
-    decorator: {
-      rules: [
-        {
-          required: true,
-          message: '角色名必填',
-        },
-      ],
+    title: '角色名',
+    dataIndex: 'roleName',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({ rules: [{ required: true, message: '角色名必填' }] })(
+            <Input />
+          )}
+        </FormItem>
+      );
     },
   },
   {
-    control: {
-      label: '别名',
-    },
-    field: 'alias',
-    input: {
-      type: 'input',
+    title: '别名',
+    dataIndex: 'alias',
+    render: (value, record, index, { form }) => {
+      return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
     },
   },
   {
-    control: {
-      label: '备注信息',
-    },
-    field: 'remark',
-    input: {
-      type: 'textarea',
-      autosize: { minRows: 4, maxRows: 4 },
+    title: '备注信息',
+    dataIndex: 'remark',
+    render: (value, record, index, { form }) => {
+      return <FormItem>{form.getFieldDecorator({})(<TextArea rows={4} />)}</FormItem>;
     },
   },
 ];
@@ -188,20 +179,6 @@ export const treeData = [
           },
         ],
       },
-
-      //   {
-      //     title: '审核',
-      //     children: [
-      //       {
-      //         title: '审核配置',
-      //         key: 'workflowSettings',
-      //       },
-      //       {
-      //         title: '任务管理',
-      //         key: 'processManagement',
-      //       },
-      //     ],
-      //   },
       {
         title: '报告',
         key: 'reports',
@@ -304,10 +281,6 @@ export const treeData = [
             title: '波动率管理日历',
             key: 'volatilityCalendar',
           },
-          // {
-          //   title: '角色管理',
-          //   key: 'roles',
-          // },
           {
             title: '角色管理',
             key: 'roleManagement',
