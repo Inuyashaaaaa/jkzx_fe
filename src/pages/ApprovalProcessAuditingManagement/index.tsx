@@ -209,9 +209,10 @@ class SystemSettingsRoleManagement extends PureComponent {
           return item.approveGroupId === currentGroup.approveGroupId;
         })
       ].userList;
+    const approveGroupList = _.sortBy(data, ['approveGroupName']);
     this.setState(
       {
-        approveGroupList: data,
+        approveGroupList,
         currentGroup,
         userList: currentGroup.userList,
       },
