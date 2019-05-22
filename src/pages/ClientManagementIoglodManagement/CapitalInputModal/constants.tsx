@@ -142,7 +142,13 @@ export const MIDDLE_FORM_CONTROLS = tradeIds => [
       return (
         <FormItem>
           {form.getFieldDecorator({})(
-            <Select style={{ minWidth: 180 }} options={tradeIds} allowClear={true} />
+            <Select
+              style={{ minWidth: 180 }}
+              options={tradeIds}
+              allowClear={true}
+              showSearch={true}
+              filterOption={true}
+            />
           )}
         </FormItem>
       );
