@@ -97,6 +97,8 @@ export const BarrierLeg: ILeg = {
         ObservationType,
         KnockDirection,
         OptionType,
+        RebateUnit,
+        BarrierType,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
