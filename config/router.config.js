@@ -63,6 +63,12 @@ export default [
               component: './TradeManagementPricing/index',
             },
             {
+              path: '/trade-management/pricing-management',
+              name: 'pricingManagement',
+              component: './TradeManagementPricingManagement/index',
+              hideInMenu: true,
+            },
+            {
               path: '/trade-management/notifications',
               name: 'notifications',
               component: './TradeManagementNotifications/index',

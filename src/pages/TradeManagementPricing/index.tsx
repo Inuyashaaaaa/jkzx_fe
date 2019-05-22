@@ -1,27 +1,25 @@
+import { Form2 } from '@/components';
+import { IFormField } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
   LEG_FIELD,
   LEG_ID_FIELD,
-  LEG_ENV_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
+  FROM_HISTORY_PRICING_TAG,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
+  COMPUTED_LEG_FIELD_MAP,
+  TOTAL_FIELD,
   TRADESCOLDEFS_LEG_FIELD_MAP,
   TRADESCOL_FIELDS,
-  TOTAL_FIELD,
-  COMPUTED_LEG_FIELD_MAP,
 } from '@/constants/global';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
-import { BOOKING_FROM_PRICING, PRICING_FROM_EDITING } from '@/constants/trade';
-import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
+import { PRICING_FROM_EDITING } from '@/constants/trade';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, Loading } from '@/components';
-import { IFormField } from '@/components/type';
-import { insert, remove, uuid, getMoment } from '@/utils';
 import Page from '@/containers/Page';
 import {
   countDelta,
@@ -39,119 +37,20 @@ import { convertTradePositions, createLegDataSourceItem } from '@/services/pages
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
-import { getLegByRecord } from '@/tools';
-import { ILeg } from '@/types/leg';
-import {
-  Affix,
-  Button,
-  Col,
-  Divider,
-  Input,
-  Menu,
-  message,
-  notification,
-  Row,
-  Select,
-  Icon,
-} from 'antd';
+import { getLegByRecord, getLegByProductType } from '@/tools';
+import { getMoment, insert, remove, uuid } from '@/utils';
+import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useRef, useState, useEffect } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import router from 'umi/router';
+import ActionBar from './ActionBar';
 import './index.less';
+import { DATE_LEG_FIELDS } from '@/constants/legType';
+import moment from 'moment';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
-
-const ActionBar = memo<any>(props => {
-  const {
-    setTableData,
-    curPricingEnv,
-    setCurPricingEnv,
-    tableData,
-    pricingEnvironmentsList,
-    fetchDefaultPricingEnvData,
-    testPricing,
-    pricingLoading,
-  } = props;
-
-  const onPricingEnvSelectChange = val => {
-    setCurPricingEnv(val);
-    tableData.forEach(item => fetchDefaultPricingEnvData(item, true));
-  };
-
-  const [affix, setAffix] = useState(false);
-
-  return (
-    <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
-      <Row
-        type="flex"
-        justify="space-between"
-        style={{
-          background: '#fff',
-          borderBottom: affix ? '1px solid #ddd' : 'none',
-          padding: affix ? '20px 0' : 0,
-        }}
-      >
-        <Row type="flex" align="middle">
-          <Col>
-            <MultilLegCreateButton
-              isPricing={true}
-              key="create"
-              handleAddLeg={(leg: ILeg) => {
-                if (!leg) return;
-
-                setTableData(pre =>
-                  pre.concat({
-                    ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-                    ...leg.getDefaultData(LEG_ENV.PRICING),
-                  })
-                );
-              }}
-            />
-          </Col>
-          <Col style={{ marginLeft: 15 }}>定价环境:</Col>
-          <Col style={{ marginLeft: 10, width: 400 }}>
-            <Input.Group compact={true}>
-              <Select
-                loading={curPricingEnv === null}
-                onChange={onPricingEnvSelectChange}
-                value={curPricingEnv}
-                style={{ width: 200 }}
-              >
-                {pricingEnvironmentsList.map(item => {
-                  return (
-                    <Select.Option key={item} value={item}>
-                      {item}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-              <Button loading={pricingLoading} key="试定价" type="primary" onClick={testPricing}>
-                试定价
-              </Button>
-            </Input.Group>
-          </Col>
-        </Row>
-        <Button
-          key="转换簿记"
-          type="primary"
-          onClick={() => {
-            router.push({
-              pathname: '/trade-management/booking',
-              query: {
-                from: BOOKING_FROM_PRICING,
-              },
-            });
-          }}
-        >
-          转换簿记
-        </Button>
-      </Row>
-    </Affix>
-  );
-});
 
 const TradeManagementBooking = props => {
   const tableData = _.map(props.pricingData.tableData, iitem => {
@@ -165,7 +64,7 @@ const TradeManagementBooking = props => {
       return item;
     });
   });
-  const { location, tradeManagementBookEditPageData } = props;
+  const { location, tradeManagementBookEditPageData, tradeManagementPricingManagement } = props;
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [curPricingEnv, setCurPricingEnv] = useState(null);
 
@@ -177,12 +76,11 @@ const TradeManagementBooking = props => {
   };
 
   const { query } = location;
-  const { from } = query;
+  const { from, id } = query;
 
   useLifecycles(() => {
-    const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
-
     if (from === PRICING_FROM_EDITING) {
+      const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
       const recordTypeIsModelXY = record => {
         return Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
       };
@@ -207,6 +105,36 @@ const TradeManagementBooking = props => {
             [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
           };
         });
+      setTableData(next);
+    }
+
+    if (from === FROM_HISTORY_PRICING_TAG) {
+      const { tableDataSource: historyTableData } = tradeManagementPricingManagement;
+      const useItem = historyTableData.find(item => item.uuid === id);
+
+      if (!useItem) return;
+
+      const { quotePositions } = useItem;
+
+      const next = quotePositions.map(position => {
+        const { productType, asset } = position;
+        const leg = getLegByProductType(productType);
+        if (!leg) {
+          throw new Error(`${productType} is not defiend!`);
+        }
+        return {
+          ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+          ...Form2.createFields({
+            ..._.mapValues(asset, (val, key) => {
+              if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                return moment(val);
+              }
+              return val;
+            }),
+            ..._.pick(position, TRADESCOL_FIELDS),
+          }),
+        };
+      });
       setTableData(next);
     }
   });
@@ -601,5 +529,6 @@ export default memo(
     currentUser: (state.user as any).currentUser,
     pricingData: state.pricingData,
     tradeManagementBookEditPageData: state.tradeManagementBookEdit,
+    tradeManagementPricingManagement: state.tradeManagementPricingManagement,
   }))(TradeManagementBooking)
 );

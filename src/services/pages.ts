@@ -100,10 +100,6 @@ export const bookingTableFormControls: () => IFormControl[] = () => [
   },
 ];
 
-export const getAddLegItem = (leg: ILeg, dataSourceItem: any, isPricing = false) => {
-  return leg.getDefault(dataSourceItem, isPricing);
-};
-
 export const convertTradePositions = (tableDataSource, tableFormData, env) => {
   const positions: any[] = tableDataSource.map(dataSourceItem => {
     dataSourceItem = miniumlPercent(dataSourceItem);
@@ -124,6 +120,22 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       counterPartyName: tableFormData.counterPartyCode,
       ...leg.getPosition(env, dataSourceItem, tableDataSource),
     };
+  });
+
+  return positions;
+};
+
+export const convertPricingHistoryTradePositions = (tableDataSource, env) => {
+  const positions: any[] = tableDataSource.map(dataSourceItem => {
+    dataSourceItem = miniumlPercent(dataSourceItem);
+    const type = dataSourceItem[LEG_TYPE_FIELD];
+    const leg = getLegByType(type);
+
+    if (!leg) {
+      throw new Error('not found Leg type');
+    }
+
+    return leg.getPosition(env, dataSourceItem, tableDataSource);
   });
 
   return positions;
