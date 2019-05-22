@@ -215,7 +215,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    let taskList = taskApproveGroupList.map((item, index) => {
+    const taskList = taskApproveGroupList.map((item, index) => {
       item.sequence = index;
       item.taskType = TASKTYPE[item.taskType];
       item.actionClass =
@@ -316,7 +316,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public handleGroupNamge = (e, param = {}) => {
-    let taskApproveGroupList = [...this.state.taskApproveGroupList];
+    const taskApproveGroupList = [...this.state.taskApproveGroupList];
     taskApproveGroupList.map(item => {
       if (item.taskId === param.taskId) {
         item.taskName = e;
@@ -448,7 +448,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                                   }}
                                 >
                                   <Paragraph
-                                    ellipsis
+                                    ellipsis={true}
                                     editable={{ onChange: e => this.handleGroupNamge(e, group) }}
                                     onChange={e => this.handleGroupNamge(e, group)}
                                   >
