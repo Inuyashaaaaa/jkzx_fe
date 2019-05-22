@@ -129,3 +129,13 @@ export async function mktInstrumentWhitelistListPaged(params = { instrumentIds: 
     },
   });
 }
+
+export async function mktQuoteSave(params = {}) {
+  return request(`${HOST_TEST}market-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'mktQuoteSave',
+      params,
+    },
+  });
+}
