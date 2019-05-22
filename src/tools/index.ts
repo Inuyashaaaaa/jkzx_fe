@@ -362,3 +362,11 @@ export const catchCallbackError = (target: any) => {
     }
   };
 };
+
+export const getLocaleId = (parent, item) => {
+  const parentName = parent && parent.name;
+  if (parentName) {
+    return `menu.${parentName}.${item.name}`;
+  }
+  return `menu.${item.name}`;
+};
