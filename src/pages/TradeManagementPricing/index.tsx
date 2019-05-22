@@ -107,36 +107,6 @@ const TradeManagementBooking = props => {
         });
       setTableData(next);
     }
-
-    if (from === FROM_HISTORY_PRICING_TAG) {
-      const { tableDataSource: historyTableData } = tradeManagementPricingManagement;
-      const useItem = historyTableData.find(item => item.uuid === id);
-
-      if (!useItem) return;
-
-      const { quotePositions } = useItem;
-
-      const next = quotePositions.map(position => {
-        const { productType, asset } = position;
-        const leg = getLegByProductType(productType);
-        if (!leg) {
-          throw new Error(`${productType} is not defiend!`);
-        }
-        return {
-          ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-          ...Form2.createFields({
-            ..._.mapValues(asset, (val, key) => {
-              if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
-                return moment(val);
-              }
-              return val;
-            }),
-            ..._.pick(position, TRADESCOL_FIELDS),
-          }),
-        };
-      });
-      setTableData(next);
-    }
   });
 
   const [fetched, setFetched] = useState(false);

@@ -7,7 +7,7 @@ import {
   convertPricingHistoryTradePositions,
 } from '@/services/pages';
 import { ILeg } from '@/types/leg';
-import { Affix, Button, Col, Input, Modal, Row, Select, notification } from 'antd';
+import { Affix, Button, Col, Input, Modal, Row, notification, Alert, Drawer } from 'antd';
 import _ from 'lodash';
 import React, { memo, useState } from 'react';
 import router from 'umi/router';
@@ -18,8 +18,11 @@ import {
   COMPUTED_LEG_FIELDS,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/global';
-import { Form2 } from '@/components';
+import { Form2, Select } from '@/components';
 import BigNumber from 'bignumber.js';
+import { refSimilarLegalNameList } from '@/services/reference-data-service';
+import FormItem from 'antd/lib/form/FormItem';
+import TradeManagementPricingManagement from './TradeManagementPricingManagement';
 
 const ActionBar = memo<any>(props => {
   const {
@@ -42,6 +45,8 @@ const ActionBar = memo<any>(props => {
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [comment, setComment] = useState('');
   const [saveLoading, setSaveLoading] = useState(false);
+  const [counterPartyCode, setCounterPartyCode] = useState(undefined);
+  const [visible, setVisible] = useState(false);
 
   return (
     <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
@@ -124,9 +129,7 @@ const ActionBar = memo<any>(props => {
             key="历史试定价"
             type="primary"
             onClick={() => {
-              router.push({
-                pathname: '/trade-management/pricing-management',
-              });
+              setVisible(true);
             }}
           >
             历史试定价
@@ -134,6 +137,7 @@ const ActionBar = memo<any>(props => {
         </Button.Group>
       </Row>
       <Modal
+        title="保存试定价"
         confirmLoading={saveLoading}
         visible={saveModalVisible}
         onCancel={() => {
@@ -159,6 +163,7 @@ const ActionBar = memo<any>(props => {
             quotePrc: {
               pricingEnvironmentId: curPricingEnv,
               comment,
+              counterPartyCode,
               quotePositions: positions.map((position, index) => {
                 return {
                   ...position,
@@ -180,21 +185,64 @@ const ActionBar = memo<any>(props => {
           if (error) return;
 
           setSaveModalVisible(false);
-          setComment('');
-          setTableData([]);
+          setComment(undefined);
+          setCounterPartyCode(undefined);
 
           notification.success({
             message: '保存记录成功',
           });
         }}
       >
-        <p>保存当前的试定价要素以便快速复用</p>
-        <Input.TextArea
-          value={comment}
-          onChange={event => setComment(event.target.value)}
-          placeholder="请输入备注信息（可选）"
+        <Alert
+          showIcon={true}
+          message="保存当前的试定价要素以便快速复用"
+          style={{ marginBottom: 20 }}
         />
+        <FormItem label="交易对手" wrapperCol={{ span: 16 }} labelCol={{ span: 8 }}>
+          <Select
+            onChange={val => {
+              setCounterPartyCode(val);
+            }}
+            value={counterPartyCode}
+            style={{ minWidth: 180 }}
+            fetchOptionsOnSearch={true}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            options={async (value: string = '') => {
+              const { data, error } = await refSimilarLegalNameList({
+                similarLegalName: value,
+              });
+              if (error) return [];
+              return data.map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />
+        </FormItem>
+        <div>
+          <FormItem label="备注信息" wrapperCol={{ span: 16 }} labelCol={{ span: 8 }}>
+            <Input.TextArea
+              value={comment}
+              onChange={event => setComment(event.target.value)}
+              placeholder="请输入备注信息"
+            />
+          </FormItem>
+        </div>
       </Modal>
+
+      <Drawer
+        width={1000}
+        title="历史定价管理"
+        placement={'right'}
+        onClose={() => {
+          setVisible(false);
+        }}
+        visible={visible}
+      >
+        <TradeManagementPricingManagement setTableData={setTableData} setVisible={setVisible} />
+      </Drawer>
     </Affix>
   );
 });

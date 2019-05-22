@@ -272,6 +272,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                         editing,
                         defaultOpen: editing ? false : true,
                         showSearch: true,
+                        allowClear: true,
                         fetchOptionsOnSearch: true,
                         placeholder: '请输入内容搜索',
                         options: async (value: string = '') => {
@@ -337,6 +338,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                               editing,
                               fetchOptionsOnSearch: true,
                               showSearch: true,
+                              allowClear: true,
                               placeholder: '请输入内容搜索',
                               options: async (value: string = '') => {
                                 const { data, error } = await refSimilarLegalNameList({

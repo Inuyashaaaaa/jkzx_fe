@@ -44,6 +44,7 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     input: {
       type: 'select',
       showSearch: true,
+      allowClear: true,
       placeholder: '请输入内容搜索',
       options: async (value: string = '') => {
         const { data, error } = await refSimilarLegalNameList({

@@ -132,6 +132,7 @@ class ClientManagementFundStatistics extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        fetchOptionsOnSearch={true}
                         options={async (value: string = '') => {
                           const { data, error } = await refSimilarLegalNameList({
                             similarLegalName: value,
@@ -160,6 +161,7 @@ class ClientManagementFundStatistics extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        fetchOptionsOnSearch={true}
                         options={async (value: string = '') => {
                           const { data, error } = await refMasterAgreementSearch({
                             masterAgreementId: value,
@@ -188,6 +190,7 @@ class ClientManagementFundStatistics extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        filterOption={true}
                         options={[
                           {
                             label: '全部',

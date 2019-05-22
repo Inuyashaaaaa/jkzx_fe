@@ -190,8 +190,8 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
                             width: 180,
                           },
                           placeholder: '请输入内容搜索',
-                          allowClear: true,
                           showSearch: true,
+                          allowClear: true,
                           fetchOptionsOnSearch: true,
                           options: async (value: string) => {
                             const { data, error } = await trdPortfolioListBySimilarPortfolioName({
