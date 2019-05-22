@@ -7,6 +7,12 @@ export const PROCESS_CONFIGS = [
   },
 ];
 
+export const TASKTYPE = {
+  insertData: 'INPUT_DATA',
+  modifyData: 'MODIFY_DATA',
+  reviewData: 'REVIEW_DATA',
+};
+
 export function GTE_PROCESS_CONFIGS(value) {
   const index = _.findIndex(PROCESS_CONFIGS, item => {
     return item.value === value;
