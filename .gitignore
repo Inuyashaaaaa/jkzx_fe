@@ -9,6 +9,7 @@ _roadhog-api-doc
 # production
 /dist
 /docs
+/e2e-test-results
 
 # misc
 .DS_Store
