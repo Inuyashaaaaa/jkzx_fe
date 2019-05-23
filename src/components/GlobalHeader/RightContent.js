@@ -78,7 +78,7 @@ export default class GlobalHeaderRight extends PureComponent {
         </Menu.Item>
         <Menu.Divider /> */}
         <Menu.Item key="updatePassword">
-          <Icon type="setting" theme="filled" />
+          <Icon type="setting" />
           <FormattedMessage id="menu.account.update" defaultMessage="update" />
         </Menu.Item>
         <Menu.Item key="logout">

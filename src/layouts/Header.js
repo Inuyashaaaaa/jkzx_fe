@@ -78,11 +78,13 @@ class HeaderView extends PureComponent {
       username: user,
       ...params,
     });
-    this.setState({ confirmLoading: false, updateVisible: false });
-    if (rsp.data.error) {
+    const { data = {} } = rsp;
+    this.setState({ confirmLoading: false });
+    if (data.error) {
       message.error('修改失败');
       return;
     }
+    this.setState({ updateVisible: false, updateFormData: {} });
     message.success('修改成功');
   };
 
