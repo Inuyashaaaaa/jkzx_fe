@@ -5,7 +5,7 @@ import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
-import { authUserList, createUser, updateUser } from '@/services/user';
+import { authUserList, createUser, updateUser, updateUserRole } from '@/services/user';
 import { Button, Col, message, Modal, notification, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
@@ -133,7 +133,6 @@ class SystemSettingsUsers extends PureComponent {
   };
 
   public handleCellValueChanged = async params => {
-    const { changedFields, record } = params;
     this.setState({
       users: this.state.users.map(item => {
         if (item.id === params.rowId) {
@@ -145,14 +144,6 @@ class SystemSettingsUsers extends PureComponent {
         return item;
       }),
     });
-    // const res = await updateUserRole({
-    //   userId: data.id,
-    //   roleIds: newValue,
-    // });
-    // if (res.error) return;
-    // notification.success({
-    //   message: '更新角色成功',
-    // });
   };
 
   public onCreate = async () => {
@@ -217,6 +208,21 @@ class SystemSettingsUsers extends PureComponent {
               size={'middle'}
               scroll={{ x: 1800 }}
               onCellFieldsChange={this.handleCellValueChanged}
+              onCellEditingChanged={async params => {
+                const { record, rowId } = params;
+
+                const user = this.state.users.find(item => item.id === rowId);
+                if (!user) return;
+
+                const res = await updateUserRole({
+                  userId: user.id,
+                  roleIds: Form2.getFieldValue(record.roles),
+                });
+                if (res.error) return;
+                notification.success({
+                  message: '更新角色成功',
+                });
+              }}
             />
           </>
         )}
