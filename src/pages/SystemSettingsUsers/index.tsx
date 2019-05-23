@@ -1,29 +1,14 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import { Form2, Table2 } from '@/components';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/components/SourceTable';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
-import {
-  authUserList,
-  createUser,
-  deleteUser,
-  expireUser,
-  lockUser,
-  saveUserPasswordByAdmin,
-  unexpireUser,
-  unlockUser,
-  updateUser,
-  updateUserRole,
-} from '@/services/user';
-import { Button, Col, Modal, notification, Row } from 'antd';
-import produce from 'immer';
+import { authUserList, createUser, updateUser } from '@/services/user';
+import { Button, Col, message, Modal, notification, Row } from 'antd';
 import React, { PureComponent } from 'react';
-import FormBuilder from '../SystemSettingDepartment/components/CommonForm';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
-import PasswordModify from './PasswordModify';
+import { CREATE_FORM_CONTROLS } from './constants';
 import { createPageTableColDefs } from './services';
-import { Table2, Form2 } from '@/components';
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -47,31 +32,42 @@ function findDepartment(departs, departId) {
   return hint;
 }
 
+function departmentsTreeData(departments) {
+  function getChild(params) {
+    if (params.children) {
+      return {
+        title: params.departmentName,
+        value: params.id,
+        key: params.id,
+        children: params.children.map(item => getChild(item)),
+      };
+    }
+    return {
+      title: params.departmentName,
+      value: params.id,
+      key: params.id,
+    };
+  }
+  return departments && getChild(departments);
+}
+
 class SystemSettingsUsers extends PureComponent {
   public rowKey = 'id';
 
   public $sourceTable: Table2 = null;
 
-  public initialFetchTableData = null;
-
-  public choosedUser = null;
+  public $form: Form2 = null;
 
   public state = {
     roleOptions: [],
     loading: false,
     formData: {},
-    saveLoading: false,
-    rowData: [],
-    canSave: false,
     users: [],
-    modalTitle: '',
     modalVisible: false,
-    modalOKLoading: false,
-    expireLoading: false,
     displayResources: false,
     choosedUser: {},
-    formBuilderItems: [],
-    laoding: false,
+    departments: [],
+    confirmLoading: false,
   };
 
   public componentDidMount = () => {
@@ -89,7 +85,9 @@ class SystemSettingsUsers extends PureComponent {
     const departments = departmentsRes.data || {};
     const users = usersRes.data || [];
     const roles = rolesRes.data || [];
-    this.departments = departments;
+    this.setState({
+      departments,
+    });
     users.forEach(user => {
       const department = findDepartment(departments, user.departmentId);
       user.departmentName = department.departmentName || '';
@@ -113,294 +111,10 @@ class SystemSettingsUsers extends PureComponent {
     });
   };
 
-  // public fetchTable = async () => {
-  //   const { error, data } = await authUserList();
-  //   if (error) return false;
-  //   data.forEach(dataItem => {
-  //     dataItem.roles.forEach(item => {
-  //       item.value = item.uuid;
-  //       item.label = item.roleName;
-  //     });
-  //   });
-  //   return data;
-  // };
-
-  public onRemove = async params => {
-    const { id: rowId } = params;
-    const res = await deleteUser({ userId: rowId });
-    if (res.error) {
-      return;
-    }
-    notification.success({
-      message: '删除成功',
-    });
-    this.fetchData();
-  };
-
-  public onCreateUser = async stationalData => {
-    const { createFormData, tableDataSource } = stationalData;
-    const { error, data } = await createUser(createFormData);
-    if (error) return false;
-
-    return {
-      tableDataSource: tableDataSource.concat(data),
-    };
-  };
-
-  public lockUser = async rowData => {
-    const user = rowData;
-    const nextLockStatus = !user.locked;
-    const params = {
-      username: user.username,
-    };
-
-    const executeMethod = nextLockStatus ? lockUser : unlockUser;
-
-    const { error } = await executeMethod(params);
-
-    if (error) return false;
-
-    const tips = nextLockStatus ? '锁定成功' : '解锁成功';
-
-    notification.success({
-      message: tips,
-    });
-    this.fetchData();
-    return () => {
-      this.setState(
-        produce((state: any) => {
-          const user = state.users.find(user => user[this.rowKey] === rowData.id);
-          if (!user) return;
-          user.locked = nextLockStatus;
-        })
-      );
-    };
-  };
-
-  public expireUser = async rowData => {
-    const nextExpireStatus = !rowData.expired;
-    const params = {
-      username: rowData.username,
-    };
-
-    const executeMethod = nextExpireStatus ? expireUser : unexpireUser;
-    const { error } = await executeMethod(params);
-
-    if (error) return false;
-
-    const tips = nextExpireStatus ? '密码过期成功' : '使密码有效成功';
-    notification.success({
-      message: tips,
-    });
-    this.fetchData();
-    return buttonContext => {
-      this.setState(
-        produce((state: any) => {
-          const user = state.users.find(user => user[this.rowKey] === rowData.id);
-          if (!user) return;
-          user.expired = nextExpireStatus;
-        })
-      );
-    };
-  };
-
-  public resetPassword = async e => {
-    this.choosedUser = e.rowData;
-    this.showModal({ modalTitle: '重置密码' });
-  };
-
-  public updateUser = async rowData => {
-    this.choosedUser = rowData;
-    this.showModal({
-      formBuilderItems: this.formatFormBuliderItems('modify', this.choosedUser),
-      modalTitle: '更新用户',
-    });
-  };
-
-  public createUser = e => {
-    this.showModal({
-      formBuilderItems: this.formatFormBuliderItems('create'),
-      modalTitle: '新建用户',
-    });
-  };
-
-  public executeModifyUser = async params => {
-    const { modalTitle, choosedUser, roleOptions } = this.state;
-    const isCreate = modalTitle === '新建用户';
-    const action = isCreate ? 'create' : 'modify';
-    const finalObj = { ...params };
-    if (isCreate) {
-      const roleNames = finalObj.roleIds || [];
-      if (roleOptions && roleOptions.length > 0) {
-        finalObj.roleIds = roleNames.map(name => {
-          const role = roleOptions.find(r => r.roleName === name || r.id === name);
-          return role.id;
-        });
-      }
-    } else {
-      finalObj.userId = this.choosedUser.id;
-    }
-    this.setState({ modalOKLoading: true });
-    finalObj.userType = finalObj.userType === '普通用户' ? 'NORMAL' : 'SCRIPT';
-    const hintMethod = isCreate ? createUser : updateUser;
-    const res = await hintMethod(finalObj);
-    this.setState({ modalOKLoading: false });
-    if (res && res.data) {
-      const tip = isCreate ? '创建' : '更新';
-      notification.success({
-        message: `${tip}用户成功`,
-      });
-      this.fetchData();
-      this.hideModal();
-    }
-  };
-
-  public setFormBuilderInfo = (value, property) => {
-    this.newUser = this.newUser || {};
-    const user = this.newUser;
-    user[property] = value;
-  };
-
-  public formatFormBuliderItems = (action, record) => {
-    const { roleOptions, users } = this.state;
-    const userName = {
-      type: 'text',
-      label: '用户名',
-      property: 'username',
-      required: true,
-    };
-    const password = {
-      type: 'password',
-      label: '密码',
-      property: 'password',
-      required: true,
-      placeholder: '至少一位数字、字母以及其他特殊字符，且不少于8位',
-      rule: value => {
-        const reg = /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/;
-        if (value && !reg.test(value)) {
-          return '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位';
-        }
-      },
-    };
-    const confirmPass = {
-      type: 'password',
-      label: '确认密码',
-      property: 'confirmPass',
-      required: true,
-      placeholder: '请与密码保持一致',
-      rule(value) {
-        if (value !== this.password) {
-          return '必须与密码保持一致';
-        }
-      },
-    };
-    const userType = {
-      type: 'select',
-      label: '用户类型',
-      property: 'userType',
-      required: true,
-      options: ['普通用户', '脚本用户'],
-    };
-    const nickName = {
-      type: 'text',
-      label: '用户昵称',
-      property: 'nickName',
-      required: false,
-    };
-    const email = {
-      type: 'text',
-      label: '邮箱',
-      property: 'contactEmail',
-      required: false,
-    };
-    const role = {
-      type: 'multiSelect',
-      label: '角色',
-      property: 'roleIds',
-      required: false,
-      options: roleOptions.map(role => role.roleName),
-    };
-    const department = {
-      type: 'treeSelect',
-      label: '部门',
-      property: 'departmentId',
-      display: 'departmentName',
-      required: true,
-      data: this.departments,
-      disabled: action === 'modify' && record.username === 'admin' ? true : false,
-    };
-    if (action === 'create') {
-      return [userName, password, confirmPass, department, userType, nickName, email, role];
-    }
-    if (action === 'modify') {
-      let user = users.find(item => item.id === record.id);
-      user = { ...user };
-      user.userType = user.userType === 'NORMAL' ? '普通用户' : '脚本用户';
-      const modifrA = [userName, department, userType, nickName, email];
-      modifrA.forEach(item => {
-        item.value = user[item.property] || '';
-      });
-      this.userOnModify = user;
-      const department1 = (this.userOnModifyDepartment = findDepartment(
-        this.departments,
-        user.departmentId
-      ));
-      department1.value = department1.departmentName;
-      return modifrA;
-    }
-  };
-
-  public showModal = nextState => {
+  public showModal = () => {
     this.setState({
-      modalVisible: true,
-      ...nextState,
+      modalVisible: !this.state.modalVisible,
     });
-  };
-
-  public hideModal = () => {
-    this.setState({
-      modalVisible: false,
-      modalOKLoading: false,
-    });
-  };
-
-  public handlePwd = () => {
-    // this.hidePwd();
-    this.PwdModify.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        this.setState({
-          modalOKLoading: true,
-        });
-        const { password } = values;
-        const params = {
-          userId: this.choosedUser.id,
-          password,
-        };
-        saveUserPasswordByAdmin(params).then(res => {
-          if (res.error) {
-            return;
-          }
-          this.hideModal();
-          notification.success({
-            message: `重置${this.choosedUser.username}密码成功`,
-          });
-        });
-      }
-    });
-  };
-
-  public handleModalOK = () => {
-    const { modalTitle } = this.state;
-    if (modalTitle === '重置密码') {
-      this.handlePwd();
-    } else {
-      // this.executeModifyUser();
-      if (this.$formBuilder) {
-        this.$formBuilder.validateForm(values => {
-          this.executeModifyUser(values);
-        });
-      }
-    }
   };
 
   public showResources = rowData => {
@@ -410,45 +124,6 @@ class SystemSettingsUsers extends PureComponent {
     });
   };
 
-  public getRowActions = event => {
-    const rowData = event;
-    const { locked, expired } = rowData;
-    return (
-      <>
-        <PopconfirmButton
-          type="primary"
-          size="small"
-          key="remove"
-          popconfirmProps={{
-            title: '确定要删除吗?',
-            onConfirm: this.onRemove.bind(this, event),
-          }}
-        >
-          删除
-        </PopconfirmButton>
-        <Button key="password" type="primary" onClick={this.resetPassword} size="small">
-          重置密码
-        </Button>
-        <Button key="lock" type="primary" onClick={() => this.lockUser(rowData)} size="small">
-          {!locked ? '锁定用户' : '解锁用户'}
-        </Button>
-        <Button key="expire" type="primary" onClick={() => this.expireUser(rowData)} size="small">
-          {expired ? '使用户在期' : '过期用户'}
-        </Button>
-        <Button key="user" type="primary" onClick={() => this.updateUser(rowData)} size="small">
-          修改用户
-        </Button>
-        <Button
-          key="resource"
-          type="primary"
-          onClick={async () => this.showResources(rowData)}
-          size="small"
-        >
-          数据权限
-        </Button>
-      </>
-    );
-  };
   public hideResource = () => {
     this.setState({
       displayResources: false,
@@ -479,16 +154,41 @@ class SystemSettingsUsers extends PureComponent {
     // });
   };
 
+  public onCreate = async () => {
+    const validateRsp = await this.$form.validate();
+    if (validateRsp.error) return;
+    this.setState({ confirmLoading: true });
+    const { error, data } = await createUser(
+      _.omit(Form2.getFieldsValue(this.state.formData), 'confirmpassword')
+    );
+    this.setState({ confirmLoading: false });
+    if (error) {
+      message.error('新建失败');
+      return;
+    }
+    message.success('新建成功');
+    this.setState({
+      modalVisible: false,
+      formData: {},
+    });
+    this.fetchData();
+  };
+
+  public handleFieldsChangeCreate = (props, fields, allFields) => {
+    this.setState({
+      formData: allFields,
+    });
+  };
+
   public render() {
     const {
       displayResources,
       choosedUser,
-      modalVisible,
-      modalOKLoading,
-      modalTitle,
-      formBuilderItems,
       users,
       loading,
+      modalVisible,
+      formData,
+      confirmLoading,
     } = this.state;
     console.log(users);
     return (
@@ -497,7 +197,7 @@ class SystemSettingsUsers extends PureComponent {
           <>
             <Row type="flex" justify="start" style={{ marginBottom: VERTICAL_GUTTER }}>
               <Col>
-                <Button type="primary" onClick={this.createUser}>
+                <Button type="primary" onClick={this.showModal}>
                   新建用户
                 </Button>
               </Col>
@@ -507,9 +207,14 @@ class SystemSettingsUsers extends PureComponent {
               ref={node => (this.$sourceTable = node)}
               rowKey={this.rowKey}
               dataSource={users}
-              columns={createPageTableColDefs(this.state.roleOptions, this.getRowActions)}
+              columns={createPageTableColDefs(
+                this.state.roleOptions,
+                this.showResources,
+                departmentsTreeData(this.state.departments),
+                this.fetchData
+              )}
               size={'middle'}
-              scroll={{ x: 2000 }}
+              scroll={{ x: 1800 }}
               onCellFieldsChange={this.handleCellValueChanged}
             />
           </>
@@ -540,33 +245,23 @@ class SystemSettingsUsers extends PureComponent {
           </div>
         )}
         <Modal
-          title={modalTitle}
+          title={'新建用户'}
           visible={modalVisible}
-          onCancel={this.hideModal}
-          onOk={this.handleModalOK}
+          onCancel={this.showModal}
+          onOk={this.onCreate}
           width={600}
-          footer={
-            <div>
-              <Button type="primary" onClick={this.hideModal}>
-                取消
-              </Button>
-              <Button type="primary" onClick={this.handleModalOK} loading={modalOKLoading}>
-                确认
-              </Button>
-            </div>
-          }
+          confirmLoading={confirmLoading}
         >
-          {modalTitle === '重置密码' ? (
-            <PasswordModify ref={node => (this.PwdModify = node)} />
-          ) : (
-            modalVisible && (
-              <FormBuilder
-                data={formBuilderItems}
-                handleChange={this.setFormBuilderInfo}
-                ref={ele => (this.$formBuilder = ele)}
-              />
-            )
-          )}
+          <Form2
+            ref={node => (this.$form = node)}
+            dataSource={formData}
+            onFieldsChange={this.handleFieldsChangeCreate}
+            footer={false}
+            columns={CREATE_FORM_CONTROLS(
+              departmentsTreeData(this.state.departments),
+              this.state.roleOptions
+            )}
+          />
         </Modal>
       </Page>
     );
