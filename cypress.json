@@ -1,9 +1,4 @@
 {
-  "reporter": "mochawesome",
-  "reporterOptions": {
-    "reportDir": "e2e-test-results",
-    "reportFilename": "index.html"
-  },
   "video": false,
   "browser": "chrome"
 }
