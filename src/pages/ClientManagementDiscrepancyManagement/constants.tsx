@@ -3,6 +3,9 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   PAYMENT_DIRECTION_TYPE_OPTIONS,
   PROCESS_STATUS_TYPES_OPTIONS,
+  PAYMENT_DIRECTION_TYPE_ZHCN_MAP,
+  ACCOUNT_DIRECTION_TYPE_ZHCN_MAP,
+  PROCESS_STATUS_TYPES_ZHCN_MAPS,
 } from '@/constants/common';
 import { IFormControl } from '@/components/Form/types';
 import { IColumnDef } from '@/components/Table/types';
@@ -10,244 +13,263 @@ import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
+import { ITableColDef, IFormColDef } from '@/components/type';
+import { formatNumber } from '@/tools';
+import React from 'react';
+import FormItem from 'antd/lib/form/FormItem';
+import { Select, Input, InputNumber, DatePicker } from '@/components';
+import { DatePicker as AntdDatePicker } from 'antd';
+const { RangePicker } = AntdDatePicker;
 
-export const TABLE_COL_DEFS: IColumnDef[] = [
+export const TABLE_COL_DEFS: ITableColDef[] = [
   {
-    headerName: '交易对手',
-    field: 'clientId',
+    title: '交易对手',
+    dataIndex: 'clientId',
   },
   {
-    headerName: '交易对手银行账号',
-    field: 'bankAccount',
+    title: '交易对手银行账号',
+    dataIndex: 'bankAccount',
   },
   {
-    headerName: '序列号',
-    field: 'serialNumber',
+    title: '序列号',
+    dataIndex: 'serialNumber',
   },
   {
-    headerName: '出入金额 (¥)',
-    field: 'paymentAmount',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '出入金额 (¥)',
+    dataIndex: 'paymentAmount',
+    render: (value, record, index) => formatNumber(value, 4),
   },
   {
-    headerName: '方向',
-    field: 'paymentDirection',
-    input: {
-      type: 'select',
-      options: PAYMENT_DIRECTION_TYPE_OPTIONS,
+    title: '方向',
+    dataIndex: 'paymentDirection',
+    render: (value, record, index) => PAYMENT_DIRECTION_TYPE_ZHCN_MAP[value],
+  },
+  {
+    title: '账户类型',
+    dataIndex: 'accountDirection',
+    render: (value, record, index) => ACCOUNT_DIRECTION_TYPE_ZHCN_MAP[value],
+  },
+  {
+    title: '支付日期',
+    dataIndex: 'paymentDate',
+  },
+  {
+    title: '状态',
+    dataIndex: 'processStatus',
+    render: (value, record, index) => PROCESS_STATUS_TYPES_ZHCN_MAPS[value],
+  },
+];
+
+export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAccountList => [
+  {
+    title: '交易对手',
+    dataIndex: 'clientId',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '交易对手必填',
+              },
+            ],
+          })(
+            <Select
+              showSearch={true}
+              allowClear={true}
+              options={async (value: string = '') => {
+                const { data, error } = await refSimilarLegalNameList({
+                  similarLegalName: value,
+                });
+                if (error) return [];
+                return data.map(item => ({
+                  label: item,
+                  value: item,
+                }));
+              }}
+            />
+          )}
+        </FormItem>
+      );
     },
   },
   {
-    headerName: '账户类型',
-    field: 'accountDirection',
-    input: {
-      type: 'select',
-      options: ACCOUNT_DIRECTION_TYPE_OPTIONS,
+    title: '交易对手银行账号',
+    dataIndex: 'bankAccount',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '交易对手银行账号必填',
+              },
+            ],
+          })(<Select allowClear={true} options={bankAccountList} />)}
+        </FormItem>
+      );
     },
   },
   {
-    headerName: '支付日期',
-    field: 'paymentDate',
-    input: {
-      type: 'date',
-      range: 'day',
+    title: '出入金金额',
+    dataIndex: 'paymentAmount',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '出入金金额必填',
+              },
+            ],
+          })(<InputNumber />)}
+        </FormItem>
+      );
     },
   },
   {
-    headerName: '状态',
-    field: 'processStatus',
-    input: {
-      type: 'select',
-      options: PROCESS_STATUS_TYPES_OPTIONS,
+    title: '出入金日期',
+    dataIndex: 'paymentDate',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '出入金日期必填',
+              },
+            ],
+          })(<DatePicker format={'YYYY-MM-DD'} />)}
+        </FormItem>
+      );
+    },
+  },
+  {
+    title: '出入金方向',
+    dataIndex: 'paymentDirection',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '出入金方向必填',
+              },
+            ],
+          })(<Select options={PAYMENT_DIRECTION_TYPE_OPTIONS} />)}
+        </FormItem>
+      );
+    },
+  },
+  {
+    title: '账户类型',
+    dataIndex: 'accountDirection',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '账户类型必填',
+              },
+            ],
+          })(<Select options={ACCOUNT_DIRECTION_TYPE_OPTIONS} />)}
+        </FormItem>
+      );
     },
   },
 ];
 
-export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormControl[] = bankAccountList => [
+export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
   {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '交易对手',
-    },
-    field: 'clientId',
-    input: {
-      type: 'select',
-      showSearch: true,
-      allowClear: true,
-      placeholder: '请输入内容搜索',
-      options: async (value: string = '') => {
-        const { data, error } = await refSimilarLegalNameList({
-          similarLegalName: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
-      },
+    title: '交易对手',
+    dataIndex: 'clientId',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <Select
+              style={{ minWidth: 180 }}
+              showSearch={true}
+              allowClear={true}
+              options={async (value: string = '') => {
+                const { data, error } = await refSimilarLegalNameList({
+                  similarLegalName: value,
+                });
+                if (error) return [];
+                return data.map(item => ({
+                  label: item,
+                  value: item,
+                }));
+              }}
+            />
+          )}
+        </FormItem>
+      );
     },
   },
   {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '交易对手银行账号',
-    },
-    input: {
-      type: 'select',
-      options: bankAccountList,
-    },
-    field: 'bankAccount',
-  },
-  {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '出入金金额',
-    },
-    field: 'paymentAmount',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '出入金日期',
-    },
-    field: 'paymentDate',
-    input: {
-      type: 'date',
-      range: 'day',
+    title: '主协议编号',
+    dataIndex: 'masterAgreementId',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <Select
+              style={{ minWidth: 180 }}
+              showSearch={true}
+              allowClear={true}
+              options={async (value: string = '') => {
+                const { data, error } = await refMasterAgreementSearch({
+                  masterAgreementId: value,
+                });
+                if (error) return [];
+                return data.map(item => ({
+                  label: item,
+                  value: item,
+                }));
+              }}
+            />
+          )}
+        </FormItem>
+      );
     },
   },
   {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '出入金方向',
-    },
-    input: {
-      showSearch: true,
-      type: 'select',
-      options: PAYMENT_DIRECTION_TYPE_OPTIONS,
-    },
-    field: 'paymentDirection',
-  },
-  {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '账户类型',
-    },
-    input: {
-      showSearch: true,
-      type: 'select',
-      options: ACCOUNT_DIRECTION_TYPE_OPTIONS,
-    },
-    field: 'accountDirection',
-  },
-];
-
-export const SEARCH_FORM_CONTROLS: IFormControl[] = [
-  {
-    control: {
-      label: '交易对手',
-    },
-    field: 'clientId',
-    input: {
-      type: 'select',
-      showSearch: true,
-      allowClear: true,
-      placeholder: '请输入内容搜索',
-      options: async (value: string = '') => {
-        const { data, error } = await refSimilarLegalNameList({
-          similarLegalName: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
-      },
+    title: '银行账号',
+    dataIndex: 'bankAccount',
+    render: (value, record, index, { form }) => {
+      return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
     },
   },
   {
-    control: {
-      label: '主协议编号',
-    },
-    field: 'masterAgreementId',
-    input: {
-      allowClear: true,
-      type: 'select',
-      showSearch: true,
-      placeholder: '请输入内容搜索',
-      options: async (value: string = '') => {
-        const { data, error } = await refMasterAgreementSearch({
-          masterAgreementId: value,
-        });
-        if (error) return [];
-        return data.map(item => ({
-          label: item,
-          value: item,
-        }));
-      },
+    title: '支付日期',
+    dataIndex: 'paymentDate',
+    render: (value, record, index, { form }) => {
+      return <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>;
     },
   },
   {
-    control: {
-      label: '银行账号',
-    },
-    field: 'bankAccount',
-  },
-  {
-    control: {
-      label: '支付日期',
-    },
-    field: 'paymentDate',
-    input: {
-      type: 'date',
-      range: 'range',
-    },
-  },
-  {
-    control: {
-      label: '出入金状态',
-    },
-    field: 'processStatus',
-    input: {
-      type: 'select',
-      options: [{ label: '全部', value: 'all' }, ...PROCESS_STATUS_TYPES_OPTIONS],
+    title: '出入金状态',
+    dataIndex: 'processStatus',
+    render: (value, record, index, { form }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <Select
+              style={{ minWidth: 180 }}
+              allowClear={true}
+              options={[{ label: '全部', value: 'all' }, ...PROCESS_STATUS_TYPES_OPTIONS]}
+            />
+          )}
+        </FormItem>
+      );
     },
   },
 ];

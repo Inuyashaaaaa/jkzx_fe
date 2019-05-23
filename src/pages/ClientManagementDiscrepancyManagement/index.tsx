@@ -1,11 +1,9 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/components/Form';
-import ModalButton from '@/components/ModalButton';
-import SourceTable from '@/components/SourceTable';
+import { Table2, Form2 } from '@/components';
 import Page from '@/containers/Page';
 import { createApprovalProcess } from '@/services/approval';
 import { cliFundEventSearch, refBankAccountSearch } from '@/services/reference-data-service';
-import { message } from 'antd';
+import { message, Button, Modal, Divider } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
@@ -14,26 +12,26 @@ import { CREATE_FORM_CONTROLS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './co
 import router from 'umi/router';
 
 class ClientManagementDiscrepancyManagement extends PureComponent {
-  public $form: Form = null;
+  public $searchForm: Form2 = null;
+
+  public $createForm: Form2 = null;
+
   public state = {
     dataSource: [],
     searchFormData: {
-      processStatus: 'all',
+      processStatus: Form2.createField('all'),
     },
     loading: false,
     visible: false,
     confirmLoading: false,
     bankAccountList: [],
-    createFormData: {},
+    createFormData: {
+      paymentDate: Form2.createField(moment()),
+      accountDirection: Form2.createField('PARTY'),
+    },
   };
 
   public componentDidMount = () => {
-    this.setState({
-      createFormData: {
-        paymentDate: moment(),
-        accountDirection: 'PARTY',
-      },
-    });
     this.fetchTable();
   };
 
@@ -41,19 +39,18 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     this.setState({
       loading: true,
     });
-
+    const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error, data } = await cliFundEventSearch({
-      ..._.omit(this.state.searchFormData, ['paymentDate', 'processStatus']),
-      ...(this.state.searchFormData.paymentDate
+      ..._.omit(searchFormData, ['paymentDate', 'processStatus']),
+      ...(searchFormData.paymentDate
         ? {
-            startDate: moment(this.state.searchFormData.paymentDate[0]).format('YYYY-MM-DD'),
-            endDate: moment(this.state.searchFormData.paymentDate[1]).format('YYYY-MM-DD'),
+            startDate: moment(searchFormData.paymentDate[0]).format('YYYY-MM-DD'),
+            endDate: moment(searchFormData.paymentDate[1]).format('YYYY-MM-DD'),
           }
         : null),
-      ...(this.state.searchFormData.processStatus &&
-      this.state.searchFormData.processStatus === 'all'
+      ...(searchFormData.processStatus && searchFormData.processStatus === 'all'
         ? null
-        : { processStatus: this.state.searchFormData.processStatus }),
+        : { processStatus: searchFormData.processStatus }),
     });
     this.setState({
       loading: false,
@@ -65,9 +62,9 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     return;
   };
 
-  public onSearchFormChange = params => {
+  public onSearchFormChange = (props, fields, allFields) => {
     this.setState({
-      searchFormData: params.values,
+      searchFormData: allFields,
     });
   };
 
@@ -75,7 +72,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     this.setState(
       {
         searchFormData: {
-          processStatus: 'all',
+          processStatus: Form2.createField('all'),
         },
       },
       () => {
@@ -97,8 +94,8 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
   };
 
   public onOk = async () => {
-    if (this.$form) {
-      const { error } = await this.$form.validate();
+    if (this.$createForm) {
+      const { error } = await this.$createForm.validate();
       if (error) return;
     }
     this.setState({
@@ -106,7 +103,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       confirmLoading: true,
     });
     const { createFormData } = this.state;
-    const formatValues = _.mapValues(createFormData, (val, key) => {
+    const formatValues = _.mapValues(Form2.getFieldsValue(createFormData), (val, key) => {
       if (isMoment(val)) {
         return val.format('YYYY-MM-DD');
       }
@@ -122,26 +119,21 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     if (error) return;
     this.setState(
       produce((state: any) => {
-        state.discrepancyCreateData = {
-          paymentDate: moment(),
-          accountDirection: 'PARTY',
-        };
-        state.modalVisible = false;
         state.createFormData = {};
       }),
       () => {
         message.success(data.processInstanceId ? '已进入流程' : '资金录入成功');
         router.push('/approval-process/process-manangement');
-        // this.fetchTable();
       }
     );
   };
 
-  public createFormChange = async params => {
-    const { changedValues, values } = params;
+  public createFormChange = async (props, fields, allFields) => {
+    const changedValues = fields;
+    const values = allFields;
     if (changedValues.clientId) {
       const { error, data } = await refBankAccountSearch({
-        legalName: values.clientId,
+        legalName: Form2.getFieldValue(values.clientId),
       });
       if (error) return;
       const bankAccountList = _.map(data, (val, key) => {
@@ -161,48 +153,49 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     });
   };
 
+  public showModal = () => {
+    this.setState({ visible: !this.state.visible });
+  };
+
   public render() {
     return (
       <Page>
-        <SourceTable
+        <Form2
+          ref={node => (this.$searchForm = node)}
+          dataSource={this.state.searchFormData}
+          columns={SEARCH_FORM_CONTROLS}
+          layout="inline"
+          submitText="搜索"
+          onResetButtonClick={this.onReset}
+          onFieldsChange={this.onSearchFormChange}
+          onSubmitButtonClick={this.fetchTable}
+        />
+        <Divider />
+        <Button type="primary" style={{ marginBottom: VERTICAL_GUTTER }} onClick={this.showModal}>
+          出入金录入
+        </Button>
+        <Table2
           rowKey="uuid"
-          columnDefs={TABLE_COL_DEFS}
+          columns={TABLE_COL_DEFS}
           loading={this.state.loading}
           dataSource={this.state.dataSource}
-          searchable={true}
-          resetable={true}
-          onResetButtonClick={this.onReset}
-          searchFormControls={SEARCH_FORM_CONTROLS}
-          searchFormData={this.state.searchFormData}
-          onSearchButtonClick={this.fetchTable}
-          onSearchFormChange={this.onSearchFormChange}
-          header={
-            <ModalButton
-              key="import"
-              type="primary"
-              style={{ marginBottom: VERTICAL_GUTTER }}
-              modalProps={{
-                title: '出入金录入',
-                visible: this.state.visible,
-                onCancel: this.onCancel,
-                onOk: this.onOk,
-                confirmLoading: this.state.confirmLoading,
-              }}
-              content={
-                <Form
-                  ref={node => (this.$form = node)}
-                  dataSource={this.state.createFormData}
-                  controls={CREATE_FORM_CONTROLS(this.state.bankAccountList)}
-                  onValueChange={this.createFormChange}
-                  footer={false}
-                />
-              }
-              onClick={this.switchModal}
-            >
-              出入金录入
-            </ModalButton>
-          }
         />
+        <Modal
+          visible={this.state.visible}
+          confirmLoading={this.state.confirmLoading}
+          title={'出入金录入'}
+          onOk={this.onOk}
+          onCancel={this.onCancel}
+          maskClosable={false}
+        >
+          <Form2
+            ref={node => (this.$createForm = node)}
+            dataSource={this.state.createFormData}
+            columns={CREATE_FORM_CONTROLS(this.state.bankAccountList)}
+            footer={false}
+            onFieldsChange={this.createFormChange}
+          />
+        </Modal>
       </Page>
     );
   }
