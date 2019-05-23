@@ -1,4 +1,4 @@
-import SiderMenu from '@/components/SiderMenu';
+import SiderMenu from '@/containers/SiderMenu';
 import ErrorBoundary from '@/containers/ErrorBoundary';
 import { Layout } from 'antd';
 import classNames from 'classnames';

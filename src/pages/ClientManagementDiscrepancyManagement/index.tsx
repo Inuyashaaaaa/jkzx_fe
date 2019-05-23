@@ -1,7 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/components/Form';
-import ModalButton from '@/components/ModalButton';
-import SourceTable from '@/components/SourceTable';
+import Form from '@/containers/Form';
+import ModalButton from '@/containers/ModalButton';
+import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { createApprovalProcess } from '@/services/approval';
 import { cliFundEventSearch, refBankAccountSearch } from '@/services/reference-data-service';

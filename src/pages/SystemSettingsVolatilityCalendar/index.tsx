@@ -1,6 +1,6 @@
 // import Table from '@/components/_Table2';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import {
   addVolSpecialDates,

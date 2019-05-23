@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Chart, Geom, Axis, Tooltip } from 'bizcharts';
-import FormPlus from '@/components/_FormPlus';
+import FormPlus from '@/containers/_FormPlus';
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 
 class ScaleLineChart extends PureComponent {

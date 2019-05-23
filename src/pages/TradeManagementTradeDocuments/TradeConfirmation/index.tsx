@@ -1,11 +1,11 @@
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { SEARCH_FORM_CONTROLS_TRADE, TRADE_COLUMN_DEFS, columns } from './constants';
 import { Button, Divider, Row, Table, DatePicker } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,

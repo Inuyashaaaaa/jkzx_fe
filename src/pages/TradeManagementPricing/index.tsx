@@ -1,13 +1,11 @@
-import { Form2 } from '@/components';
-import { IFormField } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
+  FROM_HISTORY_PRICING_TAG,
   LEG_FIELD,
   LEG_ID_FIELD,
   LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  FROM_HISTORY_PRICING_TAG,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -17,10 +15,13 @@ import {
   TRADESCOL_FIELDS,
 } from '@/constants/global';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
+import { DATE_LEG_FIELDS } from '@/constants/legType';
 import { PRICING_FROM_EDITING } from '@/constants/trade';
+import { Form2 } from '@/containers';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
+import { IFormField } from '@/containers/type';
 import {
   countDelta,
   countDeltaCash,
@@ -37,18 +38,16 @@ import { convertTradePositions, createLegDataSourceItem } from '@/services/pages
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
-import { getLegByRecord, getLegByProductType } from '@/tools';
-import { getMoment, insert, remove, uuid } from '@/utils';
+import { getLegByProductType, getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
 import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
+import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import './index.less';
-import { DATE_LEG_FIELDS } from '@/constants/legType';
-import moment from 'moment';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 

@@ -10,7 +10,7 @@ import {
   UNIT_ENUM_OPTIONS,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
@@ -18,7 +18,7 @@ import _ from 'lodash';
 import React from 'react';
 
 export const BarrierType: ILegColDef = {
-  title: '障碍类型',
+  title: '障碍价类型',
   dataIndex: LEG_FIELD.BARRIER_TYPE,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);

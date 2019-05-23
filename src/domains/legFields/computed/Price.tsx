@@ -1,6 +1,6 @@
 import { COMPUTED_LEG_FIELD_MAP } from '@/constants/global';
 import { COMPUTED_HEADER_CELL_STYLE } from '@/constants/legs';
-import { Input } from '@/components';
+import { Input } from '@/containers';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

@@ -5,7 +5,7 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 
 export const LowStrike: ILegColDef = {
   title: '低行权价',

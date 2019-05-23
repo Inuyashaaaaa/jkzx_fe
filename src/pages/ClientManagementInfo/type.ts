@@ -1,1 +1,1 @@
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';

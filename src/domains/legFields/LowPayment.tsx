@@ -1,6 +1,6 @@
 import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

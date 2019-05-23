@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/utils/request';
+import request from '@/tools/request';
 
 export async function authRolesList(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {

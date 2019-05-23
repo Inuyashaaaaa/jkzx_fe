@@ -1,6 +1,6 @@
 import BackBtn from '@/containers/BackBtn';
 import MenuContext from '@/layouts/MenuContext';
-import { urlToList } from '@/utils';
+import { urlToList } from '@/tools';
 import { Card, PageHeader } from 'antd';
 import { connect } from 'dva';
 import React, { memo } from 'react';

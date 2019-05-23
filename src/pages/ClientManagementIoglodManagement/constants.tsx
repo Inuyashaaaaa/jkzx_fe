@@ -5,8 +5,8 @@ import {
   PROCESS_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
 import CashInsertModal from '@/containers/CashInsertModal';
-import { IFormControl } from '@/components/Form/types';
-import { IColumnDef } from '@/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import {
   refMasterAgreementSearch,

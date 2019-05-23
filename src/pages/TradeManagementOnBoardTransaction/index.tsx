@@ -1,4 +1,4 @@
-import Form from '@/components/Form';
+import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import {

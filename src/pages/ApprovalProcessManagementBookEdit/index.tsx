@@ -1,26 +1,26 @@
-import { LEG_ID_FIELD, LEG_FIELD } from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { LEG_ENV, TOTAL_EDITING_FIELDS, ILegColDef } from '@/constants/legs';
+import { ILegColDef, LEG_ENV, TOTAL_EDITING_FIELDS } from '@/constants/legs';
+import { Form2 } from '@/containers';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
+import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, Loading } from '@/components';
-import { ITableData } from '@/components/type';
 import Page from '@/containers/Page';
+import { ITableData } from '@/containers/type';
 import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 import { convertTradePageData2ApiData } from '@/services/pages';
-import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
+import { createLegRecordByPosition, getLegByProductType, getLegByRecord, getMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, message, Typography, Skeleton, Row, Button } from 'antd';
+import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
+import moment from 'moment';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import './index.less';
-import { ILcmEventModalEl } from '@/containers/LcmEventModal';
-import moment from 'moment';
 import uuidv4 from 'uuid/v4';
-import { getMoment } from '@/utils';
+import './index.less';
+
 const DATE_ARRAY = [
   LEG_FIELD.SETTLEMENT_DATE,
   LEG_FIELD.EFFECTIVE_DATE,

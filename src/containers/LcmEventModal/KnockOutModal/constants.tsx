@@ -4,7 +4,7 @@ import {
   INPUT_NUMBER_LOT_CONFIG,
   NOTION_ENUM_MAP,
 } from '@/constants/common';
-import { IFormControl } from '@/components/Form/types';
+import { IFormControl } from '@/containers/Form/types';
 import { Button } from 'antd';
 import React from 'react';
 

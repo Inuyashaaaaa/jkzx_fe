@@ -1,10 +1,10 @@
-import { Form2, InputNumber, Upload } from '@/components';
+import { Form2, InputNumber, Upload } from '@/containers';
 import { UPLOAD_URL, wkProcessGet, wkProcessInstanceCreate } from '@/services/approval';
 import {
   clientUpdateCredit,
   wkAttachmentProcessInstanceBind,
 } from '@/services/reference-data-service';
-import { getToken } from '@/utils/authority';
+import { getToken } from '@/tools/authority';
 import { Alert, Button, Icon, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';

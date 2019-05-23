@@ -7,9 +7,9 @@ import {
 } from '@/constants/common';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import RangeNumberInput from '@/containers/RangeNumberInput';
-import Form from '@/components/Form';
-import SourceTable from '@/components/SourceTable';
-import { IColDef } from '@/components/Table/types';
+import Form from '@/containers/Form';
+import SourceTable from '@/containers/SourceTable';
+import { IColDef } from '@/containers/Table/types';
 import Page from '@/containers/Page';
 import {
   countDelta,

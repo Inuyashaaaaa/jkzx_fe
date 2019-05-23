@@ -4,7 +4,7 @@ import { Button, message, Row, Modal } from 'antd';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
 import { FORM_CONTROL, TABLE_COL_DEF } from './constants';
-import { Form2, Table2 } from '@/components';
+import { Form2, Table2 } from '@/containers';
 import { VERTICAL_GUTTER } from '@/constants/global';
 
 class SystemSettingsRoleManagement extends PureComponent {

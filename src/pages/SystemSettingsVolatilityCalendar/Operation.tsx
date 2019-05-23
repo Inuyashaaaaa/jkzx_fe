@@ -1,4 +1,4 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import { deleteVolSpecialDates } from '@/services/volatility';
 import { Button, notification } from 'antd';
 import React, { PureComponent } from 'react';

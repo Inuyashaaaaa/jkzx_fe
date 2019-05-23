@@ -1,9 +1,9 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Input, Select } from '@/components';
-import Form from '@/components/Form';
-import ModalButton from '@/components/ModalButton';
-import SourceTable from '@/components/SourceTable';
-import { IFormColDef } from '@/components/type';
+import { Form2, Input, Select } from '@/containers';
+import Form from '@/containers/Form';
+import ModalButton from '@/containers/ModalButton';
+import SourceTable from '@/containers/SourceTable';
+import { IFormColDef } from '@/containers/type';
 import Page from '@/containers/Page';
 import {
   trdPortfolioCreate,

@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/components';
+import { Form2, Select, Table2 } from '@/containers';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import {
   trdPortfolioDelete,

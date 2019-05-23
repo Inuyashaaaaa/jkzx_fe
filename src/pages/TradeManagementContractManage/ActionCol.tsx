@@ -1,4 +1,4 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import { trdTradePortfolioDelete } from '@/services/trade-service';
 import { message } from 'antd';
 import _ from 'lodash';

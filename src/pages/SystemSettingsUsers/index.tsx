@@ -1,6 +1,6 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';

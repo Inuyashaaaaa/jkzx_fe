@@ -1,6 +1,6 @@
 import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IFormControl } from '@/components/_Form2';
-import { IColumnDef } from '@/components/_Table2';
+import { IFormControl } from '@/containers/_Form2';
+import { IColumnDef } from '@/containers/_Table2';
 import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 
 export const SEARCH_FORM_CONTROLS: IFormControl[] = [

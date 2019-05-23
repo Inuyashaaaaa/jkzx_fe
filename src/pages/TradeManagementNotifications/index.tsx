@@ -1,6 +1,6 @@
 import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
-import { Form2, Select } from '@/components';
-import SourceTable from '@/components/SourceTable';
+import { Form2, Select } from '@/containers';
+import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { removeCalendar } from '@/services/calendars';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';

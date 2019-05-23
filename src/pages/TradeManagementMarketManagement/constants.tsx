@@ -6,8 +6,8 @@ import {
   ASSET_CLASS_ZHCN_MAP,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
-import { IFormControl } from '@/components/_Form2';
-import { IColumnDef } from '@/components/_Table2';
+import { IFormControl } from '@/containers/_Form2';
+import { IColumnDef } from '@/containers/_Table2';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { getDate, getUnit } from '@/tools/format';
 import { formatNumber } from '@/tools';

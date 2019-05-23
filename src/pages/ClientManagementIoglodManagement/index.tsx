@@ -1,6 +1,6 @@
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
-import { delay, mockData } from '@/utils';
+import { delay, mockData } from '@/tools';
 import React, { PureComponent } from 'react';
 import History from './History';
 import Processed from './Processed';

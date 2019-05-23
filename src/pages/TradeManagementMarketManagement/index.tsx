@@ -1,5 +1,5 @@
-import { Form2, Select } from '@/components';
-import SourceTable from '@/components/_SourceTable';
+import { Form2, Select } from '@/containers';
+import SourceTable from '@/containers/_SourceTable';
 import Page from '@/containers/Page';
 import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
 import { Button, Divider, Row, Table, Tooltip, Icon } from 'antd';

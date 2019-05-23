@@ -1,4 +1,4 @@
-import { Form2, Input, InputNumber, Table2 } from '@/components';
+import { Form2, Input, InputNumber, Table2 } from '@/containers';
 import { Button, Menu } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useRef, useState } from 'react';

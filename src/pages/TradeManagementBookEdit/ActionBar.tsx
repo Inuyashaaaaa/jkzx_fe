@@ -3,9 +3,9 @@ import { Affix, Button, Divider, Row } from 'antd';
 import React, { memo, useState } from 'react';
 import router from 'umi/router';
 import './index.less';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
-import { ITableData } from '@/components/type';
+import { ITableData } from '@/containers/type';
 
 const ActionBar = memo<{
   tableData?: ITableData[];

@@ -1,22 +1,19 @@
-import SourceTable from '@/components/SourceTable';
+import { Form2, Select } from '@/containers';
 import Page from '@/containers/Page';
-import { arr2treeOptions } from '@/utils';
 import {
   clientAccountSearch,
+  refMasterAgreementSearch,
   refSalesGetByLegalName,
   refSimilarLegalNameList,
-  refMasterAgreementSearch,
 } from '@/services/reference-data-service';
-import { queryCompleteCompanys } from '@/services/sales';
 import { sortByCreateAt } from '@/services/sort';
+import { formatMoney } from '@/tools';
+import { Divider, Table } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { ADDRESS_CASCADER, SEARCH_FORM_CONTROLS, TABLE_COL_DEF } from './constants';
-import { Form2, Select } from '@/components';
-import FormItem from 'antd/lib/form/FormItem';
-import { Button, Divider, Row, Table } from 'antd';
+import { ADDRESS_CASCADER } from './constants';
 import Operation from './Operation';
-import { formatMoney } from '@/tools';
 
 class ClientManagementFundStatistics extends PureComponent {
   public state = {

@@ -1,4 +1,4 @@
-import { getUser, setUser } from '@/utils/authority';
+import { getUser, setUser } from '@/tools/authority';
 import router from 'umi/router';
 
 export default {

@@ -1,4 +1,4 @@
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   LEG_FIELD,

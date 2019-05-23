@@ -1,5 +1,5 @@
-import Form from '@/components/Form';
-import ModalButton from '@/components/ModalButton';
+import Form from '@/containers/Form';
+import ModalButton from '@/containers/ModalButton';
 import { DOWN_LOAD_TRADE_URL, emlSendSupplementaryAgreementReport } from '@/services/document';
 import { Alert, Button, Col, message, Row } from 'antd';
 import moment from 'moment';

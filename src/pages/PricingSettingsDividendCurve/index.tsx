@@ -1,9 +1,9 @@
 import { INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 import MarketSourceTable from '@/containers/MarketSourceTable';
-import { IFormControl } from '@/components/_Form2';
-import ModalButton from '@/components/_ModalButton2';
-import SourceTable from '@/components/_SourceTable';
+import { IFormControl } from '@/containers/_Form2';
+import ModalButton from '@/containers/_ModalButton2';
+import SourceTable from '@/containers/_SourceTable';
 import Page from '@/containers/Page';
 import {
   getCanUsedTranorsOtions,

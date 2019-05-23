@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import Page from '@/containers/Page';
 import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
 import { Button, Divider, message, Modal, Table } from 'antd';
