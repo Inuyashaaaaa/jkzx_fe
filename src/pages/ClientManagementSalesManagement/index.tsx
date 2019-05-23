@@ -192,6 +192,10 @@ class ClientManagementSalesManagement extends PureComponent {
     );
   };
 
+  public onCancelRemove = item => e => {
+    e.stopPropagation();
+  };
+
   // 未完成remove
   public bindRemove = item => async e => {
     e.stopPropagation();
@@ -210,6 +214,7 @@ class ClientManagementSalesManagement extends PureComponent {
       message.error('删除失败');
       return;
     }
+    message.success('删除成功');
     this.handleTreeNode();
   };
 
@@ -275,6 +280,7 @@ class ClientManagementSalesManagement extends PureComponent {
                     onConfirm={this.bindRemove(item)}
                     okText="确认"
                     cancelText="取消"
+                    onCancel={this.onCancelRemove(item)}
                   >
                     <Icon
                       type="minus-circle"
@@ -313,6 +319,7 @@ class ClientManagementSalesManagement extends PureComponent {
                   onConfirm={this.bindRemove(item)}
                   okText="确认"
                   cancelText="取消"
+                  onCancel={this.onCancelRemove(item)}
                 >
                   <Icon
                     type="minus-circle"
