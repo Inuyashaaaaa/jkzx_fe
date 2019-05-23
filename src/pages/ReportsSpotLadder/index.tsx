@@ -5,11 +5,12 @@ import {
   INPUT_NUMBER_LOT_CONFIG,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
-import DownloadExcelButton from '@/containers/DownloadExcelButton';
+import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderExcelButton';
 import RangeNumberInput from '@/containers/RangeNumberInput';
 import Form from '@/components/Form';
-import SourceTable from '@/components/SourceTable';
-import { IColDef } from '@/components/Table/types';
+// import SourceTable from '@/components/SourceTable';
+import { Table2, Form2 } from '@/components';
+import { ITableColDef } from '@/components/type';
 import Page from '@/containers/Page';
 import {
   countDelta,
@@ -28,6 +29,8 @@ import { Card, Empty, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import { TABLE_COL_DEFS, TABLE_FORM_CONTROLS } from './constants';
+import { VERTICAL_GUTTER } from '@/constants/global';
 
 const { TabPane } = Tabs;
 
@@ -36,7 +39,7 @@ class Component extends PureComponent<
   {
     instruments: any[];
     searchFormData: any;
-    tableColumnDefs: IColDef[];
+    tableColumnDefs: ITableColDef[];
     loading: boolean;
     underlyersOptions: any[];
   }
@@ -48,61 +51,9 @@ class Component extends PureComponent<
       loading: false,
       searchFormData: this.getInitialSearchFormData(),
       instruments: [],
-      tableColumnDefs: [
-        {
-          headerName: '标的物价格',
-          field: 'underlyerPrice',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: '价格',
-          field: 'price',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'PNL变动',
-          field: 'pnlChange',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'DELTA',
-          field: 'delta',
-          input: INPUT_NUMBER_LOT_CONFIG,
-        },
-        {
-          headerName: 'DELTA CASH',
-          field: 'deltaCash',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'GAMMA',
-          field: 'gamma',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
-        },
-        {
-          headerName: 'GAMMA CASH',
-          field: 'gammaCash',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'VEGA',
-          field: 'vega',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'THETA',
-          field: 'theta',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'RHO_R',
-          field: 'rhoR',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
-        },
-      ],
+      tableColumnDefs: TABLE_COL_DEFS,
     };
   }
-
   public fetch = async () => {
     this.setState({
       loading: true,
@@ -295,10 +246,10 @@ class Component extends PureComponent<
   };
 
   public render() {
-    const headers = this.state.tableColumnDefs.map(item => item.headerName);
-    headers.unshift('');
-    const cols = this.state.tableColumnDefs.map(item => item.field);
-    cols.unshift('scenarioId');
+    const headers = this.state.tableColumnDefs.map(item => item.title);
+    // headers.unshift('');
+    const cols = this.state.tableColumnDefs.map(item => item.dataIndex);
+    // cols.unshift('scenarioId');
     const _data = this.handleData(this.state.instruments, cols, headers);
     return (
       <Page title="标的物情景分析" card={false}>
@@ -375,7 +326,7 @@ class Component extends PureComponent<
           />
         </Card>
         <Card style={{ marginTop: 15 }} loading={this.state.loading}>
-          <DownloadExcelButton
+          <SpotLadderExcelButton
             style={{ margin: '10px 0' }}
             key="export"
             type="primary"
@@ -387,57 +338,28 @@ class Component extends PureComponent<
             tabs={this.state.instruments.map(item => item.underlyerInstrumentId)}
           >
             导出Excel
-          </DownloadExcelButton>
+          </SpotLadderExcelButton>
           {this.state.instruments && !!this.state.instruments.length ? (
             <Tabs animated={false}>
               {this.state.instruments.map(item => {
                 return (
                   <TabPane tab={item.underlyerInstrumentId} key={item.underlyerInstrumentId}>
-                    <SourceTable
+                    <Form2
+                      columns={TABLE_FORM_CONTROLS}
+                      style={{ marginBottom: VERTICAL_GUTTER }}
+                      dataSource={Form2.createFields(
+                        _.pick(item, ['underlyerInstrumentId', 'assetClass', 'instrumentType'])
+                      )}
+                      footer={false}
+                      layout="inline"
+                    />
+                    <Table2
                       vertical={true}
-                      getHorizontalrColumnDef={this.getHorizontalrColumnDef}
-                      tableFormData={_.pick(item, [
-                        'underlyerInstrumentId',
-                        'assetClass',
-                        'instrumentType',
-                      ])}
-                      tableFormControls={[
-                        {
-                          control: {
-                            label: '标的物名称',
-                          },
-                          field: 'underlyerInstrumentId',
-                          input: {
-                            type: 'input',
-                            subtype: 'static',
-                          },
-                        },
-                        {
-                          control: {
-                            label: '资产类别',
-                          },
-                          field: 'assetClass',
-                          input: {
-                            type: 'input',
-                            subtype: 'static',
-                          },
-                        },
-                        {
-                          control: {
-                            label: '合约类型',
-                          },
-                          field: 'instrumentType',
-                          input: {
-                            type: 'input',
-                            subtype: 'static',
-                          },
-                        },
-                      ]}
                       pagination={false}
                       rowKey="scenarioId"
+                      bordered={true}
                       dataSource={item.tableDataSource}
-                      columnDefs={this.state.tableColumnDefs}
-                      autoSizeColumnsToFit={false}
+                      columns={TABLE_COL_DEFS}
                     />
                   </TabPane>
                 );
