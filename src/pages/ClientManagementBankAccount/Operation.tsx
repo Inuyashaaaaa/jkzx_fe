@@ -1,5 +1,5 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
-import ModalButton from '@/components/ModalButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
+import ModalButton from '@/containers/ModalButton';
 import { refBankAccountDel, refBankAccountSave } from '@/services/reference-data-service';
 import { Col, message, Row } from 'antd';
 import React, { PureComponent } from 'react';

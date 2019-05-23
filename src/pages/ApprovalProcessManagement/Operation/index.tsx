@@ -1,4 +1,4 @@
-import ModalButton from '@/components/ModalButton';
+import ModalButton from '@/containers/ModalButton';
 import { queryProcessDiagram } from '@/services/approval';
 import { Col, Row, Button, Model } from 'antd';
 import React, { PureComponent } from 'react';

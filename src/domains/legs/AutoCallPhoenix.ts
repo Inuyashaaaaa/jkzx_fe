@@ -19,10 +19,10 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/components';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/containers/type';
 import { ILeg } from '@/types/leg';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import _ from 'lodash';
 import moment from 'moment';
 import {

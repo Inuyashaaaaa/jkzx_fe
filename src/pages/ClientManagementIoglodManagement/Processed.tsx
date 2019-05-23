@@ -1,12 +1,12 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import { sortByCreateAt } from '@/services/sort';
 import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
 import { PROCESSED_COL_DEFS, PROCESSED_FORM_CONTROLS, PROCESSED_COLUMN } from './constants';
 import FormItem from 'antd/lib/form/FormItem';
 import { Button, Divider, Row, Table } from 'antd';
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,

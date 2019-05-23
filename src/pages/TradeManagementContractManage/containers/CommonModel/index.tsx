@@ -1,4 +1,4 @@
-import { Form2, Loading, Select, Table2 } from '@/components';
+import { Form2, Loading, Select, Table2 } from '@/containers';
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';

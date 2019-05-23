@@ -5,8 +5,8 @@ import {
   PROCESS_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
 import CashInsertModal from '@/containers/CashInsertModal';
-import { IFormControl } from '@/components/Form/types';
-import { IColumnDef } from '@/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import {
   refMasterAgreementSearch,
@@ -16,7 +16,7 @@ import React from 'react';
 import CapitalInputModal from './CapitalInputModal';
 import CommonCapitalInput from './CommonCapitalInput';
 import { formatMoney } from '@/tools';
-import { Select } from '@/components';
+import { Select } from '@/containers';
 import _ from 'lodash';
 export const PROCESSED_FORM_CONTROLS: (tabKey) => IFormControl[] = tabKey => {
   const event = {

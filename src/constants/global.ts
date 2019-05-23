@@ -1,4 +1,4 @@
-import { IColDef } from '@/components/Table/types';
+import { IColDef } from '@/containers/Table/types';
 import _ from 'lodash';
 
 export const USER_LOCAL_FIELD = 'tongyu_USER_LOCAL_FIELD';

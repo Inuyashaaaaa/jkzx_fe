@@ -1,11 +1,10 @@
-import { IFormColDef, ITableColDef } from '@/components/type';
-import React from 'react';
-import Operation from './Operation';
-import FormItem from 'antd/lib/form/FormItem';
+import { IFormColDef, ITableColDef } from '@/containers/type';
+import { getLocaleId, mapTree, remove } from '@/tools';
 import { Input } from 'antd';
-import { mapTree, remove } from '@/utils';
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
 import { formatMessage } from 'umi/locale';
-import { getLocaleId } from '@/tools';
+import Operation from './Operation';
 
 const { TextArea } = Input;
 

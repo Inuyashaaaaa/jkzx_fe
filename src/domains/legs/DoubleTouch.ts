@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   LEG_TYPE_MAP,
@@ -18,8 +18,8 @@ import {
 } from '@/constants/global';
 import _ from 'lodash';
 import moment from 'moment';
-import { Form2 } from '@/components';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/containers/type';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,

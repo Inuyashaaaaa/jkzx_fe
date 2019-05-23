@@ -1,5 +1,5 @@
-import { Input, InputNumber, Select } from '@/components';
-import { IFormColDef, ITableColDef } from '@/components/type';
+import { Input, InputNumber, Select } from '@/containers';
+import { IFormColDef, ITableColDef } from '@/containers/type';
 import RangeNumberInput from '@/containers/RangeNumberInput';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import { formatMoney, formatNumber } from '@/tools';

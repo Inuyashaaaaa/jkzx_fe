@@ -1,4 +1,4 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import {
   authPagePermissionGetByRoleId,
   deleteRole,
@@ -9,7 +9,7 @@ import { Button, Col, Drawer, message, Row, Tree, Divider, Modal } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { treeData, FORM_CONTROL } from './constants';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 
 const { TreeNode } = Tree;
 

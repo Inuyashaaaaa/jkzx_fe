@@ -1,6 +1,6 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Input, Select } from '@/components';
+import { Input, Select } from '@/containers';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';

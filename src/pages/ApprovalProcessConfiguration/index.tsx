@@ -25,7 +25,7 @@ import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
 import _ from 'lodash';
 import { GTE_PROCESS_CONFIGS, TASKTYPE } from './constants';
-import { Select } from '@/components';
+import { Select } from '@/containers';
 
 const TabPane = Tabs.TabPane;
 const { Paragraph } = Typography;

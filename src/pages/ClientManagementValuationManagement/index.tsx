@@ -1,6 +1,6 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/components';
-import ModalButton from '@/components/ModalButton';
+import { Form2, Select, Table2 } from '@/containers';
+import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
 import {
   refMasterAgreementSearch,

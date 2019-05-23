@@ -6,7 +6,7 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

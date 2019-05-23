@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Popconfirm, Button, Divider, Dropdown, Menu, Icon, Modal, message } from 'antd';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { UPDATE_FORM_CONTROLS, RESET_FORM } from './constants';
 import {
   updateUser,

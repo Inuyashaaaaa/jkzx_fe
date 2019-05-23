@@ -1,7 +1,7 @@
-import { Form2, Input } from '@/components';
-import ModalButton from '@/components/ModalButton';
+import { Form2, Input } from '@/containers';
+import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import {
   queryCompanys,
   querySalers,
@@ -13,7 +13,7 @@ import {
   refSubsidiaryDelete,
   refSubsidiaryUpdate,
 } from '@/services/sales';
-import { arr2treeOptions, getMoment } from '@/utils';
+import { arr2treeOptions, getMoment } from '@/tools';
 import { Col, Divider, Icon, message, Modal, Popconfirm, Row, Table, Tree } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';

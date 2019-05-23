@@ -1,7 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Table2 } from '@/components';
+import { Form2, Table2 } from '@/containers';
 import Page from '@/containers/Page';
-import { delay, getMoment } from '@/utils';
+import { delay, getMoment } from '@/tools';
 import { createCalendar, queryCalendar, removeCalendar } from '@/services/calendars';
 import { Button, Col, DatePicker, message, Row, Modal } from 'antd';
 import produce from 'immer';

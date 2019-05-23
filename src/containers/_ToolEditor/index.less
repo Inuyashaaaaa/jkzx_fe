@@ -1,0 +1,69 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/tools/utils.less';
+
+.moreBtn {
+  width: 100%;
+  height: 100%;
+  border: 1px solid @success-color;
+  background: @success-color;
+}
+
+@light: fadeout(@success-color, 15%);
+
+.moreBtnWrap {
+  width: 100%;
+  height: 100%;
+  :global {
+    .ant-btn-primary:hover,
+    .ant-btn-primary:focus {
+      color: #fff;
+      background-color: @light !important;
+      border: 1px solid @light !important;
+    }
+  }
+}
+
+.noData {
+  width: 100%;
+  height: 100%;
+  background: fade(#000, 10%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  :global {
+    .ant-popover-inner-content {
+      padding: 0;
+    }
+    .ant-popover-title {
+      padding: 4px;
+    }
+  }
+  .row {
+    &.last {
+      :global {
+        .ant-input {
+          border-bottom: none !important;
+        }
+        .ant-btn {
+          border-bottom: none !important;
+        }
+      }
+    }
+    :global {
+      .ant-input {
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+      }
+      .ant-btn {
+        border-top: none !important;
+        border-right: none !important;
+        border-left: 1px solid @input-border-color !important;
+        border-bottom: 1px solid @input-border-color !important;
+      }
+    }
+  }
+}

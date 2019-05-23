@@ -1,4 +1,4 @@
-import { getPageQuery } from '@/utils';
+import { getPageQuery } from '@/tools';
 import { initPagePermissions } from '@/services/role';
 import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
 import { notification } from 'antd';

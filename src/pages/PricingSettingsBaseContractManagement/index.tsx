@@ -1,8 +1,8 @@
-import CascaderSourceList from '@/components/_CascaderSourceList';
-import { PureStateComponent } from '@/components/Components';
-import Form from '@/components/_Form2';
+import CascaderSourceList from '@/containers/_CascaderSourceList';
+import { PureStateComponent } from '@/containers/Components';
+import Form from '@/containers/_Form2';
 import Page from '@/containers/Page';
-import { baseTree, delay, isAllSame, mockData } from '@/utils';
+import { baseTree, delay, isAllSame, mockData } from '@/tools';
 import {
   mktInstrumentsListPaged,
   prcBaseContractsList,

@@ -1,5 +1,5 @@
-import { IFormControl } from '@/components/_Form2';
-import { IColumnDef } from '@/components/_Table2';
+import { IFormControl } from '@/containers/_Form2';
+import { IColumnDef } from '@/containers/_Table2';
 import { Icon } from 'antd';
 import React from 'react';
 

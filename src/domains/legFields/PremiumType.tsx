@@ -7,7 +7,7 @@ import {
   PREMIUM_TYPE_ZHCN_MAP,
   RULES_REQUIRED,
 } from '@/constants/common';
-import { Select } from '@/components';
+import { Select } from '@/containers';
 import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

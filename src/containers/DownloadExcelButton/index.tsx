@@ -4,8 +4,8 @@ import { AnchorButtonProps, NativeButtonProps } from 'antd/lib/button/button';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import XLSX from 'xlsx';
-import { Form2 } from '@/components';
-import { getMoment } from '@/utils';
+import { Form2 } from '@/containers';
+import { getMoment } from '@/tools';
 
 /* list of supported file types */
 const SheetJSFT = [

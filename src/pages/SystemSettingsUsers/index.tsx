@@ -1,5 +1,7 @@
-import { Form2, Table2 } from '@/components';
+import { Form2, Table2 } from '@/containers';
 import { VERTICAL_GUTTER } from '@/constants/global';
+import PopconfirmButton from '@/containers/PopconfirmButton';
+import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';

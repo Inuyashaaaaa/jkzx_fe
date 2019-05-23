@@ -1,6 +1,6 @@
 import FormItem from 'antd/lib/form/FormItem';
-import { Input, Select, Form2 } from '@/components';
-import { IFormColDef } from '@/components/type';
+import { Input, Select, Form2 } from '@/containers';
+import { IFormColDef } from '@/containers/type';
 import { TreeSelect, Input as AntdInput } from 'antd';
 import React from 'react';
 

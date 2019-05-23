@@ -1,5 +1,5 @@
 import { EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
-import { toggleItem } from '@/utils';
+import { toggleItem } from '@/tools';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 import { Badge, Calendar, Col, Popover, Row } from 'antd';
 import _ from 'lodash';

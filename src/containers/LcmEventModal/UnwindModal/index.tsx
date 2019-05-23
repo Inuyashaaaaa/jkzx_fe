@@ -6,7 +6,7 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
-import Form from '@/components/Form';
+import Form from '@/containers/Form';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { Alert, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';

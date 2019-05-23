@@ -1,5 +1,5 @@
 import { LEG_FIELD, RULES_REQUIRED, UP_BARRIER_TYPE_OPTIONS } from '@/constants/common';
-import { Select } from '@/components';
+import { Select } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

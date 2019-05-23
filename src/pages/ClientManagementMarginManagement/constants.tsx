@@ -3,8 +3,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   MARGIN_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
-import { IFormControl } from '@/components/Form/types';
-import { IColumnDef } from '@/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
@@ -12,7 +12,7 @@ import {
 import React from 'react';
 import Operations from './Operations';
 import { formatMoney } from '@/tools';
-import { Select } from '@/components';
+import { Select } from '@/containers';
 import _ from 'lodash';
 export const TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {

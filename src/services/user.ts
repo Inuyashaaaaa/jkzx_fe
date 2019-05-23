@@ -1,6 +1,6 @@
 import { HOST_TEST } from '@/constants/global';
-import { delay } from '@/utils';
-import request from '@/utils/request';
+import { delay } from '@/tools';
+import request from '@/tools/request';
 import fetch from 'dva/fetch';
 import _ from 'lodash';
 

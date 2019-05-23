@@ -18,7 +18,7 @@ import {
   COMPUTED_LEG_FIELDS,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/global';
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import BigNumber from 'bignumber.js';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import FormItem from 'antd/lib/form/FormItem';

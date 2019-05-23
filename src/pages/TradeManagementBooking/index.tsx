@@ -1,15 +1,15 @@
-import { Form2, ModalButton, Upload } from '@/components';
-import { IFormField } from '@/components/type';
 import { LEG_FIELD, LEG_ID_FIELD, LEG_INJECT_FIELDS, PREMIUM_TYPE_MAP } from '@/constants/common';
 import { COMPUTED_LEG_FIELD_MAP, FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { BOOKING_FROM_PRICING } from '@/constants/trade';
+import { Form2, ModalButton, Upload } from '@/containers';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import CashExportModal from '@/containers/CashExportModal';
 import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
+import { IFormField } from '@/containers/type';
 import {
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
@@ -17,10 +17,9 @@ import {
   wkProcessInstanceCreate,
 } from '@/services/approval';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
-import { getLegByRecord } from '@/tools';
+import { getLegByRecord, insert, remove, uuid } from '@/tools';
+import { getToken } from '@/tools/authority';
 import { ILeg } from '@/types/leg';
-import { insert, remove, uuid } from '@/utils';
-import { getToken } from '@/utils/authority';
 import { Affix, Alert, Button, Divider, Menu, message, Modal, Row } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';

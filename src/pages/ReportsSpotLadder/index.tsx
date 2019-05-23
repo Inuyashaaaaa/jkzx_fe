@@ -1,12 +1,12 @@
-// import SourceTable from '@/components/SourceTable';
-import { Form2, Table2 } from '@/components';
-import Form from '@/components/Form';
-import { ITableColDef } from '@/components/type';
+// import SourceTable from '@/containers/SourceTable';
 import { ASSET_CLASS_ZHCN_MAP, INSTRUMENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2, Table2 } from '@/containers';
 import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderExcelButton';
+import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import RangeNumberInput from '@/containers/RangeNumberInput';
+import { ITableColDef } from '@/containers/type';
 import {
   countDelta,
   countDeltaCash,

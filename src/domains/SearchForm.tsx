@@ -4,7 +4,7 @@ import {
   PRODUCTTYPE_OPTIONS,
   RULES_REQUIRED,
 } from '@/constants/common';
-import { DatePicker, Select } from '@/components';
+import { DatePicker, Select } from '@/containers';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
   refMasterAgreementSearch,

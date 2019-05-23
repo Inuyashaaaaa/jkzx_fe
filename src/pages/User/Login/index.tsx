@@ -1,4 +1,4 @@
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { Alert, Button, Form, Icon, Input, Modal, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';

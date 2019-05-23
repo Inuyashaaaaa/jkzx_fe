@@ -1,10 +1,10 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import { sortByCreateAt } from '@/services/sort';
 import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
 import { HISTORY_COL_DEFS, PROCESSED_FORM_CONTROLS, HISTORY_CLOUNMS } from './constants';
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import { IOGLOD_EVENT_TYPE_OPTIONS } from '@/constants/common';
 import {
   refMasterAgreementSearch,

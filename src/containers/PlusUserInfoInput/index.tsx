@@ -1,5 +1,5 @@
-import { InputPolym } from '@/components/Form/Input/InputPolym';
-import { remove } from '@/utils';
+import { InputPolym } from '@/containers/Form/Input/InputPolym';
+import { remove } from '@/tools';
 import { Button, Col, DatePicker, Icon, Input, Row } from 'antd';
 import moment, { isMoment } from 'moment';
 import React from 'react';

@@ -1,4 +1,4 @@
-import { DatePicker, Form2 } from '@/components';
+import { DatePicker, Form2 } from '@/containers';
 import { LEG_FIELD } from '@/constants/common';
 import { qlIsHoliday } from '@/services/volatility';
 import { getLegEnvs, getRequiredRule } from '@/tools';

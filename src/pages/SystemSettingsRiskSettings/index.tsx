@@ -1,6 +1,6 @@
-import ImportExcelButton from '@/components/_ImportExcelButton';
-import SourceTable, { SourceTableState } from '@/components/_SourceTable';
-// import Table from '@/components/_Table2';
+import ImportExcelButton from '@/containers/_ImportExcelButton';
+import SourceTable, { SourceTableState } from '@/containers/_SourceTable';
+// import Table from '@/containers/_Table2';
 import Page from '@/containers/Page';
 import {
   mktAllInstrumentWhitelistSave,
@@ -14,7 +14,7 @@ import { message, Modal, Tabs, Table, Divider, Row, Button } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS, SEARCH_FORM_CONTROLS } from './constants';
-import { Form2, Select, InputNumber, Input } from '@/components';
+import { Form2, Select, InputNumber, Input } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
 
 const { TabPane } = Tabs;

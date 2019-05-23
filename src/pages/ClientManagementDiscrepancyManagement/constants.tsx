@@ -7,17 +7,17 @@ import {
   ACCOUNT_DIRECTION_TYPE_ZHCN_MAP,
   PROCESS_STATUS_TYPES_ZHCN_MAPS,
 } from '@/constants/common';
-import { IFormControl } from '@/components/Form/types';
-import { IColumnDef } from '@/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
-import { ITableColDef, IFormColDef } from '@/components/type';
+import { ITableColDef, IFormColDef } from '@/containers/type';
 import { formatNumber } from '@/tools';
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
-import { Select, Input, InputNumber, DatePicker } from '@/components';
+import { Select, Input, InputNumber, DatePicker } from '@/containers';
 import { DatePicker as AntdDatePicker } from 'antd';
 const { RangePicker } = AntdDatePicker;
 

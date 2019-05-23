@@ -4,12 +4,12 @@ import { Layout, message, Modal, Input } from 'antd';
 import Animate from 'rc-animate';
 import { connect } from 'dva';
 import router from 'umi/router';
-import GlobalHeader from '@/components/GlobalHeader';
-import TopNavHeader from '@/components/TopNavHeader';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { updateOwnPassword } from '@/services/user';
 import _ from 'lodash';
+import GlobalHeader from '@/containers/GlobalHeader';
+import TopNavHeader from '@/containers/TopNavHeader';
 import styles from './Header.less';
 
 const { Header } = Layout;

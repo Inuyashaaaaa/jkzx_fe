@@ -8,7 +8,7 @@ import {
   REBATETYPE_TYPE_OPTIONS,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

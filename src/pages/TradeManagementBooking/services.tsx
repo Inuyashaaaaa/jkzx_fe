@@ -1,8 +1,8 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Select } from '@/components';
-import { IFormControl } from '@/components/Form/types';
-import Input from '@/components/Input/Upload';
+import { Select } from '@/containers';
+import { IFormControl } from '@/containers/Form/types';
+import Input from '@/containers/Input/Upload';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 

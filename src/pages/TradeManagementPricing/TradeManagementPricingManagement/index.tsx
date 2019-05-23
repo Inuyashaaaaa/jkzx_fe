@@ -1,4 +1,4 @@
-import { Form2, Input, Loading, Select } from '@/components';
+import { Form2, Input, Loading, Select } from '@/containers';
 import {
   DIRECTION_OPTIONS,
   DIRECTION_TYPE_ZHCN_MAP,

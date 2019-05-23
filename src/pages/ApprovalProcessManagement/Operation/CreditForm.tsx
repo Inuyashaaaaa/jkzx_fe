@@ -1,4 +1,4 @@
-import SourceTable from '@/components/_SourceTable';
+import SourceTable from '@/containers/_SourceTable';
 import {
   completeTaskProcess,
   queryProcessForm,
@@ -10,7 +10,7 @@ import {
   downloadTradeAttachment,
 } from '@/services/approval';
 import moment from 'moment';
-import { Form2, Upload, Input as Input2, InputNumber } from '@/components';
+import { Form2, Upload, Input as Input2, InputNumber } from '@/containers';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import {
   Button,
@@ -29,7 +29,7 @@ import {
 import React, { PureComponent } from 'react';
 import { generateColumns } from '../constants';
 import FormItem from 'antd/lib/form/FormItem';
-import { getToken } from '@/utils/authority';
+import { getToken } from '@/tools/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
 import styles from '../index.less';
