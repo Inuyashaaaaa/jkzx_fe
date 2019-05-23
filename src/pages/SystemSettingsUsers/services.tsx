@@ -7,12 +7,7 @@ import { Select } from '@/components';
 import { Divider, Button } from 'antd';
 import Operation from './Operation';
 
-export const createPageTableColDefs: ITableColDef[] = (
-  roleOptions,
-  showResources,
-  departments,
-  fetchData
-) => [
+export const createPageTableColDefs = (roleOptions, showResources, departments, fetchData) => [
   {
     title: '用户名',
     dataIndex: 'username',
