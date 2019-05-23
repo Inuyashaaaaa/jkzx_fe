@@ -153,7 +153,10 @@ class Operation extends PureComponent<{
 
   public handleFieldsChangeReset = (props, fields, allFields) => {
     this.setState({
-      resetDataSource: allFields,
+      resetDataSource: {
+        ...this.state.resetDataSource,
+        ...fields,
+      },
     });
   };
 
@@ -161,18 +164,14 @@ class Operation extends PureComponent<{
     const { userModalVisible, userDataSource, resetDataSource, resetModalVisible } = this.state;
     return (
       <>
-        <Button
-          type="link"
-          size="small"
-          onClick={() => this.props.showResources(this.props.record)}
-        >
+        <a href="javascript:;" onClick={() => this.props.showResources(this.props.record)}>
           数据权限
-        </Button>
+        </a>
         <Divider type="vertical" />
         <Popconfirm title={'确定要删除吗？'} onConfirm={this.onRemove}>
-          <Button type="link" size="small">
+          <a href="javascript:;" style={{ color: 'red' }}>
             删除
-          </Button>
+          </a>
         </Popconfirm>
 
         <Divider type="vertical" />
@@ -218,6 +217,8 @@ class Operation extends PureComponent<{
           confirmLoading={this.state.resetConfirmLoading}
         >
           <Form2
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 18 }}
             ref={node => (this.$resetForm = node)}
             dataSource={resetDataSource}
             onFieldsChange={this.handleFieldsChangeReset}

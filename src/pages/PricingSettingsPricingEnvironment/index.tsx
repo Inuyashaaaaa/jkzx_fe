@@ -67,7 +67,7 @@ class PricingSettingsPricingEnvironment extends PureComponent {
     //   [OPTION_KEY, SUBJECT_KEY, DATE_KEY, POSITION_KEY],
     //   [OPTION_KEY, SUBJECT_KEY, DATE_KEY, POSITION_KEY]
     // );
-    // console.log(nodes);
+    //
     return options;
   });
 

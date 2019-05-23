@@ -163,7 +163,7 @@ class Table2 extends PureComponent<ITableProps> {
   public defaultRenderItem = val => val;
 
   public getColumnDefs = () => {
-    const { size } = this.props;
+    const { size, vertical } = this.props;
     const columns = this.props.columns.map(colDef => {
       return {
         ...colDef,
@@ -188,6 +188,7 @@ class Table2 extends PureComponent<ITableProps> {
             context: this.context,
             getRowKey,
             rowId,
+            vertical,
             // setEditing: this.bindSetEditing(rowId, colDef.dataIndex),
             // getEditing: this.bindGetEditing(rowId, colDef.dataIndex),
             // editings: this.editings,

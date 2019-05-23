@@ -14,11 +14,7 @@
   visibility: visible;
 }
 
-:global {
-  .tongyu-cell-diff {
-    background-color: @primary-3 !important;
-  }
-
+.commonCell(@n) {
   .tongyu-cell {
     transition: background-color 0.5s;
     &.editable {
@@ -28,10 +24,16 @@
           cursor: pointer;
           -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          z-index: 999;
+          z-index: @n;
         }
       }
     }
+  }
+}
+
+:global {
+  .tongyu-cell-diff {
+    background-color: @primary-3 !important;
   }
 
   .ant-table-vertical {
@@ -42,6 +44,8 @@
         }
       }
     }
+
+    .commonCell(9);
   }
 
   .ant-table-horizontal {
@@ -52,6 +56,8 @@
         }
       }
     }
+
+    .commonCell(inherit);
   }
 
   .tongyu-table-row {

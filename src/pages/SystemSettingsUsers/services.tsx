@@ -65,7 +65,7 @@ export const createPageTableColDefs: ITableColDef[] = (
     title: '操作',
     dataIndex: 'operation',
     fixed: 'right',
-    width: 300,
+    width: 230,
     render: (value, record, index) => {
       return (
         <Operation

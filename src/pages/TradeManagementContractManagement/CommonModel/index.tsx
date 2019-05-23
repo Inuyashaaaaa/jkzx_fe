@@ -82,7 +82,6 @@ class CommonModel extends PureComponent {
   };
 
   public onTablePaginationChange = ({ pagination }) => {
-    console.log(pagination);
     this.setState(
       {
         pagination,

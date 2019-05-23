@@ -59,7 +59,7 @@ export default class CommonForm extends Component {
     if (type === 'main') {
       return false;
     }
-    // console.log(mainDate);
+    //
     return current && current < moment(mainDate).endOf('day');
   };
 

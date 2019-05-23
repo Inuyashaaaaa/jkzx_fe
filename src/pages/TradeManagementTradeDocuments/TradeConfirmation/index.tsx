@@ -88,7 +88,6 @@ class TradeConfirmation extends PureComponent {
   };
 
   public onFetch = async (paramsPagination?) => {
-    console.log(paramsPagination);
     const formValues = {
       startDate: _.get(this.state.searchFormData, 'tradeDate.value[0]').format('YYYY-MM-DD'),
       endDate: _.get(this.state.searchFormData, 'tradeDate.value[1]').format('YYYY-MM-DD'),

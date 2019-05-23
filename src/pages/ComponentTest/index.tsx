@@ -8,12 +8,9 @@ const StatelessForm = memo(() => {
 
   return (
     <Form2
-      onEditingChanged={params => {
-        console.log('onEditingChanged', params);
-      }}
+      onEditingChanged={params => {}}
       onSubmitButtonClick={e => {
         e.domEvent.preventDefault();
-        console.log(formEl.current.decoratorForm.getFieldsValue());
       }}
       ref={node => (formEl.current = node)}
       columns={[
@@ -65,7 +62,6 @@ function ControlForm() {
       }}
       onSubmitButtonClick={e => {
         e.domEvent.preventDefault();
-        console.log(formData);
       }}
       dataSource={formData}
       columns={[
@@ -184,12 +180,8 @@ const ControlTable = memo(() => {
         vertical={vertical}
         rowKey="id"
         dataSource={tableData}
-        onCellEditingChanged={params => {
-          console.log(params);
-          console.log(tableData);
-        }}
+        onCellEditingChanged={params => {}}
         onCellFieldsChange={params => {
-          console.log(params);
           setTableData(pre =>
             pre.map(item => {
               if (item.id === params.rowId) {

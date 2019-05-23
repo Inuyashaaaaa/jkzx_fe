@@ -156,6 +156,7 @@ export interface ITableCellProps<T = ITableData> {
   style?: CSSProperties;
   $$render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
   form?: WrappedFormUtils;
+  vertical?: boolean;
 }
 
 export interface ITableRowProps<T = any> extends FormComponentProps {

@@ -131,7 +131,6 @@ class SystemSettingsUsers extends PureComponent {
   };
 
   public handleCellValueChanged = async params => {
-    console.log(params);
     const { changedFields, record } = params;
     this.setState({
       users: this.state.users.map(item => {
@@ -190,7 +189,7 @@ class SystemSettingsUsers extends PureComponent {
       formData,
       confirmLoading,
     } = this.state;
-    console.log(users);
+
     return (
       <Page>
         {!displayResources && (

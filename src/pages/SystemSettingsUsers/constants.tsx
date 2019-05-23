@@ -1,5 +1,5 @@
 import FormItem from 'antd/lib/form/FormItem';
-import { Input, Select } from '@/components';
+import { Input, Select, Form2 } from '@/components';
 import { IFormColDef } from '@/components/type';
 import { TreeSelect, Input as AntdInput } from 'antd';
 import React from 'react';
@@ -64,7 +64,7 @@ export const CREATE_FORM_CONTROLS: (departments, roleOptions) => IFormColDef[] =
               },
               {
                 validator(rule, value, cb) {
-                  if (record.password.value !== value) {
+                  if (Form2.getFieldValue(record.password) !== value) {
                     cb('2次密码输入不一致');
                   }
                   cb();
@@ -269,7 +269,7 @@ export const RESET_FORM: IFormColDef[] = [
               },
               {
                 validator(rule, value, cb) {
-                  if (record.password.value !== value) {
+                  if (Form2.getFieldValue(record.password) !== value) {
                     cb('2次密码输入不一致');
                   }
                   cb();

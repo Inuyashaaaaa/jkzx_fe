@@ -149,7 +149,6 @@ class ClientManagementSalesManagement extends PureComponent {
 
   public onEdit = (params, e) => {
     e.stopPropagation();
-    console.log(params);
     if (params.children) {
       return this.setState(
         {
@@ -331,7 +330,6 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public onSelect = async selectedKeys => {
-    console.log(selectedKeys);
     if (!selectedKeys.length) return;
     const arr = selectedKeys[0].split('/');
     if (arr.length === 3) {
@@ -369,7 +367,7 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleConfirmSub = async () => {
     const { error } = await this.$subModalForm.validate();
     if (error) return;
-    console.log(this.state.subFormData);
+
     const subsidiaryEdit = this.state.editSub ? refSubsidiaryUpdate : refSubsidiaryCreate;
     const params = this.state.editSub
       ? {

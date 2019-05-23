@@ -52,7 +52,7 @@ class Calendars extends PureComponent<any, any> {
   public getListData = value => {
     const format = this.getCompareDateFormat();
     const sameDataSourceByDate = this.getSameDataSourceByDate(this.state.dataSource, format);
-    console.log(sameDataSourceByDate);
+
     return sameDataSourceByDate[value.format(format)];
   };
 

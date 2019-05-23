@@ -120,7 +120,6 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public render() {
-    console.log(this.state.tableDataSource);
     return (
       <Page>
         <Form2

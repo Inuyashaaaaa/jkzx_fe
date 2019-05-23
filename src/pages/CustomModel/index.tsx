@@ -365,7 +365,7 @@ const CustomModel = memo(() => {
         return tabData;
       });
       const wb = XLSX.utils.book_new();
-      console.log(_data);
+
       cols.forEach((item, index) => {
         const ws = XLSX.utils.aoa_to_sheet(_data[index]);
         XLSX.utils.book_append_sheet(wb, ws, item);
@@ -491,7 +491,6 @@ const CustomModel = memo(() => {
             key="import"
             type="primary"
             onImport={data => {
-              console.log('data', data);
               setFile(data.fileName);
               setUploadData(data);
             }}

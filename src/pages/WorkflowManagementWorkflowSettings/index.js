@@ -95,7 +95,6 @@ class Component extends PureStateComponent {
         ]);
       },
       onBtnClick: event => {
-        console.log(event);
         if (event.name === '新建角色') {
           this.switchVisible();
         }
