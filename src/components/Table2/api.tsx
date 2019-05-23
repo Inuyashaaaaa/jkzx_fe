@@ -38,14 +38,13 @@ class TableManager {
   }
 
   public registeCell(rowId: string, colId: string, cellNode: SwitchCell) {
-    if (
-      this.cellNodes[rowId] &&
-      this.cellNodes[rowId].findIndex(item => item.id === colId) === -1
-    ) {
-      this.cellNodes[rowId].push({
-        node: cellNode,
-        id: colId,
-      });
+    if (this.cellNodes[rowId]) {
+      if (this.cellNodes[rowId].findIndex(item => item.id === colId) === -1) {
+        this.cellNodes[rowId].push({
+          node: cellNode,
+          id: colId,
+        });
+      }
     } else {
       this.cellNodes[rowId] = [
         {

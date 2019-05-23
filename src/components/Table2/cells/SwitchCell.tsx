@@ -104,7 +104,6 @@ class SwitchCell extends PureComponent<
     if (this.isSelectionCell()) {
       return;
     }
-
     const { record, getRowKey, api } = this.props;
     api.tableManager.registeCell(record[getRowKey()], this.getDataIndex(), this);
   };

@@ -34,12 +34,27 @@
     }
   }
 
-  .tongyu-table-row {
-    .tongyu-table-cell {
-      &.active {
-        border: 1px solid @primary-color !important;
+  .ant-table-vertical {
+    .tongyu-table-row {
+      .tongyu-table-cell {
+        &.active {
+          border: 1px solid @primary-color !important;
+        }
       }
     }
+  }
+
+  .ant-table-horizontal {
+    .tongyu-table-row {
+      .tongyu-table-cell {
+        &.active {
+          outline: 1px solid @primary-color !important;
+        }
+      }
+    }
+  }
+
+  .tongyu-table-row {
     &:hover {
       .tongyu-table-cell {
         transition: background-color 0.5s;

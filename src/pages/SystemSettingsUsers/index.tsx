@@ -490,6 +490,7 @@ class SystemSettingsUsers extends PureComponent {
       users,
       loading,
     } = this.state;
+    console.log(users);
     return (
       <Page>
         {!displayResources && (

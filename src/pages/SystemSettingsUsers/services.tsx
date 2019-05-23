@@ -4,6 +4,7 @@ import React from 'react';
 import { ITableColDef } from '@/components/type';
 import FormItem from 'antd/lib/form/FormItem';
 import { Select } from '@/components';
+import { Divider, Button } from 'antd';
 
 export const createPageTableColDefs: ITableColDef[] = (roleOptions, getRowActions) => [
   {
@@ -24,7 +25,6 @@ export const createPageTableColDefs: ITableColDef[] = (roleOptions, getRowAction
     },
     defaultEditing: false,
     render: (value, record, index, { form, editing }) => {
-      console.log(value, editing);
       return (
         <FormItem>
           {form.getFieldDecorator({})(
