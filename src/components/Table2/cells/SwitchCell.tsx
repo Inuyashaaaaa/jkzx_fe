@@ -104,7 +104,6 @@ class SwitchCell extends PureComponent<
     if (this.isSelectionCell()) {
       return;
     }
-
     const { record, getRowKey, api } = this.props;
     api.tableManager.registeCell(record[getRowKey()], this.getDataIndex(), this);
   };
@@ -396,19 +395,35 @@ class SwitchCell extends PureComponent<
     }
 
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.DOWN) {
-      return this.props.api.tableManager.getDownCell(rowId, colId);
+      if (this.props.vertical) {
+        return this.props.api.tableManager.getDownCell(rowId, colId);
+      } else {
+        return this.props.api.tableManager.getRightCell(rowId, colId);
+      }
     }
 
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.UP) {
-      return this.props.api.tableManager.getUpCell(rowId, colId);
+      if (this.props.vertical) {
+        return this.props.api.tableManager.getUpCell(rowId, colId);
+      } else {
+        return this.props.api.tableManager.getLeftCell(rowId, colId);
+      }
     }
 
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.LEFT) {
-      return this.props.api.tableManager.getLeftCell(rowId, colId);
+      if (this.props.vertical) {
+        return this.props.api.tableManager.getLeftCell(rowId, colId);
+      } else {
+        return this.props.api.tableManager.getUpCell(rowId, colId);
+      }
     }
 
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.RIGHT) {
-      return this.props.api.tableManager.getRightCell(rowId, colId);
+      if (this.props.vertical) {
+        return this.props.api.tableManager.getRightCell(rowId, colId);
+      } else {
+        return this.props.api.tableManager.getDownCell(rowId, colId);
+      }
     }
   };
 

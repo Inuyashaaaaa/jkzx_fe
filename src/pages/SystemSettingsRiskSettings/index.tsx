@@ -453,7 +453,6 @@ class SystemSettingsRiskSettings extends PureComponent {
                   key="import"
                   type="primary"
                   onImport={data => {
-                    console.log('data', data);
                     const _data = data.data[0][Object.keys(data.data[0])[0]];
                     this.setState({
                       visible: true,

@@ -7,11 +7,13 @@ class FormManager {
   }> = [];
 
   public registeCell(colId: string, cellNode: SwitchCell) {
-    if (this.cellNodes && this.cellNodes.findIndex(item => item.id === colId) === -1) {
-      this.cellNodes.push({
-        node: cellNode,
-        id: colId,
-      });
+    if (this.cellNodes) {
+      if (this.cellNodes.findIndex(item => item.id === colId) === -1) {
+        this.cellNodes.push({
+          node: cellNode,
+          id: colId,
+        });
+      }
     } else {
       this.cellNodes = [
         {

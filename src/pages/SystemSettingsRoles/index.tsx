@@ -156,7 +156,7 @@ class SystemSettingsPermissions extends PureComponent {
   };
 
   public onCreateRole = async event => {
-    // console.log(event);
+    //
     return createRole(event.createFormData).then(rp => {
       if (rp.error) return false;
       this.fetchTable();

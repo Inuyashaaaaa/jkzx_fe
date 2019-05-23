@@ -14,11 +14,7 @@
   visibility: visible;
 }
 
-:global {
-  .tongyu-cell-diff {
-    background-color: @primary-3 !important;
-  }
-
+.commonCell(@n) {
   .tongyu-cell {
     transition: background-color 0.5s;
     &.editable {
@@ -28,18 +24,43 @@
           cursor: pointer;
           -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          z-index: 999;
+          z-index: @n;
         }
       }
     }
   }
+}
 
-  .tongyu-table-row {
-    .tongyu-table-cell {
-      &.active {
-        border: 1px solid @primary-color !important;
+:global {
+  .tongyu-cell-diff {
+    background-color: @primary-3 !important;
+  }
+
+  .ant-table-vertical {
+    .tongyu-table-row {
+      .tongyu-table-cell {
+        &.active {
+          border: 1px solid @primary-color !important;
+        }
       }
     }
+
+    .commonCell(9);
+  }
+
+  .ant-table-horizontal {
+    .tongyu-table-row {
+      .tongyu-table-cell {
+        &.active {
+          outline: 1px solid @primary-color !important;
+        }
+      }
+    }
+
+    .commonCell(inherit);
+  }
+
+  .tongyu-table-row {
     &:hover {
       .tongyu-table-cell {
         transition: background-color 0.5s;

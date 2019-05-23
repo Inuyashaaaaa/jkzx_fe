@@ -368,7 +368,6 @@ export default class ResourceManagement extends PureComponent {
   };
 
   executeUpate = async (data, action) => {
-    console.log(data);
     let hintMethod = function() {};
     let message = '';
     switch (action) {

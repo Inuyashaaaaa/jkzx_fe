@@ -1,40 +1,81 @@
 import { IColumnDef } from '@/components/Table/types';
 import { IFormControl } from '@/components/_Form2';
+import React from 'react';
+import { ITableColDef } from '@/components/type';
+import FormItem from 'antd/lib/form/FormItem';
+import { Select } from '@/components';
+import { Divider, Button } from 'antd';
+import Operation from './Operation';
 
-export const createPageTableColDefs: (roleOptions) => IColumnDef[] = roleOptions => [
+export const createPageTableColDefs: ITableColDef[] = (
+  roleOptions,
+  showResources,
+  departments,
+  fetchData
+) => [
   {
-    headerName: '用户名',
-    field: 'username',
+    title: '用户名',
+    dataIndex: 'username',
+    width: 180,
   },
   {
-    headerName: '昵称',
-    field: 'nickName',
+    title: '昵称',
+    dataIndex: 'nickName',
+    width: 180,
   },
   {
-    headerName: '拥有角色（可编辑）',
-    field: 'roles',
-    editable: true,
-    input: {
-      defaultOpen: true,
-      mode: 'multiple',
-      type: 'select',
-      options: roleOptions,
+    title: '拥有角色（可编辑）',
+    dataIndex: 'roles',
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (value, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <Select
+              defaultOpen={true}
+              editing={editing}
+              autoSelect={true}
+              options={roleOptions}
+              mode={'multiple'}
+            />
+          )}
+        </FormItem>
+      );
     },
   },
   {
-    headerName: '部门',
-    field: 'departmentName',
-    editable: false,
+    title: '部门',
+    dataIndex: 'departmentName',
+    width: 200,
   },
   {
-    headerName: '类型',
-    field: 'userTypeName',
-    editable: false,
+    title: '类型',
+    dataIndex: 'userTypeName',
+    width: 100,
   },
   {
-    headerName: '邮箱',
-    field: 'contactEmail',
-    editable: false,
+    title: '邮箱',
+    dataIndex: 'contactEmail',
+    width: 200,
+  },
+  {
+    title: '操作',
+    dataIndex: 'operation',
+    fixed: 'right',
+    width: 230,
+    render: (value, record, index) => {
+      return (
+        <Operation
+          record={record}
+          showResources={showResources}
+          departments={departments}
+          fetchData={fetchData}
+        />
+      );
+    },
   },
 ];
 

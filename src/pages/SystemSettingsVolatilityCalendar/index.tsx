@@ -138,7 +138,6 @@ class VolatilityCalendar extends PureComponent {
   public confirmUpdate = () => {
     if (this.$formBuilder) {
       this.$formBuilder.validateForm(values => {
-        console.log(values);
         this.executeUpdate(values);
       });
     }
@@ -213,7 +212,7 @@ class VolatilityCalendar extends PureComponent {
   };
 
   public highLightSpecialDates = date => {
-    // console.log()
+    //
     const { calendarMoment, dates } = this.state;
     const isSpecial = dates.find(d => d.specialDate === date.format('YYYY-MM-DD'));
     const isValid = calendarMoment.isSame(date, 'month');

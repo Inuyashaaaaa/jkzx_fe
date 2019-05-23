@@ -125,9 +125,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
         message.success('新建成功');
         this.search();
       });
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   public bindChange = params => async () => {};
@@ -160,8 +158,6 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
   };
 
   public render() {
-    console.log(this.state.dataSource);
-
     return (
       <Page title="投资组合管理">
         <Form2

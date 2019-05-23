@@ -173,7 +173,7 @@ class SettlementAdvice extends PureComponent {
 
   public render() {
     const { searchFormData } = this.state;
-    console.log(this.state.positionIdList);
+
     return (
       <>
         <Form2
