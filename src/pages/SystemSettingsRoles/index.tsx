@@ -53,6 +53,7 @@ const pagesCollection = [
   'tradingStatements',
   'fundsDetailedStatements',
   'customerFundsSummaryStatements',
+  'reportsCustomManagement',
   'riskManager',
   'intradayPositionReport',
   'intradayRiskByUnderlyerReport',
