@@ -1,17 +1,12 @@
-import {
-  ASSET_CLASS_ZHCN_MAP,
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  INPUT_NUMBER_LOT_CONFIG,
-  INSTRUMENT_TYPE_ZHCN_MAP,
-} from '@/constants/common';
-import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderExcelButton';
-import RangeNumberInput from '@/containers/RangeNumberInput';
-import Form from '@/components/Form';
 // import SourceTable from '@/components/SourceTable';
-import { Table2, Form2 } from '@/components';
+import { Form2, Table2 } from '@/components';
+import Form from '@/components/Form';
 import { ITableColDef } from '@/components/type';
+import { ASSET_CLASS_ZHCN_MAP, INSTRUMENT_TYPE_ZHCN_MAP } from '@/constants/common';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderExcelButton';
 import Page from '@/containers/Page';
+import RangeNumberInput from '@/containers/RangeNumberInput';
 import {
   countDelta,
   countDeltaCash,
@@ -30,7 +25,6 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS, TABLE_FORM_CONTROLS } from './constants';
-import { VERTICAL_GUTTER } from '@/constants/global';
 
 const { TabPane } = Tabs;
 
