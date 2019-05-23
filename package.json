@@ -69,6 +69,8 @@
     "qs": "^6.6.0",
     "raw-loader": "^0.5.1",
     "rc-animate": "^2.4.4",
+    "rc-texty": "^0.2.0",
+    "rc-tween-one": "^2.4.1",
     "react": "^16.8.6",
     "react-container-query": "^0.11.0",
     "react-copy-to-clipboard": "^5.0.1",
