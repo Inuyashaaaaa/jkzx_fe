@@ -189,7 +189,11 @@ class ApprovalProcessConfiguration extends PureComponent {
 
   public onConfirm = async () => {
     const { currentProcessName, status, processConfigs, taskApproveGroupList } = this.state;
+    let addFlag = false;
     const noneGroupIndex = _.findIndex(taskApproveGroupList, item => {
+      if (_.isNumber(item.taskId)) {
+        addFlag = true;
+      }
       return (
         !item ||
         !item.approveGroupList ||
@@ -211,7 +215,7 @@ class ApprovalProcessConfiguration extends PureComponent {
 
     if (noneGroupIndex >= 0) {
       return notification.error({
-        message: `请为每个节点命名为首位不能为数字长度大于三位，并且至少选择一个审批组`,
+        message: `请为每个节点命名为首位不能为数字，并且至少选择一个审批组`,
       });
     }
 
@@ -224,18 +228,22 @@ class ApprovalProcessConfiguration extends PureComponent {
           : 'tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction';
       return item;
     });
-
-    const { error: merror, data } = await wkProcessModify({
-      processName: currentProcessName,
-      taskList,
-    });
-    const tasks = _.sortBy(data.tasks, ['sequence']);
-    const taskListData = taskApproveGroupList.map((item, index) => {
-      return {
-        ...tasks[index],
-        ...item,
-      };
-    });
+    // 如果没有增加节点不调wkProcessModify接口
+    let taskListData = [...taskApproveGroupList];
+    if (addFlag) {
+      const { error: merror, data } = await wkProcessModify({
+        processName: currentProcessName,
+        taskList,
+      });
+      if (merror) return;
+      const tasks = _.sortBy(data.tasks, ['sequence']);
+      taskListData = taskApproveGroupList.map((item, index) => {
+        return {
+          ...tasks[index],
+          ...item,
+        };
+      });
+    }
 
     const requests = () =>
       Promise.all([
@@ -303,7 +311,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       return item.taskType === 'reviewData';
     }).length;
     let taskApproveGroupList = this.state.taskApproveGroupList.concat({
-      taskName: `${taskName}${length + 1}`,
+      taskName: `复核节点${length + 1}`,
       index: `1.${length}`,
       taskType: 'reviewData',
       taskId: _.random(10, true),
