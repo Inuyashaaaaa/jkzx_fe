@@ -54,10 +54,11 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const TripleDigital: ILeg = {
+export const TripleDigital: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.TRIPLE_DIGITAL],
   type: LEG_TYPE_MAP.TRIPLE_DIGITAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -242,4 +243,4 @@ export const TripleDigital: ILeg = {
       setTableData
     );
   },
-};
+});

@@ -1,16 +1,10 @@
 import {
   ASSET_CLASS_MAP,
-  EXERCISETYPE_MAP,
+  FREQUENCY_TYPE_MAP,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
-  UNIT_ENUM_MAP,
-  REBATETYPE_UNIT_MAP,
-  REBATETYPE_TYPE_MAP,
-  KNOCK_DIRECTION_MAP,
-  OPTION_TYPE_MAP,
   OB_DAY_FIELD,
-  FREQUENCY_TYPE_MAP,
   OB_PRICE_FIELD,
 } from '@/constants/common';
 import {
@@ -21,11 +15,12 @@ import {
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/containers/type';
+import { getMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -41,15 +36,15 @@ import { DaysInYear } from '../legFields/DaysInYear';
 import { EffectiveDate } from '../legFields/EffectiveDate';
 import { ExpirationDate } from '../legFields/ExpirationDate';
 import { FrontPremium } from '../legFields/FrontPremium';
-import { AlUnwindNotionalAmount } from '../legFields/infos/AlUnwindNotionalAmount';
-import { InitialNotionalAmount } from '../legFields/infos/InitialNotionalAmount';
-import { LcmEventType } from '../legFields/infos/LcmEventType';
-import { PositionId } from '../legFields/infos/PositionId';
 import { InitialSpot } from '../legFields/InitialSpot';
 import { IsAnnual } from '../legFields/IsAnnual';
 import { MinimumPremium } from '../legFields/MinimumPremium';
 import { NotionalAmount } from '../legFields/NotionalAmount';
 import { NotionalAmountType } from '../legFields/NotionalAmountType';
+import { ObservationDates } from '../legFields/ObservationDates';
+import { ObservationStep } from '../legFields/ObservationStep';
+import { ObserveEndDay } from '../legFields/ObserveEndDay';
+import { ObserveStartDay } from '../legFields/ObserveStartDay';
 import { OptionType } from '../legFields/OptionType';
 import { ParticipationRate } from '../legFields/ParticipationRate';
 import { Premium } from '../legFields/Premium';
@@ -61,23 +56,11 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
-import { Rebate } from '../legFields/Rebate';
-import { ObservationType } from '../legFields/ObservationType';
-import { KnockDirection } from '../legFields/KnockDirection';
-import { RebateUnit } from '../legFields/RebateUnit';
-import { RebateType } from '../legFields/RebateType';
-import { BarrierType } from '../legFields/BarrierType';
-import { Barrier } from '../legFields/Barrier';
-import { getMoment } from '@/tools';
-import { ObservationStep } from '../legFields/ObservationStep';
-import { ObservationDates } from '../legFields/ObservationDates';
-import { ObserveStartDay } from '../legFields/ObserveStartDay';
-import { ObserveEndDay } from '../legFields/ObserveEndDay';
-import { convertObservetions } from '@/services/common';
 import { Unit } from '../legFields/Unit';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
 
-export const Asia: ILeg = {
+export const Asia: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.ASIAN],
   type: LEG_TYPE_MAP.ASIAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -254,7 +237,7 @@ export const Asia: ILeg = {
     nextPosition.asset.settlementDate =
       env === LEG_ENV.PRICING
         ? nextPosition.asset.expirationDate
-        : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate;
+        : nextPosition.asset.settlementDate;
 
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
@@ -314,4 +297,4 @@ export const Asia: ILeg = {
       );
     }
   },
-};
+});

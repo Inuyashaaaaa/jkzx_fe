@@ -57,7 +57,7 @@ import { Button } from 'antd';
             const { columnDefs, rowData } = this.state;
             return <>
             <Button style={{marginBottom: 12}} onClick={() => this.setState({ text: '666' }, () => {
-                console.log(this.$table)
+                
                 this.$table.$baseTable.gridApi.refreshView()
             })}>change text and refresh view</Button>
             <Table ref={node => this.$table = node } rowKey="make" columnDefs={columnDefs} rowData={rowData} />
@@ -488,7 +488,7 @@ import { Button } from 'antd';
         onClick() {
             this.$table.$baseTable.validateTableCells().then(results => {
                 if (results.some(item => item.error)) {
-                   console.log(results)
+                   
                    return alert('has error');
                 }
                 alert('success!')

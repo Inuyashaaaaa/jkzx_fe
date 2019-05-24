@@ -63,7 +63,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Rebate } from '../legFields/Rebate';
 import { ObservationType } from '../legFields/ObservationType';
 import { KnockDirection } from '../legFields/KnockDirection';
@@ -78,8 +78,9 @@ import { LowBarrier } from '../legFields/LowBarrier';
 import { ObservationDates } from '../legFields/ObservationDates';
 import { ObservationStep } from '../legFields/ObservationStep';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const RangeAccruals: ILeg = {
+export const RangeAccruals: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.RANGE_ACCRUALS],
   type: LEG_TYPE_MAP.RANGE_ACCRUALS,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -279,4 +280,4 @@ export const RangeAccruals: ILeg = {
       setTableData
     );
   },
-};
+});

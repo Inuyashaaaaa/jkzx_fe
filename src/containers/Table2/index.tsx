@@ -122,7 +122,6 @@ class Table2 extends PureComponent<ITableProps> {
   };
 
   public save = (rowIds?: string[], colIds?: string[]) => {
-    console.log(this.api.tableManager.cellNodes);
     return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
       if (rowIds && rowIds.indexOf(rowId) === -1) return;
       items.forEach(item => {

@@ -55,7 +55,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Rebate } from '../legFields/Rebate';
 import { ObservationType } from '../legFields/ObservationType';
 import { KnockDirection } from '../legFields/KnockDirection';
@@ -75,8 +75,9 @@ import { PaymentType } from '../legFields/PaymentType';
 import { HighPayment } from '../legFields/HighPayment';
 import { LowPayment } from '../legFields/LowPayment';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const DoubleDigital: ILeg = {
+export const DoubleDigital: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_DIGITAL],
   type: LEG_TYPE_MAP.DOUBLE_DIGITAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -257,4 +258,4 @@ export const DoubleDigital: ILeg = {
 
     const { changedFields } = changeFieldsParams;
   },
-};
+});

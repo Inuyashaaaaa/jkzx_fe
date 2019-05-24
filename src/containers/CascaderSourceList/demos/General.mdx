@@ -67,14 +67,14 @@ import CascaderSourceListBase from '../CascaderSourceListBase';
         }
 
         onChange(selectedRowKeys) {
-            console.log(selectedRowKeys)
+            
             this.setState({
                 value: selectedRowKeys
             })
         }
 
         onRemove(params) {
-            console.log(params)
+            
             this.setState({
                 options: this.removeOptions(this.state.options, params.rowId)
             })
@@ -115,7 +115,7 @@ import CascaderSourceListBase from '../CascaderSourceListBase';
         }
 
         onCreate(params) {
-            console.log(params)
+            
         }
 
         render () {

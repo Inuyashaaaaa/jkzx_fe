@@ -48,13 +48,14 @@ import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { RebateType } from '../legFields/RebateType';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const DoubleTouch: ILeg = {
+export const DoubleTouch: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_TOUCH],
   type: LEG_TYPE_MAP.DOUBLE_TOUCH,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -224,4 +225,4 @@ export const DoubleTouch: ILeg = {
       setTableData
     );
   },
-};
+});

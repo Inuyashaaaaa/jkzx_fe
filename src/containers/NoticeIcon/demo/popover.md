@@ -97,11 +97,11 @@ const data = [{
 }];
 
 function onItemClick(item, tabProps) {
-  console.log(item, tabProps);
+  
 }
 
 function onClear(tabTitle) {
-  console.log(tabTitle);
+  
 }
 
 function getNoticeData(notices) {

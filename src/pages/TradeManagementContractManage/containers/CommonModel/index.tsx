@@ -104,8 +104,6 @@ class CommonModel extends PureComponent<any> {
       })
     );
 
-    console.log(tableDataSource);
-
     const { dispatch, name } = this.props;
     dispatch({
       type: 'tradeManagementContractManage/save',

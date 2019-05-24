@@ -1,6 +1,5 @@
 import {
   BIG_NUMBER_CONFIG,
-  FROM_HISTORY_PRICING_TAG,
   LEG_FIELD,
   LEG_ID_FIELD,
   LEG_INJECT_FIELDS,
@@ -15,7 +14,6 @@ import {
   TRADESCOL_FIELDS,
 } from '@/constants/global';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
-import { DATE_LEG_FIELDS } from '@/constants/legType';
 import { PRICING_FROM_EDITING } from '@/constants/trade';
 import { Form2 } from '@/containers';
 import MultiLegTable from '@/containers/MultiLegTable';
@@ -38,12 +36,11 @@ import { convertTradePositions, createLegDataSourceItem } from '@/services/pages
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
-import { getLegByProductType, getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
+import { getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
 import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
-import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
@@ -163,7 +160,7 @@ const TradeManagementBooking = props => {
     return selfTradesColDataIndexs;
   };
 
-  const fetchDefaultPricingEnvData = _.debounce(async (record, reload = false) => {
+  const fetchDefaultPricingEnvData = async (record, reload = false) => {
     if (judgeLegColumnsHasError(record)) {
       return;
     }
@@ -199,13 +196,16 @@ const TradeManagementBooking = props => {
 
     inlineSetLoadings(true);
 
+    const [position] = convertTradePositions(
+      [Form2.getFieldsValue(_.omit(record, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))],
+      {},
+      LEG_ENV.PRICING
+    );
+
     const { error, data = [], raw } = await prcTrialPositionsService({
-      positions: convertTradePositions(
-        [Form2.getFieldsValue(_.omit(record, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))],
-        {},
-        LEG_ENV.PRICING
-      ),
+      positions: [position],
       pricingEnvironmentId: curPricingEnv,
+      valuationDateTime: _.get(position, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
     });
 
     inlineSetLoadings(false);
@@ -253,7 +253,7 @@ const TradeManagementBooking = props => {
         return item;
       });
     });
-  }, 250);
+  };
 
   const [pricingEnvironmentsList, setPricingEnvironmentsList] = useState([]);
 
@@ -310,6 +310,7 @@ const TradeManagementBooking = props => {
           ),
           ...(item.productType === LEG_TYPE_MAP.FORWARD ? { vol: 1 } : undefined),
           pricingEnvironmentId: curPricingEnv,
+          valuationDateTime: _.get(item, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
         });
       })
     );

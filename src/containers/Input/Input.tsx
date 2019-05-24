@@ -16,8 +16,6 @@ class Input extends InputBase<IInputProps> {
   };
 
   public onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e);
-
     if (this.props.onChange) {
       this.props.onChange(e);
     }
