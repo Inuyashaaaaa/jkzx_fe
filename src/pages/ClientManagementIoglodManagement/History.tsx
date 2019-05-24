@@ -193,7 +193,7 @@ class History extends PureComponent {
           loading={this.state.loading}
           size="middle"
           rowKey="uuid"
-          scroll={this.state.dataSource ? { x: '3400px' } : { x: false }}
+          scroll={this.state.dataSource ? { x: '3600px' } : { x: false }}
         />
         {/* <SourceTable
         rowKey="uuid"

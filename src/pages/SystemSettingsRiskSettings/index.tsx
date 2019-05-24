@@ -10,15 +10,14 @@ import {
   mktInstrumentWhitelistSearch,
 } from '@/services/market-data-service';
 import { tradeReferenceGet } from '@/services/trade-service';
-import { message, Modal, Tabs, Table, Divider, Row, Button } from 'antd';
+import { message, Modal, Table, Divider, Row, Button, Popconfirm } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS, SEARCH_FORM_CONTROLS } from './constants';
 import { Form2, Select, InputNumber, Input } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
 import { formatMoney } from '@/tools';
-
-const { TabPane } = Tabs;
+import TabHeader from '@/containers/TabHeader';
 
 class SystemSettingsRiskSettings extends PureComponent {
   public $createFrom: Form2 = null;
@@ -42,11 +41,12 @@ class SystemSettingsRiskSettings extends PureComponent {
     venueCodes: [],
     pagination: {
       current: 1,
-      pageSize: 20,
+      pageSize: 10,
     },
     createVisible: false,
     createFormData: {},
     tableDataSource: [],
+    activeKey: '1',
   };
 
   public componentDidMount() {
@@ -112,7 +112,7 @@ class SystemSettingsRiskSettings extends PureComponent {
     };
   };
 
-  public onRemove = (e, data = {}) => {
+  public onRemove = (data = {}) => {
     return mktInstrumentWhitelistDelete({
       instrumentIds: [data.instrumentId],
     }).then(rsp => {
@@ -228,11 +228,25 @@ class SystemSettingsRiskSettings extends PureComponent {
     );
   };
 
+  public changeTab = tab => {
+    this.setState({
+      activeKey: tab,
+    });
+  };
+
   public render() {
     return (
-      <Page>
-        <Tabs defaultActiveKey="1">
-          <TabPane tab="白名单" key="1">
+      <Page
+        footer={
+          <TabHeader
+            activeKey={this.state.activeKey}
+            onChange={this.changeTab}
+            tabList={[{ key: '1', tab: '白名单' }]}
+          />
+        }
+      >
+        {this.state.activeKey === '1' && (
+          <>
             <Form2
               layout="inline"
               dataSource={this.state.searchFormData}
@@ -332,9 +346,9 @@ class SystemSettingsRiskSettings extends PureComponent {
                   title: '操作',
                   render: (text, record, index) => {
                     return (
-                      <a style={{ color: 'red' }} onClick={e => this.onRemove(e, record)}>
-                        删除
-                      </a>
+                      <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(record)}>
+                        <a style={{ color: 'red' }}>删除</a>
+                      </Popconfirm>
                     );
                   },
                 },
@@ -355,8 +369,8 @@ class SystemSettingsRiskSettings extends PureComponent {
                   : { x: false }
               }
             />
-          </TabPane>
-        </Tabs>
+          </>
+        )}
         <Modal
           title="导入预览"
           visible={this.state.visible}

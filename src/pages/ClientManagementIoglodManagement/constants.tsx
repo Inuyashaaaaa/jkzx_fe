@@ -139,17 +139,16 @@ export const PROCESSED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
 export const PROCESSED_COLUMN = fetchTable => [
   {
     title: '交易对手',
-    width: 150,
+    width: 200,
     dataIndex: 'legalName',
   },
   {
     title: '交易ID',
-    width: 150,
     dataIndex: 'tradeId',
   },
   {
     title: '现金流 (¥)',
-    width: 150,
+    width: 200,
     dataIndex: 'cashFlow',
     render: (text, record, index) => {
       return text ? formatMoney(text, {}) : text;
@@ -157,7 +156,7 @@ export const PROCESSED_COLUMN = fetchTable => [
   },
   {
     title: '期权费 (¥)',
-    width: 150,
+    width: 200,
     dataIndex: 'premium',
     render: (text, record, index) => {
       return text ? formatMoney(text, {}) : text;
@@ -165,7 +164,7 @@ export const PROCESSED_COLUMN = fetchTable => [
   },
   {
     title: '生命周期事件',
-    width: 150,
+    width: 200,
     dataIndex: 'lcmEventType',
     render: (value, record, index) => {
       return LCM_EVENT_TYPE_OPTIONS[
@@ -177,7 +176,8 @@ export const PROCESSED_COLUMN = fetchTable => [
   },
   {
     title: '操作',
-    width: 150,
+    width: 100,
+    fixed: 'right',
     render: (text, record, index) => {
       return <CashInsertModal record={text} fetchTable={fetchTable} />;
     },
@@ -193,7 +193,6 @@ export const HISTORY_CLOUNMS = fetchTable => [
   },
   {
     title: '交易ID',
-    width: 150,
     dataIndex: 'tradeId',
   },
   {
@@ -296,7 +295,7 @@ export const HISTORY_CLOUNMS = fetchTable => [
   },
   {
     title: '我方授信总额变化 (¥)',
-    width: 250,
+    width: 200,
     dataIndex: 'counterPartyCreditChange',
     render: (text, record, index) => {
       return text ? formatMoney(text, {}) : text;
@@ -304,7 +303,7 @@ export const HISTORY_CLOUNMS = fetchTable => [
   },
   {
     title: '我方剩余授信余额变化 (¥)',
-    width: 250,
+    width: 200,
     dataIndex: 'counterPartyCreditBalanceChange',
     render: (text, record, index) => {
       return text ? formatMoney(text, {}) : text;
@@ -312,7 +311,7 @@ export const HISTORY_CLOUNMS = fetchTable => [
   },
   {
     title: '我方可用资金变化 (¥)',
-    width: 250,
+    width: 200,
     dataIndex: 'counterPartyFundChange',
     render: (text, record, index) => {
       return text ? formatMoney(text, {}) : text;
@@ -320,7 +319,7 @@ export const HISTORY_CLOUNMS = fetchTable => [
   },
   {
     title: '我方冻结保证金变化 (¥)',
-    width: 280,
+    width: 200,
     dataIndex: 'counterPartyMarginChange',
     render: (text, record, index) => {
       return text ? formatMoney(text, {}) : text;
@@ -328,12 +327,12 @@ export const HISTORY_CLOUNMS = fetchTable => [
   },
   {
     title: '账户信息',
-    width: 150,
+    width: 250,
     dataIndex: 'information',
   },
   {
     title: '创建时间',
-    width: 150,
+    width: 250,
     dataIndex: 'createdAt',
     // input: {
     //   type: 'date',
@@ -343,7 +342,7 @@ export const HISTORY_CLOUNMS = fetchTable => [
   },
   {
     title: '更新时间',
-    width: 150,
+    width: 250,
     dataIndex: 'updatedAt',
     // input: {
     //   type: 'date',
