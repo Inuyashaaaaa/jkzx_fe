@@ -1,7 +1,7 @@
 import ModalButton from '@/containers/ModalButton';
 import { DOWN_LOAD_VALUATION_URL } from '@/services/document';
 import { emlSendValuationReport } from '@/services/report-service';
-import { Button, Col, message, Row } from 'antd';
+import { Modal, Col, message, Row } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 class ValuationCellRenderer extends PureComponent<{
@@ -71,28 +71,28 @@ class ValuationCellRenderer extends PureComponent<{
     return (
       <Row type="flex" justify="start" align="bottom">
         <Col>
-          <Button size="small" type="primary">
-            <a href={`${DOWN_LOAD_VALUATION_URL}${this.props.params.uuid}`} download="template.t">
-              查看
-            </a>
-          </Button>
+          <a
+            style={{ marginRight: 10 }}
+            href={`${DOWN_LOAD_VALUATION_URL}${this.props.params.uuid}`}
+            download="template.t"
+          >
+            查看
+          </a>
         </Col>
         <Col>
-          <ModalButton
-            size="small"
-            type="primary"
-            modalProps={{ visible, onOk: this.onConfirm, onCancel: this.onCancel }}
-            content={
-              <div>
-                是否确认向&nbsp;&nbsp;{this.props.params.legalName}
-                &nbsp;&nbsp;邮箱发送估值报告?
-              </div>
-            }
+          <a onClick={this.onClick}>发送报告</a>
+          <Modal
+            title="生成交易确认书"
             visible={visible}
-            onClick={this.onClick}
+            width={600}
+            onCancel={this.onCancel}
+            onOk={this.onConfirm}
           >
-            发送报告
-          </ModalButton>
+            <div>
+              是否确认向&nbsp;&nbsp;{this.props.params.legalName}
+              &nbsp;&nbsp;邮箱发送估值报告?
+            </div>
+          </Modal>
         </Col>
       </Row>
     );

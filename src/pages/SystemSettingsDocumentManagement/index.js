@@ -182,27 +182,19 @@ class ClientManagementDocument extends PureComponent {
 
         return isValid ? (
           <div>
-            <Button size="small" type="primary">
-              <a href={`${HREF_UPLOAD_URL}${record.uuid}`} download={`${record.fileName}`}>
-                查看
-              </a>
-            </Button>
+            <a href={`${HREF_UPLOAD_URL}${record.uuid}`} download={`${record.fileName}`}>
+              查看
+            </a>
             <Popconfirm title="新文件将会替换旧文件" onConfirm={() => this.showModal(record)}>
-              <Button style={{ marginLeft: 10 }} size="small" type="primary">
-                更新
-              </Button>
+              <a style={{ marginLeft: 10 }}>更新</a>
             </Popconfirm>
             <Popconfirm title="确定要删除吗？" onConfirm={() => this.removeTemplate(record)}>
-              <Button type="danger" style={{ marginLeft: 10 }} size="small">
-                删除
-              </Button>
+              <a style={{ marginLeft: 10, color: 'red' }}>删除</a>
             </Popconfirm>
           </div>
         ) : (
           <div>
-            <Button onClick={() => this.showModal(record)} size="small" type="primary">
-              上传
-            </Button>
+            <a onClick={() => this.showModal(record)}>上传</a>
           </div>
         );
       },

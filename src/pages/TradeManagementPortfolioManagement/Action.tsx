@@ -282,20 +282,12 @@ class Action extends PureComponent<any, any> {
     const { params } = this.props;
     return (
       <Row type="flex" align="middle">
-        <Button.Group>
-          <Button size="small" type="primary" onClick={this.showModal}>
-            查看/修改
-          </Button>
-          <Popconfirm title="确认删除？" onConfirm={this.onRemove}>
-            <Button
-              size="small"
-              type="danger"
-              style={{ marginLeft: '5px', border: '1px solid #ccc' }}
-            >
-              删除
-            </Button>
-          </Popconfirm>
-        </Button.Group>
+        <a onClick={this.showModal} style={{ marginRight: 10 }}>
+          查看/修改
+        </a>
+        <Popconfirm title="确认删除？" onConfirm={this.onRemove} style={{ color: 'red' }}>
+          <a style={{ color: 'red' }}>删除</a>
+        </Popconfirm>
         <Modal
           title="投资组合详情"
           visible={this.state.visible}

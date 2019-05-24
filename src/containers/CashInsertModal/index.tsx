@@ -280,9 +280,7 @@ const CashInsertModal = memo<{
           style={{ width: '720px' }}
         /> */}
       </Modal>
-      <Button type="primary" onClick={switchModal} size="small">
-        资金录入
-      </Button>
+      <a onClick={switchModal}>资金录入</a>
     </>
   );
 });

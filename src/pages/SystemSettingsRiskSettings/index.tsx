@@ -16,6 +16,7 @@ import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS, SEARCH_FORM_CONTROLS } from './constants';
 import { Form2, Select, InputNumber, Input } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
+import { formatMoney } from '@/tools';
 
 const { TabPane } = Tabs;
 
@@ -321,8 +322,11 @@ class SystemSettingsRiskSettings extends PureComponent {
                   dataIndex: 'instrumentId',
                 },
                 {
-                  title: '存续期名义金额上限',
+                  title: '存续期名义金额上限（￥）',
                   dataIndex: 'notionalLimit',
+                  render: (text, record, index) => {
+                    return text ? formatMoney(text, {}) : text;
+                  },
                 },
                 {
                   title: '操作',

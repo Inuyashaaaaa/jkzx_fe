@@ -1,7 +1,7 @@
 import Form from '@/containers/Form';
 import ModalButton from '@/containers/ModalButton';
 import { DOWN_LOAD_TRADE_URL, emlSendSupplementaryAgreementReport } from '@/services/document';
-import { Alert, Button, Col, message, Row } from 'antd';
+import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 
@@ -57,109 +57,101 @@ class TradeModal extends PureComponent {
     const { data } = this.props;
     return (
       <>
-        <ModalButton
-          modalProps={{
-            title: '生成交易确认书',
-            width: 700,
-            footer: null,
-            closable: true,
-            visible: this.state.visible,
-            onCancel: this.onCancel,
-          }}
-          onClick={this.onClick}
-          size="small"
-          type="primary"
-          content={
-            <>
-              <Alert
-                style={{ marginBottom: 40 }}
-                message="交易确认书使用最新模板和下方输入的内容即时生成，系统不会留存每次生成的文档。"
-                description="请在下载或发送前，确认以下自定义内容。"
-                type="info"
-                showIcon={true}
-              />
-              <Form
-                wrappedComponentRef={element => {
-                  if (element) {
-                    this.$form = element.props.form;
-                  }
-                  return;
-                }}
-                controls={[
-                  {
-                    field: 'marketDisruption',
-                    control: {
-                      label: '市场中断事件的处理',
-                    },
-                    input: {
-                      type: 'textarea',
-                      autosize: { minRows: 6, maxRows: 6 },
-                      maxLength: 500,
-                      showMaxLength: true,
-                      showResetButton: true,
-                    },
-                  },
-                  {
-                    field: 'tradeOption',
-                    control: {
-                      label: '提前终止期权交易的情形',
-                    },
-                    input: {
-                      type: 'textarea',
-                      autosize: { minRows: 6, maxRows: 6 },
-                      maxLength: 500,
-                      showMaxLength: true,
-                      showResetButton: true,
-                    },
-                  },
-                ]}
-                dataSource={this.state.modalData}
-                onValueChange={this.handleChange}
-                controlNumberOneRow={1}
-                layout="vertical"
-                footer={false}
-              />
-              <Row type="flex" justify="end" align="middle" gutter={8}>
-                <Col>
-                  <Button type="default">
-                    <a
-                      href={encodeURI(
-                        `${DOWN_LOAD_TRADE_URL}tradeId=${this.props.data.tradeId}&description7=${
-                          this.state.modalData.marketDisruption
-                        }&description8=${this.state.modalData.tradeOption}&partyName=${
-                          this.props.data.partyName
-                        }`
-                      )}
-                      download="template.t"
-                    >
-                      下载
-                    </a>
-                  </Button>
-                </Col>
-                <Col>
-                  <Button type="primary" onClick={this.onConfirm}>
-                    发送至客户邮箱
-                  </Button>
-                </Col>
-              </Row>
-              <Row type="flex" justify="end" align="middle" gutter={8}>
-                <p style={{ lineHeight: '40px' }}>
-                  {data.docProcessStatus === 'UN_PROCESSED'
-                    ? `${data.partyName}未处理过交易确认书`
-                    : data.docProcessStatus === 'DOWNLOADED'
-                    ? `${data.partyName} 于 ${moment(data.updateAt).format(
-                        'YYYY-MM-DD HH:mm'
-                      )}下载过交易确认书`
-                    : `${data.partyName} 于 ${moment(data.updateAt).format(
-                        'YYYY-MM-DD HH:mm'
-                      )}发送过交易确认书`}
-                </p>
-              </Row>
-            </>
-          }
+        <a onClick={this.onClick}>生成交易确认书</a>
+        <Modal
+          title="生成交易确认书"
+          visible={this.state.visible}
+          footer={false}
+          width={700}
+          onCancel={this.onCancel}
         >
-          生成交易确认书
-        </ModalButton>
+          <>
+            <Alert
+              style={{ marginBottom: 40 }}
+              message="交易确认书使用最新模板和下方输入的内容即时生成，系统不会留存每次生成的文档。"
+              description="请在下载或发送前，确认以下自定义内容。"
+              type="info"
+              showIcon={true}
+            />
+            <Form
+              wrappedComponentRef={element => {
+                if (element) {
+                  this.$form = element.props.form;
+                }
+                return;
+              }}
+              controls={[
+                {
+                  field: 'marketDisruption',
+                  control: {
+                    label: '市场中断事件的处理',
+                  },
+                  input: {
+                    type: 'textarea',
+                    autosize: { minRows: 6, maxRows: 6 },
+                    maxLength: 500,
+                    showMaxLength: true,
+                    showResetButton: true,
+                  },
+                },
+                {
+                  field: 'tradeOption',
+                  control: {
+                    label: '提前终止期权交易的情形',
+                  },
+                  input: {
+                    type: 'textarea',
+                    autosize: { minRows: 6, maxRows: 6 },
+                    maxLength: 500,
+                    showMaxLength: true,
+                    showResetButton: true,
+                  },
+                },
+              ]}
+              dataSource={this.state.modalData}
+              onValueChange={this.handleChange}
+              controlNumberOneRow={1}
+              layout="vertical"
+              footer={false}
+            />
+            <Row type="flex" justify="end" align="middle" gutter={8}>
+              <Col>
+                <Button type="default">
+                  <a
+                    href={encodeURI(
+                      `${DOWN_LOAD_TRADE_URL}tradeId=${this.props.data.tradeId}&description7=${
+                        this.state.modalData.marketDisruption
+                      }&description8=${this.state.modalData.tradeOption}&partyName=${
+                        this.props.data.partyName
+                      }`
+                    )}
+                    download="template.t"
+                  >
+                    下载
+                  </a>
+                </Button>
+              </Col>
+              <Col>
+                <Button type="primary" onClick={this.onConfirm}>
+                  发送至客户邮箱
+                </Button>
+              </Col>
+            </Row>
+            <Row type="flex" justify="end" align="middle" gutter={8}>
+              <p style={{ lineHeight: '40px' }}>
+                {data.docProcessStatus === 'UN_PROCESSED'
+                  ? `${data.partyName}未处理过交易确认书`
+                  : data.docProcessStatus === 'DOWNLOADED'
+                  ? `${data.partyName} 于 ${moment(data.updateAt).format(
+                      'YYYY-MM-DD HH:mm'
+                    )}下载过交易确认书`
+                  : `${data.partyName} 于 ${moment(data.updateAt).format(
+                      'YYYY-MM-DD HH:mm'
+                    )}发送过交易确认书`}
+              </p>
+            </Row>
+          </>
+        </Modal>
       </>
     );
   }
