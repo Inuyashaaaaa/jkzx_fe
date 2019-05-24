@@ -20,7 +20,7 @@ import {
 import { mktInstrumentInfo } from '@/services/market-data-service';
 import { prcSpotScenarios } from '@/services/pricing-service';
 import { trdBookListBySimilarBookName, trdInstrumentListByBook } from '@/services/trade-service';
-import { Card, Empty, Tabs } from 'antd';
+import { Card, Empty, Tabs, Divider } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -246,82 +246,81 @@ class Component extends PureComponent<
     // cols.unshift('scenarioId');
     const _data = this.handleData(this.state.instruments, cols, headers);
     return (
-      <Page title="标的物情景分析" card={false}>
-        <Card>
-          <Form
-            layout="inline"
-            onValueChange={this.onSearchFormChange}
-            dataSource={this.state.searchFormData}
-            submitText="分析"
-            resetable={false}
-            onSubmitButtonClick={this.fetch}
-            controls={[
-              {
-                field: 'bookId',
-                control: {
-                  label: '交易簿',
+      <Page title="标的物情景分析">
+        <Form
+          layout="inline"
+          onValueChange={this.onSearchFormChange}
+          dataSource={this.state.searchFormData}
+          submitText="分析"
+          resetable={false}
+          onSubmitButtonClick={this.fetch}
+          controls={[
+            {
+              field: 'bookId',
+              control: {
+                label: '交易簿',
+              },
+              input: {
+                type: 'select',
+                showSearch: true,
+                placeholder: '请输入内容搜索',
+                options: async (value: string = '') => {
+                  const { data, error } = await trdBookListBySimilarBookName({
+                    similarBookName: value,
+                  });
+                  if (error) return [];
+                  return _.union(data).map(item => ({
+                    label: item,
+                    value: item,
+                  }));
                 },
-                input: {
-                  type: 'select',
-                  showSearch: true,
-                  placeholder: '请输入内容搜索',
-                  options: async (value: string = '') => {
-                    const { data, error } = await trdBookListBySimilarBookName({
-                      similarBookName: value,
-                    });
-                    if (error) return [];
-                    return _.union(data).map(item => ({
-                      label: item,
-                      value: item,
-                    }));
+              },
+              decorator: {
+                rules: [
+                  {
+                    required: true,
                   },
-                },
-                decorator: {
-                  rules: [
-                    {
-                      required: true,
-                    },
-                  ],
-                },
+                ],
               },
-              {
-                field: 'underlyers',
-                control: {
-                  label: '标的物',
-                },
-                input: {
-                  type: 'select',
-                  mode: 'multiple',
-                  placeholder: '全部',
-                  showSearch: true,
-                  options: this.state.underlyersOptions,
-                  formatValue: val => val,
-                },
+            },
+            {
+              field: 'underlyers',
+              control: {
+                label: '标的物',
               },
-              {
-                field: 'priceRange',
-                control: {
-                  label: '价格范围(%)',
-                },
-                input: {
-                  type: RangeNumberInput,
-                },
+              input: {
+                type: 'select',
+                mode: 'multiple',
+                placeholder: '全部',
+                showSearch: true,
+                options: this.state.underlyersOptions,
+                formatValue: val => val,
               },
-              {
-                field: 'num',
-                control: {
-                  label: '情景个数',
-                },
-                input: {
-                  type: 'number',
-                },
+            },
+            {
+              field: 'priceRange',
+              control: {
+                label: '价格范围(%)',
               },
-            ]}
-          />
-        </Card>
-        <Card style={{ marginTop: 15 }} loading={this.state.loading}>
+              input: {
+                type: RangeNumberInput,
+              },
+            },
+            {
+              field: 'num',
+              control: {
+                label: '情景个数',
+              },
+              input: {
+                type: 'number',
+              },
+            },
+          ]}
+        />
+        <Divider />
+        <Card loading={this.state.loading} bordered={false}>
           <SpotLadderExcelButton
-            style={{ margin: '10px 0' }}
+            style={{ marginBottom: VERTICAL_GUTTER }}
             key="export"
             type="primary"
             data={{
