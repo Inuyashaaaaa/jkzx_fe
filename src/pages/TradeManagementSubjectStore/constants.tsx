@@ -45,12 +45,10 @@ export const TABLE_COL_DEFS = fetchTable => [
   {
     title: '报价单位',
     dataIndex: 'unit',
-    render: (value, record, index) => {
-      if (!value) {
-        return '-';
-      }
-      return value;
-    },
+  },
+  {
+    title: '交易品种',
+    dataIndex: 'tradeCategory',
   },
   {
     title: '期货到期日',
