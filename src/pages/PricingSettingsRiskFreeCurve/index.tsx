@@ -10,10 +10,12 @@ import {
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
 import { queryModelName, queryModelRiskFreeCurve, saveModelRiskFreeCurve } from '@/services/model';
-import { message } from 'antd';
+import { message, Divider, Table, Modal, Row, Button } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import { GROUP_KEY } from './constants';
+import { Form2, Input, Select } from '@/containers';
+import FormItem from 'antd/lib/form/FormItem';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
@@ -27,6 +29,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     editings: {},
     saveLoading: false,
     options: [],
+    insertVisible: false,
+    searchFormData: {},
+    insertFormData: {},
   };
 
   public lastFetchedDataSource = null;
@@ -74,8 +79,8 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
       .map(item => item.record);
   };
 
-  public fetchTableData = async event => {
-    const { searchFormData } = event;
+  public fetchTableData = async () => {
+    const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error, data } = await queryModelRiskFreeCurve({
       modelName: searchFormData[GROUP_KEY],
     });
@@ -96,26 +101,43 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
       tableDataSource = this.sortDataSource(dataSource);
     }
     this.setState({ tableDataSource });
-    // return tableDataSource;
   };
 
-  public saveTableData = async event => {
-    const { searchFormData, tableDataSource } = event;
+  public saveTableData = async () => {
+    const { tableDataSource } = this.state;
+    const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error } = await saveModelRiskFreeCurve({
       dataSource: tableDataSource,
       modelName: searchFormData[GROUP_KEY],
     });
 
-    return !error;
+    if (error) return;
+
+    message.success('保存成功');
   };
 
-  public onSearchFormChange = values => {
-    this.fetchTableData(values);
+  public onSearchFormChange = (props, changedFields, allFields) => {
+    const { searchFormData } = this.state;
+    this.setState(
+      {
+        searchFormData: {
+          ...searchFormData,
+          ...changedFields,
+        },
+      },
+      () => {
+        this.fetchTableData();
+      }
+    );
+    // this.fetchTableData({
+    //   ...this.state.searchFormData,
+    //   ...Form2.getFieldsValue(allFields)
+    // });
   };
 
-  public onRemove = event => {
+  public onRemove = (e, rowIndex) => {
     const clone = [...this.state.tableDataSource];
-    clone.splice(event.rowIndex, 1);
+    clone.splice(rowIndex, 1);
     this.setState({
       tableDataSource: clone,
     });
@@ -123,24 +145,29 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     message.success('删除成功');
   };
 
-  public onConfirm = event => {
-    if (!event.formData.tenor) return;
-
+  public onConfirm = (event, rowIndex, param) => {
     const clone = [...this.state.tableDataSource];
-    clone.splice(event.extra.rowIndex + 1, 0, {
-      ...event.extra.rowData,
-      ...event.formData,
+    const { insertFormData } = this.state;
+    if (!Form2.getFieldsValue(insertFormData).tenor) return;
+    clone.splice(rowIndex + 1, 0, {
+      ...param,
+      ...Form2.getFieldsValue(insertFormData),
       id: Math.random(),
     });
+
     this.setState({
+      insertVisible: false,
       tableDataSource: this.sortDataSource(clone),
+      insertFormData: {},
     });
 
     message.success('插入成功');
   };
 
-  public onClick = event => {
-    const { tableDataSource = [] } = event.state;
+  public onClick = (e, tableDataSource = {}) => {
+    this.setState({
+      insertVisible: true,
+    });
 
     const formControls: IFormControl[] = [
       {
@@ -150,7 +177,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
         },
         input: {
           type: 'select',
-          options: getCanUsedTranorsOtionsNotIncludingSelf(tableDataSource),
+          options: getCanUsedTranorsOtionsNotIncludingSelf([tableDataSource]),
         },
         options: {
           rules: [
@@ -183,10 +210,154 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     };
   };
 
+  public onInsertFormChange = (props, changedFields, allFields) => {
+    console.log(allFields);
+    this.setState({
+      insertFormData: allFields,
+    });
+  };
+
   public render() {
+    console.log(this.state.insertFormData);
     return (
       <Page>
-        <SourceTable
+        <Form2
+          ref={node => (this.$sourceTable = node)}
+          layout="inline"
+          dataSource={this.state.searchFormData}
+          submitText="搜索"
+          submitButtonProps={{
+            icon: 'search',
+          }}
+          onSubmitButtonClick={this.fetchTableData}
+          onFieldsChange={this.onSearchFormChange}
+          resetable={false}
+          columns={[
+            {
+              title: '分组',
+              dataIndex: GROUP_KEY,
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true }],
+                    })(
+                      <Select
+                        {...{
+                          editing,
+                          style: {
+                            width: 280,
+                          },
+                          placeholder: '请输入内容搜索',
+                          showSearch: true,
+                          allowClear: true,
+                          fetchOptionsOnSearch: true,
+                          options: this.state.options,
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+          ]}
+        />
+        <Divider type="horizontal" />
+        <Row>
+          {this.state.tableDataSource.length > 0 ? (
+            <Button type="primary" style={{ marginBottom: 10 }} onClick={this.saveTableData}>
+              保存
+            </Button>
+          ) : null}
+        </Row>
+        <Table
+          size="middle"
+          rowKey="id"
+          dataSource={this.state.tableDataSource}
+          columns={[
+            {
+              title: '期限',
+              dataIndex: 'tenor',
+              // input: record => {
+              //   return {
+              //     type: 'select',
+              //     // columnDefs 的函数字段不会被 diff 判断，如果加上一个 key 会影响动效，所以命令获取
+              //     options: getCanUsedTranorsOtions(
+              //       this.$sourceTable.getTableDataSource(),
+              //       record
+              //     ),
+              //   };
+              // },
+            },
+            {
+              title: '利率(%)',
+              dataIndex: 'quote',
+              // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+            },
+            {
+              title: '操作',
+              render: (value, record, index) => {
+                return (
+                  <>
+                    <a
+                      style={{ color: 'red' }}
+                      onClick={e => {
+                        this.onRemove(e, index);
+                      }}
+                    >
+                      删除
+                    </a>
+                    <Divider type="vertical" />
+                    <a onClick={e => this.onClick(e, value)}>插入</a>
+                    <Modal
+                      visible={this.state.insertVisible}
+                      onOk={e => this.onConfirm(e, index, value)}
+                      onCancel={() => {
+                        this.setState({ insertVisible: false });
+                      }}
+                    >
+                      <Form2
+                        layout="inline"
+                        dataSource={this.state.insertFormData}
+                        submitable={false}
+                        resetable={false}
+                        onFieldsChange={this.onInsertFormChange}
+                        columns={[
+                          {
+                            title: '期限',
+                            dataIndex: 'tenor',
+                            render: (val, record, index, { form, editing }) => {
+                              console.log(value);
+                              return (
+                                <FormItem>
+                                  {form.getFieldDecorator({
+                                    rules: [
+                                      {
+                                        required: true,
+                                      },
+                                    ],
+                                  })(
+                                    <Select
+                                      style={{ minWidth: 280 }}
+                                      placeholder="请选择左侧标的物"
+                                      options={getCanUsedTranorsOtionsNotIncludingSelf([value])}
+                                    />
+                                  )}
+                                </FormItem>
+                              );
+                            },
+                          },
+                        ]}
+                      />
+                    </Modal>
+                  </>
+                );
+              },
+            },
+          ]}
+          pagination={false}
+        />
+        {/* <SourceTable
           ref={node => (this.$sourceTable = node)}
           rowKey="id"
           removeable={true}
@@ -225,28 +396,28 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
           tableColumnDefs={event => {
             return event.tableDataSource.length
               ? [
-                  {
-                    headerName: '期限',
-                    field: 'tenor',
-                    editable: true,
-                    input: record => {
-                      return {
-                        type: 'select',
-                        // columnDefs 的函数字段不会被 diff 判断，如果加上一个 key 会影响动效，所以命令获取
-                        options: getCanUsedTranorsOtions(
-                          this.$sourceTable.getTableDataSource(),
-                          record
-                        ),
-                      };
-                    },
+                {
+                  headerName: '期限',
+                  field: 'tenor',
+                  editable: true,
+                  input: record => {
+                    return {
+                      type: 'select',
+                      // columnDefs 的函数字段不会被 diff 判断，如果加上一个 key 会影响动效，所以命令获取
+                      options: getCanUsedTranorsOtions(
+                        this.$sourceTable.getTableDataSource(),
+                        record
+                      ),
+                    };
                   },
-                  {
-                    headerName: '利率(%)',
-                    editable: true,
-                    field: 'quote',
-                    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-                  },
-                ]
+                },
+                {
+                  headerName: '利率(%)',
+                  editable: true,
+                  field: 'quote',
+                  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+                },
+              ]
               : [];
           }}
           rowActions={[
@@ -260,7 +431,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               插入
             </ModalButton>,
           ]}
-        />
+        /> */}
       </Page>
     );
   }

@@ -227,7 +227,9 @@ class PricingSettingVolSurface extends PureComponent {
       instance: searchFormData[INSTANCE_KEY],
     });
 
-    return !error;
+    if (error) return;
+
+    message.success('保存成功');
   };
 
   public onSetConstantsButtonClick = event => {
@@ -269,12 +271,10 @@ class PricingSettingVolSurface extends PureComponent {
       ...Form2.getFieldsValue(insertFormData),
       id: Math.random(),
     });
-    this.setState({
-      tableDataSource: this.sortDataSource(clone),
-    });
 
     this.setState({
       insertVisible: false,
+      tableDataSource: this.sortDataSource(clone),
       insertFormData: {},
     });
     message.success('插入成功');
@@ -306,9 +306,7 @@ class PricingSettingVolSurface extends PureComponent {
     this.selectedColumns = columns;
   };
 
-  public onClick = (tableDataSource = {}) => {
-    console.log(tableDataSource);
-
+  public onClick = (e, tableDataSource = {}) => {
     this.setState({
       insertVisible: true,
     });
@@ -351,7 +349,7 @@ class PricingSettingVolSurface extends PureComponent {
               删除
             </a>
             <Divider type="vertical" />
-            <a onClick={tetx => this.onClick(text)}>插入</a>
+            <a onClick={e => this.onClick(e, text)}>插入</a>
             <Modal
               visible={this.state.insertVisible}
               onOk={e => this.onConfirm(e, index, text)}
