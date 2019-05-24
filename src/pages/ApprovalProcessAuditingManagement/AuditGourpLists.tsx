@@ -244,7 +244,7 @@ class AuditLists extends PureComponent {
             <li className={styles.listItem}>
               <Button
                 type="dashed"
-                style={{ width: '100%', border: '1px dashed #ccc', borderRadius: '8px' }}
+                style={{ width: '100%', border: '1px dashed #ccc' }}
                 onClick={this.showModal}
               >
                 新建审批组
