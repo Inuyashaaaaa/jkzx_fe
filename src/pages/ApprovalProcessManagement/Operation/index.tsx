@@ -60,7 +60,7 @@ class Operation extends PureComponent {
           <Divider type="vertical" />
           <a onClick={this.switchModal}>查看审批单</a>
           <Modal
-            title="编辑银行账户"
+            title="流程图"
             visible={this.state.diagramVisible}
             width={700}
             onCancel={this.hideDiagramModal}
@@ -69,7 +69,7 @@ class Operation extends PureComponent {
             <img src={this.state.flowDiagram} style={{ width: 650 }} alt="图片加载出错，请重试" />
           </Modal>
           <Modal
-            title="编辑银行账户"
+            title="审批单"
             visible={this.state.visible}
             width={900}
             onCancel={this.handleFormChange}
