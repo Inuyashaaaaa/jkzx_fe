@@ -156,6 +156,7 @@ class LoginPage extends Component<any> {
           footer={
             <Form.Item>
               <Button
+                htmlType="submit"
                 size="large"
                 type="primary"
                 block={true}

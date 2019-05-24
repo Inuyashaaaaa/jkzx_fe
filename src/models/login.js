@@ -2,8 +2,8 @@ import { getPageQuery } from '@/tools';
 import { initPagePermissions } from '@/services/role';
 import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
 import { notification } from 'antd';
-import { stringify } from 'qs';
 import pageRouters from '../../config/router.config';
+import router from 'umi/router';
 
 function setPagePermissions(user, roles, rolePagesPermission, pagePermissionTree, userPermissions) {
   function setPermission(pageTree, pageIds) {
@@ -141,19 +141,19 @@ export default {
         redirect = '/welcome-page';
       }
 
-      // router.push({
-      //   pathname: redirect,
-      // });
-      // yield put({
-      //   type: 'changeForm',
-      //   payload: {}
-      // })
-
-      const nextQueryStr = stringify({
-        _random: Math.random(),
+      router.push({
+        pathname: redirect,
+      });
+      yield put({
+        type: 'changeForm',
+        payload: {},
       });
 
-      window.location.href = `/?${nextQueryStr}/#${redirect || ''}`;
+      // const nextQueryStr = stringify({
+      //   _random: Math.random(),
+      // });
+
+      // window.location.href = `/?${nextQueryStr}/#${redirect || ''}`;
     },
 
     *queryCaptcha(_, { call, put }) {
@@ -172,16 +172,16 @@ export default {
         type: 'user/cleanCurrentUser',
       });
 
-      // router.push({
-      //   pathname: '/user/login',
-      //   query: {
-      //     redirect: window.location.href,
-      //   },
-      // });
+      router.push({
+        pathname: '/user/login',
+        query: {
+          redirect: window.location.href,
+        },
+      });
 
-      window.location.href = `/#/user/login?${stringify({
-        redirect: window.location.href,
-      })}`;
+      // window.location.href = `/#/user/login?${stringify({
+      //   redirect: window.location.href,
+      // })}`;
     },
 
     *updatePassword({ payload }, { call, put }) {

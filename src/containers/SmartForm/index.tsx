@@ -47,7 +47,7 @@ const SmartForm = memo<ISmartFormProps & FormCreateOption<IFormProps>>(props => 
         <Button.Group>
           {!!submitable && (
             <Button
-              // htmlType="submit"
+              htmlType="submit"
               type="primary"
               {...submitButtonProps}
               loading={submitLoading}

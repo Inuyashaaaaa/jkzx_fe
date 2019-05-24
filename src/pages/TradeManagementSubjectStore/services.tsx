@@ -353,11 +353,11 @@ const instrumentIds = {
             disabled={disable()}
             fetchOptionsOnSearch={true}
             options={async (value: string = '') => {
-              const { data, error } = await mktInstrumentSearch({
+              const { data = [], error } = await mktInstrumentSearch({
                 instrumentIdPart: value,
               });
               if (error) return [];
-              return data.map(item => ({
+              return data.slice(0, 50).map(item => ({
                 label: item,
                 value: item,
               }));
