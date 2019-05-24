@@ -1,5 +1,5 @@
 import Page from '@/containers/Page';
-import { Button, Modal, Table, Tabs, Popconfirm, Divider } from 'antd';
+import { Button, Modal, Table, Popconfirm, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import moment from 'moment';
@@ -11,8 +11,7 @@ import {
   HREF_UPLOAD_URL,
   UPLOAD_URL,
 } from '@/services/document';
-
-const { TabPane } = Tabs;
+import TabHeader from '@/containers/TabHeader';
 
 const TRADE_MAP = {
   EUROPEAN: '欧式',
@@ -38,6 +37,7 @@ class ClientManagementDocument extends PureComponent {
       tradePageSize: 10,
       customerPageSize: 10,
       formItems: [],
+      activeKey: '1',
     };
   }
 
@@ -219,6 +219,7 @@ class ClientManagementDocument extends PureComponent {
     this.setState(
       {
         type,
+        activeKey: tab,
       },
       () => {
         if (!target.length) {
@@ -256,55 +257,62 @@ class ClientManagementDocument extends PureComponent {
       tradePageSize,
       customerPageSize,
       loading,
+      activeKey,
     } = this.state;
     const tradeColumns = this.generateTableColumns('trade');
     const customerColumns = this.generateTableColumns('customer');
     return (
-      <Page>
-        <Tabs defaultActiveKey="1" onChange={this.changeTab}>
-          <TabPane tab="交易模板" key="1">
-            <Table
-              loading={loading}
-              columns={tradeColumns}
-              dataSource={tradeData}
-              rowKey="uuid"
-              pagination={{
-                pageSizeOptions: ['10', '20', '30'],
-                showSizeChanger: true,
-                showQuickJumper: true,
-                onShowSizeChange: (page, size) => {
-                  this.setState({ tradePageSize: size });
-                },
-                showTotal: (total, range) => {
-                  const curPage = Math.ceil(range[1] / tradePageSize);
-                  const totalPage = Math.ceil(total / tradePageSize);
-                  return `共有 ${total} 条记录   第 ${curPage}/${totalPage}页`;
-                },
-              }}
-            />
-          </TabPane>
-          <TabPane tab="客户模板" key="2">
-            <Table
-              loading={loading}
-              columns={customerColumns}
-              rowKey="uuid"
-              dataSource={customerData}
-              pagination={{
-                pageSizeOptions: ['10', '20', '30'],
-                showSizeChanger: true,
-                showQuickJumper: true,
-                onShowSizeChange: (page, size) => {
-                  this.setState({ customerPageSize: size });
-                },
-                showTotal: (total, range) => {
-                  const curPage = Math.ceil(range[1] / customerPageSize);
-                  const totalPage = Math.ceil(total / customerPageSize);
-                  return `共有 ${total} 条记录   第 ${curPage}/${totalPage}页`;
-                },
-              }}
-            />
-          </TabPane>
-        </Tabs>
+      <Page
+        footer={
+          <TabHeader
+            activeKey={activeKey}
+            onChange={this.changeTab}
+            tabList={[{ key: '1', tab: '交易模板' }, { key: '2', tab: '客户模板' }]}
+          />
+        }
+      >
+        {activeKey === '1' && (
+          <Table
+            loading={loading}
+            columns={tradeColumns}
+            dataSource={tradeData}
+            rowKey="uuid"
+            pagination={{
+              pageSizeOptions: ['10', '20', '30'],
+              showSizeChanger: true,
+              showQuickJumper: true,
+              onShowSizeChange: (page, size) => {
+                this.setState({ tradePageSize: size });
+              },
+              showTotal: (total, range) => {
+                const curPage = Math.ceil(range[1] / tradePageSize);
+                const totalPage = Math.ceil(total / tradePageSize);
+                return `共有 ${total} 条记录   第 ${curPage}/${totalPage}页`;
+              },
+            }}
+          />
+        )}
+        {activeKey === '2' && (
+          <Table
+            loading={loading}
+            columns={customerColumns}
+            rowKey="uuid"
+            dataSource={customerData}
+            pagination={{
+              pageSizeOptions: ['10', '20', '30'],
+              showSizeChanger: true,
+              showQuickJumper: true,
+              onShowSizeChange: (page, size) => {
+                this.setState({ customerPageSize: size });
+              },
+              showTotal: (total, range) => {
+                const curPage = Math.ceil(range[1] / customerPageSize);
+                const totalPage = Math.ceil(total / customerPageSize);
+                return `共有 ${total} 条记录   第 ${curPage}/${totalPage}页`;
+              },
+            }}
+          />
+        )}
         <Modal
           title={modalTitle}
           visible={modalVisible}
