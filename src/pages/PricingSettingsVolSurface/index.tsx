@@ -319,7 +319,7 @@ class PricingSettingVolSurface extends PureComponent {
         },
         input: {
           type: 'select',
-          options: getCanUsedTranorsOtionsNotIncludingSelf([tableDataSource]),
+          options: getCanUsedTranorsOtionsNotIncludingSelf(this.state.tableDataSource),
         },
         options: {
           rules: [

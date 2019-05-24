@@ -340,7 +340,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
                                     <Select
                                       style={{ minWidth: 280 }}
                                       placeholder="请选择左侧标的物"
-                                      options={getCanUsedTranorsOtionsNotIncludingSelf([value])}
+                                      options={getCanUsedTranorsOtionsNotIncludingSelf(
+                                        this.state.tableDataSource
+                                      )}
                                     />
                                   )}
                                 </FormItem>
