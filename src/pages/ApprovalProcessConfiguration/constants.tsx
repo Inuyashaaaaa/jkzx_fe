@@ -13,6 +13,8 @@ export const TASKTYPE = {
   reviewData: 'REVIEW_DATA',
 };
 
+export const REVIEW_DATA = 'reviewData';
+
 export function GTE_PROCESS_CONFIGS(value) {
   const index = _.findIndex(PROCESS_CONFIGS, item => {
     return item.value === value;

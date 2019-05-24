@@ -1,11 +1,11 @@
+import { Select } from '@/containers';
 import Page from '@/containers/Page';
 import {
-  wkProcessList,
-  wkProcessStatusModify,
-  wkProcessGet,
   wkProcessConfigModify,
-  wkTaskApproveGroupBind,
+  wkProcessList,
   wkProcessModify,
+  wkProcessStatusModify,
+  wkTaskApproveGroupBind,
 } from '@/services/approvalProcessConfiguration';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
@@ -13,19 +13,18 @@ import {
   Checkbox,
   Icon,
   List,
+  message,
   Modal,
   notification,
   Popconfirm,
   Switch,
   Tabs,
   Typography,
-  message,
 } from 'antd';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
-import _ from 'lodash';
-import { GTE_PROCESS_CONFIGS, TASKTYPE } from './constants';
-import { Select } from '@/containers';
+import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE } from './constants';
 
 const TabPane = Tabs.TabPane;
 const { Paragraph } = Typography;
@@ -69,7 +68,7 @@ class ApprovalProcessConfiguration extends PureComponent {
 
     const tabsData = processList.map(tab => {
       const reviewDataLength = _.filter(tab.tasks, item => {
-        return item.taskType === 'reviewData';
+        return item.taskType === REVIEW_DATA;
       }).length;
       tab.reviewDataLength = reviewDataLength;
       tab.tasks.map(task => {
@@ -78,7 +77,7 @@ class ApprovalProcessConfiguration extends PureComponent {
         });
         if (task.taskType === 'modifyData') {
           task.index = 2;
-        } else if (task.taskType === 'reviewData') {
+        } else if (task.taskType === REVIEW_DATA) {
           task.index = 1;
         } else if (task.taskType === 'insertData') {
           task.index = 0;
@@ -91,6 +90,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       tab.tasks = _.sortBy(tab.tasks, ['index']);
       return tab;
     });
+
     this.setState({
       loading: false,
       processList: tabsData,
@@ -184,6 +184,34 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
+  public getActionClass = (taskType, processName) => {
+    // 资金
+    if (processName === '财务出入金') {
+      if (taskType === 'REVIEW_DATA') {
+        return `tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction`;
+    }
+
+    // 授信
+    if (processName === '授信额度变更') {
+      if (taskType === 'REVIEW_DATA') {
+        return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
+    }
+
+    // 交易
+    if (processName === '交易录入') {
+      if (taskType === 'REVIEW_DATA') {
+        return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
+    }
+
+    throw new Error('getActionClass: no match');
+  };
+
   public onConfirm = async () => {
     const { currentProcessName, processList } = this.state;
     const pIndex = _.findIndex(processList, item => {
@@ -193,7 +221,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     const tasks = processList[pIndex].tasks;
 
     const length = _.filter(tasks, item => {
-      return item.taskType === 'reviewData';
+      return item.taskType === REVIEW_DATA;
     }).length;
 
     const noneGroupIndex = _.findIndex(tasks, item => {
@@ -215,14 +243,14 @@ class ApprovalProcessConfiguration extends PureComponent {
     }
 
     const taskList = tasks.map((item, index) => {
-      item.sequence = index;
-      item.taskType = TASKTYPE[item.taskType];
-      item.actionClass =
-        item.taskType === 'REVIEW_DATA'
-          ? 'tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction'
-          : 'tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction';
-      return item;
+      return {
+        ...item,
+        sequence: index,
+        taskType: TASKTYPE[item.taskType],
+        actionClass: this.getActionClass(item.taskType, currentProcessName),
+      };
     });
+
     // 如果没有增加节点不调wkProcessModify接口
     let taskListData = [...tasks];
     if (addFlag) {
@@ -256,7 +284,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       item.approveGroupList = item.approveGroups.map(ap => ap.approveGroupId);
       if (item.taskType === 'modifyData') {
         item.index = 2;
-      } else if (item.taskType === 'reviewData') {
+      } else if (item.taskType === REVIEW_DATA) {
         item.index = 1;
       } else if (item.taskType === 'insertData') {
         item.index = 0;
@@ -268,7 +296,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     _tasks = _.sortBy(_tasks, 'index');
 
     const reviewDataLength = _.filter(_tasks, item => {
-      return item.taskType === 'reviewData';
+      return item.taskType === REVIEW_DATA;
     }).length;
     _processList.reviewDataLength = reviewDataLength;
 
@@ -334,23 +362,25 @@ class ApprovalProcessConfiguration extends PureComponent {
 
     let taskName = '';
     const length = _.filter(tasks, item => {
-      if (item.taskType === 'reviewData' && !taskName) {
+      if (item.taskType === REVIEW_DATA && !taskName) {
         taskName = item.taskName;
       }
-      return item.taskType === 'reviewData';
+      return item.taskType === REVIEW_DATA;
     }).length;
 
     let taskApproveGroupList = tasks.concat({
       taskName: `${currentProcessName}复核节点`,
       index: `1.${length}`,
-      taskType: 'reviewData',
+      taskType: REVIEW_DATA,
       taskId: _.random(10, true),
-      actionClass: 'tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction',
+      actionClass: this.getActionClass(TASKTYPE[REVIEW_DATA], currentProcessName),
     });
+
     taskApproveGroupList = _.sortBy(taskApproveGroupList, ['index']);
 
     processList[pIndex].tasks = taskApproveGroupList;
     processList[pIndex].tabName = processList[pIndex].processName + '审批';
+
     this.setState({
       processList,
     });
@@ -386,7 +416,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     let tasks = processList[pIndex].tasks;
 
     const reviewLength = _.filter(tasks, item => {
-      return item.taskType === 'reviewData';
+      return item.taskType === REVIEW_DATA;
     }).length;
 
     if (reviewLength <= 1) return message.info('至少保留一个复合审批节点');
@@ -445,7 +475,6 @@ class ApprovalProcessConfiguration extends PureComponent {
             >
               <Button type="primary">保存</Button>
             </Popconfirm>
-            ,
           </p>
           <p>
             <Button onClick={this.onReset}>重置</Button>
@@ -460,7 +489,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     return (
       <div className={styles.approvalProcessConfiguration}>
         <Page>
-          <Tabs onChange={this.tabsChange}>
+          <Tabs animated={false} onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
               return (
                 <TabPane tab={tab.processName + '审批'} key={tab.processName}>
@@ -559,7 +588,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                                 />
                               </div>
                             </div>
-                            {task.taskType === 'reviewData' ? (
+                            {task.taskType === REVIEW_DATA ? (
                               <span className={styles.approvalIcon}>
                                 <Icon
                                   type="minus-circle"
@@ -578,7 +607,11 @@ class ApprovalProcessConfiguration extends PureComponent {
                       <List.Item>
                         <div
                           className={styles.approvalNode}
-                          style={{ border: '2px dashed #e8e5e5', textAlign: 'center' }}
+                          style={{
+                            border: '2px dashed #e8e5e5',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                          }}
                           onClick={e => {
                             return this.handleClick(e, tab.processId);
                           }}
