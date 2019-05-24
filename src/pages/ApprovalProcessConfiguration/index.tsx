@@ -67,12 +67,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const tabsData = processList.map(item => {
-      item.tabName = item.processName + '审批';
-      return item;
-    });
-
-    tabsData.map(tab => {
+    const tabsData = processList.map(tab => {
       tab.tasks.map(task => {
         task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
           return item.approveGroupId;
@@ -236,27 +231,44 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const requests = () =>
-      Promise.all([
-        wkTaskApproveGroupBind({
-          processName: currentProcessName,
-          taskList: taskListData.map(item => {
-            return {
-              taskId: item.taskId,
-              approveGroupList: item.approveGroupList,
-            };
-          }),
-        }),
-      ]);
-    const res = await requests();
-    const error = res.some(item => {
-      return item.error;
+    const { error: _error, data } = await wkTaskApproveGroupBind({
+      processName: currentProcessName,
+      taskList: taskListData.map(item => {
+        return {
+          taskId: item.taskId,
+          approveGroupList: item.approveGroupList,
+        };
+      }),
     });
-    if (error) return;
-
-    notification.success({
-      message: `保存成功`,
+    if (_error) return;
+    const _processList = { ...data };
+    let _tasks = [..._processList.tasks];
+    _tasks = _tasks.map(item => {
+      item.approveGroupList = item.approveGroups.map(ap => ap.approveGroupId);
+      if (item.taskType === 'modifyData') {
+        item.index = 2;
+      } else if (item.taskType === 'reviewData') {
+        item.index = 1;
+      } else if (item.taskType === 'insertData') {
+        item.index = 0;
+      } else {
+        item.index = 4;
+      }
+      return item;
     });
+    _tasks = _.sortBy(_tasks, 'index');
+    _processList.tasks = _tasks;
+    processList[pIndex] = _processList;
+    this.setState(
+      {
+        processList,
+      },
+      () => {
+        notification.success({
+          message: `保存成功`,
+        });
+      }
+    );
   };
 
   public handleResetOk = async () => {
@@ -323,6 +335,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     taskApproveGroupList = _.sortBy(taskApproveGroupList, ['index']);
 
     processList[pIndex].tasks = taskApproveGroupList;
+    processList[pIndex].tabName = processList[pIndex].processName + '审批';
     this.setState({
       processList,
     });
@@ -432,10 +445,10 @@ class ApprovalProcessConfiguration extends PureComponent {
     return (
       <div className={styles.approvalProcessConfiguration}>
         <Page>
-          <Tabs defaultActiveKey="资金录入经办复合流程" onChange={this.tabsChange}>
+          <Tabs onChange={this.tabsChange}>
             {this.state.processList.map((tab, index) => {
               return (
-                <TabPane tab={tab.tabName} key={tab.processName}>
+                <TabPane tab={tab.processName + '审批'} key={tab.processName}>
                   <div
                     style={{
                       marginRight: '2px',
@@ -517,10 +530,13 @@ class ApprovalProcessConfiguration extends PureComponent {
                                   options={async (value: string = '') => {
                                     const { data, error } = await wkApproveGroupList();
                                     if (error) return [];
-                                    return data.map(item => ({
-                                      value: item.approveGroupId,
-                                      label: item.approveGroupName,
-                                    }));
+                                    return _.sortBy(
+                                      data.map(item => ({
+                                        value: item.approveGroupId,
+                                        label: item.approveGroupName,
+                                      })),
+                                      'label'
+                                    );
                                   }}
                                   onChange={e =>
                                     this.handleApproveGroup(e, tab.processId, task.taskId)
