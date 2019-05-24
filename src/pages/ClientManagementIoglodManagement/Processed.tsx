@@ -174,20 +174,6 @@ class Processed extends PureComponent {
           rowKey="uuid"
           scroll={this.state.dataSource ? { x: '1200px' } : { x: false }}
         />
-        {/* <SourceTable
-          rowKey="uuid"
-          dataSource={this.state.dataSource}
-          loading={this.state.loading}
-          searchable={true}
-          resetable={true}
-          onResetButtonClick={this.onReset}
-          columnDefs={PROCESSED_COL_DEFS(this.fetchTable)}
-          searchFormControls={PROCESSED_FORM_CONTROLS('processed')}
-          searchFormData={this.state.searchFormData}
-          onSearchButtonClick={this.fetchTable}
-          onSearchFormChange={this.onSearchFormChange}
-          header={<CapitalInputModal fetchTable={this.fetchTable} />}
-        /> */}
       </>
     );
   }

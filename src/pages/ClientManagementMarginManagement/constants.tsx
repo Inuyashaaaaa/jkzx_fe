@@ -60,7 +60,6 @@ export const TABLE_COLUMNS = fetchTable => [
   {
     title: '交易对手',
     dataIndex: 'legalName',
-    width: 150,
   },
   {
     title: '可用资金 (¥)',
@@ -109,6 +108,7 @@ export const TABLE_COLUMNS = fetchTable => [
   {
     title: '操作',
     width: 250,
+    fixed: 'right',
     render: (text, record, index) => {
       return <Operations record={text} fetchTable={fetchTable} />;
     },
