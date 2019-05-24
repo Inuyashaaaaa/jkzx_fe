@@ -22,7 +22,7 @@ export default [
   },
   {
     path: '/',
-    redirect: '/user/login',
+    redirect: '/welcome-page',
   },
   mapTree(
     {
