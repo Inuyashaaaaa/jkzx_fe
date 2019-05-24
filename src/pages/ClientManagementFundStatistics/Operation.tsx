@@ -120,9 +120,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public render() {
     return (
       <>
-        <Button type="primary" onClick={this.switchModal} size="small">
-          调整授信额度
-        </Button>
+        <a onClick={this.switchModal}>调整授信额度</a>
         <Modal
           visible={this.state.visible}
           onOk={this.onConfirm}

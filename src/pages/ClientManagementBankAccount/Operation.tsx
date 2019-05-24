@@ -1,7 +1,7 @@
 import PopconfirmButton from '@/containers/PopconfirmButton';
 import ModalButton from '@/containers/ModalButton';
 import { refBankAccountDel, refBankAccountSave } from '@/services/reference-data-service';
-import { Col, message, Row } from 'antd';
+import { Col, message, Row, Modal, Popconfirm } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonModalForm from './CommonModalForm';
 
@@ -51,7 +51,7 @@ class Operation extends PureComponent<{
 
   public onRemove = async () => {
     const { error, data } = await refBankAccountDel({
-      uuid: this.props.record.data.uuid,
+      uuid: this.props.record.uuid,
     });
     if (error) {
       message.error('删除失败');
@@ -66,39 +66,27 @@ class Operation extends PureComponent<{
     return (
       <Row type="flex" justify="start">
         <Col>
-          <ModalButton
-            type="primary"
-            key="edit"
-            size="small"
-            onClick={this.switchModal}
-            modalProps={{
-              visible: this.state.visible,
-              confirmLoading: this.state.confirmLoading,
-              onCancel: this.switchModal,
-              onOk: this.handleEdit,
-              title: '编辑银行账户',
-            }}
-            content={
-              <CommonModalForm
-                createFormData={this.state.createFormData}
-                onCreateFormChange={this.onCreateFormChange}
-              />
-            }
-          >
+          <a onClick={this.switchModal} style={{ marginRight: 10 }}>
             编辑
-          </ModalButton>
+          </a>
+          <Modal
+            title="编辑银行账户"
+            visible={this.state.visible}
+            width={700}
+            onCancel={this.switchModal}
+            onOk={this.handleEdit}
+            confirmLoading={this.state.confirmLoading}
+          >
+            <CommonModalForm
+              createFormData={this.state.createFormData}
+              onCreateFormChange={this.onCreateFormChange}
+            />
+          </Modal>
         </Col>
         <Col>
-          <PopconfirmButton
-            type="danger"
-            size="small"
-            popconfirmProps={{
-              title: '确定要删除吗?',
-              onConfirm: this.onRemove,
-            }}
-          >
-            删除
-          </PopconfirmButton>
+          <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
+            <a style={{ color: 'red' }}>删除</a>
+          </Popconfirm>
         </Col>
       </Row>
     );
