@@ -14,6 +14,7 @@ import {
   Table,
   Tabs,
   Empty,
+  List,
 } from 'antd';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
@@ -94,6 +95,7 @@ const useList = () => {
       item.positions.forEach(param => {
         const obj = { ...item };
         obj.positions = param;
+        obj.id = _.random(10, true);
         positions = positions.concat(obj);
       });
     });
@@ -295,7 +297,8 @@ const CustomModel = memo(() => {
     setTradeList(positions);
   };
 
-  const handleSelect = async param => {
+  const handleSelect = async (e, param) => {
+    console.log(param);
     setCurrentTrade(param);
     setTableLoading(true);
     const { data, error } = await mdlModelDataGet({
@@ -403,7 +406,7 @@ const CustomModel = memo(() => {
     });
     XLSX.writeFile(wb, `${PRODUCTTYPE}_${currentTrade.tradeId}.xlsx`);
   };
-
+  console.log(currentTrade);
   return (
     <div className={styles.customModel}>
       <Page title="自定义模型（MODEL_XY）">
@@ -416,7 +419,7 @@ const CustomModel = memo(() => {
             />
           </p>
           <Spin spinning={loading}>
-            <ul style={{ marginTop: '20px' }} className={styles.searchList}>
+            {/* <ul style={{ marginTop: '20px' }} className={styles.searchList}>
               {tradeList.map((item, index) => {
                 return (
                   <li
@@ -441,7 +444,52 @@ const CustomModel = memo(() => {
                   </li>
                 );
               })}
-            </ul>
+            </ul> */}
+            <List
+              itemLayout="vertical"
+              size="large"
+              pagination={{
+                onChange: page => {
+                  console.log(page);
+                },
+                pageSize: 10,
+              }}
+              dataSource={tradeList}
+              footer={null}
+              className={styles.searchList}
+              renderItem={item => {
+                console.log(item.positions.positionId);
+                return (
+                  <List.Item
+                    key={item.id}
+                    className={
+                      currentTrade &&
+                      currentTrade.positions &&
+                      currentTrade.positions.positionId === item.positions.positionId
+                        ? styles.checked
+                        : styles.liItme
+                    }
+                  >
+                    <div
+                      style={{
+                        width: '100%',
+                        paddingLeft: '20px',
+                      }}
+                      onClick={e => handleSelect(e, item)}
+                    >
+                      <span className={styles.itemName}>
+                        {item.tradeId}
+                        <br />
+                        标的物 {item.positions.asset.underlyerInstrumentId}
+                        <br />
+                        到期日 {item.positions.asset.expirationDate}
+                        <br />
+                      </span>
+                    </div>
+                  </List.Item>
+                );
+              }}
+            />
           </Spin>
         </div>
         <div
