@@ -292,6 +292,15 @@ const APPROVAL_GROUP_INFO = common.concat([
   },
 ]);
 
+const PROCESS_DEFINITION = [];
+
+const PROCESS_DEFINITION_INFO = common.concat([
+  {
+    value: 'UPDATE_PROCESS_DEFINITION',
+    zh: '流程定义修改',
+  },
+]);
+
 export const RESOURCE_ENUM = [
   'ROOT',
   'NAMESPACE',
@@ -306,6 +315,8 @@ export const RESOURCE_ENUM = [
   'CLIENT_INFO',
   'APPROVAL_GROUP',
   'APPROVAL_GROUP_INFO',
+  'PROCESS_DEFINITION',
+  'PROCESS_DEFINITION_INFO',
 ];
 
 export default {
@@ -322,4 +333,6 @@ export default {
   CLIENT_INFO,
   APPROVAL_GROUP,
   APPROVAL_GROUP_INFO,
+  PROCESS_DEFINITION,
+  PROCESS_DEFINITION_INFO,
 };
