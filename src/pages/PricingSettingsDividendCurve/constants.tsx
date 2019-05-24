@@ -52,10 +52,10 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
     title: '利率(%)',
     dataIndex: 'quote',
     width: 10,
-    editable: record => {
-      return true;
-    },
-    defaultEditing: false,
+    // editable: record => {
+    //   return true;
+    // },
+    // defaultEditing: false,
     render: (val, record, index, { form, editing }) => {
       return (
         <FormItem>
