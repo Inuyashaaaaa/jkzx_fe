@@ -2,7 +2,19 @@ import ImportExcelButton from '@/containers/_ImportExcelButton';
 import Page from '@/containers/Page';
 import { trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mdlModelDataGet, mdlModelXYCreate } from '@/services/model';
-import { Button, Input, message, Modal, notification, Row, Select, Spin, Table, Tabs } from 'antd';
+import {
+  Button,
+  Input,
+  message,
+  Modal,
+  notification,
+  Row,
+  Select,
+  Spin,
+  Table,
+  Tabs,
+  Empty,
+} from 'antd';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
@@ -481,7 +493,8 @@ const CustomModel = memo(() => {
               </Tabs>
             </div>
           ) : (
-            <span className={styles.center}>请先选中一个标的物</span>
+            // <span className={styles.center}>请先选中一个标的物</span>
+            <Empty className={styles.center} />
           )}
         </div>
       </Page>
