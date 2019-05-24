@@ -40,7 +40,7 @@ const EditableBaseRowHOC = (OldRow: React.ReactType) =>
     public render() {
       // const { form, onEditCell, editable, $editableRows, rowId, ...props } = this.props;
       // const { errors } = this.state;
-      // console.log('render EditableRowInner');
+      //
       const { form, ...restProps } = this.props;
       return (
         //   <EditableContext.Provider value={{ form, errors, cleanError: this.cleanError }}>

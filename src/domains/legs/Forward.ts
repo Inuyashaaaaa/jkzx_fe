@@ -51,14 +51,15 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { RebateType } from '../legFields/RebateType';
 import { ObservationType } from '../legFields/ObservationType';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const Forward: ILeg = {
+export const Forward: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.FORWARD],
   type: LEG_TYPE_MAP.FORWARD,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -210,4 +211,4 @@ export const Forward: ILeg = {
       setTableData
     );
   },
-};
+});

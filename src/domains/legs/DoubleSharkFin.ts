@@ -59,7 +59,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Rebate } from '../legFields/Rebate';
 import { ObservationType } from '../legFields/ObservationType';
 import { KnockDirection } from '../legFields/KnockDirection';
@@ -76,8 +76,9 @@ import { HighRebate } from '../legFields/HighRebate';
 import { LowBarrier } from '../legFields/LowBarrier';
 import { HighBarrier } from '../legFields/HighBarrier';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const DoubleSharkFin: ILeg = {
+export const DoubleSharkFin: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_SHARK_FIN],
   type: LEG_TYPE_MAP.DOUBLE_SHARK_FIN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -301,4 +302,4 @@ export const DoubleSharkFin: ILeg = {
       }
     }
   },
-};
+});

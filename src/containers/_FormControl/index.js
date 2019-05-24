@@ -218,7 +218,7 @@ class FormControl extends Component {
   // };
 
   render() {
-    // console.log('render FormControl')
+    //
     const { counting } = this.state;
     const { field, onChange, value } = this.props;
 
