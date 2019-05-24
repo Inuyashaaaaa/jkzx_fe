@@ -241,7 +241,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       }),
     });
     if (_error) return;
-    let _processList = { ...data };
+    const _processList = { ...data };
     let _tasks = [..._processList.tasks];
     _tasks = _tasks.map(item => {
       item.approveGroupList = item.approveGroups.map(ap => ap.approveGroupId);
