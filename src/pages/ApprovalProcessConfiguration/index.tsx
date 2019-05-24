@@ -68,6 +68,10 @@ class ApprovalProcessConfiguration extends PureComponent {
     }
 
     const tabsData = processList.map(tab => {
+      const reviewDataLength = _.filter(tab.tasks, item => {
+        return item.taskType === 'reviewData';
+      }).length;
+      tab.reviewDataLength = reviewDataLength;
       tab.tasks.map(task => {
         task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
           return item.approveGroupId;
@@ -187,8 +191,13 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
     let addFlag = false;
     const tasks = processList[pIndex].tasks;
+
+    const length = _.filter(tasks, item => {
+      return item.taskType === 'reviewData';
+    }).length;
+
     const noneGroupIndex = _.findIndex(tasks, item => {
-      if (_.isNumber(item.taskId)) {
+      if (_.isNumber(item.taskId) || processList[pIndex].reviewDataLength !== length) {
         addFlag = true;
       }
       return (
@@ -257,6 +266,12 @@ class ApprovalProcessConfiguration extends PureComponent {
       return item;
     });
     _tasks = _.sortBy(_tasks, 'index');
+
+    const reviewDataLength = _.filter(_tasks, item => {
+      return item.taskType === 'reviewData';
+    }).length;
+    _processList.reviewDataLength = reviewDataLength;
+
     _processList.tasks = _tasks;
     processList[pIndex] = _processList;
     this.setState(
