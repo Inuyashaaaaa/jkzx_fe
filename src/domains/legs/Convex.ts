@@ -56,14 +56,15 @@ import { HighBarrier } from '../legFields/HighBarrier';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { BarrierType } from '../legFields/BarrierType';
 import { LowBarrier } from '../legFields/LowBarrier';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const Convex: ILeg = {
+export const Convex: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.CONVEX],
   type: LEG_TYPE_MAP.CONVEX,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -229,4 +230,4 @@ export const Convex: ILeg = {
       setTableData
     );
   },
-};
+});

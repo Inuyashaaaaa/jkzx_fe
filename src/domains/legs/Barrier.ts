@@ -60,7 +60,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Rebate } from '../legFields/Rebate';
 import { ObservationType } from '../legFields/ObservationType';
 import { KnockDirection } from '../legFields/KnockDirection';
@@ -70,8 +70,9 @@ import { BarrierType } from '../legFields/BarrierType';
 import { Barrier } from '../legFields/Barrier';
 import BigNumber from 'bignumber.js';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const BarrierLeg: ILeg = {
+export const BarrierLeg: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.BARRIER],
   type: LEG_TYPE_MAP.BARRIER,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -295,4 +296,4 @@ export const BarrierLeg: ILeg = {
       }
     }
   },
-};
+});

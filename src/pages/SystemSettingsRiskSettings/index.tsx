@@ -347,9 +347,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                   render: (text, record, index) => {
                     return (
                       <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(record)}>
-                        <Button type="link" style={{ color: 'red' }}>
-                          删除
-                        </Button>
+                        <a style={{ color: 'red' }}>删除</a>
                       </Popconfirm>
                     );
                   },

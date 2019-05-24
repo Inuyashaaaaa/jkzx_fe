@@ -44,7 +44,6 @@ const makeCols = refstr => {
 
 class SpotLadderExcelButton extends PureComponent<ImportButtonProps> {
   public exportFile = () => {
-    console.log(this.props.data);
     /* convert state to workbook */
     if (!this.checkData(this.props.data)) {
       return;
@@ -52,11 +51,10 @@ class SpotLadderExcelButton extends PureComponent<ImportButtonProps> {
 
     const { dataSource, cols, name } = this.props.data;
     // dataSource = dataSource.unshift(cols)
-    console.log(dataSource, cols);
 
     if (this.props.tabs) {
       // 多sheet表导出
-      console.log(this.props.tabs);
+
       const wb = XLSX.utils.book_new();
       this.props.tabs.forEach((item, index) => {
         const ws = XLSX.utils.aoa_to_sheet(dataSource[index]);

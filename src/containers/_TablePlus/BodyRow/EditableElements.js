@@ -53,7 +53,7 @@ const EditableRow = BaseRow =>
     render() {
       const { form, onEditCell, editable, $editableRows, rowId, ...props } = this.props;
       const { errors } = this.state;
-      // console.log('render EditableRowInner');
+      //
       return (
         <EditableContext.Provider value={{ form, errors, cleanError: this.cleanError }}>
           <BaseRow {...props} />
@@ -82,7 +82,7 @@ class EditableCell extends Component {
 
   shouldComponentUpdate(nextProps) {
     // @todo children is unused but pass in?
-    // console.log('getDiffProps', getDiffProps(nextProps, this.props));
+    //
     return !isShallowEqual(
       lodash.omit(nextProps, ['children']),
       lodash.omit(this.props, ['children'])
@@ -126,7 +126,7 @@ class EditableCell extends Component {
 
     const changed = record[dataIndex] !== this.initialValue;
 
-    // console.log('render EditableCell');
+    //
 
     return (
       <td {...rest}>

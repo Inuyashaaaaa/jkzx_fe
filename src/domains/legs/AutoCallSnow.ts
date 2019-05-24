@@ -59,11 +59,12 @@ import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { getMoment } from '@/tools';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const AutoCallSnow: ILeg = {
+export const AutoCallSnow: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL],
   type: LEG_TYPE_MAP.AUTOCALL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -274,4 +275,4 @@ export const AutoCallSnow: ILeg = {
       setTableData
     );
   },
-};
+});

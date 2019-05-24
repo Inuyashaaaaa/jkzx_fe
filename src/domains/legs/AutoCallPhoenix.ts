@@ -64,9 +64,10 @@ import { Unit } from '../legFields/Unit';
 import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
 
-export const AutoCallPhoenix: ILeg = {
+export const AutoCallPhoenix: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX],
   type: LEG_TYPE_MAP.AUTOCALL_PHOENIX,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -307,4 +308,4 @@ export const AutoCallPhoenix: ILeg = {
       setTableData
     );
   },
-};
+});

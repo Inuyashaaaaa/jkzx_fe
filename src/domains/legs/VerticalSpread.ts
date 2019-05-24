@@ -54,14 +54,15 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { RebateType } from '../legFields/RebateType';
 import { LowStrike } from '../legFields/LowStrike';
 import { HighStrike } from '../legFields/HighStrike';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const VerticalSpread: ILeg = {
+export const VerticalSpread: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VERTICAL_SPREAD],
   type: LEG_TYPE_MAP.VERTICAL_SPREAD,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -227,4 +228,4 @@ export const VerticalSpread: ILeg = {
       setTableData
     );
   },
-};
+});

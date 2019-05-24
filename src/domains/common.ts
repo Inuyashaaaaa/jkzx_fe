@@ -12,6 +12,7 @@ import { mktInstrumentInfo, mktQuotesListPaged } from '@/services/market-data-se
 import { getLegByRecord, getMoment } from '@/tools';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+import { ILeg } from '@/types/leg';
 
 const fetchUnderlyerMultiplierAndUnit = _.debounce(
   (
@@ -215,4 +216,8 @@ export const commonLinkage = (
       record[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE] = Form2.createField(initialSpot);
     }
   }
+};
+
+export const commonGetPosition = (leg: ILeg) => {
+  return leg;
 };

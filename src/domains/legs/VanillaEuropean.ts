@@ -54,12 +54,13 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { RebateType } from '../legFields/RebateType';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const VanillaEuropean: ILeg = {
+export const VanillaEuropean: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_EUROPEAN],
   type: LEG_TYPE_MAP.VANILLA_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -227,4 +228,4 @@ export const VanillaEuropean: ILeg = {
       setTableData
     );
   },
-};
+});

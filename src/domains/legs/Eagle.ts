@@ -53,9 +53,10 @@ import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { Unit } from '../legFields/Unit';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
 
-export const Eagle: ILeg = {
+export const Eagle: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.EAGLE],
   type: LEG_TYPE_MAP.EAGLE,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -256,4 +257,4 @@ export const Eagle: ILeg = {
       }
     }
   },
-};
+});

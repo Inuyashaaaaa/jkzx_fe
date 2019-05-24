@@ -54,10 +54,11 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
 
-export const VanillaAmerican: ILeg = {
+export const VanillaAmerican: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
   type: LEG_TYPE_MAP.VANILLA_AMERICAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -224,4 +225,4 @@ export const VanillaAmerican: ILeg = {
       setTableData
     );
   },
-};
+});

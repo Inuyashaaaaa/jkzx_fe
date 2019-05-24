@@ -86,7 +86,7 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     );
     if (this.props.tabs) {
       // 多sheet表导出
-      console.log(this.props.tabs);
+
       const wb = XLSX.utils.book_new();
       this.props.tabs.forEach((item, index) => {
         const ws = XLSX.utils.aoa_to_sheet(dataSource[index]);

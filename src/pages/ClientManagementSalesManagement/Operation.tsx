@@ -2,7 +2,7 @@ import PopconfirmButton from '@/containers/PopconfirmButton';
 import ModalButton from '@/containers/ModalButton';
 import { arr2treeOptions } from '@/tools';
 import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales';
-import { Col, message, Row, Popconfirm, Modal } from 'antd';
+import { Col, message, Row, Popconfirm, Modal, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
 
@@ -98,31 +98,26 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
 
   public render() {
     return (
-      <Row type="flex" justify="start">
-        <Col>
-          <a onClick={this.switchModal} style={{ marginRight: 10 }}>
-            编辑
-          </a>
-          <Modal
-            title="编辑销售"
-            visible={this.state.visible}
-            width={700}
-            onCancel={this.onCancel}
-            onOk={this.onEdit}
-            confirmLoading={this.state.confirmLoading}
-          >
-            <CreateFormModal
-              dataSource={this.state.editFormData}
-              handleValueChange={this.handleValueChange}
-              branchSalesList={this.state.branchSalesList}
-            />
-          </Modal>
-        </Col>
-        <Col>
-          <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
-            <a style={{ color: 'red' }}>删除</a>
-          </Popconfirm>
-        </Col>
+      <Row>
+        <a onClick={this.switchModal}>编辑</a>
+        <Divider type="vertical" />
+        <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
+          <a style={{ color: 'red' }}>删除</a>
+        </Popconfirm>
+        <Modal
+          title="编辑销售"
+          visible={this.state.visible}
+          width={700}
+          onCancel={this.onCancel}
+          onOk={this.onEdit}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <CreateFormModal
+            dataSource={this.state.editFormData}
+            handleValueChange={this.handleValueChange}
+            branchSalesList={this.state.branchSalesList}
+          />
+        </Modal>
       </Row>
     );
   }
