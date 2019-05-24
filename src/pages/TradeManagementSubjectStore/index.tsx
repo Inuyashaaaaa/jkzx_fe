@@ -194,7 +194,7 @@ class TradeManagementMarketManagement extends PureComponent {
 
   public render() {
     return (
-      <Page back={true}>
+      <Page>
         <Form2
           columns={searchFormControls()}
           dataSource={this.state.searchFormData}
