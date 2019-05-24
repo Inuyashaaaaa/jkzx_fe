@@ -212,37 +212,10 @@ class ClientManagementMarginManagement extends PureComponent {
           size="middle"
           scroll={
             this.state.dataSource && this.state.dataSource.length > 0
-              ? { x: '1000px' }
+              ? { x: '1200px' }
               : { x: false }
           }
         />
-        {/* <SourceTable
-          rowKey="uuid"
-          ref={node => (this.$marginSourceTable = node)}
-          loading={this.state.loading}
-          columnDefs={TABLE_COL_DEFS(this.fetchTable)}
-          dataSource={this.state.dataSource}
-          searchable={true}
-          resetable={true}
-          onResetButtonClick={this.onReset}
-          onSearchButtonClick={this.fetchTable}
-          searchFormControls={SEARCH_FORM_CONTROLS}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          header={
-            <Button
-              style={{
-                marginBottom: '20px',
-              }}
-              type="primary"
-              onClick={() => {
-                this.setState({ modalVisible: true });
-              }}
-            >
-              批量更新
-            </Button>
-          }
-        /> */}
         <Modal
           title="导入预览"
           visible={this.state.excelVisible}
