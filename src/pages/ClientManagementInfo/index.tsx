@@ -128,194 +128,189 @@ const ClientManagementInfo = memo(() => {
   );
 
   return (
-    <Page title="客户信息管理" card={false}>
-      <Card>
-        <Form2
-          ref={node => (formEl.current = node)}
-          onResetButtonClick={() => {
-            setSearchFormData(initialFormData);
-            setResetFetchNumber(resetFetchNumber + 1);
-          }}
-          onSubmitButtonClick={async ({ domEvent }) => {
-            domEvent.preventDefault();
-            const formData = getFormData();
-            fetchTableData(formData);
-          }}
-          layout="inline"
-          submitText="查询"
-          submitButtonProps={{
-            icon: 'search',
-          }}
-          onFieldsChange={(props, changedFields, allFields) => {
-            setSearchFormData(allFields);
-          }}
-          dataSource={searchFormData}
-          columns={[
-            {
-              title: '交易对手',
-              dataIndex: 'legalName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        fetchOptionsOnSearch={true}
-                        showSearch={true}
-                        options={async value => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
-            },
-            {
-              title: '主协议编号',
-              dataIndex: 'masterAgreementId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(<Input placeholder="请输入内容" />)}
-                  </FormItem>
-                );
-              },
-            },
-            {
-              title: '销售',
-              dataIndex: SALER_CASCADER,
-              render: (value, record, index, { form }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Cascader
-                        placeholder="请输入内容"
-                        style={{ width: 250 }}
-                        options={salesCascaderList}
-                        showSearch={{
-                          filter: (inputValue, path) => {
-                            return path.some(
-                              option =>
-                                option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1
-                            );
-                          },
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
-            },
-          ]}
-        />
-      </Card>
-      <Card style={{ marginTop: VERTICAL_GUTTER }}>
-        <Row type="flex" style={{ marginBottom: VERTICAL_GUTTER }}>
-          <CreateModalButton
-            salesCascaderList={salesCascaderList}
-            fetchTableData={fetchTableData}
-          />
-        </Row>
-        <Table2
-          size="middle"
-          pagination={{
-            showQuickJumper: true,
-            showSizeChanger: true,
-          }}
-          rowKey={'accountId'}
-          dataSource={tableData}
-          loading={searchLoading}
-          columns={[
-            {
-              title: '交易对手',
-              dataIndex: 'legalName',
-            },
-            {
-              title: '开户销售',
-              dataIndex: 'salesName',
-            },
-            {
-              title: '协议编号',
-              dataIndex: 'masterAgreementId',
-            },
-            {
-              title: '类型',
-              dataIndex: 'clientType',
-              render: (value, record, index) => {
-                if (value === 'PRODUCT') {
-                  return '产品户';
-                }
-                return '机构户';
-              },
-            },
-            {
-              title: '创建时间',
-              dataIndex: 'createdAt',
-              render: (value, record, index) => {
-                return value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : '';
-              },
-            },
-            {
-              title: '更新时间',
-              dataIndex: 'updatedAt',
-              render: (value, record, index) => {
-                return value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : '';
-              },
-            },
-            {
-              width: 150,
-              title: '操作',
-              dataIndex: 'actions',
-              render: (value, record, index) => {
-                return (
-                  <span className={styles.action}>
-                    <EditModalButton
-                      salesCascaderList={salesCascaderList}
-                      name="查看"
-                      fetchTable={fetchTable}
-                      record={record}
-                    />
-                    <Divider type="vertical" />
-                    <EditModalButton
-                      salesCascaderList={salesCascaderList}
-                      name="编辑"
-                      record={record}
-                      fetchTable={fetchTable}
-                    />
-                    <Divider type="vertical" />
-                    <Popconfirm
-                      title={`是否${record.partyStatus === 'NORMAL' ? '禁用' : '启用'}交易对手`}
-                      onConfirm={async () => {
-                        const isDisableLegalName =
-                          record.partyStatus === 'NORMAL'
-                            ? refDisablePartyByLegalName
-                            : refEnablePartyByLegalName;
-                        const { error, data } = await isDisableLegalName({
-                          legalName: record.legalName,
+    <Page title="客户信息管理">
+      <Form2
+        style={{ marginBottom: VERTICAL_GUTTER }}
+        ref={node => (formEl.current = node)}
+        onResetButtonClick={() => {
+          setSearchFormData(initialFormData);
+          setResetFetchNumber(resetFetchNumber + 1);
+        }}
+        onSubmitButtonClick={async ({ domEvent }) => {
+          domEvent.preventDefault();
+          const formData = getFormData();
+          fetchTableData(formData);
+        }}
+        layout="inline"
+        submitText="查询"
+        submitButtonProps={{
+          icon: 'search',
+        }}
+        onFieldsChange={(props, changedFields, allFields) => {
+          setSearchFormData(allFields);
+        }}
+        dataSource={searchFormData}
+        columns={[
+          {
+            title: '交易对手',
+            dataIndex: 'legalName',
+            render: (value, record, index, { form, editing }) => {
+              return (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear={true}
+                      fetchOptionsOnSearch={true}
+                      showSearch={true}
+                      options={async value => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: value,
                         });
-                        if (error) return;
-                        fetchTableData(getFormData());
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
                       }}
-                    >
-                      {record.partyStatus === 'NORMAL' ? (
-                        <a href="javascipt:;" style={{ color: 'red' }}>
-                          禁用
-                        </a>
-                      ) : (
-                        <a href="javascipt:;">启用</a>
-                      )}
-                    </Popconfirm>
-                    {/* <Button
+                    />
+                  )}
+                </FormItem>
+              );
+            },
+          },
+          {
+            title: '主协议编号',
+            dataIndex: 'masterAgreementId',
+            render: (value, record, index, { form, editing }) => {
+              return (
+                <FormItem>
+                  {form.getFieldDecorator({})(<Input placeholder="请输入内容" />)}
+                </FormItem>
+              );
+            },
+          },
+          {
+            title: '销售',
+            dataIndex: SALER_CASCADER,
+            render: (value, record, index, { form }) => {
+              return (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Cascader
+                      placeholder="请输入内容"
+                      style={{ width: 250 }}
+                      options={salesCascaderList}
+                      showSearch={{
+                        filter: (inputValue, path) => {
+                          return path.some(
+                            option =>
+                              option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1
+                          );
+                        },
+                      }}
+                    />
+                  )}
+                </FormItem>
+              );
+            },
+          },
+        ]}
+      />
+      <Divider />
+      <CreateModalButton salesCascaderList={salesCascaderList} fetchTableData={fetchTableData} />
+      <Table2
+        style={{ marginTop: VERTICAL_GUTTER }}
+        size="middle"
+        pagination={{
+          showQuickJumper: true,
+          showSizeChanger: true,
+        }}
+        rowKey={'accountId'}
+        dataSource={tableData}
+        loading={searchLoading}
+        columns={[
+          {
+            title: '交易对手',
+            dataIndex: 'legalName',
+          },
+          {
+            title: '开户销售',
+            dataIndex: 'salesName',
+          },
+          {
+            title: '协议编号',
+            dataIndex: 'masterAgreementId',
+          },
+          {
+            title: '类型',
+            dataIndex: 'clientType',
+            render: (value, record, index) => {
+              if (value === 'PRODUCT') {
+                return '产品户';
+              }
+              return '机构户';
+            },
+          },
+          {
+            title: '创建时间',
+            dataIndex: 'createdAt',
+            render: (value, record, index) => {
+              return value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : '';
+            },
+          },
+          {
+            title: '更新时间',
+            dataIndex: 'updatedAt',
+            render: (value, record, index) => {
+              return value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : '';
+            },
+          },
+          {
+            width: 150,
+            title: '操作',
+            dataIndex: 'actions',
+            render: (value, record, index) => {
+              return (
+                <span className={styles.action}>
+                  <EditModalButton
+                    salesCascaderList={salesCascaderList}
+                    name="查看"
+                    fetchTable={fetchTable}
+                    record={record}
+                  />
+                  <Divider type="vertical" />
+                  <EditModalButton
+                    salesCascaderList={salesCascaderList}
+                    name="编辑"
+                    record={record}
+                    fetchTable={fetchTable}
+                  />
+                  <Divider type="vertical" />
+                  <Popconfirm
+                    title={`是否${record.partyStatus === 'NORMAL' ? '禁用' : '启用'}交易对手`}
+                    onConfirm={async () => {
+                      const isDisableLegalName =
+                        record.partyStatus === 'NORMAL'
+                          ? refDisablePartyByLegalName
+                          : refEnablePartyByLegalName;
+                      const { error, data } = await isDisableLegalName({
+                        legalName: record.legalName,
+                      });
+                      if (error) return;
+                      fetchTableData(getFormData());
+                    }}
+                  >
+                    {record.partyStatus === 'NORMAL' ? (
+                      <a href="javascipt:;" style={{ color: 'red' }}>
+                        禁用
+                      </a>
+                    ) : (
+                      <a href="javascipt:;">启用</a>
+                    )}
+                  </Popconfirm>
+                  {/* <Button
                       style={{ color: 'red' }}
                       onClick={() => {
                         AccountDel(record);
@@ -323,13 +318,12 @@ const ClientManagementInfo = memo(() => {
                     >
                       删除
                     </Button> */}
-                  </span>
-                );
-              },
+                </span>
+              );
             },
-          ]}
-        />
-      </Card>
+          },
+        ]}
+      />
     </Page>
   );
 });
