@@ -332,9 +332,9 @@ class SystemSettingsRiskSettings extends PureComponent {
                   title: '操作',
                   render: (text, record, index) => {
                     return (
-                      <Button type="danger" onClick={e => this.onRemove(e, record)}>
+                      <a style={{ color: 'red' }} onClick={e => this.onRemove(e, record)}>
                         删除
-                      </Button>
+                      </a>
                     );
                   },
                 },

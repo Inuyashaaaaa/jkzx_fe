@@ -1,7 +1,7 @@
 import PopconfirmButton from '@/containers/PopconfirmButton';
 import ModalButton from '@/containers/ModalButton';
 import { refBankAccountDel, refBankAccountSave } from '@/services/reference-data-service';
-import { Col, message, Row, Modal, Popconfirm } from 'antd';
+import { Col, message, Row, Modal, Popconfirm, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonModalForm from './CommonModalForm';
 
@@ -64,30 +64,25 @@ class Operation extends PureComponent<{
 
   public render() {
     return (
-      <Row type="flex" justify="start">
-        <Col>
-          <a onClick={this.switchModal} style={{ marginRight: 10 }}>
-            编辑
-          </a>
-          <Modal
-            title="编辑银行账户"
-            visible={this.state.visible}
-            width={700}
-            onCancel={this.switchModal}
-            onOk={this.handleEdit}
-            confirmLoading={this.state.confirmLoading}
-          >
-            <CommonModalForm
-              createFormData={this.state.createFormData}
-              onCreateFormChange={this.onCreateFormChange}
-            />
-          </Modal>
-        </Col>
-        <Col>
-          <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
-            <a style={{ color: 'red' }}>删除</a>
-          </Popconfirm>
-        </Col>
+      <Row>
+        <a onClick={this.switchModal}>编辑</a>
+        <Divider type="vertical" />
+        <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
+          <a style={{ color: 'red' }}>删除</a>
+        </Popconfirm>
+        <Modal
+          title="编辑银行账户"
+          visible={this.state.visible}
+          width={700}
+          onCancel={this.switchModal}
+          onOk={this.handleEdit}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <CommonModalForm
+            createFormData={this.state.createFormData}
+            onCreateFormChange={this.onCreateFormChange}
+          />
+        </Modal>
       </Row>
     );
   }

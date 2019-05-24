@@ -1,5 +1,5 @@
 import Page from '@/containers/Page';
-import { Button, Modal, Table, Tabs, Popconfirm } from 'antd';
+import { Button, Modal, Table, Tabs, Popconfirm, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import moment from 'moment';
@@ -185,11 +185,13 @@ class ClientManagementDocument extends PureComponent {
             <a href={`${HREF_UPLOAD_URL}${record.uuid}`} download={`${record.fileName}`}>
               查看
             </a>
+            <Divider type="vertical" />
             <Popconfirm title="新文件将会替换旧文件" onConfirm={() => this.showModal(record)}>
-              <a style={{ marginLeft: 10 }}>更新</a>
+              <a>更新</a>
             </Popconfirm>
+            <Divider type="vertical" />
             <Popconfirm title="确定要删除吗？" onConfirm={() => this.removeTemplate(record)}>
-              <a style={{ marginLeft: 10, color: 'red' }}>删除</a>
+              <a>删除</a>
             </Popconfirm>
           </div>
         ) : (
