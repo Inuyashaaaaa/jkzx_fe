@@ -7,6 +7,7 @@ export default {
     activeTabKey: FIRST_ACTIVE_TAB_KEY,
     contractManagement: {
       tableDataSource: [],
+      collapse: true,
       pagination: {
         current: 1,
         pageSize: 10,
@@ -15,6 +16,7 @@ export default {
     },
     open: {
       tableDataSource: [],
+      collapse: true,
       pagination: {
         current: 1,
         pageSize: 10,
@@ -23,6 +25,7 @@ export default {
     },
     unwind: {
       tableDataSource: [],
+      collapse: true,
       pagination: {
         current: 1,
         pageSize: 10,
@@ -31,6 +34,7 @@ export default {
     },
     expiration: {
       tableDataSource: [],
+      collapse: true,
       pagination: {
         current: 1,
         pageSize: 10,
@@ -39,6 +43,7 @@ export default {
     },
     overlate: {
       tableDataSource: [],
+      collapse: true,
       pagination: {
         current: 1,
         pageSize: 10,
@@ -69,9 +74,21 @@ export default {
       return {
         ...state,
         [activeTabKey]: {
+          ...state[activeTabKey],
           tableDataSource,
           pagination,
           pageSizeCurrent,
+        },
+      };
+    },
+
+    changeCollapse(state, action) {
+      const { activeTabKey, collapse } = action.payload;
+      return {
+        ...state,
+        [activeTabKey]: {
+          ...state[activeTabKey],
+          collapse,
         },
       };
     },
