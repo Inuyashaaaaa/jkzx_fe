@@ -18,7 +18,7 @@ const DefaultFooter = memo<any>(props => {
     <Button.Group>
       {!!submitable && (
         <Button
-          // htmlType="submit"
+          htmlType="submit"
           type="primary"
           {...submitButtonProps}
           loading={submitLoading}
