@@ -6,7 +6,7 @@ import {
   trdPortfolioUpdate,
   trdTradePortfolioCreateBatch,
 } from '@/services/trade-service';
-import { Button, Icon, Input, message, Modal, Popconfirm, Row, Table } from 'antd';
+import { Button, Icon, Input, message, Modal, Popconfirm, Row, Table, Divider } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
@@ -282,9 +282,8 @@ class Action extends PureComponent<any, any> {
     const { params } = this.props;
     return (
       <Row type="flex" align="middle">
-        <a onClick={this.showModal} style={{ marginRight: 10 }}>
-          查看/修改
-        </a>
+        <a onClick={this.showModal}>查改</a>
+        <Divider type="vertical" />
         <Popconfirm title="确认删除？" onConfirm={this.onRemove} style={{ color: 'red' }}>
           <a style={{ color: 'red' }}>删除</a>
         </Popconfirm>
