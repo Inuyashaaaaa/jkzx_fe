@@ -13,7 +13,7 @@ import {
 } from '@/services/common';
 import { queryAllModelNameVol, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
 // import { queryModelName, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
-import { Col, message, notification, Row } from 'antd';
+import { Col, message, notification, Row, Table, Divider, Button, Modal } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -24,12 +24,18 @@ import {
   MARKET_KEY,
   SEARCH_FORM_CONTROLS,
   TABLE_COLUMN_DEFS,
+  SEARCH_FORM,
+  TABLE_COLUMN,
 } from './constants';
+import FormItem from 'antd/lib/form/FormItem';
+import { Form2, Select, InputNumber } from '@/components';
 
 class PricingSettingVolSurface extends PureComponent {
   public lastFetchedDataSource = null;
 
   public $sourceTable: SourceTable = null;
+
+  public $insertTable: Form2 = null;
 
   public underlyer = null;
 
@@ -40,13 +46,16 @@ class PricingSettingVolSurface extends PureComponent {
   public state = {
     tableFormData: {},
     searchFormData: {
-      [INSTANCE_KEY]: 'INTRADAY',
+      ...Form2.createFields({ [INSTANCE_KEY]: 'INTRADAY' }),
     },
     tableLoading: false,
     tableDataSource: [],
     tableColumnDefs: [],
     groups: [],
     groupLoading: false,
+    insertVisible: false,
+    insertFormData: {},
+    quoteData: {},
   };
 
   constructor(props) {
@@ -79,7 +88,7 @@ class PricingSettingVolSurface extends PureComponent {
     });
     this.setState(
       produce((state: any) => {
-        state.searchFormData[GROUP_KEY] = undefined;
+        state.searchFormData[GROUP_KEY].value = undefined;
         state.groups = _.unionBy<any>(dataGroup, item => item.modelName).map(item => {
           const { modelName } = item;
           return {
@@ -105,9 +114,8 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public fetchTableData = async () => {
-    const { searchFormData } = this.state;
+    const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     this.setState({ tableLoading: true });
-    console.log(this.state.searchFormData);
     const rsp = await queryModelVolSurface(
       {
         underlyer: searchFormData[MARKET_KEY],
@@ -116,12 +124,10 @@ class PricingSettingVolSurface extends PureComponent {
       },
       true
     );
-
     const { error } = rsp;
     let { data } = rsp;
     this.setState({ tableLoading: false });
 
-    // if (error) return;
     if (error) {
       const { message } = error;
       if (message.includes('failed to find model data for ')) {
@@ -140,12 +146,13 @@ class PricingSettingVolSurface extends PureComponent {
             },
           ],
           underlyer: {
-            field: 'LAST',
+            dataIndex: 'LAST',
             instance: 'INTRADAY',
             instrumentId: searchFormData[MARKET_KEY],
             quote: 1,
           },
-          columns: TABLE_COLUMN_DEFS,
+          columns: TABLE_COLUMN,
+          failed: true,
         };
       } else {
         notification.error({
@@ -156,7 +163,19 @@ class PricingSettingVolSurface extends PureComponent {
       }
     }
 
-    const { columns, dataSource, underlyer } = data;
+    const { columns, dataSource, underlyer, failed } = data;
+    const tableColumnDefs = failed
+      ? columns
+      : columns.map(item => {
+          item.title = item.headerName;
+          item.dataIndex = item.field;
+          if (item.input && item.input.type === 'select') {
+            item.record = (text, record, index) => {
+              return text;
+            };
+          }
+          return item;
+        });
 
     const tableDataSource = this.sortDataSource(dataSource);
     const tableSelfFormData = {
@@ -165,54 +184,54 @@ class PricingSettingVolSurface extends PureComponent {
     this.underlyer = underlyer;
 
     this.lastFetchedDataSource = tableDataSource;
-
     this.setState({
-      tableColumnDefs: columns.map(col => {
-        if (col.input && col.input.type === 'select') {
-          return {
-            ...col,
-            input: record => {
-              return {
-                ...col.input,
-                type: 'select',
-                options: getCanUsedTranorsOtions(this.$sourceTable.getTableDataSource(), record),
-              };
-            },
-          };
-        }
-        return col;
-      }),
+      tableColumnDefs,
       tableDataSource,
       tableFormData: tableSelfFormData,
     });
   };
 
-  public onSearchFormChange = event => {
+  public onSearchFormChange = (props, changedFields, allFields) => {
     this.setState(
       {
-        searchFormData: event.formData,
+        searchFormData: allFields,
       },
       () => {
-        console.log(this.state.searchFormData);
         this.fetchTableData();
       }
     );
   };
 
+  public onTableFormChange = (props, changedFields, allFields) => {
+    this.setState({
+      tableFormData: {
+        ...Form2.getFieldsValue(allFields),
+      },
+    });
+  };
+
+  public onInsertFormChange = (props, changedFields, allFields) => {
+    this.setState({
+      insertFormData: allFields,
+    });
+  };
+
   public handleSaveTable = async () => {
+    const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error } = await saveModelVolSurface({
       columns: this.state.tableColumnDefs,
       dataSource: this.state.tableDataSource,
       underlyer: this.underlyer,
       newQuote: (this.state.tableFormData as any).quote,
-      modelName: this.state.searchFormData[GROUP_KEY],
-      instance: this.state.searchFormData[INSTANCE_KEY],
+      modelName: searchFormData[GROUP_KEY],
+      instance: searchFormData[INSTANCE_KEY],
     });
 
     return !error;
   };
 
   public onSetConstantsButtonClick = event => {
+    console.log(event);
     if (!this.$sourceTable) return;
     if (_.filter(this.selectedColumns, { colId: 'tenor' }).length) {
       this.selectedColumns = _.drop(this.selectedColumns);
@@ -232,15 +251,9 @@ class PricingSettingVolSurface extends PureComponent {
     });
   };
 
-  public onTableFormChange = event => {
-    this.setState({
-      tableFormData: event.formData,
-    });
-  };
-
-  public onRemove = event => {
+  public onRemove = (event, rowIndex, param) => {
     const clone = [...this.state.tableDataSource];
-    clone.splice(event.rowIndex, 1);
+    clone.splice(rowIndex, 1);
     this.setState({
       tableDataSource: clone,
     });
@@ -248,17 +261,22 @@ class PricingSettingVolSurface extends PureComponent {
     message.success('删除成功');
   };
 
-  public onConfirm = event => {
+  public onConfirm = (event, rowIndex, param) => {
     const clone = [...this.state.tableDataSource];
-    clone.splice(event.extra.rowIndex + 1, 0, {
-      ...event.extra.rowData,
-      ...event.formData,
+    const { insertFormData } = this.state;
+    clone.splice(rowIndex + 1, 0, {
+      ...param,
+      ...Form2.getFieldsValue(insertFormData),
       id: Math.random(),
     });
     this.setState({
       tableDataSource: this.sortDataSource(clone),
     });
 
+    this.setState({
+      insertVisible: false,
+      insertFormData: {},
+    });
     message.success('插入成功');
   };
 
@@ -288,8 +306,12 @@ class PricingSettingVolSurface extends PureComponent {
     this.selectedColumns = columns;
   };
 
-  public onClick = event => {
-    const { tableDataSource = [] } = event.state;
+  public onClick = (tableDataSource = {}) => {
+    console.log(tableDataSource);
+
+    this.setState({
+      insertVisible: true,
+    });
 
     const formControls: IFormControl[] = [
       {
@@ -299,7 +321,7 @@ class PricingSettingVolSurface extends PureComponent {
         },
         input: {
           type: 'select',
-          options: getCanUsedTranorsOtionsNotIncludingSelf(tableDataSource),
+          options: getCanUsedTranorsOtionsNotIncludingSelf([tableDataSource]),
         },
         options: {
           rules: [
@@ -319,6 +341,62 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public render() {
+    console.log(this.underlyer);
+    const columns = this.state.tableColumnDefs.concat({
+      title: '操作',
+      render: (text, record, index) => {
+        return (
+          <p>
+            <a style={{ color: 'red' }} onClick={e => this.onRemove(e, index, text)}>
+              删除
+            </a>
+            <Divider type="vertical" />
+            <a onClick={tetx => this.onClick(text)}>插入</a>
+            <Modal
+              visible={this.state.insertVisible}
+              onOk={e => this.onConfirm(e, index, text)}
+              onCancel={() => {
+                this.setState({ insertVisible: false });
+              }}
+            >
+              <Form2
+                ref={node => (this.$insertTable = node)}
+                layout="inline"
+                dataSource={this.state.insertFormData}
+                submitable={false}
+                resetable={false}
+                onFieldsChange={this.onInsertFormChange}
+                columns={[
+                  {
+                    title: '期限',
+                    dataIndex: 'tenor',
+                    render: (value, record, index, { form, editing }) => {
+                      return (
+                        <FormItem>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                              },
+                            ],
+                          })(
+                            <Select
+                              style={{ minWidth: 280 }}
+                              placeholder="请选择左侧标的物"
+                              options={getCanUsedTranorsOtionsNotIncludingSelf([text])}
+                            />
+                          )}
+                        </FormItem>
+                      );
+                    },
+                  },
+                ]}
+              />
+            </Modal>
+          </p>
+        );
+      },
+    });
     return (
       <Page>
         <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
@@ -328,14 +406,19 @@ class PricingSettingVolSurface extends PureComponent {
               {...{
                 onSelect: market => {
                   this.lastFetchedDataSource = null;
-
+                  const { searchFormData } = this.state;
                   this.setState(
-                    produce((state: any) => {
-                      state.searchFormData[MARKET_KEY] = market;
-                      state.searchFormData[GROUP_KEY] = undefined;
-                      state.tableDataSource = [];
-                      state.tableFormData = {};
-                    }),
+                    {
+                      tableDataSource: [],
+                      tableFormData: {},
+                      searchFormData: {
+                        ...searchFormData,
+                        ...Form2.createFields({
+                          [MARKET_KEY]: market,
+                          [GROUP_KEY]: undefined,
+                        }),
+                      },
+                    },
                     () => {
                       if (market) {
                         this.fetchGroup(market);
@@ -347,7 +430,82 @@ class PricingSettingVolSurface extends PureComponent {
             />
           </Col>
           <Col xs={24} sm={20}>
-            <SourceTable
+            <Form2
+              ref={node => (this.$sourceTable = node)}
+              layout="inline"
+              dataSource={this.state.searchFormData}
+              submitText={'搜索'}
+              submitButtonProps={{
+                icon: 'search',
+              }}
+              onSubmitButtonClick={this.fetchTableData}
+              resetable={false}
+              onFieldsChange={this.onSearchFormChange}
+              columns={SEARCH_FORM(this.state.groups, this.state.searchFormData)}
+            />
+            <Divider type="horizontal" />
+            <div style={{ display: 'flex' }}>
+              <Button type="primary" onClick={this.handleSaveTable}>
+                保存
+              </Button>
+              {/* <InputButton
+                // disabled={!this.lastFetchedDataSource}
+                key="快捷设置常数"
+                type="primary"
+                onClick={this.onSetConstantsButtonClick}
+                input={{
+                  type: 'number',
+                  formatter: value => `${value}%`,
+                  parser: value => value.replace('%', ''),
+                }}
+              >
+                快捷设置常数
+                </InputButton> */}
+            </div>
+            <Divider type="horizontal" />
+            {this.underlyer ? (
+              <Form2
+                // ref={node => (this.$source = node)}
+                layout="inline"
+                dataSource={Form2.createFields(this.state.tableFormData)}
+                submitable={false}
+                resetable={false}
+                onFieldsChange={this.onTableFormChange}
+                columns={[
+                  {
+                    dataIndex: 'quote',
+                    title: '标的物价格',
+                    render: (value, record, index, { form, editing }) => {
+                      return (
+                        <FormItem>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                              },
+                            ],
+                          })(<InputNumber style={{ width: 200 }} />)}
+                        </FormItem>
+                      );
+                    },
+                  },
+                ]}
+              />
+            ) : null}
+
+            <Table
+              dataSource={this.state.tableDataSource}
+              columns={columns}
+              pagination={{
+                showSizeChanger: true,
+                showQuickJumper: true,
+              }}
+              loading={this.state.loading}
+              rowKey="id"
+              size="middle"
+              style={{ marginTop: 20 }}
+            />
+            {/* <SourceTable
               editable={true}
               removeable={true}
               pagination={false}
@@ -406,18 +564,18 @@ class PricingSettingVolSurface extends PureComponent {
               tableFormControls={
                 this.lastFetchedDataSource
                   ? [
-                      {
-                        dataIndex: 'quote',
-                        control: {
-                          label: '标的物价格',
-                          labelSpace: 8,
-                        },
-                        input: INPUT_NUMBER_DIGITAL_CONFIG,
+                    {
+                      dataIndex: 'quote',
+                      control: {
+                        label: '标的物价格',
+                        labelSpace: 8,
                       },
-                    ]
+                      input: INPUT_NUMBER_DIGITAL_CONFIG,
+                    },
+                  ]
                   : undefined
               }
-            />
+            /> */}
           </Col>
         </Row>
       </Page>
