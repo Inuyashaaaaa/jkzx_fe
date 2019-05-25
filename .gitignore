@@ -26,6 +26,7 @@ package-lock.json
 *.log
 
 .temp/**
+.docz
 
 # umi
 .umi

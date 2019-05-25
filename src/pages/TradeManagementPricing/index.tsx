@@ -19,7 +19,7 @@ import { Form2 } from '@/containers';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
-import { IFormField } from '@/containers/type';
+import { IFormField } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,

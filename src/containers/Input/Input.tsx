@@ -2,7 +2,7 @@ import { Input as AntdInput } from 'antd';
 import { InputProps } from 'antd/lib/input';
 import { omit, trim } from 'lodash';
 import React from 'react';
-import { InputBase } from '../type';
+import { InputBase } from '../../components/type';
 
 export interface IInputProps extends InputProps {
   formatter?: (value) => any;

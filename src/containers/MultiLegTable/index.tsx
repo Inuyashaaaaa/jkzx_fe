@@ -10,7 +10,7 @@ import { TOTAL_FIELD } from '@/constants/global';
 import { TOTAL_LEGS } from '@/constants/legs';
 import { LEG_FIELD_ORDERS } from '@/constants/legType';
 import { Form2, Loading, Table2 } from '@/containers';
-import { ITableProps } from '@/containers/type';
+import { ITableProps } from '@/components/type';
 import { getLegByRecord, remove, uuid } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Tag } from 'antd';

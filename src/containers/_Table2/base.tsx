@@ -1,6 +1,6 @@
 // import 'ag-grid-enterprise';
 import { isShallowEqual } from '@/tools';
-import createEventBus from '@/tools/eventBus';
+import createEventBus from '@/utils/eventBus';
 import 'ag-grid-community';
 // tslint:disable-next-line:no-duplicate-imports
 import {

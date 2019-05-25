@@ -20,7 +20,7 @@ import {
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/containers/type';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import { getMoment } from '@/tools';
 import _ from 'lodash';

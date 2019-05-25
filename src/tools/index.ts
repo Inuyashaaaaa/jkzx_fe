@@ -35,7 +35,7 @@ import { Straddle } from '@/domains/legs/Straddle';
 import { Forward } from '@/domains/legs/Forward';
 import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { Form2 } from '@/containers';
-import { ITableData } from '@/containers/type';
+import { ITableData } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import BigNumber from 'bignumber.js';
 import { notification } from 'antd';
@@ -392,11 +392,11 @@ export const getMoment = (val, clone = false) => {
 };
 
 export * from './delay';
-export * from './eventBus';
-export * from './isShallowEqual';
+export * from '../utils/eventBus';
+export * from '../utils/isShallowEqual';
 export * from './mockData';
 export * from './someDeep';
-export * from './uuid';
+export * from '../utils/uuid';
 export * from './utils';
 export * from './toggleItem';
 export * from './getDiffAttrs';

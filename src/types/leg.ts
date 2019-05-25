@@ -5,7 +5,7 @@ import {
   ITableTriggerCellFieldsChangeParams,
   ITableTriggerCellEditingChangedParams,
   ITableTriggerCellValueChangeParams,
-} from '@/containers/type';
+} from '@/components/type';
 
 export interface ILegColDef extends ITableColDef {
   linkage?: boolean;

@@ -2,7 +2,7 @@ import { Button, Upload as AntdUpload } from 'antd';
 import { UploadChangeParam, UploadProps } from 'antd/lib/upload';
 import { omit } from 'lodash';
 import React from 'react';
-import { InputBase } from '../type';
+import { InputBase } from '../../components/type';
 
 export interface IUploadProps extends UploadProps {
   maxLen?: number;

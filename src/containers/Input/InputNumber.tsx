@@ -3,7 +3,7 @@ import { InputNumberProps } from 'antd/lib/input-number';
 import BigNumber from 'bignumber.js';
 import { omit } from 'lodash';
 import React from 'react';
-import { InputBase } from '../type';
+import { InputBase } from '../../components/type';
 
 export interface IInputNumberProps extends InputNumberProps {}
 

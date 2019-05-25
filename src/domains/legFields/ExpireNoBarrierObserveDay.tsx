@@ -13,7 +13,7 @@ import ModalButton from '@/containers/ModalButton';
 import PopconfirmButton from '@/containers/PopconfirmButton';
 import SourceTable from '@/containers/SourceTable';
 import { IColumnDef } from '@/containers/Table/types';
-import { InputBase } from '@/containers/type';
+import { InputBase } from '@/components/type';
 import { qlDateScheduleCreate } from '@/services/quant-service';
 import { getLegEnvs, getMoment, getRequiredRule, remove } from '@/tools';
 import { ILegColDef } from '@/types/leg';

@@ -1,7 +1,7 @@
 import lodash from 'lodash';
 import { SEPARATOR } from './constants';
 import { assert } from '@/tools';
-import createEventBus from '@/tools/eventBus';
+import createEventBus from '@/utils/eventBus';
 
 export const joinCellFieldKey = (key, id) => `${key}${SEPARATOR}${id}`;
 

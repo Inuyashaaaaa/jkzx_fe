@@ -1,3 +1,4 @@
+import { IFormField } from '@/components/type';
 import { LEG_FIELD, LEG_ID_FIELD, LEG_INJECT_FIELDS, PREMIUM_TYPE_MAP } from '@/constants/common';
 import { COMPUTED_LEG_FIELD_MAP } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
@@ -6,13 +7,12 @@ import { Form2 } from '@/containers';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
-import { IFormField } from '@/containers/type';
 import { createLegDataSourceItem } from '@/services/pages';
 import { getLegByRecord, insert, remove, uuid } from '@/tools';
 import { Divider, Menu } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef } from 'react';
 import ActionBar from './ActionBar';
 import './index.less';
 

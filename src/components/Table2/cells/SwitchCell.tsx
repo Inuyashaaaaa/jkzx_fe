@@ -1,14 +1,14 @@
-import { isShallowEqual } from '@/tools';
+import { isShallowEqual } from '../../../utils';
 import { FormItemProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
 import _, { omit } from 'lodash';
 import React, { KeyboardEvent, PureComponent, CSSProperties } from 'react';
-import { EMPTY_VALUE } from '../../constants';
+import { EMPTY_VALUE } from '../../../containers/constants';
 import Form2 from '../../Form2';
 import { ITableCellProps } from '../../type';
-import { wrapFormGetDecorator } from '../../utils';
+import { wrapFormGetDecorator } from '../../_utils';
 import {
   TABLE_CELL_EDITING_CHANGED,
   TABLE_KEY_DOWN,

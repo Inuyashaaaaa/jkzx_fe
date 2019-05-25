@@ -3,7 +3,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 import classNames from 'classnames';
 import _, { omit } from 'lodash';
 import React from 'react';
-import { VALIDATE_MESSAGES } from '../../constants';
+import { VALIDATE_MESSAGES } from '../../../containers/constants';
 import Form2 from '../../Form2';
 import {
   IFormField,

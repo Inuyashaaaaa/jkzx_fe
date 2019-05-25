@@ -24,7 +24,9 @@
     "lint:ts": "tslint --fix './src/**/*.{ts,tsx}'",
     "lint:less": "stylelint --syntax less './src/**/*.less'",
     "lint": "yarn run lint:js && yarn run lint:ts && yarn run lint:less",
-    "e2e:dev": "cypress open"
+    "e2e:dev": "cypress open",
+    "cdoc:dev": "umi-lib doc dev",
+    "cdoc:build": "umi-lib doc build"
   },
   "dependencies": {
     "@antv/data-set": "^0.9.6",
@@ -42,6 +44,7 @@
     "classnames": "^2.2.6",
     "d3-scale": "^2.1.2",
     "deep-diff": "^1.0.2",
+    "docz": "^1.2.0",
     "dva": "^2.4.0",
     "enquire-js": "^0.2.1",
     "gulp": "^4.0.2",
@@ -89,6 +92,7 @@
     "sockjs-client": "^1.3.0",
     "stompjs": "^2.3.3",
     "tslint-eslint-rules": "^5.4.0",
+    "umi-library": "^1.6.0",
     "uuid": "^3.3.2",
     "ws": "^6.2.1",
     "xlsx": "^0.14.1"
