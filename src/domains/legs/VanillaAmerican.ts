@@ -56,6 +56,7 @@ import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../tools';
 import { Unit } from '../legFields/Unit';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const VanillaAmerican: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_AMERICAN],
@@ -78,6 +79,7 @@ export const VanillaAmerican: ILeg = {
         Term,
         ExpirationDate,
         NotionalAmount,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -106,6 +108,7 @@ export const VanillaAmerican: ILeg = {
         MinimumPremium,
         FrontPremium,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -133,6 +136,7 @@ export const VanillaAmerican: ILeg = {
         MinimumPremium,
         FrontPremium,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -171,6 +175,7 @@ export const VanillaAmerican: ILeg = {
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.VANILLA_AMERICAN;

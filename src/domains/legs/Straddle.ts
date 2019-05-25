@@ -62,6 +62,7 @@ import { Payment } from '../legFields/Payment';
 import { BarrierType } from '../legFields/BarrierType';
 import { LowBarrier } from '../legFields/LowBarrier';
 import { Unit } from '../legFields/Unit';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const Straddle: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.STRADDLE],
@@ -89,6 +90,7 @@ export const Straddle: ILeg = {
         LowParticipationRate,
         HighParticipationRate,
         PremiumType,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -118,6 +120,7 @@ export const Straddle: ILeg = {
         LowParticipationRate,
         HighParticipationRate,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -146,6 +149,7 @@ export const Straddle: ILeg = {
         LowParticipationRate,
         HighParticipationRate,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -174,7 +178,7 @@ export const Straddle: ILeg = {
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [LEG_FIELD.UNIT];
+    const COMPUTED_FIELDS = [LEG_FIELD.UNIT, LEG_FIELD.TRADE_NUMBER];
 
     nextPosition.productType = LEG_TYPE_MAP.STRADDLE;
     nextPosition.lcmEventType = 'OPEN';

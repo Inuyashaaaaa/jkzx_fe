@@ -1,4 +1,4 @@
-import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { ILegColDef, LEG_ENV, TOTAL_EDITING_FIELDS } from '@/constants/legs';
 import { Form2 } from '@/containers';
@@ -20,6 +20,7 @@ import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import uuidv4 from 'uuid/v4';
 import './index.less';
+import BigNumber from 'bignumber.js';
 
 const DATE_ARRAY = [
   LEG_FIELD.SETTLEMENT_DATE,
@@ -93,11 +94,35 @@ const TradeManagementBooking = props => {
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
 
+    const handleTradeNumber = position => {
+      const record = position.asset;
+      const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+      const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
+      const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+      const notional =
+        notionalAmountType === 'LOT'
+          ? notionalAmount
+          : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+      return new BigNumber(notional)
+        .multipliedBy(multipler)
+        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+        .toNumber();
+    };
+
     const positions = _.get(data, 'process._business_payload.trade.positions');
+    const composePositions = positions.map(position => {
+      return {
+        ...position,
+        asset: {
+          ...position.asset,
+          [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+        },
+      };
+    });
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
-    if (!positions) return;
-    mockAddLegItem(positions, _detailData);
+    if (!composePositions) return;
+    mockAddLegItem(composePositions, _detailData);
   };
 
   const mockAddLegItem = async (composePositions, tableFormData) => {

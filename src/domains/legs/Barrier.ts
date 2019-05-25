@@ -70,6 +70,7 @@ import { BarrierType } from '../legFields/BarrierType';
 import { Barrier } from '../legFields/Barrier';
 import BigNumber from 'bignumber.js';
 import { Unit } from '../legFields/Unit';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const BarrierLeg: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.BARRIER],
@@ -99,6 +100,7 @@ export const BarrierLeg: ILeg = {
         OptionType,
         RebateUnit,
         BarrierType,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -134,6 +136,7 @@ export const BarrierLeg: ILeg = {
         MinimumPremium,
         ObservationType,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -168,6 +171,7 @@ export const BarrierLeg: ILeg = {
         MinimumPremium,
         ObservationType,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -209,6 +213,7 @@ export const BarrierLeg: ILeg = {
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.BARRIER;

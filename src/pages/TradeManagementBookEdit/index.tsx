@@ -1,4 +1,9 @@
-import { LCM_EVENT_TYPE_ZHCN_MAP, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import {
+  LCM_EVENT_TYPE_ZHCN_MAP,
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  BIG_NUMBER_CONFIG,
+} from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
@@ -20,6 +25,7 @@ import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import styles from './index.less';
+import BigNumber from 'bignumber.js';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
@@ -106,6 +112,7 @@ const TradeManagementBooking = props => {
             ...position,
             asset: {
               ...position.asset,
+              [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
               [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
               [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
             },
@@ -118,6 +125,21 @@ const TradeManagementBooking = props => {
     setCreateFormData(Form2.createFields(tableFormData));
     mockAddLegItem(composePositions, tableFormData);
     fetchEventType(composePositions);
+  };
+
+  const handleTradeNumber = position => {
+    const record = position.asset;
+    const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
+    const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+    const notional =
+      notionalAmountType === 'LOT'
+        ? notionalAmount
+        : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+    return new BigNumber(notional)
+      .multipliedBy(multipler)
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber();
   };
 
   const mockAddLegItem = async (composePositions, tableFormData) => {

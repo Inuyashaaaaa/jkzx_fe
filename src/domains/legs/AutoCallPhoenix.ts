@@ -65,6 +65,7 @@ import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
 import { commonLinkage } from '../tools';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const AutoCallPhoenix: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX],
@@ -98,6 +99,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierOptionsStrike,
         Term,
         ExpirationDate,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -138,6 +140,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrier,
         DownBarrierOptionsStrike,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -177,6 +180,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrier,
         DownBarrierOptionsStrike,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -215,6 +219,7 @@ export const AutoCallPhoenix: ILeg = {
       AlreadyBarrier.dataIndex,
       LEG_FIELD.IS_ANNUAL,
       LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL_PHOENIX;

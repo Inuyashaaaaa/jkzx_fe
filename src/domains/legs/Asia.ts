@@ -76,6 +76,7 @@ import { ObserveStartDay } from '../legFields/ObserveStartDay';
 import { ObserveEndDay } from '../legFields/ObserveEndDay';
 import { convertObservetions } from '@/services/common';
 import { Unit } from '../legFields/Unit';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const Asia: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.ASIAN],
@@ -102,6 +103,7 @@ export const Asia: ILeg = {
         ObserveStartDay,
         ObserveEndDay,
         ObservationDates,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -134,6 +136,7 @@ export const Asia: ILeg = {
         ObservationStep,
         ObservationDates,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -165,6 +168,7 @@ export const Asia: ILeg = {
         ObservationStep,
         ObservationDates,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -225,6 +229,7 @@ export const Asia: ILeg = {
       LEG_FIELD.OBSERVE_END_DAY,
       LEG_FIELD.OBSERVATION_DATES,
       LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
         : [

@@ -76,6 +76,7 @@ import { HighRebate } from '../legFields/HighRebate';
 import { LowBarrier } from '../legFields/LowBarrier';
 import { HighBarrier } from '../legFields/HighBarrier';
 import { Unit } from '../legFields/Unit';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const DoubleSharkFin: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_SHARK_FIN],
@@ -106,6 +107,7 @@ export const DoubleSharkFin: ILeg = {
         HighBarrier,
         ObservationType,
         ExpirationDate,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -142,6 +144,7 @@ export const DoubleSharkFin: ILeg = {
         MinimumPremium,
         ObservationType,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -177,6 +180,7 @@ export const DoubleSharkFin: ILeg = {
         MinimumPremium,
         ObservationType,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -218,6 +222,7 @@ export const DoubleSharkFin: ILeg = {
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.DOUBLE_SHARK_FIN;

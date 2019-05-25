@@ -78,6 +78,7 @@ import { LowBarrier } from '../legFields/LowBarrier';
 import { ObservationDates } from '../legFields/ObservationDates';
 import { ObservationStep } from '../legFields/ObservationStep';
 import { Unit } from '../legFields/Unit';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const RangeAccruals: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.RANGE_ACCRUALS],
@@ -106,6 +107,7 @@ export const RangeAccruals: ILeg = {
         LowBarrier,
         ObservationDates,
         ObservationStep,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -137,6 +139,7 @@ export const RangeAccruals: ILeg = {
         LowBarrier,
         ObservationDates,
         Unit,
+        TradeNumber,
         // ObservationStep,
         ...TOTAL_EDITING_FIELDS,
       ];
@@ -169,6 +172,7 @@ export const RangeAccruals: ILeg = {
         ObservationDates,
         ObservationStep,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -204,6 +208,7 @@ export const RangeAccruals: ILeg = {
       ObservationStep.dataIndex,
       LEG_FIELD.OBSERVATION_DATES,
       LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;

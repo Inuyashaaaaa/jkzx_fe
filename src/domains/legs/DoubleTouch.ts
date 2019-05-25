@@ -53,6 +53,7 @@ import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { RebateType } from '../legFields/RebateType';
 import { Unit } from '../legFields/Unit';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const DoubleTouch: ILeg = {
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_TOUCH],
@@ -75,6 +76,7 @@ export const DoubleTouch: ILeg = {
         Term,
         ExpirationDate,
         NotionalAmount,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -106,6 +108,7 @@ export const DoubleTouch: ILeg = {
         PaymentType,
         Payment,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -136,6 +139,7 @@ export const DoubleTouch: ILeg = {
         PaymentType,
         Payment,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -165,7 +169,7 @@ export const DoubleTouch: ILeg = {
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [LEG_FIELD.UNIT];
+    const COMPUTED_FIELDS = [LEG_FIELD.UNIT, LEG_FIELD.TRADE_NUMBER];
 
     nextPosition.productType = LEG_TYPE_MAP.DOUBLE_TOUCH;
     nextPosition.lcmEventType = 'OPEN';

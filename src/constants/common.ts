@@ -571,6 +571,7 @@ export const LEG_FIELD = {
   UNDERLYER_INSTRUMENT_PRICE: 'UNDERLYER_INSTRUMENT_PRICE',
   COMMENT: 'comment',
   UNIT: 'unit',
+  TRADE_NUMBER: 'tradeNumber',
 };
 
 /**
