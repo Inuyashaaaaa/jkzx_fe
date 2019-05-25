@@ -393,6 +393,45 @@ const TradeManagementBooking = props => {
     });
   };
 
+  const onCellFieldsChange = params => {
+    const { record } = params;
+    const leg = getLegByRecord(record);
+
+    setTableData(pre => {
+      const newData = pre.map(item => {
+        if (item[LEG_ID_FIELD] === params.rowId) {
+          return {
+            ...item,
+            ...params.changedFields,
+          };
+        }
+        return item;
+      });
+      if (leg.onDataChange) {
+        leg.onDataChange(
+          LEG_ENV.PRICING,
+          params,
+          newData[params.rowIndex],
+          newData,
+          (colId: string, loading: boolean) => {
+            tableEl.current.setLoadings(params.rowId, colId, loading);
+          },
+          tableEl.current.setLoadingsByRow,
+          (colId: string, newVal: IFormField) => {
+            onCellFieldsChange({
+              ...params,
+              changedFields: {
+                [colId]: newVal,
+              },
+            });
+          },
+          setTableData
+        );
+      }
+      return newData;
+    });
+  };
+
   return (
     <Page>
       <ActionBar
@@ -411,49 +450,7 @@ const TradeManagementBooking = props => {
         totalable={true}
         env={LEG_ENV.PRICING}
         tableEl={tableEl}
-        onCellFieldsChange={params => {
-          const { record } = params;
-          const leg = getLegByRecord(record);
-
-          setTableData(pre => {
-            const newData = pre.map(item => {
-              if (item[LEG_ID_FIELD] === params.rowId) {
-                return {
-                  ...item,
-                  ...params.changedFields,
-                };
-              }
-              return item;
-            });
-            if (leg.onDataChange) {
-              leg.onDataChange(
-                LEG_ENV.PRICING,
-                params,
-                newData[params.rowIndex],
-                newData,
-                (colId: string, loading: boolean) => {
-                  tableEl.current.setLoadings(params.rowId, colId, loading);
-                },
-                tableEl.current.setLoadingsByRow,
-                (colId: string, newVal: IFormField) => {
-                  setTableData(pre => {
-                    return pre.map(item => {
-                      if (item[LEG_ID_FIELD] === params.rowId) {
-                        return {
-                          ...item,
-                          [colId]: newVal,
-                        };
-                      }
-                      return item;
-                    });
-                  });
-                },
-                setTableData
-              );
-            }
-            return newData;
-          });
-        }}
+        onCellFieldsChange={onCellFieldsChange}
         onCellEditingChanged={params => {
           fetchDefaultPricingEnvData(params.record);
         }}

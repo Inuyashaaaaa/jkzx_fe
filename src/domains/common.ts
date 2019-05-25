@@ -110,6 +110,33 @@ const fetchInitialSpot = _.debounce(
   50
 );
 
+const computedTradeNumber = (
+  env: string,
+  changeFieldsParams: ITableTriggerCellFieldsChangeParams,
+  record: ITableData,
+  tableData: ITableData[],
+  setColLoading: (colId: string, loading: boolean) => void,
+  setLoading: (rowId: string, colId: string, loading: boolean) => void,
+  setColValue: (colId: string, newVal: IFormField) => void,
+  setTableData: (newData: ITableData[]) => void
+) => {
+  const notionalAmountType = Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE]);
+  const notionalAmount = Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT]);
+  const multipler = Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]);
+  const initialSpotVal = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
+  const notional =
+    notionalAmountType === 'LOT'
+      ? notionalAmount
+      : new BigNumber(notionalAmount).div(initialSpotVal).toNumber();
+
+  record[LEG_FIELD.TRADE_NUMBER] = Form2.createField(
+    new BigNumber(notional)
+      .multipliedBy(multipler)
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber()
+  );
+};
+
 export const commonLinkage = (
   env: string,
   changeFieldsParams: ITableTriggerCellFieldsChangeParams,
@@ -171,6 +198,28 @@ export const commonLinkage = (
   }
 
   if (
+    Form2.fieldValueIsChange(LEG_FIELD.NOTIONAL_AMOUNT, changedFields) ||
+    Form2.fieldValueIsChange(LEG_FIELD.NOTIONAL_AMOUNT_TYPE, changedFields)
+  ) {
+    if (
+      record[LEG_FIELD.INITIAL_SPOT] &&
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] &&
+      record[LEG_FIELD.NOTIONAL_AMOUNT]
+    ) {
+      computedTradeNumber(
+        env,
+        changeFieldsParams,
+        record,
+        tableData,
+        setColLoading,
+        setLoading,
+        setColValue,
+        setTableData
+      );
+    }
+  }
+
+  if (
     Form2.fieldValueIsChange(LEG_FIELD.PREMIUM, changedFields) ||
     Form2.fieldValueIsChange(LEG_FIELD.MINIMUM_PREMIUM, changedFields)
   ) {
@@ -214,6 +263,20 @@ export const commonLinkage = (
     if (Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)) {
       const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
       record[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE] = Form2.createField(initialSpot);
+    }
+  }
+  if (Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)) {
+    if (record[LEG_FIELD.NOTIONAL_AMOUNT] && record[LEG_FIELD.UNDERLYER_MULTIPLIER]) {
+      computedTradeNumber(
+        env,
+        changeFieldsParams,
+        record,
+        tableData,
+        setColLoading,
+        setLoading,
+        setColValue,
+        setTableData
+      );
     }
   }
 };

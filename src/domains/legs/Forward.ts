@@ -58,6 +58,7 @@ import { RebateType } from '../legFields/RebateType';
 import { ObservationType } from '../legFields/ObservationType';
 import { Unit } from '../legFields/Unit';
 import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const Forward: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.FORWARD],
@@ -79,6 +80,7 @@ export const Forward: ILeg = legPipeLine({
         Term,
         ExpirationDate,
         NotionalAmount,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS.filter(item => {
           return item.dataIndex !== 'vol';
         }),
@@ -103,6 +105,7 @@ export const Forward: ILeg = legPipeLine({
         ExpirationDate,
         EffectiveDate,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -124,6 +127,7 @@ export const Forward: ILeg = legPipeLine({
         ExpirationDate,
         EffectiveDate,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -158,6 +162,7 @@ export const Forward: ILeg = legPipeLine({
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.FORWARD;

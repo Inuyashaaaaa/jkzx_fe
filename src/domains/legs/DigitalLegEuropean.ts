@@ -64,6 +64,7 @@ import { RebateType } from '../legFields/RebateType';
 import { ObservationType } from '../legFields/ObservationType';
 import { Unit } from '../legFields/Unit';
 import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const DigitalLegEuropean: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DIGITAL_EUROPEAN],
@@ -88,6 +89,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         ParticipationRate,
         NotionalAmount,
         ObservationType,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -121,6 +123,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         ObservationType,
         RebateType,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -152,6 +155,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         ObservationType,
         RebateType,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -193,6 +197,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.DIGITAL;

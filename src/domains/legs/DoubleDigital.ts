@@ -76,6 +76,7 @@ import { HighPayment } from '../legFields/HighPayment';
 import { LowPayment } from '../legFields/LowPayment';
 import { Unit } from '../legFields/Unit';
 import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const DoubleDigital: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_DIGITAL],
@@ -102,6 +103,7 @@ export const DoubleDigital: ILeg = legPipeLine({
         PaymentType,
         LowPayment,
         HighPayment,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -134,6 +136,7 @@ export const DoubleDigital: ILeg = legPipeLine({
         UnderlyerMultiplier,
         Unit,
         DaysInYear,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -165,6 +168,7 @@ export const DoubleDigital: ILeg = legPipeLine({
         UnderlyerMultiplier,
         Unit,
         DaysInYear,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -203,6 +207,7 @@ export const DoubleDigital: ILeg = legPipeLine({
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.DOUBLE_DIGITAL;

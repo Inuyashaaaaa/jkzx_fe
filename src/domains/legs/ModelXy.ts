@@ -59,6 +59,7 @@ import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { Unit } from '../legFields/Unit';
 import { commonLinkage } from '../common';
 import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const ModelXy: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.MODEL_XY],
@@ -83,6 +84,7 @@ export const ModelXy: ILeg = legPipeLine({
         ParticipationRate,
         NotionalAmount,
         ObservationType,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -110,6 +112,7 @@ export const ModelXy: ILeg = legPipeLine({
         EffectiveDate,
         Comment,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -136,6 +139,7 @@ export const ModelXy: ILeg = legPipeLine({
         EffectiveDate,
         Comment,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -172,6 +176,7 @@ export const ModelXy: ILeg = legPipeLine({
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.MODEL_XY;

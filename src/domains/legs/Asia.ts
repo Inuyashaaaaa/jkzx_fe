@@ -59,6 +59,7 @@ import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { Unit } from '../legFields/Unit';
 import { commonLinkage } from '../common';
 import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
 export const Asia: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.ASIAN],
@@ -85,6 +86,7 @@ export const Asia: ILeg = legPipeLine({
         ObserveStartDay,
         ObserveEndDay,
         ObservationDates,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -117,6 +119,7 @@ export const Asia: ILeg = legPipeLine({
         ObservationStep,
         ObservationDates,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -148,6 +151,7 @@ export const Asia: ILeg = legPipeLine({
         ObservationStep,
         ObservationDates,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -208,6 +212,7 @@ export const Asia: ILeg = legPipeLine({
       LEG_FIELD.OBSERVE_END_DAY,
       LEG_FIELD.OBSERVATION_DATES,
       LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
         : [
