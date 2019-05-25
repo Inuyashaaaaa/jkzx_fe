@@ -1,5 +1,5 @@
 import { PureComponent } from 'react';
-import { EMPTY_VALUE } from '../../constants';
+import { EMPTY_VALUE } from '../../../containers/constants';
 import { IFormCellProps } from '../../type';
 
 class RenderingCell extends PureComponent<IFormCellProps> {

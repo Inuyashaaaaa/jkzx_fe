@@ -3,7 +3,7 @@ import { Form2, Input, Select } from '@/containers';
 import Form from '@/containers/Form';
 import ModalButton from '@/containers/ModalButton';
 import SourceTable from '@/containers/SourceTable';
-import { IFormColDef } from '@/containers/type';
+import { IFormColDef } from '@/components/type';
 import Page from '@/containers/Page';
 import {
   trdPortfolioCreate,

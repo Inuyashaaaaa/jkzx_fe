@@ -6,7 +6,7 @@ import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderEx
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import RangeNumberInput from '@/containers/RangeNumberInput';
-import { ITableColDef } from '@/containers/type';
+import { ITableColDef } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,

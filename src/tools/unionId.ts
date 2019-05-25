@@ -1,4 +1,4 @@
-import { uuid } from './uuid';
+import { uuid } from '../utils/uuid';
 
 export const unionId = () => {
   return uuid() + new Date().getTime();

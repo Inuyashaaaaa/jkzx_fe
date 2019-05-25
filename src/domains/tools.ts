@@ -7,7 +7,7 @@ import {
 import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { Form2 } from '@/containers';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/containers/type';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { mktInstrumentInfo, mktQuotesListPaged } from '@/services/market-data-service';
 import { getLegByRecord, getMoment } from '@/tools';
 import BigNumber from 'bignumber.js';

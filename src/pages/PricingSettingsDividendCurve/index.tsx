@@ -31,6 +31,7 @@ class PricingSettingsDividendCurve extends PureComponent {
   public $insertForm: Form2 = null;
 
   public state = {
+    saveLoading: false,
     tableDataSource: [],
     searchFormData: {},
     groups: [],
@@ -40,7 +41,6 @@ class PricingSettingsDividendCurve extends PureComponent {
   };
 
   public sortDataSource = dataSource => {
-    const tabledata = dataSource.map(item => this.fields2data(item));
     return dataSource
       .map(record => {
         return {
@@ -53,23 +53,15 @@ class PricingSettingsDividendCurve extends PureComponent {
   };
 
   public handleTableData = item => {
-    return _.mapValues(item, (value, key) => {
-      return Form2.createField(value);
-    });
+    return Form2.createFields(item, ['id']);
   };
 
-  public fields2data = item => {
-    return _.mapValues(item, (value, key) => {
-      return Form2.getFieldValue(value);
-    });
-  };
-
-  public fetchTableData = async event => {
+  public fetchTableData = async searchFormValues => {
     this.setState({
       tableLoading: true,
     });
 
-    const rsp = await queryModelDividendCurve(Form2.getFieldsValue(event), true);
+    const rsp = await queryModelDividendCurve(searchFormValues, true);
 
     const { error } = rsp;
     let { data } = rsp;
@@ -83,13 +75,16 @@ class PricingSettingsDividendCurve extends PureComponent {
       if (message.includes('failed to find model data for ')) {
         data = {
           dataSource: [
-            Form2.createFields({
-              expiry: null,
-              quote: 0,
-              tenor: '1D',
-              use: true,
-              id: uuidv4(),
-            }),
+            Form2.createFields(
+              {
+                expiry: null,
+                quote: 0,
+                tenor: '1D',
+                use: true,
+                id: uuidv4(),
+              },
+              ['id']
+            ),
           ],
         };
       } else {
@@ -109,11 +104,20 @@ class PricingSettingsDividendCurve extends PureComponent {
 
   public saveTableData = async () => {
     const { tableDataSource, searchFormData } = this.state;
+    this.setState({
+      saveLoading: true,
+    });
     const { error } = await saveModelDividendCurve({
-      dataSource: tableDataSource.map(item => this.fields2data(item)),
+      dataSource: tableDataSource.map(item => Form2.getFieldsValue(item)),
       ...Form2.getFieldsValue(searchFormData),
     });
-    return !error;
+    this.setState({
+      saveLoading: false,
+    });
+    if (error) return;
+    notification.success({
+      message: '保存成功',
+    });
   };
 
   public fetchGroup = async underlyer => {
@@ -159,12 +163,18 @@ class PricingSettingsDividendCurve extends PureComponent {
     );
   };
 
-  public onSearchFormChange = (props, fields, allFields) => {
+  public onSearchFormFieldsChange = (props, fields, allFields) => {
     this.setState({
-      searchFormData: allFields,
+      searchFormData: {
+        ...this.state.searchFormData,
+        ...fields,
+      },
     });
-    if (fields[GROUP_KEY]) {
-      this.fetchTableData(allFields);
+  };
+
+  public onSearchFormChange = (props, values, allValues) => {
+    if (values[GROUP_KEY]) {
+      this.fetchTableData(allValues);
     }
   };
 
@@ -185,7 +195,7 @@ class PricingSettingsDividendCurve extends PureComponent {
     if (validateRsp.error) return;
     const data = {
       ...this.state.insertFormData,
-      id: Form2.createField(uuidv4()),
+      id: uuidv4(),
       expiry: Form2.createField(null),
       use: Form2.createField(true),
     };
@@ -216,7 +226,7 @@ class PricingSettingsDividendCurve extends PureComponent {
   public handleCellValueChanged = params => {
     this.setState({
       tableDataSource: this.state.tableDataSource.map(item => {
-        if (item.id.value === params.record.id.value) {
+        if (item.id === params.record.id) {
           return params.record;
         }
         return item;
@@ -252,10 +262,12 @@ class PricingSettingsDividendCurve extends PureComponent {
               footer={false}
               dataSource={this.state.searchFormData}
               columns={SEARCH_FORM_CONTROLS(this.state.groups)}
-              onFieldsChange={this.onSearchFormChange}
+              onValuesChange={this.onSearchFormChange}
+              onFieldsChange={this.onSearchFormFieldsChange}
             />
             <Divider />
             <Button
+              loading={this.state.saveLoading}
               type="primary"
               style={{ marginBottom: VERTICAL_GUTTER }}
               onClick={this.saveTableData}
@@ -264,6 +276,7 @@ class PricingSettingsDividendCurve extends PureComponent {
             </Button>
             <Table2
               rowKey="id"
+              size="small"
               pagination={false}
               loading={this.state.tableLoading}
               dataSource={this.state.tableDataSource}

@@ -5,7 +5,7 @@ import router from 'umi/router';
 import './index.less';
 import { Form2 } from '@/containers';
 import { LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
-import { ITableData } from '@/containers/type';
+import { ITableData } from '@/components/type';
 
 const ActionBar = memo<{
   tableData?: ITableData[];

@@ -19,7 +19,7 @@ import {
 import _ from 'lodash';
 import moment from 'moment';
 import { Form2 } from '@/containers';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/containers/type';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,

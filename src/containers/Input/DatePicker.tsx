@@ -3,7 +3,7 @@ import { DatePickerProps } from 'antd/lib/date-picker/interface';
 import { omit } from 'lodash';
 import moment, { isMoment } from 'moment';
 import React from 'react';
-import { InputBase } from '../type';
+import { InputBase } from '../../components/type';
 
 export interface IDatePickerProps extends DatePickerProps {
   defaultOpen?: boolean;

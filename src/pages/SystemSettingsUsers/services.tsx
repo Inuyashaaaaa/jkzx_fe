@@ -1,7 +1,7 @@
 import { IColumnDef } from '@/containers/Table/types';
 import { IFormControl } from '@/containers/_Form2';
 import React from 'react';
-import { ITableColDef } from '@/containers/type';
+import { ITableColDef } from '@/components/type';
 import FormItem from 'antd/lib/form/FormItem';
 import { Select } from '@/containers';
 import { Divider, Button } from 'antd';

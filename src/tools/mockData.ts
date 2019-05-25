@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Mock from 'mockjs';
-import { uuid } from './uuid';
+import { uuid } from '../utils/uuid';
 
 export const mockData = (fields, range = '5-10'): any => {
   const fake = Mock.mock({

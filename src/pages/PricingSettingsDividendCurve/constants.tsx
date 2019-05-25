@@ -1,20 +1,13 @@
-import { IFormColDef, ITableColDef } from '@/containers/type';
-import FormItem from 'antd/lib/form/FormItem';
-import React from 'react';
-import { Select, Input, Form2 } from '@/containers';
+import { IFormColDef, ITableColDef } from '@/components/type';
+import { Form2, Input, Select } from '@/containers';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
-import { Button, Popconfirm, Divider } from 'antd';
-import _ from 'lodash';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
-
-const fields2data = item => {
-  return _.mapValues(item, (value, key) => {
-    return Form2.getFieldValue(value);
-  });
-};
+import { Divider, Popconfirm } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
 
 export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableColDef[] = (
   tableDataSource,
@@ -28,7 +21,6 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
     editable: record => {
       return true;
     },
-    width: 10,
     render: (val, record, index, { form, editing }) => {
       return (
         <FormItem>
@@ -38,8 +30,8 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
               autoSelect={true}
               //   style={{ minWidth: 180 }}
               options={getCanUsedTranorsOtions(
-                tableDataSource.map(item => fields2data(item)),
-                fields2data(record)
+                tableDataSource.map(item => Form2.getFieldsValue(item)),
+                Form2.getFieldsValue(record)
               )}
               editing={editing}
             />
@@ -51,11 +43,10 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
   {
     title: '利率(%)',
     dataIndex: 'quote',
-    width: 10,
-    // editable: record => {
-    //   return true;
-    // },
-    // defaultEditing: false,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
     render: (val, record, index, { form, editing }) => {
       return (
         <FormItem>
@@ -69,18 +60,18 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
   {
     title: '操作',
     dataIndex: 'operation',
-    width: 10,
+    width: 100,
     render: (val, record, index) => {
       return (
         <>
-          <Button type="link" size="small" onClick={showModal}>
+          <a href="javascript:;" onClick={showModal}>
             插入
-          </Button>
+          </a>
           <Divider type="vertical" />
           <Popconfirm title="确认要删除吗？" onConfirm={() => onRemove(record)}>
-            <Button type="link" size="small" style={{ color: 'red' }}>
+            <a href="javascript:;" style={{ color: 'red' }}>
               删除
-            </Button>
+            </a>
           </Popconfirm>
         </>
       );
@@ -106,7 +97,7 @@ export const INSERT_FORM_CONTROLS: (tableDataSource) => IFormColDef[] = tableDat
             <Select
               style={{ minWidth: 180 }}
               options={getCanUsedTranorsOtionsNotIncludingSelf(
-                tableDataSource.map(item => fields2data(item))
+                tableDataSource.map(item => Form2.getFieldsValue(item))
               )}
             />
           )}

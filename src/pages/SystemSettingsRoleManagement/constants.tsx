@@ -1,4 +1,4 @@
-import { IFormColDef, ITableColDef } from '@/containers/type';
+import { IFormColDef, ITableColDef } from '@/components/type';
 import { getLocaleId, mapTree, remove } from '@/tools';
 import { Input } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';

@@ -2,7 +2,7 @@ import { Checkbox2Props } from '@/containers/_Form2/types/Checkbox';
 import { Checkbox as AntdCheckbox } from 'antd';
 import { omit } from 'lodash';
 import React from 'react';
-import { InputBase } from '../type';
+import { InputBase } from '../../components/type';
 
 export interface ICheckbox2Props extends Checkbox2Props {
   renderingLabels: React.ReactNode[];

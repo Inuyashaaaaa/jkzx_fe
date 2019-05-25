@@ -7,7 +7,7 @@ import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
-import { ITableData } from '@/containers/type';
+import { ITableData } from '@/components/type';
 import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 import { convertTradePageData2ApiData } from '@/services/pages';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord, getMoment } from '@/tools';

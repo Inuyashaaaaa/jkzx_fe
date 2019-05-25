@@ -4,7 +4,7 @@ import { OptionProps, SelectProps } from 'antd/lib/select';
 import _, { debounce, omit } from 'lodash';
 import React from 'react';
 import Loading from '../Loading';
-import { InputBase } from '../type';
+import { InputBase } from '../../components/type';
 
 export type IOptionProps = OptionProps & { label?: string | React.ReactNode };
 

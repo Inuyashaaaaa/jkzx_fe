@@ -1,4 +1,4 @@
-import { ITableColDef } from '@/containers/type';
+import { ITableColDef } from '@/components/type';
 import React from 'react';
 import { Button, Popconfirm } from 'antd';
 

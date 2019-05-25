@@ -1,9 +1,9 @@
-import { hasElement } from '@/tools/hasElement';
+import { hasElement } from '@/utils/hasElement';
 import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { createEventBus, EVERY_EVENT_TYPE, uuid } from '@/tools';
+import { createEventBus, EVERY_EVENT_TYPE, uuid } from '../../utils';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
 import SwitchCell from './cells/SwitchCell';

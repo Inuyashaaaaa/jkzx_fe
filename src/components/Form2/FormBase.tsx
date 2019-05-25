@@ -3,7 +3,7 @@ import { FormComponentProps } from 'antd/lib/form/Form';
 import classNames from 'classnames';
 import _, { chunk, omit } from 'lodash';
 import React, { PureComponent } from 'react';
-import { EVERY_EVENT_TYPE } from '@/tools';
+import { EVERY_EVENT_TYPE } from '../../utils';
 import { IFormBaseProps, IFormColDef } from '../type';
 import SwitchCell from './cells/SwitchCell';
 import { FORM_CELL_EDITING_CHANGED } from './constants';

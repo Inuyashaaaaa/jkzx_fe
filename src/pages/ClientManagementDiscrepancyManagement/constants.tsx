@@ -13,7 +13,7 @@ import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
-import { ITableColDef, IFormColDef } from '@/containers/type';
+import { ITableColDef, IFormColDef } from '@/components/type';
 import { formatNumber } from '@/tools';
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';

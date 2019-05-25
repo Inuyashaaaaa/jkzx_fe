@@ -2,7 +2,7 @@ import { Cascader as AntdCascader } from 'antd';
 import { CascaderOptionType, CascaderProps } from 'antd/lib/cascader';
 import { omit } from 'lodash';
 import React from 'react';
-import { InputBase } from '../type';
+import { InputBase } from '../../components/type';
 
 export interface ICascaderProps extends CascaderProps {}
 

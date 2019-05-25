@@ -6,7 +6,7 @@ import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import { Form2, Loading } from '@/containers';
-import { ITableData } from '@/containers/type';
+import { ITableData } from '@/components/type';
 import Page from '@/containers/Page';
 import { trdTradeGet } from '@/services/general-service';
 import { mktInstrumentInfo } from '@/services/market-data-service';

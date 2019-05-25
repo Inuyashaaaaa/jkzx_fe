@@ -1,6 +1,6 @@
 import { InputNumber } from '@/containers';
 import { IInputNumberProps } from '@/containers/Input/InputNumber';
-import { IInputBaseProps } from '@/containers/type';
+import { IInputBaseProps } from '@/components/type';
 import React, { memo } from 'react';
 import { formatMoney, parseMoney } from '@/tools';
 import _ from 'lodash';
