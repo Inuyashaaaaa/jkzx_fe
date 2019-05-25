@@ -1,3 +1,4 @@
+// 不要修改文件后缀，router.config.js 在使用它
 function mapTree(node, cb, fieldName = 'children', parent = null) {
   return cb(
     {
@@ -10,4 +11,4 @@ function mapTree(node, cb, fieldName = 'children', parent = null) {
   );
 }
 
-export default mapTree;
+module.exports = mapTree;
