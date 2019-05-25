@@ -10,4 +10,4 @@ function mapTree(node, cb, fieldName = 'children', parent = null) {
   );
 }
 
-module.exports = mapTree;
+export default mapTree;

@@ -9,6 +9,7 @@ _roadhog-api-doc
 # production
 /dist
 /docs
+/cdocs
 
 # misc
 .DS_Store
