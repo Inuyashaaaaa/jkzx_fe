@@ -225,7 +225,13 @@ class ApprovalProcessConfiguration extends PureComponent {
     }).length;
 
     const noneGroupIndex = _.findIndex(tasks, item => {
-      if (_.isNumber(item.taskId) || processList[pIndex].reviewDataLength !== length) {
+      // if (_.isNumber(item.taskId) || processList[pIndex].reviewDataLength !== length) {
+      //   addFlag = true;
+      // }
+      if (
+        (item.editId && _.isNumber(item.editId)) ||
+        processList[pIndex].reviewDataLength !== length
+      ) {
         addFlag = true;
       }
       return (
@@ -380,6 +386,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       index: `1.${length}`,
       taskType: REVIEW_DATA,
       taskId: _.random(10, true),
+      editId: _.random(10, true),
       actionClass: this.getActionClass(TASKTYPE[REVIEW_DATA], currentProcessName),
     });
 
@@ -404,6 +411,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     tasks = tasks.map(item => {
       if (item.taskId === taskId) {
         item.taskName = e;
+        item.editId = _.random(10, true);
       }
       return item;
     });
