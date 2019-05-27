@@ -11,7 +11,11 @@ import {
 } from '@/services/approval';
 import moment from 'moment';
 import { Form2, Upload, Input as Input2, InputNumber } from '@/containers';
-import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
+import {
+  refBankAccountSearch,
+  refSimilarLegalNameList,
+  wkAttachmentProcessInstanceBind,
+} from '@/services/reference-data-service';
 import {
   Button,
   Icon,
@@ -206,15 +210,15 @@ class ApprovalForm extends PureComponent<any, any> {
         ...Form2.getFieldsValue(this.state.creditForm),
       },
     };
-    return this.executeModify(param, 'modify');
-    // return this.confirmModify(e, {
-    //   taskId: this.props.formData.taskId,
-    //   ctlProcessData: this.state.res,
-    //   businessProcessData: {
-    //     ..._.get(data, 'process._business_payload'),
-    //     ...Form2.getFieldsValue(this.state.creditForm),
-    //   },
-    // });
+    this.executeModify(param, 'modify');
+
+    if (this.state.newAttachmentId) {
+      const { error: aerror, data: adata } = await wkAttachmentProcessInstanceBind({
+        attachmentId: this.state.newAttachmentId,
+        processInstanceId: processInstanceId,
+      });
+      if (aerror) return true;
+    }
   };
 
   public queryBankAccount = async (data, status) => {
@@ -695,6 +699,9 @@ class ApprovalForm extends PureComponent<any, any> {
                                   `${_.get(fileList, '[0].response.result.attachmentName')}上传成功`
                                 );
                               }
+                              this.setState({
+                                newAttachmentId: fileList[0].response.result.attachmentId,
+                              });
                             }
                           }}
                           value={this.state.fileList}
