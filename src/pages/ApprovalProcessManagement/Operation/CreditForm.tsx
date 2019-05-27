@@ -122,7 +122,7 @@ class ApprovalForm extends PureComponent<any, any> {
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
     const _detailData = {
-      accountId: _.get(data, 'process._business_payload.accountId'),
+      legalName: _.get(data, 'process._business_payload.legalName'),
       salesName: _.get(data, 'process._business_payload.record.salesName'),
       normalStatus: _.get(data, 'process._business_payload.record.normalStatus'),
       credit: _.get(data, 'process._business_payload.record.credit'),
@@ -576,7 +576,7 @@ class ApprovalForm extends PureComponent<any, any> {
               columns={[
                 {
                   title: '交易对手',
-                  dataIndex: 'accountId',
+                  dataIndex: 'legalName',
                   render: (value, record, index, { form, editing }) => {
                     return (
                       <FormItem>{form.getFieldDecorator({})(<Input2 editing={false} />)}</FormItem>
