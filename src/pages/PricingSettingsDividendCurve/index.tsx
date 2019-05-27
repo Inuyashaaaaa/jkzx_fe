@@ -44,7 +44,7 @@ class PricingSettingsDividendCurve extends PureComponent {
     return dataSource
       .map(record => {
         return {
-          days: TRNORS_OPTS.find(item => item.name === record.tenor.value).days,
+          days: (TRNORS_OPTS.find(item => item.name === record.tenor.value) || {}).days,
           record,
         };
       })
