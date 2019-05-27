@@ -170,12 +170,13 @@ const TradeManagementPricingManagement = props => {
       <Form2
         submitText="搜索"
         onSubmitButtonClick={() => {
-          onTradeTableSearch();
+          onTradeTableSearch({ paramsPagination: { current: 1, pageSize: 10 } });
         }}
         onResetButtonClick={() => {
           setSearchFormData({});
           onTradeTableSearch({
             paramsSearchFormData: {},
+            paramsPagination: { current: 1, pageSize: 10 },
           });
         }}
         onFieldsChange={(props, changedFields, allFields) => {
@@ -271,7 +272,7 @@ const TradeManagementPricingManagement = props => {
             },
           },
           {
-            title: '日期范围',
+            title: '到期日范围',
             dataIndex: RANGE_DATE_KEY,
             render: (value, record, index, { form, editing }) => {
               return <FormItem>{form.getFieldDecorator({})(<DatePicker.RangePicker />)}</FormItem>;
@@ -415,7 +416,7 @@ const TradeManagementPricingManagement = props => {
               },
               {
                 title: '起始日',
-                dataIndex: LEG_FIELD.EFFECTIVE_DATE,
+                dataIndex: `asset.${LEG_FIELD.EFFECTIVE_DATE}`,
                 width: 150,
               },
               {
@@ -429,7 +430,10 @@ const TradeManagementPricingManagement = props => {
                 width: 150,
                 render: (val, record) => {
                   if (val == null) return null;
-                  if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+                  if (
+                    _.get(record, `quotePositions[0].asset.${LEG_FIELD.STRIKE_TYPE}`) ===
+                    STRIKE_TYPES_MAP.CNY
+                  ) {
                     return formatMoney(val, {
                       unit: '￥',
                     });

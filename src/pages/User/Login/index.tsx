@@ -142,7 +142,7 @@ class LoginPage extends Component<any> {
                       )}
 
                       <img
-                        style={{ width: 150, cursor: 'pointer' }}
+                        style={{ cursor: 'pointer' }}
                         src={login.img}
                         alt="验证码"
                         onClick={() => this.queryCaptcha()}
