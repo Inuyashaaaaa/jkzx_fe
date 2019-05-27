@@ -28,14 +28,15 @@ import {
   TABLE_COLUMN,
 } from './constants';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, InputNumber } from '@/containers';
+import { Form2, Select, InputNumber, Table2, Input } from '@/containers';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 
 class PricingSettingVolSurface extends PureComponent {
   public lastFetchedDataSource = null;
 
   public $sourceTable: SourceTable = null;
 
-  public $insertTable: Form2 = null;
+  public $insertForm: Form2 = null;
 
   public underlyer = null;
 
@@ -63,22 +64,6 @@ class PricingSettingVolSurface extends PureComponent {
   }
 
   public fetchGroup = async underlyer => {
-    // const rsp = await queryModelName({
-    //   modelType: 'vol_surface',
-    //   underlyer,
-    // });
-    // const { error } = rsp;
-    // let { data } = rsp;
-    // if (error) return;
-    // if (!data || data.length === 0) {
-    //   const { error: _error, data: _data } = await queryAllModelNameVol();
-    //   if (_error) return;
-    //   data = _data.map(item => {
-    //     return {
-    //       modelName: item,
-    //     };
-    //   });
-    // }
     const { error, data } = await queryAllModelNameVol();
     if (error) return;
     const dataGroup = data.map(item => {
@@ -103,7 +88,7 @@ class PricingSettingVolSurface extends PureComponent {
   public sortDataSource = dataSource => {
     return dataSource
       .map(record => {
-        const day = TRNORS_OPTS.find(item => item.name === record.tenor);
+        const day = TRNORS_OPTS.find(item => item.name === record.tenor) || {};
         return {
           days: day && day.days,
           record,
@@ -131,27 +116,28 @@ class PricingSettingVolSurface extends PureComponent {
     if (error) {
       const { message } = error;
       if (message.includes('failed to find model data for ')) {
+        const dataSource = [
+          {
+            tenor: '1D',
+            '80% SPOT': 0,
+            '90% SPOT': 0,
+            '95% SPOT': 0,
+            '100% SPOT': 0,
+            '105% SPOT': 0,
+            '110% SPOT': 0,
+            '120% SPOT': 0,
+            id: uuidv4(),
+          },
+        ];
         data = {
-          dataSource: [
-            {
-              tenor: '1D',
-              '80% SPOT': 0,
-              '90% SPOT': 0,
-              '95% SPOT': 0,
-              '100% SPOT': 0,
-              '105% SPOT': 0,
-              '110% SPOT': 0,
-              '120% SPOT': 0,
-              id: uuidv4(),
-            },
-          ],
+          dataSource,
           underlyer: {
-            dataIndex: 'LAST',
+            field: 'LAST',
             instance: 'INTRADAY',
             instrumentId: searchFormData[MARKET_KEY],
             quote: 1,
           },
-          columns: TABLE_COLUMN,
+          columns: TABLE_COLUMN(dataSource),
           failed: true,
         };
       } else {
@@ -167,17 +153,57 @@ class PricingSettingVolSurface extends PureComponent {
     const tableColumnDefs = failed
       ? columns
       : columns.map(item => {
-          item.title = item.headerName;
-          item.dataIndex = item.field;
-          if (item.input && item.input.type === 'select') {
-            item.record = (text, record, index) => {
-              return text;
+          if (item.field === 'tenor') {
+            return {
+              title: '期限',
+              dataIndex: 'tenor',
+              defaultEditing: false,
+              editable: record => {
+                return true;
+              },
+              render: (val, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        defaultOpen={true}
+                        autoSelect={true}
+                        //   style={{ minWidth: 180 }}
+                        options={getCanUsedTranorsOtions(
+                          tableDataSource.map(item => Form2.getFieldsValue(item)),
+                          Form2.getFieldsValue(record)
+                        )}
+                        editing={editing}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
             };
           }
-          return item;
+          return {
+            title: item.headerName,
+            dataIndex: item.field,
+            defaultEditing: false,
+            percent: item.percent,
+            editable: record => {
+              return true;
+            },
+            render: (val, record, index, { form, editing }) => {
+              return (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+                  )}
+                </FormItem>
+              );
+            },
+          };
         });
-
-    const tableDataSource = this.sortDataSource(dataSource);
+    let tableDataSource = this.sortDataSource(dataSource);
+    tableDataSource = tableDataSource.map(item => {
+      return Form2.createFields(item);
+    });
     const tableSelfFormData = {
       quote: underlyer.quote,
     };
@@ -217,10 +243,11 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public handleSaveTable = async () => {
+    const { tableDataSource } = this.state;
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error } = await saveModelVolSurface({
       columns: this.state.tableColumnDefs,
-      dataSource: this.state.tableDataSource,
+      dataSource: tableDataSource.map(item => Form2.getFieldsValue(item)),
       underlyer: this.underlyer,
       newQuote: (this.state.tableFormData as any).quote,
       modelName: searchFormData[GROUP_KEY],
@@ -233,7 +260,6 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public onSetConstantsButtonClick = event => {
-    console.log(event);
     if (!this.$sourceTable) return;
     if (_.filter(this.selectedColumns, { colId: 'tenor' }).length) {
       this.selectedColumns = _.drop(this.selectedColumns);
@@ -264,14 +290,16 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public onConfirm = (event, rowIndex, param) => {
+    const validateRsp = this.$insertForm.validate();
+    if (validateRsp.error) return;
+
     const clone = [...this.state.tableDataSource];
     const { insertFormData } = this.state;
     clone.splice(rowIndex + 1, 0, {
       ...param,
-      ...Form2.getFieldsValue(insertFormData),
+      ...insertFormData,
       id: Math.random(),
     });
-
     this.setState({
       insertVisible: false,
       tableDataSource: this.sortDataSource(clone),
@@ -338,50 +366,61 @@ class PricingSettingVolSurface extends PureComponent {
     };
   };
 
+  public handleCellValueChanged = params => {
+    this.setState({
+      tableDataSource: this.state.tableDataSource.map(item => {
+        if (item.id === params.record.id) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
+  };
+
   public render() {
-    console.log(this.underlyer);
     const columns = this.state.tableColumnDefs.concat({
       title: '操作',
       render: (text, record, index) => {
         return (
           <p>
-            <a style={{ color: 'red' }} onClick={e => this.onRemove(e, index, text)}>
+            <a style={{ color: 'red' }} onClick={e => this.onRemove(e, index, record)}>
               删除
             </a>
             <Divider type="vertical" />
             <a onClick={e => this.onClick(e, text)}>插入</a>
             <Modal
               visible={this.state.insertVisible}
-              onOk={e => this.onConfirm(e, index, text)}
+              onOk={e => this.onConfirm(e, index, record)}
               onCancel={() => {
                 this.setState({ insertVisible: false });
               }}
+              closable={false}
             >
               <Form2
-                ref={node => (this.$insertTable = node)}
-                layout="inline"
+                ref={node => (this.$insertForm = node)}
                 dataSource={this.state.insertFormData}
-                submitable={false}
-                resetable={false}
+                footer={false}
                 onFieldsChange={this.onInsertFormChange}
                 columns={[
                   {
                     title: '期限',
                     dataIndex: 'tenor',
-                    render: (value, record, index, { form, editing }) => {
+                    render: (val, record, index, { form }) => {
                       return (
                         <FormItem>
                           {form.getFieldDecorator({
                             rules: [
                               {
                                 required: true,
+                                message: '期限必填',
                               },
                             ],
                           })(
                             <Select
-                              style={{ minWidth: 280 }}
-                              placeholder="请选择左侧标的物"
-                              options={getCanUsedTranorsOtionsNotIncludingSelf([text])}
+                              style={{ minWidth: 180 }}
+                              options={getCanUsedTranorsOtionsNotIncludingSelf(
+                                this.state.tableDataSource.map(item => Form2.getFieldsValue(item))
+                              )}
                             />
                           )}
                         </FormItem>
@@ -491,89 +530,19 @@ class PricingSettingVolSurface extends PureComponent {
               />
             ) : null}
 
-            <Table
+            <Table2
               dataSource={this.state.tableDataSource}
               columns={columns}
               pagination={{
                 showSizeChanger: true,
                 showQuickJumper: true,
               }}
-              loading={this.state.loading}
+              onCellFieldsChange={this.handleCellValueChanged}
+              loading={this.state.tableLoading}
               rowKey="id"
               size="middle"
               style={{ marginTop: 20 }}
             />
-            {/* <SourceTable
-              editable={true}
-              removeable={true}
-              pagination={false}
-              rowKey="id"
-              resetable={false}
-              onRemove={this.onRemove}
-              ref={node => (this.$sourceTable = node)}
-              loading={this.state.tableLoading}
-              searchFormControls={SEARCH_FORM_CONTROLS(
-                this.state.groups,
-                this.state.searchFormData
-              )}
-              searchFormProps={{
-                controlNumberOneRow: 3,
-              }}
-              searchFormData={this.state.searchFormData}
-              onSearchFormChange={this.onSearchFormChange}
-              tableColumnDefs={this.state.tableColumnDefs}
-              tableProps={{
-                onRangeSelectionChanged: this.onRangeSelectionChanged,
-              }}
-              onSearch={this.fetchTableData}
-              dataSource={this.state.tableDataSource}
-              tableFormData={this.state.tableFormData}
-              onTableFormChange={this.onTableFormChange}
-              onSave={this.handleSaveTable}
-              searchButtonProps={{
-                disabled: !this.lastFetchedDataSource,
-              }}
-              extraActions={[
-                <InputButton
-                  // disabled={!this.lastFetchedDataSource}
-                  key="快捷设置常数"
-                  type="primary"
-                  onClick={this.onSetConstantsButtonClick}
-                  input={{
-                    type: 'number',
-                    formatter: value => `${value}%`,
-                    parser: value => value.replace('%', ''),
-                  }}
-                >
-                  快捷设置常数
-                </InputButton>,
-              ]}
-              rowActions={[
-                <ModalButton key="insert" onConfirm={this.onConfirm} onClick={this.onClick}>
-                  插入
-                </ModalButton>,
-              ]}
-              tableFormProps={{
-                labelSpace: 5,
-                style: {
-                  marginTop: 30,
-                },
-              }}
-              tableFormControls={
-                this.lastFetchedDataSource
-                  ? [
-                    {
-                      dataIndex: 'quote',
-                      control: {
-                        label: '标的物价格',
-                        labelSpace: 8,
-                      },
-                      input: INPUT_NUMBER_DIGITAL_CONFIG,
-                    },
-                  ]
-                  : undefined
-              }
-            /> */}
           </Col>
         </Row>
       </Page>

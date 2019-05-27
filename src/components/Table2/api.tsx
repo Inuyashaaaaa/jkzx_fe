@@ -38,7 +38,6 @@ class TableManager {
   }
 
   public registeCell(rowId: string, colId: string, cellNode: SwitchCell) {
-    console.log(rowId, colId, cellNode);
     if (this.cellNodes[rowId]) {
       if (this.cellNodes[rowId].findIndex(item => item.id === colId) === -1) {
         this.cellNodes[rowId].push({

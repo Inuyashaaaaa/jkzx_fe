@@ -14,13 +14,17 @@ import { message, Divider, Table, Modal, Row, Button } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import { GROUP_KEY } from './constants';
-import { Form2, Input, Select } from '@/containers';
+import { Form2, Input, Select, Table2 } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import uuidv4 from 'uuid/v4';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
 
   public $sourceTable: SourceTable = null;
+
+  public $insertForm: Form2 = null;
 
   public state = {
     tableFormData: {},
@@ -71,7 +75,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     return dataSource
       .map(record => {
         return {
-          days: TRNORS_OPTS.find(item => item.name === record.tenor).days,
+          days: (TRNORS_OPTS.find(item => item.name === record.tenor) || {}).days,
           record,
         };
       })
@@ -100,14 +104,14 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     } else {
       tableDataSource = this.sortDataSource(dataSource);
     }
-    this.setState({ tableDataSource });
+    this.setState({ tableDataSource: tableDataSource.map(item => Form2.createFields(item)) });
   };
 
   public saveTableData = async () => {
     const { tableDataSource } = this.state;
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error } = await saveModelRiskFreeCurve({
-      dataSource: tableDataSource,
+      dataSource: tableDataSource.map(item => Form2.getFieldsValue(item)),
       modelName: searchFormData[GROUP_KEY],
     });
 
@@ -146,15 +150,18 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public onConfirm = (event, rowIndex, param) => {
-    const clone = [...this.state.tableDataSource];
-    const { insertFormData } = this.state;
-    if (!Form2.getFieldsValue(insertFormData).tenor) return;
-    clone.splice(rowIndex + 1, 0, {
-      ...param,
-      ...Form2.getFieldsValue(insertFormData),
-      id: Math.random(),
-    });
+    const validateRsp = this.$insertForm.validate();
+    if (validateRsp.error) return;
 
+    const { insertFormData } = this.state;
+
+    const data = {
+      ...insertFormData,
+      id: uuidv4(),
+      expiry: Form2.createField(null),
+      use: Form2.createField(true),
+    };
+    const clone = _.concat(this.state.tableDataSource, data);
     this.setState({
       insertVisible: false,
       tableDataSource: this.sortDataSource(clone),
@@ -211,14 +218,28 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public onInsertFormChange = (props, changedFields, allFields) => {
-    console.log(allFields);
     this.setState({
       insertFormData: allFields,
     });
   };
 
+  public handleCellValueChanged = params => {
+    this.setState(
+      {
+        tableDataSource: this.state.tableDataSource.map(item => {
+          if (item.id === params.record.id) {
+            return params.record;
+          }
+          return item;
+        }),
+      },
+      () => {
+        console.log(this.state.tableDataSource);
+      }
+    );
+  };
+
   public render() {
-    console.log(this.state.insertFormData);
     return (
       <Page>
         <Form2
@@ -270,29 +291,54 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             </Button>
           ) : null}
         </Row>
-        <Table
+        <Table2
           size="middle"
           rowKey="id"
+          onCellFieldsChange={this.handleCellValueChanged}
           dataSource={this.state.tableDataSource}
           columns={[
             {
               title: '期限',
               dataIndex: 'tenor',
-              // input: record => {
-              //   return {
-              //     type: 'select',
-              //     // columnDefs 的函数字段不会被 diff 判断，如果加上一个 key 会影响动效，所以命令获取
-              //     options: getCanUsedTranorsOtions(
-              //       this.$sourceTable.getTableDataSource(),
-              //       record
-              //     ),
-              //   };
-              // },
+              defaultEditing: false,
+              editable: record => {
+                return true;
+              },
+              render: (val, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        defaultOpen={true}
+                        autoSelect={true}
+                        //   style={{ minWidth: 180 }}
+                        options={getCanUsedTranorsOtions(
+                          this.state.tableDataSource.map(item => Form2.getFieldsValue(item)),
+                          Form2.getFieldsValue(record)
+                        )}
+                        editing={editing}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
             },
             {
               title: '利率(%)',
               dataIndex: 'quote',
-              // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+              editable: record => {
+                return true;
+              },
+              defaultEditing: false,
+              render: (val, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+                    )}
+                  </FormItem>
+                );
+              },
             },
             {
               title: '操作',
@@ -315,38 +361,46 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
                       onCancel={() => {
                         this.setState({ insertVisible: false });
                       }}
+                      closable={false}
                     >
                       <Form2
-                        layout="inline"
+                        ref={node => (this.$insertForm = node)}
                         dataSource={this.state.insertFormData}
-                        submitable={false}
-                        resetable={false}
+                        footer={false}
                         onFieldsChange={this.onInsertFormChange}
                         columns={[
                           {
                             title: '期限',
                             dataIndex: 'tenor',
-                            render: (val, record, index, { form, editing }) => {
-                              console.log(value);
+                            render: (val, record, index, { form }) => {
                               return (
                                 <FormItem>
                                   {form.getFieldDecorator({
                                     rules: [
                                       {
                                         required: true,
+                                        message: '期限必填',
                                       },
                                     ],
                                   })(
                                     <Select
-                                      style={{ minWidth: 280 }}
-                                      placeholder="请选择左侧标的物"
+                                      style={{ minWidth: 180 }}
                                       options={getCanUsedTranorsOtionsNotIncludingSelf(
-                                        this.state.tableDataSource
+                                        this.state.tableDataSource.map(item =>
+                                          Form2.getFieldsValue(item)
+                                        )
                                       )}
                                     />
                                   )}
                                 </FormItem>
                               );
+                            },
+                          },
+                          {
+                            title: '利率(%)',
+                            dataIndex: 'quote',
+                            render: (val, record, index, { form }) => {
+                              return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
                             },
                           },
                         ]}
@@ -359,81 +413,6 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
           ]}
           pagination={false}
         />
-        {/* <SourceTable
-          ref={node => (this.$sourceTable = node)}
-          rowKey="id"
-          removeable={true}
-          pagination={false}
-          onRemove={this.onRemove}
-          fetchAfterSearchFormChanged={true}
-          autoFetch={false}
-          resetable={false}
-          onSearch={this.fetchTableData}
-          dataSource={this.state.tableDataSource}
-          onSave={this.saveTableData}
-          searchFormProps={{
-            wrapperSpace: 18,
-            labelSpace: 4,
-            controlNumberOneRow: 3,
-          }}
-          searchFormControls={[
-            {
-              dataIndex: GROUP_KEY,
-              control: {
-                label: '分组',
-              },
-              options: {
-                rules: [
-                  {
-                    required: true,
-                  },
-                ],
-              },
-              input: {
-                type: 'select',
-                options: this.state.options,
-              },
-            },
-          ]}
-          tableColumnDefs={event => {
-            return event.tableDataSource.length
-              ? [
-                {
-                  headerName: '期限',
-                  field: 'tenor',
-                  editable: true,
-                  input: record => {
-                    return {
-                      type: 'select',
-                      // columnDefs 的函数字段不会被 diff 判断，如果加上一个 key 会影响动效，所以命令获取
-                      options: getCanUsedTranorsOtions(
-                        this.$sourceTable.getTableDataSource(),
-                        record
-                      ),
-                    };
-                  },
-                },
-                {
-                  headerName: '利率(%)',
-                  editable: true,
-                  field: 'quote',
-                  input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-                },
-              ]
-              : [];
-          }}
-          rowActions={[
-            <ModalButton
-              key="insert"
-              ref={node => (this.$modalButton = node)}
-              onConfirm={this.onConfirm}
-              onClick={this.onClick}
-              onCancel={this.onCancel}
-            >
-              插入
-            </ModalButton>,
-          ]}
-        /> */}
       </Page>
     );
   }
