@@ -327,15 +327,22 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public configListChange = async (e, param) => {
-    const processConfigs = this.state.processConfigs.map(item => {
+  public configListChange = async (e, processId, param) => {
+    const processList = [...this.state.processList];
+
+    const pIndex = _.findIndex(processList, item => {
+      return item.processId === processId;
+    });
+    const processConfigs = processList[pIndex].processConfigs;
+
+    const processConfigsData = processConfigs.map(item => {
       if (item.id === param.id) {
         item.status = e.target.checked;
       }
       return item;
     });
     const { error, data } = await wkProcessConfigModify({
-      configList: processConfigs.map(item => {
+      configList: processConfigsData.map(item => {
         return {
           configId: item.configId,
           status: item.status,
@@ -456,7 +463,7 @@ class ApprovalProcessConfiguration extends PureComponent {
             return (
               <p key={item.id}>
                 <Checkbox
-                  onChange={e => this.configListChange(e, item)}
+                  onChange={e => this.configListChange(e, tab.processId, item)}
                   defaultChecked={!!item.status}
                 >
                   {GTE_PROCESS_CONFIGS(item.configName)}
