@@ -491,6 +491,21 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+          {
+            headerName: '自定义报告管理',
+            field: 'reportsCustomManagement',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
         ],
       },
       {

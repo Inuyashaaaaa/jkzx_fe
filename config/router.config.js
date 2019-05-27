@@ -230,6 +230,11 @@ export default [
               name: 'customerFundsSummaryStatements',
               component: './ReportsCustomerFundsSummaryStatements/index',
             },
+            {
+              path: '/reports/custom',
+              name: 'reportsCustomManagement',
+              component: './ReportsCustomManagement/index',
+            },
           ],
         },
         {
