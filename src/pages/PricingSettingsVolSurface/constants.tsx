@@ -2,10 +2,14 @@ import React from 'react';
 import { INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/containers/_Form2';
 import { IColumnDef } from '@/containers/_Table2';
-import { getCanUsedTranorsOtionsNotIncludingSelf } from '@/services/common';
 import { OptionProps } from 'antd/lib/select';
 import FormItem from 'antd/lib/form/FormItem';
-import { Select } from '@/containers';
+import {
+  getCanUsedTranorsOtions,
+  getCanUsedTranorsOtionsNotIncludingSelf,
+} from '@/services/common';
+import { Form2, Input, Select } from '@/containers';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 
 export const TRADER_VALUE = 'trader';
 
@@ -166,56 +170,158 @@ export const SEARCH_FORM_CONTROLS: (groups: OptionProps[], formData: any) => IFo
   },
 ];
 
-export const TABLE_COLUMN = [
+export const TABLE_COLUMN = tableDataSource => [
   {
-    dataIndex: 'tenor',
     title: '期限',
-    // input: {
-    //   type: 'select',
-    //   options: getCanUsedTranorsOtionsNotIncludingSelf([]),
-    // },
+    dataIndex: 'tenor',
+    defaultEditing: false,
+    editable: record => {
+      return true;
+    },
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <Select
+              defaultOpen={true}
+              autoSelect={true}
+              //   style={{ minWidth: 180 }}
+              options={getCanUsedTranorsOtions(
+                tableDataSource.map(item => Form2.getFieldsValue(item)),
+                Form2.getFieldsValue(record)
+              )}
+              editing={editing}
+            />
+          )}
+        </FormItem>
+      );
+    },
   },
   {
     dataIndex: '80% SPOT',
     title: '80% SPOT',
-    // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     percent: 0.8,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+          )}
+        </FormItem>
+      );
+    },
   },
   {
     dataIndex: '90% SPOT',
     title: '90% SPOT',
-    // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     percent: 0.9,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+          )}
+        </FormItem>
+      );
+    },
   },
   {
     dataIndex: '95% SPOT',
     title: '95% SPOT',
-    // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     percent: 0.95,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+          )}
+        </FormItem>
+      );
+    },
   },
   {
     dataIndex: '100% SPOT',
     title: '100% SPOT',
-    // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     percent: 1,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+          )}
+        </FormItem>
+      );
+    },
   },
   {
     dataIndex: '105% SPOT',
     title: '105% SPOT',
-    // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     percent: 1.05,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+          )}
+        </FormItem>
+      );
+    },
   },
   {
     dataIndex: '110% SPOT',
     title: '110% SPOT',
-    // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     percent: 1.1,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+          )}
+        </FormItem>
+      );
+    },
   },
   {
     dataIndex: '120% SPOT',
     title: '120% SPOT',
-    // input: INPUT_NUMBER_PERCENTAGE_CONFIG,
     percent: 1.2,
+    editable: record => {
+      return true;
+    },
+    defaultEditing: false,
+    render: (val, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({})(
+            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+          )}
+        </FormItem>
+      );
+    },
   },
 ];
 

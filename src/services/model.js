@@ -272,9 +272,9 @@ export async function saveModelVolSurface(params) {
           return {
             tenor: record.tenor,
             vols: columns
-              .filter(col => col.field !== 'tenor')
+              .filter(col => col.dataIndex !== 'tenor')
               .map(col => {
-                const { percent, headerName: label } = col;
+                const { percent, title: label } = col;
                 return {
                   label,
                   quote: new BigNumber(record[label])
