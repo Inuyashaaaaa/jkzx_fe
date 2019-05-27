@@ -14,7 +14,7 @@ import { TRADESCOLDEFS_LEG_FIELD_MAP, TRADESCOL_FIELDS, VERTICAL_GUTTER } from '
 import { LEG_ENV } from '@/constants/legs';
 import { DATE_LEG_FIELDS } from '@/constants/legType';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-import { createLegDataSourceItem } from '@/services/pages';
+import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
 import styles from '@/styles/index.less';
@@ -35,6 +35,7 @@ import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { memo, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import BigNumber from 'bignumber.js';
 
 const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
 
@@ -133,6 +134,15 @@ const TradeManagementPricingManagement = props => {
 
   const handleShowSizeChange = (current, pageSize) => {
     onPagination(current, pageSize);
+  };
+
+  const handleTradescol = params => {
+    return _.mapValues(params, (value, key) => {
+      if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
+        return value;
+      }
+      return value ? new BigNumber(value).multipliedBy(100).toNumber() : value;
+    });
   };
 
   useLifecycles(() => {
@@ -408,7 +418,7 @@ const TradeManagementPricingManagement = props => {
                       unit: '￥',
                     });
                   }
-                  return `${val}%`;
+                  return `${new BigNumber(val).multipliedBy(100).toNumber()}%`;
                 },
               },
               {
@@ -480,18 +490,19 @@ const TradeManagementPricingManagement = props => {
                             }
                             return {
                               ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-                              ...Form2.createFields({
-                                ..._.mapValues(asset, (val, key) => {
-                                  if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
-                                    return moment(val);
-                                  }
-                                  return val;
-                                }),
-                                ..._.pick(position, TRADESCOL_FIELDS),
-                              }),
+                              ...backConvertPercent(
+                                Form2.createFields({
+                                  ..._.mapValues(asset, (val, key) => {
+                                    if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                                      return moment(val);
+                                    }
+                                    return val;
+                                  }),
+                                  ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
+                                })
+                              ),
                             };
                           });
-
                           setTableData(next);
                           setVisible(false);
                         }}
