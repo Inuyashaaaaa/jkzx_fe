@@ -423,6 +423,11 @@ export const NOTIONAL_AMOUNT_TYPE_MAP = {
   CNY: 'CNY',
 };
 
+export const REBATETYPE_UNIT_OPTIONS_MAP = {
+  PERCENT: 'PERCENT',
+  CNY: 'CNY',
+};
+
 export const PREMIUM_TYPE_MAP = UNIT_ENUM_MAP;
 
 export const PREMIUM_TYPE_ZHCN_MAP = UNIT_ENUM_ZHCN_MAP;

@@ -8,6 +8,7 @@ import {
   REBATETYPE_TYPE_OPTIONS,
   OBSERVATION_TYPE_OPTIONS,
   REBATETYPE_UNIT_OPTIONS,
+  REBATETYPE_UNIT_OPTIONS_MAP,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/containers';
@@ -27,17 +28,20 @@ export const Rebate: ILegColDef = {
     }
     return true;
   },
-  defaultEditing: record => {
-    return false;
-  },
+  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-
+    const getUnit = () => {
+      if (_.get(record, [LEG_FIELD.REBATE_UNIT, 'value']) === REBATETYPE_UNIT_OPTIONS_MAP.CNY) {
+        return '¥';
+      }
+      return '%';
+    };
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<UnitInputNumber autoSelect={true} unit="%" editing={editing} />)}
+        })(<UnitInputNumber autoSelect={true} unit={getUnit()} editing={editing} />)}
       </FormItem>
     );
   },
