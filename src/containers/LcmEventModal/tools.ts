@@ -23,7 +23,10 @@ export const getObservertionFieldData = data => {
               'days'
             );
       const daysInYear = data[LEG_FIELD.DAYS_IN_YEAR];
-      const cuponPayment = data[LEG_FIELD.COUPON_PAYMENT];
+      const cuponPayment = new BigNumber(data[LEG_FIELD.COUPON_PAYMENT])
+        .multipliedBy(0.01)
+        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+        .toNumber();
       const notionalAmount = data[LEG_FIELD.NOTIONAL_AMOUNT];
       const knockDirection = data[LEG_FIELD.KNOCK_DIRECTION];
       const initialSpot = data[LEG_FIELD.INITIAL_SPOT];

@@ -10,6 +10,7 @@ import {
   NOTION_ENUM_MAP,
   OB_DAY_FIELD,
   OPTION_TYPE_OPTIONS,
+  STRIKE_TYPES_MAP,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
@@ -367,7 +368,9 @@ class ExpirationModal extends PureComponent<
               input: {
                 disabled: true,
                 type: 'select',
-                options: OPTION_TYPE_OPTIONS,
+                options: isKnockIn(this.data)
+                  ? OPTION_TYPE_OPTIONS
+                  : [{ label: '未敲入', value: 'CALL' }, { label: '未敲入', value: 'PUT' }],
               },
               decorator: {
                 rules: [getRequiredRule()],
@@ -378,7 +381,11 @@ class ExpirationModal extends PureComponent<
                   {
                     field: LEG_FIELD.STRIKE,
                     control: {
-                      label: '行权价',
+                      label:
+                        this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] ===
+                        STRIKE_TYPES_MAP.PERCENT
+                          ? '行权价(%)'
+                          : '行权价(￥)',
                     },
                     input: {
                       ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
