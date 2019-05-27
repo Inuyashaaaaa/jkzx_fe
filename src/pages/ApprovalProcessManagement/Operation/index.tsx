@@ -1,6 +1,6 @@
-import ModalButton from '@/components/ModalButton';
+import ModalButton from '@/containers/ModalButton';
 import { queryProcessDiagram } from '@/services/approval';
-import { Col, Row, Button, Model } from 'antd';
+import { Col, Row, Button, Modal, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import ApprovalForm from './ApprovalForm';
 import TransactionForm from './TransactionForm';
@@ -55,47 +55,28 @@ class Operation extends PureComponent {
   public render() {
     return (
       <>
-        <Row type="flex" justify="start">
-          <Col>
-            <ModalButton
-              type="primary"
-              size="small"
-              onClick={this.switchDiagramModal}
-              modalProps={{
-                title: '流程图',
-                visible: this.state.diagramVisible,
-                footer: null,
-                width: 720,
-                onCancel: this.hideDiagramModal,
-              }}
-              content={
-                <img
-                  src={this.state.flowDiagram}
-                  style={{ width: 650 }}
-                  alt="图片加载出错，请重试"
-                />
-              }
-            >
-              查看流程图
-            </ModalButton>
-          </Col>
-          <Col>
-            <ModalButton
-              type="primary"
-              size="small"
-              onClick={this.switchModal}
-              modalProps={{
-                title: '审批单',
-                visible: this.state.visible,
-                footer: null,
-                width: 900,
-                onCancel: this.handleFormChange,
-              }}
-              content={this.handleContent()}
-            >
-              查看审批单
-            </ModalButton>
-          </Col>
+        <Row>
+          <a onClick={this.switchDiagramModal}>查看流程图</a>
+          <Divider type="vertical" />
+          <a onClick={this.switchModal}>查看审批单</a>
+          <Modal
+            title="流程图"
+            visible={this.state.diagramVisible}
+            width={700}
+            onCancel={this.hideDiagramModal}
+            footer={false}
+          >
+            <img src={this.state.flowDiagram} style={{ width: 650 }} alt="图片加载出错，请重试" />
+          </Modal>
+          <Modal
+            title="审批单"
+            visible={this.state.visible}
+            width={900}
+            onCancel={this.handleFormChange}
+            footer={false}
+          >
+            {this.handleContent()}
+          </Modal>
         </Row>
       </>
     );

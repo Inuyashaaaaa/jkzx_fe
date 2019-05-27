@@ -1,6 +1,6 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/components/Form';
-import SourceTable from '@/components/SourceTable';
+import Form from '@/containers/Form';
+import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import {
@@ -12,7 +12,7 @@ import { Button, Modal, message, Row, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS } from './constants';
 import { trdTradeListByBook } from '@/services/general-service';
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
 import Operation from './Operation';
 

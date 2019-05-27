@@ -4,8 +4,7 @@ import {
   LEG_FIELD,
   OB_DAY_FIELD,
 } from '@/constants/common';
-import { isAutocallPhoenix } from '@/tools';
-import { getMoment } from '@/utils';
+import { isAutocallPhoenix, getMoment } from '@/tools';
 import BigNumber from 'bignumber.js';
 import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from './constants';
 

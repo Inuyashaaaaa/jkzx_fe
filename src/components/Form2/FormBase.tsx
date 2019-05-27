@@ -1,4 +1,4 @@
-import { Button, Col, Form as AntdForm, Row } from 'antd';
+import { Col, Form as AntdForm, Row } from 'antd';
 import { FormComponentProps } from 'antd/lib/form/Form';
 import classNames from 'classnames';
 import _, { chunk, omit } from 'lodash';
@@ -7,6 +7,7 @@ import { EVERY_EVENT_TYPE } from '../../utils';
 import { IFormBaseProps, IFormColDef } from '../type';
 import SwitchCell from './cells/SwitchCell';
 import { FORM_CELL_EDITING_CHANGED } from './constants';
+import DefaultFooter from './DefaultFooter';
 import FormManager from './formManager';
 import './index.less';
 
@@ -115,11 +116,13 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
     const {
       footer,
       submitLoading,
-      submitable,
       submitText,
+      submitable,
       resetable,
-      resetText,
       resetLoading,
+      resetText,
+      submitButtonProps,
+      resetButtonProps,
     } = this.props;
 
     if (typeof footer === 'boolean' || React.isValidElement(footer)) {
@@ -128,24 +131,20 @@ class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
 
     return (
       <AntdForm.Item {...this.getButtonItemLayout()}>
-        <Button.Group>
-          {!!submitable && (
-            <Button
-              // htmlType="submit"
-              type="primary"
-              {...this.props.submitButtonProps}
-              loading={submitLoading}
-              onClick={this.onSubmit}
-            >
-              {submitText}
-            </Button>
-          )}
-          {!!resetable && (
-            <Button {...this.props.resetButtonProps} onClick={this.onReset} loading={resetLoading}>
-              {resetText}
-            </Button>
-          )}
-        </Button.Group>
+        <DefaultFooter
+          {...{
+            submitable,
+            submitLoading,
+            submitText,
+            resetable,
+            resetLoading,
+            resetText,
+            onSubmitButtonClick: this.onSubmit,
+            onResetButtonClick: this.onReset,
+            submitButtonProps,
+            resetButtonProps,
+          }}
+        />
       </AntdForm.Item>
     );
   };

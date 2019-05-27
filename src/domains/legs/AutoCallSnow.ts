@@ -20,7 +20,7 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
@@ -59,11 +59,13 @@ import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
-import { commonLinkage } from '../tools';
-import { getMoment } from '@/utils';
+import { commonLinkage } from '../common';
+import { getMoment } from '@/tools';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const AutoCallSnow: ILeg = {
+export const AutoCallSnow: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL],
   type: LEG_TYPE_MAP.AUTOCALL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -91,6 +93,7 @@ export const AutoCallSnow: ILeg = {
         AutoCallStrike,
         ExpireNoBarrierObserveDay,
         UpObservationStep,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -126,6 +129,7 @@ export const AutoCallSnow: ILeg = {
         ExpireNoBarrierObserveDay,
         UpObservationStep,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -160,6 +164,7 @@ export const AutoCallSnow: ILeg = {
         ExpireNoBarrierObserveDay,
         UpObservationStep,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -198,6 +203,7 @@ export const AutoCallSnow: ILeg = {
       ExpireNoBarrierObserveDay.dataIndex,
       LEG_FIELD.IS_ANNUAL,
       LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
@@ -274,4 +280,4 @@ export const AutoCallSnow: ILeg = {
       setTableData
     );
   },
-};
+});

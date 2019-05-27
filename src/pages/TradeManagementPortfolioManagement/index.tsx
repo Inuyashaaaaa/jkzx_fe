@@ -1,8 +1,8 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Input, Select } from '@/components';
-import Form from '@/components/Form';
-import ModalButton from '@/components/ModalButton';
-import SourceTable from '@/components/SourceTable';
+import { Form2, Input, Select } from '@/containers';
+import Form from '@/containers/Form';
+import ModalButton from '@/containers/ModalButton';
+import SourceTable from '@/containers/SourceTable';
 import { IFormColDef } from '@/components/type';
 import Page from '@/containers/Page';
 import {
@@ -125,9 +125,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
         message.success('新建成功');
         this.search();
       });
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   public bindChange = params => async () => {};
@@ -160,8 +158,6 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
   };
 
   public render() {
-    console.log(this.state.dataSource);
-
     return (
       <Page title="投资组合管理">
         <Form2

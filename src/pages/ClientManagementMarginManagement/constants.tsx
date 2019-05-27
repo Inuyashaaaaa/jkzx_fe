@@ -3,8 +3,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   MARGIN_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
-import { IFormControl } from '@/components/Form/types';
-import { IColumnDef } from '@/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
@@ -12,7 +12,8 @@ import {
 import React from 'react';
 import Operations from './Operations';
 import { formatMoney } from '@/tools';
-
+import { Select } from '@/containers';
+import _ from 'lodash';
 export const TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {
     headerName: '交易对手',
@@ -59,7 +60,6 @@ export const TABLE_COLUMNS = fetchTable => [
   {
     title: '交易对手',
     dataIndex: 'legalName',
-    width: 150,
   },
   {
     title: '可用资金 (¥)',
@@ -97,14 +97,18 @@ export const TABLE_COLUMNS = fetchTable => [
     title: '状态',
     width: 150,
     dataIndex: 'status',
-    // input: {
-    //   type: 'select',
-    //   options: MARGIN_STATUS_TYPE_OPTIONS,
-    // },
+    render: (value, record, index) => {
+      return MARGIN_STATUS_TYPE_OPTIONS[
+        _.findIndex(MARGIN_STATUS_TYPE_OPTIONS, item => {
+          return item.value === value;
+        })
+      ].label;
+    },
   },
   {
     title: '操作',
     width: 250,
+    fixed: 'right',
     render: (text, record, index) => {
       return <Operations record={text} fetchTable={fetchTable} />;
     },

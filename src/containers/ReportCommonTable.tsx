@@ -1,10 +1,10 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import Page from '@/containers/Page';
 import { rptReportNameList } from '@/services/report-service';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import { ConfigProvider, Divider, message, Table } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';

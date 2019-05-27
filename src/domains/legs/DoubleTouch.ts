@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   LEG_TYPE_MAP,
@@ -18,7 +18,7 @@ import {
 } from '@/constants/global';
 import _ from 'lodash';
 import moment from 'moment';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   LEG_ENV,
@@ -48,13 +48,15 @@ import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { RebateType } from '../legFields/RebateType';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const DoubleTouch: ILeg = {
+export const DoubleTouch: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DOUBLE_TOUCH],
   type: LEG_TYPE_MAP.DOUBLE_TOUCH,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -75,6 +77,7 @@ export const DoubleTouch: ILeg = {
         Term,
         ExpirationDate,
         NotionalAmount,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -106,6 +109,7 @@ export const DoubleTouch: ILeg = {
         PaymentType,
         Payment,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -136,6 +140,7 @@ export const DoubleTouch: ILeg = {
         PaymentType,
         Payment,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -165,7 +170,7 @@ export const DoubleTouch: ILeg = {
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [LEG_FIELD.UNIT];
+    const COMPUTED_FIELDS = [LEG_FIELD.UNIT, LEG_FIELD.TRADE_NUMBER];
 
     nextPosition.productType = LEG_TYPE_MAP.DOUBLE_TOUCH;
     nextPosition.lcmEventType = 'OPEN';
@@ -224,4 +229,4 @@ export const DoubleTouch: ILeg = {
       setTableData
     );
   },
-};
+});

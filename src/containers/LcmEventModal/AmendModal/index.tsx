@@ -8,7 +8,7 @@ import { Modal, message } from 'antd';
 import _ from 'lodash';
 import React, { memo, useState, useRef } from 'react';
 import { convertTradePositions } from '@/services/pages';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { ITableData } from '@/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import moment from 'moment';

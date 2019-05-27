@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Tree, Button, Modal, notification } from 'antd';
 import AuthTable from './AuthTable';
-import { getUser } from '@/utils/authority';
+import { getUser } from '@/tools/authority';
 
 import CommonTree from '../SystemSettingDepartment/components/CommonTree';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
@@ -368,7 +368,6 @@ export default class ResourceManagement extends PureComponent {
   };
 
   executeUpate = async (data, action) => {
-    console.log(data);
     let hintMethod = function() {};
     let message = '';
     switch (action) {

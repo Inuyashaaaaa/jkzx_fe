@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -17,7 +17,7 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
@@ -54,14 +54,16 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { RebateType } from '../legFields/RebateType';
 import { LowStrike } from '../legFields/LowStrike';
 import { HighStrike } from '../legFields/HighStrike';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const VerticalSpread: ILeg = {
+export const VerticalSpread: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VERTICAL_SPREAD],
   type: LEG_TYPE_MAP.VERTICAL_SPREAD,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -83,6 +85,7 @@ export const VerticalSpread: ILeg = {
         ExpirationDate,
         ParticipationRate,
         NotionalAmount,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -110,6 +113,7 @@ export const VerticalSpread: ILeg = {
         PremiumType,
         Premium,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -136,6 +140,7 @@ export const VerticalSpread: ILeg = {
         PremiumType,
         Premium,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -173,6 +178,7 @@ export const VerticalSpread: ILeg = {
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;
@@ -227,4 +233,4 @@ export const VerticalSpread: ILeg = {
       setTableData
     );
   },
-};
+});

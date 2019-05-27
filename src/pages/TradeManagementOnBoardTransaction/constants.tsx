@@ -3,7 +3,7 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   INPUT_NUMBER_LOT_CONFIG,
 } from '@/constants/common';
-import { IFormControl } from '@/components/Form/types';
+import { IFormControl } from '@/containers/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import { formatMoney } from '@/tools';

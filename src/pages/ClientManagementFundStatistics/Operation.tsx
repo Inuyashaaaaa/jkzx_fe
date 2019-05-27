@@ -1,10 +1,10 @@
-import { Form2, InputNumber, Upload } from '@/components';
+import { Form2, InputNumber, Upload } from '@/containers';
 import { UPLOAD_URL, wkProcessGet, wkProcessInstanceCreate } from '@/services/approval';
 import {
   clientUpdateCredit,
   wkAttachmentProcessInstanceBind,
 } from '@/services/reference-data-service';
-import { getToken } from '@/utils/authority';
+import { getToken } from '@/tools/authority';
 import { Alert, Button, Icon, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -120,9 +120,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public render() {
     return (
       <>
-        <Button type="primary" onClick={this.switchModal} size="small">
-          调整授信额度
-        </Button>
+        <a onClick={this.switchModal}>调整授信额度</a>
         <Modal
           visible={this.state.visible}
           onOk={this.onConfirm}

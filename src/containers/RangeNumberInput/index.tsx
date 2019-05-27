@@ -1,4 +1,4 @@
-import { InputPolym } from '@/components/Form/Input/InputPolym';
+import { InputPolym } from '@/containers/Form/Input/InputPolym';
 import { Col, InputNumber, Row } from 'antd';
 import React from 'react';
 

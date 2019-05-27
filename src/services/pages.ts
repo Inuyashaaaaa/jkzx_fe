@@ -9,15 +9,14 @@ import {
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
 } from '@/constants/common';
-import { IFormControl } from '@/components/Form/types';
-import { uuid, getMoment } from '@/utils';
+import { Form2 } from '@/containers';
+import { IFormControl } from '@/containers/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
-import { getLegByType } from '@/tools';
+import { getLegByType, getMoment, uuid } from '@/tools';
 import { ILeg } from '@/types/leg';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { Form2 } from '@/components';
 
 export const createLegDataSourceItem = (leg: ILeg, env: string) => {
   return {

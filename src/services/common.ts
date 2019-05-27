@@ -16,7 +16,7 @@ export const getCanUsedTranors = usedTranors => {
 // 获取所有可用的期限下拉 options 选项
 export const getCanUsedTranorsOtions = (
   tableDataSource: Array<{ tenor: any }>,
-  record: { tenor }
+  record: { tenor?: any }
 ) => {
   return getCanUsedTranors(
     tableDataSource.map(item => item.tenor).filter(item => item !== record.tenor)

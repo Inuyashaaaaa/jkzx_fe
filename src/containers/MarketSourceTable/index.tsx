@@ -1,4 +1,4 @@
-import SourceList from '@/components/_SourceList';
+import SourceList from '@/containers/_SourceList';
 import {
   prefPreferenceCreate,
   prefPreferenceDividendInstrumentAdd,

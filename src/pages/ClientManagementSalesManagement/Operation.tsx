@@ -1,8 +1,8 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
-import ModalButton from '@/components/ModalButton';
-import { arr2treeOptions } from '@/utils';
+import PopconfirmButton from '@/containers/PopconfirmButton';
+import ModalButton from '@/containers/ModalButton';
+import { arr2treeOptions } from '@/tools';
 import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales';
-import { Col, message, Row } from 'antd';
+import { Col, message, Row, Popconfirm, Modal, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
 
@@ -98,44 +98,26 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
 
   public render() {
     return (
-      <Row type="flex" justify="start">
-        <Col>
-          <ModalButton
-            key="create"
-            style={{ marginBottom: '20px' }}
-            type="primary"
-            size="small"
-            onClick={this.switchModal}
-            modalProps={{
-              title: '编辑销售',
-              visible: this.state.visible,
-              comfirmLoading: this.state.confirmLoading,
-              onCancel: this.onCancel,
-              onOk: this.onEdit,
-            }}
-            content={
-              <CreateFormModal
-                dataSource={this.state.editFormData}
-                handleValueChange={this.handleValueChange}
-                branchSalesList={this.state.branchSalesList}
-              />
-            }
-          >
-            编辑
-          </ModalButton>
-        </Col>
-        <Col>
-          <PopconfirmButton
-            type="danger"
-            size="small"
-            popconfirmProps={{
-              title: '确定要删除吗?',
-              onConfirm: this.onRemove,
-            }}
-          >
-            删除
-          </PopconfirmButton>
-        </Col>
+      <Row>
+        <a onClick={this.switchModal}>编辑</a>
+        <Divider type="vertical" />
+        <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
+          <a style={{ color: 'red' }}>删除</a>
+        </Popconfirm>
+        <Modal
+          title="编辑销售"
+          visible={this.state.visible}
+          width={700}
+          onCancel={this.onCancel}
+          onOk={this.onEdit}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <CreateFormModal
+            dataSource={this.state.editFormData}
+            handleValueChange={this.handleValueChange}
+            branchSalesList={this.state.branchSalesList}
+          />
+        </Modal>
       </Row>
     );
   }

@@ -1,5 +1,5 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IFormControl } from '@/components/Form/types';
+import { IFormControl } from '@/containers/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
 export const OUR_CREATE_FORM_CONTROLS: (margin, premium, cash) => IFormControl[] = (

@@ -1,4 +1,4 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import { deleteNonGroupResource } from '@/services/tradeBooks';
 import { message } from 'antd';
 import React, { PureComponent } from 'react';

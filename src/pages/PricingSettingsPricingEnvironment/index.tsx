@@ -1,8 +1,8 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import CascaderSourceList from '@/components/_CascaderSourceList';
-import Form, { IFormControl } from '@/components/_Form2';
+import CascaderSourceList from '@/containers/_CascaderSourceList';
+import Form, { IFormControl } from '@/containers/_Form2';
 import Page from '@/containers/Page';
-import { delay } from '@/utils';
+import { delay } from '@/tools';
 import { Col, Row } from 'antd';
 import memo from 'memoize-one';
 import React, { PureComponent } from 'react';
@@ -67,7 +67,7 @@ class PricingSettingsPricingEnvironment extends PureComponent {
     //   [OPTION_KEY, SUBJECT_KEY, DATE_KEY, POSITION_KEY],
     //   [OPTION_KEY, SUBJECT_KEY, DATE_KEY, POSITION_KEY]
     // );
-    // console.log(nodes);
+    //
     return options;
   });
 

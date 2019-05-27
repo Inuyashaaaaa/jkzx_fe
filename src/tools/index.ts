@@ -34,11 +34,14 @@ import { Asia } from '@/domains/legs/Asia';
 import { Straddle } from '@/domains/legs/Straddle';
 import { Forward } from '@/domains/legs/Forward';
 import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { ITableData } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import BigNumber from 'bignumber.js';
 import { notification } from 'antd';
+import moment, { isMoment } from 'moment';
+import mapTree from './mapTree';
+import request from './request';
 
 export const isModelXY = data => {
   return (
@@ -370,3 +373,31 @@ export const getLocaleId = (parent, item) => {
   }
   return `menu.${item.name}`;
 };
+
+export { request };
+export { mapTree };
+export * from './utils';
+export * from './extensibleProduce';
+
+export const convertOptions = (maps, zhcn) => {
+  return Object.keys(maps).map(key => ({
+    label: zhcn[key],
+    value: maps[key],
+  }));
+};
+
+// NOTE: 如果 val 是空，则返回当前时间
+export const getMoment = (val, clone = false) => {
+  return isMoment(val) ? (clone ? val.clone() : val) : !!val ? moment(val) : moment();
+};
+
+export * from './delay';
+export * from '../utils/eventBus';
+export * from '../utils/isShallowEqual';
+export * from './mockData';
+export * from './someDeep';
+export * from '../utils/uuid';
+export * from './utils';
+export * from './toggleItem';
+export * from './getDiffAttrs';
+export * from './pathTools';

@@ -1,5 +1,5 @@
 import { queryVolatilityCalendars } from '@/services/volatility';
-import { getToken } from '@/utils/authority';
+import { getToken } from '@/tools/authority';
 
 export default {
   namespace: 'expirationDate',

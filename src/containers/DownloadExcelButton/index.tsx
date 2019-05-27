@@ -4,8 +4,8 @@ import { AnchorButtonProps, NativeButtonProps } from 'antd/lib/button/button';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import XLSX from 'xlsx';
-import { Form2 } from '@/components';
-import { getMoment } from '@/utils';
+import { Form2 } from '@/containers';
+import { getMoment } from '@/tools';
 
 /* list of supported file types */
 const SheetJSFT = [
@@ -86,7 +86,7 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     );
     if (this.props.tabs) {
       // 多sheet表导出
-      console.log(this.props.tabs);
+
       const wb = XLSX.utils.book_new();
       this.props.tabs.forEach((item, index) => {
         const ws = XLSX.utils.aoa_to_sheet(dataSource[index]);

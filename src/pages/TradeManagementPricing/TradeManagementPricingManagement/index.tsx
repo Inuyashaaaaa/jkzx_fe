@@ -1,4 +1,4 @@
-import { Form2, Input, Loading, Select } from '@/components';
+import { Form2, Input, Loading, Select } from '@/containers';
 import {
   DIRECTION_OPTIONS,
   DIRECTION_TYPE_ZHCN_MAP,
@@ -18,7 +18,7 @@ import { createLegDataSourceItem } from '@/services/pages';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
 import styles from '@/styles/index.less';
-import { formatMoney, getLegByProductType } from '@/tools';
+import { formatMoney, getLegByProductType, formatNumber } from '@/tools';
 import {
   DatePicker,
   Divider,
@@ -430,7 +430,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
                 width: 150,
                 render: (val, record) => {
-                  return val;
+                  return formatNumber(val, 2);
                 },
               },
               {
@@ -438,7 +438,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.R,
                 width: 150,
                 render: (val, record) => {
-                  return val;
+                  return formatNumber(val, 2);
                 },
               },
               {
@@ -446,7 +446,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.Q,
                 width: 150,
                 render: (val, record) => {
-                  return val;
+                  return formatNumber(val, 2);
                 },
               },
               {
@@ -471,7 +471,10 @@ const TradeManagementPricingManagement = props => {
 
                           const next = quotePositions.map(position => {
                             const { productType, asset } = position;
-                            const leg = getLegByProductType(productType);
+                            const leg = getLegByProductType(
+                              productType,
+                              position.asset.exerciseType
+                            );
                             if (!leg) {
                               throw new Error(`${productType} is not defiend!`);
                             }

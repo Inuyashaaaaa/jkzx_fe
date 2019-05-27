@@ -1,8 +1,21 @@
-import ImportExcelButton from '@/components/_ImportExcelButton';
+import ImportExcelButton from '@/containers/_ImportExcelButton';
 import Page from '@/containers/Page';
 import { trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mdlModelDataGet, mdlModelXYCreate } from '@/services/model';
-import { Button, Input, message, Modal, notification, Row, Select, Spin, Table, Tabs } from 'antd';
+import {
+  Button,
+  Input,
+  message,
+  Modal,
+  notification,
+  Row,
+  Select,
+  Spin,
+  Table,
+  Tabs,
+  Empty,
+  List,
+} from 'antd';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
@@ -82,6 +95,7 @@ const useList = () => {
       item.positions.forEach(param => {
         const obj = { ...item };
         obj.positions = param;
+        obj.id = _.random(10, true);
         positions = positions.concat(obj);
       });
     });
@@ -283,7 +297,8 @@ const CustomModel = memo(() => {
     setTradeList(positions);
   };
 
-  const handleSelect = async param => {
+  const handleSelect = async (e, param) => {
+    console.log(param);
     setCurrentTrade(param);
     setTableLoading(true);
     const { data, error } = await mdlModelDataGet({
@@ -365,7 +380,7 @@ const CustomModel = memo(() => {
         return tabData;
       });
       const wb = XLSX.utils.book_new();
-      console.log(_data);
+
       cols.forEach((item, index) => {
         const ws = XLSX.utils.aoa_to_sheet(_data[index]);
         XLSX.utils.book_append_sheet(wb, ws, item);
@@ -391,7 +406,7 @@ const CustomModel = memo(() => {
     });
     XLSX.writeFile(wb, `${PRODUCTTYPE}_${currentTrade.tradeId}.xlsx`);
   };
-
+  console.log(currentTrade);
   return (
     <div className={styles.customModel}>
       <Page title="自定义模型（MODEL_XY）">
@@ -404,7 +419,7 @@ const CustomModel = memo(() => {
             />
           </p>
           <Spin spinning={loading}>
-            <ul style={{ marginTop: '20px' }} className={styles.searchList}>
+            {/* <ul style={{ marginTop: '20px' }} className={styles.searchList}>
               {tradeList.map((item, index) => {
                 return (
                   <li
@@ -429,7 +444,52 @@ const CustomModel = memo(() => {
                   </li>
                 );
               })}
-            </ul>
+            </ul> */}
+            <List
+              itemLayout="vertical"
+              size="large"
+              pagination={{
+                onChange: page => {
+                  console.log(page);
+                },
+                pageSize: 10,
+              }}
+              dataSource={tradeList}
+              footer={null}
+              className={styles.searchList}
+              renderItem={item => {
+                console.log(item.positions.positionId);
+                return (
+                  <List.Item
+                    key={item.id}
+                    className={
+                      currentTrade &&
+                      currentTrade.positions &&
+                      currentTrade.positions.positionId === item.positions.positionId
+                        ? styles.checked
+                        : styles.liItme
+                    }
+                  >
+                    <div
+                      style={{
+                        width: '100%',
+                        paddingLeft: '20px',
+                      }}
+                      onClick={e => handleSelect(e, item)}
+                    >
+                      <span className={styles.itemName}>
+                        {item.tradeId}
+                        <br />
+                        标的物 {item.positions.asset.underlyerInstrumentId}
+                        <br />
+                        到期日 {item.positions.asset.expirationDate}
+                        <br />
+                      </span>
+                    </div>
+                  </List.Item>
+                );
+              }}
+            />
           </Spin>
         </div>
         <div
@@ -481,7 +541,8 @@ const CustomModel = memo(() => {
               </Tabs>
             </div>
           ) : (
-            <span className={styles.center}>请先选中一个标的物</span>
+            // <span className={styles.center}>请先选中一个标的物</span>
+            <Empty className={styles.center} />
           )}
         </div>
       </Page>
@@ -491,7 +552,6 @@ const CustomModel = memo(() => {
             key="import"
             type="primary"
             onImport={data => {
-              console.log('data', data);
               setFile(data.fileName);
               setUploadData(data);
             }}

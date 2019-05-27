@@ -6,7 +6,7 @@ import {
   LEG_TYPE_FIELD,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
-import Form from '@/components/Form';
+import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { Alert, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';

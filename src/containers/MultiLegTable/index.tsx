@@ -1,23 +1,22 @@
 import {
   BIG_NUMBER_CONFIG,
+  LEG_ENV_FIELD,
   LEG_FIELD,
   LEG_ID_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
-  LEG_ENV_FIELD,
 } from '@/constants/common';
-import { TOTAL_LEGS, LEG_ENV } from '@/constants/legs';
-import { Form2, Loading, Table2 } from '@/components';
+import { TOTAL_FIELD } from '@/constants/global';
+import { TOTAL_LEGS } from '@/constants/legs';
+import { LEG_FIELD_ORDERS } from '@/constants/legType';
+import { Form2, Loading, Table2 } from '@/containers';
 import { ITableProps } from '@/components/type';
-import { remove, uuid } from '@/utils';
-import { getLegByRecord } from '@/tools';
+import { getLegByRecord, remove, uuid } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { TOTAL_FIELD } from '@/constants/global';
-import { LEG_FIELD_ORDERS } from '@/constants/legType';
 
 const MultiLegTable = memo<
   {

@@ -1,5 +1,5 @@
-import SourceTable from '@/components/_SourceTable';
-import Table from '@/components/_Table2';
+import SourceTable from '@/containers/_SourceTable';
+import Table from '@/containers/_Table2';
 import Page from '@/containers/Page';
 import {
   authRolesList,
@@ -157,7 +157,7 @@ class SystemSettingsPermissions extends PureComponent {
   };
 
   public onCreateRole = async event => {
-    // console.log(event);
+    //
     return createRole(event.createFormData).then(rp => {
       if (rp.error) return false;
       this.fetchTable();

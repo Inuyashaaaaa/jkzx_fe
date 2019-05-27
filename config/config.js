@@ -24,7 +24,7 @@ export default {
           baseNavigator: false, // default true, when it is true, will use `navigator.language` overwrite default
         },
         dynamicImport: {
-          loadingComponent: '/components/_Loading',
+          loadingComponent: '/containers/_Loading',
         },
         ...(!process.env.TEST && os.platform() === 'darwin'
           ? {

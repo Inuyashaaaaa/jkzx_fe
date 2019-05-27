@@ -8,7 +8,7 @@ import {
 } from 'antd/lib/form/Form';
 import { ColumnProps, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
-import { Omit } from './common/types';
+import { Omit } from '../containers/common/types';
 import FormSwitchCell from './Form2/cells/SwitchCell';
 import FormBase from './Form2/FormBase';
 import Table2 from './Table2';
@@ -156,6 +156,7 @@ export interface ITableCellProps<T = ITableData> {
   style?: CSSProperties;
   $$render?: (value: any, record: T, index: number, params: IRenderOptions) => React.ReactNode;
   form?: WrappedFormUtils;
+  vertical?: boolean;
 }
 
 export interface ITableRowProps<T = any> extends FormComponentProps {

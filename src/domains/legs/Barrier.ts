@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -23,7 +23,7 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
@@ -60,7 +60,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Rebate } from '../legFields/Rebate';
 import { ObservationType } from '../legFields/ObservationType';
 import { KnockDirection } from '../legFields/KnockDirection';
@@ -70,8 +70,10 @@ import { BarrierType } from '../legFields/BarrierType';
 import { Barrier } from '../legFields/Barrier';
 import BigNumber from 'bignumber.js';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const BarrierLeg: ILeg = {
+export const BarrierLeg: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.BARRIER],
   type: LEG_TYPE_MAP.BARRIER,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -99,6 +101,7 @@ export const BarrierLeg: ILeg = {
         OptionType,
         RebateUnit,
         BarrierType,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -134,6 +137,7 @@ export const BarrierLeg: ILeg = {
         MinimumPremium,
         ObservationType,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -168,6 +172,7 @@ export const BarrierLeg: ILeg = {
         MinimumPremium,
         ObservationType,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -209,6 +214,7 @@ export const BarrierLeg: ILeg = {
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.BARRIER;
@@ -295,4 +301,4 @@ export const BarrierLeg: ILeg = {
       }
     }
   },
-};
+});

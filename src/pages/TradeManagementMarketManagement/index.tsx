@@ -1,4 +1,5 @@
-import { Form2, Select } from '@/components';
+import { Form2, Select } from '@/containers';
+import SourceTable from '@/containers/_SourceTable';
 import Page from '@/containers/Page';
 import {
   mktInstrumentSearch,
@@ -11,7 +12,7 @@ import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { CLOSE_FORM_CONTROLS, columns, INTRADAY_FORM_CONTROLS } from './constants';
 import _ from 'lodash';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 
 const TabPane = Tabs.TabPane;
 

@@ -1,4 +1,4 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import {
   authPagePermissionGetByRoleId,
   deleteRole,
@@ -9,7 +9,7 @@ import { Button, Col, Drawer, message, Row, Tree, Divider, Modal } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { treeData, FORM_CONTROL } from './constants';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 
 const { TreeNode } = Tree;
 
@@ -167,17 +167,11 @@ class Operation extends PureComponent<{ data: any; fetchTable: any; showResource
   public render() {
     return (
       <>
-        <Button type="link" size="small" onClick={this.handleDrawer}>
-          页面权限
-        </Button>
+        <a onClick={this.handleDrawer}>页面权限</a>
         <Divider type="vertical" />
-        <Button type="link" size="small" onClick={this.handleList}>
-          数据权限
-        </Button>
+        <a onClick={this.handleList}>数据权限</a>
         <Divider type="vertical" />
-        <Button type="link" size="small" onClick={this.showModal}>
-          修改角色
-        </Button>
+        <a onClick={this.showModal}>修改角色</a>
         <Divider type="vertical" />
         <PopconfirmButton
           type="link"

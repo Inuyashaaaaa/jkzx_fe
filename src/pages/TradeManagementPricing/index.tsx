@@ -1,5 +1,3 @@
-import { Form2 } from '@/components';
-import { IFormField } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
   LEG_FIELD,
@@ -7,7 +5,6 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  FROM_HISTORY_PRICING_TAG,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -18,9 +15,11 @@ import {
 } from '@/constants/global';
 import { LEG_ENV, TOTAL_COMPUTED_FIELDS, TOTAL_TRADESCOL_FIELDS } from '@/constants/legs';
 import { PRICING_FROM_EDITING } from '@/constants/trade';
+import { Form2 } from '@/containers';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
+import { IFormField } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,
@@ -37,8 +36,7 @@ import { convertTradePositions, createLegDataSourceItem } from '@/services/pages
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
-import { getLegByRecord, getLegByProductType } from '@/tools';
-import { getMoment, insert, remove, uuid } from '@/utils';
+import { getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
 import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
@@ -47,8 +45,6 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import './index.less';
-import { DATE_LEG_FIELDS } from '@/constants/legType';
-import moment from 'moment';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
@@ -164,7 +160,7 @@ const TradeManagementBooking = props => {
     return selfTradesColDataIndexs;
   };
 
-  const fetchDefaultPricingEnvData = _.debounce(async (record, reload = false) => {
+  const fetchDefaultPricingEnvData = async (record, reload = false) => {
     if (judgeLegColumnsHasError(record)) {
       return;
     }
@@ -200,13 +196,16 @@ const TradeManagementBooking = props => {
 
     inlineSetLoadings(true);
 
+    const [position] = convertTradePositions(
+      [Form2.getFieldsValue(_.omit(record, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))],
+      {},
+      LEG_ENV.PRICING
+    );
+
     const { error, data = [], raw } = await prcTrialPositionsService({
-      positions: convertTradePositions(
-        [Form2.getFieldsValue(_.omit(record, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))],
-        {},
-        LEG_ENV.PRICING
-      ),
+      positions: [position],
       pricingEnvironmentId: curPricingEnv,
+      valuationDateTime: _.get(position, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
     });
 
     inlineSetLoadings(false);
@@ -254,7 +253,7 @@ const TradeManagementBooking = props => {
         return item;
       });
     });
-  }, 250);
+  };
 
   const [pricingEnvironmentsList, setPricingEnvironmentsList] = useState([]);
 
@@ -311,6 +310,7 @@ const TradeManagementBooking = props => {
           ),
           ...(item.productType === LEG_TYPE_MAP.FORWARD ? { vol: 1 } : undefined),
           pricingEnvironmentId: curPricingEnv,
+          valuationDateTime: _.get(item, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
         });
       })
     );
@@ -393,6 +393,45 @@ const TradeManagementBooking = props => {
     });
   };
 
+  const onCellFieldsChange = params => {
+    const { record } = params;
+    const leg = getLegByRecord(record);
+
+    setTableData(pre => {
+      const newData = pre.map(item => {
+        if (item[LEG_ID_FIELD] === params.rowId) {
+          return {
+            ...item,
+            ...params.changedFields,
+          };
+        }
+        return item;
+      });
+      if (leg.onDataChange) {
+        leg.onDataChange(
+          LEG_ENV.PRICING,
+          params,
+          newData[params.rowIndex],
+          newData,
+          (colId: string, loading: boolean) => {
+            tableEl.current.setLoadings(params.rowId, colId, loading);
+          },
+          tableEl.current.setLoadingsByRow,
+          (colId: string, newVal: IFormField) => {
+            onCellFieldsChange({
+              ...params,
+              changedFields: {
+                [colId]: newVal,
+              },
+            });
+          },
+          setTableData
+        );
+      }
+      return newData;
+    });
+  };
+
   return (
     <Page>
       <ActionBar
@@ -411,49 +450,7 @@ const TradeManagementBooking = props => {
         totalable={true}
         env={LEG_ENV.PRICING}
         tableEl={tableEl}
-        onCellFieldsChange={params => {
-          const { record } = params;
-          const leg = getLegByRecord(record);
-
-          setTableData(pre => {
-            const newData = pre.map(item => {
-              if (item[LEG_ID_FIELD] === params.rowId) {
-                return {
-                  ...item,
-                  ...params.changedFields,
-                };
-              }
-              return item;
-            });
-            if (leg.onDataChange) {
-              leg.onDataChange(
-                LEG_ENV.PRICING,
-                params,
-                newData[params.rowIndex],
-                newData,
-                (colId: string, loading: boolean) => {
-                  tableEl.current.setLoadings(params.rowId, colId, loading);
-                },
-                tableEl.current.setLoadingsByRow,
-                (colId: string, newVal: IFormField) => {
-                  setTableData(pre => {
-                    return pre.map(item => {
-                      if (item[LEG_ID_FIELD] === params.rowId) {
-                        return {
-                          ...item,
-                          [colId]: newVal,
-                        };
-                      }
-                      return item;
-                    });
-                  });
-                },
-                setTableData
-              );
-            }
-            return newData;
-          });
-        }}
+        onCellFieldsChange={onCellFieldsChange}
         onCellEditingChanged={params => {
           fetchDefaultPricingEnvData(params.record);
         }}

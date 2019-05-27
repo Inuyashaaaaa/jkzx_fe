@@ -19,10 +19,10 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -64,9 +64,11 @@ import { Unit } from '../legFields/Unit';
 import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const AutoCallPhoenix: ILeg = {
+export const AutoCallPhoenix: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX],
   type: LEG_TYPE_MAP.AUTOCALL_PHOENIX,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -98,6 +100,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierOptionsStrike,
         Term,
         ExpirationDate,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -138,6 +141,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrier,
         DownBarrierOptionsStrike,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -177,6 +181,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrier,
         DownBarrierOptionsStrike,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -215,6 +220,7 @@ export const AutoCallPhoenix: ILeg = {
       AlreadyBarrier.dataIndex,
       LEG_FIELD.IS_ANNUAL,
       LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL_PHOENIX;
@@ -307,4 +313,4 @@ export const AutoCallPhoenix: ILeg = {
       setTableData
     );
   },
-};
+});

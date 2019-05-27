@@ -1,4 +1,4 @@
-import { Form2, Loading, Select, Table2 } from '@/components';
+import { Form2, Loading, Select, Table2 } from '@/containers';
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
@@ -18,6 +18,7 @@ import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import { BOOKING_TABLE_COLUMN_DEFS } from '../../constants';
+import SmartForm from '@/containers/SmartForm';
 
 class CommonModel extends PureComponent<any> {
   public $table2: Table2 = null;
@@ -104,8 +105,6 @@ class CommonModel extends PureComponent<any> {
       })
     );
 
-    console.log(tableDataSource);
-
     const { dispatch, name } = this.props;
     dispatch({
       type: 'tradeManagementContractManage/save',
@@ -160,11 +159,25 @@ class CommonModel extends PureComponent<any> {
 
   public render() {
     const { activeTabKey } = this.props;
-    const { tableDataSource, pagination, pageSizeCurrent } = this.props[activeTabKey];
+    const { tableDataSource, pagination, pageSizeCurrent, collapse } = this.props[activeTabKey];
     return (
       <>
-        <Form2
-          ref={node => (this.$table2 = node)}
+        <SmartForm
+          spread={3}
+          onCollapseChange={next => {
+            this.props.dispatch({
+              type: 'tradeManagementContractManage/changeCollapse',
+              payload: {
+                activeTabKey,
+                collapse: next,
+              },
+            });
+          }}
+          collapse={collapse}
+          ref={node => {
+            this.$table2 = node;
+            console.log(this.$table2);
+          }}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText="查询"

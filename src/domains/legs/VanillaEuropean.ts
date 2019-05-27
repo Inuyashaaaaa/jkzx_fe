@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -17,7 +17,7 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/components';
+import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
@@ -54,12 +54,14 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { RebateType } from '../legFields/RebateType';
 import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const VanillaEuropean: ILeg = {
+export const VanillaEuropean: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.VANILLA_EUROPEAN],
   type: LEG_TYPE_MAP.VANILLA_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -80,6 +82,7 @@ export const VanillaEuropean: ILeg = {
         Term,
         ExpirationDate,
         NotionalAmount,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -108,6 +111,7 @@ export const VanillaEuropean: ILeg = {
         MinimumPremium,
         FrontPremium,
         Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -135,6 +139,7 @@ export const VanillaEuropean: ILeg = {
         MinimumPremium,
         FrontPremium,
         Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -173,6 +178,7 @@ export const VanillaEuropean: ILeg = {
       'notional',
       'premiumPercent',
       'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.VANILLA_EUROPEAN;
@@ -227,4 +233,4 @@ export const VanillaEuropean: ILeg = {
       setTableData
     );
   },
-};
+});

@@ -1,11 +1,15 @@
 import React, { PureComponent } from 'react';
 import { formatMessage } from 'umi/locale';
-import { Layout, message } from 'antd';
+import { Layout, message, Modal, Input } from 'antd';
 import Animate from 'rc-animate';
 import { connect } from 'dva';
 import router from 'umi/router';
-import GlobalHeader from '@/components/GlobalHeader';
-import TopNavHeader from '@/components/TopNavHeader';
+import FormItem from 'antd/lib/form/FormItem';
+import { Form2 } from '@/containers';
+import { updateOwnPassword } from '@/services/user';
+import _ from 'lodash';
+import GlobalHeader from '@/containers/GlobalHeader';
+import TopNavHeader from '@/containers/TopNavHeader';
 import styles from './Header.less';
 
 const { Header } = Layout;
@@ -13,6 +17,9 @@ const { Header } = Layout;
 class HeaderView extends PureComponent {
   state = {
     visible: true,
+    updateVisible: false,
+    confirmLoading: false,
+    updateFormData: {},
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -54,6 +61,39 @@ class HeaderView extends PureComponent {
     });
   };
 
+  showModal = () => {
+    const { updateVisible } = this.state;
+    this.setState({ updateVisible: !updateVisible });
+  };
+
+  updatePassword = async () => {
+    const { updateFormData } = this.state;
+    const { currentUser } = this.props;
+    const validateRsp = await this.form.validate();
+    if (validateRsp.error) return;
+    this.setState({ confirmLoading: true });
+    const user = currentUser.username;
+    const params = _.omit(Form2.getFieldsValue(updateFormData), 'confirmpassword');
+    const rsp = await updateOwnPassword({
+      username: user,
+      ...params,
+    });
+    const { data = {} } = rsp;
+    this.setState({ confirmLoading: false });
+    if (data.error) {
+      message.error('修改失败');
+      return;
+    }
+    this.setState({ updateVisible: false, updateFormData: {} });
+    message.success('修改成功');
+  };
+
+  onFieldsChange = (props, fields, allFields) => {
+    this.setState({
+      updateFormData: allFields,
+    });
+  };
+
   handleMenuClick = ({ key }) => {
     const { dispatch } = this.props;
     if (key === 'userinfo') {
@@ -64,6 +104,9 @@ class HeaderView extends PureComponent {
       dispatch({
         type: 'login/logout',
       });
+    }
+    if (key === 'updatePassword') {
+      this.showModal();
     }
   };
 
@@ -110,11 +153,14 @@ class HeaderView extends PureComponent {
   render() {
     const { isMobile, handleMenuCollapse, setting } = this.props;
     const { navTheme, layout, fixedHeader } = setting;
-    const { visible } = this.state;
+    const { visible, updateVisible, confirmLoading, updateFormData } = this.state;
     const isTop = layout === 'topmenu';
     const width = this.getHeadWidth();
     const HeaderDom = visible ? (
-      <Header style={{ padding: 0, width }} className={fixedHeader ? styles.fixedHeader : ''}>
+      <Header
+        style={{ padding: 0, width, zIndex: 2 }}
+        className={fixedHeader ? styles.fixedHeader : ''}
+      >
         {isTop && !isMobile ? (
           <TopNavHeader
             theme={navTheme}
@@ -137,9 +183,101 @@ class HeaderView extends PureComponent {
       </Header>
     ) : null;
     return (
-      <Animate component="" transitionName="fade">
-        {HeaderDom}
-      </Animate>
+      <>
+        <Animate component="" transitionName="fade">
+          {HeaderDom}
+        </Animate>
+        <Modal
+          visible={updateVisible}
+          onCancel={this.showModal}
+          onOk={this.updatePassword}
+          confirmLoading={confirmLoading}
+          maskClosable={false}
+          title="修改密码"
+        >
+          <Form2
+            ref={node => (this.form = node)}
+            columns={[
+              {
+                dataIndex: 'oldPassword',
+                title: '旧密码',
+                render: (val, record, index, { form }) => {
+                  return (
+                    <FormItem>
+                      {form.getFieldDecorator({
+                        rules: [
+                          {
+                            required: true,
+                            message: '必填',
+                          },
+                          // {
+                          //   pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
+                          //   message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
+                          // },
+                        ],
+                      })(<Input.Password placeholder="请输入旧密码" />)}
+                    </FormItem>
+                  );
+                },
+              },
+              {
+                dataIndex: 'newPassword',
+                title: '新密码',
+                render: (val, record, index, { form }) => {
+                  return (
+                    <FormItem>
+                      {form.getFieldDecorator({
+                        rules: [
+                          {
+                            required: true,
+                            message: '必填',
+                          },
+                          {
+                            pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
+                            message:
+                              '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
+                          },
+                        ],
+                      })(
+                        <Input.Password placeholder="至少一位数字、字母以及其他特殊字符，且不少于8位" />
+                      )}
+                    </FormItem>
+                  );
+                },
+              },
+              {
+                dataIndex: 'confirmpassword',
+                title: '确认新密码',
+                render: (val, record, index, { form }) => {
+                  return (
+                    <FormItem>
+                      {form.getFieldDecorator({
+                        rules: [
+                          {
+                            required: true,
+                            message: '必填',
+                          },
+                          {
+                            validator(rule, value, cb) {
+                              if (record.newPassword.value !== value) {
+                                cb('2次密码输入不一致');
+                              }
+                              cb();
+                            },
+                          },
+                        ],
+                      })(<Input.Password placeholder="请与新密码保持一致" />)}
+                    </FormItem>
+                  );
+                },
+              },
+            ]}
+            dataSource={updateFormData}
+            footer={false}
+            onFieldsChange={this.onFieldsChange}
+          />
+        </Modal>
+      </>
     );
   }
 }

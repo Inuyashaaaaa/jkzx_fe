@@ -1,7 +1,7 @@
 import EmailInput from '@/containers/EmailInput';
 import Upload from '@/containers/Upload';
-import { DatePicker, Form2, Input, InputNumber, ModalButton, Select, Table2 } from '@/components';
-import { remove, uuid, getMoment } from '@/utils';
+import { DatePicker, Form2, Input, InputNumber, ModalButton, Select, Table2 } from '@/containers';
+import { remove, uuid, getMoment } from '@/tools';
 import { getPartyDoc, HREF_UPLOAD_URL, UPLOAD_URL } from '@/services/document';
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
 import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';

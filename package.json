@@ -19,12 +19,14 @@
     "lint-staged": "lint-staged",
     "test": "umi test",
     "test:component": "umi test ./src/components",
-    "test:all": "node ./tests/run-tests.js",
     "prettier": "prettier --write './src/**/*'",
     "lint:js": "eslint --fix './src/**/*.{js,jsx}'",
     "lint:ts": "tslint --fix './src/**/*.{ts,tsx}'",
     "lint:less": "stylelint --syntax less './src/**/*.less'",
-    "lint": "yarn run lint:js && yarn run lint:ts && yarn run lint:less"
+    "lint": "yarn run lint:js && yarn run lint:ts && yarn run lint:less",
+    "e2e:dev": "cypress open",
+    "cdoc:dev": "docz dev",
+    "cdoc:build": "docz build"
   },
   "dependencies": {
     "@antv/data-set": "^0.9.6",
@@ -42,6 +44,7 @@
     "classnames": "^2.2.6",
     "d3-scale": "^2.1.2",
     "deep-diff": "^1.0.2",
+    "docz": "^1.2.0",
     "dva": "^2.4.0",
     "enquire-js": "^0.2.1",
     "gulp": "^4.0.2",
@@ -69,6 +72,8 @@
     "qs": "^6.6.0",
     "raw-loader": "^0.5.1",
     "rc-animate": "^2.4.4",
+    "rc-texty": "^0.2.0",
+    "rc-tween-one": "^2.4.1",
     "react": "^16.8.6",
     "react-container-query": "^0.11.0",
     "react-copy-to-clipboard": "^5.0.1",
@@ -87,6 +92,7 @@
     "sockjs-client": "^1.3.0",
     "stompjs": "^2.3.3",
     "tslint-eslint-rules": "^5.4.0",
+    "umi-library": "^1.6.0",
     "uuid": "^3.3.2",
     "ws": "^6.2.1",
     "xlsx": "^0.14.1"
@@ -98,11 +104,12 @@
     "@types/react": "^16.4.16",
     "@types/react-dom": "^16.0.9",
     "babel-eslint": "^10.0.1",
-    "babel-plugin-console": "^0.2.1",
+    "babel-plugin-import": "^1.11.2",
     "babel-plugin-lodash": "^3.3.4",
     "cross-env": "^5.1.1",
-    "cross-port-killer": "^1.0.1",
-    "enzyme": "^3.7.0",
+    "css-loader": "^2.1.1",
+    "cypress": "^3.3.0",
+    "docz-theme-default": "^1.2.0",
     "eslint": "^5.4.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-config-prettier": "^3.0.1",
@@ -114,12 +121,11 @@
     "eslint-plugin-react": "^7.11.1",
     "gh-pages": "^2.0.1",
     "husky": "^1.2.0",
-    "jest-puppeteer": "^3.5.1",
     "jsdoc": "^3.5.5",
+    "less-loader": "^5.0.0",
     "lint-staged": "^8.1.0",
-    "merge-umi-mock-data": "^0.0.3",
     "prettier": "1.15.2",
-    "pro-download": "^1.0.1",
+    "style-loader": "^0.23.1",
     "stylelint": "^9.8.0",
     "stylelint-config-prettier": "^4.0.0",
     "stylelint-config-standard": "^18.0.0",
@@ -136,9 +142,7 @@
       "pre-commit": "yarn run precommit"
     }
   },
-  "optionalDependencies": {
-    "puppeteer": "^1.10.0"
-  },
+  "optionalDependencies": {},
   "lint-staged": {
     "linters": {
       "**/*.{js,jsx,ts,tsx,less}": [

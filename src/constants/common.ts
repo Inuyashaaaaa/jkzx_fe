@@ -1,5 +1,5 @@
-import { AllInputProps } from '@/components/_Form2/Input';
-import { convertOptions } from '@/utils';
+import { AllInputProps } from '@/containers/_Form2/Input';
+import { convertOptions } from './_utils';
 import { COMPUTED_LEG_FIELD_MAP, TRADESCOLDEFS_LEG_FIELD_MAP } from './global';
 
 export const OB_PRICE_FIELD = 'price';
@@ -571,6 +571,7 @@ export const LEG_FIELD = {
   UNDERLYER_INSTRUMENT_PRICE: 'UNDERLYER_INSTRUMENT_PRICE',
   COMMENT: 'comment',
   UNIT: 'unit',
+  TRADE_NUMBER: 'tradeNumber',
 };
 
 /**

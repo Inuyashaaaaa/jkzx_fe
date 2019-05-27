@@ -1,7 +1,7 @@
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { EMPTY_VALUE } from '../../constants';
+import { EMPTY_VALUE } from '../../../containers/constants';
 import { ITableCellProps } from '../../type';
 
 class RenderingCell extends PureComponent<ITableCellProps, any> {

@@ -1,7 +1,7 @@
-import Form from '@/components/Form';
-import ModalButton from '@/components/ModalButton';
+import Form from '@/containers/Form';
+import ModalButton from '@/containers/ModalButton';
 import { clientTradeCashFlow, mgnMarginUpdate } from '@/services/reference-data-service';
-import { message } from 'antd';
+import { message, Modal, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import { IOGLOD_FORM_CONTROLS, UPDATE_FORM_CONTROLS } from './constants';
 
@@ -122,54 +122,49 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
   public render() {
     return (
       <>
-        <ModalButton
-          key="ioglod"
-          modalProps={{
+        <a href="javascript:;" key="ioglod" onClick={this.switchIoGlodModal}>
+          台账调整
+        </a>
+        <Divider type="vertical" />
+        <a href="javascript:;" key="update" onClick={this.switchUpdateMargin}>
+          更新维持保证金
+        </a>
+        <Modal
+          {...{
+            title: '台账调整',
             visible: this.state.ioglodVisible,
             onCancel: this.handleIoGlodCancel,
             onOk: this.handleIoGlodConfirm,
             confirmLoading: this.state.ioGlodConfirmLoading,
             closable: false,
           }}
-          type="primary"
-          size="small"
-          onClick={this.switchIoGlodModal}
-          content={
-            <Form
-              controlNumberOneRow={1}
-              controls={IOGLOD_FORM_CONTROLS}
-              dataSource={this.state.ioGlodDataSource}
-              onValueChange={this.IOGlodFormValueChange}
-              footer={false}
-            />
-          }
         >
-          台账调整
-        </ModalButton>
-        <ModalButton
-          key="update"
-          modalProps={{
+          <Form
+            controlNumberOneRow={1}
+            controls={IOGLOD_FORM_CONTROLS}
+            dataSource={this.state.ioGlodDataSource}
+            onValueChange={this.IOGlodFormValueChange}
+            footer={false}
+          />
+        </Modal>
+        <Modal
+          {...{
+            title: '更新维持保证金',
             visible: this.state.updateVisible,
             onCancel: this.handleUpdateCancel,
             onOk: this.handleUpdateConfirm,
             confirmLoading: this.state.updateConfirmLoading,
             closable: false,
           }}
-          type="primary"
-          size="small"
-          onClick={this.switchUpdateMargin}
-          content={
-            <Form
-              controlNumberOneRow={1}
-              controls={UPDATE_FORM_CONTROLS}
-              dataSource={this.state.updateDataSource}
-              onValueChange={this.updateFormValueChange}
-              footer={false}
-            />
-          }
         >
-          更新维持保证金
-        </ModalButton>
+          <Form
+            controlNumberOneRow={1}
+            controls={UPDATE_FORM_CONTROLS}
+            dataSource={this.state.updateDataSource}
+            onValueChange={this.updateFormValueChange}
+            footer={false}
+          />
+        </Modal>
       </>
     );
   }

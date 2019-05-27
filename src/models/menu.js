@@ -1,7 +1,6 @@
-import { mapTree } from '@/utils';
+import { mapTree, getLocaleId } from '@/tools';
 import { formatMessage } from 'umi/locale';
 import pageRouters from '../../config/router.config';
-import { getLocaleId } from '@/tools';
 
 export default {
   namespace: 'menu',

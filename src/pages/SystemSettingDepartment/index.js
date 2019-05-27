@@ -59,11 +59,11 @@ export default class DepartmentManagement extends PureComponent {
       this.setState({
         tableLoading: false,
       });
-      console.log(departments);
+
       if (departments && departments.data) {
         const tableData = [];
         this.handleDepartments(departments.data, '0', tableData);
-        console.log(tableData);
+
         this.setState({
           data: tableData,
           originDepartMents: departments.data,
@@ -145,10 +145,6 @@ export default class DepartmentManagement extends PureComponent {
     }
   };
 
-  handleSelect = department => {
-    console.log(department);
-  };
-
   setFormData = (value, property) => {
     const submitData = this.submitData || {};
     this.submitData = submitData;
@@ -204,7 +200,7 @@ export default class DepartmentManagement extends PureComponent {
         let finalObj = Object.assign({}, values);
         const submitDepart = this.submitDepart || {};
         const { modalType } = this.state;
-        console.log(values);
+
         if (modalType === 'create') {
           finalObj.sort = 0;
         } else if (modalType === 'modify') {

@@ -1,7 +1,7 @@
 import { BIG_NUMBER_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { HOST_TEST } from '@/constants/global';
 import { TRNORS_OPTS } from '@/constants/model';
-import { request } from '@/utils';
+import { request } from '@/tools';
 import { BigNumber } from 'bignumber.js';
 import lodash from 'lodash';
 import uuidv4 from 'uuid/v4';
@@ -272,9 +272,9 @@ export async function saveModelVolSurface(params) {
           return {
             tenor: record.tenor,
             vols: columns
-              .filter(col => col.field !== 'tenor')
+              .filter(col => col.dataIndex !== 'tenor')
               .map(col => {
-                const { percent, headerName: label } = col;
+                const { percent, title: label } = col;
                 return {
                   label,
                   quote: new BigNumber(record[label])

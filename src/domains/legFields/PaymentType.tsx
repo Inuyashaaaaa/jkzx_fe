@@ -1,5 +1,5 @@
 import { LEG_FIELD, RULES_REQUIRED, UNIT_ENUM_MAP2, UNIT_ENUM_OPTIONS2 } from '@/constants/common';
-import { InputNumber, Select } from '@/components';
+import { InputNumber, Select } from '@/containers';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

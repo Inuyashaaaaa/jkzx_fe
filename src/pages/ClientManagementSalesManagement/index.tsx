@@ -1,7 +1,7 @@
-import { Form2, Input } from '@/components';
-import ModalButton from '@/components/ModalButton';
+import { Form2, Input } from '@/containers';
+import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
-import SourceTable from '@/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import {
   queryCompanys,
   querySalers,
@@ -13,7 +13,7 @@ import {
   refSubsidiaryDelete,
   refSubsidiaryUpdate,
 } from '@/services/sales';
-import { arr2treeOptions, getMoment } from '@/utils';
+import { arr2treeOptions, getMoment } from '@/tools';
 import { Col, Divider, Icon, message, Modal, Popconfirm, Row, Table, Tree } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
@@ -149,7 +149,6 @@ class ClientManagementSalesManagement extends PureComponent {
 
   public onEdit = (params, e) => {
     e.stopPropagation();
-    console.log(params);
     if (params.children) {
       return this.setState(
         {
@@ -192,6 +191,10 @@ class ClientManagementSalesManagement extends PureComponent {
     );
   };
 
+  public onCancelRemove = item => e => {
+    e.stopPropagation();
+  };
+
   // 未完成remove
   public bindRemove = item => async e => {
     e.stopPropagation();
@@ -210,6 +213,7 @@ class ClientManagementSalesManagement extends PureComponent {
       message.error('删除失败');
       return;
     }
+    message.success('删除成功');
     this.handleTreeNode();
   };
 
@@ -275,6 +279,7 @@ class ClientManagementSalesManagement extends PureComponent {
                     onConfirm={this.bindRemove(item)}
                     okText="确认"
                     cancelText="取消"
+                    onCancel={this.onCancelRemove(item)}
                   >
                     <Icon
                       type="minus-circle"
@@ -313,6 +318,7 @@ class ClientManagementSalesManagement extends PureComponent {
                   onConfirm={this.bindRemove(item)}
                   okText="确认"
                   cancelText="取消"
+                  onCancel={this.onCancelRemove(item)}
                 >
                   <Icon
                     type="minus-circle"
@@ -331,7 +337,6 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public onSelect = async selectedKeys => {
-    console.log(selectedKeys);
     if (!selectedKeys.length) return;
     const arr = selectedKeys[0].split('/');
     this.setState({
@@ -375,7 +380,7 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleConfirmSub = async () => {
     const { error } = await this.$subModalForm.validate();
     if (error) return;
-    console.log(this.state.subFormData);
+
     const subsidiaryEdit = this.state.editSub ? refSubsidiaryUpdate : refSubsidiaryCreate;
     const params = this.state.editSub
       ? {

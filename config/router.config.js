@@ -1,4 +1,4 @@
-import mapTree from '../src/utils/mapTree';
+import mapTree from '../src/tools/mapTree';
 
 export default [
   {
@@ -22,7 +22,7 @@ export default [
   },
   {
     path: '/',
-    redirect: '/user/login',
+    redirect: '/welcome-page',
   },
   mapTree(
     {

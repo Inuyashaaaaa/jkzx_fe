@@ -9,7 +9,6 @@ const RELEASE_CONTAINER = 'FE-release';
 // const FEATURE_CONTAINER = 'FE-feature';
 const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
-const START = '前端模块开始更新';
 const FINISH = '前端模块更新完毕';
 const BUNDLE_NAME = 'dist';
 
@@ -39,8 +38,6 @@ function upload(remoteUsername, remoteIp, remoteFolder) {
     `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${BUNDLE_NAME}`
   );
   try {
-    shell.exec(`./scripts/ci/greet.sh ${remoteIp} ${START} ${process.env.CI_COMMIT_SHA}`);
-
     shell.exec(
       `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${paths}`
     );

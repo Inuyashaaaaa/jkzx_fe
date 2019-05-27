@@ -1,7 +1,7 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, LCM_EVENT_TYPE_OPTIONS } from '@/constants/common';
-import SourceTable from '@/components/SourceTable';
-import Form, { IFormControl } from '@/components/_Form2';
-import { IColumnDef } from '@/components/_Table2';
+import SourceTable from '@/containers/SourceTable';
+import Form, { IFormControl } from '@/containers/_Form2';
+import { IColumnDef } from '@/containers/_Table2';
 import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientChangeCredit,

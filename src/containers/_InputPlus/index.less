@@ -1,0 +1,15 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/tools/utils.less';
+@import '../style/themes.less';
+
+@input-plus: ~'@{tongyu-prefix}-input-plus';
+
+:global {
+  .@{input-plus} {
+    &.no-border {
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+}

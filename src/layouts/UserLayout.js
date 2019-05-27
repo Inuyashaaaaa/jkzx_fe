@@ -2,8 +2,8 @@ import React, { Fragment } from 'react';
 import { formatMessage } from 'umi/locale';
 import Link from 'umi/link';
 import { Icon } from 'antd';
-import GlobalFooter from '@/components/GlobalFooter';
-import SelectLang from '@/components/SelectLang';
+import GlobalFooter from '@/containers/GlobalFooter';
+import SelectLang from '@/containers/SelectLang';
 import styles from './UserLayout.less';
 
 const logoPath = '/logo.svg';

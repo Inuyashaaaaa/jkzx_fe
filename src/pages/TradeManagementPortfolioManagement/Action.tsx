@@ -1,12 +1,12 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/components';
+import { Form2, Select, Table2 } from '@/containers';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import {
   trdPortfolioDelete,
   trdPortfolioUpdate,
   trdTradePortfolioCreateBatch,
 } from '@/services/trade-service';
-import { Button, Icon, Input, message, Modal, Popconfirm, Row, Table } from 'antd';
+import { Button, Icon, Input, message, Modal, Popconfirm, Row, Table, Divider } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
@@ -282,20 +282,11 @@ class Action extends PureComponent<any, any> {
     const { params } = this.props;
     return (
       <Row type="flex" align="middle">
-        <Button.Group>
-          <Button size="small" type="primary" onClick={this.showModal}>
-            查看/修改
-          </Button>
-          <Popconfirm title="确认删除？" onConfirm={this.onRemove}>
-            <Button
-              size="small"
-              type="danger"
-              style={{ marginLeft: '5px', border: '1px solid #ccc' }}
-            >
-              删除
-            </Button>
-          </Popconfirm>
-        </Button.Group>
+        <a onClick={this.showModal}>查改</a>
+        <Divider type="vertical" />
+        <Popconfirm title="确认删除？" onConfirm={this.onRemove} style={{ color: 'red' }}>
+          <a style={{ color: 'red' }}>删除</a>
+        </Popconfirm>
         <Modal
           title="投资组合详情"
           visible={this.state.visible}
