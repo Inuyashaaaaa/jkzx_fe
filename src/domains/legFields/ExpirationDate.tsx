@@ -29,7 +29,7 @@ const ExpirationDateInput = memo<any>(
       setLoading(false);
 
       if (error) return;
-      setShowTip(!data);
+      setShowTip(data);
     };
 
     const visible = volatilityCalendars && showTip;
