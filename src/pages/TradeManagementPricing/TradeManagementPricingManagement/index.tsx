@@ -144,12 +144,13 @@ const TradeManagementPricingManagement = props => {
       <Form2
         submitText="搜索"
         onSubmitButtonClick={() => {
-          onTradeTableSearch();
+          onTradeTableSearch({ paramsPagination: { current: 1, pageSize: 10 } });
         }}
         onResetButtonClick={() => {
           setSearchFormData({});
           onTradeTableSearch({
             paramsSearchFormData: {},
+            paramsPagination: { current: 1, pageSize: 10 },
           });
         }}
         onFieldsChange={(props, changedFields, allFields) => {
@@ -389,7 +390,7 @@ const TradeManagementPricingManagement = props => {
               },
               {
                 title: '起始日',
-                dataIndex: LEG_FIELD.EFFECTIVE_DATE,
+                dataIndex: `asset.${LEG_FIELD.EFFECTIVE_DATE}`,
                 width: 150,
               },
               {
