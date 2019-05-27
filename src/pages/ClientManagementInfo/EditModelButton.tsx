@@ -15,6 +15,7 @@ import {
   PARTY_DOC_CREATE_OR_UPDATE,
   TRADER_TYPE,
 } from './constants';
+import { getToken } from '@/tools/authority';
 
 const TabPane = Tabs.TabPane;
 
@@ -1114,6 +1115,7 @@ const EditModalButton = memo<any>(props => {
                                     name: '主协议',
                                   }),
                                 }}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 fileList={val}
                                 disabled={disabled}
                                 editing={editable}
@@ -1145,6 +1147,7 @@ const EditModalButton = memo<any>(props => {
                                     name: '补充协议',
                                   }),
                                 }}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 fileList={val}
                                 editing={editable}
                                 disabled={disabled}
@@ -1176,6 +1179,7 @@ const EditModalButton = memo<any>(props => {
                                     name: '风险问卷调查',
                                   }),
                                 }}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 fileList={val}
                                 editing={editable}
                                 disabled={disabled}
@@ -1208,6 +1212,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 editing={editable}
                                 disabled={disabled}
                               />
@@ -1240,6 +1245,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1271,6 +1277,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1302,6 +1309,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1333,6 +1341,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1364,6 +1373,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1395,6 +1405,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1426,6 +1437,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}

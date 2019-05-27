@@ -17,6 +17,7 @@ import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 import EmailInput from '@/containers/EmailInput';
+import { getToken } from '@/tools/authority';
 
 const CreateModalButton = memo<any>(props => {
   const { salesCascaderList, fetchTableData } = props;
@@ -1017,6 +1018,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '主协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1045,6 +1047,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '补充协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1073,6 +1076,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '风险问卷调查',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1101,6 +1105,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '交易授权书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1129,6 +1134,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '对手尽职调查',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1157,6 +1163,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '风险承受能力调查问卷',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1185,6 +1192,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '合规性承诺书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1213,6 +1221,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '风险揭示书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1241,6 +1250,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '适当性警示书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1269,6 +1279,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '授信协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1297,6 +1308,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '履约保障协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
