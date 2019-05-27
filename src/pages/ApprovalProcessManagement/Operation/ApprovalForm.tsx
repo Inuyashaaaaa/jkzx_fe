@@ -11,7 +11,7 @@ import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '@/pages/SystemSettingDepartment/components/CommonForm';
 import { generateColumns } from '../constants';
-
+import _ from 'lodash';
 const { TextArea } = Input;
 
 class ApprovalForm extends PureComponent {
@@ -70,7 +70,11 @@ class ApprovalForm extends PureComponent {
       loading: true,
     });
 
-    const isCompleted = params.status ? !params.status.includes('unfinished') : false;
+    const isCompleted = params.processInstanceStatusEnum
+      ? !_.toLower(params.processInstanceStatusEnum).includes('unfinished') &&
+        this.props.status !== 'pending'
+      : false;
+
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
       processInstanceId,

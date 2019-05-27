@@ -101,8 +101,9 @@ class ApprovalForm extends PureComponent<any, any> {
     this.setState({
       loading: true,
     });
-    const isCompleted = params.status
-      ? !params.status.includes('unfinished') && this.props.status !== 'pending'
+    const isCompleted = params.processInstanceStatusEnum
+      ? !_.toLower(params.processInstanceStatusEnum).includes('unfinished') &&
+        this.props.status !== 'pending'
       : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
