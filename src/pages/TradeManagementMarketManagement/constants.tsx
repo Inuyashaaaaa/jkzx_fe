@@ -60,12 +60,12 @@ export const columns = [
     render: (value, record, index) => formatNumber(value, 4),
     width: 150,
   },
-  {
-    title: '昨收 (¥)',
-    dataIndex: 'yesterdayClose',
-    render: (value, record, index) => formatNumber(value, 4),
-    width: 150,
-  },
+  // {
+  //   title: '昨收 (¥)',
+  //   dataIndex: 'close',
+  //   render: (value, record, index) => formatNumber(value, 4),
+  //   width: 150,
+  // },
   {
     title: '交易所',
     dataIndex: 'exchange',
