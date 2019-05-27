@@ -215,7 +215,7 @@ class ApprovalForm extends PureComponent<any, any> {
     if (this.state.newAttachmentId) {
       const { error: aerror, data: adata } = await wkAttachmentProcessInstanceBind({
         attachmentId: this.state.newAttachmentId,
-        processInstanceId: processInstanceId,
+        processInstanceId,
       });
       if (aerror) return true;
     }
