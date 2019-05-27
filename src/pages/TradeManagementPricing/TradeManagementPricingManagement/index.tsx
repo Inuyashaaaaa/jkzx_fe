@@ -245,7 +245,7 @@ const TradeManagementPricingManagement = props => {
             },
           },
           {
-            title: '日期范围',
+            title: '到期日范围',
             dataIndex: RANGE_DATE_KEY,
             render: (value, record, index, { form, editing }) => {
               return <FormItem>{form.getFieldDecorator({})(<DatePicker.RangePicker />)}</FormItem>;
