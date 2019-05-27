@@ -79,11 +79,15 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
       ...sortField,
     });
     if (error) return;
-    const dataSource = this.handleData(
-      _data.page,
-      cols.map(item => item.dataIndex),
-      cols.map(item => item.title)
+    const dataIndex = _.flatten(
+      cols.map(item =>
+        item.children ? item.children.map(iitem => iitem.dataIndex) : item.dataIndex
+      )
     );
+    const title = _.flatten(
+      cols.map(item => (item.children ? item.children.map(iitem => iitem.title) : item.title))
+    );
+    const dataSource = this.handleData(_data.page, dataIndex, title);
     if (this.props.tabs) {
       // 多sheet表导出
 
