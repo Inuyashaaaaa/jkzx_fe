@@ -15,40 +15,21 @@ import _ from 'lodash';
 import React, { memo, useRef } from 'react';
 import ActionBar from './ActionBar';
 import './index.less';
+import useLifecycles from 'react-use/lib/useLifecycles';
 
 const TradeManagementBooking = props => {
   const { location, currentUser, tableData: modalTableData, dispatch } = props;
   const { query } = location;
   const { from } = query;
-
   const getPricingPermium = record => {
+    console.log(record[COMPUTED_LEG_FIELD_MAP.PRICE]);
+    console.log(record[COMPUTED_LEG_FIELD_MAP.PRICE_PER]);
     return Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY
       ? record[COMPUTED_LEG_FIELD_MAP.PRICE]
       : record[COMPUTED_LEG_FIELD_MAP.PRICE_PER];
   };
 
-  const tableData =
-    from === BOOKING_FROM_PRICING
-      ? (props.pricingData.tableData || []).map(item => {
-          const leg = getLegByRecord(item);
-          if (!leg) return item;
-          const omits = _.difference(
-            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.BOOKING).map(item => item.dataIndex)
-          );
-
-          const pricingPermium = getPricingPermium(item);
-          const permium =
-            pricingPermium == null ? undefined : Math.abs(Form2.getFieldValue(pricingPermium));
-
-          return {
-            ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
-            ...leg.getDefaultData(LEG_ENV.BOOKING),
-            ..._.omit(item, [...omits, ...LEG_INJECT_FIELDS]),
-            [LEG_FIELD.PREMIUM]: Form2.createField(permium),
-          };
-        })
-      : modalTableData;
+  const tableData = modalTableData;
 
   const setTableData = payload => {
     dispatch({
@@ -95,6 +76,33 @@ const TradeManagementBooking = props => {
       return newData;
     });
   };
+
+  useLifecycles(() => {
+    if (from === BOOKING_FROM_PRICING) {
+      setTableData(pre => {
+        return (props.pricingData.tableData || []).map(item => {
+          const leg = getLegByRecord(item);
+          if (!leg) return item;
+          const omits = _.difference(
+            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.BOOKING).map(item => item.dataIndex)
+          );
+
+          const pricingPermium = getPricingPermium(item);
+          const permium =
+            pricingPermium == null ? undefined : Math.abs(Form2.getFieldValue(pricingPermium));
+
+          return {
+            ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
+            ...leg.getDefaultData(LEG_ENV.BOOKING),
+            ..._.omit(item, [...omits, ...LEG_INJECT_FIELDS]),
+            [LEG_FIELD.PREMIUM]: Form2.createField(permium),
+          };
+        });
+      });
+    }
+    return modalTableData;
+  });
 
   const tableEl = useRef<IMultiLegTableEl>(null);
   return (
