@@ -8,6 +8,7 @@ import {
   PREMIUM_TYPE_MAP,
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import { Form2 } from '@/containers';
 import { IFormControl } from '@/containers/Form/types';
@@ -109,8 +110,13 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       throw new Error('not found Leg type');
     }
 
+    const lcmEventType =
+      type === LEG_TYPE_MAP.AUTOCALL_PHOENIX && dataSourceItem[LEG_FIELD.ALREADY_BARRIER]
+        ? 'KNOCK_IN'
+        : 'OPEN';
+
     return {
-      lcmEventType: 'OPEN',
+      lcmEventType,
       positionAccountCode: 'empty',
       positionAccountName: 'empty',
       counterPartyAccountCode: 'empty',

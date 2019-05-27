@@ -180,11 +180,6 @@ export const Convex: ILeg = legPipeLine({
     const COMPUTED_FIELDS = [LEG_FIELD.UNIT, LEG_FIELD.TRADE_NUMBER];
 
     nextPosition.productType = LEG_TYPE_MAP.CONVEX;
-    nextPosition.lcmEventType = 'OPEN';
-    nextPosition.positionAccountCode = 'empty';
-    nextPosition.positionAccountName = 'empty';
-    nextPosition.counterPartyAccountCode = 'empty';
-    nextPosition.counterPartyAccountName = 'empty';
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       LEG_FIELD.IS_ANNUAL,
