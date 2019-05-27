@@ -22,8 +22,6 @@ const TradeManagementBooking = props => {
   const { query } = location;
   const { from } = query;
   const getPricingPermium = record => {
-    console.log(record[COMPUTED_LEG_FIELD_MAP.PRICE]);
-    console.log(record[COMPUTED_LEG_FIELD_MAP.PRICE_PER]);
     return Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY
       ? record[COMPUTED_LEG_FIELD_MAP.PRICE]
       : record[COMPUTED_LEG_FIELD_MAP.PRICE_PER];
