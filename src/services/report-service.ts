@@ -231,11 +231,21 @@ export async function rptFinancialOtcFundDetailReportSearchPaged(params) {
   });
 }
 
-export async function rptFinanicalOtcClientFundReportSearchPaged(params) {
+export async function rptCustomReportNameList(params) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'rptFinanicalOtcClientFundReportSearchPaged',
+      method: 'rptCustomReportNameList',
+      params,
+    },
+  });
+}
+
+export async function rptCustomReportSearchPaged(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptCustomReportSearchPaged',
       params,
     },
   });
