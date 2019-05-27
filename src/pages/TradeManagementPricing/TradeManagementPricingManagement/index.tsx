@@ -471,7 +471,10 @@ const TradeManagementPricingManagement = props => {
 
                           const next = quotePositions.map(position => {
                             const { productType, asset } = position;
-                            const leg = getLegByProductType(productType);
+                            const leg = getLegByProductType(
+                              productType,
+                              position.asset.exerciseType
+                            );
                             if (!leg) {
                               throw new Error(`${productType} is not defiend!`);
                             }
