@@ -403,12 +403,15 @@ const TradeManagementPricingManagement = props => {
                 width: 150,
                 render: (val, record) => {
                   if (val == null) return null;
-                  if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+                  if (
+                    _.get(record, `quotePositions[0].asset.${LEG_FIELD.STRIKE_TYPE}`) ===
+                    STRIKE_TYPES_MAP.CNY
+                  ) {
                     return formatMoney(val, {
                       unit: '￥',
                     });
                   }
-                  return `${val}%`;
+                  return `${val * 100}%`;
                 },
               },
               {
@@ -417,7 +420,10 @@ const TradeManagementPricingManagement = props => {
                 width: 150,
                 render: (val, record) => {
                   if (val == null) return null;
-                  if (record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
+                  if (
+                    _.get(record, `quotePositions[0].asset.${LEG_FIELD.NOTIONAL_AMOUNT_TYPE}`) ===
+                    NOTIONAL_AMOUNT_TYPE_MAP.CNY
+                  ) {
                     return formatMoney(val, {
                       unit: '￥',
                     });
