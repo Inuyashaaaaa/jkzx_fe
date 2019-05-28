@@ -516,7 +516,7 @@ class ApprovalProcessConfiguration extends PureComponent {
                     width: '100%',
                   }}
                 >
-                  <Skeleton active />
+                  <Skeleton active={true} />
                 </div>
               </TabPane>
             ) : (
