@@ -198,6 +198,7 @@ export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
               style={{ minWidth: 180 }}
               showSearch={true}
               allowClear={true}
+              filterOption={true}
               options={async (value: string = '') => {
                 const { data, error } = await refSimilarLegalNameList({
                   similarLegalName: value,
