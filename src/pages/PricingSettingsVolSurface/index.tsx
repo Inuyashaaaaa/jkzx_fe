@@ -289,8 +289,8 @@ class PricingSettingVolSurface extends PureComponent {
     message.success('删除成功');
   };
 
-  public onConfirm = (event, rowIndex, param) => {
-    const validateRsp = this.$insertForm.validate();
+  public onConfirm = async (event, rowIndex, param) => {
+    const validateRsp = await this.$insertForm.validate();
     if (validateRsp.error) return;
 
     const clone = [...this.state.tableDataSource];

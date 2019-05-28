@@ -149,9 +149,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     message.success('删除成功');
   };
 
-  public onConfirm = (event, rowIndex, param) => {
-    const validateRsp = this.$insertForm.validate();
-    if (validateRsp.error) return;
+  public onConfirm = async (event, rowIndex, param) => {
+    const { error } = await this.$insertForm.validate();
+    if (error) return;
 
     const { insertFormData } = this.state;
 
