@@ -78,6 +78,7 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
             <Select
               showSearch={true}
               allowClear={true}
+              filterOption={true}
               options={async (value: string = '') => {
                 const { data, error } = await refSimilarLegalNameList({
                   similarLegalName: value,
