@@ -257,13 +257,12 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
         ? nextPosition.asset.expirationDate
         : nextPosition.asset.settlementDate;
 
-    nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
-      (result, item) => {
+    nextPosition.asset.fixingObservations =
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce((result, item) => {
         result[item[OB_DAY_FIELD]] = item.price !== undefined ? item.price : null;
         return result;
-      },
-      {}
-    );
+      }, {});
 
     nextPosition.asset.annualized = true;
 
