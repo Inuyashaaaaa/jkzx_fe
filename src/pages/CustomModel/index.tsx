@@ -453,12 +453,12 @@ const CustomModel = memo(() => {
                   console.log(page);
                 },
                 pageSize: 10,
+                size: 'small',
               }}
               dataSource={tradeList}
               footer={null}
               className={styles.searchList}
               renderItem={item => {
-                console.log(item.positions.positionId);
                 return (
                   <List.Item
                     key={item.id}

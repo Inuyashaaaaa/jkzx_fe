@@ -166,14 +166,13 @@ class PricingSettingVolSurface extends PureComponent {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
-                        defaultOpen={true}
-                        autoSelect={true}
-                        //   style={{ minWidth: 180 }}
-                        options={getCanUsedTranorsOtions(
-                          tableDataSource.map(item => Form2.getFieldsValue(item)),
-                          Form2.getFieldsValue(record)
-                        )}
+                        style={{ minWidth: 180 }}
                         editing={editing}
+                        autoSelect={true}
+                        defaultOpen={true}
+                        options={getCanUsedTranorsOtionsNotIncludingSelf(
+                          dataSource.map(item => Form2.getFieldsValue(item))
+                        )}
                       />
                     )}
                   </FormItem>
