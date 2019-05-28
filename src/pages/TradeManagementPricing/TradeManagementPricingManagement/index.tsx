@@ -462,7 +462,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
                 width: 150,
                 render: (val, record) => {
-                  return formatNumber(val, 2);
+                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
                 },
               },
               {
@@ -470,7 +470,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.R,
                 width: 150,
                 render: (val, record) => {
-                  return formatNumber(val, 2);
+                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
                 },
               },
               {
@@ -478,7 +478,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.Q,
                 width: 150,
                 render: (val, record) => {
-                  return formatNumber(val, 2);
+                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
                 },
               },
               {
