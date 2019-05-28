@@ -11,7 +11,12 @@ import {
   STRIKE_TYPES_MAP,
   BIG_NUMBER_CONFIG,
 } from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP, TRADESCOL_FIELDS, VERTICAL_GUTTER } from '@/constants/global';
+import {
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+  TRADESCOL_FIELDS,
+  VERTICAL_GUTTER,
+  DEFAULT_TERM,
+} from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { DATE_LEG_FIELDS } from '@/constants/legType';
 import { mktInstrumentSearch } from '@/services/market-data-service';
@@ -19,7 +24,7 @@ import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
 import styles from '@/styles/index.less';
-import { formatMoney, getLegByProductType, formatNumber } from '@/tools';
+import { formatMoney, getLegByProductType, formatNumber, getMoment } from '@/tools';
 import {
   DatePicker,
   Divider,
@@ -148,6 +153,14 @@ const TradeManagementPricingManagement = props => {
 
   const handleTradeNumber = position => {
     const record = position.asset;
+    if (
+      !record[LEG_FIELD.NOTIONAL_AMOUNT] ||
+      !record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] ||
+      !record[LEG_FIELD.UNDERLYER_MULTIPLIER] ||
+      !record[LEG_FIELD.INITIAL_SPOT]
+    ) {
+      return null;
+    }
     const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
     const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
     const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
@@ -522,6 +535,12 @@ const TradeManagementPricingManagement = props => {
                                   }),
                                   ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
                                   [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+                                  [LEG_FIELD.TERM]: asset.annualized
+                                    ? asset[LEG_FIELD.TERM]
+                                    : getMoment(asset[LEG_FIELD.EXPIRATION_DATE]).diff(
+                                        getMoment(asset[LEG_FIELD.EFFECTIVE_DATE]),
+                                        'days'
+                                      ),
                                 })
                               ),
                             };
