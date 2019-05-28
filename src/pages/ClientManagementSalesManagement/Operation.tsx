@@ -5,8 +5,11 @@ import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales'
 import { Col, message, Row, Popconfirm, Modal, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
+import { Form2 } from '@/containers';
 
 class Operation extends PureComponent<{ record: any; fetchTable: any }> {
+  public $refCreateFormModal: Form2 = null;
+
   public state = {
     visible: false,
     confirmLoading: false,
@@ -56,6 +59,8 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   };
 
   public onEdit = async () => {
+    const res = await this.$refCreateFormModal.validate();
+    if (res.error) return;
     this.setState({
       confirmLoading: true,
       visible: false,
@@ -68,6 +73,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       salesId: this.props.record.uuid,
       branchId: this.state.editFormData.cascSubBranch[1],
       salesName: this.state.editFormData.salesName,
+    });
+    this.setState({
+      confirmLoading: false,
     });
     if (error) {
       message.error('编辑失败');
@@ -113,6 +121,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
           confirmLoading={this.state.confirmLoading}
         >
           <CreateFormModal
+            refCreateFormModal={node => (this.$refCreateFormModal = node)}
             dataSource={this.state.editFormData}
             handleValueChange={this.handleValueChange}
             branchSalesList={this.state.branchSalesList}
