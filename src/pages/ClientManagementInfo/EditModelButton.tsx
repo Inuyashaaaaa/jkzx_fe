@@ -232,8 +232,13 @@ const EditModalButton = memo<any>(props => {
   }
 
   const handleValue = val => {
+    const result = _.get(val, '[0].response.result');
     if (_.isArray(val)) {
       val = (val || []).map(item => {
+        if (result) {
+          item.url = `${HREF_UPLOAD_URL}${_.get(result, 'uuid')}&partyDoc=true`;
+          return item;
+        }
         item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
         return item;
       });
