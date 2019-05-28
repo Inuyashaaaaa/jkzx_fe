@@ -119,7 +119,13 @@ class FixingModal extends PureComponent<
         visible: false,
       },
       () => {
-        this.$expirationModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+        this.$expirationModal.show(
+          this.data,
+          this.tableFormData,
+          this.currentUser,
+          this.reload,
+          this.state.tableData
+        );
       }
     );
   };
