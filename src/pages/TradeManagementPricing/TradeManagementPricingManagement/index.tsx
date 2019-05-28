@@ -24,7 +24,7 @@ import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
 import styles from '@/styles/index.less';
-import { formatMoney, getLegByProductType, formatNumber } from '@/tools';
+import { formatMoney, getLegByProductType, formatNumber, getMoment } from '@/tools';
 import {
   DatePicker,
   Divider,
@@ -537,7 +537,10 @@ const TradeManagementPricingManagement = props => {
                                   [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
                                   [LEG_FIELD.TERM]: asset.annualized
                                     ? asset[LEG_FIELD.TERM]
-                                    : DEFAULT_TERM,
+                                    : getMoment(asset[LEG_FIELD.EXPIRATION_DATE]).diff(
+                                        getMoment(asset[LEG_FIELD.EFFECTIVE_DATE]),
+                                        'days'
+                                      ),
                                 })
                               ),
                             };
