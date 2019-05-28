@@ -84,7 +84,7 @@ class Processed extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
-                        filterOption={true}
+                        fetchOptionsOnSearch={true}
                         options={async (value: string = '') => {
                           const { data, error } = await refSimilarLegalNameList({
                             similarLegalName: value,
@@ -113,6 +113,7 @@ class Processed extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        fetchOptionsOnSearch={true}
                         options={async (value: string = '') => {
                           const { data, error } = await refMasterAgreementSearch({
                             masterAgreementId: value,
@@ -141,6 +142,7 @@ class Processed extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        fetchOptionsOnSearch={true}
                         options={async (value: string = '') => {
                           const { data, error } = await trdTradeListBySimilarTradeId({
                             similarTradeId: value,
