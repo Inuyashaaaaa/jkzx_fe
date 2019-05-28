@@ -20,12 +20,16 @@ const ReportsCustomManagement = memo<any>(props => {
       valuationDate: [moment().subtract(1, 'day'), moment()],
     }),
   });
-
-  const pagination = {
+  const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 20,
     total: 1,
-  };
+  });
+  // const pagination = {
+  //   page: 1,
+  //   pageSize: 20,
+  //   total: 1,
+  // };
   const [tabelData, setTabelData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -48,16 +52,21 @@ const ReportsCustomManagement = memo<any>(props => {
     setTabelData(data.page);
   };
 
-  const onPagination = (current, pageSize) => {
-    OnSearch(searchFormData, { current, pageSize });
+  const onPagination = (page, pageSize) => {
+    setPagination({
+      ...pagination,
+      page,
+      pageSize,
+    });
+    OnSearch(searchFormData, { page, pageSize });
   };
 
-  const handlePaninationChange = (current, pageSize) => {
-    onPagination(current, pageSize);
+  const handlePaninationChange = (page, pageSize) => {
+    onPagination(page, pageSize);
   };
 
-  const handleShowSizeChange = (current, pageSize) => {
-    onPagination(current, pageSize);
+  const handleShowSizeChange = (page, pageSize) => {
+    onPagination(page, pageSize);
   };
 
   useLifecycles(() => {
