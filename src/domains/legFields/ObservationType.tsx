@@ -7,6 +7,7 @@ import {
   STRIKE_TYPES_MAP,
   REBATETYPE_TYPE_OPTIONS,
   OBSERVATION_TYPE_OPTIONS,
+  OBSERVATION_TYPE_MAP,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/containers';
@@ -42,6 +43,11 @@ export const ObservationType: ILegColDef = {
       return editing;
     };
 
+    const SPECIAL_OBSERVATION_TYPE_OPTIONS = _.reject(
+      OBSERVATION_TYPE_OPTIONS,
+      item => item.value === OBSERVATION_TYPE_MAP.DAILY
+    );
+
     return (
       <FormItem>
         {form.getFieldDecorator({
@@ -50,7 +56,11 @@ export const ObservationType: ILegColDef = {
           <Select
             defaultOpen={getDefaultOpen()}
             editing={editing}
-            options={OBSERVATION_TYPE_OPTIONS}
+            options={
+              Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DOUBLE_SHARK_FIN
+                ? SPECIAL_OBSERVATION_TYPE_OPTIONS
+                : OBSERVATION_TYPE_OPTIONS
+            }
           />
         )}
       </FormItem>

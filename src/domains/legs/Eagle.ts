@@ -64,7 +64,6 @@ export const Eagle: ILeg = legPipeLine({
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
       return [
-        IsAnnual,
         Direction,
         NotionalAmountType,
         InitialSpot,
@@ -88,7 +87,6 @@ export const Eagle: ILeg = legPipeLine({
     }
     if (env === LEG_ENV.EDITING) {
       return [
-        IsAnnual,
         Direction,
         DaysInYear,
         UnderlyerMultiplier,
@@ -118,7 +116,6 @@ export const Eagle: ILeg = legPipeLine({
     }
     if (env === LEG_ENV.BOOKING) {
       return [
-        IsAnnual,
         Direction,
         DaysInYear,
         UnderlyerMultiplier,
