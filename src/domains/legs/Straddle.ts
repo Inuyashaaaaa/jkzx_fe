@@ -90,7 +90,6 @@ export const Straddle: ILeg = legPipeLine({
         HighStrike,
         LowParticipationRate,
         HighParticipationRate,
-        PremiumType,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,

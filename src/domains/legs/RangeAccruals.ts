@@ -101,7 +101,6 @@ export const RangeAccruals: ILeg = legPipeLine({
         EffectiveDate,
         ExpirationDate,
         PaymentType,
-        PremiumType,
         Payment,
         BarrierType,
         HighBarrier,

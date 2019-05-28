@@ -10,6 +10,7 @@ import {
   REBATETYPE_TYPE_MAP,
   KNOCK_DIRECTION_MAP,
   OPTION_TYPE_MAP,
+  OBSERVATION_TYPE_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -304,6 +305,13 @@ export const DoubleSharkFin: ILeg = legPipeLine({
           barrier > strike
             ? Form2.createField(OPTION_TYPE_MAP.CALL)
             : Form2.createField(OPTION_TYPE_MAP.PUT);
+      }
+    }
+
+    if (Form2.fieldValueIsChange(LEG_FIELD.OBSERVATION_TYPE, changedFields)) {
+      const observationType = Form2.getFieldValue(changedFields[LEG_FIELD.OBSERVATION_TYPE]);
+      if (observationType === OBSERVATION_TYPE_MAP.TERMINAL) {
+        record[LEG_FIELD.REBATE_TYPE] = Form2.createField(REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY);
       }
     }
   },
