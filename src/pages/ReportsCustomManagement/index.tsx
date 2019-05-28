@@ -99,10 +99,10 @@ const ReportsCustomManagement = memo<any>(props => {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        filterOption={true}
                         style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
-                        fetchOptionsOnSearch={true}
                         showSearch={true}
                         options={async value => {
                           const { data, error } = await rptCustomReportNameList({});
