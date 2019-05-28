@@ -85,7 +85,7 @@ class TradeManagementMarketManagement extends PureComponent {
         ...fields,
       };
     }
-    if (fields.instrumentType === 'STOCK') {
+    if (Form2.getFieldValue(fields.instrumentType) === 'STOCK') {
       return {
         ...allFields,
         multiplier: Form2.createField(1),
