@@ -148,6 +148,14 @@ const TradeManagementPricingManagement = props => {
 
   const handleTradeNumber = position => {
     const record = position.asset;
+    if (
+      !record[LEG_FIELD.NOTIONAL_AMOUNT] ||
+      !record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] ||
+      !record[LEG_FIELD.UNDERLYER_MULTIPLIER] ||
+      !record[LEG_FIELD.INITIAL_SPOT]
+    ) {
+      return null;
+    }
     const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
     const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
     const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
@@ -522,6 +530,7 @@ const TradeManagementPricingManagement = props => {
                                   }),
                                   ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
                                   [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+                                  [LEG_FIELD.TERM]: asset.annualized ? asset[LEG_FIELD.TERM] : 30,
                                 })
                               ),
                             };
