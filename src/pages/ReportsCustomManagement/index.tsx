@@ -30,6 +30,8 @@ const ReportsCustomManagement = memo<any>(props => {
   const [loading, setLoading] = useState(false);
 
   const OnSearch = async (searchData, currentPage) => {
+    const { error: verror } = await formSearch.validate();
+    if (verror) return;
     searchData = Form2.getFieldsValue(searchData);
     const formValues = {
       startDate: _.get(searchData, 'valuationDate[0]').format('YYYY-MM-DD'),
@@ -148,7 +150,13 @@ const ReportsCustomManagement = memo<any>(props => {
               title: '报告日期',
               dataIndex: 'valuationDate',
               render: (value, record, index, { form, editing }) => {
-                return <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>;
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true }],
+                    })(<RangePicker />)}
+                  </FormItem>
+                );
               },
             },
           ]}
