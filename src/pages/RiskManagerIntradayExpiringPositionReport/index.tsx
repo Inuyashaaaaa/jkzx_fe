@@ -3,6 +3,7 @@ import RiskCommonTable from '@/containers/RiskCommonTable';
 import React, { memo } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { socketHOC } from '@/tools/socketHOC';
+import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
 
 const Wrapper = socketHOC('EXPIRING_POSITION')(RiskCommonTable);
 
@@ -16,6 +17,7 @@ const RiskManagerIntradayExpiringPositionReport = memo<any>(props => {
       searchMethod={rptIntradayTradeExpiringReportPaged}
       downloadName={'到期合约'}
       scrollWidth={2800}
+      colSwitch={[{ dataIndex: 'productType', options: PRODUCTTYPE_ZHCH_MAP }]}
     />
   );
 });

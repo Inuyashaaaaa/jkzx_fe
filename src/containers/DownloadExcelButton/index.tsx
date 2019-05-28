@@ -67,7 +67,7 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     if (!this.checkData(this.props.data)) {
       return;
     }
-    const { searchMethod, cols, name, argument } = this.props.data;
+    const { searchMethod, cols, name, argument, colSwitch } = this.props.data;
     const { searchFormData, sortField = {} } = argument;
     const { error, data: _data } = await searchMethod({
       ..._.mapValues(Form2.getFieldsValue(searchFormData), (values, key) => {
@@ -87,7 +87,16 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     const title = _.flatten(
       cols.map(item => (item.children ? item.children.map(iitem => iitem.title) : item.title))
     );
-    const dataSource = this.handleData(_data.page, dataIndex, title);
+    const newData = _data.page.map(item => {
+      return _.mapValues(item, (value, key) => {
+        const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
+        if (col) {
+          return col.options[value];
+        }
+        return value;
+      });
+    });
+    const dataSource = this.handleData(newData, dataIndex, title);
     if (this.props.tabs) {
       // 多sheet表导出
 
