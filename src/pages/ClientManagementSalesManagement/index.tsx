@@ -483,6 +483,7 @@ class ClientManagementSalesManagement extends PureComponent {
               }}
               content={
                 <CreateFormModal
+                  refCreateFormModal={node => (this.$refCreateFormModal = node)}
                   dataSource={this.state.createFormData}
                   handleValueChange={this.handleValueChange}
                   branchSalesList={this.state.branchSalesList}
