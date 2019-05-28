@@ -88,7 +88,8 @@ class ApprovalProcessConfiguration extends PureComponent {
         return task;
       });
 
-      tab.tasks = _.sortBy(tab.tasks, ['index']);
+      // tab.tasks = _.sortBy(tab.tasks, ['index']);
+      tab.tasks = _.sortBy(tab.tasks, ['sequence']);
       return tab;
     });
 
@@ -213,6 +214,47 @@ class ApprovalProcessConfiguration extends PureComponent {
     throw new Error('getActionClass: no match');
   };
 
+  public changeData = data => {
+    const { currentProcessName, processList } = this.state;
+    const pIndex = _.findIndex(processList, item => {
+      return item.processName === currentProcessName;
+    });
+    const _processList = { ...data };
+    let _tasks = [..._processList.tasks];
+    _tasks = _tasks.map(item => {
+      item.approveGroupList = item.approveGroups.map(ap => ap.approveGroupId);
+      if (item.taskType === 'modifyData') {
+        item.index = 2;
+      } else if (item.taskType === REVIEW_DATA) {
+        item.index = 1;
+      } else if (item.taskType === 'insertData') {
+        item.index = 0;
+      } else {
+        item.index = 4;
+      }
+      return item;
+    });
+    _tasks = _.sortBy(_tasks, 'index');
+
+    const reviewDataLength = _.filter(_tasks, item => {
+      return item.taskType === REVIEW_DATA;
+    }).length;
+    _processList.reviewDataLength = reviewDataLength;
+
+    _processList.tasks = _tasks;
+    processList[pIndex] = _processList;
+    this.setState(
+      {
+        processList,
+      },
+      () => {
+        notification.success({
+          message: `保存成功`,
+        });
+      }
+    );
+  };
+
   public onConfirm = async () => {
     const { currentProcessName, processList } = this.state;
     const pIndex = _.findIndex(processList, item => {
@@ -273,6 +315,7 @@ class ApprovalProcessConfiguration extends PureComponent {
           ...item,
         };
       });
+      return this.changeData(data);
     }
 
     const { error: _error, data } = await wkTaskApproveGroupBind({
@@ -285,40 +328,7 @@ class ApprovalProcessConfiguration extends PureComponent {
       }),
     });
     if (_error) return;
-    const _processList = { ...data };
-    let _tasks = [..._processList.tasks];
-    _tasks = _tasks.map(item => {
-      item.approveGroupList = item.approveGroups.map(ap => ap.approveGroupId);
-      if (item.taskType === 'modifyData') {
-        item.index = 2;
-      } else if (item.taskType === REVIEW_DATA) {
-        item.index = 1;
-      } else if (item.taskType === 'insertData') {
-        item.index = 0;
-      } else {
-        item.index = 4;
-      }
-      return item;
-    });
-    _tasks = _.sortBy(_tasks, 'index');
-
-    const reviewDataLength = _.filter(_tasks, item => {
-      return item.taskType === REVIEW_DATA;
-    }).length;
-    _processList.reviewDataLength = reviewDataLength;
-
-    _processList.tasks = _tasks;
-    processList[pIndex] = _processList;
-    this.setState(
-      {
-        processList,
-      },
-      () => {
-        notification.success({
-          message: `保存成功`,
-        });
-      }
-    );
+    this.changeData(data);
   };
 
   public handleResetOk = async () => {
