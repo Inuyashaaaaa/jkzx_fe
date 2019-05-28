@@ -11,7 +11,12 @@ import {
   STRIKE_TYPES_MAP,
   BIG_NUMBER_CONFIG,
 } from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP, TRADESCOL_FIELDS, VERTICAL_GUTTER } from '@/constants/global';
+import {
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+  TRADESCOL_FIELDS,
+  VERTICAL_GUTTER,
+  DEFAULT_TERM,
+} from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { DATE_LEG_FIELDS } from '@/constants/legType';
 import { mktInstrumentSearch } from '@/services/market-data-service';
@@ -530,7 +535,9 @@ const TradeManagementPricingManagement = props => {
                                   }),
                                   ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
                                   [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
-                                  [LEG_FIELD.TERM]: asset.annualized ? asset[LEG_FIELD.TERM] : 30,
+                                  [LEG_FIELD.TERM]: asset.annualized
+                                    ? asset[LEG_FIELD.TERM]
+                                    : DEFAULT_TERM,
                                 })
                               ),
                             };
