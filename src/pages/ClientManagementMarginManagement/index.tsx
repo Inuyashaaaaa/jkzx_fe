@@ -140,6 +140,7 @@ class ClientManagementMarginManagement extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        filterOption={true}
                         options={async (value: string = '') => {
                           const { data, error } = await refSimilarLegalNameList({
                             similarLegalName: value,
