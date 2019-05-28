@@ -75,16 +75,13 @@ class PricingSettingsDividendCurve extends PureComponent {
       if (message.includes('failed to find model data for ')) {
         data = {
           dataSource: [
-            Form2.createFields(
-              {
-                expiry: null,
-                quote: 0,
-                tenor: '1D',
-                use: true,
-                id: uuidv4(),
-              },
-              ['id']
-            ),
+            {
+              expiry: null,
+              quote: 0,
+              tenor: '1D',
+              use: true,
+              id: uuidv4(),
+            },
           ],
         };
       } else {
@@ -210,7 +207,7 @@ class PricingSettingsDividendCurve extends PureComponent {
   };
 
   public showModal = () => {
-    this.setState({ visible: true });
+    this.setState({ visible: true, insertFormData: { quote: Form2.createField(0) } });
   };
 
   public onCancel = () => {
