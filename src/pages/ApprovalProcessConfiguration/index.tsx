@@ -20,6 +20,7 @@ import {
   Switch,
   Tabs,
   Typography,
+  Skeleton,
 } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -33,7 +34,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   public state = {
     approveGroupList: [],
     taskApproveGroupList: [],
-    processList: [],
+    processList: null,
     loading: false,
     currentProcessName: '',
     status: false,
@@ -501,147 +502,165 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public render() {
+    console.log(this.state.processList);
     return (
       <div className={styles.approvalProcessConfiguration}>
         <Page>
           <Tabs animated={false} onChange={this.tabsChange}>
-            {this.state.processList.map((tab, index) => {
-              return (
-                <TabPane tab={tab.processName + '审批'} key={tab.processName}>
-                  <div
-                    style={{
-                      marginRight: '2px',
-                      background: '#FFF',
-                      padding: '30px',
-                      position: 'relative',
-                      height: '100%',
-                    }}
-                  >
-                    <p className={styles.bolder}>审批流程</p>
-                    <List bordered={false} loading={this.state.loading}>
-                      <List.Item>
-                        <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
-                          <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                          <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                          <span style={{ marginLeft: '30px' }}>发起审批</span>
-                        </div>
-                        <span className={styles.approvalIcon}>
-                          {/* <Icon type="plus-circle" /> */}
-                        </span>
-                      </List.Item>
-                      {tab.tasks.map((task, gIndex) => {
-                        if (!task) return;
-                        return (
-                          <List.Item key={task.taskId}>
-                            <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
+            {!this.state.processList ? (
+              <TabPane>
+                <div
+                  style={{
+                    background: '#FFF',
+                    padding: '30px',
+                    width: '100%',
+                  }}
+                >
+                  <Skeleton active />
+                </div>
+              </TabPane>
+            ) : (
+              this.state.processList.map((tab, index) => {
+                return (
+                  <TabPane tab={tab.processName + '审批'} key={tab.processName}>
+                    <div
+                      style={{
+                        marginRight: '2px',
+                        background: '#FFF',
+                        padding: '30px',
+                        position: 'relative',
+                        height: '100%',
+                      }}
+                    >
+                      <p className={styles.bolder}>审批流程</p>
+                      <List bordered={false} loading={this.state.loading}>
+                        <List.Item>
+                          <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
+                            <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                            <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                            <span style={{ marginLeft: '30px' }}>发起审批</span>
+                          </div>
+                          <span className={styles.approvalIcon}>
+                            {/* <Icon type="plus-circle" /> */}
+                          </span>
+                        </List.Item>
+                        {tab.tasks.map((task, gIndex) => {
+                          if (!task) return;
+                          return (
+                            <List.Item key={task.taskId}>
                               <div
-                                style={{
-                                  display: 'inline-block',
-                                  float: 'left',
-                                  marginRight: '150px',
-                                }}
+                                className={styles.approvalNode}
+                                style={{ background: '#e8e5e5' }}
                               >
-                                <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                                <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                                {/* <span style={{ marginLeft: '30px' }}>{group.taskName}</span> */}
-                                <span
+                                <div
                                   style={{
-                                    marginLeft: '30px',
                                     display: 'inline-block',
-                                    width: '150px',
+                                    float: 'left',
+                                    marginRight: '150px',
                                   }}
                                 >
-                                  <Paragraph
-                                    ellipsis={true}
-                                    editable={{
-                                      onChange: e =>
-                                        this.handleGroupNamge(e, tab.processId, task.taskId),
+                                  <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                                  <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                                  {/* <span style={{ marginLeft: '30px' }}>{group.taskName}</span> */}
+                                  <span
+                                    style={{
+                                      marginLeft: '30px',
+                                      display: 'inline-block',
+                                      width: '150px',
+                                    }}
+                                  >
+                                    <Paragraph
+                                      ellipsis={true}
+                                      editable={{
+                                        onChange: e =>
+                                          this.handleGroupNamge(e, tab.processId, task.taskId),
+                                      }}
+                                      onChange={e =>
+                                        this.handleGroupNamge(e, tab.processId, task.taskId)
+                                      }
+                                    >
+                                      {task.taskName}
+                                    </Paragraph>
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    display: 'inline-block',
+                                    float: 'left',
+                                    marginLeft: '40px',
+                                    width: '600px',
+                                  }}
+                                >
+                                  <span className={styles.selectTile}>选择审批组</span>
+                                  <Select
+                                    style={{
+                                      width: '280px',
+                                    }}
+                                    editing={true}
+                                    fetchOptionsOnSearch={true}
+                                    showSearch={true}
+                                    allowClear={true}
+                                    placeholder="请输入内容搜索"
+                                    mode="multiple"
+                                    disabled={gIndex === tab.tasks.length - 1}
+                                    value={_.get(task, 'approveGroupList') || []}
+                                    options={async (value: string = '') => {
+                                      const { data, error } = await wkApproveGroupList();
+                                      if (error) return [];
+                                      return _.sortBy(
+                                        data.map(item => ({
+                                          value: item.approveGroupId,
+                                          label: item.approveGroupName,
+                                        })),
+                                        'label'
+                                      );
                                     }}
                                     onChange={e =>
-                                      this.handleGroupNamge(e, tab.processId, task.taskId)
+                                      this.handleApproveGroup(e, tab.processId, task.taskId)
                                     }
-                                  >
-                                    {task.taskName}
-                                  </Paragraph>
+                                  />
+                                </div>
+                              </div>
+                              {task.taskType === REVIEW_DATA ? (
+                                <span className={styles.approvalIcon}>
+                                  <Icon
+                                    type="minus-circle"
+                                    onClick={e => {
+                                      this.handleDeleteReview(e, tab.processId, task.taskId);
+                                    }}
+                                  />
+                                  {/* <Icon type="plus-circle" onClick={(e) => {this.handleAddReview(e, group)}}/> */}
                                 </span>
-                              </div>
-                              <div
-                                style={{
-                                  display: 'inline-block',
-                                  float: 'left',
-                                  marginLeft: '40px',
-                                  width: '600px',
-                                }}
-                              >
-                                <span className={styles.selectTile}>选择审批组</span>
-                                <Select
-                                  style={{
-                                    width: '280px',
-                                  }}
-                                  editing={true}
-                                  fetchOptionsOnSearch={true}
-                                  showSearch={true}
-                                  allowClear={true}
-                                  placeholder="请输入内容搜索"
-                                  mode="multiple"
-                                  disabled={gIndex === tab.tasks.length - 1}
-                                  value={_.get(task, 'approveGroupList') || []}
-                                  options={async (value: string = '') => {
-                                    const { data, error } = await wkApproveGroupList();
-                                    if (error) return [];
-                                    return _.sortBy(
-                                      data.map(item => ({
-                                        value: item.approveGroupId,
-                                        label: item.approveGroupName,
-                                      })),
-                                      'label'
-                                    );
-                                  }}
-                                  onChange={e =>
-                                    this.handleApproveGroup(e, tab.processId, task.taskId)
-                                  }
-                                />
-                              </div>
-                            </div>
-                            {task.taskType === REVIEW_DATA ? (
-                              <span className={styles.approvalIcon}>
-                                <Icon
-                                  type="minus-circle"
-                                  onClick={e => {
-                                    this.handleDeleteReview(e, tab.processId, task.taskId);
-                                  }}
-                                />
-                                {/* <Icon type="plus-circle" onClick={(e) => {this.handleAddReview(e, group)}}/> */}
-                              </span>
-                            ) : (
-                              <span className={styles.approvalIcon} />
-                            )}
-                          </List.Item>
-                        );
-                      })}
-                      <List.Item>
-                        <div
-                          className={styles.approvalNode}
-                          style={{
-                            border: '2px dashed #e8e5e5',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                          }}
-                          onClick={e => {
-                            return this.handleClick(e, tab.processId);
-                          }}
-                        >
-                          <Icon type="plus" style={{ fontSize: '12px' }} />
-                          增加审批节点
-                        </div>
-                        <span className={styles.approvalIcon} />
-                      </List.Item>
-                    </List>
-                  </div>
-                  {this.renderTabs(tab)}
-                </TabPane>
-              );
-            })}
+                              ) : (
+                                <span className={styles.approvalIcon} />
+                              )}
+                            </List.Item>
+                          );
+                        })}
+                        <List.Item>
+                          <div
+                            className={styles.approvalNode}
+                            style={{
+                              border: '2px dashed #e8e5e5',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                            }}
+                            onClick={e => {
+                              return this.handleClick(e, tab.processId);
+                            }}
+                          >
+                            <Icon type="plus" style={{ fontSize: '12px' }} />
+                            增加审批节点
+                          </div>
+                          <span className={styles.approvalIcon} />
+                        </List.Item>
+                      </List>
+                    </div>
+                    {this.renderTabs(tab)}
+                  </TabPane>
+                );
+              })
+            )}
           </Tabs>
           <Modal
             title="消息提示"
