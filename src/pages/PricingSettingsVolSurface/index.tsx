@@ -433,6 +433,11 @@ class PricingSettingVolSurface extends PureComponent {
         );
       },
     });
+    let { tableDataSource } = this.state;
+    tableDataSource = tableDataSource.map(item => {
+      item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
+      return item;
+    });
     return (
       <Page>
         <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
@@ -530,7 +535,7 @@ class PricingSettingVolSurface extends PureComponent {
             ) : null}
 
             <Table2
-              dataSource={this.state.tableDataSource}
+              dataSource={tableDataSource}
               columns={columns}
               pagination={{
                 showSizeChanger: true,
