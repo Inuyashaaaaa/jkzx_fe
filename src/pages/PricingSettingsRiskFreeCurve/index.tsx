@@ -240,6 +240,11 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public render() {
+    let { tableDataSource } = this.state;
+    tableDataSource = tableDataSource.map(item => {
+      item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
+      return item;
+    });
     return (
       <Page>
         <Form2
@@ -295,7 +300,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
           size="middle"
           rowKey="id"
           onCellFieldsChange={this.handleCellValueChanged}
-          dataSource={this.state.tableDataSource}
+          dataSource={tableDataSource}
           columns={[
             {
               title: '期限',
