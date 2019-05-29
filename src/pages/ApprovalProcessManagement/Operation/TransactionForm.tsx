@@ -65,13 +65,6 @@ class ApprovalForm extends PureComponent<any, any> {
   }
   public componentDidMount = async () => {
     const { formData, status } = this.props;
-    const { data, error } = await wkProcessInstanceFormGet({
-      processInstanceId: this.props.formData.processInstanceId,
-    });
-    if (error) return;
-    this.setState({
-      tableData: _.get(data, 'process._business_payload'),
-    });
     this.fetchData(formData, status);
   };
 
@@ -141,9 +134,9 @@ class ApprovalForm extends PureComponent<any, any> {
     };
     this.setState({
       detailData: _detailData,
+      currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
     });
-
     if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
       this.setState({
@@ -299,7 +292,7 @@ class ApprovalForm extends PureComponent<any, any> {
         confirmed: true,
         comment: passComment,
       },
-      businessProcessData: {},
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'pass');
   };
@@ -320,7 +313,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: passComment,
         abandon: false,
       },
-      businessProcessData: { trade: this.state.tableData, validTime: '2018-01-01T10:10:10' },
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'modify');
   };
@@ -334,7 +327,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: rejectReason,
         confirmed: false,
       },
-      businessProcessData: { trade: this.state.tableData, validTime: '2018-01-01T10:10:10' },
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'reject');
   };
@@ -446,9 +439,9 @@ class ApprovalForm extends PureComponent<any, any> {
       rejectReason,
       passComment,
       modifyComment,
+      currentNodeDTO,
     } = this.state;
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
+    const isCheckBtn = currentNodeDTO !== 'modifyData' && status === 'pending';
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
