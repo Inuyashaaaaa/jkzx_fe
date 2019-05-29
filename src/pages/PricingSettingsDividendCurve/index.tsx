@@ -187,8 +187,8 @@ class PricingSettingsDividendCurve extends PureComponent {
     message.success('删除成功');
   };
 
-  public onConfirm = () => {
-    const validateRsp = this.$insertForm.validate();
+  public onConfirm = async () => {
+    const validateRsp = await this.$insertForm.validate();
     if (validateRsp.error) return;
     const data = {
       ...this.state.insertFormData,

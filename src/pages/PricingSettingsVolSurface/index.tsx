@@ -13,7 +13,7 @@ import {
 } from '@/services/common';
 import { queryAllModelNameVol, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
 // import { queryModelName, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
-import { Col, message, notification, Row, Table, Divider, Button, Modal } from 'antd';
+import { Col, message, notification, Row, Table, Divider, Button, Modal, Popconfirm } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -57,6 +57,8 @@ class PricingSettingVolSurface extends PureComponent {
     insertVisible: false,
     insertFormData: {},
     quoteData: {},
+    record: {},
+    rowIndex: 0,
   };
 
   constructor(props) {
@@ -88,7 +90,7 @@ class PricingSettingVolSurface extends PureComponent {
   public sortDataSource = dataSource => {
     return dataSource
       .map(record => {
-        const day = TRNORS_OPTS.find(item => item.name === record.tenor) || {};
+        const day = TRNORS_OPTS.find(item => item.name === record.tenor.value) || {};
         return {
           days: day && day.days,
           record,
@@ -137,7 +139,6 @@ class PricingSettingVolSurface extends PureComponent {
             instrumentId: searchFormData[MARKET_KEY],
             quote: 1,
           },
-          columns: TABLE_COLUMN(dataSource),
           failed: true,
         };
       } else {
@@ -170,9 +171,7 @@ class PricingSettingVolSurface extends PureComponent {
                         editing={editing}
                         autoSelect={true}
                         defaultOpen={true}
-                        options={getCanUsedTranorsOtionsNotIncludingSelf(
-                          dataSource.map(item => Form2.getFieldsValue(item))
-                        )}
+                        options={getCanUsedTranorsOtions(dataSource, Form2.getFieldsValue(record))}
                       />
                     )}
                   </FormItem>
@@ -278,7 +277,7 @@ class PricingSettingVolSurface extends PureComponent {
     });
   };
 
-  public onRemove = (event, rowIndex, param) => {
+  public onRemove = (rowIndex, param) => {
     const clone = [...this.state.tableDataSource];
     clone.splice(rowIndex, 1);
     this.setState({
@@ -288,22 +287,25 @@ class PricingSettingVolSurface extends PureComponent {
     message.success('删除成功');
   };
 
-  public onConfirm = async (event, rowIndex, param) => {
+  public onConfirm = async (rowIndex, param) => {
     const validateRsp = await this.$insertForm.validate();
     if (validateRsp.error) return;
-
-    const clone = [...this.state.tableDataSource];
-    const { insertFormData } = this.state;
-    clone.splice(rowIndex + 1, 0, {
+    const data = {
       ...param,
-      ...insertFormData,
-      id: Math.random(),
-    });
-    this.setState({
-      insertVisible: false,
-      tableDataSource: this.sortDataSource(clone),
-      insertFormData: {},
-    });
+      ...this.state.insertFormData,
+      id: uuidv4(),
+    };
+    const clone = _.concat(this.state.tableDataSource, data);
+    this.setState(
+      {
+        insertVisible: false,
+        tableDataSource: this.sortDataSource(clone),
+        insertFormData: {},
+      },
+      () => {
+        console.log(this.state.tableDataSource);
+      }
+    );
     message.success('插入成功');
   };
 
@@ -333,108 +335,48 @@ class PricingSettingVolSurface extends PureComponent {
     this.selectedColumns = columns;
   };
 
-  public onClick = (e, tableDataSource = {}) => {
+  public onClick = (record, index) => {
     this.setState({
       insertVisible: true,
+      record,
+      rowIndex: index,
     });
-
-    const formControls: IFormControl[] = [
-      {
-        dataIndex: 'tenor',
-        control: {
-          label: '期限',
-        },
-        input: {
-          type: 'select',
-          options: getCanUsedTranorsOtionsNotIncludingSelf(this.state.tableDataSource),
-        },
-        options: {
-          rules: [
-            {
-              required: true,
-            },
-          ],
-        },
-      },
-    ];
-
-    return {
-      formControls,
-      formData: {},
-      extra: event,
-    };
   };
 
   public handleCellValueChanged = params => {
-    this.setState({
-      tableDataSource: this.state.tableDataSource.map(item => {
-        if (item.id === params.record.id) {
-          return params.record;
-        }
-        return item;
-      }),
-    });
+    this.setState(
+      {
+        tableDataSource: this.state.tableDataSource.map(item => {
+          if (item.id === params.record.id) {
+            return params.record;
+          }
+          return item;
+        }),
+      },
+      () => {
+        console.log(this.state.tableDataSource);
+      }
+    );
   };
 
   public render() {
-    const columns = this.state.tableColumnDefs.concat({
+    const tableColumnDefs = TABLE_COLUMN(this.state.tableDataSource);
+    const columns = tableColumnDefs.concat({
       title: '操作',
+      dataIndex: 'operation',
       render: (text, record, index) => {
         return (
-          <p>
-            <a style={{ color: 'red' }} onClick={e => this.onRemove(e, index, record)}>
-              删除
-            </a>
+          <>
+            <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(index, record)}>
+              <a style={{ color: 'red' }}>删除</a>
+            </Popconfirm>
             <Divider type="vertical" />
-            <a onClick={e => this.onClick(e, text)}>插入</a>
-            <Modal
-              visible={this.state.insertVisible}
-              onOk={e => this.onConfirm(e, index, record)}
-              onCancel={() => {
-                this.setState({ insertVisible: false });
-              }}
-              closable={false}
-            >
-              <Form2
-                ref={node => (this.$insertForm = node)}
-                dataSource={this.state.insertFormData}
-                footer={false}
-                onFieldsChange={this.onInsertFormChange}
-                columns={[
-                  {
-                    title: '期限',
-                    dataIndex: 'tenor',
-                    render: (val, record, index, { form }) => {
-                      return (
-                        <FormItem>
-                          {form.getFieldDecorator({
-                            rules: [
-                              {
-                                required: true,
-                                message: '期限必填',
-                              },
-                            ],
-                          })(
-                            <Select
-                              style={{ minWidth: 180 }}
-                              options={getCanUsedTranorsOtionsNotIncludingSelf(
-                                this.state.tableDataSource.map(item => Form2.getFieldsValue(item))
-                              )}
-                            />
-                          )}
-                        </FormItem>
-                      );
-                    },
-                  },
-                ]}
-              />
-            </Modal>
-          </p>
+            <a onClick={() => this.onClick(record, index)}>插入</a>
+          </>
         );
       },
     });
-    let { tableDataSource } = this.state;
-    tableDataSource = tableDataSource.map(item => {
+    const tableDataSource = this.state.tableDataSource.map(item => {
       item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
       return item;
     });
@@ -506,7 +448,6 @@ class PricingSettingVolSurface extends PureComponent {
             <Divider type="horizontal" />
             {this.underlyer ? (
               <Form2
-                // ref={node => (this.$source = node)}
                 layout="inline"
                 dataSource={Form2.createFields(this.state.tableFormData)}
                 submitable={false}
@@ -549,6 +490,49 @@ class PricingSettingVolSurface extends PureComponent {
             />
           </Col>
         </Row>
+        <Modal
+          visible={this.state.insertVisible}
+          onOk={() => this.onConfirm(this.state.rowIndex, this.state.record)}
+          onCancel={() => {
+            this.setState({ insertVisible: false });
+          }}
+          closable={false}
+          maskClosable={false}
+        >
+          <Form2
+            ref={node => (this.$insertForm = node)}
+            dataSource={this.state.insertFormData}
+            footer={false}
+            onFieldsChange={this.onInsertFormChange}
+            columns={[
+              {
+                title: '期限',
+                dataIndex: 'tenor',
+                render: (val, record, index, { form }) => {
+                  return (
+                    <FormItem>
+                      {form.getFieldDecorator({
+                        rules: [
+                          {
+                            required: true,
+                            message: '期限必填',
+                          },
+                        ],
+                      })(
+                        <Select
+                          style={{ minWidth: 180 }}
+                          options={getCanUsedTranorsOtionsNotIncludingSelf(
+                            this.state.tableDataSource.map(item => Form2.getFieldsValue(item))
+                          )}
+                        />
+                      )}
+                    </FormItem>
+                  );
+                },
+              },
+            ]}
+          />
+        </Modal>
       </Page>
     );
   }
