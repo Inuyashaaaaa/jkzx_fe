@@ -2,6 +2,8 @@ import { notification } from 'antd';
 import fetch from 'dva/fetch';
 import hash from 'hash.js';
 import { getToken } from './authority';
+import router from 'umi/router';
+import _ from 'lodash';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -74,6 +76,10 @@ const cachedSave = (response, hashcode) => {
   return response;
 };
 
+const gotoLogin = _.debounce(() => {
+  router.push('/user/login');
+}, 100);
+
 /**
  * Requests a URL, returning a promise.
  *
@@ -82,7 +88,13 @@ const cachedSave = (response, hashcode) => {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, _options = {}, passError = false) {
-  const { token, ...options } = _options;
+  const { token, passToken, ...options } = _options;
+
+  if (!passToken && !(token || getToken())) {
+    passError = true;
+    gotoLogin();
+  }
+
   /**
    * Produce fingerprints based on url and parameters
    * Maybe url has the same parameters
