@@ -63,10 +63,17 @@ class ApprovalForm extends PureComponent<any, any> {
       tableData: {},
     };
   }
-  public componentDidMount() {
+  public componentDidMount = async () => {
     const { formData, status } = this.props;
+    const { data, error } = await wkProcessInstanceFormGet({
+      processInstanceId: this.props.formData.processInstanceId,
+    });
+    if (error) return;
+    this.setState({
+      tableData: _.get(data, 'process._business_payload'),
+    });
     this.fetchData(formData, status);
-  }
+  };
 
   public componentWillReceiveProps(nextProps) {
     const { formData, status } = nextProps;
@@ -181,6 +188,7 @@ class ApprovalForm extends PureComponent<any, any> {
   public handleCounterChange = () => {
     const { formData } = this.props;
     const { data } = this.state;
+    console.log(formData);
     const isCheckBtn =
       formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
     const formItems = this.formatFormItems(data, isCheckBtn);
@@ -326,7 +334,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: rejectReason,
         confirmed: false,
       },
-      businessProcessData: {},
+      businessProcessData: { trade: this.state.tableData, validTime: '2018-01-01T10:10:10' },
     };
     this.executeModify(params, 'reject');
   };
