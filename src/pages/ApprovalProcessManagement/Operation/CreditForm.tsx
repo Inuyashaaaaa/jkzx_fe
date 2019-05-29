@@ -66,10 +66,10 @@ class ApprovalForm extends PureComponent<any, any> {
       isCompleted: null,
     };
   }
-  public componentDidMount() {
+  public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
-  }
+  };
 
   public componentWillReceiveProps(nextProps) {
     const { formData, status } = nextProps;
@@ -141,10 +141,10 @@ class ApprovalForm extends PureComponent<any, any> {
       credit: _.get(data, 'process._business_payload.credit'),
       counterPartyCredit: _.get(data, 'process._business_payload.counterPartyCredit'),
     };
-
     this.setState({
       detailData: Form2.createFields(_detailData),
       creditForm: Form2.createFields(_creditForm),
+      currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
     });
 
@@ -402,13 +402,16 @@ class ApprovalForm extends PureComponent<any, any> {
   public rejectForm = async () => {
     const { formData } = this.props;
     const { rejectReason } = this.state;
+    const { data, error } = await wkProcessInstanceFormGet({
+      processInstanceId: this.props.formData.processInstanceId,
+    });
     const params = {
       taskId: formData.taskId,
       ctlProcessData: {
         comment: rejectReason,
         confirmed: false,
       },
-      businessProcessData: {},
+      businessProcessData: _.get(data, 'process._business_payload'),
     };
     this.executeModify(params, 'reject');
   };
@@ -490,9 +493,11 @@ class ApprovalForm extends PureComponent<any, any> {
       rejectReason,
       passComment,
       modifyComment,
+      currentNodeDTO,
     } = this.state;
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
+
+    const isCheckBtn = currentNodeDTO !== 'modifyData' && status === 'pending';
+
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
