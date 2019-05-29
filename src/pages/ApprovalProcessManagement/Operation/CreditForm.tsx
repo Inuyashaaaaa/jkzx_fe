@@ -514,7 +514,8 @@ class ApprovalForm extends PureComponent<any, any> {
       _data.status =
         histories[histories.length - 1].operation === '退回'
           ? '待修改'
-          : histories[histories.length - 1].operation === '复核通过'
+          : histories[histories.length - 1].operation === '复核通过' ||
+            histories[histories.length - 1].operation === '废弃'
           ? '审核完成'
           : '待审批';
     }
