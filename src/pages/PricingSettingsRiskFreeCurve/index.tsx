@@ -10,7 +10,7 @@ import {
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
 import { queryModelName, queryModelRiskFreeCurve, saveModelRiskFreeCurve } from '@/services/model';
-import { message, Divider, Table, Modal, Row, Button } from 'antd';
+import { message, Divider, Table, Modal, Row, Button, Popconfirm } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import { GROUP_KEY } from './constants';
@@ -18,6 +18,7 @@ import { Form2, Input, Select, Table2 } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import uuidv4 from 'uuid/v4';
+import Item from 'antd/lib/list/Item';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
@@ -36,6 +37,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     insertVisible: false,
     searchFormData: {},
     insertFormData: {},
+    visible: [],
   };
 
   public lastFetchedDataSource = null;
@@ -75,7 +77,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     return dataSource
       .map(record => {
         return {
-          days: (TRNORS_OPTS.find(item => item.name === record.tenor) || {}).days,
+          days: (TRNORS_OPTS.find(item => item.name === record.tenor.value) || {}).days,
           record,
         };
       })
@@ -99,19 +101,26 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
           use: true,
           expiry: null,
           id: uuidv4(),
+          visible: false,
         },
       ];
     } else {
-      tableDataSource = this.sortDataSource(dataSource);
+      tableDataSource = this.sortDataSource(
+        dataSource.map(item => {
+          return { ...item, visible: false };
+        })
+      );
     }
-    this.setState({ tableDataSource: tableDataSource.map(item => Form2.createFields(item)) });
+    this.setState({
+      tableDataSource: tableDataSource.map(item => Form2.createFields(item, ['id', 'visible'])),
+    });
   };
 
   public saveTableData = async () => {
     const { tableDataSource } = this.state;
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error } = await saveModelRiskFreeCurve({
-      dataSource: tableDataSource.map(item => Form2.getFieldsValue(item)),
+      dataSource: tableDataSource.map(item => _.omit(Form2.getFieldsValue(item), 'visible')),
       modelName: searchFormData[GROUP_KEY],
     });
 
@@ -139,7 +148,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     // });
   };
 
-  public onRemove = (e, rowIndex) => {
+  public onRemove = rowIndex => {
     const clone = [...this.state.tableDataSource];
     clone.splice(rowIndex, 1);
     this.setState({
@@ -149,7 +158,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     message.success('删除成功');
   };
 
-  public onConfirm = async (event, rowIndex, param) => {
+  public onConfirm = async (rowIndex, param, record) => {
     const { error } = await this.$insertForm.validate();
     if (error) return;
 
@@ -158,10 +167,19 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     const data = {
       ...insertFormData,
       id: uuidv4(),
+      visible: false,
       expiry: Form2.createField(null),
       use: Form2.createField(true),
     };
-    const clone = _.concat(this.state.tableDataSource, data);
+    const clone = _.concat(this.state.tableDataSource, data).map(item => {
+      if (item.id === record.id) {
+        return {
+          ...item,
+          visible: false,
+        };
+      }
+      return item;
+    });
     this.setState({
       insertVisible: false,
       tableDataSource: this.sortDataSource(clone),
@@ -171,36 +189,21 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     message.success('插入成功');
   };
 
-  public onClick = (e, tableDataSource = {}) => {
+  public onClick = record => {
     this.setState({
-      insertVisible: true,
-    });
-
-    const formControls: IFormControl[] = [
-      {
-        dataIndex: 'tenor',
-        control: {
-          label: '期限',
-        },
-        input: {
-          type: 'select',
-          options: getCanUsedTranorsOtionsNotIncludingSelf([tableDataSource]),
-        },
-        options: {
-          rules: [
-            {
-              required: true,
-            },
-          ],
-        },
+      tableDataSource: this.state.tableDataSource.map(item => {
+        if (item.id === record.id) {
+          return {
+            ...item,
+            visible: true,
+          };
+        }
+        return item;
+      }),
+      insertFormData: {
+        quote: Form2.createField(0),
       },
-    ];
-
-    return {
-      formControls,
-      formData: {},
-      extra: event,
-    };
+    });
   };
 
   public createPromise = () => {
@@ -224,19 +227,14 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public handleCellValueChanged = params => {
-    this.setState(
-      {
-        tableDataSource: this.state.tableDataSource.map(item => {
-          if (item.id === params.record.id) {
-            return params.record;
-          }
-          return item;
-        }),
-      },
-      () => {
-        console.log(this.state.tableDataSource);
-      }
-    );
+    this.setState({
+      tableDataSource: this.state.tableDataSource.map(item => {
+        if (item.id === params.record.id) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
   };
 
   public render() {
@@ -350,21 +348,25 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               render: (value, record, index) => {
                 return (
                   <>
-                    <a
-                      style={{ color: 'red' }}
-                      onClick={e => {
-                        this.onRemove(e, index);
-                      }}
-                    >
-                      删除
-                    </a>
+                    <Popconfirm title="确认要删除吗？" onConfirm={() => this.onRemove(index)}>
+                      <a style={{ color: 'red' }}>删除</a>
+                    </Popconfirm>
                     <Divider type="vertical" />
-                    <a onClick={e => this.onClick(e, value)}>插入</a>
+                    <a onClick={() => this.onClick(record)}>插入</a>
                     <Modal
-                      visible={this.state.insertVisible}
-                      onOk={e => this.onConfirm(e, index, value)}
+                      visible={
+                        this.state.tableDataSource.find(item => item.id === record.id).visible
+                      }
+                      onOk={e => this.onConfirm(index, value, record)}
                       onCancel={() => {
-                        this.setState({ insertVisible: false });
+                        this.setState({
+                          tableDataSource: this.state.tableDataSource.map(item => {
+                            if (item.id === record.id) {
+                              return { ...item, visible: false };
+                            }
+                            return item;
+                          }),
+                        });
                       }}
                       closable={false}
                     >

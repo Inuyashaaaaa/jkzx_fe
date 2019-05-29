@@ -185,7 +185,6 @@ export const TABLE_COLUMN = tableDataSource => [
             <Select
               defaultOpen={true}
               autoSelect={true}
-              //   style={{ minWidth: 180 }}
               options={getCanUsedTranorsOtions(
                 tableDataSource.map(item => Form2.getFieldsValue(item)),
                 Form2.getFieldsValue(record)
@@ -322,66 +321,5 @@ export const TABLE_COLUMN = tableDataSource => [
         </FormItem>
       );
     },
-  },
-];
-
-export const TABLE_COLUMN_DEFS: IColumnDef[] = [
-  {
-    editable: true,
-    field: 'tenor',
-    headerName: '期限',
-    input: {
-      type: 'select',
-      options: getCanUsedTranorsOtionsNotIncludingSelf([]),
-    },
-  },
-  {
-    editable: true,
-    field: '80% SPOT',
-    headerName: '80% SPOT',
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-    percent: 0.8,
-  },
-  {
-    editable: true,
-    field: '90% SPOT',
-    headerName: '90% SPOT',
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-    percent: 0.9,
-  },
-  {
-    editable: true,
-    field: '95% SPOT',
-    headerName: '95% SPOT',
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-    percent: 0.95,
-  },
-  {
-    editable: true,
-    field: '100% SPOT',
-    headerName: '100% SPOT',
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-    percent: 1,
-  },
-  {
-    editable: true,
-    field: '105% SPOT',
-    headerName: '105% SPOT',
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-    percent: 1.05,
-  },
-  {
-    editable: true,
-    field: '110% SPOT',
-    headerName: '110% SPOT',
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-    percent: 1.1,
-  },
-  {
-    editable: true,
-    field: '120% SPOT',
-    headerName: '120% SPOT',
-    input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-    percent: 1.2,
   },
 ];
