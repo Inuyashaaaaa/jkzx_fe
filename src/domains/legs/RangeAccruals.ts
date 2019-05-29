@@ -227,13 +227,15 @@ export const RangeAccruals: ILeg = legPipeLine({
           ]),
     ]);
 
-    nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
-      (result, item) => {
-        result[item[OB_DAY_FIELD]] = item.price || null;
-        return result;
-      },
-      {}
-    );
+    if (dataItem[LEG_FIELD.OBSERVATION_DATES]) {
+      nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
+        (result, item) => {
+          result[item[OB_DAY_FIELD]] = item.price || null;
+          return result;
+        },
+        {}
+      );
+    }
 
     nextPosition.asset.effectiveDate =
       nextPosition.asset.effectiveDate &&
