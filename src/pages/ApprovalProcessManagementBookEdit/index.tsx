@@ -110,7 +110,7 @@ const TradeManagementBooking = props => {
     };
 
     const positions = _.get(data, 'process._business_payload.trade.positions');
-    const composePositions = positions.map(position => {
+    const composePositions = (positions || []).map(position => {
       return {
         ...position,
         asset: {

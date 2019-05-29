@@ -189,7 +189,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   public getActionClass = (taskType, processName) => {
     // 资金
     if (processName === '财务出入金') {
-      if (taskType === 'REVIEW_DATA') {
+      if (taskType === 'reviewData') {
         return `tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction`;
       }
       return `tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction`;
@@ -197,18 +197,18 @@ class ApprovalProcessConfiguration extends PureComponent {
 
     // 授信
     if (processName === '授信额度变更') {
-      if (taskType === 'REVIEW_DATA') {
-        return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
+      if (taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
       }
-      return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
+      return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
     }
 
     // 交易
     if (processName === '交易录入') {
-      if (taskType === 'REVIEW_DATA') {
-        return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
+      if (taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
       }
-      return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
+      return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
     }
 
     throw new Error('getActionClass: no match');
@@ -292,6 +292,7 @@ class ApprovalProcessConfiguration extends PureComponent {
     }
 
     const taskList = tasks.map((item, index) => {
+      console.log(item.taskType, this.getActionClass(item.taskType, currentProcessName));
       return {
         ...item,
         sequence: index,
