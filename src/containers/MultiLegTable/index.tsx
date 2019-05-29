@@ -50,6 +50,7 @@ const MultiLegTable = memo<
 
         const nextUnion = getUnionLegColumns(multiLegColumns);
         const nextColumns = chainLegColumns(nextUnion);
+
         return nextColumns;
       });
     },

@@ -1,5 +1,5 @@
 import { DatePicker, Form2 } from '@/containers';
-import { LEG_FIELD } from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
 import { qlIsHoliday } from '@/services/volatility';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
@@ -83,6 +83,12 @@ export const ExpirationDate: ILegColDef = {
   },
   defaultEditing: false,
   render: (value, record, index, { form, editing, colDef }) => {
-    return <ExpirationDateInput value={value} form={form} editing={editing} record={record} />;
+    return (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [getRequiredRule()],
+        })(<DatePicker defaultOpen={true} editing={editing} format={'YYYY-MM-DD'} />)}
+      </FormItem>
+    );
   },
 };

@@ -1,6 +1,6 @@
 import { ILeg } from '@/types/leg';
-import { commonGetPosition } from './common';
+import { commonGetPosition, commonGetDefaultData } from './common';
 
 export const legPipeLine = (leg: ILeg) => {
-  return commonGetPosition(leg);
+  return commonGetDefaultData(commonGetPosition(leg));
 };

@@ -13,6 +13,8 @@ import { getLegByRecord, getMoment } from '@/tools';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { ILeg } from '@/types/leg';
+import { qlIsHoliday } from '@/services/volatility';
+import { message } from 'antd';
 
 const fetchUnderlyerMultiplierAndUnit = _.debounce(
   (
@@ -283,4 +285,69 @@ export const commonLinkage = (
 
 export const commonGetPosition = (leg: ILeg) => {
   return leg;
+};
+
+export const commonGetDefaultData = (leg: ILeg) => {
+  const validate = async date => {
+    if (!date) return;
+    const rootState = window.g_app._store.getState() || {};
+    const { expirationDate = {} } = rootState;
+    const { volatilityCalendars } = expirationDate;
+    if (!volatilityCalendars) return;
+    const formatDate = date.format('YYYY-MM-DD');
+    const { error, data } = await qlIsHoliday({
+      calendars: volatilityCalendars,
+      date: formatDate,
+    });
+    if (error) return;
+    if (data) {
+      message.warning(`${formatDate}属于非交易日`);
+    }
+  };
+
+  return {
+    ...leg,
+    onDataChange: (
+      env,
+      changeFieldsParams,
+      record,
+      tableData,
+      setColLoading,
+      setLoading,
+      setColValue,
+      setTableData
+    ) => {
+      if (leg.onDataChange) {
+        const result = leg.onDataChange(
+          env,
+          changeFieldsParams,
+          record,
+          tableData,
+          setColLoading,
+          setLoading,
+          setColValue,
+          setTableData
+        );
+        const { changedFields } = changeFieldsParams;
+        if (
+          Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields) ||
+          Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
+          Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)
+        ) {
+          validate(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]));
+        }
+        return result;
+      }
+      return undefined;
+    },
+
+    getDefaultData: env => {
+      if (leg.getDefaultData) {
+        const result = leg.getDefaultData(env);
+        validate(Form2.getFieldValue(result[LEG_FIELD.EXPIRATION_DATE]));
+        return result;
+      }
+      return undefined;
+    },
+  };
 };
