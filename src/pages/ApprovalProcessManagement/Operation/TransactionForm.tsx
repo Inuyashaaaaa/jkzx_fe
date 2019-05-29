@@ -136,6 +136,7 @@ class ApprovalForm extends PureComponent<any, any> {
       detailData: _detailData,
       currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
+      tableData: _.get(data, 'process._business_payload'),
     });
     if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
@@ -423,7 +424,7 @@ class ApprovalForm extends PureComponent<any, any> {
       trader: _.get(data, 'trader'),
     };
     this.setState({
-      tableData: data,
+      tableData: { trade: data, validTime: '2018-01-01T10:10:10' },
       detailData,
     });
   };
@@ -462,7 +463,7 @@ class ApprovalForm extends PureComponent<any, any> {
           ? '审核完成'
           : '待审批';
     }
-
+    console.log(this.state.tableData);
     return (
       <div className={styles.fromContainer}>
         {!loading && (
