@@ -8,7 +8,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
   NOTION_ENUM_MAP,
-  OB_DAY_FIELD,
+  OB_PRICE_FIELD,
   OPTION_TYPE_OPTIONS,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
@@ -81,7 +81,7 @@ class ExpirationModal extends PureComponent<
       [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
       [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: _.chain(this.fixingTableData)
         .last()
-        .get(OB_DAY_FIELD)
+        .get(OB_PRICE_FIELD)
         .value(),
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
