@@ -29,8 +29,11 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
 
   public switchModal = () => {
     const data = _.mapValues(this.props.record, (value, key) => {
-      if (key === 'maturity') {
+      if ('maturity' === key) {
         return moment(value);
+      }
+      if (['expirationDate', 'expirationTime'].indexOf(key) !== -1) {
+        return moment(this.props.record.expirationDate + ' ' + this.props.record.expirationTime);
       }
       return value;
     });

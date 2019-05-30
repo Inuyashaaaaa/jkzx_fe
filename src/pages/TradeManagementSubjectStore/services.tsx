@@ -2,6 +2,7 @@ import { DatePicker, Input, InputNumber, Select } from '@/containers';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
+import { TimePicker } from 'antd';
 
 const multiplier = {
   title: '合约乘数',
@@ -154,6 +155,14 @@ const instrumentType = {
             label: '股指期货',
             value: 'INDEX_FUTURES',
           },
+          {
+            label: '股指期权',
+            value: 'INDEX_OPTION',
+          },
+          {
+            label: '个股/ETF期权',
+            value: 'STOCK_OPTION',
+          },
         ];
       }
       return [
@@ -164,6 +173,10 @@ const instrumentType = {
         {
           label: '期货',
           value: 'FUTURES',
+        },
+        {
+          label: '期货期权',
+          value: 'FUTURES_OPTION',
         },
       ];
     };
@@ -208,6 +221,14 @@ const instrumentTypeSearch = {
             label: '股指期货',
             value: 'INDEX_FUTURES',
           },
+          {
+            label: '股指期权',
+            value: 'INDEX_OPTION',
+          },
+          {
+            label: '个股/ETF期权',
+            value: 'STOCK_OPTION',
+          },
         ];
       }
       return [
@@ -218,6 +239,10 @@ const instrumentTypeSearch = {
         {
           label: '期货',
           value: 'FUTURES',
+        },
+        {
+          label: '期货期权',
+          value: 'FUTURES_OPTION',
         },
       ];
     };
@@ -309,7 +334,7 @@ const assetClass = type => {
 
 const instrumentId = type => {
   return {
-    title: '标的物代码',
+    title: '合约代码',
     dataIndex: 'instrumentId',
     render: (value, record, index, { form, editing }) => {
       return (
@@ -321,7 +346,7 @@ const instrumentId = type => {
                 message: '标的物代码是必填项',
               },
             ],
-          })(<Input disabled={type === 'edit' ? true : false} />)}
+          })(<Input disabled={type === 'edit'} />)}
         </FormItem>
       );
     },
@@ -369,28 +394,210 @@ const instrumentIds = {
   },
 };
 
+const exerciseType = {
+  title: '行权方式',
+  dataIndex: 'exerciseType',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator('exerciseType', {
+          rules: [
+            {
+              required: true,
+              message: '行权方式是必填项',
+            },
+          ],
+        })(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={[
+              {
+                label: '欧式',
+                value: 'EUROPEAN',
+              },
+              {
+                label: '美式',
+                value: 'AMERICAN',
+              },
+            ]}
+          />
+        )}
+      </FormItem>
+    );
+  },
+};
+
+const optionType = {
+  title: '期权类型',
+  dataIndex: 'optionType',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator('optionType', {
+          rules: [
+            {
+              required: true,
+              message: '期权类型是必填项',
+            },
+          ],
+        })(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={[
+              {
+                label: '看涨',
+                value: 'CALL',
+              },
+              {
+                label: '看跌',
+                value: 'PUT',
+              },
+            ]}
+          />
+        )}
+      </FormItem>
+    );
+  },
+};
+
+const strike = {
+  title: '行权价格',
+  dataIndex: 'strike',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '行权价格是必填项',
+            },
+          ],
+        })(<InputNumber precision={4} />)}
+      </FormItem>
+    );
+  },
+};
+
+const underlyerInstrumentId = {
+  title: '标的代码',
+  dataIndex: 'underlyerInstrumentId',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '标的代码是必填项',
+            },
+          ],
+        })(<Input />)}
+      </FormItem>
+    );
+  },
+};
+
+const expirationDate = {
+  title: '期权到期日',
+  dataIndex: 'expirationDate',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '期权到期时间是必填项',
+            },
+          ],
+        })(<DatePicker editing={true} format={'YYYY-MM-DD'} />)}
+      </FormItem>
+    );
+  },
+};
+
+const expirationTime = {
+  title: '期权到期时间',
+  dataIndex: 'expirationTime',
+  render: (value, record, index, { form, editing }) => {
+    return (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '期权到期时间是必填项',
+            },
+          ],
+        })(<TimePicker format={'HH:mm:ss'} />)}
+      </FormItem>
+    );
+  },
+};
+
 export const getInstrumenInfo = event => {
-  if (event.assetClass === 'COMMODITY' && event.instrumentType === 'SPOT') {
-    return [multiplier, name, exchange];
-  }
-
-  if (event.assetClass === 'COMMODITY' && event.instrumentType === 'FUTURES') {
-    return [multiplier, name, exchange, maturity];
-  }
-
-  if (event.assetClass === 'EQUITY' && event.instrumentType === 'STOCK') {
-    return [multiplier, name, exchange];
-  }
-
-  if (event.assetClass === 'EQUITY' && event.instrumentType === 'INDEX') {
-    return [indexName, exchange];
-  }
-
-  if (event.assetClass === 'EQUITY' && event.instrumentType === 'INDEX_FUTURES') {
-    return [multiplier, name, exchange, maturity];
-  }
-
-  return [];
+  const fieldMap = {
+    'COMMODITY:SPOT': [multiplier, name, exchange],
+    'COMMODITY:FUTURES': [multiplier, name, exchange, maturity],
+    'COMMODITY:FUTURES_OPTION': [
+      name,
+      underlyerInstrumentId,
+      exchange,
+      multiplier,
+      exerciseType,
+      optionType,
+      strike,
+      expirationDate,
+      expirationTime,
+    ],
+    'EQUITY:STOCK': [multiplier, name, exchange],
+    'EQUITY:INDEX': [indexName, exchange],
+    'EQUITY:INDEX_FUTURES': [multiplier, name, exchange, maturity],
+    'EQUITY:INDEX_OPTION': [
+      name,
+      underlyerInstrumentId,
+      exchange,
+      multiplier,
+      exerciseType,
+      optionType,
+      strike,
+      expirationDate,
+      expirationTime,
+    ],
+    'EQUITY:STOCK_OPTION': [
+      name,
+      underlyerInstrumentId,
+      exchange,
+      multiplier,
+      exerciseType,
+      optionType,
+      strike,
+      expirationDate,
+      expirationTime,
+    ],
+    'EQUITY:FUTURES_OPTION': [
+      name,
+      underlyerInstrumentId,
+      exchange,
+      multiplier,
+      exerciseType,
+      optionType,
+      exerciseType,
+      expirationDate,
+      expirationTime,
+    ],
+  };
+  const key = [event.assetClass, event.instrumentType].join(':');
+  return fieldMap[key] || [];
 };
 
 export const createFormControls = (event = {}, type) => {

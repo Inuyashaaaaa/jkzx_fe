@@ -7,6 +7,8 @@ import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { createFormControls, searchFormControls } from './services';
+import moment from 'moment';
+
 class TradeManagementMarketManagement extends PureComponent {
   public $form: Form2 = null;
 
@@ -105,8 +107,22 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public composeInstrumentInfo = modalFormData => {
-    const instrumentInfoFields = ['multiplier', 'name', 'exchange', 'maturity'];
-    let instrumentInfoSomeFields = ['multiplier', 'name', 'exchange', 'maturity'];
+    modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
+    modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
+    const instrumentInfoFields = [
+      'multiplier',
+      'name',
+      'exchange',
+      'maturity',
+      'expirationDate',
+      'expirationTime',
+      'optionType',
+      'exerciseType',
+      'strike',
+      'multiplier',
+      'underlyerInstrumentId',
+    ];
+    let instrumentInfoSomeFields = instrumentInfoFields;
     if (modalFormData.instrumentType === 'INDEX') {
       instrumentInfoSomeFields = ['name', 'exchange'];
     }
