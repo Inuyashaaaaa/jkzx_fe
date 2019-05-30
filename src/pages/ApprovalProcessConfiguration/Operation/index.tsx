@@ -184,7 +184,7 @@ const Operation = props => {
   };
 
   const handleReviewCancel = () => {
-    handleReviewData();
+    handleReviewData(null);
     setReviewVisible(false);
   };
 
@@ -525,18 +525,22 @@ const Operation = props => {
               width: 250,
               render: (value, record, index, { form, editing }) => {
                 return (
-                  // <FormItem>
-                  //   {form.getFieldDecorator({
-                  //     rules: [
-                  //       {
-                  //         required: true,
-                  //         message: '至少选择一个审批组'
-                  //       },
-                  //     ],
-                  //   })(
-                  <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
-                  //   )}
-                  // </FormItem>
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '至少选择一个审批组',
+                        },
+                      ],
+                    })(
+                      <GroupSelcet
+                        record={record}
+                        index={index}
+                        formData={{ form, editing: true }}
+                      />
+                    )}
+                  </FormItem>
                 );
               },
             },
@@ -622,18 +626,22 @@ const Operation = props => {
               width: 450,
               render: (value, record, index, { form, editing }) => {
                 return (
-                  // <FormItem>
-                  //   {form.getFieldDecorator({
-                  //     rules: [
-                  //       {
-                  //         required: true,
-                  //         message: '至少选择一个审批组'
-                  //       },
-                  //     ],
-                  //   })(
-                  <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
-                  //   )}
-                  // </FormItem>
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '至少选择一个审批组',
+                        },
+                      ],
+                    })(
+                      <GroupSelcet
+                        record={record}
+                        index={index}
+                        formData={{ form, editing: true }}
+                      />
+                    )}
+                  </FormItem>
                 );
               },
             },
