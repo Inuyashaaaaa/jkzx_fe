@@ -1,0 +1,108 @@
+@import '~antd/lib/style/themes/default.less';
+
+.approvalProcessConfiguration {
+  :global {
+    .ant-card-body {
+      display: flex;
+      min-height: 720px;
+      padding: 0;
+      background: #f3f3f3;
+    }
+    .ant-tabs {
+      width: 100%;
+    }
+    .ant-tabs-bar {
+      margin: 0;
+      background: #fff;
+    }
+    .ant-tabs-content {
+      height: 100%;
+    }
+    .ant-checkbox-wrapper {
+      margin-left: 0;
+      span {
+        font-size: 12px;
+      }
+    }
+    .ant-list-item-content-single {
+      display: flex;
+      justify-content: space-between;
+    }
+    .ant-list-split .ant-list-item {
+      border: none;
+    }
+    .ant-select {
+      padding: 13px 10px;
+    }
+    .ant-list-item {
+      padding: 8px 0;
+    }
+    .ant-tabs .ant-tabs-top-content > .ant-tabs-tabpane,
+    .ant-tabs .ant-tabs-bottom-content > .ant-tabs-tabpane {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+  .rightBox {
+    width: '300px';
+    background: '#FFF';
+    padding: '30px';
+    float: 'right';
+    height: '100%';
+  }
+  .leftBox {
+    margin-right: '320px';
+    background: '#FFF';
+    padding: '30px';
+    position: 'relative';
+    height: '100%';
+  }
+  .configButtonBox {
+    text-align: center;
+    margin-top: 300px;
+    :global {
+      .ant-btn {
+        width: 220px;
+      }
+    }
+  }
+  .message {
+    margin-top: 40px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+  }
+  .approvalNode {
+    flex: 1;
+    border-radius: 10px;
+    border-color: #ccc;
+    line-height: 60px;
+    padding: 0 10px;
+    margin-right: 20px;
+    :global {
+      .ant-btn {
+        width: 100%;
+        height: 100%;
+        border: none;
+        font-size: 16px;
+      }
+    }
+  }
+  .approvalIcon {
+    width: 100px;
+    line-height: 60px;
+    i {
+      font-size: 16px;
+      padding: 8px;
+      cursor: pointer;
+    }
+  }
+  .selectTile {
+    // margin: 0 10px 0 180px;
+  }
+  .bolder {
+    font-weight: bolder;
+  }
+  .select {
+    width: 80%;
+  }
+}

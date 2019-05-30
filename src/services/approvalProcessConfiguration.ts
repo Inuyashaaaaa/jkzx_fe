@@ -120,3 +120,13 @@ export async function wkTaskApproveGroupBind(params = {}) {
     },
   });
 }
+
+export async function wkProcessInstanceListByProcessName(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessInstanceListByProcessName',
+      params,
+    },
+  });
+}
