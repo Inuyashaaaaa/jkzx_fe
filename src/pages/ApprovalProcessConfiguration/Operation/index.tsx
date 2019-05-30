@@ -488,6 +488,7 @@ const Operation = props => {
         <Alert
           message="如果不需要增删节点、调整节点顺序或修改节点名称，建议通过编辑节点来实现审批组或触发器的修改。"
           type="info"
+          showIcon
         />
         <Table2
           ref={node => (tableE1 = node)}
@@ -550,7 +551,7 @@ const Operation = props => {
               width: 150,
               render: (value, record, index, { form, editing }) => {
                 return (
-                  <div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end ' }}>
                     {index !== 0 ? (
                       <a style={{ margin: '0 5px' }} onClick={e => reviewMove(1, record, index)}>
                         上移
