@@ -10,33 +10,63 @@ const GroupSelcet = memo<{
   index: number;
   formData?: any;
 }>(props => {
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState(null);
   const { record, index, formData } = props;
   const { form } = formData;
   const [editing, setEditing] = useState(formData.editing);
   const [value, setValue] = useState([]);
 
+  useEffect(
+    () => {
+      fetchOptions();
+    },
+    [props.record]
+  );
+
   const fetchOptions = async () => {
+    console.log(1);
     const { data, error } = await wkApproveGroupList();
     if (error) return;
+    const optionsData = data.map(item => ({
+      value: item.approveGroupId,
+      label: item.approveGroupName,
+    }));
+    setOptions(_.sortBy(optionsData, 'label'));
     setValue(props.value);
-    return _.sortBy(
-      data.map(item => ({
-        value: item.approveGroupId,
-        label: item.approveGroupName,
-      }))
-    );
   };
 
+  if (!options) {
+    return (
+      <Select
+        defaultOpen={false}
+        autoSelect={true}
+        mode="multiple"
+        options={options}
+        editing={editing}
+        value={[]}
+      />
+    );
+  }
+
   return (
-    <Select
-      defaultOpen={false}
-      autoSelect={true}
-      mode="multiple"
-      value={value}
-      options={fetchOptions}
-      editing={editing}
-    />
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '至少选择一个审批组',
+          },
+        ],
+      })(
+        <Select
+          defaultOpen={false}
+          autoSelect={true}
+          mode="multiple"
+          options={options}
+          editing={editing}
+        />
+      )}
+    </FormItem>
   );
 });
 

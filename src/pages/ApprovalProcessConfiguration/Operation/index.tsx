@@ -25,6 +25,7 @@ import {
   Button,
   Icon,
   message,
+  Card,
 } from 'antd';
 import { Table2, Select, Form2, Input } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
@@ -39,7 +40,7 @@ const Operation = props => {
   const [reviewTask, setReviewTask] = useState([]);
   const [warningVisible, setWarningVisible] = useState(false);
   const [otherVisible, setOtherVisible] = useState(false);
-  const [otherTask, setOtherTask] = useState(false);
+  const [otherTask, setOtherTask] = useState([]);
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [excelData, setExcelData] = useState([]);
   const [processConfigs, setProcessConfigs] = useState([]);
@@ -314,18 +315,22 @@ const Operation = props => {
     setCurrentTaskId(currentTaskIdData);
     let otherTaskData = (process.tasks || []).filter(item => item.taskId === currentTaskIdData);
     otherTaskData = otherTaskData.map(item => {
+      item.approveGroupList = (item.approveGroups || []).map(i => i.approveGroupId);
+      return item;
+    });
+    otherTaskData = otherTaskData.map(item => {
       return {
         ...Form2.createFields(item),
         taskId: item.taskId,
       };
     });
+
     setOtherTask(otherTaskData);
     setOtherVisible(true);
   };
 
   const handleOtherOk = async () => {
     const res = await tableE2.validate();
-    console.log(res);
     if (_.isArray(res)) {
       if (res.some(value => value.errors)) return;
     }
@@ -402,8 +407,8 @@ const Operation = props => {
     <>
       <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
         <Col xs={24} sm={4}>
-          <List itemLayout="vertical">
-            <List.Item>
+          <div>
+            <Card bordered={false}>
               <Switch
                 checkedChildren="开"
                 unCheckedChildren="关"
@@ -413,11 +418,13 @@ const Operation = props => {
               <span style={{ marginLeft: '6px' }}>
                 {process.status ? '流程已启用' : '流程已停用'}
               </span>
-            </List.Item>
-            <List.Item
+            </Card>
+            <Card
+              title="谁能发起"
+              style={{ marginTop: '10px' }}
+              bordered={false}
               extra={<a onClick={e => showOtherModel(e, _.get(insertData, '[0].taskId'))}>修改</a>}
             >
-              <List.Item.Meta title="谁能发起" />
               {approveGroups.map(item => {
                 return (
                   <Tag style={{ margin: 5 }} key={item.approveGroupId}>
@@ -425,9 +432,8 @@ const Operation = props => {
                   </Tag>
                 );
               })}
-            </List.Item>
-            <List.Item>
-              <List.Item.Meta title="审批配置" />
+            </Card>
+            <Card title="审批配置" style={{ marginTop: '10px' }} bordered={false}>
               {(processConfigs || []).map(item => {
                 return (
                   <p key={item.id}>
@@ -437,10 +443,10 @@ const Operation = props => {
                   </p>
                 );
               })}
-            </List.Item>
-          </List>
+            </Card>
+          </div>
         </Col>
-        <Col xs={24} sm={20}>
+        <Col xs={24} sm={20} style={{ background: '#fff', minHeight: '700px', padding: '20px' }}>
           <Button type="primary" onClick={showReview}>
             编辑流程
           </Button>
@@ -526,22 +532,7 @@ const Operation = props => {
               width: 250,
               render: (value, record, index, { form, editing }) => {
                 return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [
-                        {
-                          required: true,
-                          message: '至少选择一个审批组',
-                        },
-                      ],
-                    })(
-                      <GroupSelcet
-                        record={record}
-                        index={index}
-                        formData={{ form, editing: true }}
-                      />
-                    )}
-                  </FormItem>
+                  <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
                 );
               },
             },
@@ -627,22 +618,7 @@ const Operation = props => {
               width: 450,
               render: (value, record, index, { form, editing }) => {
                 return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [
-                        {
-                          required: true,
-                          message: '至少选择一个审批组',
-                        },
-                      ],
-                    })(
-                      <GroupSelcet
-                        record={record}
-                        index={index}
-                        formData={{ form, editing: true }}
-                      />
-                    )}
-                  </FormItem>
+                  <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
                 );
               },
             },

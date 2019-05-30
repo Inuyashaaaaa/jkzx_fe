@@ -84,6 +84,7 @@ class ApprovalProcessManage extends PureComponent {
     return (
       <Page
         title="流程管理"
+        card={false}
         footer={
           <TabHeader
             activeKey={this.state.activeKey}
