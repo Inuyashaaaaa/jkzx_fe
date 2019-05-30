@@ -79,6 +79,7 @@ const Operation = props => {
   };
 
   const handleReviewData = processData => {
+    console.log(processData)
     const data = processData ? processData : process;
     let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
     reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
@@ -174,8 +175,13 @@ const Operation = props => {
       setReviewVisible(false);
       return;
     }
+    const cloneData = { ...data };
+    cloneData.tasks = cloneData.tasks.map(item => {
+      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      return item;
+    })
 
-    setProcess(data);
+    setProcess(cloneData);
     setProcessConfigs(data.processConfigs);
 
     notification.success({
@@ -374,10 +380,14 @@ const Operation = props => {
       setOtherTask(otherTaskData);
       return setOtherVisible(false);
     }
-    setProcess(data);
-    setProcessConfigs(data.processConfigs);
-
-    handleReviewData(data);
+    const cloneData = { ...data };
+    cloneData.tasks = cloneData.tasks.map(item => {
+      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      return item;
+    })
+    setProcess(cloneData);
+    setProcessConfigs(cloneData.processConfigs);
+    handleReviewData(cloneData);
     setOtherVisible(false);
     notification.success({
       message: `${processName}流程保存成功`,
