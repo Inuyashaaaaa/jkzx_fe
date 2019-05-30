@@ -24,7 +24,6 @@ const GroupSelcet = memo<{
   );
 
   const fetchOptions = async () => {
-    console.log(1);
     const { data, error } = await wkApproveGroupList();
     if (error) return;
     const optionsData = data.map(item => ({
