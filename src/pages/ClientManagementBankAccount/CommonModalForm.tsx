@@ -1,4 +1,4 @@
-import Form from '@/design/components/Form';
+import Form from '@/containers/Form';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS } from './constants';
 

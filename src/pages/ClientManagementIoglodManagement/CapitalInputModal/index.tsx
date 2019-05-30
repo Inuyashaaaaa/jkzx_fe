@@ -4,7 +4,7 @@ import {
   RULES_REQUIRED,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Input, Select } from '@/design/components';
+import { Form2, Input, Select } from '@/containers';
 import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientAccountGetByLegalName,

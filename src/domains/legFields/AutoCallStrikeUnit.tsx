@@ -1,20 +1,12 @@
+import { Form2, Select } from '@/containers';
 import {
-  LEG_FIELD,
-  LEG_TYPE_FIELD,
-  LEG_TYPE_MAP,
-  PREMIUM_TYPE_MAP,
-  RULES_REQUIRED,
-  STRIKE_TYPES_MAP,
-  REBATETYPE_TYPE_OPTIONS,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
+  LEG_FIELD,
   UNIT_ENUM_OPTIONS2,
 } from '@/constants/common';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2, Select } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
 import React from 'react';
 
 export const AutoCallStrikeUnit: ILegColDef = {

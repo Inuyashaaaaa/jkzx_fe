@@ -1,5 +1,5 @@
-import Form, { Form2Props, IFormControl } from '@/lib/components/_Form2';
-import { viewModel } from '@/lib/viewModel';
+import Form, { Form2Props, IFormControl } from '@/containers/_Form2';
+import { viewModel } from '@/containers/common/types';
 import React from 'react';
 import LinkageFormData from './$model';
 

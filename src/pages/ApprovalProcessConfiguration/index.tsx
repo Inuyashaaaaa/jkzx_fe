@@ -1,11 +1,11 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Select } from '@/containers';
+import Page from '@/containers/Page';
 import {
-  wkGlobalConfigList,
-  wkGlobalConfigModify,
+  wkProcessConfigModify,
   wkProcessList,
+  wkProcessModify,
   wkProcessStatusModify,
-  wkTaskApproveGroupCreateBatch,
-  wkTaskApproveGroupList,
+  wkTaskApproveGroupBind,
 } from '@/services/approvalProcessConfiguration';
 import { wkApproveGroupList } from '@/services/auditing';
 import {
@@ -13,30 +13,33 @@ import {
   Checkbox,
   Icon,
   List,
+  message,
   Modal,
   notification,
   Popconfirm,
-  Select,
   Switch,
   Tabs,
+  Typography,
+  Skeleton,
 } from 'antd';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import styles from './ApprovalProcessConfiguration.less';
-import _ from 'lodash';
+import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE } from './constants';
+
 const TabPane = Tabs.TabPane;
-const Option = Select.Option;
+const { Paragraph } = Typography;
 
 class ApprovalProcessConfiguration extends PureComponent {
   public state = {
     approveGroupList: [],
     taskApproveGroupList: [],
-    processList: [],
+    processList: null,
     loading: false,
     currentProcessName: '',
     status: false,
     resetVisible: false,
-    globalConfigList: [],
-    globalConfig: {},
+    processConfigs: [],
   };
 
   constructor(props) {
@@ -44,7 +47,7 @@ class ApprovalProcessConfiguration extends PureComponent {
   }
 
   public componentDidMount = () => {
-    this.fetchData();
+    this.fetchData(null);
   };
 
   public fetchData = async currentProcessName => {
@@ -64,56 +67,47 @@ class ApprovalProcessConfiguration extends PureComponent {
       });
     }
 
-    const requests = () =>
-      Promise.all([
-        wkTaskApproveGroupList({
-          processName: currentProcessName ? currentProcessName : processList[0].processName,
-        }),
-        wkApproveGroupList(),
-        wkGlobalConfigList({
-          processName: currentProcessName ? currentProcessName : processList[0].processName,
-        }),
-      ]);
-    const res = await requests();
-    const [taskApproveGroupList, approveGroupList, globalConfigList] = res;
-    const error = res.some(item => {
-      return item.error;
-    });
-
-    if (error) {
-      return this.setState({
-        loading: false,
-        taskApproveGroupList: [],
+    const tabsData = processList.map(tab => {
+      const reviewDataLength = _.filter(tab.tasks, item => {
+        return item.taskType === REVIEW_DATA;
+      }).length;
+      tab.reviewDataLength = reviewDataLength;
+      tab.tasks.map(task => {
+        task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
+          return item.approveGroupId;
+        });
+        if (task.taskType === 'modifyData') {
+          task.index = 2;
+        } else if (task.taskType === REVIEW_DATA) {
+          task.index = 1;
+        } else if (task.taskType === 'insertData') {
+          task.index = 0;
+        } else {
+          task.index = 4;
+        }
+        return task;
       });
-    }
 
-    const tabsData = processList.map(item => {
-      item.tabName = item.processName.split('经办复合流程')[0] + '审批';
-      return item;
+      // tab.tasks = _.sortBy(tab.tasks, ['index']);
+      tab.tasks = _.sortBy(tab.tasks, ['sequence']);
+      return tab;
     });
 
-    let editTask = {};
-    let taskData = (taskApproveGroupList.data || []).map((item, index) => {
-      item.approveGroupList = (item.approveGroupDTO || []).map(item => item.approveGroupId);
-      if (item.taskType === '修改') {
-        editTask = item;
-        return null;
-      }
-      return item;
-    });
-    taskData = taskData.concat(editTask).filter(item => !!item);
     this.setState({
       loading: false,
-      approveGroupList: approveGroupList.data || [],
-      taskApproveGroupList: taskData,
       processList: tabsData,
-      globalConfigList: globalConfigList.data || [],
-      globalConfig: globalConfigList.data ? globalConfigList.data[0] : {},
-      status: tabsData[0].status,
     });
   };
 
   public handleStatus = async (e, processName) => {
+    const { error, data } = await wkProcessStatusModify({
+      processName,
+      status: e,
+    });
+    if (error) return;
+    notification.success({
+      message: `${e ? '启用' : '关闭'}流程成功`,
+    });
     this.setState({
       status: e,
     });
@@ -150,23 +144,27 @@ class ApprovalProcessConfiguration extends PureComponent {
     );
   };
 
-  public handleApproveGroup = (e, taskId) => {
-    let { taskApproveGroupList } = this.state;
+  public handleApproveGroup = (e, processId, taskId) => {
     let fristChange = false;
-    taskApproveGroupList = taskApproveGroupList.map((item, index) => {
-      if (item.taskId === taskId) {
-        item.approveGroupList = e;
-        if (index === 0) {
-          fristChange = true;
-        }
+    let processList = [...this.state.processList];
+    processList = processList.map(tab => {
+      if (tab.processId === processId) {
+        tab.tasks.map((task, tIndex) => {
+          if (task.taskId === taskId) {
+            task.approveGroupList = e;
+            if (tIndex === 0) {
+              fristChange = true;
+            }
+          }
+          if (fristChange && tIndex === tab.tasks.length - 1) {
+            task.approveGroupList = e;
+          }
+        });
       }
-      if (fristChange && index === taskApproveGroupList.length - 1) {
-        item.approveGroupList = e;
-      }
-      return item;
+      return tab;
     });
     this.setState({
-      taskApproveGroupList,
+      processList,
     });
   };
 
@@ -188,43 +186,150 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public onConfirm = async () => {
-    const {
-      currentProcessName,
-      taskApproveGroupList,
-      status,
-      globalConfig,
-      globalConfigList,
-    } = this.state;
-    const noneGroupIndex = _.findIndex(
-      taskApproveGroupList,
-      item => item && item.approveGroupList.length <= 0
+  public getActionClass = (taskType, processName) => {
+    // 资金
+    if (processName === '财务出入金') {
+      if (taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction`;
+    }
+
+    // 授信
+    if (processName === '授信额度变更') {
+      if (taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
+    }
+
+    // 交易
+    if (processName === '交易录入') {
+      if (taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
+    }
+
+    throw new Error('getActionClass: no match');
+  };
+
+  public changeData = data => {
+    const { currentProcessName, processList } = this.state;
+    const pIndex = _.findIndex(processList, item => {
+      return item.processName === currentProcessName;
+    });
+    const _processList = { ...data };
+    let _tasks = [..._processList.tasks];
+    _tasks = _tasks.map(item => {
+      item.approveGroupList = item.approveGroups.map(ap => ap.approveGroupId);
+      if (item.taskType === 'modifyData') {
+        item.index = 2;
+      } else if (item.taskType === REVIEW_DATA) {
+        item.index = 1;
+      } else if (item.taskType === 'insertData') {
+        item.index = 0;
+      } else {
+        item.index = 4;
+      }
+      return item;
+    });
+    _tasks = _.sortBy(_tasks, 'index');
+
+    const reviewDataLength = _.filter(_tasks, item => {
+      return item.taskType === REVIEW_DATA;
+    }).length;
+    _processList.reviewDataLength = reviewDataLength;
+
+    _processList.tasks = _tasks;
+    processList[pIndex] = _processList;
+    this.setState(
+      {
+        processList,
+      },
+      () => {
+        notification.success({
+          message: `保存成功`,
+        });
+      }
     );
+  };
+
+  public onConfirm = async () => {
+    const { currentProcessName, processList } = this.state;
+    const pIndex = _.findIndex(processList, item => {
+      return item.processName === currentProcessName;
+    });
+    let addFlag = false;
+    const tasks = processList[pIndex].tasks;
+
+    const length = _.filter(tasks, item => {
+      return item.taskType === REVIEW_DATA;
+    }).length;
+
+    const noneGroupIndex = _.findIndex(tasks, item => {
+      // if (_.isNumber(item.taskId) || processList[pIndex].reviewDataLength !== length) {
+      //   addFlag = true;
+      // }
+      if (
+        (item.editId && _.isNumber(item.editId)) ||
+        processList[pIndex].reviewDataLength !== length
+      ) {
+        addFlag = true;
+      }
+      return (
+        !item ||
+        !item.approveGroupList ||
+        item.approveGroupList.length <= 0 ||
+        /^[0-9]/.test(_.trim(item.taskName))
+      );
+    });
+
     if (noneGroupIndex >= 0) {
-      return notification.success({
-        message: `请至少选择一个审批组`,
+      return notification.error({
+        message: `请为每个节点命名，并至少选择一个审批组。节点名称不能以数字开头。`,
       });
     }
-    const requests = () =>
-      Promise.all([
-        wkProcessStatusModify({ processName: currentProcessName, status }),
-        wkTaskApproveGroupCreateBatch({
-          processName: currentProcessName,
-          taskList: taskApproveGroupList,
-        }),
-        // wkGlobalConfigModify(globalConfig)
-        ...globalConfigList.map(item => wkGlobalConfigModify(item)),
-      ]);
-    const res = await requests();
-    const [modify, batch, globalConfigModify] = res;
-    const error = res.some(item => {
-      return item.error;
-    });
-    if (error) return;
 
-    notification.success({
-      message: `保存成功`,
+    const taskList = tasks.map((item, index) => {
+      console.log(item.taskType, this.getActionClass(item.taskType, currentProcessName));
+      return {
+        ...item,
+        sequence: index,
+        taskType: TASKTYPE[item.taskType],
+        actionClass: this.getActionClass(item.taskType, currentProcessName),
+      };
     });
+
+    // 如果没有增加节点不调wkProcessModify接口
+    let taskListData = [...tasks];
+    if (addFlag) {
+      const { error: merror, data } = await wkProcessModify({
+        processName: currentProcessName,
+        taskList,
+      });
+      if (merror) return;
+      const tasksData = _.sortBy(data.tasks, ['sequence']);
+      taskListData = tasksData.map((item, index) => {
+        return {
+          ...tasks[index],
+          ...item,
+        };
+      });
+      return this.changeData(data);
+    }
+
+    const { error: _error, data } = await wkTaskApproveGroupBind({
+      processName: currentProcessName,
+      taskList: taskListData.map(item => {
+        return {
+          taskId: item.taskId,
+          approveGroupList: item.approveGroupList,
+        };
+      }),
+    });
+    if (_error) return;
+    this.changeData(data);
   };
 
   public handleResetOk = async () => {
@@ -240,20 +345,115 @@ class ApprovalProcessConfiguration extends PureComponent {
     });
   };
 
-  public configListChange = (e, param) => {
-    const globalConfigList = this.state.globalConfigList.map(item => {
+  public configListChange = async (e, processId, param) => {
+    const processList = [...this.state.processList];
+
+    const pIndex = _.findIndex(processList, item => {
+      return item.processId === processId;
+    });
+    const processConfigs = processList[pIndex].processConfigs;
+
+    const processConfigsData = processConfigs.map(item => {
       if (item.id === param.id) {
         item.status = e.target.checked;
       }
       return item;
     });
+    const { error, data } = await wkProcessConfigModify({
+      configList: processConfigsData.map(item => {
+        return {
+          configId: item.configId,
+          status: item.status,
+        };
+      }),
+    });
+    if (error) return;
     this.setState({
-      globalConfig: {
-        processName: param.processName,
-        id: param.id,
-        status: e.target.checked,
-      },
-      globalConfigList,
+      processConfigs,
+    });
+    notification.success({
+      message: `修改全局配置成功`,
+    });
+  };
+
+  public handleClick = (e, processId) => {
+    const processList = [...this.state.processList];
+    const { currentProcessName } = this.state;
+
+    const pIndex = _.findIndex(processList, item => {
+      return item.processId === processId;
+    });
+    const tasks = processList[pIndex].tasks;
+
+    let taskName = '';
+    const length = _.filter(tasks, item => {
+      if (item.taskType === REVIEW_DATA && !taskName) {
+        taskName = item.taskName;
+      }
+      return item.taskType === REVIEW_DATA;
+    }).length;
+
+    let taskApproveGroupList = tasks.concat({
+      taskName: `${currentProcessName}复核节点`,
+      index: `1.${length}`,
+      taskType: REVIEW_DATA,
+      taskId: _.random(10, true),
+      editId: _.random(10, true),
+      actionClass: this.getActionClass(TASKTYPE[REVIEW_DATA], currentProcessName),
+    });
+
+    taskApproveGroupList = _.sortBy(taskApproveGroupList, ['index']);
+
+    processList[pIndex].tasks = taskApproveGroupList;
+    processList[pIndex].tabName = processList[pIndex].processName + '审批';
+
+    this.setState({
+      processList,
+    });
+  };
+
+  public handleGroupNamge = (e, processId, taskId) => {
+    const processList = [...this.state.processList];
+
+    const pIndex = _.findIndex(processList, item => {
+      return item.processId === processId;
+    });
+    let tasks = processList[pIndex].tasks;
+
+    tasks = tasks.map(item => {
+      if (item.taskId === taskId) {
+        item.taskName = e;
+        item.editId = _.random(10, true);
+      }
+      return item;
+    });
+    processList[pIndex].tasks = tasks;
+    this.setState({
+      processList,
+    });
+  };
+
+  public handleDeleteReview = (e, processId, taskId) => {
+    const processList = [...this.state.processList];
+
+    const pIndex = _.findIndex(processList, item => {
+      return item.processId === processId;
+    });
+
+    let tasks = processList[pIndex].tasks;
+
+    const reviewLength = _.filter(tasks, item => {
+      return item.taskType === REVIEW_DATA;
+    }).length;
+
+    if (reviewLength <= 1) return message.info('至少保留一个复合审批节点');
+
+    tasks = _.filter(tasks, item => {
+      return item.taskId !== taskId;
+    });
+    processList[pIndex].tasks = tasks;
+    this.setState({
+      processList,
     });
   };
 
@@ -279,11 +479,14 @@ class ApprovalProcessConfiguration extends PureComponent {
         </div>
         <div style={{ marginTop: '60px', minHeight: '60px' }}>
           <p style={{ fontWeight: 'bolder' }}>全局配置</p>
-          {this.state.globalConfigList.map(item => {
+          {tab.processConfigs.map(item => {
             return (
               <p key={item.id}>
-                <Checkbox onChange={e => this.configListChange(e, item)} checked={!!item.status}>
-                  {item.globalName}
+                <Checkbox
+                  onChange={e => this.configListChange(e, tab.processId, item)}
+                  defaultChecked={!!item.status}
+                >
+                  {GTE_PROCESS_CONFIGS(item.configName)}
                 </Checkbox>
               </p>
             );
@@ -299,7 +502,6 @@ class ApprovalProcessConfiguration extends PureComponent {
             >
               <Button type="primary">保存</Button>
             </Popconfirm>
-            ,
           </p>
           <p>
             <Button onClick={this.onReset}>重置</Button>
@@ -311,95 +513,165 @@ class ApprovalProcessConfiguration extends PureComponent {
   };
 
   public render() {
+    console.log(this.state.processList);
     return (
       <div className={styles.approvalProcessConfiguration}>
-        <PageHeaderWrapper>
-          <Tabs defaultActiveKey="资金录入经办复合流程" onChange={this.tabsChange}>
-            {this.state.processList.map((tab, index) => {
-              return (
-                <TabPane tab={tab.tabName} key={tab.processName}>
-                  <div
-                    style={{
-                      marginRight: '2px',
-                      background: '#FFF',
-                      padding: '30px',
-                      position: 'relative',
-                      height: '100%',
-                    }}
-                  >
-                    <p className={styles.bolder}>审批流程</p>
-                    <List bordered={false} loading={this.state.loading}>
-                      <List.Item>
-                        <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
-                          <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                          <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                          <span style={{ marginLeft: '30px' }}>发起审批</span>
-                        </div>
-                        <span className={styles.approvalIcon}>
-                          {/* <Icon type="plus-circle" /> */}
-                        </span>
-                      </List.Item>
-                      {this.state.taskApproveGroupList.map((group, gIndex) => {
-                        if (!group) return;
-                        return (
-                          <List.Item key={group.taskId}>
-                            <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
+        <Page>
+          <Tabs animated={false} onChange={this.tabsChange}>
+            {!this.state.processList ? (
+              <TabPane>
+                <div
+                  style={{
+                    background: '#FFF',
+                    padding: '30px',
+                    width: '100%',
+                  }}
+                >
+                  <Skeleton active={true} />
+                </div>
+              </TabPane>
+            ) : (
+              this.state.processList.map((tab, index) => {
+                return (
+                  <TabPane tab={tab.processName + '审批'} key={tab.processName}>
+                    <div
+                      style={{
+                        marginRight: '2px',
+                        background: '#FFF',
+                        padding: '30px',
+                        position: 'relative',
+                        height: '100%',
+                      }}
+                    >
+                      <p className={styles.bolder}>审批流程</p>
+                      <List bordered={false} loading={this.state.loading}>
+                        <List.Item>
+                          <div className={styles.approvalNode} style={{ background: '#e8e5e5' }}>
+                            <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                            <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                            <span style={{ marginLeft: '30px' }}>发起审批</span>
+                          </div>
+                          <span className={styles.approvalIcon}>
+                            {/* <Icon type="plus-circle" /> */}
+                          </span>
+                        </List.Item>
+                        {tab.tasks.map((task, gIndex) => {
+                          if (!task) return;
+                          return (
+                            <List.Item key={task.taskId}>
                               <div
-                                style={{
-                                  display: 'inline-block',
-                                  float: 'left',
-                                  marginRight: '150px',
-                                }}
+                                className={styles.approvalNode}
+                                style={{ background: '#e8e5e5' }}
                               >
-                                <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                                <Icon type="more" style={{ width: '4px', color: '#999' }} />
-                                <span style={{ marginLeft: '30px' }}>{group.taskName}</span>
-                              </div>
-                              <div
-                                style={{
-                                  display: 'inline-block',
-                                  float: 'left',
-                                  marginLeft: '40px',
-                                  width: '600px',
-                                }}
-                              >
-                                <span className={styles.selectTile}>选择审批组</span>
-                                <Select
-                                  className={styles.select}
-                                  value={group.approveGroupList}
-                                  mode="multiple"
-                                  disabled={gIndex === this.state.taskApproveGroupList.length - 1}
-                                  onChange={e => this.handleApproveGroup(e, group.taskId)}
-                                  optionFilterProp="children"
-                                  filterOption={(input, option) =>
-                                    option.props.children
-                                      .toLowerCase()
-                                      .indexOf(input.toLowerCase()) >= 0
-                                  }
+                                <div
+                                  style={{
+                                    display: 'inline-block',
+                                    float: 'left',
+                                    marginRight: '150px',
+                                  }}
                                 >
-                                  {this.state.approveGroupList.map(item => {
-                                    return (
-                                      <Option key={item.approveGroupId}>
-                                        {item.approveGroupName}
-                                      </Option>
-                                    );
-                                  })}
-                                </Select>
+                                  <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                                  <Icon type="more" style={{ width: '4px', color: '#999' }} />
+                                  {/* <span style={{ marginLeft: '30px' }}>{group.taskName}</span> */}
+                                  <span
+                                    style={{
+                                      marginLeft: '30px',
+                                      display: 'inline-block',
+                                      width: '150px',
+                                    }}
+                                  >
+                                    <Paragraph
+                                      ellipsis={true}
+                                      editable={{
+                                        onChange: e =>
+                                          this.handleGroupNamge(e, tab.processId, task.taskId),
+                                      }}
+                                      onChange={e =>
+                                        this.handleGroupNamge(e, tab.processId, task.taskId)
+                                      }
+                                    >
+                                      {task.taskName}
+                                    </Paragraph>
+                                  </span>
+                                </div>
+                                <div
+                                  style={{
+                                    display: 'inline-block',
+                                    float: 'left',
+                                    marginLeft: '40px',
+                                    width: '600px',
+                                  }}
+                                >
+                                  <span className={styles.selectTile}>选择审批组</span>
+                                  <Select
+                                    style={{
+                                      width: '280px',
+                                    }}
+                                    editing={true}
+                                    fetchOptionsOnSearch={true}
+                                    showSearch={true}
+                                    allowClear={true}
+                                    placeholder="请输入内容搜索"
+                                    mode="multiple"
+                                    disabled={gIndex === tab.tasks.length - 1}
+                                    value={_.get(task, 'approveGroupList') || []}
+                                    options={async (value: string = '') => {
+                                      const { data, error } = await wkApproveGroupList();
+                                      if (error) return [];
+                                      return _.sortBy(
+                                        data.map(item => ({
+                                          value: item.approveGroupId,
+                                          label: item.approveGroupName,
+                                        })),
+                                        'label'
+                                      );
+                                    }}
+                                    onChange={e =>
+                                      this.handleApproveGroup(e, tab.processId, task.taskId)
+                                    }
+                                  />
+                                </div>
                               </div>
-                            </div>
-                            <span className={styles.approvalIcon}>
-                              {/* <Icon type="minus-circle" />  
-                                  <Icon type="plus-circle" /> */}
-                            </span>
-                          </List.Item>
-                        );
-                      })}
-                    </List>
-                  </div>
-                  {this.renderTabs(tab)}
-                </TabPane>
-              );
-            })}
+                              {task.taskType === REVIEW_DATA ? (
+                                <span className={styles.approvalIcon}>
+                                  <Icon
+                                    type="minus-circle"
+                                    onClick={e => {
+                                      this.handleDeleteReview(e, tab.processId, task.taskId);
+                                    }}
+                                  />
+                                  {/* <Icon type="plus-circle" onClick={(e) => {this.handleAddReview(e, group)}}/> */}
+                                </span>
+                              ) : (
+                                <span className={styles.approvalIcon} />
+                              )}
+                            </List.Item>
+                          );
+                        })}
+                        <List.Item>
+                          <div
+                            className={styles.approvalNode}
+                            style={{
+                              border: '2px dashed #e8e5e5',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                            }}
+                            onClick={e => {
+                              return this.handleClick(e, tab.processId);
+                            }}
+                          >
+                            <Icon type="plus" style={{ fontSize: '12px' }} />
+                            增加审批节点
+                          </div>
+                          <span className={styles.approvalIcon} />
+                        </List.Item>
+                      </List>
+                    </div>
+                    {this.renderTabs(tab)}
+                  </TabPane>
+                );
+              })
+            )}
           </Tabs>
           <Modal
             title="消息提示"
@@ -409,7 +681,7 @@ class ApprovalProcessConfiguration extends PureComponent {
           >
             <p>重置后即放弃当前页面的编辑，恢复到编辑前的状态。是否确定重置？</p>
           </Modal>
-        </PageHeaderWrapper>
+        </Page>
       </div>
     );
   }

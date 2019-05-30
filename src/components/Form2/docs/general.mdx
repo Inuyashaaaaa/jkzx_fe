@@ -1,0 +1,71 @@
+---
+name: Form test
+---
+
+# Hello world
+
+Hello, I'm a mdx file!
+
+import Form from '../index';
+import FormItem from 'antd/lib/form/FormItem';
+
+<Form
+  footer={false}
+  dataSource={{}}
+  columnNumberOneRow={2}
+  columns={[
+    {
+      dataIndex: 'tradingDirection',
+      title: '交易方向',
+      render: (value, record, index, { form }) => {
+        const val = () => {
+          if (value === 'BUY') {
+            return '买';
+          } else if (value === 'SELL') {
+            return '卖';
+          } else {
+            return '买卖';
+          }
+        };
+        return <FormItem>{val()}</FormItem>;
+      },
+    },
+    {
+      dataIndex: 'tradingPermission',
+      title: '交易权限',
+      render: (value, record, index) => {
+        const val = () => {
+          if (value === 'FULL') {
+            return '交易';
+          } else if (value === 'LIMITED') {
+            return '限制交易';
+          } else {
+            return '交易标的';
+          }
+        };
+        return <FormItem>{val()}</FormItem>;
+      },
+    },
+    {
+      dataIndex: 'tradingPermissionNote',
+      title: '交易权限备注',
+      render: (value, record, index) => {
+        return <FormItem>{value}</FormItem>;
+      },
+    },
+    {
+      dataIndex: 'tradingUnderlyers',
+      title: '交易标的',
+      render: value => {
+        const val = () => {
+          if (value === 'COMMODITY') {
+            return '商品';
+          } else {
+            return '个股商品';
+          }
+        };
+        return <FormItem>{val()}</FormItem>;
+      },
+    },
+  ]}
+/>

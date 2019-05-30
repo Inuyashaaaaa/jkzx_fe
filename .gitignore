@@ -9,6 +9,7 @@ _roadhog-api-doc
 # production
 /dist
 /docs
+/cdocs
 
 # misc
 .DS_Store
@@ -26,6 +27,7 @@ package-lock.json
 *.log
 
 .temp/**
+.docz
 
 # umi
 .umi

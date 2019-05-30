@@ -1,22 +1,22 @@
 import {
   BIG_NUMBER_CONFIG,
+  LEG_ENV_FIELD,
   LEG_FIELD,
   LEG_ID_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
-import { LEG_FIELD_ORDERS } from '@/constants/legColDefs/common/order';
+import { TOTAL_FIELD } from '@/constants/global';
 import { TOTAL_LEGS } from '@/constants/legs';
-import { Form2, Loading, Table2 } from '@/design/components';
-import { ITableProps } from '@/design/components/type';
-import { remove } from '@/design/utils';
-import { getLegByRecord } from '@/tools';
+import { LEG_FIELD_ORDERS } from '@/constants/legType';
+import { Form2, Loading, Table2 } from '@/containers';
+import { ITableProps } from '@/components/type';
+import { getLegByRecord, remove, uuid } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { TOTAL_FIELD } from '@/constants/global';
 
 const MultiLegTable = memo<
   {
@@ -50,6 +50,7 @@ const MultiLegTable = memo<
 
         const nextUnion = getUnionLegColumns(multiLegColumns);
         const nextColumns = chainLegColumns(nextUnion);
+
         return nextColumns;
       });
     },
@@ -95,6 +96,13 @@ const MultiLegTable = memo<
   };
 
   const cellIsEmpty = (record, colDef) => {
+    if (cellIsTotal(record)) {
+      if (_.findIndex(totalColumnIds, key => key === colDef.dataIndex) !== -1) {
+        return false;
+      }
+      return true;
+    }
+
     const leg = getLegByType(record[LEG_TYPE_FIELD]);
 
     if (colDef.dataIndex === LEG_FIELD.LEG_META) {
@@ -140,13 +148,11 @@ const MultiLegTable = memo<
           }
         },
         render(val, record, index, { colDef }) {
-          if (cellIsTotal(record)) {
-            return val;
-          }
           if (cellIsEmpty(record, colDef)) {
             return null;
           }
-          return item.render.apply(this, arguments);
+          const result = item.render.apply(this, arguments);
+          return result;
         },
       };
     });
@@ -212,18 +218,26 @@ const MultiLegTable = memo<
           return {
             ...totalItem,
             ..._.mapValues(record, (val, key) => {
+              const value = Form2.getFieldValue(val);
+              if (!_.isNumber(value) || totalColumnIds.indexOf(key) === -1) {
+                return val;
+              }
               const origin = Form2.getFieldValue(totalItem[key]);
-              if (!_.isNumber(Form2.getFieldValue(val)) || totalColumnIds.indexOf(key) === -1)
-                return origin;
-              return new BigNumber(origin || 0)
-                .plus(Form2.getFieldValue(val) || 0)
-                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                .toNumber();
+              return {
+                ...val,
+                value: new BigNumber(value || 0)
+                  .plus(origin || 0)
+                  .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                  .toNumber(),
+              };
             }),
+            [LEG_ID_FIELD]: totalItem[LEG_ID_FIELD],
           };
         },
         {
           [TOTAL_FIELD]: true,
+          [LEG_ENV_FIELD]: env,
+          [LEG_ID_FIELD]: uuid(),
         }
       );
       return dataSource.concat(totalRecord);
@@ -247,6 +261,36 @@ const MultiLegTable = memo<
           setLoadingsByRow,
         })
       }
+      onCellFieldsChange={(...args) => {
+        if (tableProps.onCellFieldsChange) {
+          tableProps.onCellFieldsChange(...args);
+        }
+        columns.forEach(col => {
+          if (col.onCellFieldsChange) {
+            col.onCellFieldsChange(...args);
+          }
+        });
+      }}
+      onCellEditingChanged={(...args) => {
+        if (tableProps.onCellEditingChanged) {
+          tableProps.onCellEditingChanged(...args);
+        }
+        columns.forEach(col => {
+          if (col.onCellEditingChanged) {
+            col.onCellEditingChanged(...args);
+          }
+        });
+      }}
+      onCellValuesChange={(...args) => {
+        if (tableProps.onCellValuesChange) {
+          tableProps.onCellValuesChange(...args);
+        }
+        columns.forEach(col => {
+          if (col.onCellValuesChange) {
+            col.onCellValuesChange(...args);
+          }
+        });
+      }}
     />
   );
 });

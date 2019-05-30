@@ -14,6 +14,7 @@ module.exports = {
     page: true,
   },
   rules: {
+    'import/no-extraneous-dependencies': 0,
     'react/jsx-filename-extension': [1, { extensions: ['.js'] }],
     'react/jsx-wrap-multilines': 0,
     'react/require-default-props': 0,
@@ -25,7 +26,7 @@ module.exports = {
       2,
       {
         optionalDependencies: true,
-        devDependencies: ['**/tests/**.js', '/mock/**.js', '**/**.test.js'],
+        devDependencies: ['**/tests/**.js', '/mock/**.js', '**/**.test.js', 'doczrc.js'],
       },
     ],
     'jsx-a11y/no-noninteractive-element-interactions': 0,

@@ -1,26 +1,27 @@
-import { LEG_ID_FIELD, LEG_FIELD } from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { LEG_ENV, TOTAL_EDITING_FIELDS, ILegColDef } from '@/constants/legs';
+import { ILegColDef, LEG_ENV, TOTAL_EDITING_FIELDS } from '@/constants/legs';
+import { Form2 } from '@/containers';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
+import { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, Loading } from '@/design/components';
-import { ITableData } from '@/design/components/type';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
+import { ITableData } from '@/components/type';
 import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 import { convertTradePageData2ApiData } from '@/services/pages';
-import { getLegByProductType, getLegByRecord, createLegRecordByPosition } from '@/tools';
+import { createLegRecordByPosition, getLegByProductType, getLegByRecord, getMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, message, Typography, Skeleton, Row, Button } from 'antd';
+import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
+import moment from 'moment';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import './index.less';
-import { ILcmEventModalEl } from '@/containers/LcmEventModal';
-import moment from 'moment';
 import uuidv4 from 'uuid/v4';
-import { getMoment } from '@/utils';
+import './index.less';
+import BigNumber from 'bignumber.js';
+
 const DATE_ARRAY = [
   LEG_FIELD.SETTLEMENT_DATE,
   LEG_FIELD.EFFECTIVE_DATE,
@@ -93,11 +94,35 @@ const TradeManagementBooking = props => {
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
 
+    const handleTradeNumber = position => {
+      const record = position.asset;
+      const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+      const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
+      const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+      const notional =
+        notionalAmountType === 'LOT'
+          ? notionalAmount
+          : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+      return new BigNumber(notional)
+        .multipliedBy(multipler)
+        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+        .toNumber();
+    };
+
     const positions = _.get(data, 'process._business_payload.trade.positions');
+    const composePositions = (positions || []).map(position => {
+      return {
+        ...position,
+        asset: {
+          ...position.asset,
+          [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+        },
+      };
+    });
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
-    if (!positions) return;
-    mockAddLegItem(positions, _detailData);
+    if (!composePositions) return;
+    mockAddLegItem(composePositions, _detailData);
   };
 
   const mockAddLegItem = async (composePositions, tableFormData) => {
@@ -136,14 +161,14 @@ const TradeManagementBooking = props => {
 
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
   return (
-    <PageHeaderWrapper>
+    <Page>
       {tableLoading ? (
         <Skeleton active={true} paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
           <Divider />
-          <Loading loading={tableLoading}>
+          <div>
             <BookingBaseInfoForm
               currentCreateFormRef={node => {
                 currentCreateFormRef = node;
@@ -155,7 +180,7 @@ const TradeManagementBooking = props => {
               createFormData={createFormData}
               setCreateFormData={setCreateFormData}
             />
-          </Loading>
+          </div>
           <Typography.Title style={{ marginTop: 20 }} level={4}>
             交易结构信息
           </Typography.Title>
@@ -234,7 +259,7 @@ const TradeManagementBooking = props => {
           </Button>
         </Row>
       ) : null}
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 

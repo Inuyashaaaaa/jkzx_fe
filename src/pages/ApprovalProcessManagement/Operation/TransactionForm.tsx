@@ -1,4 +1,4 @@
-import SourceTable from '@/lib/components/_SourceTable';
+import SourceTable from '@/containers/_SourceTable';
 import {
   completeTaskProcess,
   queryProcessForm,
@@ -10,7 +10,7 @@ import {
   downloadTradeAttachment,
 } from '@/services/approval';
 import moment from 'moment';
-import { Form2, Upload } from '@/design/components';
+import { Form2, Upload } from '@/containers';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import {
   Button,
@@ -29,9 +29,10 @@ import {
 import React, { PureComponent } from 'react';
 import { generateColumns } from '../constants';
 import FormItem from 'antd/lib/form/FormItem';
-import { getToken } from '@/lib/utils/authority';
+import { getToken } from '@/tools/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
+import styles from '../index.less';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -62,10 +63,10 @@ class ApprovalForm extends PureComponent<any, any> {
       tableData: {},
     };
   }
-  public componentDidMount() {
+  public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
-  }
+  };
 
   public componentWillReceiveProps(nextProps) {
     const { formData, status } = nextProps;
@@ -100,8 +101,9 @@ class ApprovalForm extends PureComponent<any, any> {
     this.setState({
       loading: true,
     });
-    const isCompleted = params.status
-      ? !params.status.includes('unfinished') && this.props.status !== 'pending'
+    const isCompleted = params.processInstanceStatusEnum
+      ? !_.toLower(params.processInstanceStatusEnum).includes('unfinished') &&
+        this.props.status !== 'pending'
       : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
@@ -132,9 +134,10 @@ class ApprovalForm extends PureComponent<any, any> {
     };
     this.setState({
       detailData: _detailData,
+      currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
+      tableData: _.get(data, 'process._business_payload'),
     });
-
     if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
       this.setState({
@@ -179,6 +182,7 @@ class ApprovalForm extends PureComponent<any, any> {
   public handleCounterChange = () => {
     const { formData } = this.props;
     const { data } = this.state;
+    console.log(formData);
     const isCheckBtn =
       formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
     const formItems = this.formatFormItems(data, isCheckBtn);
@@ -289,7 +293,7 @@ class ApprovalForm extends PureComponent<any, any> {
         confirmed: true,
         comment: passComment,
       },
-      businessProcessData: {},
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'pass');
   };
@@ -310,7 +314,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: passComment,
         abandon: false,
       },
-      businessProcessData: { trade: this.state.tableData, validTime: '2018-01-01T10:10:10' },
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'modify');
   };
@@ -324,7 +328,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: rejectReason,
         confirmed: false,
       },
-      businessProcessData: {},
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'reject');
   };
@@ -420,7 +424,7 @@ class ApprovalForm extends PureComponent<any, any> {
       trader: _.get(data, 'trader'),
     };
     this.setState({
-      tableData: data,
+      tableData: { trade: data, validTime: '2018-01-01T10:10:10' },
       detailData,
     });
   };
@@ -436,9 +440,9 @@ class ApprovalForm extends PureComponent<any, any> {
       rejectReason,
       passComment,
       modifyComment,
+      currentNodeDTO,
     } = this.state;
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
+    const isCheckBtn = currentNodeDTO !== 'modifyData' && status === 'pending';
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
@@ -455,13 +459,13 @@ class ApprovalForm extends PureComponent<any, any> {
       _data.status =
         histories[histories.length - 1].operation === '退回'
           ? '待修改'
-          : histories[histories.length - 1].operation === '复核通过'
+          : histories[histories.length - 1].operation === '复核通过' ||
+            histories[histories.length - 1].operation === '废弃'
           ? '审核完成'
           : '待审批';
     }
-
     return (
-      <div>
+      <div className={styles.fromContainer}>
         {!loading && (
           <div>
             <Form2
@@ -571,63 +575,66 @@ class ApprovalForm extends PureComponent<any, any> {
                 },
               ]}
             />
-            <Divider type="horizontal" />
-            {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
-              <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
-                <Button
-                  style={{ marginRight: '20px' }}
-                  onClick={() => {
-                    this.setState({ bookEditVisible: true, editable: false });
-                  }}
-                >
-                  查看合约详情
-                </Button>
-                <Button onClick={this.download}>下载审批附件</Button>
-              </Row>
-            ) : (
-              <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
-                <Button
-                  style={{ marginRight: '20px' }}
-                  onClick={() => {
-                    this.setState({ bookEditVisible: true, editable: true });
-                  }}
-                >
-                  修改合约详情
-                </Button>
-                <Upload
-                  maxLen={1}
-                  action={UPLOAD_URL}
-                  data={{
-                    method: 'wkAttachmentUpload',
-                    params: JSON.stringify({}),
-                  }}
-                  headers={{ Authorization: `Bearer ${getToken()}` }}
-                  onChange={fileList => {
-                    this.setState({
-                      fileList,
-                    });
-                    if (fileList[0].status === 'done') {
-                      this.setState(
-                        {
-                          attachmentId: _.get(fileList, '[0].response.result.attachmentId'),
-                        },
-                        () => {
-                          this.transactionHandleOk(
-                            _.get(fileList, '[0].response.result.attachmentName')
-                          );
-                        }
-                      );
-                    }
-                  }}
-                  value={this.state.fileList}
-                  showUploadList={false}
-                >
-                  <Button>重新上传附件</Button>
-                </Upload>
-              </Row>
-            )}
-            <Divider type="horizontal" />
-            <Title level={4}>流程记录</Title>
+            <div style={{ marginLeft: 62, marginTop: 10 }}>
+              {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
+                <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
+                  <Button
+                    style={{ marginRight: '20px' }}
+                    onClick={() => {
+                      this.setState({ bookEditVisible: true, editable: false });
+                    }}
+                  >
+                    查看合约详情
+                  </Button>
+                  <Button onClick={this.download}>下载审批附件</Button>
+                </Row>
+              ) : (
+                <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
+                  <Button
+                    style={{ marginRight: '20px' }}
+                    onClick={() => {
+                      this.setState({ bookEditVisible: true, editable: true });
+                    }}
+                  >
+                    修改合约详情
+                  </Button>
+                  <Upload
+                    maxLen={1}
+                    action={UPLOAD_URL}
+                    data={{
+                      method: 'wkAttachmentUpload',
+                      params: JSON.stringify({}),
+                    }}
+                    headers={{ Authorization: `Bearer ${getToken()}` }}
+                    onChange={fileList => {
+                      this.setState({
+                        fileList,
+                      });
+                      if (fileList[0].status === 'done') {
+                        this.setState(
+                          {
+                            attachmentId: _.get(fileList, '[0].response.result.attachmentId'),
+                          },
+                          () => {
+                            this.transactionHandleOk(
+                              _.get(fileList, '[0].response.result.attachmentName')
+                            );
+                          }
+                        );
+                      }
+                    }}
+                    value={this.state.fileList}
+                    showUploadList={false}
+                  >
+                    <Button>重新上传附件</Button>
+                  </Upload>
+                </Row>
+              )}
+            </div>
+
+            <Title level={4} style={{ marginTop: 50 }}>
+              流程记录
+            </Title>
             <div style={{ marginTop: 20 }}>
               <Table
                 columns={processColumns}

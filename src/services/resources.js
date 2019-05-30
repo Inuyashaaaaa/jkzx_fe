@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
 // 查询资源权限
 export async function queryResourceAuthes(params) {

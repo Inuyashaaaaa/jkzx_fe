@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import { request } from '@/lib/utils';
+import { request } from '@/tools';
 
 export async function prcSpotScenarios(params = {}) {
   return request(`${HOST_TEST}pricing-service/api/rpc`, {

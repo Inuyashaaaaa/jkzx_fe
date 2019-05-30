@@ -5,9 +5,9 @@ import {
   LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
-import Form from '@/design/components/Form';
+import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import { Alert, message, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';

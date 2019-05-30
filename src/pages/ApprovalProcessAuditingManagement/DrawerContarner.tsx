@@ -1,4 +1,4 @@
-import SourceTable from '@/design/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
 import { authUserList } from '@/services/user';

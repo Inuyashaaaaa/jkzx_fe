@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import { request } from '@/lib/utils';
+import { request } from '@/tools';
 import _ from 'lodash';
 
 export async function prcBaseContractsList(params = {}) {

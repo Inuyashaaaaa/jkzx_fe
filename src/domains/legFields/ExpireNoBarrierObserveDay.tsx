@@ -1,33 +1,22 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
   KNOCK_DIRECTION_MAP,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
-  RULES_REQUIRED,
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
-import { Form2 } from '@/design/components';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import { IColumnDef } from '@/design/components/Table/types';
-import { InputBase } from '@/design/components/type';
-import { remove } from '@/design/utils';
+import { Form2 } from '@/containers';
+import Form from '@/containers/Form';
+import ModalButton from '@/containers/ModalButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
+import SourceTable from '@/containers/SourceTable';
+import { IColumnDef } from '@/containers/Table/types';
+import { InputBase } from '@/components/type';
 import { qlDateScheduleCreate } from '@/services/quant-service';
-import {
-  getLegEnvs,
-  isAsian,
-  isAutocallPhoenix,
-  isAutocallSnow,
-  isRangeAccruals,
-  getRequiredRule,
-} from '@/tools';
+import { getLegEnvs, getMoment, getRequiredRule, remove } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { getMoment } from '@/utils';
 import { Button, Col, message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';

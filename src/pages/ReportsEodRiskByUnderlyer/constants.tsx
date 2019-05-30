@@ -1,5 +1,5 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IColumnDef } from '@/containers/Table/types';
 import { formatNumber, formatMoney } from '@/tools';
 
 export const TABLE_COL_DEFS = [
@@ -53,6 +53,14 @@ export const TABLE_COL_DEFS = [
   {
     title: '净 Delta (手)',
     dataIndex: 'netDelta',
+    width: 130,
+    render: (value, record, index) => {
+      return formatNumber(value, 4);
+    },
+  },
+  {
+    title: 'Delta Cash (手)',
+    dataIndex: 'deltaCash',
     width: 130,
     render: (value, record, index) => {
       return formatNumber(value, 4);

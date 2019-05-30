@@ -1,4 +1,4 @@
-import { IFormControl } from '@/lib/components/_Form2';
+import { IFormControl } from '@/containers/_Form2';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 
 export const NAME_FIELD_KEY = 'title';

@@ -1,4 +1,4 @@
-import { DatePicker, Input, InputNumber, Select } from '@/design/components';
+import { DatePicker, Input, InputNumber, Select, Form2 } from '@/containers';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -16,7 +16,13 @@ const multiplier = {
               message: '合约乘数是必填项',
             },
           ],
-        })(<InputNumber precision={4} min={1} />)}
+        })(
+          <InputNumber
+            precision={0}
+            min={1}
+            disabled={Form2.getFieldValue(record.instrumentType) === 'STOCK'}
+          />
+        )}
       </FormItem>
     );
   },
@@ -353,11 +359,11 @@ const instrumentIds = {
             disabled={disable()}
             fetchOptionsOnSearch={true}
             options={async (value: string = '') => {
-              const { data, error } = await mktInstrumentSearch({
+              const { data = [], error } = await mktInstrumentSearch({
                 instrumentIdPart: value,
               });
               if (error) return [];
-              return data.map(item => ({
+              return data.slice(0, 50).map(item => ({
                 label: item,
                 value: item,
               }));

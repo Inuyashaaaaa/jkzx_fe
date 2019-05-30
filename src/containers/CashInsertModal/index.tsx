@@ -1,5 +1,5 @@
 import { DIRECTION_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
-import { Form2, Input } from '@/design/components';
+import { Form2, Input } from '@/containers';
 import { clientChangePremium, clientSettleTrade } from '@/services/client-service';
 import {
   clientAccountGetByLegalName,
@@ -280,9 +280,7 @@ const CashInsertModal = memo<{
           style={{ width: '720px' }}
         /> */}
       </Modal>
-      <Button type="primary" onClick={switchModal} size="small">
-        资金录入
-      </Button>
+      <a onClick={switchModal}>资金录入</a>
     </>
   );
 });

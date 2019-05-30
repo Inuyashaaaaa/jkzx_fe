@@ -1,4 +1,4 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   wkApproveGroupList,
   wkApproveGroupModify,
@@ -75,14 +75,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
       approveGroupName: currentGroup.approveGroupName,
-      userList: userList.map(item => {
-        return {
-          userApproveGroupId: item.userApproveGroupId,
-          departmentId: item.departmentId,
-          nickName: item.nickName,
-          username: item.username,
-        };
-      }),
+      userList: userList.map(item => item.username),
     });
     const { message } = error;
     if (error) {
@@ -111,9 +104,8 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { data, error } = await wkApproveGroupList();
     if (error) return;
 
-    data.sort((a, b) => {
-      return a.approveGroupName.localeCompare(b.approveGroupName);
-    });
+    let approveGroupList = [];
+    approveGroupList = _.sortBy(data, ['approveGroupName']);
 
     const department = await queryAuthDepartmentList();
     if (department.error) {
@@ -128,7 +120,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     }
 
     this.setState({
-      approveGroupList: data,
+      approveGroupList,
       loading: false,
       department: array,
     });
@@ -200,7 +192,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
       approveGroupName: currentGroup.approveGroupName,
-      userList,
+      userList: userList.map(item => item.username),
     });
     if (error) {
       return;
@@ -217,9 +209,10 @@ class SystemSettingsRoleManagement extends PureComponent {
           return item.approveGroupId === currentGroup.approveGroupId;
         })
       ].userList;
+    const approveGroupList = _.sortBy(data, ['approveGroupName']);
     this.setState(
       {
-        approveGroupList: data,
+        approveGroupList,
         currentGroup,
         userList: currentGroup.userList,
       },
@@ -253,7 +246,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     return (
       <>
         <div className={styles.auditingWrapper}>
-          <PageHeaderWrapper>
+          <Page>
             <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
               <p>审批组列表</p>
               <AuditGourpLists
@@ -309,7 +302,7 @@ class SystemSettingsRoleManagement extends PureComponent {
                 currentGroup={this.state.currentGroup}
               />
             </Drawer>
-          </PageHeaderWrapper>
+          </Page>
         </div>
       </>
     );

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import Exception from '@/lib/components/Exception';
+import Exception from '@/containers/Exception';
 import { Button } from 'antd';
 import withRouter from 'umi/withRouter';
 

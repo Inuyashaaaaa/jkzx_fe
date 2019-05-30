@@ -6,14 +6,15 @@ import {
   LCM_EVENT_TYPE_ZHCN_MAP,
   PRODUCTTYPE_ZHCH_MAP,
 } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IColumnDef } from '@/containers/Table/types';
 import { Timeline, Typography } from 'antd';
 import React from 'react';
-import Operations from './CommonModel/Operations';
-import styles from './index.less';
+import Operations from './containers/CommonModel/Operations';
+import styles from '@/styles/index.less';
+
 const TimelineItem = Timeline.Item;
 
-export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
+export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
   {
     title: '交易ID',
     dataIndex: 'tradeId',
@@ -65,13 +66,13 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   },
   {
     title: '标的物',
-    dataIndex: 'underlyerInstrumentId',
+    dataIndex: 'asset.underlyerInstrumentId',
     width: 100,
     // width: 150,
   },
   {
     title: '买/卖',
-    dataIndex: 'direction',
+    dataIndex: 'asset.direction',
     width: 100,
     render: (text, record, index) => {
       return DIRECTION_TYPE_ZHCN_MAP[text];
@@ -88,11 +89,11 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   },
   {
     title: '涨/跌',
-    dataIndex: 'optionType',
+    dataIndex: 'asset.optionType',
     width: 100,
     // width: 60,
     render: (text, record, index) => {
-      return EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[text];
+      return EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[text] || '--';
     },
   },
   {
@@ -102,7 +103,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
   },
   {
     title: '到期日',
-    dataIndex: 'expirationDate',
+    dataIndex: 'asset.expirationDate',
     width: 150,
   },
   {
@@ -138,7 +139,9 @@ export const BOOKING_TABLE_COLUMN_DEFS = onSearch => [
     dataIndex: 'action',
     width: 150,
     render: (value, record, index) => {
-      return <Operations record={record} onSearch={onSearch} rowId={record.positionId} />;
+      return (
+        <Operations name={name} record={record} onSearch={onSearch} rowId={record.positionId} />
+      );
     },
   },
 ];

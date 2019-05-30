@@ -1,4 +1,4 @@
-import { mapTree } from '@/lib/utils';
+import { mapTree, getLocaleId } from '@/tools';
 import { formatMessage } from 'umi/locale';
 import pageRouters from '../../config/router.config';
 
@@ -17,14 +17,6 @@ export default {
       if (!appRoute) {
         throw new Error('appRoute is not defiend!');
       }
-
-      const getLocaleId = (parent, item) => {
-        const parentName = parent && parent.name;
-        if (parentName) {
-          return `menu.${parentName}.${item.name}`;
-        }
-        return `menu.${item.name}`;
-      };
 
       const menuData = mapTree(
         appRoute,

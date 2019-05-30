@@ -1,10 +1,10 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import { Form2 } from '@/design/components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2 } from '@/containers';
+import Page from '@/containers/Page';
 import { rptReportNameList } from '@/services/report-service';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import { ConfigProvider, Divider, message, Table } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
@@ -23,6 +23,7 @@ const ReportCommonTable = memo<any>(props => {
     downloadName,
     scrollWidth,
     bordered = false,
+    colSwitch = [],
   } = props;
   const [markets, setMarkets] = useState([]);
   const [dataSource, setDataSource] = useState([]);
@@ -37,6 +38,7 @@ const ReportCommonTable = memo<any>(props => {
   const [total, setTotal] = useState(null);
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
+  const [excelFormData, setExcelFormData] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
     setIsMount(true);
@@ -52,6 +54,7 @@ const ReportCommonTable = memo<any>(props => {
 
   const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
+    setExcelFormData(usedFormData);
     const formValidateRsp = await form.current.validate();
     if (formValidateRsp.error) {
       return;
@@ -172,7 +175,7 @@ const ReportCommonTable = memo<any>(props => {
   );
 
   return (
-    <PageHeaderWrapper>
+    <Page>
       <Form2
         ref={node => (form.current = node)}
         dataSource={searchFormData}
@@ -197,9 +200,14 @@ const ReportCommonTable = memo<any>(props => {
         key="export"
         type="primary"
         data={{
-          dataSource: data,
-          cols: tableColDefs.map(item => item.title),
+          searchMethod,
+          argument: {
+            searchFormData: excelFormData,
+            sortField,
+          },
+          cols: tableColDefs,
           name: downloadName,
+          colSwitch,
         }}
       >
         导出Excel
@@ -224,7 +232,7 @@ const ReportCommonTable = memo<any>(props => {
           bordered={bordered}
         />
       </ConfigProvider>
-    </PageHeaderWrapper>
+    </Page>
   );
 });
 

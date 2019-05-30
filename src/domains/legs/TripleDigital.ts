@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   LEG_FIELD,
@@ -22,12 +22,8 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -58,9 +54,12 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
+import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const TripleDigital: ILeg = {
+export const TripleDigital: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.TRIPLE_DIGITAL],
   type: LEG_TYPE_MAP.TRIPLE_DIGITAL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -73,6 +72,7 @@ export const TripleDigital: ILeg = {
         InitialSpot,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
+        EffectiveDate,
         OptionType,
         StrikeType,
         ParticipationRate,
@@ -86,6 +86,7 @@ export const TripleDigital: ILeg = {
         Payment1,
         Payment2,
         Payment3,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -119,6 +120,8 @@ export const TripleDigital: ILeg = {
         Payment1,
         Payment2,
         Payment3,
+        Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -151,6 +154,8 @@ export const TripleDigital: ILeg = {
         Payment1,
         Payment2,
         Payment3,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -188,6 +193,8 @@ export const TripleDigital: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.TRIPLE_DIGITAL;
@@ -241,4 +248,4 @@ export const TripleDigital: ILeg = {
       setTableData
     );
   },
-};
+});

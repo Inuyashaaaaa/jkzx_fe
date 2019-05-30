@@ -7,8 +7,8 @@ import {
   Select,
   Table2,
   Upload,
-} from '@/design/components';
-import { remove, uuid } from '@/design/utils';
+} from '@/containers';
+import { remove, uuid } from '@/tools';
 import { UPLOAD_URL } from '@/services/document';
 import { createRefParty } from '@/services/reference-data-service';
 import { AutoComplete, Button, Cascader, Divider, Icon, notification, Row, Steps } from 'antd';
@@ -17,6 +17,7 @@ import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 import EmailInput from '@/containers/EmailInput';
+import { getToken } from '@/tools/authority';
 
 const CreateModalButton = memo<any>(props => {
   const { salesCascaderList, fetchTableData } = props;
@@ -302,25 +303,6 @@ const CreateModalButton = memo<any>(props => {
                   },
                 },
                 {
-                  title: '托管邮箱',
-                  dataIndex: 'trustorEmail',
-                  render: (val, record, index, { form }) => {
-                    return (
-                      <FormItem hasFeedback={true}>
-                        {form.getFieldDecorator({
-                          rules: [
-                            {
-                              required: true,
-                              message: '必填',
-                            },
-                          ],
-                        })(<EmailInput style={{ width: '100%' }} />)}
-                      </FormItem>
-                    );
-                  },
-                },
-
-                {
                   title: '联系人',
                   dataIndex: 'contact',
                   render: (val, record, index, { form }) => {
@@ -388,6 +370,23 @@ const CreateModalButton = memo<any>(props => {
                             },
                           ],
                         })(<Input editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '托管邮箱',
+                  dataIndex: 'trustorEmail',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<EmailInput style={{ width: '100%' }} />)}
                       </FormItem>
                     );
                   },
@@ -473,6 +472,83 @@ const CreateModalButton = memo<any>(props => {
                             },
                           ],
                         })(<DatePicker editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '主协议编号版本',
+                  dataIndex: 'masterAgreementNoVersion',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(
+                          <Select
+                            editing={editable}
+                            options={[
+                              {
+                                label: ' SAC2014',
+                                value: 'SAC2014',
+                              },
+                              {
+                                label: 'SAC2015',
+                                value: 'SAC2015',
+                              },
+                              {
+                                label: 'ISDA',
+                                value: 'ISDA',
+                              },
+                              {
+                                label: 'OTHER',
+                                value: 'OTHER',
+                              },
+                              {
+                                label: 'NAFMII',
+                                value: 'NAFMII',
+                              },
+                            ]}
+                          />
+                        )}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '主协议签证日期',
+                  dataIndex: 'masterAgreementSignDate',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<DatePicker editing={editable} />)}
+                      </FormItem>
+                    );
+                  },
+                },
+                {
+                  title: '营业执照',
+                  dataIndex: 'businessLicense',
+                  render: (val, record, index, { form }) => {
+                    return (
+                      <FormItem hasFeedback={true}>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: false,
+                            },
+                          ],
+                        })(<Input editing={editable} />)}
                       </FormItem>
                     );
                   },
@@ -942,6 +1018,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '主协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -970,6 +1047,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '补充协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -998,6 +1076,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '风险问卷调查',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1026,6 +1105,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '交易授权书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1054,6 +1134,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '对手尽职调查',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1082,6 +1163,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '风险承受能力调查问卷',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1110,6 +1192,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '合规性承诺书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1138,6 +1221,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '风险揭示书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1166,6 +1250,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '适当性警示书',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1194,6 +1279,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '授信协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}
@@ -1222,6 +1308,7 @@ const CreateModalButton = memo<any>(props => {
                                 name: '履约保障协议',
                               }),
                             }}
+                            headers={{ Authorization: `Bearer ${getToken()}` }}
                             editing={editable}
                           />
                         )}

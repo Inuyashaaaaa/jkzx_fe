@@ -1,6 +1,6 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
-import { getToken } from '@/lib/utils/authority';
+import request from '@/tools/request';
+import { getToken } from '@/tools/authority';
 
 // 创建审批流程
 export async function createApprovalProcess(params = {}) {

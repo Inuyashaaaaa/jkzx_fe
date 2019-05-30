@@ -4,6 +4,8 @@ import { AnchorButtonProps, NativeButtonProps } from 'antd/lib/button/button';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import XLSX from 'xlsx';
+import { Form2 } from '@/containers';
+import { getMoment } from '@/tools';
 
 /* list of supported file types */
 const SheetJSFT = [
@@ -43,21 +45,61 @@ const makeCols = refstr => {
 };
 
 class DownloadExcelButton extends PureComponent<ImportButtonProps> {
-  public exportFile = () => {
-    console.log(this.props.data);
+  public handleData = (dataSource, cols, headers) => {
+    const data = [];
+    data.push(headers);
+    const length = data.length;
+    dataSource.forEach((ds, index) => {
+      const _data = [];
+      Object.keys(ds).forEach(key => {
+        const dsIndex = _.findIndex(cols, k => k === key);
+        if (dsIndex >= 0) {
+          _data[dsIndex] = ds[key];
+        }
+      });
+      data.push(_data);
+    });
+    return data;
+  };
 
+  public exportFile = async () => {
     /* convert state to workbook */
     if (!this.checkData(this.props.data)) {
       return;
     }
-
-    const { dataSource, cols, name } = this.props.data;
-    // dataSource = dataSource.unshift(cols)
-    console.log(dataSource, cols);
-
+    const { searchMethod, cols, name, argument, colSwitch } = this.props.data;
+    const { searchFormData, sortField = {} } = argument;
+    const { error, data: _data } = await searchMethod({
+      ..._.mapValues(Form2.getFieldsValue(searchFormData), (values, key) => {
+        if (key === 'valuationDate') {
+          return getMoment(values).format('YYYY-MM-DD');
+        }
+        return values;
+      }),
+      ...sortField,
+    });
+    if (error) return;
+    const dataIndex = _.flatten(
+      cols.map(item =>
+        item.children ? item.children.map(iitem => iitem.dataIndex) : item.dataIndex
+      )
+    );
+    const title = _.flatten(
+      cols.map(item => (item.children ? item.children.map(iitem => iitem.title) : item.title))
+    );
+    const newData = _data.page.map(item => {
+      return _.mapValues(item, (value, key) => {
+        const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
+        if (col) {
+          return col.options[value];
+        }
+        return value;
+      });
+    });
+    const dataSource = this.handleData(newData, dataIndex, title);
     if (this.props.tabs) {
       // 多sheet表导出
-      console.log(this.props.tabs);
+
       const wb = XLSX.utils.book_new();
       this.props.tabs.forEach((item, index) => {
         const ws = XLSX.utils.aoa_to_sheet(dataSource[index]);

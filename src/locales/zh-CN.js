@@ -67,6 +67,7 @@ export default {
   'menu.tradeManagement.onBoardTransaction': '场内交易管理',
   'menu.tradeManagement.portfolioManagement': '投资组合管理',
   'menu.tradeManagement.tradeDocuments': '交易文档',
+  'menu.tradeManagement.pricingManagement': '历史定价管理',
   'menu.workflowManagement': '审核',
   'menu.workflowManagement.workflowSettings': '审核配置',
   'menu.workflowManagement.processManagement': '任务管理',
@@ -85,6 +86,7 @@ export default {
   'menu.reports.tradingStatements': '交易报表',
   'menu.reports.fundsDetailedStatements': '资金明细报表',
   'menu.reports.customerFundsSummaryStatements': '客户资金汇总报表',
+  'menu.reports.reportsCustomManagement': '自定义报告管理',
   'menu.userInfo': '个人中心',
   // pro lang
   'navBar.lang': '语言',
@@ -189,6 +191,7 @@ export default {
   'menu.account.settings': '个人设置',
   'menu.account.trigger': '触发报错',
   'menu.account.logout': '退出登录',
+  'menu.account.update': '修改密码',
   'app.login.message-invalid-credentials': '账户或密码错误（admin/888888）',
   'app.login.message-invalid-verification-code': '验证码错误',
   'app.login.tab-login-credentials': '账户密码登录',

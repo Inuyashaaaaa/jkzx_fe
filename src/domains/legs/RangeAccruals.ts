@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -26,12 +26,8 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -67,7 +63,7 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { Rebate } from '../legFields/Rebate';
 import { ObservationType } from '../legFields/ObservationType';
 import { KnockDirection } from '../legFields/KnockDirection';
@@ -81,8 +77,11 @@ import { HighBarrier } from '../legFields/HighBarrier';
 import { LowBarrier } from '../legFields/LowBarrier';
 import { ObservationDates } from '../legFields/ObservationDates';
 import { ObservationStep } from '../legFields/ObservationStep';
+import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const RangeAccruals: ILeg = {
+export const RangeAccruals: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.RANGE_ACCRUALS],
   type: LEG_TYPE_MAP.RANGE_ACCRUALS,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -109,6 +108,7 @@ export const RangeAccruals: ILeg = {
         LowBarrier,
         ObservationDates,
         ObservationStep,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -139,6 +139,8 @@ export const RangeAccruals: ILeg = {
         HighBarrier,
         LowBarrier,
         ObservationDates,
+        Unit,
+        TradeNumber,
         // ObservationStep,
         ...TOTAL_EDITING_FIELDS,
       ];
@@ -170,6 +172,8 @@ export const RangeAccruals: ILeg = {
         LowBarrier,
         ObservationDates,
         ObservationStep,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -201,7 +205,12 @@ export const RangeAccruals: ILeg = {
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [ObservationStep.dataIndex, LEG_FIELD.OBSERVATION_DATES];
+    const COMPUTED_FIELDS = [
+      ObservationStep.dataIndex,
+      LEG_FIELD.OBSERVATION_DATES,
+      LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
+    ];
 
     nextPosition.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;
     nextPosition.asset = _.omit(dataItem, [
@@ -218,13 +227,15 @@ export const RangeAccruals: ILeg = {
           ]),
     ]);
 
-    nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
-      (result, item) => {
-        result[item[OB_DAY_FIELD]] = item.price || null;
-        return result;
-      },
-      {}
-    );
+    if (dataItem[LEG_FIELD.OBSERVATION_DATES]) {
+      nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
+        (result, item) => {
+          result[item[OB_DAY_FIELD]] = item.price || null;
+          return result;
+        },
+        {}
+      );
+    }
 
     nextPosition.asset.effectiveDate =
       nextPosition.asset.effectiveDate &&
@@ -276,4 +287,4 @@ export const RangeAccruals: ILeg = {
       setTableData
     );
   },
-};
+});

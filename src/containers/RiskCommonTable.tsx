@@ -2,8 +2,8 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
-import { Form2 } from '@/design/components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2 } from '@/containers';
+import Page from '@/containers/Page';
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useRef, useState, memo } from 'react';
@@ -22,6 +22,7 @@ const RiskCommonTable = memo<any>(props => {
     scrollWidth,
     getReload,
     hideReload = false,
+    colSwitch = [],
   } = props;
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
@@ -35,6 +36,7 @@ const RiskCommonTable = memo<any>(props => {
   const [total, setTotal] = useState(null);
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
+  const [excelFormData, setExcelFormData] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
     setIsMount(true);
@@ -50,6 +52,8 @@ const RiskCommonTable = memo<any>(props => {
 
   const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
+    setExcelFormData(usedFormData);
+
     if (searchFormControls) {
       const formValidateRsp = await form.current.validate();
       if (formValidateRsp.error) {
@@ -151,7 +155,7 @@ const RiskCommonTable = memo<any>(props => {
     [dataSource]
   );
   return (
-    <PageHeaderWrapper>
+    <Page>
       {searchFormControls && (
         <>
           <Form2
@@ -181,9 +185,14 @@ const RiskCommonTable = memo<any>(props => {
           key="export"
           type="primary"
           data={{
-            dataSource: data,
-            cols: tableColDefs.map(item => item.title),
+            cols: tableColDefs,
             name: downloadName,
+            searchMethod,
+            argument: {
+              searchFormData: excelFormData,
+              sortField,
+            },
+            colSwitch,
           }}
         >
           导出Excel
@@ -209,7 +218,7 @@ const RiskCommonTable = memo<any>(props => {
           scroll={{ x: scrollWidth }}
         />
       </ConfigProvider>
-    </PageHeaderWrapper>
+    </Page>
   );
 });
 

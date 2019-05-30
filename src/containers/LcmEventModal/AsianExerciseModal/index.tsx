@@ -1,4 +1,4 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import {
   BIG_NUMBER_CONFIG,
   DIRECTION_TYPE_MAP,
@@ -12,10 +12,10 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
+import Form from '@/containers/Form';
 import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import { Alert, Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';

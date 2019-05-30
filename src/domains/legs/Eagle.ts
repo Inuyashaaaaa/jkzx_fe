@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   BIG_NUMBER_CONFIG,
@@ -22,12 +22,8 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -56,9 +52,12 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { Unit } from '../legFields/Unit';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const Eagle: ILeg = {
+export const Eagle: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.EAGLE],
   type: LEG_TYPE_MAP.EAGLE,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -69,6 +68,7 @@ export const Eagle: ILeg = {
         Direction,
         NotionalAmountType,
         InitialSpot,
+        EffectiveDate,
         StrikeType,
         UnderlyerMultiplier,
         UnderlyerInstrumentId,
@@ -81,6 +81,7 @@ export const Eagle: ILeg = {
         ParticipationRate2,
         ExpirationDate,
         NotionalAmount,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -110,6 +111,8 @@ export const Eagle: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -138,6 +141,8 @@ export const Eagle: ILeg = {
         Premium,
         FrontPremium,
         MinimumPremium,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -175,6 +180,8 @@ export const Eagle: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.EAGLE;
@@ -255,4 +262,4 @@ export const Eagle: ILeg = {
       }
     }
   },
-};
+});

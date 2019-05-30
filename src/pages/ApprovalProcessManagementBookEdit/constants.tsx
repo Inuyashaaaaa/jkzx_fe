@@ -1,4 +1,4 @@
-import { IFormControl } from '@/lib/components/_Form2';
+import { IFormControl } from '@/containers/_Form2';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
 export const CREATE_FORM_CONTROLS: IFormControl[] = [
@@ -44,6 +44,7 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     input: {
       type: 'select',
       showSearch: true,
+      allowClear: true,
       placeholder: '请输入内容搜索',
       options: async (value: string = '') => {
         const { data, error } = await refSimilarLegalNameList({

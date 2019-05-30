@@ -1,8 +1,8 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import CascaderSourceList from '@/lib/components/_CascaderSourceList';
-import Form, { IFormControl } from '@/lib/components/_Form2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay } from '@/lib/utils';
+import CascaderSourceList from '@/containers/_CascaderSourceList';
+import Form, { IFormControl } from '@/containers/_Form2';
+import Page from '@/containers/Page';
+import { delay } from '@/tools';
 import { Col, Row } from 'antd';
 import memo from 'memoize-one';
 import React, { PureComponent } from 'react';
@@ -67,7 +67,7 @@ class PricingSettingsPricingEnvironment extends PureComponent {
     //   [OPTION_KEY, SUBJECT_KEY, DATE_KEY, POSITION_KEY],
     //   [OPTION_KEY, SUBJECT_KEY, DATE_KEY, POSITION_KEY]
     // );
-    // console.log(nodes);
+    //
     return options;
   });
 
@@ -251,7 +251,7 @@ class PricingSettingsPricingEnvironment extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row type="flex" justify="space-between" align="top">
           <Col sm={18} xs={24}>
             {/* <BigCascader {...bigCascaderProps} /> */}
@@ -292,7 +292,7 @@ class PricingSettingsPricingEnvironment extends PureComponent {
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

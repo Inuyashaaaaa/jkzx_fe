@@ -1,6 +1,6 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import { deleteVolSpecialDates } from '@/services/volatility';
-import { Button, notification } from 'antd';
+import { Divider, notification, Popconfirm } from 'antd';
 import React, { PureComponent } from 'react';
 
 class Operation extends PureComponent<{
@@ -29,25 +29,11 @@ class Operation extends PureComponent<{
   public render() {
     return (
       <>
-        <PopconfirmButton
-          type="danger"
-          size="small"
-          loading={this.state.loading}
-          popconfirmProps={{
-            title: '确定要删除吗?',
-            onConfirm: this.onRemove,
-          }}
-        >
-          删除
-        </PopconfirmButton>
-        <Button
-          key="edit"
-          type="primary"
-          size="small"
-          onClick={() => this.props.showModal('modify', this.props.record)}
-        >
-          编辑
-        </Button>
+        <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
+          <a style={{ color: 'red' }}>删除</a>
+        </Popconfirm>
+        <Divider type="vertical" />
+        <a onClick={() => this.props.showModal('modify', this.props.record)}>编辑</a>
       </>
     );
   }

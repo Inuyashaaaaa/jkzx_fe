@@ -1,5 +1,5 @@
 import { OB_DAY_FIELD } from '@/constants/common';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 

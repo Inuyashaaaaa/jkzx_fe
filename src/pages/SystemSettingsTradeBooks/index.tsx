@@ -1,17 +1,20 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Form from '@/containers/Form';
+import SourceTable from '@/containers/SourceTable';
+import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import {
   addNonGroupResource,
   queryNonGroupResource,
   updateNonGroupResource,
 } from '@/services/tradeBooks';
-import { Button, Modal, message } from 'antd';
+import { Button, Modal, message, Row, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS } from './constants';
 import { trdTradeListByBook } from '@/services/general-service';
+import { Form2, Select } from '@/containers';
+import FormItem from 'antd/lib/form/FormItem';
+import Operation from './Operation';
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -135,8 +138,43 @@ class SystemSettingsTradeBooks extends PureComponent {
   public render() {
     const { books, loading } = this.state;
     return (
-      <PageHeaderWrapper>
-        <SourceTable
+      <Page>
+        <Row>
+          <Button
+            type="primary"
+            style={{ marginBottom: VERTICAL_GUTTER }}
+            onClick={this.switchModal}
+          >
+            新建交易簿
+          </Button>
+        </Row>
+        <Table
+          dataSource={books}
+          columns={[
+            {
+              title: '名称',
+              dataIndex: 'resourceName',
+            },
+            {
+              title: '部门',
+              dataIndex: 'departmentName',
+            },
+            {
+              title: '创建时间',
+              dataIndex: 'createTime',
+            },
+            {
+              title: '操作',
+              render: (text, record, index) => {
+                return <Operation record={text} fetchTable={this.fetchTable} />;
+              },
+            },
+          ]}
+          rowKey="resourceName"
+          size="middle"
+          loading={loading}
+        />
+        {/* <SourceTable
           loading={loading}
           rowKey={'id'}
           dataSource={books}
@@ -151,7 +189,7 @@ class SystemSettingsTradeBooks extends PureComponent {
               新建交易簿
             </Button>
           }
-        />
+        /> */}
         <Modal
           title="新建交易簿"
           onOk={this.onCreateBook}
@@ -167,7 +205,7 @@ class SystemSettingsTradeBooks extends PureComponent {
             onValueChange={this.onValueChange}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

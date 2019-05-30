@@ -2,8 +2,8 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
-import { Form2, Select } from '@/design/components';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select } from '@/containers';
+import Page from '@/containers/Page';
 import { socketHOC } from '@/tools/socketHOC';
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
@@ -27,6 +27,7 @@ const RiskManagerCustomReport = memo<any>(props => {
   const [total, setTotal] = useState(null);
   const [data, setData] = useState([]);
   const [tableColumnDefs, setTableColumnDefs] = useState([]);
+  const [excelFormData, setExcelFormData] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
     setPagination({
@@ -41,6 +42,7 @@ const RiskManagerCustomReport = memo<any>(props => {
 
   const fetchTable = async (paramsSearchFormData?) => {
     const usedFormData = paramsSearchFormData || searchFormData;
+    setExcelFormData(usedFormData);
     const formValidateRsp = await form.current.validate();
     if (formValidateRsp.error) {
       return;
@@ -115,7 +117,7 @@ const RiskManagerCustomReport = memo<any>(props => {
   );
 
   return (
-    <PageHeaderWrapper>
+    <Page>
       <Form2
         ref={node => (form.current = node)}
         dataSource={searchFormData}
@@ -173,9 +175,12 @@ const RiskManagerCustomReport = memo<any>(props => {
         key="export"
         type="primary"
         data={{
-          dataSource: data,
-          cols: tableColumnDefs.map(item => item.title),
+          searchMethod: rptIntradayReportPaged,
+          cols: tableColumnDefs,
           name: '定制化报告',
+          argument: {
+            searchFormData: excelFormData,
+          },
         }}
       >
         导出Excel
@@ -198,7 +203,7 @@ const RiskManagerCustomReport = memo<any>(props => {
           scroll={{ x: 1350 }}
         />
       </ConfigProvider>
-    </PageHeaderWrapper>
+    </Page>
   );
 });
 

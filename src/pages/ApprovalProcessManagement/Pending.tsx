@@ -1,4 +1,4 @@
-import { Table2 } from '@/design/components';
+import { Table2 } from '@/containers';
 import { queryProcessToDoList } from '@/services/approval';
 import moment from 'moment';
 import React, { PureComponent } from 'react';

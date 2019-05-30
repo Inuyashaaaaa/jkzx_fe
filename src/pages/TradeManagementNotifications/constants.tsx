@@ -4,8 +4,8 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   PRODUCT_TYPE_OPTIONS,
 } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import moment from 'moment';
 
 export const DEFAULT_CALENDAR = 'DEFAULT_CALENDAR';

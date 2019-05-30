@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 // 查询所有模板信息
 export async function queryTemplateList(params = {}) {
   return request(`${HOST_TEST}document-service/api/rpc`, {

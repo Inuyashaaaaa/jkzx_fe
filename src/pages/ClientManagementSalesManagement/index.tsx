@@ -1,8 +1,7 @@
-import { Form2, Input } from '@/design/components';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { arr2treeOptions } from '@/lib/utils';
+import { Form2, Input } from '@/containers';
+import ModalButton from '@/containers/ModalButton';
+import Page from '@/containers/Page';
+import SourceTable from '@/containers/SourceTable';
 import {
   queryCompanys,
   querySalers,
@@ -10,17 +9,17 @@ import {
   refBranchDelete,
   refBranchUpdate,
   refSalesCreate,
-  refSalesDelete,
-  refSalesUpdate,
   refSubsidiaryCreate,
   refSubsidiaryDelete,
   refSubsidiaryUpdate,
 } from '@/services/sales';
-import { Col, Icon, message, Modal, Popconfirm, Row, Tree } from 'antd';
+import { arr2treeOptions, getMoment } from '@/tools';
+import { Col, Divider, Icon, message, Modal, Popconfirm, Row, Table, Tree } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
-import { TABLE_COL_DEF } from './constants';
 import CreateFormModal from './CreateFormModal';
+import Operation from './Operation';
+
 const { TreeNode } = Tree;
 
 class ClientManagementSalesManagement extends PureComponent {
@@ -48,6 +47,10 @@ class ClientManagementSalesManagement extends PureComponent {
     editBranch: true,
     branchId: '',
     subsidiaryId: '',
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
   };
 
   public componentDidMount = () => {
@@ -146,7 +149,6 @@ class ClientManagementSalesManagement extends PureComponent {
 
   public onEdit = (params, e) => {
     e.stopPropagation();
-    console.log(params);
     if (params.children) {
       return this.setState(
         {
@@ -189,6 +191,10 @@ class ClientManagementSalesManagement extends PureComponent {
     );
   };
 
+  public onCancelRemove = item => e => {
+    e.stopPropagation();
+  };
+
   // 未完成remove
   public bindRemove = item => async e => {
     e.stopPropagation();
@@ -207,6 +213,7 @@ class ClientManagementSalesManagement extends PureComponent {
       message.error('删除失败');
       return;
     }
+    message.success('删除成功');
     this.handleTreeNode();
   };
 
@@ -272,6 +279,7 @@ class ClientManagementSalesManagement extends PureComponent {
                     onConfirm={this.bindRemove(item)}
                     okText="确认"
                     cancelText="取消"
+                    onCancel={this.onCancelRemove(item)}
                   >
                     <Icon
                       type="minus-circle"
@@ -310,6 +318,7 @@ class ClientManagementSalesManagement extends PureComponent {
                   onConfirm={this.bindRemove(item)}
                   okText="确认"
                   cancelText="取消"
+                  onCancel={this.onCancelRemove(item)}
                 >
                   <Icon
                     type="minus-circle"
@@ -328,24 +337,29 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public onSelect = async selectedKeys => {
-    console.log(selectedKeys);
     if (!selectedKeys.length) return;
     const arr = selectedKeys[0].split('/');
+    this.setState({
+      loading: true,
+    });
+    let salesRsp;
     if (arr.length === 3) {
-      this.setState({
-        loading: true,
-      });
-      const { error, data } = await querySalers({
+      salesRsp = await querySalers({
         branchId: arr[2],
       });
-      this.setState({
-        loading: false,
-      });
-      if (error) return;
-      return this.setState({
-        dataSource: data,
+    }
+    if (arr.length === 1) {
+      salesRsp = await querySalers({
+        subsidiaryId: arr[0],
       });
     }
+    this.setState({
+      loading: false,
+    });
+    if (salesRsp.error) return;
+    return this.setState({
+      dataSource: salesRsp.data,
+    });
   };
 
   public handleCancelSub = () => {
@@ -366,7 +380,7 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleConfirmSub = async () => {
     const { error } = await this.$subModalForm.validate();
     if (error) return;
-    console.log(this.state.subFormData);
+
     const subsidiaryEdit = this.state.editSub ? refSubsidiaryUpdate : refSubsidiaryCreate;
     const params = this.state.editSub
       ? {
@@ -436,9 +450,18 @@ class ClientManagementSalesManagement extends PureComponent {
     });
   };
 
+  public paginationChange = (current, pageSize) => {
+    this.setState({
+      pagination: {
+        current,
+        pageSize,
+      },
+    });
+  };
+
   public render() {
     return (
-      <PageHeaderWrapper title="销售管理">
+      <Page title="销售管理">
         <Row type="flex" justify="space-between" gutter={32}>
           <Col>
             <Tree showLine={true} onSelect={this.onSelect} blockNode={false}>
@@ -446,37 +469,73 @@ class ClientManagementSalesManagement extends PureComponent {
             </Tree>
           </Col>
           <Col>
-            <SourceTable
-              rowKey="uuid"
-              ref={node => (this.$sourceTable = node)}
-              dataSource={this.state.dataSource}
-              columnDefs={TABLE_COL_DEF(this.state.branchSalesList, this.fetchTable)}
-              loading={this.state.loading}
-              header={
-                <ModalButton
-                  key="create"
-                  style={{ marginBottom: '20px' }}
-                  type="primary"
-                  onClick={this.switchModal}
-                  modalProps={{
-                    title: '新建销售',
-                    visible: this.state.visible,
-                    comfirmLoading: this.state.confirmLoading,
-                    onCancel: this.switchModal,
-                    onOk: this.onCreate,
-                  }}
-                  content={
-                    <CreateFormModal
-                      refCreateFormModal={node => (this.$refCreateFormModal = node)}
-                      dataSource={this.state.createFormData}
-                      handleValueChange={this.handleValueChange}
-                      branchSalesList={this.state.branchSalesList}
-                    />
-                  }
-                >
-                  新建销售
-                </ModalButton>
+            <ModalButton
+              key="create"
+              style={{ marginBottom: '20px' }}
+              type="primary"
+              onClick={this.switchModal}
+              modalProps={{
+                title: '新建销售',
+                visible: this.state.visible,
+                comfirmLoading: this.state.confirmLoading,
+                onCancel: this.switchModal,
+                onOk: this.onCreate,
+              }}
+              content={
+                <CreateFormModal
+                  refCreateFormModal={node => (this.$refCreateFormModal = node)}
+                  dataSource={this.state.createFormData}
+                  handleValueChange={this.handleValueChange}
+                  branchSalesList={this.state.branchSalesList}
+                />
               }
+            >
+              新建销售
+            </ModalButton>
+            <Divider type="horizontal" />
+            <Table
+              dataSource={this.state.dataSource}
+              columns={[
+                {
+                  title: '销售',
+                  dataIndex: 'salesName',
+                  width: 200,
+                },
+                {
+                  title: '营业部',
+                  width: 200,
+                  dataIndex: 'branchName',
+                },
+                {
+                  title: '分公司',
+                  width: 200,
+                  dataIndex: 'subsidiaryName',
+                },
+                {
+                  title: '创建时间',
+                  width: 250,
+                  dataIndex: 'createdAt',
+                  render: (text, record, index) => {
+                    return getMoment(text).format('YYYY-MM-DD HH:mm:ss');
+                  },
+                },
+                {
+                  title: '操作',
+                  width: 250,
+                  render: (text, record, index) => {
+                    return <Operation record={text} fetchTable={this.fetchTable} />;
+                  },
+                },
+              ]}
+              loading={this.state.loading}
+              rowKey="uuid"
+              size="middle"
+              pagination={{
+                ...this.state.pagination,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                onChange: this.paginationChange,
+              }}
             />
           </Col>
         </Row>
@@ -565,7 +624,7 @@ class ClientManagementSalesManagement extends PureComponent {
             ]}
           />
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

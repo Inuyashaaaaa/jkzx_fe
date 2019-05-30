@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
 export async function rptIntradayTradeReportPaged(params = {}) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
@@ -226,6 +226,26 @@ export async function rptFinancialOtcFundDetailReportSearchPaged(params) {
     method: `POST`,
     body: {
       method: 'rptFinancialOtcFundDetailReportSearchPaged',
+      params,
+    },
+  });
+}
+
+export async function rptCustomReportNameList(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptCustomReportNameList',
+      params,
+    },
+  });
+}
+
+export async function rptCustomReportSearchPaged(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptCustomReportSearchPaged',
       params,
     },
   });

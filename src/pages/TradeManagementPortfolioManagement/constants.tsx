@@ -6,7 +6,7 @@ import {
   LCM_EVENT_TYPE_ZHCN_MAP,
   PRODUCTTYPE_ZHCH_MAP,
 } from '@/constants/common';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IColumnDef } from '@/containers/Table/types';
 import { trdTradePortfolioDelete } from '@/services/trade-service';
 import { message, Popconfirm, Timeline } from 'antd';
 import React from 'react';

@@ -1,5 +1,6 @@
-import { getUser, setUser } from '@/lib/utils/authority';
+import { getUser, setUser } from '@/tools/authority';
 import router from 'umi/router';
+import _ from 'lodash';
 
 export default {
   namespace: 'user',
@@ -9,9 +10,9 @@ export default {
   },
 
   effects: {
-    *replenish(_, { put }) {
+    *replenish($, { put }) {
       const userInfo = getUser();
-      if (!userInfo) {
+      if (_.isEmpty(userInfo)) {
         router.push('/user/login');
         return;
       }
@@ -35,7 +36,7 @@ export default {
       });
     },
 
-    *cleanCurrentUser(_, { put }) {
+    *cleanCurrentUser($, { put }) {
       yield put({
         type: 'saveUserData',
         payload: {},

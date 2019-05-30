@@ -9,7 +9,6 @@ const RELEASE_CONTAINER = 'FE-release';
 // const FEATURE_CONTAINER = 'FE-feature';
 const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
-const START = '前端模块开始更新';
 const FINISH = '前端模块更新完毕';
 const BUNDLE_NAME = 'dist';
 
@@ -39,8 +38,6 @@ function upload(remoteUsername, remoteIp, remoteFolder) {
     `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${BUNDLE_NAME}`
   );
   try {
-    shell.exec(`./scripts/ci/greet.sh ${remoteIp} ${START} ${process.env.CI_COMMIT_SHA}`);
-
     shell.exec(
       `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${paths}`
     );
@@ -54,59 +51,41 @@ function upload(remoteUsername, remoteIp, remoteFolder) {
   }
 }
 
-function last(prodContainerPath) {
+function bundle(prodContainerPath, distpath, filename = new Date().toISOString()) {
+  cp(path.join(__dirname, distpath), path.join(prodContainerPath, filename));
+
   const lastPath = path.join(prodContainerPath, 'last');
 
   if (exists(lastPath)) {
     remove(lastPath);
   }
 
-  cp(path.join(__dirname, '../dist/*'), lastPath);
+  cp(path.join(__dirname, distpath), lastPath);
 }
 
 function prod() {
   const prodContainerPath = path.join(USER_PATH, PROD_CONTAINER);
-  // @todo 获取当前 master 的标签作为文件名
-  const filename = new Date().toISOString();
-  console.log(`文件名：${filename}`);
-
-  // 拷贝文件到目标位置
-  cp(path.join(__dirname, '../dist/*'), path.join(prodContainerPath, filename));
 
   // 更新 last
-  last(prodContainerPath);
+  bundle(prodContainerPath, '../dist/*');
 
   upload('tongyu', '10.1.5.24', '/home/tongyu/');
 }
 
 function test() {
   const prodContainerPath = path.join(USER_PATH, TEST_CONTAINER);
-  // 检测目标容器
-  // @todo 获取当前 master 的标签作为文件名
-  const filename = new Date().toISOString();
-  console.log(`文件名：${filename}`);
-
-  // 拷贝文件到目标位置
-  cp(path.join(__dirname, '../dist/*'), path.join(prodContainerPath, filename));
 
   // 更新 last
-  last(prodContainerPath);
+  bundle(prodContainerPath, '../dist/*');
 
   upload('tongyu', '10.1.5.16', '/home/tongyu/');
 }
 
 function release() {
   const prodContainerPath = path.join(USER_PATH, RELEASE_CONTAINER);
-  // 检测目标容器
-  // @todo 获取当前 master 的标签作为文件名
-  const filename = new Date().toISOString();
-  console.log(`文件名：${filename}`);
-
-  // 拷贝文件到目标位置
-  cp(path.join(__dirname, '../dist/*'), path.join(prodContainerPath, filename));
 
   // 更新 last
-  last(prodContainerPath);
+  bundle(prodContainerPath, '../dist/*');
 
   upload('tongyu', '10.1.5.23', '/home/tongyu/');
 }
@@ -118,7 +97,7 @@ function hotfix() {
 function doc() {
   const prodContainerPath = path.join(USER_PATH, DOC_CONTAINER);
 
-  cp(path.join(__dirname, '../docs/*'), path.join(prodContainerPath));
+  bundle(prodContainerPath, '../docs/*');
 }
 
 console.log('deploy start!');

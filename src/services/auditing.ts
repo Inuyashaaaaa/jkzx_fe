@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
 export async function wkApproveGroupCreate(params = {}) {
   return request(`${HOST_TEST}workflow-service/api/rpc`, {

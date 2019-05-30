@@ -1,11 +1,11 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
-import { Input, Select } from '@/design/components';
+import { Input, Select } from '@/containers';
 import {
   mktInstrumentSearch,
   mktInstrumentWhitelistListPaged,
   mktInstrumentWhitelistSearch,
 } from '@/services/market-data-service';
-import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

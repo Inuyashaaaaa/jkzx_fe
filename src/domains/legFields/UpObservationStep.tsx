@@ -5,7 +5,7 @@ import {
   UNIT_ENUM_OPTIONS2,
   FREQUENCY_TYPE_OPTIONS,
 } from '@/constants/common';
-import { InputNumber, Select } from '@/design/components';
+import { InputNumber, Select } from '@/containers';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

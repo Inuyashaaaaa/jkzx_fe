@@ -1,4 +1,4 @@
-import SourceList from '@/lib/components/_SourceList';
+import SourceList from '@/containers/_SourceList';
 import {
   prefPreferenceCreate,
   prefPreferenceDividendInstrumentAdd,
@@ -205,6 +205,8 @@ class MarketSourceTable extends PureComponent<MarketSourceTableProps> {
         onRemove={this.removeMarket}
         onSearch={this.onSearch}
         onChange={this.onChange}
+        searchable={false}
+        createText="添加"
       />
     );
   }

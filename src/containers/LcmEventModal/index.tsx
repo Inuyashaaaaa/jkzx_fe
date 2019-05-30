@@ -4,8 +4,11 @@ import {
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
+  BIG_NUMBER_CONFIG,
+  UNIT_ENUM_MAP2,
+  KNOCK_DIRECTION_MAP,
 } from '@/constants/common';
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/containers';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
 import { convertObservetions } from '@/services/common';
 import { message } from 'antd';
@@ -20,6 +23,10 @@ import KnockOutModal from './KnockOutModal';
 import RollModal from './RollModal';
 import SettleModal from './SettleModal';
 import UnwindModal from './UnwindModal';
+import { OB_PRICE_FIELD } from './constants';
+import _ from 'lodash';
+import BigNumber from 'bignumber.js';
+import { getObservertionFieldData } from './tools';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -49,6 +56,37 @@ const LcmEventModal = memo<{
 
   const { current } = props;
 
+  const notBarrierHappen = data => {
+    const direction = data[LEG_FIELD.KNOCK_DIRECTION];
+    const fixObservations = data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
+    const last = fixObservations.every(item => {
+      return _.isNumber(item[OB_PRICE_FIELD]);
+    });
+    const tableData = getObservertionFieldData(data);
+    return (
+      last &&
+      tableData.every(record => {
+        const upBarrier = record[LEG_FIELD.UP_BARRIER];
+        const alObPrice = record[OB_PRICE_FIELD];
+        const actUpBarrier =
+          data[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP2.PERCENT
+            ? new BigNumber(upBarrier)
+                .multipliedBy(0.01)
+                .multipliedBy(data[LEG_FIELD.INITIAL_SPOT])
+                .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                .toNumber()
+            : upBarrier;
+        if (direction === KNOCK_DIRECTION_MAP.UP) {
+          return alObPrice <= actUpBarrier;
+        }
+        if (direction === KNOCK_DIRECTION_MAP.DOWN) {
+          return alObPrice >= actUpBarrier;
+        }
+        return false;
+      })
+    );
+  };
+
   const meta: ILcmEventModalEl = {
     show: (event: ILcmEventModalEventParams) => {
       const { eventType, record, createFormData, currentUser, loadData } = event;
@@ -56,6 +94,11 @@ const LcmEventModal = memo<{
       const data = Form2.getFieldsValue(record);
       const tableFormData = Form2.getFieldsValue(createFormData);
       if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
+        if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+          if (!notBarrierHappen(data)) {
+            return message.warn('不能进行到期结算操作');
+          }
+        }
         return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
       }
 

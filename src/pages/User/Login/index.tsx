@@ -1,4 +1,4 @@
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/containers';
 import { Alert, Button, Form, Icon, Input, Modal, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';
@@ -142,7 +142,7 @@ class LoginPage extends Component<any> {
                       )}
 
                       <img
-                        style={{ width: 150, cursor: 'pointer' }}
+                        style={{ cursor: 'pointer' }}
                         src={login.img}
                         alt="验证码"
                         onClick={() => this.queryCaptcha()}
@@ -156,6 +156,7 @@ class LoginPage extends Component<any> {
           footer={
             <Form.Item>
               <Button
+                htmlType="submit"
                 size="large"
                 type="primary"
                 block={true}

@@ -20,12 +20,8 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -63,10 +59,13 @@ import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
 import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
-import { commonLinkage } from '../tools';
-import { getMoment } from '@/utils';
+import { commonLinkage } from '../common';
+import { getMoment } from '@/tools';
+import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const AutoCallSnow: ILeg = {
+export const AutoCallSnow: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL],
   type: LEG_TYPE_MAP.AUTOCALL,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -75,6 +74,7 @@ export const AutoCallSnow: ILeg = {
       return [
         Direction,
         UnderlyerInstrumentId,
+        EffectiveDate,
         UnderlyerMultiplier,
         InitialSpot,
         ParticipationRate,
@@ -93,6 +93,7 @@ export const AutoCallSnow: ILeg = {
         AutoCallStrike,
         ExpireNoBarrierObserveDay,
         UpObservationStep,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -127,6 +128,8 @@ export const AutoCallSnow: ILeg = {
         AutoCallStrike,
         ExpireNoBarrierObserveDay,
         UpObservationStep,
+        Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -160,6 +163,8 @@ export const AutoCallSnow: ILeg = {
         AutoCallStrike,
         ExpireNoBarrierObserveDay,
         UpObservationStep,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -197,6 +202,8 @@ export const AutoCallSnow: ILeg = {
       LEG_FIELD.UP_BARRIER_TYPE,
       ExpireNoBarrierObserveDay.dataIndex,
       LEG_FIELD.IS_ANNUAL,
+      LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL;
@@ -205,7 +212,7 @@ export const AutoCallSnow: ILeg = {
       LEG_FIELD.IS_ANNUAL,
       ...COMPUTED_FIELDS,
     ]);
-    nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
+    // nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     if (
       nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
@@ -217,9 +224,9 @@ export const AutoCallSnow: ILeg = {
       nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
     }
 
-    nextPosition.asset.observationDates = dataItem[ExpireNoBarrierObserveDay.dataIndex].map(
-      item => item[OB_DAY_FIELD]
-    );
+    nextPosition.asset.observationDates =
+      dataItem[ExpireNoBarrierObserveDay.dataIndex] &&
+      dataItem[ExpireNoBarrierObserveDay.dataIndex].map(item => item[OB_DAY_FIELD]);
 
     nextPosition.asset.barrier = dataItem[LEG_FIELD.UP_BARRIER];
     nextPosition.asset.barrierType = dataItem[LEG_FIELD.UP_BARRIER_TYPE];
@@ -273,4 +280,4 @@ export const AutoCallSnow: ILeg = {
       setTableData
     );
   },
-};
+});

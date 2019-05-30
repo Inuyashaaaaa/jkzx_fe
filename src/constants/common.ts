@@ -1,5 +1,5 @@
-import { AllInputProps } from '@/lib/components/_Form2/Input';
-import { convertOptions } from '@/utils';
+import { AllInputProps } from '@/containers/_Form2/Input';
+import { convertOptions } from './_utils';
 import { COMPUTED_LEG_FIELD_MAP, TRADESCOLDEFS_LEG_FIELD_MAP } from './global';
 
 export const OB_PRICE_FIELD = 'price';
@@ -181,19 +181,25 @@ export const EVENT_TYPE_MAP = {
 };
 
 export const EVENT_TYPE_ZHCN_MAP = {
-  EXPIRATION: '到期',
-  KNOCK_OUT: '敲出',
+  EXPIRATION: '到期提醒',
+  KNOCK_OUT: '敲出提醒',
   // PAYMENT: '支付',
-  OBSERVE: '观察',
+  OBSERVE: '观察提醒',
 };
 
 export const EVENT_TYPE_OPTIONS = convertOptions(EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP);
 
 // 流程状态类型
+export const PROCESS_STATUS_TYPE_MAP_LOW = {
+  PROCESS_FINISH: 'processFinish',
+  PROCESS_UNFINISHED: 'processUnfinished',
+  PROCESS_ABANDON: 'processAbandon',
+};
+
 export const PROCESS_STATUS_TYPE_MAP = {
-  PROCESS_FINISH: 'process_finish',
-  PROCESS_UNFINISHED: 'process_unfinished',
-  PROCESS_ABANDON: 'process_abandon',
+  PROCESS_FINISH: 'PROCESS_FINISH',
+  PROCESS_UNFINISHED: 'PROCESS_UNFINISHED',
+  PROCESS_ABANDON: 'PROCESS_ABANDON',
 };
 
 export const PROCESS_STATUS_TYPE_ZHCN_MAP = {
@@ -201,6 +207,11 @@ export const PROCESS_STATUS_TYPE_ZHCN_MAP = {
   PROCESS_UNFINISHED: '未完成',
   PROCESS_ABANDON: '已废弃',
 };
+
+export const PROCESS_STATUS_TYPE_OPTIONS_LOW = convertOptions(
+  PROCESS_STATUS_TYPE_MAP_LOW,
+  PROCESS_STATUS_TYPE_ZHCN_MAP
+);
 
 export const PROCESS_STATUS_TYPE_OPTIONS = convertOptions(
   PROCESS_STATUS_TYPE_MAP,
@@ -412,6 +423,11 @@ export const NOTIONAL_AMOUNT_TYPE_MAP = {
   CNY: 'CNY',
 };
 
+export const REBATETYPE_UNIT_OPTIONS_MAP = {
+  PERCENT: 'PERCENT',
+  CNY: 'CNY',
+};
+
 export const PREMIUM_TYPE_MAP = UNIT_ENUM_MAP;
 
 export const PREMIUM_TYPE_ZHCN_MAP = UNIT_ENUM_ZHCN_MAP;
@@ -475,7 +491,7 @@ export const LEG_FIELD = {
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
-  IS_ANNUAL: 'IS_ANNUAL', // 是否年化
+  IS_ANNUAL: 'annualized', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
   DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
   ALREADY_BARRIER: 'AlreadyBarrier', // 已经敲入
@@ -559,7 +575,8 @@ export const LEG_FIELD = {
   HIGH_BARRIER: 'highBarrier',
   UNDERLYER_INSTRUMENT_PRICE: 'UNDERLYER_INSTRUMENT_PRICE',
   COMMENT: 'comment',
-  VOL: 'vol',
+  UNIT: 'unit',
+  TRADE_NUMBER: 'tradeNumber',
 };
 
 /**
@@ -781,11 +798,11 @@ export const PRODUCTTYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.ASIAN]: '亚式',
   [LEG_TYPE_MAP.AUTOCALL_PHOENIX]: '凤凰式',
   [LEG_TYPE_MAP.AUTOCALL]: '雪球式',
-  [LEG_TYPE_MAP.GENERIC_SINGLE_ASSET_OPTION]: '其他单资产期权',
+  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '欧式价差',
+  // [LEG_TYPE_MAP.DIGITAL_AMERICAN]: '一触即付',
   [LEG_TYPE_MAP.VANILLA_EUROPEAN]: '欧式',
   [LEG_TYPE_MAP.VANILLA_AMERICAN]: '美式',
-  [LEG_TYPE_MAP.DIGITAL]: '二元',
-  [LEG_TYPE_MAP.VERTICAL_SPREAD]: '价差',
+  // [LEG_TYPE_MAP.DIGITAL_EUROPEAN]: '欧式二元',
   [LEG_TYPE_MAP.BARRIER]: '单鲨',
   [LEG_TYPE_MAP.DOUBLE_SHARK_FIN]: '双鲨',
   [LEG_TYPE_MAP.EAGLE]: '鹰式',
@@ -797,6 +814,7 @@ export const PRODUCTTYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.TRIPLE_DIGITAL]: '四层阶梯',
   [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间累积',
   [LEG_TYPE_MAP.STRADDLE]: '跨式',
+  [LEG_TYPE_MAP.DIGITAL]: '二元',
 };
 
 export const PRODUCTTYPE_MAP = {
@@ -805,11 +823,9 @@ export const PRODUCTTYPE_MAP = {
   ASIAN: 'ASIAN',
   AUTOCALL_PHOENIX: 'AUTOCALL_PHOENIX',
   AUTOCALL: 'AUTOCALL',
-  GENERIC_SINGLE_ASSET_OPTION: 'GENERIC_SINGLE_ASSET_OPTION',
+  VERTICAL_SPREAD: 'VERTICAL_SPREAD',
   VANILLA_EUROPEAN: 'VANILLA_EUROPEAN',
   VANILLA_AMERICAN: 'VANILLA_AMERICAN',
-  DIGITAL: 'DIGITAL',
-  VERTICAL_SPREAD: 'VERTICAL_SPREAD',
   BARRIER: 'BARRIER',
   DOUBLE_SHARK_FIN: 'DOUBLE_SHARK_FIN',
   EAGLE: 'EAGLE',
@@ -821,6 +837,9 @@ export const PRODUCTTYPE_MAP = {
   TRIPLE_DIGITAL: 'TRIPLE_DIGITAL',
   RANGE_ACCRUALS: 'RANGE_ACCRUALS',
   STRADDLE: 'STRADDLE',
+  // DIGITAL_AMERICAN: 'DIGITAL_AMERICAN',
+  // DIGITAL_EUROPEAN: 'DIGITAL_EUROPEAN',
+  DIGITAL: 'DIGITAL',
 };
 
 export const PRODUCTTYPE_OPTIONS = convertOptions(PRODUCTTYPE_MAP, PRODUCTTYPE_ZHCH_MAP);
@@ -914,3 +933,14 @@ export const EQUITY_EXCHANGE_OPTIONS = convertOptions(
   EQUITY_EXCHANGE_MAP,
   EQUITY_EXCHANGE_ZHCN_MAP
 );
+
+export const FROM_HISTORY_PRICING_TAG = 'FROM_HISTORY_PRICING_TAG';
+
+export const DATE_ARRAY = [
+  LEG_FIELD.EFFECTIVE_DATE,
+  LEG_FIELD.EXPIRATION_DATE,
+  LEG_FIELD.SETTLEMENT_DATE,
+  LEG_FIELD.DOWN_BARRIER_DATE,
+  LEG_FIELD.OBSERVE_START_DAY,
+  LEG_FIELD.OBSERVE_END_DAY,
+];

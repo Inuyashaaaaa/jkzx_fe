@@ -11,7 +11,7 @@ import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '@/pages/SystemSettingDepartment/components/CommonForm';
 import { generateColumns } from '../constants';
-
+import _ from 'lodash';
 const { TextArea } = Input;
 
 class ApprovalForm extends PureComponent {
@@ -29,12 +29,13 @@ class ApprovalForm extends PureComponent {
       rejectReason: '',
       passComment: '',
       modifyComment: '',
+      currentNodeDTO: null,
     };
   }
-  public componentDidMount() {
+  public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
-  }
+  };
 
   public componentWillReceiveProps(nextProps) {
     const { formData, status } = nextProps;
@@ -70,7 +71,11 @@ class ApprovalForm extends PureComponent {
       loading: true,
     });
 
-    const isCompleted = params.status ? !params.status.includes('unfinished') : false;
+    const isCompleted = params.processInstanceStatusEnum
+      ? !_.toLower(params.processInstanceStatusEnum).includes('unfinished') &&
+        this.props.status !== 'pending'
+      : false;
+
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
       processInstanceId,
@@ -87,6 +92,9 @@ class ApprovalForm extends PureComponent {
       instance.initiatorName = (instance.initiator && instance.initiator.userName) || '';
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
+    this.setState({
+      currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
+    });
     if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
       this.setState({
@@ -227,17 +235,34 @@ class ApprovalForm extends PureComponent {
   };
 
   public confirmPass = async () => {
-    const { formData } = this.props;
-    const { passComment } = this.state;
-    const params = {
-      taskId: formData.taskId,
-      ctlProcessData: {
-        confirmed: true,
-        comment: passComment,
-      },
-      businessProcessData: {},
-    };
-    this.executeModify(params, 'pass');
+    // const { formData } = this.props;
+    // const { passComment } = this.state;
+    // const params = {
+    //   taskId: formData.taskId,
+    //   ctlProcessData: {
+    //     confirmed: true,
+    //     comment: passComment,
+    //   },
+    //   businessProcessData: {},
+    // };
+    // this.executeModify(params, 'pass');
+    this.$formBuilder.validateForm(values => {
+      const obj = { ...values };
+      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
+      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
+      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+      const { formData } = this.props;
+      const { passComment } = this.state;
+      const params = {
+        taskId: formData.taskId,
+        ctlProcessData: {
+          comment: passComment,
+          confirmed: true,
+        },
+        businessProcessData: obj,
+      };
+      this.executeModify(params, 'pass');
+    });
   };
   public confirmModify = async () => {
     this.$formBuilder.validateForm(values => {
@@ -259,17 +284,35 @@ class ApprovalForm extends PureComponent {
     });
   };
   public rejectForm = async () => {
-    const { formData } = this.props;
-    const { rejectReason } = this.state;
-    const params = {
-      taskId: formData.taskId,
-      ctlProcessData: {
-        comment: rejectReason,
-        confirmed: false,
-      },
-      businessProcessData: {},
-    };
-    this.executeModify(params, 'reject');
+    // const { formData } = this.props;
+    // const { rejectReason } = this.state;
+    // const params = {
+    //   taskId: formData.taskId,
+    //   ctlProcessData: {
+    //     comment: rejectReason,
+    //     confirmed: false,
+    //   },
+    //   businessProcessData: {},
+    // };
+    // this.executeModify(params, 'reject');
+    this.$formBuilder.validateForm(values => {
+      const obj = { ...values };
+      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
+      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
+      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
+      const { formData } = this.props;
+      const { rejectReason } = this.state;
+      const params = {
+        taskId: formData.taskId,
+        ctlProcessData: {
+          comment: rejectReason,
+          comment: rejectReason,
+          confirmed: false,
+        },
+        businessProcessData: obj,
+      };
+      this.executeModify(params, 'reject');
+    });
   };
 
   public setRejectReson = e => {
@@ -319,9 +362,10 @@ class ApprovalForm extends PureComponent {
       rejectReason,
       passComment,
       modifyComment,
+      currentNodeDTO,
     } = this.state;
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
+    const isCheckBtn = currentNodeDTO !== 'modifyData' && status === 'pending';
+
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'

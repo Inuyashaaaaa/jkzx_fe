@@ -1,13 +1,15 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import {
   authPagePermissionGetByRoleId,
   deleteRole,
   updateRolePagePermissions,
+  updateRole,
 } from '@/services/role';
-import { Button, Col, Drawer, message, Row, Tree } from 'antd';
+import { Button, Col, Drawer, message, Row, Tree, Divider, Modal } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { treeData } from './constants';
+import { treeData, FORM_CONTROL } from './constants';
+import { Form2 } from '@/containers';
 
 const { TreeNode } = Tree;
 
@@ -22,17 +24,28 @@ const fatherTreeNode = [
   'systemSettings',
 ];
 
-class Operation extends PureComponent {
+class Operation extends PureComponent<{ data: any; fetchTable: any; showResource: any }> {
+  public $form: Form2 = null;
+
   public state = {
     visible: false,
     selectedKeys: [],
     checkedKeys: [],
     displayResources: false,
+    formVisible: false,
+    formData: {},
+    confirmLoading: false,
   };
 
   constructor(props) {
     super(props);
   }
+
+  public componentDidMount = () => {
+    this.setState({
+      formData: Form2.createFields(this.props.data),
+    });
+  };
 
   public onClose = () => {
     this.setState({
@@ -117,33 +130,59 @@ class Operation extends PureComponent {
     return;
   };
 
+  public showModal = () => {
+    this.setState({
+      formVisible: !this.state.formVisible,
+    });
+  };
+
+  public onConfirm = async () => {
+    const validateRsp = await this.$form.validate();
+    if (validateRsp.error) return;
+    this.setState({
+      confirmLoading: true,
+    });
+    const { error, data } = await updateRole({
+      ...Form2.getFieldsValue(this.state.formData),
+      roleId: this.props.data.id,
+    });
+    this.setState({ confirmLoading: false });
+    if (error) {
+      message.error('修改失败');
+      return;
+    }
+    message.success('修改成功');
+    this.setState({
+      formVisible: false,
+    });
+    this.props.fetchTable();
+  };
+
+  public handleFormChange = (props, fields, allFields) => {
+    this.setState({
+      formData: allFields,
+    });
+  };
+
   public render() {
     return (
       <>
-        <Row type="flex" align="middle" justify="start">
-          <Col>
-            <Button type="primary" size="small" onClick={this.handleDrawer}>
-              配置页面权限
-            </Button>
-          </Col>
-          <Col>
-            <Button type="primary" size="small" onClick={this.handleList}>
-              数据权限
-            </Button>
-          </Col>
-          <Col>
-            <PopconfirmButton
-              type="primary"
-              size="small"
-              popconfirmProps={{
-                title: '确定要删除吗?',
-                onConfirm: this.onRemove,
-              }}
-            >
-              删除
-            </PopconfirmButton>
-          </Col>
-        </Row>
+        <a onClick={this.handleDrawer}>页面权限</a>
+        <Divider type="vertical" />
+        <a onClick={this.handleList}>数据权限</a>
+        <Divider type="vertical" />
+        <a onClick={this.showModal}>修改角色</a>
+        <Divider type="vertical" />
+        <PopconfirmButton
+          type="link"
+          size="small"
+          popconfirmProps={{
+            title: '确定要删除吗?',
+            onConfirm: this.onRemove,
+          }}
+        >
+          删除
+        </PopconfirmButton>
         <Drawer
           placement="right"
           onClose={this.onClose}
@@ -163,10 +202,8 @@ class Operation extends PureComponent {
           <Tree
             checkable={true}
             onCheck={this.onCheck}
-            // defaultExpandAll={true}
             defaultCheckedKeys={this.state.checkedKeys}
             checkedKeys={this.state.checkedKeys}
-            // checkStrictly={true}
             defaultExpandedKeys={this.state.checkedKeys}
           >
             {this.renderTreeNodes(treeData)}
@@ -189,6 +226,21 @@ class Operation extends PureComponent {
             </Col>
           </Row>
         </Drawer>
+        <Modal
+          visible={this.state.formVisible}
+          title="修改角色信息"
+          onOk={this.onConfirm}
+          onCancel={this.showModal}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <Form2
+            ref={node => (this.$form = node)}
+            dataSource={this.state.formData}
+            columns={FORM_CONTROL}
+            footer={false}
+            onFieldsChange={this.handleFormChange}
+          />
+        </Modal>
       </>
     );
   }

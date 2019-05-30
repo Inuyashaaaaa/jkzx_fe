@@ -1,12 +1,4 @@
-import {
-  DatePicker,
-  Form2,
-  Input,
-  Loading,
-  ModalButton,
-  Select,
-  Table2,
-} from '@/design/components';
+import { DatePicker, Form2, Input, Loading, ModalButton, Select, Table2 } from '@/containers';
 import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,
@@ -94,6 +86,7 @@ const CreateForm = memo<any>(props => {
                     {...{
                       editing: true,
                       showSearch: true,
+                      allowClear: true,
                       fetchOptionsOnSearch: true,
                       placeholder: '请输入内容搜索',
                       options: async (value: string = '') => {
@@ -136,6 +129,7 @@ const CreateForm = memo<any>(props => {
                         editing: true,
                         fetchOptionsOnSearch: true,
                         showSearch: true,
+                        allowClear: true,
                         placeholder: '请输入内容搜索',
                         options: async (value: string = '') => {
                           const { data, error } = await refSimilarLegalNameList({

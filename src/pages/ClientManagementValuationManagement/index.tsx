@@ -1,7 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/design/components';
-import ModalButton from '@/design/components/ModalButton';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Select, Table2 } from '@/containers';
+import ModalButton from '@/containers/ModalButton';
+import Page from '@/containers/Page';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
@@ -179,7 +179,7 @@ class ClientManagementValuationManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
           ref={node => (this.$form = node)}
           layout="inline"
@@ -293,7 +293,7 @@ class ClientManagementValuationManagement extends PureComponent {
             }}
           />
         </div>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

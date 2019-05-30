@@ -3,15 +3,17 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   MARGIN_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import React from 'react';
 import Operations from './Operations';
-
+import { formatMoney } from '@/tools';
+import { Select } from '@/containers';
+import _ from 'lodash';
 export const TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {
     headerName: '交易对手',
@@ -50,6 +52,65 @@ export const TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
     width: 300,
     render: params => {
       return <Operations record={params.data} fetchTable={fetchTable} />;
+    },
+  },
+];
+
+export const TABLE_COLUMNS = fetchTable => [
+  {
+    title: '交易对手',
+    dataIndex: 'legalName',
+  },
+  {
+    title: '可用资金 (¥)',
+    width: 150,
+    dataIndex: 'cash',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '剩余授信额度 (¥)',
+    width: 150,
+    dataIndex: 'credit',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '冻结保证金 (¥)',
+    width: 150,
+    dataIndex: 'margin',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '维持保证金 (¥)',
+    width: 150,
+    dataIndex: 'maintenanceMargin',
+    render: (text, record, index) => {
+      return text ? formatMoney(text, {}) : text;
+    },
+  },
+  {
+    title: '状态',
+    width: 150,
+    dataIndex: 'status',
+    render: (value, record, index) => {
+      return MARGIN_STATUS_TYPE_OPTIONS[
+        _.findIndex(MARGIN_STATUS_TYPE_OPTIONS, item => {
+          return item.value === value;
+        })
+      ].label;
+    },
+  },
+  {
+    title: '操作',
+    width: 250,
+    fixed: 'right',
+    render: (text, record, index) => {
+      return <Operations record={text} fetchTable={fetchTable} />;
     },
   },
 ];

@@ -1,4 +1,4 @@
-import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD, DATE_ARRAY } from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
@@ -8,8 +8,8 @@ import { Modal, message } from 'antd';
 import _ from 'lodash';
 import React, { memo, useState, useRef } from 'react';
 import { convertTradePositions } from '@/services/pages';
-import { Form2 } from '@/design/components';
-import { ITableData } from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { ITableData } from '@/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import moment from 'moment';
 
@@ -20,16 +20,8 @@ const UN_EDITDIR = [
   LEG_FIELD.EXPIRATION_DATE,
   LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   LEG_FIELD.NOTIONAL_AMOUNT,
+  LEG_FIELD.UNIT,
   LEG_FIELD.ALREADY_BARRIER,
-];
-
-const DATE_ARRAY = [
-  LEG_FIELD.EFFECTIVE_DATE,
-  LEG_FIELD.EXPIRATION_DATE,
-  LEG_FIELD.SETTLEMENT_DATE,
-  LEG_FIELD.DOWN_BARRIER_DATE,
-  LEG_FIELD.OBSERVE_START_DAY,
-  LEG_FIELD.OBSERVE_END_DAY,
 ];
 
 export interface IAmendModalEl {

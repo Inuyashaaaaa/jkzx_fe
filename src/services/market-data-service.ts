@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
 export async function mktInstrumentWhitelistSearch(params = {}) {
   return request(`${HOST_TEST}market-data-service/api/rpc`, {
@@ -125,6 +125,16 @@ export async function mktInstrumentWhitelistListPaged(params = { instrumentIds: 
     method: `POST`,
     body: {
       method: 'mktInstrumentWhitelistListPaged',
+      params,
+    },
+  });
+}
+
+export async function mktQuoteSave(params = {}) {
+  return request(`${HOST_TEST}market-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'mktQuoteSave',
       params,
     },
   });

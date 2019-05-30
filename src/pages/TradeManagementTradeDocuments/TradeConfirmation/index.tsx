@@ -1,11 +1,11 @@
-import SourceTable from '@/design/components/SourceTable';
+import SourceTable from '@/containers/SourceTable';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { SEARCH_FORM_CONTROLS_TRADE, TRADE_COLUMN_DEFS, columns } from './constants';
 import { Button, Divider, Row, Table, DatePicker } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select } from '@/design/components';
+import { Form2, Select } from '@/containers';
 import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
@@ -88,7 +88,6 @@ class TradeConfirmation extends PureComponent {
   };
 
   public onFetch = async (paramsPagination?) => {
-    console.log(paramsPagination);
     const formValues = {
       startDate: _.get(this.state.searchFormData, 'tradeDate.value[0]').format('YYYY-MM-DD'),
       endDate: _.get(this.state.searchFormData, 'tradeDate.value[1]').format('YYYY-MM-DD'),

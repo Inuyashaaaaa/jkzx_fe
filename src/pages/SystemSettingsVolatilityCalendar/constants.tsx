@@ -1,4 +1,4 @@
-import { IColumnDef } from '@/design/components/SourceTable/types';
+import { IColumnDef } from '@/containers/SourceTable/types';
 import React from 'react';
 import Operation from './Operation';
 

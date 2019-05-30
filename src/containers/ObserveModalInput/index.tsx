@@ -1,4 +1,3 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
@@ -9,15 +8,21 @@ import {
   OB_DAY_FIELD,
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
-import Form from '@/design/components/Form';
-import { InputPolym } from '@/design/components/Form/Input/InputPolym';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import { IColumnDef } from '@/design/components/Table/types';
-import { remove } from '@/design/utils';
+import Form from '@/containers/Form';
+import { InputPolym } from '@/containers/Form/Input/InputPolym';
+import ModalButton from '@/containers/ModalButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
+import SourceTable from '@/containers/SourceTable';
+import { IColumnDef } from '@/containers/Table/types';
 import { qlDateScheduleCreate } from '@/services/quant-service';
-import { isAsian, isAutocallPhoenix, isAutocallSnow, isKnockIn, isRangeAccruals } from '@/tools';
-import { getMoment } from '@/utils';
+import {
+  getMoment,
+  isAsian,
+  isAutocallPhoenix,
+  isAutocallSnow,
+  isRangeAccruals,
+  remove,
+} from '@/tools';
 import { Button, Col, message, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';

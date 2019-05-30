@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import Demo from './Text';
 
 class WelcomePage extends PureComponent {
   public render() {
@@ -20,8 +21,7 @@ class WelcomePage extends PureComponent {
             width: '100%',
           }}
         >
-          <p style={{ marginBottom: '0' }}>欢迎使用</p>
-          <p style={{ fontWeight: 300, fontSize: '24px' }}>场外衍生品交易管理系统</p>
+          <Demo />
         </div>
       </div>
     );

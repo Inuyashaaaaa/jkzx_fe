@@ -1,14 +1,13 @@
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { trdExpiringTradeList } from '@/services/general-service';
+import Page from '@/containers/Page';
 import { connect } from 'dva';
 import produce from 'immer';
-import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
-import CommonModel from './CommonModel';
 import { ROW_KEY } from './constants';
+import CommonModel from './containers/CommonModel';
+import TabHeaderWrapper from './TabHeaderWrapper';
 
-class TradeManagementContractManage extends PureComponent {
+class TradeManagementContractManage extends PureComponent<any> {
   public curRowId: any;
 
   public state = {
@@ -25,13 +24,19 @@ class TradeManagementContractManage extends PureComponent {
     },
     lifeLoading: false,
     lifeTableData: [],
-    tradeTableData: [],
     tradeLoading: false,
   };
 
-  public componentDidMount = () => {
-    this.onFetchTradeTableData();
-  };
+  constructor(props) {
+    super(props);
+    const { preRouting, dispatch } = props;
+    if (preRouting && preRouting.pathname !== '/trade-management/book-edit') {
+      dispatch({
+        type: 'tradeManagementContractManage/initKey',
+        payload: 'contractManagement',
+      });
+    }
+  }
 
   public onCheckContract = async event => {
     router.push({
@@ -49,30 +54,6 @@ class TradeManagementContractManage extends PureComponent {
     });
   };
 
-  public onFetchTradeTableData = async () => {
-    this.switchTradeLoading();
-    const { error, data } = await trdExpiringTradeList();
-    this.switchTradeLoading();
-
-    if (error) return;
-
-    if (_.isEmpty(data)) return;
-
-    // @todo
-    const commonCounterPartyName = data[0].positions[0].counterPartyName;
-
-    this.setState(
-      produce((state: any) => {
-        state.tradeTableData = data.map(item => {
-          return {
-            ...item,
-            commonCounterPartyName,
-          };
-        });
-      })
-    );
-  };
-
   public switchTradeLoading = () => {
     this.setState(
       produce((state: any) => {
@@ -81,34 +62,18 @@ class TradeManagementContractManage extends PureComponent {
     );
   };
 
-  public onTabChange = key => {
-    this.props.dispatch({
-      type: 'tradeManagementContractManage/onTabChange',
-      payload: { key },
-    });
-  };
-
   public render() {
-    const activeTabKey = this.props.tradeManagementContractManage.activeTabKey;
+    const { activeTabKey } = this.props.tradeManagementContractManage;
     return (
-      <PageHeaderWrapper
-        title="合约管理"
-        tabList={[
-          { key: 'contractManagement', tab: '合约管理' },
-          { key: 'open', tab: '当日开仓' },
-          { key: 'unwind', tab: '当日平仓' },
-          { key: 'expiration', tab: '当日到期' },
-          { key: 'overlate', tab: '已过期' },
-        ]}
-        tabActiveKey={activeTabKey}
-        onTabChange={this.onTabChange}
-      >
-        {activeTabKey === 'contractManagement' && <CommonModel />}
-        {activeTabKey === 'open' && <CommonModel status="OPEN_TODAY" />}
-        {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" />}
-        {activeTabKey === 'expiration' && <CommonModel status="EXPIRATION_TODAY" />}
-        {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" />}
-      </PageHeaderWrapper>
+      <Page title="合约管理" footer={<TabHeaderWrapper />}>
+        {activeTabKey === 'contractManagement' && <CommonModel name="contractManagement" />}
+        {activeTabKey === 'open' && <CommonModel status="OPEN_TODAY" name="open" />}
+        {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" name="unwind" />}
+        {activeTabKey === 'expiration' && (
+          <CommonModel status="EXPIRATION_TODAY" name="expiration" />
+        )}
+        {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" name="overlate" />}
+      </Page>
     );
   }
 }
@@ -116,5 +81,6 @@ class TradeManagementContractManage extends PureComponent {
 export default connect(state => {
   return {
     tradeManagementContractManage: state.tradeManagementContractManage,
+    preRouting: state.preRouting.location,
   };
 })(TradeManagementContractManage);

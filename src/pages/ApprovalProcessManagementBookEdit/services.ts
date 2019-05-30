@@ -1,4 +1,4 @@
-import { IFormControl } from '@/lib/components/_Form2';
+import { IFormControl } from '@/containers/_Form2';
 import moment from 'moment';
 
 export const modalFormControls: (markets) => IFormControl[] = markets => [

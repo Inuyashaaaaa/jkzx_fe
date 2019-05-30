@@ -1,6 +1,6 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/lib/components/_Table2';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/_Table2';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,

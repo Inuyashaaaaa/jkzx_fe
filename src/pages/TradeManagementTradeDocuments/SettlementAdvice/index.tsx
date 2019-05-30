@@ -1,5 +1,5 @@
-import SourceTable from '@/design/components/SourceTable';
-import { delay, mockData } from '@/lib/utils';
+import SourceTable from '@/containers/SourceTable';
+import { delay, mockData } from '@/tools';
 import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { positionDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
 import _ from 'lodash';
@@ -7,7 +7,7 @@ import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { SEARCH_FORM_CONTROLS_SETTLE, SETTLE_COLUMN_DEFS, columns } from './constants';
 import { Divider, Row, Table, DatePicker } from 'antd';
-import { Form2, Select } from '@/design/components';
+import { Form2, Select } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
 import SettlementModal from './SettlementModal';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
@@ -173,7 +173,7 @@ class SettlementAdvice extends PureComponent {
 
   public render() {
     const { searchFormData } = this.state;
-    console.log(this.state.positionIdList);
+
     return (
       <>
         <Form2

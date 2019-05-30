@@ -6,7 +6,7 @@ import {
 import { Button, Icon, Input, Modal, notification, Popconfirm } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './AuditGourpLists.less';
-
+import _ from 'lodash';
 class AuditLists extends PureComponent {
   public state = {
     approveGroupList: [],
@@ -122,7 +122,7 @@ class AuditLists extends PureComponent {
       const { data, error } = await wkApproveGroupModify({
         approveGroupId: this.state.approveGroupId,
         approveGroupName: this.state.approveGroupName,
-        description: this.state.description,
+        description: this.state.description ? this.state.description : '',
       });
       const { message } = error;
       if (error) {
@@ -164,8 +164,9 @@ class AuditLists extends PureComponent {
         message: `创建成功`,
         description: message,
       });
-      let { approveGroupList } = this.state;
-      approveGroupList = data;
+      let approveGroupList = [];
+      approveGroupList = _.sortBy(data, ['approveGroupName']);
+
       this.setState(
         {
           visible: false,
@@ -243,7 +244,7 @@ class AuditLists extends PureComponent {
             <li className={styles.listItem}>
               <Button
                 type="dashed"
-                style={{ width: '100%', border: '1px dashed #ccc', borderRadius: '8px' }}
+                style={{ width: '100%', border: '1px dashed #ccc' }}
                 onClick={this.showModal}
               >
                 新建审批组

@@ -1,0 +1,15 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~@/tools/utils.less';
+@import '../../../style/themes.less';
+
+@select-plus: ~'@{tongyu-prefix}-select2';
+
+:global {
+  .@{select-plus} {
+    width: 100%;
+
+    .ant-select-selection {
+      width: 100%;
+    }
+  }
+}

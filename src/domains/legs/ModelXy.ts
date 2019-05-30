@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -20,12 +20,8 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -60,9 +56,12 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { Unit } from '../legFields/Unit';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const ModelXy: ILeg = {
+export const ModelXy: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.MODEL_XY],
   type: LEG_TYPE_MAP.MODEL_XY,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -75,6 +74,7 @@ export const ModelXy: ILeg = {
         StrikeType,
         InitialSpot,
         UnderlyerMultiplier,
+        EffectiveDate,
         UnderlyerInstrumentId,
         OptionType,
         Strike,
@@ -84,6 +84,7 @@ export const ModelXy: ILeg = {
         ParticipationRate,
         NotionalAmount,
         ObservationType,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -110,6 +111,8 @@ export const ModelXy: ILeg = {
         ExpirationDate,
         EffectiveDate,
         Comment,
+        Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -135,6 +138,8 @@ export const ModelXy: ILeg = {
         ExpirationDate,
         EffectiveDate,
         Comment,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -170,6 +175,8 @@ export const ModelXy: ILeg = {
       'trigger',
       'notional',
       'premiumPercent',
+      'unit',
+      'tradeNumber',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.MODEL_XY;
@@ -223,4 +230,4 @@ export const ModelXy: ILeg = {
       setTableData
     );
   },
-};
+});

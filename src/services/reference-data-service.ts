@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
 export async function createRefParty(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
@@ -451,6 +451,39 @@ export async function clientAccountSearch(params = {}) {
     method: `POST`,
     body: {
       method: 'clientAccountSearch',
+      params,
+    },
+  });
+}
+
+// 禁用交易对手
+export async function refDisablePartyByLegalName(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refDisablePartyByLegalName',
+      params,
+    },
+  });
+}
+
+// 启用交易对手
+export async function refEnablePartyByLegalName(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refEnablePartyByLegalName',
+      params,
+    },
+  });
+}
+
+// 授信审批绑定附件
+export async function wkAttachmentProcessInstanceBind(params) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkAttachmentProcessInstanceBind',
       params,
     },
   });

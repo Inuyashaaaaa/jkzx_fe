@@ -43,6 +43,14 @@ export const TABLE_COL_DEFS = fetchTable => [
     render: (value, record, index) => formatNumber(value, 4),
   },
   {
+    title: '报价单位',
+    dataIndex: 'unit',
+  },
+  {
+    title: '交易品种',
+    dataIndex: 'tradeCategory',
+  },
+  {
     title: '期货到期日',
     dataIndex: 'maturity',
   },

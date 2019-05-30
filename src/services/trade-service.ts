@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
 export async function trdTradeCreate(params) {
   return request(`${HOST_TEST}trade-service/api/rpc`, {
@@ -186,6 +186,36 @@ export async function tradeDocSearch(params = {}) {
     method: `POST`,
     body: {
       method: 'tradeDocSearch',
+      params,
+    },
+  });
+}
+
+export async function quotePrcCreate(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'quotePrcCreate',
+      params,
+    },
+  });
+}
+
+export async function quotePrcSearchPaged(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'quotePrcSearchPaged',
+      params,
+    },
+  });
+}
+
+export async function quotePrcPositionDelete(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'quotePrcPositionDelete',
       params,
     },
   });

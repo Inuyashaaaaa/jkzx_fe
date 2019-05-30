@@ -1,5 +1,5 @@
-import { IFormControl } from '@/lib/components/_Form2';
-import { IColumnDef } from '@/lib/components/_Table2';
+import { IFormControl } from '@/containers/_Form2';
+import { IColumnDef } from '@/containers/_Table2';
 import { Icon } from 'antd';
 import React from 'react';
 
@@ -479,6 +479,21 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
           {
             headerName: '客户资金汇总报表',
             field: 'customerFundsSummaryStatements',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
+          {
+            headerName: '自定义报告管理',
+            field: 'reportsCustomManagement',
             editable: true,
             input: {
               type: 'checkbox',

@@ -1,7 +1,7 @@
-import PopconfirmButton from '@/components/PopconfirmButton';
-import ModalButton from '@/design/components/ModalButton';
+import PopconfirmButton from '@/containers/PopconfirmButton';
+import ModalButton from '@/containers/ModalButton';
 import { refBankAccountDel, refBankAccountSave } from '@/services/reference-data-service';
-import { Col, message, Row } from 'antd';
+import { Col, message, Row, Modal, Popconfirm, Divider } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonModalForm from './CommonModalForm';
 
@@ -17,7 +17,7 @@ class Operation extends PureComponent<{
 
   public componentDidMount = () => {
     this.setState({
-      createFormData: this.props.record.data,
+      createFormData: this.props.record,
     });
   };
 
@@ -32,7 +32,7 @@ class Operation extends PureComponent<{
       visible: false,
     });
     const { error, data } = await refBankAccountSave({
-      uuid: this.props.record.data.uuid,
+      uuid: this.props.record.uuid,
       ...this.state.createFormData,
     });
     if (error) {
@@ -51,7 +51,7 @@ class Operation extends PureComponent<{
 
   public onRemove = async () => {
     const { error, data } = await refBankAccountDel({
-      uuid: this.props.record.data.uuid,
+      uuid: this.props.record.uuid,
     });
     if (error) {
       message.error('删除失败');
@@ -64,42 +64,25 @@ class Operation extends PureComponent<{
 
   public render() {
     return (
-      <Row type="flex" justify="start">
-        <Col>
-          <ModalButton
-            type="primary"
-            key="edit"
-            size="small"
-            onClick={this.switchModal}
-            modalProps={{
-              visible: this.state.visible,
-              confirmLoading: this.state.confirmLoading,
-              onCancel: this.switchModal,
-              onOk: this.handleEdit,
-              title: '编辑银行账户',
-            }}
-            content={
-              <CommonModalForm
-                createFormData={this.state.createFormData}
-                onCreateFormChange={this.onCreateFormChange}
-              />
-            }
-          >
-            编辑
-          </ModalButton>
-        </Col>
-        <Col>
-          <PopconfirmButton
-            type="danger"
-            size="small"
-            popconfirmProps={{
-              title: '确定要删除吗?',
-              onConfirm: this.onRemove,
-            }}
-          >
-            删除
-          </PopconfirmButton>
-        </Col>
+      <Row>
+        <a onClick={this.switchModal}>编辑</a>
+        <Divider type="vertical" />
+        <Popconfirm title="确定要删除吗?" onConfirm={this.onRemove}>
+          <a style={{ color: 'red' }}>删除</a>
+        </Popconfirm>
+        <Modal
+          title="编辑银行账户"
+          visible={this.state.visible}
+          width={700}
+          onCancel={this.switchModal}
+          onOk={this.handleEdit}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <CommonModalForm
+            createFormData={this.state.createFormData}
+            onCreateFormChange={this.onCreateFormChange}
+          />
+        </Modal>
       </Row>
     );
   }

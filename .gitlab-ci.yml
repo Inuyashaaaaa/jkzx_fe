@@ -84,7 +84,6 @@ Deploy-Hotfix:
 Deploy-Prod:
   stage: deploy
   script:
-    - export
     - yarn run deploy:prod
   when: manual
   only:
@@ -97,3 +96,4 @@ Deploy-Doc:
   when: manual
   only:
     - master
+    - master-staging

@@ -1,16 +1,25 @@
-import { Form2, Select } from '@/design/components';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { mktInstrumentSearch, mktQuotesListPaged } from '@/services/market-data-service';
-import { Button, Divider, Row, Table } from 'antd';
+import { Form2, Select } from '@/containers';
+import SourceTable from '@/containers/_SourceTable';
+import Page from '@/containers/Page';
+import {
+  mktInstrumentSearch,
+  mktQuotesListPaged,
+  mktQuoteSave,
+} from '@/services/market-data-service';
+import { Button, Divider, Icon, Modal, Row, Table, Tabs, Tooltip } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import router from 'umi/router';
-import { columns, searchFormControls, TABLE_COLUMN_DEFS } from './constants';
+import { CLOSE_FORM_CONTROLS, columns, INTRADAY_FORM_CONTROLS } from './constants';
+import _ from 'lodash';
+import { getMoment } from '@/tools';
+
+const TabPane = Tabs.TabPane;
+
 class TradeManagementMarketManagement extends PureComponent {
-  public $sourceTable: SourceTable = null;
+  public $intradayForm: Form2 = null;
+
+  public $closeForm: Form2 = null;
 
   public clean = null;
 
@@ -26,6 +35,11 @@ class TradeManagementMarketManagement extends PureComponent {
     },
     total: 0,
     loading: false,
+    visible: false,
+    activeKey: 'intraday',
+    intradayFormData: { valuationDate: Form2.createField(moment()) },
+    closeFormData: { valuationDate: Form2.createField(moment()) },
+    confirmLoading: false,
   };
 
   public paginationChange = (current, pageSize) => {
@@ -42,10 +56,6 @@ class TradeManagementMarketManagement extends PureComponent {
     );
   };
 
-  public componentWillMount = () => {
-    this.fetchTable(true);
-  };
-
   public componentDidMount = () => {
     this.clean = setInterval(() => {
       this.setState({
@@ -53,6 +63,8 @@ class TradeManagementMarketManagement extends PureComponent {
       });
       this.fetchTable(false);
     }, 1000 * 30);
+
+    this.fetchTable(true);
   };
 
   public componentWillUnmount = () => {
@@ -83,8 +95,10 @@ class TradeManagementMarketManagement extends PureComponent {
     });
   };
 
-  public handleSubjectBtnClick = () => {
-    router.push('/trade-management/subject-store');
+  public handleMarketBtnClick = () => {
+    this.setState({
+      visible: true,
+    });
   };
 
   public onSearchFormChange = event => {
@@ -122,12 +136,65 @@ class TradeManagementMarketManagement extends PureComponent {
     });
   };
 
+  public showModal = () => {
+    this.setState({ visible: false });
+  };
+
+  public handleParams = instance => {
+    const formData =
+      instance === 'intraday' ? this.state.intradayFormData : this.state.closeFormData;
+    const quoteData = _.omit(formData, ['instrumentId', 'valuationDate']);
+    const normalData = _.pick(formData, ['instrumentId', 'valuationDate']);
+    return {
+      instance,
+      ..._.mapValues(Form2.getFieldsValue(normalData), (value, key) => {
+        if (key === 'valuationDate') {
+          return getMoment(value).format('YYYY-MM-DD');
+        }
+        return value;
+      }),
+      quote: {
+        ...Form2.getFieldsValue(quoteData),
+      },
+    };
+  };
+
+  public handleSaveMarket = async () => {
+    const instance = this.state.activeKey;
+    const form = instance === 'intraday' ? this.$intradayForm : this.$closeForm;
+    const validateRsp = await form.validate();
+    if (validateRsp.error) return;
+    const params = this.handleParams(instance);
+    this.setState({ confirmLoading: true });
+    const { error, data } = await mktQuoteSave(params);
+    this.setState({ confirmLoading: false });
+    if (error) return;
+    this.setState({
+      visible: false,
+      intradayFormData: { valuationDate: Form2.createField(moment()) },
+      closeFormData: { valuationDate: Form2.createField(moment()) },
+    });
+    this.fetchTable(true);
+  };
+
+  public handleTabChange = activeKey => {
+    this.setState({
+      activeKey,
+    });
+  };
+
+  public handleIntradayChange = (props, fields, allFields) => {
+    this.setState({ intradayFormData: allFields });
+  };
+
+  public handleCloseChange = (props, fields, allFields) => {
+    this.setState({ closeFormData: allFields });
+  };
+
   public render() {
-    console.log(this.state.tableDataSource);
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Form2
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText={'查询'}
@@ -146,7 +213,9 @@ class TradeManagementMarketManagement extends PureComponent {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
-                        style={{ minWidth: 180 }}
+                        fetchOptionsOnSearch={true}
+                        editing={editing}
+                        style={{ minWidth: 180, maxWidth: 400 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
@@ -156,7 +225,7 @@ class TradeManagementMarketManagement extends PureComponent {
                             instrumentIdPart: value,
                           });
                           if (error) return [];
-                          return data.map(item => ({
+                          return data.slice(0, 50).map(item => ({
                             label: item,
                             value: item,
                           }));
@@ -170,13 +239,16 @@ class TradeManagementMarketManagement extends PureComponent {
           ]}
         />
         <Divider type="horizontal" />
-        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
-          <Button type="primary" onClick={this.handleSubjectBtnClick}>
-            标的物管理
+        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between" align="bottom">
+          <Button type="primary" onClick={this.handleMarketBtnClick}>
+            行情管理
           </Button>
-          <Button type="primary" onClick={this.onSearchFormChange}>
-            {`刷新 ${this.state.lastUpdateTime}`}
-          </Button>
+          <span>
+            {`最近刷新时间 ${this.state.lastUpdateTime}`}
+            <Tooltip title="每隔30秒自动刷新行情" placement="topRight" arrowPointAtCenter={true}>
+              <Icon style={{ marginLeft: 4 }} type="info-circle" theme="twoTone" />
+            </Tooltip>
+          </span>
         </Row>
         <Table
           dataSource={this.state.tableDataSource}
@@ -189,11 +261,40 @@ class TradeManagementMarketManagement extends PureComponent {
             onChange: this.paginationChange,
           }}
           loading={this.state.loading}
-          rowKey={(data, index) => index}
+          rowKey={'instrumentId'}
           size="middle"
           scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
         />
-      </PageHeaderWrapper>
+        <Modal
+          title="录入标的物行情"
+          visible={this.state.visible}
+          onOk={this.handleSaveMarket}
+          onCancel={this.showModal}
+          maskClosable={false}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <Tabs onChange={this.handleTabChange} activeKey={this.state.activeKey}>
+            <TabPane tab="日内" key="intraday">
+              <Form2
+                ref={node => (this.$intradayForm = node)}
+                dataSource={this.state.intradayFormData}
+                columns={INTRADAY_FORM_CONTROLS}
+                footer={false}
+                onFieldsChange={this.handleIntradayChange}
+              />
+            </TabPane>
+            <TabPane tab="收盘" key="close">
+              <Form2
+                ref={node => (this.$closeForm = node)}
+                dataSource={this.state.closeFormData}
+                columns={CLOSE_FORM_CONTROLS}
+                footer={false}
+                onFieldsChange={this.handleCloseChange}
+              />
+            </TabPane>
+          </Tabs>
+        </Modal>
+      </Page>
     );
   }
 }

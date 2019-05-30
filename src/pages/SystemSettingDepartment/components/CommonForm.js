@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { getToken } from '@/lib/utils/authority';
+import { getToken } from '@/tools/authority';
 
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
@@ -59,7 +59,7 @@ export default class CommonForm extends Component {
     if (type === 'main') {
       return false;
     }
-    // console.log(mainDate);
+    //
     return current && current < moment(mainDate).endOf('day');
   };
 

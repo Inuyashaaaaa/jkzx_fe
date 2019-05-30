@@ -6,7 +6,7 @@ import {
   RULES_REQUIRED,
   OPTION_TYPE_OPTIONS,
 } from '@/constants/common';
-import { Select } from '@/design/components';
+import { Select } from '@/containers';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';

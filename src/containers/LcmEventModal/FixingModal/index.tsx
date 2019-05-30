@@ -13,14 +13,14 @@ import {
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import Form from '@/design/components/Form';
-import SourceTable from '@/design/components/SourceTable';
-import { IColumnDef } from '@/design/components/Table/types';
+import Form from '@/containers/Form';
+import SourceTable from '@/containers/SourceTable';
+import { IColumnDef } from '@/containers/Table/types';
 import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
 import { getObservertionFieldData } from '../tools';
 import { countAvg, filterObDays } from '../utils';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { isAutocallPhoenix, isRangeAccruals } from '@/tools';
+import { isAutocallPhoenix, isRangeAccruals, getMoment } from '@/tools';
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -30,7 +30,6 @@ import AsianExerciseModal from '../AsianExerciseModal';
 import ExpirationModal from '../ExpirationModal';
 import KnockOutModal from '../KnockOutModal';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
-import { getMoment } from '@/utils';
 
 class FixingModal extends PureComponent<
   {
@@ -120,7 +119,13 @@ class FixingModal extends PureComponent<
         visible: false,
       },
       () => {
-        this.$expirationModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+        this.$expirationModal.show(
+          this.data,
+          this.tableFormData,
+          this.currentUser,
+          this.reload,
+          this.state.tableData
+        );
       }
     );
   };

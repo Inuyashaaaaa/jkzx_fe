@@ -1,13 +1,9 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2 } from '@/design/components';
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay } from '@/lib/utils';
+import { Form2, Table2 } from '@/containers';
+import Page from '@/containers/Page';
+import { delay, getMoment } from '@/tools';
 import { createCalendar, queryCalendar, removeCalendar } from '@/services/calendars';
-import { getMoment } from '@/utils';
-import { Button, Col, DatePicker, message, Row } from 'antd';
+import { Button, Col, DatePicker, message, Row, Modal } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import moment from 'moment';
@@ -18,7 +14,7 @@ import { createFormControls } from './services';
 const { RangePicker } = DatePicker;
 
 class SystemTradeDate extends PureComponent<any, any> {
-  public $sourceTable: SourceTable = null;
+  public $table: Table2 = null;
 
   public $createForm: Form2 = null;
 
@@ -29,6 +25,7 @@ class SystemTradeDate extends PureComponent<any, any> {
     holidays: [],
     createFormData: {},
     visible: false,
+    confirmLoading: false,
   };
 
   public componentDidMount = () => {
@@ -72,6 +69,7 @@ class SystemTradeDate extends PureComponent<any, any> {
       const result = await this.$createForm.validate();
       if (result.error) return;
     }
+    this.setState({ confirmLoading: true });
     const { createFormData, holidays: tableDataSource } = this.state;
 
     const createFormDataValues = Form2.getFieldsValue(createFormData);
@@ -80,6 +78,8 @@ class SystemTradeDate extends PureComponent<any, any> {
       calendarId: DEFAULT_CALENDAR,
       holidays: [createFormDataValues],
     });
+
+    this.setState({ confirmLoading: false });
 
     if (error) {
       message.error('创建失败');
@@ -147,8 +147,7 @@ class SystemTradeDate extends PureComponent<any, any> {
     });
   };
 
-  public onRemove = async event => {
-    const { rowData, rowIndex } = event;
+  public onRemove = async rowData => {
     const { error } = await removeCalendar({
       calendarId: DEFAULT_CALENDAR,
       holidays: [
@@ -158,11 +157,7 @@ class SystemTradeDate extends PureComponent<any, any> {
       ],
     });
     if (error) return;
-    this.setState(
-      produce((state: any) => {
-        state.holidays.splice(rowIndex, 1);
-      })
-    );
+    this.onFetch();
   };
 
   public onCreateFormChange = (props, changedFields) => {
@@ -184,7 +179,7 @@ class SystemTradeDate extends PureComponent<any, any> {
     ];
 
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row type="flex" justify="space-around" align="top" gutter={8}>
           <Col xs={24} sm={12}>
             <RangePicker
@@ -195,48 +190,40 @@ class SystemTradeDate extends PureComponent<any, any> {
             />
           </Col>
           <Col xs={24} sm={12}>
-            <SourceTable
+            <Button
+              type="primary"
+              style={{ marginBottom: VERTICAL_GUTTER }}
+              onClick={this.onOpenCreateModal}
+            >
+              创建
+            </Button>
+            <Table2
               loading={this.state.loading}
               rowKey="uuid"
-              ref={node => (this.$sourceTable = node)}
-              columnDefs={TABLE_COLUMN_DEFS}
+              size="small"
+              ref={node => (this.$table = node)}
+              columns={TABLE_COLUMN_DEFS(this.onRemove)}
               dataSource={this.state.holidays}
-              header={
-                <Row style={{ marginBottom: VERTICAL_GUTTER }}>
-                  <ModalButton
-                    type="primary"
-                    onClick={this.onOpenCreateModal}
-                    modalProps={{
-                      visible: this.state.visible,
-                      onCancel: this.onCloseCreateModal,
-                      onOk: this.onCreate,
-                      title: '创建交易日',
-                    }}
-                    content={
-                      <Form2
-                        ref={node => (this.$createForm = node)}
-                        onFieldsChange={this.onCreateFormChange}
-                        dataSource={this.state.createFormData}
-                        footer={false}
-                        columnNumberOneRow={1}
-                        columns={createFormControls(this.state.holidays)}
-                      />
-                    }
-                  >
-                    创建
-                  </ModalButton>
-                </Row>
-              }
-              rowActions={[
-                <Button key="remove" type="danger" onClick={this.onRemove}>
-                  删除
-                </Button>,
-              ]}
-              pagination={false}
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+        <Modal
+          title="创建交易日"
+          visible={this.state.visible}
+          onOk={this.onCreate}
+          onCancel={this.onCloseCreateModal}
+          confirmLoading={this.state.confirmLoading}
+        >
+          <Form2
+            ref={node => (this.$createForm = node)}
+            onFieldsChange={this.onCreateFormChange}
+            dataSource={this.state.createFormData}
+            footer={false}
+            columnNumberOneRow={1}
+            columns={createFormControls(this.state.holidays)}
+          />
+        </Modal>
+      </Page>
     );
   }
 }

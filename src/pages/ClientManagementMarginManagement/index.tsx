@@ -1,16 +1,28 @@
-import SourceTable from '@/design/components/SourceTable';
-import ImportExcelButton from '@/lib/components/_ImportExcelButton';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { delay, mockData } from '@/lib/utils';
-import { mgnMarginSearch, mgnMarginsUpdate } from '@/services/reference-data-service';
-import { message, Modal, Button, Icon } from 'antd';
+import SourceTable from '@/containers/SourceTable';
+import ImportExcelButton from '@/containers/_ImportExcelButton';
+import Page from '@/containers/Page';
+import { delay, mockData } from '@/tools';
+import { message, Modal, Button, Icon, Divider, Table, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid';
-import { PAGE_TABLE_COL_DEFS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
+import {
+  PAGE_TABLE_COL_DEFS,
+  SEARCH_FORM_CONTROLS,
+  TABLE_COL_DEFS,
+  TABLE_COLUMNS,
+} from './constants';
 import { docBctTemplateList, downloadUrl } from '@/services/onBoardTransaction';
+import { Form2, Select } from '@/containers';
+import FormItem from 'antd/lib/form/FormItem';
+import {
+  refMasterAgreementSearch,
+  refSimilarLegalNameList,
+  mgnMarginSearch,
+  mgnMarginsUpdate,
+} from '@/services/reference-data-service';
 class ClientManagementMarginManagement extends PureComponent {
   public $marginSourceTable: SourceTable = null;
-
+  public $sourceTable: Form2 = null;
   public state = {
     dataSource: [],
     loading: false,
@@ -35,9 +47,9 @@ class ClientManagementMarginManagement extends PureComponent {
     );
   };
 
-  public onSearchFormChange = async params => {
+  public onSearchFormChange = async (props, changedFields, allFields) => {
     this.setState({
-      searchFormData: params.values,
+      searchFormData: allFields,
     });
   };
 
@@ -46,7 +58,7 @@ class ClientManagementMarginManagement extends PureComponent {
       loading: true,
     });
     const { error, data } = await mgnMarginSearch({
-      ...this.state.searchFormData,
+      ...Form2.getFieldsValue(this.state.searchFormData),
     });
     this.setState({
       loading: false,
@@ -55,7 +67,7 @@ class ClientManagementMarginManagement extends PureComponent {
     this.setState({
       dataSource: data,
     });
-    this.$marginSourceTable.$baseSourceTable.$table.$baseTable.gridApi.refreshView();
+    // this.$marginSourceTable.$baseSourceTable.$table.$baseTable.gridApi.refreshView();
   };
 
   public handleConfirmExcel = () => {
@@ -103,32 +115,107 @@ class ClientManagementMarginManagement extends PureComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
-        <SourceTable
-          rowKey="uuid"
-          ref={node => (this.$marginSourceTable = node)}
-          loading={this.state.loading}
-          columnDefs={TABLE_COL_DEFS(this.fetchTable)}
-          dataSource={this.state.dataSource}
-          searchable={true}
-          resetable={true}
+      <Page>
+        <Form2
+          ref={node => (this.$sourceTable = node)}
+          layout="inline"
+          dataSource={this.state.searchFormData}
+          submitText={'查询'}
+          submitButtonProps={{
+            icon: 'search',
+          }}
+          onSubmitButtonClick={this.fetchTable}
           onResetButtonClick={this.onReset}
-          onSearchButtonClick={this.fetchTable}
-          searchFormControls={SEARCH_FORM_CONTROLS}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          header={
-            <Button
-              style={{
-                marginBottom: '20px',
-              }}
-              type="primary"
-              onClick={() => {
-                this.setState({ modalVisible: true });
-              }}
-            >
-              批量更新
-            </Button>
+          onFieldsChange={this.onSearchFormChange}
+          columns={[
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        fetchOptionsOnSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await refSimilarLegalNameList({
+                            similarLegalName: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '主协议编号',
+              dataIndex: 'masterAgreementId',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear={true}
+                        showSearch={true}
+                        fetchOptionsOnSearch={true}
+                        options={async (value: string = '') => {
+                          const { data, error } = await refMasterAgreementSearch({
+                            masterAgreementId: value,
+                          });
+                          if (error) return [];
+                          return data.map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                        }}
+                      />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+          ]}
+        />
+        <Divider type="horizontal" />
+        <Row>
+          <Button
+            style={{
+              marginBottom: '20px',
+            }}
+            type="primary"
+            onClick={() => {
+              this.setState({ modalVisible: true });
+            }}
+          >
+            批量更新
+          </Button>
+        </Row>
+        <Table
+          dataSource={this.state.dataSource}
+          columns={TABLE_COLUMNS(this.fetchTable)}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+          }}
+          loading={this.state.loading}
+          rowKey="uuid"
+          size="middle"
+          scroll={
+            this.state.dataSource && this.state.dataSource.length > 0
+              ? { x: '1200px' }
+              : { x: false }
           }
         />
         <Modal
@@ -185,7 +272,7 @@ class ClientManagementMarginManagement extends PureComponent {
             <a onClick={this.downloadFormModal}>批量更新维持保证金.xlsx</a>
           </p>
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

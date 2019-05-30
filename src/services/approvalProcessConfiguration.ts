@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
 export async function wkProcessStatusModify(params = {}) {
   return request(`${HOST_TEST}workflow-service/api/rpc`, {
@@ -76,6 +76,46 @@ export async function wkGlobalConfigModify(params = {}) {
     method: `POST`,
     body: {
       method: 'wkGlobalConfigModify',
+      params,
+    },
+  });
+}
+
+export async function wkProcessGet(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessGet',
+      params,
+    },
+  });
+}
+
+export async function wkProcessModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessModify',
+      params,
+    },
+  });
+}
+
+export async function wkProcessConfigModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessConfigModify',
+      params,
+    },
+  });
+}
+
+export async function wkTaskApproveGroupBind(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkTaskApproveGroupBind',
       params,
     },
   });

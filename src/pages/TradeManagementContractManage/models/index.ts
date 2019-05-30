@@ -1,7 +1,55 @@
+const FIRST_ACTIVE_TAB_KEY = 'contractManagement';
+
 export default {
   namespace: 'tradeManagementContractManage',
   state: {
-    activeTabKey: 'contractManagement',
+    entryTabKey: null,
+    activeTabKey: FIRST_ACTIVE_TAB_KEY,
+    contractManagement: {
+      tableDataSource: [],
+      collapse: true,
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    open: {
+      tableDataSource: [],
+      collapse: true,
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    unwind: {
+      tableDataSource: [],
+      collapse: true,
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    expiration: {
+      tableDataSource: [],
+      collapse: true,
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
+    overlate: {
+      tableDataSource: [],
+      collapse: true,
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+    },
   },
   reducers: {
     onTabChange(state, action) {
@@ -11,6 +59,44 @@ export default {
       return {
         ...state,
         activeTabKey: key,
+      };
+    },
+
+    initKey(state) {
+      return {
+        ...state,
+        activeTabKey: FIRST_ACTIVE_TAB_KEY,
+      };
+    },
+
+    save(state, action) {
+      const { activeTabKey, tableDataSource, pagination, pageSizeCurrent } = action.payload;
+      return {
+        ...state,
+        [activeTabKey]: {
+          ...state[activeTabKey],
+          tableDataSource,
+          pagination,
+          pageSizeCurrent,
+        },
+      };
+    },
+
+    changeCollapse(state, action) {
+      const { activeTabKey, collapse } = action.payload;
+      return {
+        ...state,
+        [activeTabKey]: {
+          ...state[activeTabKey],
+          collapse,
+        },
+      };
+    },
+
+    setEntryTabKey(state, action) {
+      return {
+        ...state,
+        entryTabKey: action.payload,
       };
     },
   },

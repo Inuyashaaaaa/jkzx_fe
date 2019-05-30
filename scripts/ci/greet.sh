@@ -3,7 +3,7 @@ curl 'https://oapi.dingtalk.com/robot/send?access_token=310d4788c2227bcef34fbbb5
    -d "{\"msgtype\": \"markdown\",
         \"markdown\": {
             \"title\": \"部署通知\",
-            \"text\": \"### 部署通知\n > ${1} ${2}\n > sha: ${3}\n > ![screenshot](https://docs.gitlab.com/ee/ci/introduction/img/gitlab_workflow_example_11_9.png)\n > ##### GITLAB \n\"
+            \"text\": \"### 部署通知\n > ${1} ${2}\n > sha: ${3}\n > ##### GITLAB \n\"
         },
         \"at\": {
                 \"isAtAll\": true

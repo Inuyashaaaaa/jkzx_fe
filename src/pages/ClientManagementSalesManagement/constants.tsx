@@ -1,9 +1,9 @@
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import React from 'react';
 import Operation from './Operation';
 export const ADDRESS_CASCADER = 'ADDRESS_CASCADER';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import { CascaderOptionType } from 'antd/lib/cascader';
 
 export const TABLE_COL_DEF: (branchSalesList, fetchTable) => IColumnDef[] = (

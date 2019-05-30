@@ -1,7 +1,7 @@
-// import Table from '@/lib/components/_Table2';
+// import Table from '@/containers/_Table2';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/design/components/SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import SourceTable from '@/containers/SourceTable';
+import Page from '@/containers/Page';
 import {
   addVolSpecialDates,
   deleteVolSpecialDates,
@@ -10,11 +10,25 @@ import {
   setVolWeekendWeight,
   updateVolSpecialDates,
 } from '@/services/volatility';
-import { Button, Calendar, Col, Input, message, Modal, notification, Row } from 'antd';
+import {
+  Button,
+  Calendar,
+  Col,
+  Input,
+  message,
+  Modal,
+  notification,
+  Row,
+  Table,
+  Divider,
+} from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { PAGE_TABLE_COL_DEFS } from './constants';
+import { Form2, Select } from '@/containers';
+import FormItem from 'antd/lib/form/FormItem';
+import Operation from './Operation';
 
 class VolatilityCalendar extends PureComponent {
   constructor(props) {
@@ -138,7 +152,6 @@ class VolatilityCalendar extends PureComponent {
   public confirmUpdate = () => {
     if (this.$formBuilder) {
       this.$formBuilder.validateForm(values => {
-        console.log(values);
         this.executeUpdate(values);
       });
     }
@@ -213,7 +226,7 @@ class VolatilityCalendar extends PureComponent {
   };
 
   public highLightSpecialDates = date => {
-    // console.log()
+    //
     const { calendarMoment, dates } = this.state;
     const isSpecial = dates.find(d => d.specialDate === date.format('YYYY-MM-DD'));
     const isValid = calendarMoment.isSame(date, 'month');
@@ -262,7 +275,7 @@ class VolatilityCalendar extends PureComponent {
       modalLoading,
     } = this.state;
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row>
           <Col span={8}>
             <Calendar
@@ -299,7 +312,52 @@ class VolatilityCalendar extends PureComponent {
                   确定
                 </Button>
               </div>
-              <SourceTable
+              <Divider type="horizontal" />
+              <Button
+                style={{ marginTop: VERTICAL_GUTTER, marginBottom: VERTICAL_GUTTER }}
+                key="edit"
+                type="primary"
+                onClick={() => this.showModal('create')}
+              >
+                新增特殊日期
+              </Button>
+              <Table
+                dataSource={dates}
+                columns={[
+                  {
+                    title: '特殊日期',
+                    dataIndex: 'specialDate',
+                  },
+                  {
+                    title: '权重',
+                    dataIndex: 'weight',
+                  },
+                  {
+                    title: '备注',
+                    dataIndex: 'note',
+                  },
+                  {
+                    title: '操作',
+                    render: (text, record, index) => {
+                      return (
+                        <Operation
+                          record={record}
+                          fetchTable={this.fetchData}
+                          showModal={this.showModal}
+                        />
+                      );
+                    },
+                  },
+                ]}
+                pagination={{
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                }}
+                loading={loading}
+                rowKey="uuid"
+                size="middle"
+              />
+              {/* <SourceTable
                 loading={loading}
                 rowKey="uuid"
                 dataSource={dates}
@@ -314,7 +372,7 @@ class VolatilityCalendar extends PureComponent {
                     新增特殊日期
                   </Button>
                 }
-              />
+              /> */}
             </div>
           </Col>
         </Row>
@@ -334,7 +392,7 @@ class VolatilityCalendar extends PureComponent {
         >
           {modalVisible && <CommonForm data={formItems} ref={ele => (this.$formBuilder = ele)} />}
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

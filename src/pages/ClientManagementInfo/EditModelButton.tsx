@@ -1,18 +1,9 @@
 import EmailInput from '@/containers/EmailInput';
 import Upload from '@/containers/Upload';
-import {
-  DatePicker,
-  Form2,
-  Input,
-  InputNumber,
-  ModalButton,
-  Select,
-  Table2,
-} from '@/design/components';
-import { remove, uuid } from '@/design/utils';
+import { DatePicker, Form2, Input, InputNumber, ModalButton, Select, Table2 } from '@/containers';
+import { remove, uuid, getMoment } from '@/tools';
 import { getPartyDoc, HREF_UPLOAD_URL, UPLOAD_URL } from '@/services/document';
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
-import { getMoment } from '@/utils';
 import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -24,6 +15,7 @@ import {
   PARTY_DOC_CREATE_OR_UPDATE,
   TRADER_TYPE,
 } from './constants';
+import { getToken } from '@/tools/authority';
 
 const TabPane = Tabs.TabPane;
 
@@ -240,8 +232,13 @@ const EditModalButton = memo<any>(props => {
   }
 
   const handleValue = val => {
+    const result = _.get(val, '[0].response.result');
     if (_.isArray(val)) {
       val = (val || []).map(item => {
+        if (result) {
+          item.url = `${HREF_UPLOAD_URL}${_.get(result, 'uuid')}&partyDoc=true`;
+          return item;
+        }
         item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
         return item;
       });
@@ -495,25 +492,6 @@ const EditModalButton = memo<any>(props => {
                       },
                     },
                     {
-                      title: '托管邮箱',
-                      dataIndex: 'trustorEmail',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
-                    },
-
-                    {
                       title: '联系人',
                       dataIndex: 'contact',
                       render: (val, record, index, { form }) => {
@@ -581,6 +559,23 @@ const EditModalButton = memo<any>(props => {
                                 },
                               ],
                             })(<Input disabled={disabled} editing={editable} />)}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '托管邮箱',
+                      dataIndex: 'trustorEmail',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -666,6 +661,83 @@ const EditModalButton = memo<any>(props => {
                                 },
                               ],
                             })(<DatePicker disabled={disabled} editing={editable} />)}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '主协议编号版本',
+                      dataIndex: 'masterAgreementNoVersion',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(
+                              <Select
+                                editing={editable}
+                                options={[
+                                  {
+                                    label: ' SAC2014',
+                                    value: 'SAC2014',
+                                  },
+                                  {
+                                    label: 'SAC2015',
+                                    value: 'SAC2015',
+                                  },
+                                  {
+                                    label: 'ISDA',
+                                    value: 'ISDA',
+                                  },
+                                  {
+                                    label: 'OTHER',
+                                    value: 'OTHER',
+                                  },
+                                  {
+                                    label: 'NAFMII',
+                                    value: 'NAFMII',
+                                  },
+                                ]}
+                              />
+                            )}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '主协议签证日期',
+                      dataIndex: 'masterAgreementSignDate',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(<DatePicker editing={editable} />)}
+                          </FormItem>
+                        );
+                      },
+                    },
+                    {
+                      title: '营业执照',
+                      dataIndex: 'businessLicense',
+                      render: (val, record, index, { form }) => {
+                        return (
+                          <FormItem hasFeedback={!disabled ? true : false}>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: false,
+                                },
+                              ],
+                            })(<Input editing={editable} />)}
                           </FormItem>
                         );
                       },
@@ -1048,6 +1120,7 @@ const EditModalButton = memo<any>(props => {
                                     name: '主协议',
                                   }),
                                 }}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 fileList={val}
                                 disabled={disabled}
                                 editing={editable}
@@ -1079,6 +1152,7 @@ const EditModalButton = memo<any>(props => {
                                     name: '补充协议',
                                   }),
                                 }}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 fileList={val}
                                 editing={editable}
                                 disabled={disabled}
@@ -1110,6 +1184,7 @@ const EditModalButton = memo<any>(props => {
                                     name: '风险问卷调查',
                                   }),
                                 }}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 fileList={val}
                                 editing={editable}
                                 disabled={disabled}
@@ -1142,6 +1217,7 @@ const EditModalButton = memo<any>(props => {
                                   }),
                                 }}
                                 fileList={val}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 editing={editable}
                                 disabled={disabled}
                               />
@@ -1174,6 +1250,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1205,6 +1282,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1236,6 +1314,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1267,6 +1346,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1298,6 +1378,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1329,6 +1410,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}
@@ -1360,6 +1442,7 @@ const EditModalButton = memo<any>(props => {
                                 }}
                                 fileList={val}
                                 editing={editable}
+                                headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
                               />
                             )}

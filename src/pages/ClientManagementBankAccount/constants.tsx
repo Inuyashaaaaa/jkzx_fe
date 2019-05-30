@@ -1,5 +1,5 @@
-import { IFormControl } from '@/design/components/Form/types';
-import { IColumnDef } from '@/design/components/Table/types';
+import { IFormControl } from '@/containers/Form/types';
+import { IColumnDef } from '@/containers/Table/types';
 import {
   refSimilarAccountNameList,
   refSimilarBankAccountList,

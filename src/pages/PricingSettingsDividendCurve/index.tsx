@@ -1,10 +1,7 @@
 import { INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 import MarketSourceTable from '@/containers/MarketSourceTable';
-import { IFormControl } from '@/lib/components/_Form2';
-import ModalButton from '@/lib/components/_ModalButton2';
-import SourceTable from '@/lib/components/_SourceTable';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import Page from '@/containers/Page';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
@@ -15,31 +12,39 @@ import {
   queryModelName,
   saveModelDividendCurve,
 } from '@/services/model';
-import { Col, message, notification, Row } from 'antd';
+import { Col, message, notification, Row, Button, Modal, Divider } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
+import { TABLE_COL_DEFS, INSERT_FORM_CONTROLS, SEARCH_FORM_CONTROLS } from './constants';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import { Table2, Form2 } from '@/containers';
 
 const GROUP_KEY = 'modelName';
 
-const MARKET_KEY = 'quote';
+const MARKET_KEY = 'underlyer';
 
 class PricingSettingsDividendCurve extends PureComponent {
-  public $sourceTable: SourceTable = null;
+  public $form: Form2 = null;
+
+  public $insertForm: Form2 = null;
 
   public state = {
+    saveLoading: false,
     tableDataSource: [],
     searchFormData: {},
     groups: [],
     tableLoading: false,
+    visible: false,
+    insertFormData: {},
   };
 
   public sortDataSource = dataSource => {
     return dataSource
       .map(record => {
         return {
-          days: TRNORS_OPTS.find(item => item.name === record.tenor).days,
+          days: (TRNORS_OPTS.find(item => item.name === record.tenor.value) || {}).days,
           record,
         };
       })
@@ -47,23 +52,19 @@ class PricingSettingsDividendCurve extends PureComponent {
       .map(item => item.record);
   };
 
-  public fetchTableData = async event => {
+  public handleTableData = item => {
+    return Form2.createFields(item, ['id']);
+  };
+
+  public fetchTableData = async searchFormValues => {
     this.setState({
       tableLoading: true,
     });
 
-    const rsp = await queryModelDividendCurve(
-      {
-        modelName: event.searchFormData[GROUP_KEY],
-        underlyer: event.searchFormData[MARKET_KEY],
-      },
-      true
-    );
+    const rsp = await queryModelDividendCurve(searchFormValues, true);
 
     const { error } = rsp;
     let { data } = rsp;
-
-    // if (error) return;
 
     this.setState({
       tableLoading: false,
@@ -94,19 +95,26 @@ class PricingSettingsDividendCurve extends PureComponent {
 
     const { dataSource } = data;
 
-    const tableDataSource = this.sortDataSource(dataSource);
-
-    this.setState({ tableDataSource });
+    const tableDataSource = dataSource.map(item => this.handleTableData(item));
+    this.setState({ tableDataSource: this.sortDataSource(tableDataSource) });
   };
 
-  public saveTableData = async event => {
+  public saveTableData = async () => {
     const { tableDataSource, searchFormData } = this.state;
-    const { error } = await saveModelDividendCurve({
-      dataSource: tableDataSource,
-      modelName: searchFormData[GROUP_KEY],
-      underlyer: searchFormData[MARKET_KEY],
+    this.setState({
+      saveLoading: true,
     });
-    return !error;
+    const { error } = await saveModelDividendCurve({
+      dataSource: tableDataSource.map(item => Form2.getFieldsValue(item)),
+      ...Form2.getFieldsValue(searchFormData),
+    });
+    this.setState({
+      saveLoading: false,
+    });
+    if (error) return;
+    notification.success({
+      message: '保存成功',
+    });
   };
 
   public fetchGroup = async underlyer => {
@@ -152,70 +160,80 @@ class PricingSettingsDividendCurve extends PureComponent {
     );
   };
 
-  public onSearchFormChange = event => {
+  public onSearchFormFieldsChange = (props, fields, allFields) => {
     this.setState({
-      searchFormData: event.formData,
+      searchFormData: {
+        ...this.state.searchFormData,
+        ...fields,
+      },
     });
-    this.fetchTableData(event);
+  };
+
+  public onSearchFormChange = (props, values, allValues) => {
+    if (values[GROUP_KEY]) {
+      this.fetchTableData(allValues);
+    }
   };
 
   public onRemove = event => {
-    const clone = [...this.state.tableDataSource];
-    clone.splice(event.rowIndex, 1);
+    const clone = _.reject(this.state.tableDataSource, value => {
+      return value.tenor.value === event.tenor.value;
+    });
+
     this.setState({
-      tableDataSource: clone,
+      tableDataSource: this.sortDataSource(clone),
     });
 
     message.success('删除成功');
   };
 
-  public onConfirm = event => {
-    const clone = [...this.state.tableDataSource];
-    clone.splice(event.extra.rowIndex + 1, 0, {
-      ...event.extra.rowData,
-      ...event.formData,
-      id: Math.random(),
-    });
+  public onConfirm = async () => {
+    const validateRsp = await this.$insertForm.validate();
+    if (validateRsp.error) return;
+    const data = {
+      ...this.state.insertFormData,
+      id: uuidv4(),
+      expiry: Form2.createField(null),
+      use: Form2.createField(true),
+    };
+    const clone = _.concat(this.state.tableDataSource, data);
     this.setState({
+      visible: false,
       tableDataSource: this.sortDataSource(clone),
+      insertFormData: {},
     });
 
     message.success('插入成功');
   };
 
-  public onClick = event => {
-    const { tableDataSource = [] } = event.state;
+  public showModal = () => {
+    this.setState({ visible: true, insertFormData: { quote: Form2.createField(0) } });
+  };
 
-    const formControls: IFormControl[] = [
-      {
-        dataIndex: 'tenor',
-        control: {
-          label: '期限',
-        },
-        input: {
-          type: 'select',
-          options: getCanUsedTranorsOtionsNotIncludingSelf(tableDataSource),
-        },
-        options: {
-          rules: [
-            {
-              required: true,
-            },
-          ],
-        },
-      },
-    ];
+  public onCancel = () => {
+    this.setState({ visible: false });
+  };
 
-    return {
-      formControls,
-      formData: {},
-      extra: event,
-    };
+  public onInsertFormChange = (props, fields, allFields) => {
+    this.setState({
+      insertFormData: allFields,
+    });
+  };
+
+  public handleCellValueChanged = params => {
+    this.setState({
+      tableDataSource: this.state.tableDataSource.map(item => {
+        if (item.id === params.record.id) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
   };
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row gutter={16 + 8}>
           <Col xs={24} sm={4}>
             <MarketSourceTable
@@ -224,7 +242,7 @@ class PricingSettingsDividendCurve extends PureComponent {
                 onSelect: market => {
                   this.setState(
                     produce((state: any) => {
-                      state.searchFormData[MARKET_KEY] = market;
+                      state.searchFormData[MARKET_KEY] = Form2.createField(market);
                       state.tableDataSource = [];
                       state.searchFormData[GROUP_KEY] = undefined;
                     }),
@@ -235,92 +253,51 @@ class PricingSettingsDividendCurve extends PureComponent {
             />
           </Col>
           <Col xs={24} sm={20}>
-            <SourceTable
+            <Form2
+              ref={node => (this.$form = node)}
+              layout="inline"
+              footer={false}
+              dataSource={this.state.searchFormData}
+              columns={SEARCH_FORM_CONTROLS(this.state.groups)}
+              onValuesChange={this.onSearchFormChange}
+              onFieldsChange={this.onSearchFormFieldsChange}
+            />
+            <Divider />
+            <Button
+              loading={this.state.saveLoading}
+              type="primary"
+              style={{ marginBottom: VERTICAL_GUTTER }}
+              onClick={this.saveTableData}
+            >
+              保存
+            </Button>
+            <Table2
               rowKey="id"
+              size="small"
               pagination={false}
               loading={this.state.tableLoading}
-              ref={node => (this.$sourceTable = node)}
-              resetable={false}
-              removeable={true}
-              onRemove={this.onRemove}
-              searchFormData={this.state.searchFormData}
               dataSource={this.state.tableDataSource}
-              onSearchFormChange={this.onSearchFormChange}
-              onSave={this.saveTableData}
-              onSearch={this.fetchTableData}
-              searchFormProps={{
-                wrapperSpace: 14,
-                labelSpace: 4,
-                controlNumberOneRow: 2,
-              }}
-              rowActions={[
-                <ModalButton key="insert" onConfirm={this.onConfirm} onClick={this.onClick}>
-                  插入
-                </ModalButton>,
-              ]}
-              searchFormControls={[
-                {
-                  control: {
-                    label: '标的',
-                    required: true,
-                  },
-                  dataIndex: MARKET_KEY,
-                  input: {
-                    disabled: true,
-                    placeholder: '请选择左侧标的物',
-                    type: 'input',
-                    subtype: 'show',
-                    hoverIcon: 'lock',
-                  },
-                  options: {
-                    rules: [
-                      {
-                        required: true,
-                      },
-                    ],
-                  },
-                },
-                {
-                  dataIndex: GROUP_KEY,
-                  control: {
-                    label: '分组',
-                  },
-                  input: {
-                    type: 'select',
-                    options: this.state.groups,
-                  },
-                },
-              ]}
-              tableColumnDefs={event => {
-                return event.tableDataSource.length
-                  ? [
-                      {
-                        headerName: '期限',
-                        field: 'tenor',
-                        editable: true,
-                        input: record => {
-                          return {
-                            type: 'select',
-                            options: getCanUsedTranorsOtions(
-                              this.$sourceTable.getTableDataSource(),
-                              record
-                            ),
-                          };
-                        },
-                      },
-                      {
-                        headerName: '利率(%)',
-                        editable: true,
-                        field: 'quote',
-                        input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-                      },
-                    ]
-                  : [];
-              }}
+              columns={TABLE_COL_DEFS(this.state.tableDataSource, this.onRemove, this.showModal)}
+              onCellFieldsChange={this.handleCellValueChanged}
             />
           </Col>
         </Row>
-      </PageHeaderWrapper>
+        <Modal
+          closable={false}
+          onCancel={this.onCancel}
+          onOk={this.onConfirm}
+          maskClosable={false}
+          visible={this.state.visible}
+        >
+          <Form2
+            ref={node => (this.$insertForm = node)}
+            dataSource={this.state.insertFormData}
+            columns={INSERT_FORM_CONTROLS(this.state.tableDataSource)}
+            footer={false}
+            onFieldsChange={this.onInsertFormChange}
+          />
+        </Modal>
+      </Page>
     );
   }
 }

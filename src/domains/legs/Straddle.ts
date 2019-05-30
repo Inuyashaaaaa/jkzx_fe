@@ -1,4 +1,4 @@
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -19,12 +19,8 @@ import {
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -60,13 +56,16 @@ import { HighBarrier } from '../legFields/HighBarrier';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
 import { PaymentType } from '../legFields/PaymentType';
 import { Payment } from '../legFields/Payment';
 import { BarrierType } from '../legFields/BarrierType';
 import { LowBarrier } from '../legFields/LowBarrier';
+import { Unit } from '../legFields/Unit';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const Straddle: ILeg = {
+export const Straddle: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.STRADDLE],
   type: LEG_TYPE_MAP.STRADDLE,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -85,12 +84,14 @@ export const Straddle: ILeg = {
         DaysInYear,
         NotionalAmountType,
         NotionalAmount,
+        EffectiveDate,
         StrikeType,
         LowStrike,
         HighStrike,
         LowParticipationRate,
         HighParticipationRate,
         PremiumType,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -119,6 +120,8 @@ export const Straddle: ILeg = {
         HighStrike,
         LowParticipationRate,
         HighParticipationRate,
+        Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -146,6 +149,8 @@ export const Straddle: ILeg = {
         HighStrike,
         LowParticipationRate,
         HighParticipationRate,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -174,14 +179,9 @@ export const Straddle: ILeg = {
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [];
+    const COMPUTED_FIELDS = [LEG_FIELD.UNIT, LEG_FIELD.TRADE_NUMBER];
 
     nextPosition.productType = LEG_TYPE_MAP.STRADDLE;
-    nextPosition.lcmEventType = 'OPEN';
-    nextPosition.positionAccountCode = 'empty';
-    nextPosition.positionAccountName = 'empty';
-    nextPosition.counterPartyAccountCode = 'empty';
-    nextPosition.counterPartyAccountName = 'empty';
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       LEG_FIELD.IS_ANNUAL,
@@ -230,4 +230,4 @@ export const Straddle: ILeg = {
       setTableData
     );
   },
-};
+});

@@ -8,11 +8,12 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_ZHCH_MAP,
   NOTION_ENUM_MAP,
-  OB_DAY_FIELD,
+  OB_PRICE_FIELD,
   OPTION_TYPE_OPTIONS,
+  STRIKE_TYPES_MAP,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
-import Form from '@/design/components/Form';
+import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
 import { Alert, Button, message, Modal } from 'antd';
@@ -80,7 +81,7 @@ class ExpirationModal extends PureComponent<
       [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
       [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: _.chain(this.fixingTableData)
         .last()
-        .get(OB_DAY_FIELD)
+        .get(OB_PRICE_FIELD)
         .value(),
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
@@ -367,7 +368,9 @@ class ExpirationModal extends PureComponent<
               input: {
                 disabled: true,
                 type: 'select',
-                options: OPTION_TYPE_OPTIONS,
+                options: isKnockIn(this.data)
+                  ? OPTION_TYPE_OPTIONS
+                  : [{ label: '未敲入', value: 'CALL' }, { label: '未敲入', value: 'PUT' }],
               },
               decorator: {
                 rules: [getRequiredRule()],
@@ -378,7 +381,11 @@ class ExpirationModal extends PureComponent<
                   {
                     field: LEG_FIELD.STRIKE,
                     control: {
-                      label: '行权价',
+                      label:
+                        this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] ===
+                        STRIKE_TYPES_MAP.PERCENT
+                          ? '行权价(%)'
+                          : '行权价(￥)',
                     },
                     input: {
                       ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,

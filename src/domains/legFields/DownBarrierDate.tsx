@@ -1,6 +1,6 @@
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
-import { DatePicker, Select, Form2 } from '@/design/components';
-import { legEnvIsBooking, legEnvIsPricing, getRequiredRule, getRequiredRule } from '@/tools';
+import { DatePicker, Select, Form2 } from '@/containers';
+import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';

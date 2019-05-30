@@ -1,16 +1,10 @@
 import {
   ASSET_CLASS_MAP,
-  EXERCISETYPE_MAP,
+  FREQUENCY_TYPE_MAP,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
-  UNIT_ENUM_MAP,
-  REBATETYPE_UNIT_MAP,
-  REBATETYPE_TYPE_MAP,
-  KNOCK_DIRECTION_MAP,
-  OPTION_TYPE_MAP,
   OB_DAY_FIELD,
-  FREQUENCY_TYPE_MAP,
   OB_PRICE_FIELD,
 } from '@/constants/common';
 import {
@@ -21,15 +15,12 @@ import {
 import {
   LEG_ENV,
   TOTAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { getMoment } from '@/tools';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -45,15 +36,15 @@ import { DaysInYear } from '../legFields/DaysInYear';
 import { EffectiveDate } from '../legFields/EffectiveDate';
 import { ExpirationDate } from '../legFields/ExpirationDate';
 import { FrontPremium } from '../legFields/FrontPremium';
-import { AlUnwindNotionalAmount } from '../legFields/infos/AlUnwindNotionalAmount';
-import { InitialNotionalAmount } from '../legFields/infos/InitialNotionalAmount';
-import { LcmEventType } from '../legFields/infos/LcmEventType';
-import { PositionId } from '../legFields/infos/PositionId';
 import { InitialSpot } from '../legFields/InitialSpot';
 import { IsAnnual } from '../legFields/IsAnnual';
 import { MinimumPremium } from '../legFields/MinimumPremium';
 import { NotionalAmount } from '../legFields/NotionalAmount';
 import { NotionalAmountType } from '../legFields/NotionalAmountType';
+import { ObservationDates } from '../legFields/ObservationDates';
+import { ObservationStep } from '../legFields/ObservationStep';
+import { ObserveEndDay } from '../legFields/ObserveEndDay';
+import { ObserveStartDay } from '../legFields/ObserveStartDay';
 import { OptionType } from '../legFields/OptionType';
 import { ParticipationRate } from '../legFields/ParticipationRate';
 import { Premium } from '../legFields/Premium';
@@ -65,22 +56,12 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../tools';
-import { Rebate } from '../legFields/Rebate';
-import { ObservationType } from '../legFields/ObservationType';
-import { KnockDirection } from '../legFields/KnockDirection';
-import { RebateUnit } from '../legFields/RebateUnit';
-import { RebateType } from '../legFields/RebateType';
-import { BarrierType } from '../legFields/BarrierType';
-import { Barrier } from '../legFields/Barrier';
-import { getMoment } from '@/utils';
-import { ObservationStep } from '../legFields/ObservationStep';
-import { ObservationDates } from '../legFields/ObservationDates';
-import { ObserveStartDay } from '../legFields/ObserveStartDay';
-import { ObserveEndDay } from '../legFields/ObserveEndDay';
-import { convertObservetions } from '@/services/common';
+import { Unit } from '../legFields/Unit';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const Asia: ILeg = {
+export const Asia: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.ASIAN],
   type: LEG_TYPE_MAP.ASIAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -89,6 +70,7 @@ export const Asia: ILeg = {
       return [
         IsAnnual,
         Direction,
+        EffectiveDate,
         OptionType,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
@@ -104,6 +86,7 @@ export const Asia: ILeg = {
         ObserveStartDay,
         ObserveEndDay,
         ObservationDates,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -135,6 +118,8 @@ export const Asia: ILeg = {
         ObserveEndDay,
         ObservationStep,
         ObservationDates,
+        Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -165,6 +150,8 @@ export const Asia: ILeg = {
         ObserveEndDay,
         ObservationStep,
         ObservationDates,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -216,7 +203,6 @@ export const Asia: ILeg = {
     });
 
     nextPosition.productType = LEG_TYPE_MAP.ASIAN;
-    nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
@@ -224,6 +210,8 @@ export const Asia: ILeg = {
       LEG_FIELD.OBSERVE_START_DAY,
       LEG_FIELD.OBSERVE_END_DAY,
       LEG_FIELD.OBSERVATION_DATES,
+      LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
       ...(dataItem[LEG_FIELD.IS_ANNUAL]
         ? []
         : [
@@ -234,26 +222,30 @@ export const Asia: ILeg = {
           ]),
     ]);
 
-    nextPosition.asset.fixingWeights = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
-      (result, item) => {
-        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
-        return result;
-      },
-      {}
-    );
+    if (dataItem[LEG_FIELD.OBSERVATION_DATES]) {
+      nextPosition.asset.fixingWeights = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
+        (result, item) => {
+          result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
+          return result;
+        },
+        {}
+      );
+    }
 
-    nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
-      (result, item) => {
-        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
-        return result;
-      },
-      {}
-    );
+    if (dataItem[LEG_FIELD.OBSERVATION_DATES]) {
+      nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
+        (result, item) => {
+          result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
+          return result;
+        },
+        {}
+      );
+    }
 
     nextPosition.asset.settlementDate =
       env === LEG_ENV.PRICING
         ? nextPosition.asset.expirationDate
-        : nextPosition.asset.settlementDate && nextPosition.asset.settlementDate;
+        : nextPosition.asset.settlementDate;
 
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
@@ -313,4 +305,4 @@ export const Asia: ILeg = {
       );
     }
   },
-};
+});

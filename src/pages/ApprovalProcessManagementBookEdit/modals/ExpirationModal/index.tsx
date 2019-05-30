@@ -12,7 +12,7 @@ import {
   OPTION_TYPE_OPTIONS,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
-import Form from '@/design/components/Form';
+import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
 import { Alert, Button, message, Modal } from 'antd';

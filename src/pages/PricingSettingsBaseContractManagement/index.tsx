@@ -1,8 +1,8 @@
-import CascaderSourceList from '@/lib/components/_CascaderSourceList';
-import { PureStateComponent } from '@/lib/components/_Components';
-import Form from '@/lib/components/_Form2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
-import { baseTree, delay, isAllSame, mockData } from '@/lib/utils';
+import CascaderSourceList from '@/containers/_CascaderSourceList';
+import { PureStateComponent } from '@/containers/Components';
+import Form from '@/containers/_Form2';
+import Page from '@/containers/Page';
+import { baseTree, delay, isAllSame, mockData } from '@/tools';
 import {
   mktInstrumentsListPaged,
   prcBaseContractsList,
@@ -232,7 +232,7 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
 
   public render() {
     return (
-      <PageHeaderWrapper>
+      <Page>
         <Row gutter={16}>
           <Col xs={24} sm={18}>
             <CascaderSourceList
@@ -293,7 +293,7 @@ class PricingSettingsBaseContractManagement extends PureStateComponent {
         >
           <p>确定要对选中的{this.state.count}个持仓执行操作吗？</p>
         </Modal>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

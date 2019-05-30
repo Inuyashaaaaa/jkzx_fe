@@ -1,5 +1,5 @@
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
-import { DatePicker, Form2, Input, Loading, Select, Table2 } from '@/design/components';
+import { DatePicker, Form2, Input, Loading, Select, Table2 } from '@/containers';
 import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,
@@ -25,6 +25,7 @@ const BookingBaseInfoForm = memo<any>(props => {
     editableStatus = FORM_EDITABLE_STATUS.EDITING_NO_CONVERT,
     columnNumberOneRow = 1,
     currentCreateFormRef,
+    hideRequiredMark,
   } = props;
   const [tradeInfo, settradeInfo] = useState({});
   const [tradeTableData, settradeTableData] = useState([]);
@@ -226,6 +227,7 @@ const BookingBaseInfoForm = memo<any>(props => {
         </Loading>
       </Modal>
       <Form2
+        hideRequiredMark={hideRequiredMark}
         ref={node => (currentCreateFormRef ? currentCreateFormRef(node) : null)}
         columnNumberOneRow={columnNumberOneRow}
         footer={false}
@@ -270,6 +272,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                         editing,
                         defaultOpen: editing ? false : true,
                         showSearch: true,
+                        allowClear: true,
                         fetchOptionsOnSearch: true,
                         placeholder: '请输入内容搜索',
                         options: async (value: string = '') => {
@@ -335,6 +338,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                               editing,
                               fetchOptionsOnSearch: true,
                               showSearch: true,
+                              allowClear: true,
                               placeholder: '请输入内容搜索',
                               options: async (value: string = '') => {
                                 const { data, error } = await refSimilarLegalNameList({

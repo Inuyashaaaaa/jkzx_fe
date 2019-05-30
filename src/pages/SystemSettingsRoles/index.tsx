@@ -1,6 +1,6 @@
-import SourceTable from '@/lib/components/_SourceTable';
-import Table from '@/lib/components/_Table2';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import SourceTable from '@/containers/_SourceTable';
+import Table from '@/containers/_Table2';
+import Page from '@/containers/Page';
 import {
   authRolesList,
   createRole,
@@ -53,6 +53,7 @@ const pagesCollection = [
   'tradingStatements',
   'fundsDetailedStatements',
   'customerFundsSummaryStatements',
+  'reportsCustomManagement',
   'riskManager',
   'intradayPositionReport',
   'intradayRiskByUnderlyerReport',
@@ -156,7 +157,7 @@ class SystemSettingsPermissions extends PureComponent {
   };
 
   public onCreateRole = async event => {
-    // console.log(event);
+    //
     return createRole(event.createFormData).then(rp => {
       if (rp.error) return false;
       this.fetchTable();
@@ -214,7 +215,7 @@ class SystemSettingsPermissions extends PureComponent {
   public render() {
     const { roles, loading, displayResources, choosedRole } = this.state;
     return (
-      <PageHeaderWrapper>
+      <Page>
         {!displayResources && (
           <SourceTable
             loading={loading}
@@ -266,7 +267,7 @@ class SystemSettingsPermissions extends PureComponent {
             <ResourceManagement info={{ type: 'role', detail: choosedRole }} />
           </div>
         )}
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

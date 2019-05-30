@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 // 查询交易薄
 export async function queryNonGroupResource(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {

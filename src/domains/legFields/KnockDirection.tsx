@@ -4,7 +4,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
 } from '@/constants/common';
-import { Form2, Select } from '@/design/components';
+import { Form2, Select } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Icon, Tooltip } from 'antd';

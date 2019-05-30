@@ -1,7 +1,7 @@
 import { HOST_TEST } from '@/constants/global';
-import request from '@/lib/utils/request';
+import request from '@/tools/request';
 
-export async function authRolesList(params = {}, token) {
+export async function authRolesList(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     token,
     method: `POST`,
@@ -42,7 +42,7 @@ export async function deleteRole(params = {}) {
   });
 }
 
-export async function queryAllPagePermissions(params = {}, token) {
+export async function queryAllPagePermissions(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     token,
     method: `POST`,
@@ -53,7 +53,7 @@ export async function queryAllPagePermissions(params = {}, token) {
   });
 }
 
-export async function queryRolePagePermissions(params = {}, token) {
+export async function queryRolePagePermissions(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     token,
     method: `POST`,
@@ -84,7 +84,7 @@ export async function authPagePermissionGetByRoleId(params = {}) {
   });
 }
 
-export async function initPagePermissions(token) {
+export async function initPagePermissions(token?) {
   return Promise.all([
     queryRolePagePermissions({}, token),
     queryAllPagePermissions({}, token),

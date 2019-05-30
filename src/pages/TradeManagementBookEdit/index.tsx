@@ -1,14 +1,20 @@
-import { LCM_EVENT_TYPE_ZHCN_MAP, LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
+import {
+  LCM_EVENT_TYPE_ZHCN_MAP,
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  BIG_NUMBER_CONFIG,
+} from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import BookingBaseInfoForm from '@/containers/BookingBaseInfoForm';
 import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import { Form2, Loading } from '@/design/components';
-import { ITableData } from '@/design/components/type';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { Form2, Loading } from '@/containers';
+import { ITableData } from '@/components/type';
+import Page from '@/containers/Page';
 import { trdTradeGet } from '@/services/general-service';
+import { mktInstrumentInfo } from '@/services/market-data-service';
 import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
@@ -18,7 +24,8 @@ import { connect } from 'dva';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
-import './index.less';
+import styles from './index.less';
+import BigNumber from 'bignumber.js';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
@@ -68,8 +75,33 @@ const TradeManagementBooking = props => {
 
     const { positions } = data;
 
-    const composePositions = await Promise.all(
+    const unitPositions = await Promise.all(
       positions.map(position => {
+        return mktInstrumentInfo({
+          instrumentId: position.asset[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
+        }).then(rsp => {
+          const { error, data } = rsp;
+          if (error || data.instrumentInfo.unit === undefined) {
+            return {
+              ...position,
+              asset: {
+                ...position.asset,
+                [LEG_FIELD.UNIT]: '-',
+              },
+            };
+          }
+          return {
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.UNIT]: data.instrumentInfo.unit,
+            },
+          };
+        });
+      })
+    );
+    const composePositions = await Promise.all(
+      unitPositions.map(position => {
         return trdTradeLCMUnwindAmountGet({
           tradeId: tableFormData.tradeId,
           positionId: position.positionId,
@@ -80,6 +112,7 @@ const TradeManagementBooking = props => {
             ...position,
             asset: {
               ...position.asset,
+              [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
               [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
               [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
             },
@@ -92,6 +125,21 @@ const TradeManagementBooking = props => {
     setCreateFormData(Form2.createFields(tableFormData));
     mockAddLegItem(composePositions, tableFormData);
     fetchEventType(composePositions);
+  };
+
+  const handleTradeNumber = position => {
+    const record = position.asset;
+    const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
+    const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+    const notional =
+      notionalAmountType === 'LOT'
+        ? notionalAmount
+        : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+    return new BigNumber(notional)
+      .multipliedBy(multipler)
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber();
   };
 
   const mockAddLegItem = async (composePositions, tableFormData) => {
@@ -149,23 +197,24 @@ const TradeManagementBooking = props => {
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
-    <PageHeaderWrapper back={true}>
+    <Page back={true} title={'交易详情'}>
       {tableLoading ? (
         <Skeleton active={true} paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
           <Divider />
-          <Loading loading={tableLoading}>
+          <div className={styles.bookingBaseInfoFormWrapper}>
             <BookingBaseInfoForm
+              hideRequiredMark={true}
               columnNumberOneRow={2}
               editableStatus={FORM_EDITABLE_STATUS.SHOW}
               createFormData={createFormData}
               setCreateFormData={setCreateFormData}
             />
-          </Loading>
-          <Typography.Title style={{ marginTop: 20 }} level={4}>
-            交易结构信息
+          </div>
+          <Typography.Title style={{ marginTop: 40 }} level={4}>
+            结构信息
           </Typography.Title>
           <Divider />
           <MultiLegTable
@@ -222,7 +271,7 @@ const TradeManagementBooking = props => {
         </>
       )}
       <ActionBar tableData={tableData} />
-    </PageHeaderWrapper>
+    </Page>
   );
 };
 

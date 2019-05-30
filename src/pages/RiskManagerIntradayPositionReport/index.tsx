@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
 import { socketHOC } from '@/tools/socketHOC';
+import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
 
 const Wrapper = socketHOC('VALUATION')(RiskCommonTable);
 
@@ -17,7 +18,8 @@ const RiskManagerIntradayPositionReport = memo<any>(props => {
       defaultDirection={'desc'}
       searchMethod={rptIntradayTradeReportSearchPaged}
       downloadName={'持仓明细'}
-      scrollWidth={3320}
+      scrollWidth={3450}
+      colSwitch={[{ dataIndex: 'productType', options: PRODUCTTYPE_ZHCH_MAP }]}
     />
   );
 });

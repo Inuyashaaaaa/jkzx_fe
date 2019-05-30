@@ -1,8 +1,8 @@
 import { PROCESS_STATUS_TYPE_MAP, PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Table2 } from '@/design/components';
-import Form from '@/design/components/Form';
-import { IFormControl } from '@/design/components/Form/types';
+import { Table2 } from '@/containers';
+import Form from '@/containers/Form';
+import { IFormControl } from '@/containers/Form/types';
 import { wkProcessInstanceComplexList } from '@/services/approval';
 import { Switch } from 'antd';
 import _ from 'lodash';
@@ -28,7 +28,7 @@ class Related extends PureComponent {
     });
     const { error, data } = await wkProcessInstanceComplexList({
       processInstanceUserPerspective: this.state.type,
-      keyword:
+      processInstanceStatus:
         this.state.formData.status && this.state.formData.status.length
           ? this.state.formData.status
           : _.values(PROCESS_STATUS_TYPE_MAP),

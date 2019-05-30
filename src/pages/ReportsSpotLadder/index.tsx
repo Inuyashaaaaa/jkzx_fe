@@ -1,16 +1,12 @@
-import {
-  ASSET_CLASS_ZHCN_MAP,
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  INPUT_NUMBER_LOT_CONFIG,
-  INSTRUMENT_TYPE_ZHCN_MAP,
-} from '@/constants/common';
-import DownloadExcelButton from '@/containers/DownloadExcelButton';
+// import SourceTable from '@/containers/SourceTable';
+import { ASSET_CLASS_ZHCN_MAP, INSTRUMENT_TYPE_ZHCN_MAP } from '@/constants/common';
+import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2, Table2 } from '@/containers';
+import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderExcelButton';
+import Form from '@/containers/Form';
+import Page from '@/containers/Page';
 import RangeNumberInput from '@/containers/RangeNumberInput';
-import Form from '@/design/components/Form';
-import SourceTable from '@/design/components/SourceTable';
-import { IColDef } from '@/design/components/Table/types';
-import PageHeaderWrapper from '@/lib/components/PageHeaderWrapper';
+import { ITableColDef } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,
@@ -24,10 +20,11 @@ import {
 import { mktInstrumentInfo } from '@/services/market-data-service';
 import { prcSpotScenarios } from '@/services/pricing-service';
 import { trdBookListBySimilarBookName, trdInstrumentListByBook } from '@/services/trade-service';
-import { Card, Empty, Tabs } from 'antd';
+import { Card, Empty, Tabs, Divider } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import { TABLE_COL_DEFS, TABLE_FORM_CONTROLS } from './constants';
 
 const { TabPane } = Tabs;
 
@@ -36,7 +33,7 @@ class Component extends PureComponent<
   {
     instruments: any[];
     searchFormData: any;
-    tableColumnDefs: IColDef[];
+    tableColumnDefs: ITableColDef[];
     loading: boolean;
     underlyersOptions: any[];
   }
@@ -48,61 +45,9 @@ class Component extends PureComponent<
       loading: false,
       searchFormData: this.getInitialSearchFormData(),
       instruments: [],
-      tableColumnDefs: [
-        {
-          headerName: '标的物价格',
-          field: 'underlyerPrice',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: '价格',
-          field: 'price',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'PNL变动',
-          field: 'pnlChange',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'DELTA',
-          field: 'delta',
-          input: INPUT_NUMBER_LOT_CONFIG,
-        },
-        {
-          headerName: 'DELTA CASH',
-          field: 'deltaCash',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'GAMMA',
-          field: 'gamma',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
-        },
-        {
-          headerName: 'GAMMA CASH',
-          field: 'gammaCash',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'VEGA',
-          field: 'vega',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'THETA',
-          field: 'theta',
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        },
-        {
-          headerName: 'RHO_R',
-          field: 'rhoR',
-          input: INPUT_NUMBER_DIGITAL_CONFIG,
-        },
-      ],
+      tableColumnDefs: TABLE_COL_DEFS,
     };
   }
-
   public fetch = async () => {
     this.setState({
       loading: true,
@@ -295,88 +240,87 @@ class Component extends PureComponent<
   };
 
   public render() {
-    const headers = this.state.tableColumnDefs.map(item => item.headerName);
-    headers.unshift('');
-    const cols = this.state.tableColumnDefs.map(item => item.field);
-    cols.unshift('scenarioId');
+    const headers = this.state.tableColumnDefs.map(item => item.title);
+    // headers.unshift('');
+    const cols = this.state.tableColumnDefs.map(item => item.dataIndex);
+    // cols.unshift('scenarioId');
     const _data = this.handleData(this.state.instruments, cols, headers);
     return (
-      <PageHeaderWrapper title="标的物情景分析" card={false}>
-        <Card>
-          <Form
-            layout="inline"
-            onValueChange={this.onSearchFormChange}
-            dataSource={this.state.searchFormData}
-            submitText="分析"
-            resetable={false}
-            onSubmitButtonClick={this.fetch}
-            controls={[
-              {
-                field: 'bookId',
-                control: {
-                  label: '交易簿',
+      <Page title="标的物情景分析">
+        <Form
+          layout="inline"
+          onValueChange={this.onSearchFormChange}
+          dataSource={this.state.searchFormData}
+          submitText="分析"
+          resetable={false}
+          onSubmitButtonClick={this.fetch}
+          controls={[
+            {
+              field: 'bookId',
+              control: {
+                label: '交易簿',
+              },
+              input: {
+                type: 'select',
+                showSearch: true,
+                placeholder: '请输入内容搜索',
+                options: async (value: string = '') => {
+                  const { data, error } = await trdBookListBySimilarBookName({
+                    similarBookName: value,
+                  });
+                  if (error) return [];
+                  return _.union(data).map(item => ({
+                    label: item,
+                    value: item,
+                  }));
                 },
-                input: {
-                  type: 'select',
-                  showSearch: true,
-                  placeholder: '请输入内容搜索',
-                  options: async (value: string = '') => {
-                    const { data, error } = await trdBookListBySimilarBookName({
-                      similarBookName: value,
-                    });
-                    if (error) return [];
-                    return _.union(data).map(item => ({
-                      label: item,
-                      value: item,
-                    }));
+              },
+              decorator: {
+                rules: [
+                  {
+                    required: true,
                   },
-                },
-                decorator: {
-                  rules: [
-                    {
-                      required: true,
-                    },
-                  ],
-                },
+                ],
               },
-              {
-                field: 'underlyers',
-                control: {
-                  label: '标的物',
-                },
-                input: {
-                  type: 'select',
-                  mode: 'multiple',
-                  placeholder: '全部',
-                  showSearch: true,
-                  options: this.state.underlyersOptions,
-                  formatValue: val => val,
-                },
+            },
+            {
+              field: 'underlyers',
+              control: {
+                label: '标的物',
               },
-              {
-                field: 'priceRange',
-                control: {
-                  label: '价格范围(%)',
-                },
-                input: {
-                  type: RangeNumberInput,
-                },
+              input: {
+                type: 'select',
+                mode: 'multiple',
+                placeholder: '全部',
+                showSearch: true,
+                options: this.state.underlyersOptions,
+                formatValue: val => val,
               },
-              {
-                field: 'num',
-                control: {
-                  label: '情景个数',
-                },
-                input: {
-                  type: 'number',
-                },
+            },
+            {
+              field: 'priceRange',
+              control: {
+                label: '价格范围(%)',
               },
-            ]}
-          />
-        </Card>
-        <Card style={{ marginTop: 15 }} loading={this.state.loading}>
-          <DownloadExcelButton
-            style={{ margin: '10px 0' }}
+              input: {
+                type: RangeNumberInput,
+              },
+            },
+            {
+              field: 'num',
+              control: {
+                label: '情景个数',
+              },
+              input: {
+                type: 'number',
+              },
+            },
+          ]}
+        />
+        <Divider />
+        <Card loading={this.state.loading} bordered={false}>
+          <SpotLadderExcelButton
+            style={{ marginBottom: VERTICAL_GUTTER }}
             key="export"
             type="primary"
             data={{
@@ -387,57 +331,28 @@ class Component extends PureComponent<
             tabs={this.state.instruments.map(item => item.underlyerInstrumentId)}
           >
             导出Excel
-          </DownloadExcelButton>
+          </SpotLadderExcelButton>
           {this.state.instruments && !!this.state.instruments.length ? (
             <Tabs animated={false}>
               {this.state.instruments.map(item => {
                 return (
                   <TabPane tab={item.underlyerInstrumentId} key={item.underlyerInstrumentId}>
-                    <SourceTable
+                    <Form2
+                      columns={TABLE_FORM_CONTROLS}
+                      style={{ marginBottom: VERTICAL_GUTTER }}
+                      dataSource={Form2.createFields(
+                        _.pick(item, ['underlyerInstrumentId', 'assetClass', 'instrumentType'])
+                      )}
+                      footer={false}
+                      layout="inline"
+                    />
+                    <Table2
                       vertical={true}
-                      getHorizontalrColumnDef={this.getHorizontalrColumnDef}
-                      tableFormData={_.pick(item, [
-                        'underlyerInstrumentId',
-                        'assetClass',
-                        'instrumentType',
-                      ])}
-                      tableFormControls={[
-                        {
-                          control: {
-                            label: '标的物名称',
-                          },
-                          field: 'underlyerInstrumentId',
-                          input: {
-                            type: 'input',
-                            subtype: 'static',
-                          },
-                        },
-                        {
-                          control: {
-                            label: '资产类别',
-                          },
-                          field: 'assetClass',
-                          input: {
-                            type: 'input',
-                            subtype: 'static',
-                          },
-                        },
-                        {
-                          control: {
-                            label: '合约类型',
-                          },
-                          field: 'instrumentType',
-                          input: {
-                            type: 'input',
-                            subtype: 'static',
-                          },
-                        },
-                      ]}
                       pagination={false}
                       rowKey="scenarioId"
+                      bordered={true}
                       dataSource={item.tableDataSource}
-                      columnDefs={this.state.tableColumnDefs}
-                      autoSizeColumnsToFit={false}
+                      columns={TABLE_COL_DEFS}
                     />
                   </TabPane>
                 );
@@ -447,7 +362,7 @@ class Component extends PureComponent<
             <Empty style={{ padding: 100 }} description={<span>暂无分析结果</span>} />
           )}
         </Card>
-      </PageHeaderWrapper>
+      </Page>
     );
   }
 }

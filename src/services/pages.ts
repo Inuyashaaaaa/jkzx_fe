@@ -8,17 +8,16 @@ import {
   PREMIUM_TYPE_MAP,
   STRIKE_TYPES_MAP,
   UNIT_ENUM_MAP,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
-import { IFormControl } from '@/design/components/Form/types';
-import { uuid } from '@/design/utils';
+import { Form2 } from '@/containers';
+import { IFormControl } from '@/containers/Form/types';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
-import { getLegByType } from '@/tools';
+import { getLegByType, getMoment, uuid } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { getMoment } from '@/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { Form2 } from '@/design/components';
 
 export const createLegDataSourceItem = (leg: ILeg, env: string) => {
   return {
@@ -101,10 +100,6 @@ export const bookingTableFormControls: () => IFormControl[] = () => [
   },
 ];
 
-export const getAddLegItem = (leg: ILeg, dataSourceItem: any, isPricing = false) => {
-  return leg.getDefault(dataSourceItem, isPricing);
-};
-
 export const convertTradePositions = (tableDataSource, tableFormData, env) => {
   const positions: any[] = tableDataSource.map(dataSourceItem => {
     dataSourceItem = miniumlPercent(dataSourceItem);
@@ -115,8 +110,13 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       throw new Error('not found Leg type');
     }
 
+    const lcmEventType =
+      type === LEG_TYPE_MAP.AUTOCALL_PHOENIX && dataSourceItem[LEG_FIELD.ALREADY_BARRIER]
+        ? 'KNOCK_IN'
+        : 'OPEN';
+
     return {
-      lcmEventType: 'OPEN',
+      lcmEventType,
       positionAccountCode: 'empty',
       positionAccountName: 'empty',
       counterPartyAccountCode: 'empty',
@@ -125,6 +125,22 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       counterPartyName: tableFormData.counterPartyCode,
       ...leg.getPosition(env, dataSourceItem, tableDataSource),
     };
+  });
+
+  return positions;
+};
+
+export const convertPricingHistoryTradePositions = (tableDataSource, env) => {
+  const positions: any[] = tableDataSource.map(dataSourceItem => {
+    dataSourceItem = miniumlPercent(dataSourceItem);
+    const type = dataSourceItem[LEG_TYPE_FIELD];
+    const leg = getLegByType(type);
+
+    if (!leg) {
+      throw new Error('not found Leg type');
+    }
+
+    return leg.getPosition(env, dataSourceItem, tableDataSource);
   });
 
   return positions;

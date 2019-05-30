@@ -19,14 +19,10 @@ import {
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
-import { Form2 } from '@/design/components';
-import {
-  IFormField,
-  ITableData,
-  ITableTriggerCellFieldsChangeParams,
-} from '@/design/components/type';
+import { Form2 } from '@/containers';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import { getMoment } from '@/utils';
+import { getMoment } from '@/tools';
 import _ from 'lodash';
 import moment from 'moment';
 import {
@@ -64,12 +60,15 @@ import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
+import { Unit } from '../legFields/Unit';
 import { UpBarrier } from '../legFields/UpBarrier';
 import { UpBarrierType } from '../legFields/UpBarrierType';
 import { UpObservationStep } from '../legFields/UpObservationStep';
-import { commonLinkage } from '../tools';
+import { commonLinkage } from '../common';
+import { legPipeLine } from '../_utils';
+import { TradeNumber } from '../legFields/TradeNumber';
 
-export const AutoCallPhoenix: ILeg = {
+export const AutoCallPhoenix: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL_PHOENIX],
   type: LEG_TYPE_MAP.AUTOCALL_PHOENIX,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -77,6 +76,7 @@ export const AutoCallPhoenix: ILeg = {
     if (env === LEG_ENV.PRICING) {
       return [
         SpecifiedPrice,
+        EffectiveDate,
         Direction,
         UnderlyerInstrumentId,
         UnderlyerMultiplier,
@@ -100,6 +100,7 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierOptionsStrike,
         Term,
         ExpirationDate,
+        TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...TOTAL_COMPUTED_FIELDS,
       ];
@@ -139,6 +140,8 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierDate,
         DownBarrier,
         DownBarrierOptionsStrike,
+        Unit,
+        TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -177,6 +180,8 @@ export const AutoCallPhoenix: ILeg = {
         DownBarrierDate,
         DownBarrier,
         DownBarrierOptionsStrike,
+        Unit,
+        TradeNumber,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -214,6 +219,8 @@ export const AutoCallPhoenix: ILeg = {
       LEG_FIELD.UP_BARRIER_TYPE,
       AlreadyBarrier.dataIndex,
       LEG_FIELD.IS_ANNUAL,
+      LEG_FIELD.UNIT,
+      LEG_FIELD.TRADE_NUMBER,
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.AUTOCALL_PHOENIX;
@@ -222,13 +229,10 @@ export const AutoCallPhoenix: ILeg = {
       LEG_FIELD.IS_ANNUAL,
       ...COMPUTED_FIELDS,
     ]);
-    nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
+    // nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     if (!dataItem[AlreadyBarrier.dataIndex]) {
       nextPosition.asset[DownBarrierDate.dataIndex] = undefined;
-      nextPosition.lcmEventType = 'OPEN';
-    } else {
-      nextPosition.lcmEventType = 'KNOCK_IN';
     }
 
     nextPosition.asset.barrier = dataItem[LEG_FIELD.UP_BARRIER];
@@ -253,13 +257,12 @@ export const AutoCallPhoenix: ILeg = {
         ? nextPosition.asset.expirationDate
         : nextPosition.asset.settlementDate;
 
-    nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
-      (result, item) => {
+    nextPosition.asset.fixingObservations =
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce((result, item) => {
         result[item[OB_DAY_FIELD]] = item.price !== undefined ? item.price : null;
         return result;
-      },
-      {}
-    );
+      }, {});
 
     nextPosition.asset.annualized = true;
 
@@ -306,4 +309,4 @@ export const AutoCallPhoenix: ILeg = {
       setTableData
     );
   },
-};
+});

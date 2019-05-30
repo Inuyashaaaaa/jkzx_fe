@@ -3,7 +3,7 @@ import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
 } from '@/constants/common';
-import Form from '@/design/components/Form';
+import Form from '@/containers/Form';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { message, Modal } from 'antd';
 import { PureComponent } from 'react';

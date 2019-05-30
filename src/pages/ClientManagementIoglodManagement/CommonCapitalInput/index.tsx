@@ -1,5 +1,5 @@
-import Form from '@/design/components/Form';
-import ModalButton from '@/design/components/ModalButton';
+import Form from '@/containers/Form';
+import ModalButton from '@/containers/ModalButton';
 import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
 import {
   clientChangeCredit,

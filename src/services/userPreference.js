@@ -1,5 +1,5 @@
 import { HOST_TEST } from '@/constants/global';
-import { request } from '@/lib/utils';
+import { request } from '@/tools';
 
 export async function prefPreferenceExist(params = {}) {
   return request(`${HOST_TEST}user-preference-service/api/rpc`, {

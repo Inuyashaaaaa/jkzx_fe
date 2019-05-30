@@ -5,7 +5,7 @@ import {
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { Form2 } from '@/design/components';
+import { Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
