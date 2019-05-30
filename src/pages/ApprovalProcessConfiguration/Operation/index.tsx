@@ -488,7 +488,7 @@ const Operation = props => {
         <Alert
           message="如果不需要增删节点、调整节点顺序或修改节点名称，建议通过编辑节点来实现审批组或触发器的修改。"
           type="info"
-          showIcon
+          showIcon={true}
         />
         <Table2
           ref={node => (tableE1 = node)}
