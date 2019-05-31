@@ -29,11 +29,11 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
 
   public switchModal = () => {
     const data = _.mapValues(this.props.record, (value, key) => {
-      if ('maturity' === key) {
-        return moment(value);
+      if ('expirationTime' === key) {
+        return moment(value, 'HH:mm:ss');
       }
-      if (['expirationDate', 'expirationTime'].indexOf(key) !== -1) {
-        return moment(this.props.record.expirationDate + ' ' + this.props.record.expirationTime);
+      if (['maturity', 'expirationDate'].indexOf(key) !== -1) {
+        return moment(value);
       }
       return value;
     });
@@ -45,8 +45,22 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   };
 
   public composeInstrumentInfo = modalFormData => {
-    const instrumentInfoFields = ['multiplier', 'name', 'exchange', 'maturity'];
-    let instrumentInfoSomeFields = ['multiplier', 'name', 'exchange', 'maturity'];
+    modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
+    modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
+    const instrumentInfoFields = [
+      'multiplier',
+      'name',
+      'exchange',
+      'maturity',
+      'expirationDate',
+      'expirationTime',
+      'optionType',
+      'exerciseType',
+      'strike',
+      'multiplier',
+      'underlyerInstrumentId',
+    ];
+    let instrumentInfoSomeFields = instrumentInfoFields;
     if (modalFormData.instrumentType === 'INDEX') {
       instrumentInfoSomeFields = ['name', 'exchange'];
     }
