@@ -52,7 +52,7 @@ const ApprocalTriggerManagement = props => {
   };
 
   const handleOk = async () => {
-    let currentTriggerData = _.cloneDeep(currentTrigger);
+    const currentTriggerData = _.cloneDeep(currentTrigger);
     currentTriggerData.conditions = $formModel.value.map(item => Form2.getFieldsValue(item));
     const { data, error } = await wkTriggerConditionModify(currentTriggerData);
     if (error) return;
