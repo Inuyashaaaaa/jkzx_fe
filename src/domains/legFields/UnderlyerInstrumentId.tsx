@@ -1,15 +1,65 @@
-import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
+import { InputBase } from '@/components/type';
+import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { Input, Select } from '@/containers';
-import {
-  mktInstrumentSearch,
-  mktInstrumentWhitelistListPaged,
-  mktInstrumentWhitelistSearch,
-} from '@/services/market-data-service';
-import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
+import { Import2 } from '@/containers/InstrumentModalInput';
+import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
+import { getRequiredRule, legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
+import { Tag, Icon } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
-import { truncate } from 'fs';
+
+class InstrumentModalInput extends InputBase {
+  public state = {
+    visible: false,
+  };
+
+  public hideModal = () => {
+    this.setState({ visible: false });
+  };
+  public renderEditing() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        <div style={{ position: 'relative' }}>
+          {value.map((item, index) => {
+            return <Tag key="index">{item.underlyerInstrumentId}</Tag>;
+          })}
+          <Icon
+            type="alert"
+            onClick={() => {
+              this.setState({ visible: true });
+            }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+            }}
+          />
+        </div>
+
+        <Import2
+          visible={this.state.visible}
+          value={value}
+          onChange={onChange}
+          onValueChange={onValueChange}
+          hideModal={this.hideModal}
+        />
+      </>
+    );
+  }
+
+  public renderRendering() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        {value.map((item, index) => {
+          return <Tag key="index">{item.underlyerInstrumentId}</Tag>;
+        })}
+      </>
+    );
+  }
+}
 
 export const UnderlyerInstrumentId: ILegColDef = {
   title: '标的物',
@@ -31,7 +81,9 @@ export const UnderlyerInstrumentId: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          editing ? (
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN ? (
+            <InstrumentModalInput />
+          ) : editing ? (
             <Select
               defaultOpen={isBooking || isPricing}
               {...{

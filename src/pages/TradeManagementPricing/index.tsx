@@ -31,6 +31,13 @@ import {
   countStdDelta,
   countTheta,
   countVega,
+  countSpreadStdDelta,
+  countSpreadDelta,
+  countSpreadDeltaCash,
+  countSpreadGamma,
+  countSpreadGammaCash,
+  countSpreadVega,
+  countSpreadCega,
 } from '@/services/cash';
 import { convertTradePositions, createLegDataSourceItem } from '@/services/pages';
 import { prcTrialPositionsService } from '@/services/pricing';
@@ -48,7 +55,7 @@ import './index.less';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
-const TradeManagementBooking = props => {
+const TradeManagementPricing = props => {
   const tableData = _.map(props.pricingData.tableData, iitem => {
     return _.mapValues(iitem, (item, key) => {
       if (_.includes(DATE_ARRAY, key)) {
@@ -348,6 +355,78 @@ const TradeManagementBooking = props => {
 
           if (item == null) return record;
 
+          console.log(record);
+          if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.VANILLA_AMERICAN) {
+            return {
+              ...record,
+              ...Form2.createFields({
+                ..._.mapValues(_.pick(item, TRADESCOL_FIELDS), (val, key) => {
+                  val = new BigNumber(val)
+                    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                    .toNumber();
+                  if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
+                    return val;
+                  }
+                  return val
+                    ? new BigNumber(val)
+                        .multipliedBy(100)
+                        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                        .toNumber()
+                    : val;
+                }),
+                [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
+                [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
+                  item.price,
+                  getActualNotionAmountBigNumber(Form2.getFieldsValue(record))
+                ),
+                // [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countSpreadStdDelta(
+                //   item.delta,
+                //   item.delta,
+                //   item.quantity
+                // ),
+                [COMPUTED_LEG_FIELD_MAP.DELTA]: countSpreadDelta(
+                  item.delta,
+                  item.delta,
+                  Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER])
+                ),
+                [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(
+                  item.delta,
+                  item.underlyerPrice
+                ),
+                [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
+                  item.gamma,
+                  Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]),
+                  item.underlyerPrice
+                ),
+                [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),
+                [COMPUTED_LEG_FIELD_MAP.VEGA]: countVega(item.vega),
+                [COMPUTED_LEG_FIELD_MAP.THETA]: countTheta(item.theta),
+                [COMPUTED_LEG_FIELD_MAP.RHO_R]: countRhoR(item.rhoR),
+                [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
+                // [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countSpreadDeltaCash(
+                //   item.delta1,
+                //   item.delta2,
+                //   Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_PRICE])
+                // ),
+                // [COMPUTED_LEG_FIELD_MAP.GAMMA]: countSpreadGamma(
+                //   item.gamma1,
+                //   item.gamma2,
+                //   Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]),
+                //   Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]),
+                //   Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_PRICE])
+                // ),
+                // [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countSpreadGammaCash(
+                //   item.gamma1,
+                //   item.gamma2,
+                //   Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_PRICE])
+                // ),
+                // [COMPUTED_LEG_FIELD_MAP.VEGA]: countSpreadVega(item.vega1, item.vega2),
+                // [COMPUTED_LEG_FIELD_MAP.THETA]: countTheta(item.theta),
+                // [COMPUTED_LEG_FIELD_MAP.RHO_R]: countRhoR(item.rhoR),
+                // [COMPUTED_LEG_FIELD_MAP.CEGA]: countSpreadCega(item.cega),
+              }),
+            };
+          }
           return {
             ...record,
             ...Form2.createFields({
@@ -497,5 +576,5 @@ export default memo(
     pricingData: state.pricingData,
     tradeManagementBookEditPageData: state.tradeManagementBookEdit,
     tradeManagementPricingManagement: state.tradeManagementPricingManagement,
-  }))(TradeManagementBooking)
+  }))(TradeManagementPricing)
 );

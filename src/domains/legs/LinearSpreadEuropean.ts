@@ -1,13 +1,10 @@
-import { getMoment } from '@/tools';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
-  PAYMENT_TYPE_MAP,
-  OBSERVATION_TYPE_MAP,
-  REBATETYPE_TYPE_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -17,11 +14,12 @@ import {
 import {
   LEG_ENV,
   GENERAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
+  TOTAL_COMPUTED_FIELDS,
   TOTAL_EDITING_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
+import { getMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -32,15 +30,13 @@ import {
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '../../constants/common';
+import { commonLinkage } from '../common';
 import { Direction } from '../legFields';
 import { DaysInYear } from '../legFields/DaysInYear';
+import { DynamicUnderlyer } from '../legFields/DynamicUnderlyer';
 import { EffectiveDate } from '../legFields/EffectiveDate';
 import { ExpirationDate } from '../legFields/ExpirationDate';
 import { FrontPremium } from '../legFields/FrontPremium';
-import { AlUnwindNotionalAmount } from '../legFields/infos/AlUnwindNotionalAmount';
-import { InitialNotionalAmount } from '../legFields/infos/InitialNotionalAmount';
-import { LcmEventType } from '../legFields/infos/LcmEventType';
-import { PositionId } from '../legFields/infos/PositionId';
 import { InitialSpot } from '../legFields/InitialSpot';
 import { IsAnnual } from '../legFields/IsAnnual';
 import { MinimumPremium } from '../legFields/MinimumPremium';
@@ -57,46 +53,38 @@ import { StrikeType } from '../legFields/StrikeType';
 import { Term } from '../legFields/Term';
 import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../common';
-import { PaymentType } from '../legFields/PaymentType';
-import { Payment } from '../legFields/Payment';
-import { RebateType } from '../legFields/RebateType';
-import { ObservationType } from '../legFields/ObservationType';
-import { Unit } from '../legFields/Unit';
 import { legPipeLine } from '../_utils';
-import { TradeNumber } from '../legFields/TradeNumber';
+import { Weight } from '../legFields/Weight';
+import { Cega } from '../legFields/computed/Cega';
 
-export const DigitalLegAmerican: ILeg = legPipeLine({
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DIGITAL_AMERICAN],
-  type: LEG_TYPE_MAP.DIGITAL_AMERICAN,
+export const LinearSpreadEuropean: ILeg = legPipeLine({
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN],
+  type: LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
       return [
-        IsAnnual,
         Direction,
-        EffectiveDate,
         NotionalAmountType,
-        StrikeType,
         InitialSpot,
         UnderlyerMultiplier,
-        UnderlyerInstrumentId,
+        // UnderlyerInstrumentId,
         OptionType,
+        StrikeType,
+        EffectiveDate,
         Strike,
         Term,
         ExpirationDate,
-        Payment,
         ParticipationRate,
         NotionalAmount,
-        ObservationType,
-        TradeNumber,
+        SpecifiedPrice,
+        // Weight,
         ...TOTAL_TRADESCOL_FIELDS,
-        ...GENERAL_COMPUTED_FIELDS,
+        ...TOTAL_COMPUTED_FIELDS,
       ];
     }
     if (env === LEG_ENV.EDITING) {
       return [
-        IsAnnual,
         Direction,
         OptionType,
         UnderlyerInstrumentId,
@@ -105,31 +93,23 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         StrikeType,
         Strike,
         Term,
+        EffectiveDate,
+        ExpirationDate,
         SpecifiedPrice,
-        SettlementDate,
         DaysInYear,
+        SettlementDate,
         ParticipationRate,
         NotionalAmountType,
         NotionalAmount,
-        PaymentType,
-        Payment,
         PremiumType,
         Premium,
-        FrontPremium,
         MinimumPremium,
-        ExpirationDate,
-        // ExpirationTime,
-        EffectiveDate,
-        ObservationType,
-        RebateType,
-        Unit,
-        TradeNumber,
+        FrontPremium,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
     if (env === LEG_ENV.BOOKING) {
       return [
-        IsAnnual,
         Direction,
         OptionType,
         UnderlyerInstrumentId,
@@ -138,52 +118,44 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         StrikeType,
         Strike,
         Term,
+        EffectiveDate,
+        ExpirationDate,
         SpecifiedPrice,
-        SettlementDate,
         DaysInYear,
+        SettlementDate,
         ParticipationRate,
         NotionalAmountType,
         NotionalAmount,
-        PaymentType,
-        Payment,
         PremiumType,
         Premium,
-        FrontPremium,
         MinimumPremium,
-        ExpirationDate,
-        EffectiveDate,
-        ObservationType,
-        RebateType,
-        Unit,
-        TradeNumber,
+        FrontPremium,
+        Weight,
+        // DynamicUnderlyer,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
     return Form2.createFields({
-      // expirationTime: '15:00:00',
+      expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.EFFECTIVE_DATE]: moment(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
+      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
-      [LEG_FIELD.TERM]: DEFAULT_TERM,
-      [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-      [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
+      [LEG_FIELD.TERM]: DEFAULT_TERM,
       ...(env === LEG_ENV.PRICING
         ? {
             [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
-      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.CONTINUOUS,
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
@@ -200,7 +172,7 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
       'tradeNumber',
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.DIGITAL;
+    nextPosition.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       LEG_FIELD.IS_ANNUAL,
@@ -225,7 +197,7 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
+    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
 
     return nextPosition;

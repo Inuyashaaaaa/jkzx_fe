@@ -486,6 +486,7 @@ export const LEG_FIELD = {
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
+  WEIGHT: 'weight',
   IS_ANNUAL: 'annualized', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
   DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
@@ -572,6 +573,7 @@ export const LEG_FIELD = {
   COMMENT: 'comment',
   UNIT: 'unit',
   TRADE_NUMBER: 'tradeNumber',
+  DYNAMIC_UNDERLYER: 'dynamicUnderlyer',
 };
 
 /**
@@ -710,6 +712,7 @@ export const LEG_TYPE_MAP = {
   MODEL_XY_UNANNUAL: 'MODEL_XY_UNANNUAL',
   FORWARD: 'FORWARD',
   FORWARD_UNANNUAL: 'FORWARD_UNANNUAL',
+  LINEAR_SPREAD_EUROPEAN: 'LINEAR_SPREAD_EUROPEAN',
 };
 
 export const PRODUCT_TYPE_MAP = {
@@ -783,6 +786,7 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.MODEL_XY_UNANNUAL]: '自定义产品 - 非年化',
   [LEG_TYPE_MAP.FORWARD]: '远期',
   [LEG_TYPE_MAP.FORWARD_UNANNUAL]: '远期 - 非年化',
+  [LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN]: '价差欧式',
 };
 
 export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, LEG_TYPE_ZHCH_MAP);
@@ -809,6 +813,7 @@ export const PRODUCTTYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.TRIPLE_DIGITAL]: '四层阶梯',
   [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间累积',
   [LEG_TYPE_MAP.STRADDLE]: '跨式',
+  [LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN]: '价差欧式',
 };
 
 export const PRODUCTTYPE_MAP = {
@@ -833,6 +838,7 @@ export const PRODUCTTYPE_MAP = {
   TRIPLE_DIGITAL: 'TRIPLE_DIGITAL',
   RANGE_ACCRUALS: 'RANGE_ACCRUALS',
   STRADDLE: 'STRADDLE',
+  LINEAR_SPREAD_EUROPEAN: 'LINEAR_SPREAD_EUROPEAN',
 };
 
 export const PRODUCTTYPE_OPTIONS = convertOptions(PRODUCTTYPE_MAP, PRODUCTTYPE_ZHCH_MAP);

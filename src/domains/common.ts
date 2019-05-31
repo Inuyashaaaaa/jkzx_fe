@@ -3,6 +3,8 @@ import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
+  LEG_TYPE_MAP,
+  LEG_TYPE_FIELD,
 } from '@/constants/common';
 import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
@@ -25,6 +27,11 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
+    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN) {
+      const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+      return;
+    }
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
     const curLegHasUnitField = !!getLegByRecord(record)
@@ -77,6 +84,13 @@ const fetchInitialSpot = _.debounce(
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
+    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN) {
+      const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
+      record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
+      record[LEG_FIELD.WEIGHT] = Form2.createField(value);
+      return;
+    }
+
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
     setColLoading(LEG_FIELD.INITIAL_SPOT, true);
@@ -148,6 +162,7 @@ export const commonLinkage = (
   setTableData: (newData: ITableData[]) => void
 ) => {
   const { changedFields } = changeFieldsParams;
+
   if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
     fetchUnderlyerMultiplierAndUnit(
       env,

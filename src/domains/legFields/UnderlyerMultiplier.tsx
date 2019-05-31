@@ -1,9 +1,64 @@
-import { LEG_FIELD } from '@/constants/common';
+import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { InputNumber } from '@/containers';
 import { getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
+import { InputBase } from '@/components/type';
+import { Tag, Icon } from 'antd';
 import React from 'react';
+import { Import2 } from '@/containers/InstrumentModalInput';
+
+class MultiplierModalInput extends InputBase {
+  public state = {
+    visible: false,
+  };
+
+  public hideModal = () => {
+    this.setState({ visible: false });
+  };
+  public renderEditing() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        <div style={{ position: 'relative' }}>
+          {value.map((item, index) => {
+            return <Tag key="index">{item.underlyerMultiplier}</Tag>;
+          })}
+          <Icon
+            type="alert"
+            onClick={() => {
+              this.setState({ visible: true });
+            }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 10,
+            }}
+          />
+        </div>
+
+        <Import2
+          visible={this.state.visible}
+          value={value}
+          onChange={onChange}
+          onValueChange={onValueChange}
+          hideModal={this.hideModal}
+        />
+      </>
+    );
+  }
+
+  public renderRendering() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        {value.map((item, index) => {
+          return <Tag key="index">{item.underlyerMultiplier}</Tag>;
+        })}
+      </>
+    );
+  }
+}
 
 export const UnderlyerMultiplier: ILegColDef = {
   title: '合约乘数',
@@ -17,7 +72,13 @@ export const UnderlyerMultiplier: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<InputNumber editing={false} />)}
+        })(
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN ? (
+            <MultiplierModalInput />
+          ) : (
+            <InputNumber editing={false} />
+          )
+        )}
       </FormItem>
     );
   },

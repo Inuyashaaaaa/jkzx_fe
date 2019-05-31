@@ -24,7 +24,7 @@ import {
 } from '@/constants/global';
 import {
   LEG_ENV,
-  TOTAL_COMPUTED_FIELDS,
+  GENERAL_COMPUTED_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
@@ -105,7 +105,7 @@ export const DoubleDigital: ILeg = legPipeLine({
         HighPayment,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
-        ...TOTAL_COMPUTED_FIELDS,
+        ...GENERAL_COMPUTED_FIELDS,
       ];
     }
     if (env === LEG_ENV.EDITING) {

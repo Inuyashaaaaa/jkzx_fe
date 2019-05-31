@@ -1,14 +1,13 @@
-import { LEG_FIELD, RULES_REQUIRED, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
-import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
 import { InputBase } from '@/components/type';
+import { LEG_FIELD } from '@/constants/common';
 import { Import2 } from '@/containers/InstrumentModalInput';
-import { Tag, Icon } from 'antd';
+import { getRequiredRule, legEnvIsBooking, legEnvIsPricing } from '@/tools';
+import { ILegColDef } from '@/types/leg';
+import { Icon, Tag } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
-class InstrumentModalInput extends InputBase {
+class WeightModalInput extends InputBase {
   public state = {
     visible: false,
   };
@@ -22,7 +21,7 @@ class InstrumentModalInput extends InputBase {
       <>
         <div style={{ position: 'relative' }}>
           {value.map((item, index) => {
-            return <Tag key="index">{item.initialSpot}</Tag>;
+            return <Tag key="index">{item.weight}</Tag>;
           })}
           <Icon
             type="alert"
@@ -53,16 +52,16 @@ class InstrumentModalInput extends InputBase {
     return (
       <>
         {value.map((item, index) => {
-          return <Tag key="index">{item.initialSpot}</Tag>;
+          return <Tag key="index">{item.weight}</Tag>;
         })}
       </>
     );
   }
 }
 
-export const InitialSpot: ILegColDef = {
-  title: '期初价格',
-  dataIndex: LEG_FIELD.INITIAL_SPOT,
+export const Weight: ILegColDef = {
+  title: '权重',
+  dataIndex: LEG_FIELD.WEIGHT,
   editable: record => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -74,40 +73,13 @@ export const InitialSpot: ILegColDef = {
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
+    editing = isBooking || isPricing ? editing : false;
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(
-          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN ? (
-            <InstrumentModalInput />
-          ) : (
-            <UnitInputNumber
-              autoSelect={isBooking || isPricing}
-              editing={isBooking || isPricing ? editing : false}
-            />
-          )
-        )}
+        })(<WeightModalInput editing={editing} record={record} />)}
       </FormItem>
     );
   },
-  //   getValue: {
-  //     depends: [LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
-  //     value: record => {
-  //       return mktQuotesListPaged({
-  //         instrumentIds: [record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID]],
-  //       }).then(rsp => {
-  //         if (rsp.error) return undefined;
-  //         return new BigNumber(
-  //           _.chain(rsp)
-  //             .get('data.page[0]')
-  //             .omitBy(_.isNull)
-  //             .get('last', 1)
-  //             .value()
-  //         )
-  //           .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-  //           .toNumber();
-  //       });
-  //     },
-  //   },
 };
