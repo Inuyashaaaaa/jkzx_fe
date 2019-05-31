@@ -5,6 +5,7 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
+  DATE_ARRAY,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -45,8 +46,6 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import './index.less';
-
-const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
 const TradeManagementBooking = props => {
   const tableData = _.map(props.pricingData.tableData, iitem => {

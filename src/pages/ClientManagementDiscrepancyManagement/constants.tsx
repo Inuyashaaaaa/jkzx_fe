@@ -78,6 +78,7 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
             <Select
               showSearch={true}
               allowClear={true}
+              fetchOptionsOnSearch={true}
               options={async (value: string = '') => {
                 const { data, error } = await refSimilarLegalNameList({
                   similarLegalName: value,
@@ -198,6 +199,7 @@ export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
               style={{ minWidth: 180 }}
               showSearch={true}
               allowClear={true}
+              fetchOptionsOnSearch={true}
               options={async (value: string = '') => {
                 const { data, error } = await refSimilarLegalNameList({
                   similarLegalName: value,
@@ -225,6 +227,7 @@ export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
               style={{ minWidth: 180 }}
               showSearch={true}
               allowClear={true}
+              fetchOptionsOnSearch={true}
               options={async (value: string = '') => {
                 const { data, error } = await refMasterAgreementSearch({
                   masterAgreementId: value,

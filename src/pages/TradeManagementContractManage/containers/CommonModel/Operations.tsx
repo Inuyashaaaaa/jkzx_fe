@@ -94,7 +94,7 @@ class Operations extends PureComponent<{
       const tableFormData = getTradeCreateModalData(this.props.record);
       const leg = getLegByProductType(
         this.props.record.productType,
-        this.props.record.exerciseType
+        this.props.record.asset.exerciseType
       );
       const record = createLegRecordByPosition(leg, position, LEG_ENV.BOOKING);
 

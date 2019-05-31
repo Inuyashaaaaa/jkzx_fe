@@ -20,16 +20,22 @@ const ReportsCustomManagement = memo<any>(props => {
       valuationDate: [moment().subtract(1, 'day'), moment()],
     }),
   });
-
-  const pagination = {
+  const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 20,
     total: 1,
-  };
+  });
+  // const pagination = {
+  //   page: 1,
+  //   pageSize: 20,
+  //   total: 1,
+  // };
   const [tabelData, setTabelData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const OnSearch = async (searchData, currentPage) => {
+    // const { error: verror } = await formSearch.validate();
+    // if (verror) return;
     searchData = Form2.getFieldsValue(searchData);
     const formValues = {
       startDate: _.get(searchData, 'valuationDate[0]').format('YYYY-MM-DD'),
@@ -48,16 +54,21 @@ const ReportsCustomManagement = memo<any>(props => {
     setTabelData(data.page);
   };
 
-  const onPagination = (current, pageSize) => {
-    OnSearch(searchFormData, { current, pageSize });
+  const onPagination = (page, pageSize) => {
+    setPagination({
+      ...pagination,
+      page,
+      pageSize,
+    });
+    OnSearch(searchFormData, { page, pageSize });
   };
 
-  const handlePaninationChange = (current, pageSize) => {
-    onPagination(current, pageSize);
+  const handlePaninationChange = (page, pageSize) => {
+    onPagination(page, pageSize);
   };
 
-  const handleShowSizeChange = (current, pageSize) => {
-    onPagination(current, pageSize);
+  const handleShowSizeChange = (page, pageSize) => {
+    onPagination(page, pageSize);
   };
 
   useLifecycles(() => {
@@ -70,13 +81,11 @@ const ReportsCustomManagement = memo<any>(props => {
         <Form2
           ref={node => (formSearch = node)}
           onResetButtonClick={() => {
-            const _search = {
-              ...Form2.createFields({
-                reportName: '',
-                reportType: '',
-                valuationDate: [moment().subtract(1, 'day'), moment()],
-              }),
-            };
+            const _search = Form2.createFields({
+              reportName: '',
+              reportType: '',
+              valuationDate: [moment().subtract(1, 'day'), moment()],
+            });
             setSearchFormData(_search);
             OnSearch(_search, pagination);
           }}
@@ -99,10 +108,10 @@ const ReportsCustomManagement = memo<any>(props => {
                   <FormItem>
                     {form.getFieldDecorator({})(
                       <Select
+                        filterOption={true}
                         style={{ minWidth: 180 }}
                         placeholder="请输入内容搜索"
                         allowClear={true}
-                        fetchOptionsOnSearch={true}
                         showSearch={true}
                         options={async value => {
                           const { data, error } = await rptCustomReportNameList({});
@@ -148,7 +157,13 @@ const ReportsCustomManagement = memo<any>(props => {
               title: '报告日期',
               dataIndex: 'valuationDate',
               render: (value, record, index, { form, editing }) => {
-                return <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>;
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true }],
+                    })(<RangePicker allowClear={false} />)}
+                  </FormItem>
+                );
               },
             },
           ]}

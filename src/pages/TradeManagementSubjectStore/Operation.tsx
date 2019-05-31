@@ -59,8 +59,13 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public onEdit = async () => {
     const rsp = await this.$form.validate();
     if (rsp.error) return;
-    const editFormData = Form2.getFieldsValue(this.state.editFormData);
-    const { error, data } = await mktInstrumentCreate(this.composeInstrumentInfo(editFormData));
+    let editFormData = Form2.getFieldsValue(this.state.editFormData);
+    editFormData = this.composeInstrumentInfo(editFormData);
+    editFormData.instrumentInfo.maturity = isMoment(editFormData.instrumentInfo.maturity)
+      ? moment(editFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
+      : editFormData.instrumentInfo.maturity;
+
+    const { error, data } = await mktInstrumentCreate(editFormData);
     if (error) {
       message.error('编辑失败');
       return;

@@ -212,7 +212,7 @@ export const AutoCallSnow: ILeg = legPipeLine({
       LEG_FIELD.IS_ANNUAL,
       ...COMPUTED_FIELDS,
     ]);
-    nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
+    // nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     if (
       nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
@@ -224,9 +224,9 @@ export const AutoCallSnow: ILeg = legPipeLine({
       nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
     }
 
-    nextPosition.asset.observationDates = dataItem[ExpireNoBarrierObserveDay.dataIndex].map(
-      item => item[OB_DAY_FIELD]
-    );
+    nextPosition.asset.observationDates =
+      dataItem[ExpireNoBarrierObserveDay.dataIndex] &&
+      dataItem[ExpireNoBarrierObserveDay.dataIndex].map(item => item[OB_DAY_FIELD]);
 
     nextPosition.asset.barrier = dataItem[LEG_FIELD.UP_BARRIER];
     nextPosition.asset.barrierType = dataItem[LEG_FIELD.UP_BARRIER_TYPE];

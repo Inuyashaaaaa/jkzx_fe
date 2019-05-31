@@ -22,6 +22,7 @@ const RiskCommonTable = memo<any>(props => {
     scrollWidth,
     getReload,
     hideReload = false,
+    colSwitch = [],
   } = props;
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
@@ -191,6 +192,7 @@ const RiskCommonTable = memo<any>(props => {
               searchFormData: excelFormData,
               sortField,
             },
+            colSwitch,
           }}
         >
           导出Excel

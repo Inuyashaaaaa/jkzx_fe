@@ -385,6 +385,7 @@ class SourceList extends PureComponent<SourceListProps> {
       selectedRowKeys,
       removeable,
       onSearch,
+      searchable = true,
       ...rest
     } = this.props;
 
@@ -412,7 +413,9 @@ class SourceList extends PureComponent<SourceListProps> {
               modalContent={modalContent}
               onCreate={this.onCreate}
             />
-            <Input.Search onSearch={this.onSearch} style={{ marginTop: 10 }} />
+            {searchable ? (
+              <Input.Search onSearch={this.onSearch} style={{ marginTop: 10 }} />
+            ) : null}
           </>
         }
         renderItem={(data, index) => (

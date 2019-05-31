@@ -9,16 +9,22 @@ import {
   PRODUCTTYPE_OPTIONS,
   PRODUCTTYPE_ZHCH_MAP,
   STRIKE_TYPES_MAP,
+  BIG_NUMBER_CONFIG,
 } from '@/constants/common';
-import { TRADESCOLDEFS_LEG_FIELD_MAP, TRADESCOL_FIELDS, VERTICAL_GUTTER } from '@/constants/global';
+import {
+  TRADESCOLDEFS_LEG_FIELD_MAP,
+  TRADESCOL_FIELDS,
+  VERTICAL_GUTTER,
+  DEFAULT_TERM,
+} from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { DATE_LEG_FIELDS } from '@/constants/legType';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-import { createLegDataSourceItem } from '@/services/pages';
+import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
 import styles from '@/styles/index.less';
-import { formatMoney, getLegByProductType, formatNumber } from '@/tools';
+import { formatMoney, getLegByProductType, formatNumber, getMoment } from '@/tools';
 import {
   DatePicker,
   Divider,
@@ -35,6 +41,7 @@ import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { memo, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import BigNumber from 'bignumber.js';
 
 const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
 
@@ -135,6 +142,38 @@ const TradeManagementPricingManagement = props => {
     onPagination(current, pageSize);
   };
 
+  const handleTradescol = params => {
+    return _.mapValues(params, (value, key) => {
+      if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
+        return value;
+      }
+      return value ? new BigNumber(value).multipliedBy(100).toNumber() : value;
+    });
+  };
+
+  const handleTradeNumber = position => {
+    const record = position.asset;
+    if (
+      !record[LEG_FIELD.NOTIONAL_AMOUNT] ||
+      !record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] ||
+      !record[LEG_FIELD.UNDERLYER_MULTIPLIER] ||
+      !record[LEG_FIELD.INITIAL_SPOT]
+    ) {
+      return null;
+    }
+    const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
+    const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+    const notional =
+      notionalAmountType === 'LOT'
+        ? notionalAmount
+        : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+    return new BigNumber(notional)
+      .multipliedBy(multipler)
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber();
+  };
+
   useLifecycles(() => {
     onTradeTableSearch();
   });
@@ -144,12 +183,13 @@ const TradeManagementPricingManagement = props => {
       <Form2
         submitText="搜索"
         onSubmitButtonClick={() => {
-          onTradeTableSearch();
+          onTradeTableSearch({ paramsPagination: { current: 1, pageSize: 10 } });
         }}
         onResetButtonClick={() => {
           setSearchFormData({});
           onTradeTableSearch({
             paramsSearchFormData: {},
+            paramsPagination: { current: 1, pageSize: 10 },
           });
         }}
         onFieldsChange={(props, changedFields, allFields) => {
@@ -245,7 +285,7 @@ const TradeManagementPricingManagement = props => {
             },
           },
           {
-            title: '日期范围',
+            title: '到期日范围',
             dataIndex: RANGE_DATE_KEY,
             render: (value, record, index, { form, editing }) => {
               return <FormItem>{form.getFieldDecorator({})(<DatePicker.RangePicker />)}</FormItem>;
@@ -389,7 +429,7 @@ const TradeManagementPricingManagement = props => {
               },
               {
                 title: '起始日',
-                dataIndex: LEG_FIELD.EFFECTIVE_DATE,
+                dataIndex: `asset.${LEG_FIELD.EFFECTIVE_DATE}`,
                 width: 150,
               },
               {
@@ -403,12 +443,15 @@ const TradeManagementPricingManagement = props => {
                 width: 150,
                 render: (val, record) => {
                   if (val == null) return null;
-                  if (record[LEG_FIELD.STRIKE_TYPE] === STRIKE_TYPES_MAP.CNY) {
+                  if (
+                    _.get(record, `quotePositions[0].asset.${LEG_FIELD.STRIKE_TYPE}`) ===
+                    STRIKE_TYPES_MAP.CNY
+                  ) {
                     return formatMoney(val, {
                       unit: '￥',
                     });
                   }
-                  return `${val}%`;
+                  return `${new BigNumber(val).multipliedBy(100).toNumber()}%`;
                 },
               },
               {
@@ -417,7 +460,9 @@ const TradeManagementPricingManagement = props => {
                 width: 150,
                 render: (val, record) => {
                   if (val == null) return null;
-                  if (record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY) {
+                  if (
+                    record.asset[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+                  ) {
                     return formatMoney(val, {
                       unit: '￥',
                     });
@@ -430,7 +475,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
                 width: 150,
                 render: (val, record) => {
-                  return formatNumber(val, 2);
+                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
                 },
               },
               {
@@ -438,7 +483,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.R,
                 width: 150,
                 render: (val, record) => {
-                  return formatNumber(val, 2);
+                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
                 },
               },
               {
@@ -446,7 +491,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.Q,
                 width: 150,
                 render: (val, record) => {
-                  return formatNumber(val, 2);
+                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
                 },
               },
               {
@@ -480,18 +525,26 @@ const TradeManagementPricingManagement = props => {
                             }
                             return {
                               ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-                              ...Form2.createFields({
-                                ..._.mapValues(asset, (val, key) => {
-                                  if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
-                                    return moment(val);
-                                  }
-                                  return val;
-                                }),
-                                ..._.pick(position, TRADESCOL_FIELDS),
-                              }),
+                              ...backConvertPercent(
+                                Form2.createFields({
+                                  ..._.mapValues(asset, (val, key) => {
+                                    if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                                      return moment(val);
+                                    }
+                                    return val;
+                                  }),
+                                  ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
+                                  [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+                                  [LEG_FIELD.TERM]: asset.annualized
+                                    ? asset[LEG_FIELD.TERM]
+                                    : getMoment(asset[LEG_FIELD.EXPIRATION_DATE]).diff(
+                                        getMoment(asset[LEG_FIELD.EFFECTIVE_DATE]),
+                                        'days'
+                                      ),
+                                })
+                              ),
                             };
                           });
-
                           setTableData(next);
                           setVisible(false);
                         }}

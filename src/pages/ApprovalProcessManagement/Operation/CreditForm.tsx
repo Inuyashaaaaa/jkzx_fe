@@ -11,7 +11,11 @@ import {
 } from '@/services/approval';
 import moment from 'moment';
 import { Form2, Upload, Input as Input2, InputNumber } from '@/containers';
-import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
+import {
+  refBankAccountSearch,
+  refSimilarLegalNameList,
+  wkAttachmentProcessInstanceBind,
+} from '@/services/reference-data-service';
 import {
   Button,
   Icon,
@@ -62,10 +66,10 @@ class ApprovalForm extends PureComponent<any, any> {
       isCompleted: null,
     };
   }
-  public componentDidMount() {
+  public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
-  }
+  };
 
   public componentWillReceiveProps(nextProps) {
     const { formData, status } = nextProps;
@@ -122,7 +126,7 @@ class ApprovalForm extends PureComponent<any, any> {
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
     const _detailData = {
-      accountId: _.get(data, 'process._business_payload.accountId'),
+      legalName: _.get(data, 'process._business_payload.legalName'),
       salesName: _.get(data, 'process._business_payload.record.salesName'),
       normalStatus: _.get(data, 'process._business_payload.record.normalStatus'),
       credit: _.get(data, 'process._business_payload.record.credit'),
@@ -137,10 +141,10 @@ class ApprovalForm extends PureComponent<any, any> {
       credit: _.get(data, 'process._business_payload.credit'),
       counterPartyCredit: _.get(data, 'process._business_payload.counterPartyCredit'),
     };
-
     this.setState({
       detailData: Form2.createFields(_detailData),
       creditForm: Form2.createFields(_creditForm),
+      currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
     });
 
@@ -206,15 +210,15 @@ class ApprovalForm extends PureComponent<any, any> {
         ...Form2.getFieldsValue(this.state.creditForm),
       },
     };
-    return this.executeModify(param, 'modify');
-    // return this.confirmModify(e, {
-    //   taskId: this.props.formData.taskId,
-    //   ctlProcessData: this.state.res,
-    //   businessProcessData: {
-    //     ..._.get(data, 'process._business_payload'),
-    //     ...Form2.getFieldsValue(this.state.creditForm),
-    //   },
-    // });
+    this.executeModify(param, 'modify');
+
+    if (this.state.newAttachmentId) {
+      const { error: aerror, data: adata } = await wkAttachmentProcessInstanceBind({
+        attachmentId: this.state.newAttachmentId,
+        processInstanceId,
+      });
+      if (aerror) return true;
+    }
   };
 
   public queryBankAccount = async (data, status) => {
@@ -398,13 +402,16 @@ class ApprovalForm extends PureComponent<any, any> {
   public rejectForm = async () => {
     const { formData } = this.props;
     const { rejectReason } = this.state;
+    const { data, error } = await wkProcessInstanceFormGet({
+      processInstanceId: this.props.formData.processInstanceId,
+    });
     const params = {
       taskId: formData.taskId,
       ctlProcessData: {
         comment: rejectReason,
         confirmed: false,
       },
-      businessProcessData: {},
+      businessProcessData: _.get(data, 'process._business_payload'),
     };
     this.executeModify(params, 'reject');
   };
@@ -486,9 +493,11 @@ class ApprovalForm extends PureComponent<any, any> {
       rejectReason,
       passComment,
       modifyComment,
+      currentNodeDTO,
     } = this.state;
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
+
+    const isCheckBtn = currentNodeDTO !== 'modifyData' && status === 'pending';
+
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
@@ -505,7 +514,8 @@ class ApprovalForm extends PureComponent<any, any> {
       _data.status =
         histories[histories.length - 1].operation === '退回'
           ? '待修改'
-          : histories[histories.length - 1].operation === '复核通过'
+          : histories[histories.length - 1].operation === '复核通过' ||
+            histories[histories.length - 1].operation === '废弃'
           ? '审核完成'
           : '待审批';
     }
@@ -576,7 +586,7 @@ class ApprovalForm extends PureComponent<any, any> {
               columns={[
                 {
                   title: '交易对手',
-                  dataIndex: 'accountId',
+                  dataIndex: 'legalName',
                   render: (value, record, index, { form, editing }) => {
                     return (
                       <FormItem>{form.getFieldDecorator({})(<Input2 editing={false} />)}</FormItem>
@@ -695,6 +705,9 @@ class ApprovalForm extends PureComponent<any, any> {
                                   `${_.get(fileList, '[0].response.result.attachmentName')}上传成功`
                                 );
                               }
+                              this.setState({
+                                newAttachmentId: fileList[0].response.result.attachmentId,
+                              });
                             }
                           }}
                           value={this.state.fileList}

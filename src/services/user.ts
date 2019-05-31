@@ -43,6 +43,7 @@ export async function login(params) {
   return request(`${HOST_TEST}auth-service/users/login`, {
     method: `POST`,
     body: params,
+    passToken: true,
   }).then(result => {
     const { data } = result;
 
