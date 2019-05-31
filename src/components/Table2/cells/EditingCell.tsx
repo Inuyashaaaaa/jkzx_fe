@@ -30,7 +30,7 @@ class EditingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public render() {
-    const { record, rowIndex, children, $$render, colDef, cellApi } = this.props;
+    const { record, rowIndex, children, $$render, colDef, cellApi, api, context } = this.props;
     const value = this.props.cellApi.getValue();
     return $$render
       ? cellApi.renderElement(
@@ -38,6 +38,9 @@ class EditingCell extends PureComponent<ITableCellProps, any> {
             form: this.props.form,
             editing: true,
             colDef,
+            api,
+            cellApi,
+            context,
           })
         )
       : children;
