@@ -27,7 +27,7 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
-    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN) {
+    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
       const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
       record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
       return;
@@ -84,7 +84,7 @@ const fetchInitialSpot = _.debounce(
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
-    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN) {
+    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
       const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
       record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
       record[LEG_FIELD.WEIGHT] = Form2.createField(value);
@@ -281,6 +281,13 @@ export const commonLinkage = (
     }
   }
   if (Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)) {
+    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
+      const value = _.get(record, [LEG_FIELD.INITIAL_SPOT, 'value']);
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+      record[LEG_FIELD.WEIGHT] = Form2.createField(value);
+      record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID] = Form2.createField(value);
+      return;
+    }
     if (record[LEG_FIELD.NOTIONAL_AMOUNT] && record[LEG_FIELD.UNDERLYER_MULTIPLIER]) {
       computedTradeNumber(
         env,
@@ -292,6 +299,16 @@ export const commonLinkage = (
         setColValue,
         setTableData
       );
+    }
+  }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.WEIGHT, changedFields)) {
+    if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
+      const value = _.get(record, [LEG_FIELD.WEIGHT, 'value']);
+      record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+      record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID] = Form2.createField(value);
+      return;
     }
   }
 };

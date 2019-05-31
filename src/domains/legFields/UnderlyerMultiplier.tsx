@@ -9,41 +9,14 @@ import React from 'react';
 import { Import2 } from '@/containers/InstrumentModalInput';
 
 class MultiplierModalInput extends InputBase {
-  public state = {
-    visible: false,
-  };
-
-  public hideModal = () => {
-    this.setState({ visible: false });
-  };
   public renderEditing() {
     const { editing, value = [], onChange, onValueChange } = this.props;
     return (
       <>
-        <div style={{ position: 'relative' }}>
-          {value.map((item, index) => {
-            return <Tag key="index">{item.underlyerMultiplier}</Tag>;
-          })}
-          <Icon
-            type="alert"
-            onClick={() => {
-              this.setState({ visible: true });
-            }}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 10,
-            }}
-          />
-        </div>
-
-        <Import2
-          visible={this.state.visible}
-          value={value}
-          onChange={onChange}
-          onValueChange={onValueChange}
-          hideModal={this.hideModal}
-        />
+        {value.map((item, index) => {
+          return <Tag key="index">{item.underlyerMultiplier}</Tag>;
+        })}
+        <Import2 value={value} onChange={onChange} onValueChange={onValueChange} />
       </>
     );
   }
@@ -73,8 +46,8 @@ export const UnderlyerMultiplier: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN ? (
-            <MultiplierModalInput />
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ? (
+            <MultiplierModalInput editing={editing} />
           ) : (
             <InputNumber editing={false} />
           )

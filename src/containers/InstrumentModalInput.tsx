@@ -182,7 +182,7 @@ export const Import2 = memo<{
     weight?: number;
   }>;
 }>(props => {
-  const { value, onChange, onValueChange, visible, hideModal } = props;
+  const { value, onChange, onValueChange } = props;
   if (!Array.isArray(value)) {
     throw new Error('value 必须是数组类型');
   }
@@ -192,6 +192,12 @@ export const Import2 = memo<{
       ? value.map(item => Form2.createFields(item, ['name']))
       : [{ name: '标的物1' }, { name: '标的物2' }]
   );
+
+  const [visible, setVisible] = useState(true);
+
+  const hideModal = () => {
+    setVisible(false);
+  };
 
   const onCellFieldsChange = async params => {
     const { changedFields, rowIndex } = params;
@@ -255,7 +261,10 @@ export const Import2 = memo<{
                 .value()
             ).toNumber();
 
-            const weight = new BigNumber(1).div(initialSpot).toNumber();
+            const weight = new BigNumber(1)
+              .div(initialSpot)
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber();
             const fetchData = tableDataSource.map((item, index) => {
               if (index === rowIndex) {
                 return {

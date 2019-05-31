@@ -58,8 +58,8 @@ import { Weight } from '../legFields/Weight';
 import { Cega } from '../legFields/computed/Cega';
 
 export const LinearSpreadEuropean: ILeg = legPipeLine({
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN],
-  type: LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN,
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.SPREAD_EUROPEAN],
+  type: LEG_TYPE_MAP.SPREAD_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
@@ -105,6 +105,7 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
         Premium,
         MinimumPremium,
         FrontPremium,
+        Weight,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -138,7 +139,7 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
   },
   getDefaultData: env => {
     return Form2.createFields({
-      expirationTime: '15:00:00',
+      // expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
       [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
@@ -170,9 +171,17 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
       'premiumPercent',
       'unit',
       'tradeNumber',
+      'underlyerInstrumentId',
+      'underlyerMultiplier',
+      'initialSpot',
+      'weight',
     ];
 
-    nextPosition.productType = LEG_TYPE_MAP.VERTICAL_SPREAD;
+    const constituents = dataItem[LEG_FIELD.UNDERLYER_INSTRUMENT_ID].map(item => {
+      return _.omit(item, 'name');
+    });
+
+    nextPosition.productType = LEG_TYPE_MAP.SPREAD_EUROPEAN;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       LEG_FIELD.IS_ANNUAL,
@@ -187,6 +196,7 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
           ]),
     ]);
 
+    nextPosition.asset.constituents = constituents;
     nextPosition.asset.effectiveDate =
       nextPosition.asset.effectiveDate &&
       getMoment(nextPosition.asset.effectiveDate).format('YYYY-MM-DD');
@@ -197,12 +207,46 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
-
+    nextPosition.asset.annualized = true;
     return nextPosition;
   },
-  getPageData: (env: string, position: any) => {},
+  getPageData: (env: string, position: any) => {
+    const value = [
+      _.mapKeys(
+        _.pick(position.asset, [
+          'underlyerInstrumentId1',
+          'underlyerMultiplier1',
+          'initialSpot1',
+          'weight1',
+        ]),
+        (value, key) => {
+          return key.substr(0, key.length - 1);
+        }
+      ),
+      _.mapKeys(
+        _.pick(position.asset, [
+          'underlyerInstrumentId2',
+          'underlyerMultiplier2',
+          'initialSpot2',
+          'weight2',
+        ]),
+        (value, key) => {
+          return key.substr(0, key.length - 1);
+        }
+      ),
+    ].map((item, index) => {
+      return {
+        ...item,
+        name: '标的物' + (index + 1),
+      };
+    });
+    return Form2.createFields({
+      [LEG_FIELD.UNDERLYER_INSTRUMENT_ID]: value,
+      [LEG_FIELD.UNDERLYER_MULTIPLIER]: value,
+      [LEG_FIELD.INITIAL_SPOT]: value,
+      [LEG_FIELD.WEIGHT]: value,
+    });
+  },
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,

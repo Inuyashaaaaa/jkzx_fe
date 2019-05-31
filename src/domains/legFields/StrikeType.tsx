@@ -52,7 +52,7 @@ export const StrikeType: ILegColDef = {
   title: '行权价类型',
   dataIndex: LEG_FIELD.STRIKE_TYPE,
   editable: record => {
-    if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN) {
+    if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
       return false;
     }
     const isBooking = legEnvIsBooking(record);

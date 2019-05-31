@@ -9,13 +9,6 @@ import { Tag, Icon } from 'antd';
 import React from 'react';
 
 class InstrumentModalInput extends InputBase {
-  public state = {
-    visible: false,
-  };
-
-  public hideModal = () => {
-    this.setState({ visible: false });
-  };
   public renderEditing() {
     const { editing, value = [], onChange, onValueChange } = this.props;
     return (
@@ -26,24 +19,16 @@ class InstrumentModalInput extends InputBase {
           })}
           <Icon
             type="alert"
-            onClick={() => {
-              this.setState({ visible: true });
-            }}
+            theme="twoTone"
             style={{
               position: 'absolute',
               top: '50%',
-              right: 10,
+              right: 0,
+              transform: 'translateY(-50%)',
             }}
           />
         </div>
-
-        <Import2
-          visible={this.state.visible}
-          value={value}
-          onChange={onChange}
-          onValueChange={onValueChange}
-          hideModal={this.hideModal}
-        />
+        <Import2 value={value} onChange={onChange} onValueChange={onValueChange} />
       </>
     );
   }
@@ -71,6 +56,7 @@ export const InitialSpot: ILegColDef = {
     }
     return false;
   },
+  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -79,8 +65,8 @@ export const InitialSpot: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN ? (
-            <InstrumentModalInput />
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ? (
+            <InstrumentModalInput editing={editing} />
           ) : (
             <UnitInputNumber
               autoSelect={isBooking || isPricing}

@@ -10,13 +10,6 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
 class InstrumentModalInput extends InputBase {
-  public state = {
-    visible: false,
-  };
-
-  public hideModal = () => {
-    this.setState({ visible: false });
-  };
   public renderEditing() {
     const { editing, value = [], onChange, onValueChange } = this.props;
     return (
@@ -27,24 +20,16 @@ class InstrumentModalInput extends InputBase {
           })}
           <Icon
             type="alert"
-            onClick={() => {
-              this.setState({ visible: true });
-            }}
+            theme="twoTone"
             style={{
               position: 'absolute',
               top: '50%',
-              right: 10,
+              right: 0,
+              transform: 'translateY(-50%)',
             }}
           />
         </div>
-
-        <Import2
-          visible={this.state.visible}
-          value={value}
-          onChange={onChange}
-          onValueChange={onValueChange}
-          hideModal={this.hideModal}
-        />
+        <Import2 value={value} onChange={onChange} onValueChange={onValueChange} />
       </>
     );
   }
@@ -81,8 +66,8 @@ export const UnderlyerInstrumentId: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN ? (
-            <InstrumentModalInput />
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ? (
+            <InstrumentModalInput editing={editing} />
           ) : editing ? (
             <Select
               defaultOpen={isBooking || isPricing}

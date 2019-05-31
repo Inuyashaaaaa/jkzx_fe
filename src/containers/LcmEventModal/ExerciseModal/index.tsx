@@ -1,4 +1,10 @@
-import { LCM_EVENT_TYPE_MAP, LEG_FIELD, NOTIONAL_AMOUNT_TYPE_MAP } from '@/constants/common';
+import {
+  LCM_EVENT_TYPE_MAP,
+  LEG_FIELD,
+  NOTIONAL_AMOUNT_TYPE_MAP,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
+} from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
@@ -11,7 +17,10 @@ import {
   NUM_OF_OPTIONS,
   SETTLE_AMOUNT,
   UNDERLYER_PRICE,
+  UNDERLYER_PRICE1,
+  UNDERLYER_PRICE2,
 } from './constants';
+import _ from 'lodash';
 
 class ExerciseModal extends PureComponent<
   {
@@ -37,6 +46,7 @@ class ExerciseModal extends PureComponent<
     dataSource: {},
     exportVisible: false,
     notionalType: null,
+    productType: '',
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -44,11 +54,11 @@ class ExerciseModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-
     const direction = this.data.direction;
     this.setState({
       visible: true,
       notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
+      productType: this.data[LEG_TYPE_FIELD],
       direction,
       ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
         ? {
@@ -119,16 +129,27 @@ class ExerciseModal extends PureComponent<
     if (rsp.error) return;
     const dataSource = this.state.dataSource;
     this.switchConfirmLoading();
+    const params =
+      this.state.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN
+        ? {
+            underlyerPrice1: String(dataSource[UNDERLYER_PRICE1]),
+            underlyerPrice2: String(dataSource[UNDERLYER_PRICE2]),
+            notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+            settleAmount: String(dataSource[SETTLE_AMOUNT]),
+          }
+        : {
+            underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+            settleAmount: String(dataSource[SETTLE_AMOUNT]),
+            numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+            notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+          };
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
       userLoginId: this.currentUser.username,
       eventDetail: {
-        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
-        settleAmount: String(dataSource[SETTLE_AMOUNT]),
-        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
-        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+        ...params,
       },
     });
 
@@ -155,18 +176,35 @@ class ExerciseModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const dataSource = this.state.dataSource;
-    if (!dataSource[UNDERLYER_PRICE]) {
-      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+    if (
+      (_.has(dataSource, 'UNDERLYER_PRICE') && !dataSource[UNDERLYER_PRICE]) ||
+      (!dataSource[UNDERLYER_PRICE1] || !dataSource[UNDERLYER_PRICE2])
+    ) {
+      if (
+        (_.has(dataSource, 'UNDERLYER_PRICE') && !(dataSource[UNDERLYER_PRICE] === 0)) ||
+        !(dataSource[UNDERLYER_PRICE1] === 0) ||
+        !(dataSource[UNDERLYER_PRICE2] === 0)
+      ) {
         message.error('请填标的物价格');
         return;
       }
     }
+    const params =
+      this.state.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN
+        ? {
+            underlyerPrice1: String(dataSource[UNDERLYER_PRICE1]),
+            underlyerPrice2: String(dataSource[UNDERLYER_PRICE2]),
+            notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+          }
+        : {
+            underlyerPrice1: String(dataSource[UNDERLYER_PRICE]),
+            numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+            notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+          };
     const { error, data } = await tradeExercisePreSettle({
       positionId: this.data.id,
       eventDetail: {
-        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
-        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
-        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+        ...params,
       },
       eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
     });
@@ -206,7 +244,11 @@ class ExerciseModal extends PureComponent<
             onValueChange={this.onValueChange}
             controlNumberOneRow={1}
             footer={false}
-            controls={EXERCISE_FORM_CONTROLS(this.state.notionalType, this.handleSettleAmount)}
+            controls={EXERCISE_FORM_CONTROLS(
+              this.state.notionalType,
+              this.handleSettleAmount,
+              this.state.productType
+            )}
           />
           <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>

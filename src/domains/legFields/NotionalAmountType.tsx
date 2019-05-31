@@ -18,7 +18,7 @@ export const NotionalAmountType: ILegColDef = {
   editable: record => {
     if (
       Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
-      Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.LINEAR_SPREAD_EUROPEAN
+      Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.SPREAD_EUROPEAN
     ) {
       return false;
     }

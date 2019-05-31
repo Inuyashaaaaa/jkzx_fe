@@ -3,6 +3,8 @@ import {
   LEG_FIELD,
   LEG_ID_FIELD,
   BIG_NUMBER_CONFIG,
+  LEG_TYPE_MAP,
+  LEG_TYPE_FIELD,
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
@@ -74,9 +76,11 @@ const TradeManagementBooking = props => {
     const tableFormData = getTradeCreateModalData(data);
 
     const { positions } = data;
-
     const unitPositions = await Promise.all(
       positions.map(position => {
+        // if (position.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
+        //   return Promise.resolve(position);
+        // }
         return mktInstrumentInfo({
           instrumentId: position.asset[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
         }).then(rsp => {
