@@ -1,0 +1,30 @@
+@import '~antd/lib/style/themes/default.less';
+
+.card {
+  margin: 10px;
+  height: 220px;
+}
+.cardAdd {
+  border: 2px dashed #e8e5e5;
+  cursor: pointer;
+  margin: 10px;
+  height: 220px;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  span {
+    font-size: 18px;
+    :global {
+      .anticon-plus {
+        font-size: 18px;
+        padding: 5px;
+      }
+    }
+  }
+}
+.desList {
+  padding: 0;
+  list-style: disc;
+  list-style-position: inside;
+}

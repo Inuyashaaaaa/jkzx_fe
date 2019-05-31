@@ -130,3 +130,33 @@ export async function wkProcessInstanceListByProcessName(params = {}) {
     },
   });
 }
+
+export async function wkProcessTriggerList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerList',
+      params,
+    },
+  });
+}
+
+export async function wkIndexList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkIndexList',
+      params,
+    },
+  });
+}
+
+export async function wkTriggerConditionModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkTriggerConditionModify',
+      params,
+    },
+  });
+}
