@@ -46,6 +46,7 @@ export const UnderlyerInstrumentId: ILegColDef = {
                   // });
                   const { data, error } = await mktInstrumentWhitelistSearch({
                     instrumentIdPart: value,
+                    excludeOption: true,
                   });
                   if (error) return [];
                   return data.slice(0, 50).map(item => ({

@@ -33,6 +33,7 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
       options: async (value: string) => {
         const { data, error } = await mktInstrumentSearch({
           instrumentIdPart: value,
+          excludeOption: true,
         });
         if (error) return [];
         return data.map(item => ({
