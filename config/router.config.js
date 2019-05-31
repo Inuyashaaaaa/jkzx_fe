@@ -294,6 +294,11 @@ export default [
               name: 'processConfiguration',
               component: './ApprovalProcessConfiguration/index',
             },
+            {
+              path: '/approval-process/trigger-management',
+              name: 'triggerManagement',
+              component: './ApprocalTriggerManagement/index',
+            },
           ],
         },
         {

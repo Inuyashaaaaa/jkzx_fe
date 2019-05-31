@@ -70,6 +70,7 @@ const pagesCollection = [
   'riskSettings',
   'approvalProcessManagement',
   'approvalAuditingManagement',
+  'approcalTriggerManagement',
   'customReport',
   'portfolioManagement',
   'tradeDocuments',
