@@ -43,10 +43,10 @@ class Operation extends PureComponent {
   };
 
   public handleContent = () => {
-    if (this.state.type === '交易录入') {
+    if (_.includes(this.state.type, '交易录入')) {
       return <TransactionForm {...this.props} handleFormChange={this.handleFormChange} />;
     }
-    if (this.state.type === '授信额度变更') {
+    if (_.includes(this.state.type, '授信额度变更')) {
       return <CreditForm {...this.props} handleFormChange={this.handleFormChange} />;
     }
     return <ApprovalForm {...this.props} handleFormChange={this.handleFormChange} />;

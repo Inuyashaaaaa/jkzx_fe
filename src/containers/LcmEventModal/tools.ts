@@ -3,6 +3,7 @@ import {
   KNOCK_DIRECTION_MAP,
   LEG_FIELD,
   OB_DAY_FIELD,
+  NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import { isAutocallPhoenix, getMoment } from '@/tools';
 import BigNumber from 'bignumber.js';
@@ -23,8 +24,17 @@ export const getObservertionFieldData = data => {
               'days'
             );
       const daysInYear = data[LEG_FIELD.DAYS_IN_YEAR];
-      const cuponPayment = data[LEG_FIELD.COUPON_PAYMENT];
-      const notionalAmount = data[LEG_FIELD.NOTIONAL_AMOUNT];
+      const cuponPayment = new BigNumber(data[LEG_FIELD.COUPON_PAYMENT])
+        .multipliedBy(0.01)
+        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+        .toNumber();
+      const notionalAmount =
+        data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+          ? data[LEG_FIELD.NOTIONAL_AMOUNT]
+          : new BigNumber(data[LEG_FIELD.NOTIONAL_AMOUNT])
+              .multipliedBy(data[LEG_FIELD.INITIAL_SPOT])
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber();
       const knockDirection = data[LEG_FIELD.KNOCK_DIRECTION];
       const initialSpot = data[LEG_FIELD.INITIAL_SPOT];
 

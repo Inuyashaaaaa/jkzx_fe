@@ -203,7 +203,6 @@ export const Asia: ILeg = legPipeLine({
     });
 
     nextPosition.productType = LEG_TYPE_MAP.ASIAN;
-    nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
@@ -223,21 +222,25 @@ export const Asia: ILeg = legPipeLine({
           ]),
     ]);
 
-    nextPosition.asset.fixingWeights = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
-      (result, item) => {
-        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
-        return result;
-      },
-      {}
-    );
+    if (dataItem[LEG_FIELD.OBSERVATION_DATES]) {
+      nextPosition.asset.fixingWeights = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
+        (result, item) => {
+          result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
+          return result;
+        },
+        {}
+      );
+    }
 
-    nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
-      (result, item) => {
-        result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
-        return result;
-      },
-      {}
-    );
+    if (dataItem[LEG_FIELD.OBSERVATION_DATES]) {
+      nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.OBSERVATION_DATES].reduce(
+        (result, item) => {
+          result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
+          return result;
+        },
+        {}
+      );
+    }
 
     nextPosition.asset.settlementDate =
       env === LEG_ENV.PRICING

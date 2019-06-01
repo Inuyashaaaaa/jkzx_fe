@@ -174,6 +174,7 @@ class ClientManagementBankAccount extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        fetchOptionsOnSearch={true}
                         options={async (value: string = '') => {
                           const { data, error } = await refSimilarLegalNameList({
                             similarLegalName: value,
@@ -202,6 +203,7 @@ class ClientManagementBankAccount extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        fetchOptionsOnSearch={true}
                         options={
                           this.state.markets
                             ? this.state.markets
@@ -234,6 +236,7 @@ class ClientManagementBankAccount extends PureComponent {
                         placeholder="请输入内容搜索"
                         allowClear={true}
                         showSearch={true}
+                        fetchOptionsOnSearch={true}
                         options={async (value: string = '') => {
                           const { data, error } = await refSimilarAccountNameList({
                             similarAccountName: value,

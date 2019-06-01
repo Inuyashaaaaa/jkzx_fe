@@ -23,6 +23,7 @@ const ReportCommonTable = memo<any>(props => {
     downloadName,
     scrollWidth,
     bordered = false,
+    colSwitch = [],
   } = props;
   const [markets, setMarkets] = useState([]);
   const [dataSource, setDataSource] = useState([]);
@@ -206,6 +207,7 @@ const ReportCommonTable = memo<any>(props => {
           },
           cols: tableColDefs,
           name: downloadName,
+          colSwitch,
         }}
       >
         导出Excel

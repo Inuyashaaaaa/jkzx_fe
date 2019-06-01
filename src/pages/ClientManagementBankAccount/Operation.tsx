@@ -17,7 +17,7 @@ class Operation extends PureComponent<{
 
   public componentDidMount = () => {
     this.setState({
-      createFormData: this.props.record.data,
+      createFormData: this.props.record,
     });
   };
 
@@ -32,7 +32,7 @@ class Operation extends PureComponent<{
       visible: false,
     });
     const { error, data } = await refBankAccountSave({
-      uuid: this.props.record.data.uuid,
+      uuid: this.props.record.uuid,
       ...this.state.createFormData,
     });
     if (error) {

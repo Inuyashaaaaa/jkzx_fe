@@ -54,7 +54,7 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
   };
 
   public getRenderResult = () => {
-    const { record, rowIndex, $$render, form, colDef, cellApi } = this.props;
+    const { record, rowIndex, $$render, form, colDef, cellApi, api, context } = this.props;
     const value = this.getValue();
 
     if (!$$render) return value;
@@ -64,6 +64,8 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
         form,
         editing: false,
         colDef,
+        api,
+        context,
       })
     );
     if (React.isValidElement(node)) {

@@ -63,10 +63,10 @@ class ApprovalForm extends PureComponent<any, any> {
       tableData: {},
     };
   }
-  public componentDidMount() {
+  public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
-  }
+  };
 
   public componentWillReceiveProps(nextProps) {
     const { formData, status } = nextProps;
@@ -101,8 +101,9 @@ class ApprovalForm extends PureComponent<any, any> {
     this.setState({
       loading: true,
     });
-    const isCompleted = params.status
-      ? !params.status.includes('unfinished') && this.props.status !== 'pending'
+    const isCompleted = params.processInstanceStatusEnum
+      ? !_.toLower(params.processInstanceStatusEnum).includes('unfinished') &&
+        this.props.status !== 'pending'
       : false;
     const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
     const res = await executeMethod({
@@ -133,9 +134,10 @@ class ApprovalForm extends PureComponent<any, any> {
     };
     this.setState({
       detailData: _detailData,
+      currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
+      tableData: _.get(data, 'process._business_payload'),
     });
-
     if (!isCheckBtn) {
       const formItems = this.formatFormItems(data, true);
       this.setState({
@@ -180,6 +182,7 @@ class ApprovalForm extends PureComponent<any, any> {
   public handleCounterChange = () => {
     const { formData } = this.props;
     const { data } = this.state;
+    console.log(formData);
     const isCheckBtn =
       formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
     const formItems = this.formatFormItems(data, isCheckBtn);
@@ -290,7 +293,7 @@ class ApprovalForm extends PureComponent<any, any> {
         confirmed: true,
         comment: passComment,
       },
-      businessProcessData: {},
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'pass');
   };
@@ -311,7 +314,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: passComment,
         abandon: false,
       },
-      businessProcessData: { trade: this.state.tableData, validTime: '2018-01-01T10:10:10' },
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'modify');
   };
@@ -325,7 +328,7 @@ class ApprovalForm extends PureComponent<any, any> {
         comment: rejectReason,
         confirmed: false,
       },
-      businessProcessData: {},
+      businessProcessData: this.state.tableData,
     };
     this.executeModify(params, 'reject');
   };
@@ -421,7 +424,7 @@ class ApprovalForm extends PureComponent<any, any> {
       trader: _.get(data, 'trader'),
     };
     this.setState({
-      tableData: data,
+      tableData: { trade: data, validTime: '2018-01-01T10:10:10' },
       detailData,
     });
   };
@@ -437,9 +440,9 @@ class ApprovalForm extends PureComponent<any, any> {
       rejectReason,
       passComment,
       modifyComment,
+      currentNodeDTO,
     } = this.state;
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'pending';
+    const isCheckBtn = currentNodeDTO !== 'modifyData' && status === 'pending';
     const approvalColumns = generateColumns(
       'approval',
       data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
@@ -456,11 +459,11 @@ class ApprovalForm extends PureComponent<any, any> {
       _data.status =
         histories[histories.length - 1].operation === '退回'
           ? '待修改'
-          : histories[histories.length - 1].operation === '复核通过'
+          : histories[histories.length - 1].operation === '复核通过' ||
+            histories[histories.length - 1].operation === '废弃'
           ? '审核完成'
           : '待审批';
     }
-
     return (
       <div className={styles.fromContainer}>
         {!loading && (

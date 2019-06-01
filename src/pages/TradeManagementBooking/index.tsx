@@ -1,5 +1,11 @@
 import { IFormField } from '@/components/type';
-import { LEG_FIELD, LEG_ID_FIELD, LEG_INJECT_FIELDS, PREMIUM_TYPE_MAP } from '@/constants/common';
+import {
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  LEG_INJECT_FIELDS,
+  PREMIUM_TYPE_MAP,
+  DATE_ARRAY,
+} from '@/constants/common';
 import { COMPUTED_LEG_FIELD_MAP } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { BOOKING_FROM_PRICING } from '@/constants/trade';
@@ -8,7 +14,7 @@ import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
 import { createLegDataSourceItem } from '@/services/pages';
-import { getLegByRecord, insert, remove, uuid } from '@/tools';
+import { getLegByRecord, insert, remove, uuid, getMoment } from '@/tools';
 import { Divider, Menu } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -22,14 +28,22 @@ const TradeManagementBooking = props => {
   const { query } = location;
   const { from } = query;
   const getPricingPermium = record => {
-    console.log(record[COMPUTED_LEG_FIELD_MAP.PRICE]);
-    console.log(record[COMPUTED_LEG_FIELD_MAP.PRICE_PER]);
     return Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY
       ? record[COMPUTED_LEG_FIELD_MAP.PRICE]
       : record[COMPUTED_LEG_FIELD_MAP.PRICE_PER];
   };
 
-  const tableData = modalTableData;
+  const tableData = _.map(modalTableData, iitem => {
+    return _.mapValues(iitem, (item, key) => {
+      if (_.includes(DATE_ARRAY, key)) {
+        return {
+          type: 'field',
+          value: getMoment(item.value),
+        };
+      }
+      return item;
+    });
+  });
 
   const setTableData = payload => {
     dispatch({

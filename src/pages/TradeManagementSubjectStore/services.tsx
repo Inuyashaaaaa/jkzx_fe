@@ -1,4 +1,4 @@
-import { DatePicker, Input, InputNumber, Select } from '@/containers';
+import { DatePicker, Input, InputNumber, Select, Form2 } from '@/containers';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -17,7 +17,13 @@ const multiplier = {
               message: '合约乘数是必填项',
             },
           ],
-        })(<InputNumber precision={0} min={1} />)}
+        })(
+          <InputNumber
+            precision={0}
+            min={1}
+            disabled={Form2.getFieldValue(record.instrumentType) === 'STOCK'}
+          />
+        )}
       </FormItem>
     );
   },

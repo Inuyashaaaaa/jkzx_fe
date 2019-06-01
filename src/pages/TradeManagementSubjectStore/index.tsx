@@ -7,7 +7,7 @@ import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { createFormControls, searchFormControls } from './services';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 
 class TradeManagementMarketManagement extends PureComponent {
   public $form: Form2 = null;
@@ -85,7 +85,7 @@ class TradeManagementMarketManagement extends PureComponent {
         ...fields,
       };
     }
-    if (fields.instrumentType === 'STOCK') {
+    if (Form2.getFieldValue(fields.instrumentType) === 'STOCK') {
       return {
         ...allFields,
         multiplier: Form2.createField(1),
@@ -138,8 +138,13 @@ class TradeManagementMarketManagement extends PureComponent {
   public onCreate = async () => {
     const rsp = await this.$form.validate();
     if (rsp.error) return;
-    const createFormData = Form2.getFieldsValue(this.state.createFormData);
-    const { error } = await mktInstrumentCreate(this.composeInstrumentInfo(createFormData));
+
+    let createFormData = Form2.getFieldsValue(this.state.createFormData);
+    createFormData = this.composeInstrumentInfo(createFormData);
+    createFormData.instrumentInfo.maturity = isMoment(createFormData.instrumentInfo.maturity)
+      ? moment(createFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
+      : createFormData.instrumentInfo.maturity;
+    const { error } = await mktInstrumentCreate(createFormData);
     if (error) {
       message.error('创建失败');
       return;

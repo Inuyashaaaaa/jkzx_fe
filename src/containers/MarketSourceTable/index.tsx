@@ -205,6 +205,8 @@ class MarketSourceTable extends PureComponent<MarketSourceTableProps> {
         onRemove={this.removeMarket}
         onSearch={this.onSearch}
         onChange={this.onChange}
+        searchable={false}
+        createText="添加"
       />
     );
   }

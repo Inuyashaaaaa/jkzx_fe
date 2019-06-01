@@ -11,6 +11,7 @@ import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
 import { CREATE_FORM_CONTROLS } from './constants';
 import { createPageTableColDefs } from './services';
+import _ from 'lodash';
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -63,7 +64,7 @@ class SystemSettingsUsers extends PureComponent {
   public state = {
     roleOptions: [],
     loading: false,
-    formData: {},
+    formData: Form2.createFields({ roleIds: [] }),
     users: [],
     modalVisible: false,
     displayResources: false,
@@ -161,14 +162,17 @@ class SystemSettingsUsers extends PureComponent {
     message.success('新建成功');
     this.setState({
       modalVisible: false,
-      formData: {},
+      formData: Form2.createFields({ roleIds: [] }),
     });
     this.fetchData();
   };
 
   public handleFieldsChangeCreate = (props, fields, allFields) => {
     this.setState({
-      formData: allFields,
+      formData: {
+        ...this.state.formData,
+        ...fields,
+      },
     });
   };
 
