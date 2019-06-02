@@ -51,7 +51,9 @@ function upload(bundleName) {
     shell.exec(
       `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
     );
-    shell.exec(`./scripts/ci/greet.sh ${remoteIp} ${FINISH} ${process.env.CI_COMMIT_SHA}`);
+    shell.exec(
+      `./scripts/ci/greet.sh ${remoteIp}:${branchName} ${FINISH} ${process.env.CI_COMMIT_SHA}`
+    );
   } catch (error) {
     console.log(`上传失败: scp -r ${remotePaths} ${remoteUsername}@${remoteIp}:${remoteFolder}`);
   }
