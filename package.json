@@ -14,6 +14,7 @@
     "deploy:release": "cross-env DEPLOY_DIST=release node ./scripts/deploy.js",
     "deploy:prod": "cross-env DEPLOY_DIST=prod node ./scripts/deploy.js",
     "deploy:hotfix": "cross-env DEPLOY_DIST=hotfix node ./scripts/deploy.js",
+    "deploy:feature": "cross-env DEPLOY_DIST=feature node ./scripts/deploy.js",
     "deploy:doc": "yarn run jsdoc && cross-env DEPLOY_DIST=doc node ./scripts/deploy.js",
     "analyze": "cross-env ANALYZE=1 umi build",
     "lint-staged": "lint-staged",
