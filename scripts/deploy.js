@@ -9,7 +9,6 @@ const RELEASE_CONTAINER = 'FE-release';
 // const FEATURE_CONTAINER = 'FE-feature';
 const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
-const FINISH = '前端模块更新完毕';
 
 const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
@@ -52,7 +51,9 @@ function upload(bundleName) {
       `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
     );
     shell.exec(
-      `./scripts/ci/greet.sh ${remoteIp}:${branchName} ${FINISH} ${process.env.CI_COMMIT_SHA}`
+      `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remotePaths} ${`前端打包上传完毕`} ${
+        process.env.CI_COMMIT_SHA
+      }`
     );
   } catch (error) {
     console.log(`上传失败: scp -r ${remotePaths} ${remoteUsername}@${remoteIp}:${remoteFolder}`);
