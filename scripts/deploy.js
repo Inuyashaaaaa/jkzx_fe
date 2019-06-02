@@ -51,7 +51,7 @@ function upload(bundleName) {
       `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
     );
     shell.exec(
-      `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remoteFolder} ${`前端打包上传完毕`} ${
+      `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remotePaths} ${`前端打包上传完毕`} ${
         process.env.CI_COMMIT_SHA
       }`
     );
