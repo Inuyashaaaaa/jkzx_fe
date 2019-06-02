@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
-import { Layout, Icon } from 'antd';
 import GlobalFooter from '@/containers/GlobalFooter';
+import { Icon, Layout } from 'antd';
+import React, { Fragment } from 'react';
 
 const { Footer } = Layout;
 const FooterView = () => (
@@ -29,10 +29,11 @@ const FooterView = () => (
       copyright={
         <Fragment>
           Copyright <Icon type="copyright" /> Tongyu All Rights Reserved 上海同余信息科技有限公司
-          沪ICP备16043748号
+          沪ICP备16043748号 version {require('@/defaultSettings').version}
         </Fragment>
       }
     />
   </Footer>
 );
+
 export default FooterView;
