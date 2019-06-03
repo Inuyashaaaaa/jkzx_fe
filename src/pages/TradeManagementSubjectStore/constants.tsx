@@ -13,6 +13,8 @@ import Operation from './Operation';
 export const TABLE_COL_DEFS = fetchTable => [
   {
     title: '合约代码',
+    fixed: 'left',
+    width: 130,
     dataIndex: 'instrumentId',
   },
   {
@@ -57,8 +59,9 @@ export const TABLE_COL_DEFS = fetchTable => [
     dataIndex: 'underlyerInstrumentId',
   },
   {
-    title: '行权价格',
+    title: '行权价格（￥）',
     dataIndex: 'strike',
+    render: value => formatNumber(value, 4),
   },
   {
     title: '行权方式',
@@ -85,6 +88,8 @@ export const TABLE_COL_DEFS = fetchTable => [
   {
     dataIndex: 'operation',
     title: '操作',
+    fixed: 'right',
+    width: 130,
     render: (value, record, index) => {
       return <Operation record={record} fetchTable={fetchTable} />;
     },

@@ -20,6 +20,8 @@ const TradeManagementMarketManagement = props => {
   const [tableDataSource, setTableDataSource] = useState([]);
   const [createVisible, setCreateVisible] = useState(false);
   const [createFormControlsState, setCreateFormControlsState] = useState({});
+  const [creating, setCreating] = useState(false);
+  const [noData, setNoData] = useState(true);
 
   useEffect(() => {
     fetchTable();
@@ -51,6 +53,7 @@ const TradeManagementMarketManagement = props => {
     if (error) return;
     setTableDataSource(data.page);
     setTotal(data.totalCount);
+    setNoData(data.page.length === 0 ? true : false);
   };
 
   const filterFormData = (allFields, fields) => {
@@ -111,18 +114,21 @@ const TradeManagementMarketManagement = props => {
   const onCreate = async () => {
     const rsp = await $form.validate();
     if (rsp.error) return;
-
     let newCreateFormData = Form2.getFieldsValue(createFormData);
     newCreateFormData = composeInstrumentInfo(newCreateFormData);
     newCreateFormData.instrumentInfo.maturity = isMoment(newCreateFormData.instrumentInfo.maturity)
       ? moment(newCreateFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
       : newCreateFormData.instrumentInfo.maturity;
+
+    setCreating(true);
     const { error } = await mktInstrumentCreate(newCreateFormData);
     if (error) {
       message.error('创建失败');
       return;
     }
     message.success('创建成功');
+    setCreating(false);
+
     setCreateVisible(false);
     setCreateFormData({});
     setCreateFormControlsState(createFormControls({}, 'create'));
@@ -131,24 +137,25 @@ const TradeManagementMarketManagement = props => {
   };
 
   const onSearchFormChange = (props, fields, allFields) => {
-    const changed = Form2.getFieldsValue(fields);
+    const instrumentTypeMap = {
+      EQUITY: 'STOCK',
+      COMMODITY: 'SPOT',
+    };
+    const assetClass = fields.assetClass;
     const formData = Form2.getFieldsValue(allFields);
-    const searchFormData =
-      Object.keys(changed)[0] === 'assetClass'
-        ? {
-            ..._.pick(formData, ['instrumentIds']),
-            ...changed,
-          }
-        : formData;
-    setSearchFormData(Form2.createFields(searchFormData));
+    if (assetClass) {
+      formData.instrumentType = assetClass.value ? instrumentTypeMap[assetClass.value] : undefined;
+    }
+    setSearchFormData(Form2.createFields(formData));
   };
 
   const onPaginationChange = (current, pageSize) => {
-    setPagination({
+    const next = {
       current,
       pageSize,
-    });
-    fetchTable();
+    };
+    setPagination(next);
+    fetchTable(next);
   };
 
   const switchModal = () => {
@@ -158,11 +165,12 @@ const TradeManagementMarketManagement = props => {
   };
 
   const onSearch = () => {
-    setPagination({
+    const next = {
       current: 1,
       pageSize: 10,
-    });
-    fetchTable();
+    };
+    setPagination(next);
+    fetchTable(next);
   };
 
   return (
@@ -184,6 +192,7 @@ const TradeManagementMarketManagement = props => {
         rowKey="instrumentId"
         columns={TABLE_COL_DEFS(fetchTable)}
         loading={loading}
+        scroll={{ x: noData ? false : 2300 }}
         dataSource={tableDataSource}
         pagination={{
           ...pagination,
@@ -193,7 +202,13 @@ const TradeManagementMarketManagement = props => {
           onChange: onPaginationChange,
         }}
       />
-      <Modal visible={createVisible} onOk={onCreate} onCancel={switchModal} title={'新建标的物'}>
+      <Modal
+        visible={createVisible}
+        onOk={onCreate}
+        onCancel={switchModal}
+        title={'新建标的物'}
+        okButtonProps={{ loading: creating }}
+      >
         <Form2
           ref={node => ($form = node)}
           columns={createFormControlsState}

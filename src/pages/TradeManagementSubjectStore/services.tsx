@@ -1,8 +1,7 @@
-import { DatePicker, Input, InputNumber, Select, Form2 } from '@/containers';
+import { DatePicker, Input, InputNumber, Select, Form2, TimePicker } from '@/containers';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
-import { TimePicker } from 'antd';
 
 const multiplier = {
   title: '合约乘数',
@@ -256,12 +255,7 @@ const instrumentTypeSearch = {
     return (
       <FormItem>
         {form.getFieldDecorator({})(
-          <Select
-            style={{ minWidth: 180 }}
-            options={getOptions()}
-            disabled={disable()}
-            allowClear={true}
-          />
+          <Select style={{ minWidth: 180 }} options={getOptions()} disabled={disable()} />
         )}
       </FormItem>
     );
@@ -544,7 +538,7 @@ const expirationTime = {
               message: '期权到期时间是必填项',
             },
           ],
-        })(<TimePicker format={'HH:mm:ss'} />)}
+        })(<TimePicker />)}
       </FormItem>
     );
   },

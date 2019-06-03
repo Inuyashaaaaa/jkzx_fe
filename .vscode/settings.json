@@ -22,7 +22,6 @@
   "workbench.statusBar.visible": true,
   "editor.minimap.enabled": false,
   "autoimport.showNotifications": true,
-  "editor.lineNumbers": "interval",
   "editor.renderLineHighlight": "gutter",
   "autoimport.filesToScan": "**/*.{ts,tsx}",
   "workbench.colorTheme": "One Dark Pro",
