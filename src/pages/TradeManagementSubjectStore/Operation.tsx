@@ -46,8 +46,12 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   };
 
   public composeInstrumentInfo = modalFormData => {
-    modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
-    modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
+    modalFormData.expirationDate = modalFormData.expirationDate
+      ? moment(modalFormData.expirationDate).format('YYYY-MM-DD')
+      : undefined;
+    modalFormData.expirationTime = modalFormData.expirationTime
+      ? moment(modalFormData.expirationTime).format('HH:mm:ss')
+      : undefined;
     const instrumentInfoFields = [
       'multiplier',
       'name',
