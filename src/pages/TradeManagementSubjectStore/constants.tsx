@@ -12,11 +12,11 @@ import Operation from './Operation';
 
 export const TABLE_COL_DEFS = fetchTable => [
   {
-    title: '标的物代码',
+    title: '合约代码',
     dataIndex: 'instrumentId',
   },
   {
-    title: '标的物名称',
+    title: '合约名称',
     dataIndex: 'name',
   },
   {
@@ -51,6 +51,10 @@ export const TABLE_COL_DEFS = fetchTable => [
   {
     title: '交易品种',
     dataIndex: 'tradeCategory',
+  },
+  {
+    title: '标的代码',
+    dataIndex: 'underlyerInstrumentId',
   },
   {
     title: '行权价格',
