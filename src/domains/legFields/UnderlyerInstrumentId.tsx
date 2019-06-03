@@ -66,7 +66,8 @@ export const UnderlyerInstrumentId: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ? (
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+            record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN ? (
             <InstrumentModalInput editing={editing} />
           ) : editing ? (
             <Select

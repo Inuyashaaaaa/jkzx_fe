@@ -22,21 +22,12 @@ class DeltaModalInput extends InputBase {
   };
 
   public renderEditing() {
-    const { editing, value = {}, onChange, onValueChange, record } = this.props;
+    const { value = {}, onChange, onValueChange, record } = this.props;
     console.log(this.props);
     return (
       <>
         <div style={{ position: 'relative' }}>
           {_.values(value).join(', ')}
-          {/* <a
-          href="javascript:;"
-          style={{ position: 'absolute', right: 20, transform: 'translateY(-50%)', top: '50%' }}
-          onClick={() => {
-            this.setState({ visible: true });
-          }}
-        >
-          详情
-        </a> */}
           <Icon
             type="alert"
             theme="twoTone"
@@ -51,7 +42,6 @@ class DeltaModalInput extends InputBase {
             }}
           />
         </div>
-
         <Import4
           visible={this.state.visible}
           value={record}
@@ -68,7 +58,7 @@ class DeltaModalInput extends InputBase {
     return (
       <>
         {_.values(value).join(', ')}
-        <a
+        {/* <a
           href="javascript:;"
           style={{ position: 'absolute', right: 20, transform: 'translateY(-50%)', top: '50%' }}
           onClick={() => {
@@ -76,7 +66,7 @@ class DeltaModalInput extends InputBase {
           }}
         >
           详情
-        </a>
+        </a> */}
       </>
     );
   }

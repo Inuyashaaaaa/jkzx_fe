@@ -57,9 +57,9 @@ import { legPipeLine } from '../_utils';
 import { Weight } from '../legFields/Weight';
 import { Cega } from '../legFields/computed/Cega';
 
-export const LinearSpreadEuropean: ILeg = legPipeLine({
-  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.SPREAD_EUROPEAN],
-  type: LEG_TYPE_MAP.SPREAD_EUROPEAN,
+export const RatioSpreadEuropean: ILeg = legPipeLine({
+  name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN],
+  type: LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
@@ -181,7 +181,7 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
       return _.omit(item, 'name');
     });
 
-    nextPosition.productType = LEG_TYPE_MAP.SPREAD_EUROPEAN;
+    nextPosition.productType = LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN;
     nextPosition.asset = _.omit(dataItem, [
       ...LEG_INJECT_FIELDS,
       LEG_FIELD.IS_ANNUAL,

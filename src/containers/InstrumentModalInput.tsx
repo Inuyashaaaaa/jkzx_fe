@@ -395,17 +395,32 @@ export const Import3 = memo<{
     initialSpot?: number;
   }>;
 }>(props => {
-  const { value, onChange, onValueChange } = props;
+  const { value, onChange, onValueChange, record } = props;
   const [visible, setVisible] = useState(true);
   if (!Array.isArray(value)) {
     throw new Error('value 必须是数组类型');
   }
+
+  const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']).map(item => {
+    return item[LEG_FIELD.UNDERLYER_INSTRUMENT_ID];
+  });
 
   const [tableDataSource, setTableDataSource] = useState(
     value.length
       ? value.map(item => Form2.createFields(item, ['name']))
       : [{ name: '标的物1' }, { name: '标的物2' }]
   );
+
+  useLifecycles(() => {
+    setTableDataSource(prev => {
+      prev.map((item, index) => {
+        return {
+          ...item,
+          instrumentId: instrumentId[index],
+        };
+      });
+    });
+  });
 
   const onCellFieldsChange = async params => {
     const { changedFields, rowIndex } = params;

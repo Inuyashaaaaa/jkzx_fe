@@ -38,6 +38,7 @@ import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { Forward } from '@/domains/legs/Forward';
 import { LinearSpreadEuropean } from '@/domains/legs/LinearSpreadEuropean';
+import { RatioSpreadEuropean } from '@/domains/legs/RatioSpreadEuropean';
 import { Cega } from '@/domains/legFields/computed/Cega';
 
 export const TOTAL_LEGS = [
@@ -63,6 +64,7 @@ export const TOTAL_LEGS = [
   Straddle,
   Forward,
   LinearSpreadEuropean,
+  RatioSpreadEuropean,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];

@@ -4,6 +4,8 @@ import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  LEG_TYPE_FIELD,
+  LEG_TYPE_MAP,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
@@ -49,6 +51,7 @@ class UnwindModal extends PureComponent<
     modalConfirmLoading: false,
     notionalAmountType: null,
     exportVisible: false,
+    productType: '',
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -58,10 +61,12 @@ class UnwindModal extends PureComponent<
     this.reload = reload;
 
     const notionalAmountType = data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const productType = data[LEG_TYPE_FIELD];
 
     this.setState({
       visible: true,
       notionalAmountType,
+      productType,
       ...(notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
         ? {
             cnyFormData: _.omitBy(
@@ -229,129 +234,209 @@ class UnwindModal extends PureComponent<
           onCancel={this.switchModal}
           onOk={this.onConfirm}
           destroyOnClose={true}
-          width={900}
+          width={this.state.productType.includes('SPREAD_EUROPEAN') ? 500 : 900}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
           title="平仓"
         >
           {this.state.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY ? (
-            <Form
-              wrappedComponentRef={node => (this.$cnyForm = node)}
-              dataSource={cnyFormData}
-              onValueChange={this.onCnyFormDataChange}
-              controlNumberOneRow={2}
-              footer={false}
-              controls={[
-                {
-                  field: CAN_UNWIND_PRICE,
-                  control: {
-                    label: '可平仓名义本金',
+            this.state.productType.includes('SPREAD_EUROPEAN') ? (
+              <Form
+                wrappedComponentRef={node => (this.$cnyForm = node)}
+                dataSource={cnyFormData}
+                onValueChange={this.onCnyFormDataChange}
+                controlNumberOneRow={1}
+                footer={false}
+                controls={[
+                  {
+                    field: CAN_UNWIND_PRICE,
+                    control: {
+                      label: '可平仓名义本金',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                  input: {
-                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                    disabled: true,
-                  },
-                },
-                {
-                  field: CAN_UNWIND_NUM,
-                  control: {
-                    label: '可平仓手数',
-                  },
-                  input: {
-                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                    disabled: true,
-                  },
-                },
-                {
-                  field: UNWIND_PRICE,
-                  control: {
-                    label: '平仓名义本金',
-                  },
-                  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                  decorator: {
-                    rules: [
-                      {
-                        message: '数值必须大于0',
-                        validator: (rule, value, callback) => {
-                          if (value < 0) {
-                            return callback(true);
-                          }
-                          callback();
+                  {
+                    field: UNWIND_PRICE,
+                    control: {
+                      label: '平仓名义本金',
+                    },
+                    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                    decorator: {
+                      rules: [
+                        {
+                          message: '数值必须大于0',
+                          validator: (rule, value, callback) => {
+                            if (value < 0) {
+                              return callback(true);
+                            }
+                            callback();
+                          },
                         },
-                      },
-                      {
-                        message: '平仓金额为必填项',
-                        required: true,
-                      },
-                      {
-                        message: '必须小于等于可平仓名义本金',
-                        validator: (rule, value, callback) => {
-                          if (value > this.state.cnyFormData[CAN_UNWIND_PRICE]) {
-                            return callback(true);
-                          }
-                          callback();
+                        {
+                          message: '平仓金额为必填项',
+                          required: true,
                         },
-                      },
-                    ],
+                        {
+                          message: '必须小于等于可平仓名义本金',
+                          validator: (rule, value, callback) => {
+                            if (value > this.state.cnyFormData[CAN_UNWIND_PRICE]) {
+                              return callback(true);
+                            }
+                            callback();
+                          },
+                        },
+                      ],
+                    },
                   },
-                },
-                {
-                  field: UNWIND_NUM,
-                  control: {
-                    label: '平仓手数',
+                  {
+                    field: LEFT_PRICE,
+                    control: {
+                      label: '剩余名义本金',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                  input: {
-                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                    disabled: true,
+                  {
+                    field: UNWIND_TOTAL,
+                    control: {
+                      label: '平仓金额',
+                    },
+                    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                    decorator: {
+                      rules: [
+                        {
+                          message: '平仓金额为必填项',
+                          required: true,
+                        },
+                      ],
+                    },
                   },
-                },
-                {
-                  field: LEFT_PRICE,
-                  control: {
-                    label: '剩余名义本金',
+                ]}
+              />
+            ) : (
+              <Form
+                wrappedComponentRef={node => (this.$cnyForm = node)}
+                dataSource={cnyFormData}
+                onValueChange={this.onCnyFormDataChange}
+                controlNumberOneRow={2}
+                footer={false}
+                controls={[
+                  {
+                    field: CAN_UNWIND_PRICE,
+                    control: {
+                      label: '可平仓名义本金',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                  input: {
-                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                    disabled: true,
+                  {
+                    field: CAN_UNWIND_NUM,
+                    control: {
+                      label: '可平仓手数',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                },
-                {
-                  field: LEFT_NUM,
-                  control: {
-                    label: '剩余手数',
+                  {
+                    field: UNWIND_PRICE,
+                    control: {
+                      label: '平仓名义本金',
+                    },
+                    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                    decorator: {
+                      rules: [
+                        {
+                          message: '数值必须大于0',
+                          validator: (rule, value, callback) => {
+                            if (value < 0) {
+                              return callback(true);
+                            }
+                            callback();
+                          },
+                        },
+                        {
+                          message: '平仓金额为必填项',
+                          required: true,
+                        },
+                        {
+                          message: '必须小于等于可平仓名义本金',
+                          validator: (rule, value, callback) => {
+                            if (value > this.state.cnyFormData[CAN_UNWIND_PRICE]) {
+                              return callback(true);
+                            }
+                            callback();
+                          },
+                        },
+                      ],
+                    },
                   },
-                  input: {
-                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                    disabled: true,
+                  {
+                    field: UNWIND_NUM,
+                    control: {
+                      label: '平仓手数',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                },
-                {
-                  field: UNWIND_TOTAL,
-                  control: {
-                    label: '平仓金额',
+                  {
+                    field: LEFT_PRICE,
+                    control: {
+                      label: '剩余名义本金',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                  decorator: {
-                    rules: [
-                      {
-                        message: '平仓金额为必填项',
-                        required: true,
-                      },
-                    ],
+                  {
+                    field: LEFT_NUM,
+                    control: {
+                      label: '剩余手数',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                },
-                {
-                  field: UNWIND_PER,
-                  control: {
-                    label: '平仓单价（每手）',
+                  {
+                    field: UNWIND_TOTAL,
+                    control: {
+                      label: '平仓金额',
+                    },
+                    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                    decorator: {
+                      rules: [
+                        {
+                          message: '平仓金额为必填项',
+                          required: true,
+                        },
+                      ],
+                    },
                   },
-                  input: {
-                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                    disabled: true,
+                  {
+                    field: UNWIND_PER,
+                    control: {
+                      label: '平仓单价（每手）',
+                    },
+                    input: {
+                      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                      disabled: true,
+                    },
                   },
-                },
-              ]}
-            />
+                ]}
+              />
+            )
           ) : (
             <Form
               wrappedComponentRef={node => (this.$lotForm = node)}

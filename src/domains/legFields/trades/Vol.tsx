@@ -6,38 +6,46 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 import { legEnvIsPricing, getRequiredRule } from '@/tools';
-import { Tag } from 'antd';
+import { Tag, Icon } from 'antd';
 import { InputBase } from '@/components/type';
-import InstrumentModalInput, { Import3 } from '@/containers/InstrumentModalInput';
+import { Import3 } from '@/containers/InstrumentModalInput';
 
-// class VolModalInput extends InputBase {
-//   public renderEditing() {
-//     const { editing, value = [], onChange, onValueChange } = this.props;
-//     return (
-//       <>
-//         {value.map((item, index) => {
-//           return <Tag key="index">{item.instrumentId}</Tag>;
-//         })}
-//         <Import2 visible={true} value={value} onChange={onChange} onValueChange={onValueChange} />
-//       </>
-//     );
-//   }
+class VolModalInput extends InputBase {
+  public renderEditing() {
+    const { value = [], onChange, onValueChange, record } = this.props;
+    return (
+      <>
+        <div style={{ position: 'relative' }}>
+          {value.map((item, index) => {
+            return <Tag key="index">{item.vol}</Tag>;
+          })}
+          <Icon
+            type="alert"
+            theme="twoTone"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 0,
+              transform: 'translateY(-50%)',
+            }}
+          />
+        </div>
+        <Import3 value={value} onChange={onChange} onValueChange={onValueChange} record={record} />
+      </>
+    );
+  }
 
-//   public renderRendering() {
-//     const { editing, value = [], onChange, onValueChange } = this.props;
-//     return (
-//       <>
-//         {value.map((item, index) => {
-//           return <Tag key="index">{item.instrumentId}</Tag>;
-//         })}
-//       </>
-//     );
-//   }
-// }
-
-// record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_VERTICAL ? (
-//   <InstrumentModalInput />
-// ) :
+  public renderRendering() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        {value.map((item, index) => {
+          return <Tag key="index">{item.vol}</Tag>;
+        })}
+      </>
+    );
+  }
+}
 
 export const Vol: ILegColDef = {
   editable: record => {
@@ -59,7 +67,14 @@ export const Vol: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<UnitInputNumber unit="%" editing={editing} autoSelect={true} />)}
+        })(
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+            record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN ? (
+            <VolModalInput editing={editing} />
+          ) : (
+            <UnitInputNumber unit="%" editing={editing} autoSelect={true} />
+          )
+        )}
       </FormItem>
     );
   },

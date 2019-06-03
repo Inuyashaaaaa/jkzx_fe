@@ -23,7 +23,33 @@ const Import4 = memo(props => {
     'CEGA',
   ];
   const { visible, value, onChange, onValueChange, hideModal } = props;
-  const handleItem = Form2.getFieldsValue(_.pick(value, totalComputedFields));
+  const handleItem = () => {
+    const computedItem = _.reduce(
+      Form2.getFieldsValue(_.pick(value, totalComputedFields)),
+      (total, value, key) => {
+        if (_.isNumber(value)) {
+          return {
+            ...total,
+            [key]: value,
+          };
+        }
+        if (_.isObjectLike(value)) {
+          return {
+            ...total,
+            ...value,
+          };
+        }
+      },
+      {}
+    );
+    return _.map(computedItem, (value, key) => {
+      return (
+        <Descriptions.Item label={key} key={key}>
+          {value}
+        </Descriptions.Item>
+      );
+    });
+  };
 
   return (
     <Modal
@@ -33,7 +59,7 @@ const Import4 = memo(props => {
         hideModal();
       }}
     >
-      <div>fadfadjgioa</div>
+      <Descriptions column={2}>{handleItem()}</Descriptions>
     </Modal>
   );
 });

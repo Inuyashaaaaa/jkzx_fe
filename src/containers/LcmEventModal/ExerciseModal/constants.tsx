@@ -13,7 +13,7 @@ export const EXERCISE_FORM_CONTROLS: (
   handleSettleAmount,
   productType
 ) => IFormControl[] = (notionalType, handleSettleAmount, productType) => {
-  if (productType === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
+  if (productType.includes('SPREAD_EUROPEAN')) {
     return [
       // {
       //   field: 'NUM_OF_OPTIONS',

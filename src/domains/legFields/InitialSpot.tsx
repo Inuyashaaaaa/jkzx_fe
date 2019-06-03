@@ -65,7 +65,7 @@ export const InitialSpot: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ? (
+          record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN') ? (
             <InstrumentModalInput editing={editing} />
           ) : (
             <UnitInputNumber
