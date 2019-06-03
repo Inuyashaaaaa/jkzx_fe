@@ -79,7 +79,7 @@ const Operation = props => {
   };
 
   const handleReviewData = processData => {
-    console.log(processData)
+    console.log(processData);
     const data = processData ? processData : process;
     let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
     reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
@@ -177,9 +177,9 @@ const Operation = props => {
     }
     const cloneData = { ...data };
     cloneData.tasks = cloneData.tasks.map(item => {
-      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
       return item;
-    })
+    });
 
     setProcess(cloneData);
     setProcessConfigs(data.processConfigs);
@@ -382,9 +382,9 @@ const Operation = props => {
     }
     const cloneData = { ...data };
     cloneData.tasks = cloneData.tasks.map(item => {
-      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
       return item;
-    })
+    });
     setProcess(cloneData);
     setProcessConfigs(cloneData.processConfigs);
     handleReviewData(cloneData);

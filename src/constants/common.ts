@@ -612,6 +612,9 @@ export const INSTRUMENT_TYPE_ZHCN_MAP = {
   STOCK: '股票',
   INDEX: '股指',
   INDEX_FUTURES: '股指期货',
+  INDEX_OPTION: '股指期权',
+  STOCK_OPTION: '个股/ETF期权',
+  FUTURES_OPTION: '期货期权',
   SPOT: '现货',
   FUTURES: '期货',
 };
@@ -632,6 +635,11 @@ export const ASSET_TYPE_ZHCN_MAP = {
 };
 
 export const ASSET_TYPE_OPTIONS = convertOptions(ASSET_TYPE_MAP, ASSET_TYPE_ZHCN_MAP);
+
+export const EXERCISETYPE_MAP_CN = {
+  EUROPEAN: '欧式',
+  AMERICAN: '美式',
+};
 
 export const EXERCISETYPE_MAP = {
   EUROPEAN: 'EUROPEAN',
