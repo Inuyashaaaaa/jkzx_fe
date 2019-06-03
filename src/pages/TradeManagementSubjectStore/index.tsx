@@ -155,9 +155,6 @@ const TradeManagementMarketManagement = props => {
     setCreateVisible(!createVisible);
     setCreateFormData({});
     setCreateFormControlsState(createFormControls({}, 'create'));
-    setCreateVisible(!createVisible);
-    setCreateFormData({});
-    setCreateFormControlsState(createFormControls({}, 'create'));
   };
 
   const onSearch = () => {
