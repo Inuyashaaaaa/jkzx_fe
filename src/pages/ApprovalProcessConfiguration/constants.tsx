@@ -24,3 +24,14 @@ export function GTE_PROCESS_CONFIGS(value) {
   }
   return PROCESS_CONFIGS[index].label;
 }
+
+export const TRIGGERTYPE = [
+  {
+    label: '全部触发',
+    value: '1',
+  },
+  {
+    label: '通过触发器',
+    value: '2',
+  },
+];

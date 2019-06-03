@@ -11,7 +11,7 @@ import {
 import uuidv4 from 'uuid/v4';
 import { wkApproveGroupList } from '@/services/auditing';
 import _ from 'lodash';
-import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE } from '../constants';
+import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE, TRIGGERTYPE } from '../constants';
 import {
   List,
   Switch,
@@ -34,6 +34,8 @@ import GroupSelcet from './GroupSelcet';
 import XLSX from 'xlsx';
 
 const Operation = props => {
+  let $form = useRef<Form2>(null);
+
   const [process, setProcess] = useState({});
   const [loading, setLoading] = useState(false);
   const [reviewVisible, setReviewVisible] = useState(false);
@@ -46,6 +48,7 @@ const Operation = props => {
   const [processConfigs, setProcessConfigs] = useState([]);
   let tableE1 = useRef<Table2>(null);
   let tableE2 = useRef<Table2>(null);
+  const [targetVisible, setTargetVisible] = useState(false);
 
   useEffect(
     () => {
@@ -79,7 +82,7 @@ const Operation = props => {
   };
 
   const handleReviewData = processData => {
-    console.log(processData)
+    console.log(processData);
     const data = processData ? processData : process;
     let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
     reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
@@ -177,9 +180,9 @@ const Operation = props => {
     }
     const cloneData = { ...data };
     cloneData.tasks = cloneData.tasks.map(item => {
-      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
       return item;
-    })
+    });
 
     setProcess(cloneData);
     setProcessConfigs(data.processConfigs);
@@ -382,9 +385,9 @@ const Operation = props => {
     }
     const cloneData = { ...data };
     cloneData.tasks = cloneData.tasks.map(item => {
-      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
       return item;
-    })
+    });
     setProcess(cloneData);
     setProcessConfigs(cloneData.processConfigs);
     handleReviewData(cloneData);
@@ -408,6 +411,21 @@ const Operation = props => {
       })
     );
   };
+
+  const showTargetModel = () => {
+    setTargetVisible(true);
+  };
+
+  const onFormChange = (props, changedFields, allFields, rowIndex) => {};
+
+  const handleTargetOk = () => {
+    setTargetVisible(false);
+  };
+
+  const handleTargetCancel = () => {
+    setTargetVisible(false);
+  };
+
   const insertData = (_.get(process, 'tasks') || []).filter(item => {
     return item.taskType === 'insertData';
   });
@@ -428,6 +446,20 @@ const Operation = props => {
               <span style={{ marginLeft: '6px' }}>
                 {process.status ? '流程已启用' : '流程已停用'}
               </span>
+            </Card>
+            <Card
+              title="流程触发"
+              style={{ marginTop: '10px' }}
+              bordered={false}
+              extra={<a onClick={e => showTargetModel(e, _.get(insertData, '[0].taskId'))}>修改</a>}
+            >
+              {(_.get(process, 'triggers') || []).map(item => {
+                return (
+                  <Tag style={{ margin: 5 }} key={item.approveGroupId}>
+                    {item.triggerName}
+                  </Tag>
+                );
+              })}
             </Card>
             <Card
               title="谁能发起"
@@ -468,6 +500,13 @@ const Operation = props => {
               {
                 title: '节点名称',
                 dataIndex: 'taskName',
+                render: (value, record, index, { form, editing }) => {
+                  return value;
+                },
+              },
+              {
+                title: '节点触发器',
+                dataIndex: 'triggers',
                 render: (value, record, index, { form, editing }) => {
                   return value;
                 },
@@ -630,6 +669,65 @@ const Operation = props => {
                 return (
                   <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
                 );
+              },
+            },
+          ]}
+        />
+      </Modal>
+      <Modal
+        visible={targetVisible}
+        width={520}
+        title="选择触发器"
+        onOk={handleTargetOk}
+        onCancel={handleTargetCancel}
+      >
+        <Form2
+          ref={node => ($form = node)}
+          layout="horizontal"
+          footer={false}
+          dataSource={[]}
+          wrapperCol={{ span: 16 }}
+          labelCol={{ span: 8 }}
+          onFieldsChange={onFormChange}
+          columns={[
+            {
+              title: '触发方式',
+              dataIndex: 'triggerType',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true }],
+                    })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '选择触发器',
+              dataIndex: 'triggerName',
+              render: (value, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true }],
+                    })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
+                  </FormItem>
+                );
+              },
+            },
+            {
+              title: '组合方式',
+              dataIndex: 'operation',
+              render: (value, record, index, { form, editing }) => {
+                return value;
+              },
+            },
+            {
+              title: '条件列表',
+              dataIndex: 'conditions',
+              render: (value, record, index, { form, editing }) => {
+                return value;
               },
             },
           ]}

@@ -1,42 +1,36 @@
 import _ from 'lodash';
 import FormItem from 'antd/lib/form/FormItem';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState, useRef } from 'react';
 import { Table2, Select, Form2, Input } from '@/containers';
 import { operation, symbol, RETURN_NUMBER } from './constants';
-import { Card, Icon, Row, Col, Modal } from 'antd';
+import { Card, Icon, Row, Col, Modal, message } from 'antd';
 import { wkIndexList } from '@/services/approvalProcessConfiguration';
 import uuidv4 from 'uuid/v4';
 
-const GroupList = memo<{
-  value: any;
-  record: object;
-  index: number;
-}>(props => {
+const GroupList = memo<any>(props => {
   const [options, setOptions] = useState(null);
-  const { record, index, getCurrent } = props;
-  const [value, setValue] = useState([]);
+  const { record, index, onChange, getCurrent } = props;
+  const { value } = props;
+  // value = value.map(item => {
 
-  const $childForm: Form2 = {};
+  // })
 
-  useEffect(
-    () => {
-      fetchOptions();
-    },
-    [props.record]
-  );
+  useEffect(() => {
+    fetchOptions();
+  }, []);
 
   const fetchOptions = async () => {
-    let data = props.value ? props.value : [];
-    data = data.map(item => {
-      item.leftIndex = _.get(item, 'leftIndex.indexClass');
-      item.rightIndex = _.get(item, 'rightIndex.indexClass');
-      item.rightValue = _.get(item, 'rightValue.number');
-      return {
-        ...Form2.createFields(item),
-        conditionId: item.conditionId,
-      };
-    });
-    setValue(data);
+    // let data = props.value ? props.value : [];
+    // data = data.map(item => {
+    //   item.leftIndex = _.get(item, 'leftIndex.indexClass');
+    //   item.rightIndex = _.get(item, 'rightIndex.indexClass');
+    //   item.rightValue = _.get(item, 'rightValue.number') ? _.get(item, 'rightValue.number') : _.get(item, 'rightValue');
+    //   return {
+    //     ...Form2.createFields(item),
+    //     conditionId: item.conditionId,
+    //   };
+    // });
+    // onChange(data);
   };
 
   const handleAdd = () => {
@@ -51,13 +45,16 @@ const GroupList = memo<{
       }),
       conditionId: uuidv4(),
     };
-    setValue([...value, block]);
+    onChange(_.concat(value, block));
   };
 
-  const handleDelete = rowIndex => {
+  const handleDelete = (condition, rowIndex) => {
     const data = _.cloneDeep(value);
+    if (data.length <= 1) {
+      return message.info('至少保留一个条件');
+    }
     data.splice(rowIndex, 1);
-    setValue(data);
+    onChange(data);
   };
 
   const onFormChange = (props, changedFields, allFields, rowIndex) => {
@@ -66,26 +63,39 @@ const GroupList = memo<{
       ...data[rowIndex],
       ...changedFields,
     };
-    setValue(data);
+    onChange(data);
+  };
+  const $childForm = useRef<Form2>({});
+
+  const validate = () => {
+    let err = null;
+    value.map(async (item, index) => {
+      const { error, _error } = await $childForm.current[index].validate();
+      if (_error) err = _error;
+    });
+    console.log(err);
+    return err;
   };
 
   if (getCurrent) {
     getCurrent({
       value,
+      validate,
     });
   }
 
   return (
     <>
-      {value.map((condition, index) => {
+      {(value || []).map((condition, index) => {
+        if (!condition) return;
         return (
           <>
             <Form2
               key={condition.conditionId}
               style={{ marginBottom: '15px' }}
-              ref={node => ($childForm[index] = node)}
               layout="inline"
               dataSource={condition}
+              ref={node => ($childForm.current[index] = node)}
               columnNumberOneRow={4}
               wrapperCol={{ span: 24 }}
               labelCol={{ span: 0 }}
@@ -93,7 +103,7 @@ const GroupList = memo<{
                 onFormChange(props, changedFields, allFields, index)
               }
               footer={
-                <a onClick={() => handleDelete(index)} style={{ color: 'red' }}>
+                <a onClick={() => handleDelete(condition, index)} style={{ color: 'red' }}>
                   删除
                 </a>
               }
@@ -203,7 +213,7 @@ const GroupList = memo<{
         onClick={handleAdd}
       >
         <Icon type="plus" style={{ fontSize: '12px' }} />
-        增加审批节点
+        添加
       </div>
     </>
   );

@@ -9,6 +9,11 @@ export const operation = [
   },
 ];
 
+export const OPERATION_MAP = {
+  OR: '满足任一条件时触发',
+  AND: '满足所有条件时触发',
+};
+
 export const symbol = [
   {
     label: '大于',
@@ -32,9 +37,12 @@ export const symbol = [
   },
 ];
 
-export const operation_map = {
-  OR: '满足任一条件时触发',
-  AND: '满足所有条件时触发',
+export const SYMBOL_MAP = {
+  GT: '>',
+  LT: '<',
+  EQ: '=',
+  GE: '>=',
+  LE: '<=',
 };
 
 export const RETURN_NUMBER = 'returnNumberIndexImpl';
