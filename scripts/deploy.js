@@ -9,8 +9,9 @@ const RELEASE_CONTAINER = 'FE-release';
 // const FEATURE_CONTAINER = 'FE-feature';
 const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
-const FINISH = '前端模块更新完毕';
+
 const BUNDLE_NAME = 'dist';
+const DOC_BUNDLE_NAME = 'docs';
 
 const exists = src => {
   return fs.existsSync(src);
@@ -32,22 +33,30 @@ function cp(from, to) {
   }
 }
 
-function upload(remoteUsername, remoteIp, remoteFolder) {
-  const paths = path.join(remoteFolder, BUNDLE_NAME);
+function upload(bundleName) {
+  const remoteUsername = 'root';
+  const remoteIp = '10.1.5.28';
+  const branchName = process.env.CI_BUILD_REF_NAME;
+  const remoteFolder = `/home/share/bct_product/frontend/${branchName}/`;
+  const remotePaths = path.join(remoteFolder, bundleName);
   console.log(
-    `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${BUNDLE_NAME}`
+    `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${bundleName}`
   );
   try {
     shell.exec(
-      `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${paths}`
+      `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${remotePaths}`
     );
     // https://stackoverflow.com/questions/3663895/ssh-the-authenticity-of-host-hostname-cant-be-established
     shell.exec(
-      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${BUNDLE_NAME} ${remoteUsername}@${remoteIp}:${remoteFolder}`
+      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
     );
-    shell.exec(`./scripts/ci/greet.sh ${remoteIp} ${FINISH} ${process.env.CI_COMMIT_SHA}`);
+    shell.exec(
+      `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remotePaths} ${`前端打包上传完毕`} ${
+        process.env.CI_COMMIT_SHA
+      }`
+    );
   } catch (error) {
-    console.log(`上传失败: scp -r ${paths} ${remoteUsername}@${remoteIp}:${remoteFolder}`);
+    console.log(`上传失败: scp -r ${remotePaths} ${remoteUsername}@${remoteIp}:${remoteFolder}`);
   }
 }
 
@@ -69,7 +78,7 @@ function prod() {
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
-  upload('tongyu', '10.1.5.24', '/home/tongyu/');
+  upload(BUNDLE_NAME);
 }
 
 function test() {
@@ -78,7 +87,7 @@ function test() {
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
-  upload('tongyu', '10.1.5.16', '/home/tongyu/');
+  upload(BUNDLE_NAME);
 }
 
 function release() {
@@ -87,17 +96,23 @@ function release() {
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
-  upload('tongyu', '10.1.5.23', '/home/tongyu/');
+  upload(BUNDLE_NAME);
 }
 
 function hotfix() {
-  upload('tongyu', '10.1.5.27', '/home/tongyu/');
+  upload(BUNDLE_NAME);
+}
+
+function feature() {
+  upload(BUNDLE_NAME);
 }
 
 function doc() {
   const prodContainerPath = path.join(USER_PATH, DOC_CONTAINER);
 
   bundle(prodContainerPath, '../docs/*');
+
+  upload(DOC_BUNDLE_NAME);
 }
 
 console.log('deploy start!');
@@ -120,6 +135,10 @@ if (denv === 'release') {
 
 if (denv === 'test') {
   test();
+}
+
+if (denv === 'feature') {
+  feature();
 }
 
 if (denv === 'doc') {
