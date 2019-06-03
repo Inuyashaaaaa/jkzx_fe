@@ -13,6 +13,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     editVisible: false,
     editFormControls: {},
     editFormData: {},
+    editing: false,
   };
 
   public onRemove = async () => {
@@ -76,6 +77,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public onEdit = async () => {
     const rsp = await this.$form.validate();
     if (rsp.error) return;
+    this.setState({
+      editing: true,
+    });
     let editFormData = Form2.getFieldsValue(this.state.editFormData);
     editFormData = this.composeInstrumentInfo(editFormData);
     editFormData.instrumentInfo.maturity = isMoment(editFormData.instrumentInfo.maturity)
@@ -83,6 +87,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       : editFormData.instrumentInfo.maturity;
 
     const { error, data } = await mktInstrumentCreate(editFormData);
+    this.setState({
+      editing: false,
+    });
     if (error) {
       message.error('编辑失败');
       return;
@@ -137,6 +144,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
           visible={this.state.editVisible}
           onOk={this.onEdit}
           onCancel={this.switchModal}
+          okButtonProps={{ loading: this.state.editing }}
           title={'编辑标的物'}
         >
           <Form2
