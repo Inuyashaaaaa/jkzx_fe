@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { useRef, useState, memo } from 'react';
 import { Popconfirm, Divider, Modal, message } from 'antd';
 import { Form2 } from '@/containers';
 import { editFormControls } from './services';
@@ -6,30 +6,28 @@ import { mktInstrumentCreate, mktInstrumentDelete } from '@/services/market-data
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 
-class Operation extends PureComponent<{ record: any; fetchTable: any }> {
-  public $form: Form2 = null;
+const Operation = memo<{ record: any; fetchTable: any }>(props => {
+  let $form: Form2 = useRef(null);
 
-  public state = {
-    editVisible: false,
-    editFormControls: {},
-    editFormData: {},
-    editing: false,
-  };
+  const [editVisible, setEditVisible] = useState(false);
+  const [editFormControlsState, setEditformControlsState] = useState({});
+  const [editFormData, setEditFormData] = useState({});
+  const [editing, setEditing] = useState(false);
 
-  public onRemove = async () => {
+  const onRemove = async () => {
     const { error } = await mktInstrumentDelete({
-      instrumentId: this.props.record.instrumentId,
+      instrumentId: props.record.instrumentId,
     });
     if (error) {
       message.error('删除失败');
       return;
     }
     message.success('删除成功');
-    this.props.fetchTable();
+    props.fetchTable();
   };
 
-  public switchModal = () => {
-    const data = _.mapValues(this.props.record, (value, key) => {
+  const switchModal = () => {
+    const data = _.mapValues(props.record, (value, key) => {
       if ('expirationTime' === key) {
         return moment(value, 'HH:mm:ss');
       }
@@ -38,14 +36,12 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       }
       return value;
     });
-    this.setState({
-      editVisible: !this.state.editVisible,
-      editFormData: Form2.createFields(data),
-      editFormControls: editFormControls(this.props.record, 'edit'),
-    });
+    setEditVisible(!editVisible);
+    setEditFormData(Form2.createFields(data));
+    setEditformControlsState(editFormControls(props.record, 'edit'));
   };
 
-  public composeInstrumentInfo = modalFormData => {
+  const composeInstrumentInfo = modalFormData => {
     modalFormData.expirationDate = modalFormData.expirationDate
       ? moment(modalFormData.expirationDate).format('YYYY-MM-DD')
       : undefined;
@@ -71,47 +67,41 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     }
     const params = {
       ..._.omit(modalFormData, instrumentInfoFields),
-      instrumentInfo: this.omitNull(_.pick(modalFormData, instrumentInfoSomeFields)),
+      instrumentInfo: omitNull(_.pick(modalFormData, instrumentInfoSomeFields)),
     };
-    return this.omitNull(params);
+    return omitNull(params);
   };
 
-  public omitNull = obj => _.omitBy(obj, val => val === null);
+  const omitNull = obj => _.omitBy(obj, val => val === null);
 
-  public onEdit = async () => {
-    const rsp = await this.$form.validate();
+  const onEdit = async () => {
+    const rsp = await $form.validate();
     if (rsp.error) return;
-    this.setState({
-      editing: true,
-    });
-    let editFormData = Form2.getFieldsValue(this.state.editFormData);
-    editFormData = this.composeInstrumentInfo(editFormData);
-    editFormData.instrumentInfo.maturity = isMoment(editFormData.instrumentInfo.maturity)
-      ? moment(editFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
-      : editFormData.instrumentInfo.maturity;
+    setEditing(false);
+    let newEditFormData = Form2.getFieldsValue(editFormData);
+    newEditFormData = composeInstrumentInfo(newEditFormData);
+    newEditFormData.instrumentInfo.maturity = isMoment(newEditFormData.instrumentInfo.maturity)
+      ? moment(newEditFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
+      : newEditFormData.instrumentInfo.maturity;
+    const { error, data } = await mktInstrumentCreate(newEditFormData);
+    setEditing(false);
 
-    const { error, data } = await mktInstrumentCreate(editFormData);
-    this.setState({
-      editing: false,
-    });
     if (error) {
       message.error('编辑失败');
       return;
     }
     message.success('编辑成功');
-    this.setState({
-      editVisible: false,
-    });
-    this.props.fetchTable();
+    setEditVisible(false);
+    props.fetchTable();
     return;
   };
 
-  public filterFormData = (allFields, fields) => {
+  const filterFormData = (allFields, fields) => {
     const changed = Form2.getFieldsValue(fields);
     const formData = Form2.getFieldsValue(allFields);
     if (Object.keys(changed)[0] === 'assetClass') {
       return {
-        ..._.pick(this.props.record, ['instrumentId']),
+        ..._.pick(props.record, ['instrumentId']),
         ...changed,
       };
     }
@@ -124,44 +114,40 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     return formData;
   };
 
-  public onEditFormChange = (props, fields, allFields) => {
+  const onEditFormChange = (props, fields, allFields) => {
     const columns = editFormControls(Form2.getFieldsValue(allFields), 'edit');
-    this.setState({
-      editFormControls: columns,
-      editFormData: Form2.createFields(this.filterFormData(allFields, fields)),
-    });
+    setEditformControlsState(columns);
+    setEditFormData(Form2.createFields(filterFormData(allFields, fields)));
   };
 
-  public render() {
-    return (
-      <>
-        <a href="javascript:;" style={{ color: '#1890ff' }} onClick={this.switchModal}>
-          编辑
+  return (
+    <>
+      <a href="javascript:;" style={{ color: '#1890ff' }} onClick={switchModal}>
+        编辑
+      </a>
+      <Divider type="vertical" />
+      <Popconfirm title="确定要删除吗？" onConfirm={onRemove}>
+        <a href="javascript:;" style={{ color: 'red' }}>
+          删除
         </a>
-        <Divider type="vertical" />
-        <Popconfirm title="确定要删除吗？" onConfirm={this.onRemove}>
-          <a href="javascript:;" style={{ color: 'red' }}>
-            删除
-          </a>
-        </Popconfirm>
-        <Modal
-          visible={this.state.editVisible}
-          onOk={this.onEdit}
-          onCancel={this.switchModal}
-          okButtonProps={{ loading: this.state.editing }}
-          title={'编辑标的物'}
-        >
-          <Form2
-            ref={node => (this.$form = node)}
-            columns={this.state.editFormControls}
-            dataSource={this.state.editFormData}
-            onFieldsChange={this.onEditFormChange}
-            footer={false}
-          />
-        </Modal>
-      </>
-    );
-  }
-}
+      </Popconfirm>
+      <Modal
+        visible={editVisible}
+        onOk={onEdit}
+        onCancel={switchModal}
+        okButtonProps={{ loading: editing }}
+        title={'编辑标的物'}
+      >
+        <Form2
+          ref={node => ($form = node)}
+          columns={editFormControlsState}
+          dataSource={editFormData}
+          onFieldsChange={onEditFormChange}
+          footer={false}
+        />
+      </Modal>
+    </>
+  );
+});
 
 export default Operation;
