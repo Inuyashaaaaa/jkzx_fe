@@ -1,5 +1,3 @@
-import Page from '@/containers/Page';
-import TabHeader from '@/containers/TabHeader';
 import {
   wkProcessGet,
   wkProcessStatusModify,
@@ -9,11 +7,9 @@ import {
   wkProcessInstanceListByProcessName,
 } from '@/services/approvalProcessConfiguration';
 import uuidv4 from 'uuid/v4';
-import { wkApproveGroupList } from '@/services/auditing';
 import _ from 'lodash';
-import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE, TRIGGERTYPE } from '../constants';
+import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE, COLUMNS } from '../constants';
 import {
-  List,
   Switch,
   notification,
   Row,
@@ -23,19 +19,15 @@ import {
   Tag,
   Modal,
   Button,
-  Icon,
   message,
   Card,
 } from 'antd';
 import { Table2, Select, Form2, Input } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
 import React, { useRef, useEffect, useState } from 'react';
-import GroupSelcet from './GroupSelcet';
-import XLSX from 'xlsx';
+import EditTable from './EditTable';
+import TriggerCard from './TriggerCard';
 
 const Operation = props => {
-  let $form = useRef<Form2>(null);
-
   const [process, setProcess] = useState({});
   const [loading, setLoading] = useState(false);
   const [reviewVisible, setReviewVisible] = useState(false);
@@ -47,8 +39,7 @@ const Operation = props => {
   const [excelData, setExcelData] = useState([]);
   const [processConfigs, setProcessConfigs] = useState([]);
   let tableE1 = useRef<Table2>(null);
-  let tableE2 = useRef<Table2>(null);
-  const [targetVisible, setTargetVisible] = useState(false);
+  let $editTable = useRef<Table2>(null);
 
   useEffect(
     () => {
@@ -82,7 +73,6 @@ const Operation = props => {
   };
 
   const handleReviewData = processData => {
-    console.log(processData);
     const data = processData ? processData : process;
     let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
     reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
@@ -186,6 +176,7 @@ const Operation = props => {
 
     setProcess(cloneData);
     setProcessConfigs(data.processConfigs);
+    handleReviewData(data);
 
     notification.success({
       message: `${process.processName}流程保存成功`,
@@ -219,7 +210,6 @@ const Operation = props => {
 
   const configListChange = async (e, param) => {
     const processData = { ...process };
-    // const processConfigs = processData.processConfigs;
 
     const processConfigsData = processConfigs.map(item => {
       if (item.id === param.id) {
@@ -293,33 +283,6 @@ const Operation = props => {
     setWarningVisible(false);
   };
 
-  const downloadFormModal = () => {
-    const cols = ['sheet'];
-    const _data = cols.map(tab => {
-      const tabData = [['审批单号', '审批类型', '发起人', '标题', '发起时间']];
-      return _.concat(
-        tabData,
-        excelData.map(item => {
-          return [
-            item.processSequenceNum,
-            item.processName,
-            _.get(item, 'initiator.userName'),
-            item.subject,
-            item.startTime,
-          ];
-        })
-      );
-    });
-    const wb = XLSX.utils.book_new();
-
-    cols.forEach((item, index) => {
-      const ws = XLSX.utils.aoa_to_sheet(_data[index]);
-      XLSX.utils.book_append_sheet(wb, ws, item);
-    });
-    XLSX.writeFile(wb, `${process.processName}未完成审批单.xlsx`);
-    setWarningVisible(false);
-  };
-
   const showOtherModel = (e, currentTaskIdData) => {
     setCurrentTaskId(currentTaskIdData);
     let otherTaskData = (process.tasks || []).filter(item => item.taskId === currentTaskIdData);
@@ -339,7 +302,7 @@ const Operation = props => {
   };
 
   const handleOtherOk = async () => {
-    const res = await tableE2.validate();
+    const res = await $editTable.tableE2.current.validate();
     if (_.isArray(res)) {
       if (res.some(value => value.errors)) return;
     }
@@ -412,25 +375,12 @@ const Operation = props => {
     );
   };
 
-  const showTargetModel = () => {
-    setTargetVisible(true);
-  };
-
-  const onFormChange = (props, changedFields, allFields, rowIndex) => {};
-
-  const handleTargetOk = () => {
-    setTargetVisible(false);
-  };
-
-  const handleTargetCancel = () => {
-    setTargetVisible(false);
-  };
-
   const insertData = (_.get(process, 'tasks') || []).filter(item => {
     return item.taskType === 'insertData';
   });
   const approveGroups = _.get(insertData, '[0].approveGroups') || [];
   const { status } = process;
+
   return (
     <>
       <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
@@ -447,20 +397,7 @@ const Operation = props => {
                 {process.status ? '流程已启用' : '流程已停用'}
               </span>
             </Card>
-            <Card
-              title="流程触发"
-              style={{ marginTop: '10px' }}
-              bordered={false}
-              extra={<a onClick={e => showTargetModel(e, _.get(insertData, '[0].taskId'))}>修改</a>}
-            >
-              {(_.get(process, 'triggers') || []).map(item => {
-                return (
-                  <Tag style={{ margin: 5 }} key={item.approveGroupId}>
-                    {item.triggerName}
-                  </Tag>
-                );
-              })}
-            </Card>
+            <TriggerCard />
             <Card
               title="谁能发起"
               style={{ marginTop: '10px' }}
@@ -492,42 +429,20 @@ const Operation = props => {
           <Button type="primary" onClick={showReview}>
             编辑流程
           </Button>
-          <Table2
-            dataSource={reviewTask}
-            rowKey="taskId"
-            pagination={false}
-            columns={[
-              {
-                title: '节点名称',
-                dataIndex: 'taskName',
-                render: (value, record, index, { form, editing }) => {
-                  return value;
-                },
-              },
-              {
-                title: '节点触发器',
-                dataIndex: 'triggers',
-                render: (value, record, index, { form, editing }) => {
-                  return value;
-                },
-              },
-              {
-                title: '审批组',
-                dataIndex: 'approveGroups',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <>
-                      {value.map(item => {
-                        return <Tag key={item.approveGroupId}>{item.approveGroupName}</Tag>;
-                      })}
-                      <a onClick={e => showOtherModel(e, record.taskId)}>
-                        <Icon type="form" />
-                      </a>
-                    </>
-                  );
-                },
-              },
-            ]}
+          <EditTable
+            reviewTask={reviewTask}
+            showOtherModel={showOtherModel}
+            otherVisible={otherVisible}
+            handleOtherOk={handleOtherOk}
+            handleOtherCancel={handleOtherCancel}
+            otherTask={otherTask}
+            onOtherCellFieldsChange={onOtherCellFieldsChange}
+            getRef={node => ($editTable = node)}
+            warningVisible={warningVisible}
+            warningCancel={warningCancel}
+            excelData={excelData}
+            processName={process.processName}
+            setWarningVisible={setWarningVisible}
           />
         </Col>
       </Row>
@@ -551,186 +466,7 @@ const Operation = props => {
           rowKey="taskId"
           pagination={false}
           onCellFieldsChange={onReviewCellFieldsChange}
-          columns={[
-            {
-              title: '节点名称',
-              width: 200,
-              dataIndex: 'taskName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [
-                        {
-                          required: true,
-                          message: '节点名称为必填项',
-                        },
-                        {
-                          pattern: /^[^0-9]{1,}/,
-                          message: '节点名称不能以数字开头',
-                        },
-                      ],
-                    })(<Input editing={true} />)}
-                  </FormItem>
-                );
-              },
-            },
-            {
-              title: '审批组',
-              dataIndex: 'approveGroupList',
-              width: 250,
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
-                );
-              },
-            },
-            {
-              title: '操作',
-              dataIndex: 'action',
-              width: 150,
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <div style={{ display: 'flex', justifyContent: 'flex-end ' }}>
-                    {index !== 0 ? (
-                      <a style={{ margin: '0 5px' }} onClick={e => reviewMove(1, record, index)}>
-                        上移
-                      </a>
-                    ) : null}
-                    {index !== reviewTask.length - 1 ? (
-                      <a style={{ margin: '0 5px' }} onClick={e => reviewMove(-1, record, index)}>
-                        下移
-                      </a>
-                    ) : null}
-                    <a style={{ margin: '0 5px' }} onClick={e => reviewInsert(e, record, index)}>
-                      插入
-                    </a>
-                    <a style={{ margin: '0 5px' }} onClick={e => reviewDelete(e, record, index)}>
-                      删除
-                    </a>
-                  </div>
-                );
-              },
-            },
-          ]}
-        />
-      </Modal>
-      <Modal
-        visible={warningVisible}
-        width={520}
-        footer={
-          <Button type="primary" onClick={warningCancel}>
-            好吧
-          </Button>
-        }
-        closable={false}
-      >
-        <Alert
-          message="该流程下尚有未完成状态的审批单，暂无法修改"
-          description={<a onClick={downloadFormModal}>下载这些未完成的审批单</a>}
-          type="warning"
-          showIcon={true}
-          style={{
-            border: 'none',
-            backgroundColor: '#fff',
-          }}
-        />
-      </Modal>
-      <Modal
-        title="编辑流程"
-        visible={otherVisible}
-        onOk={handleOtherOk}
-        onCancel={handleOtherCancel}
-        okText="保存"
-        cancelText="放弃修改"
-        width={800}
-      >
-        <Table2
-          size="small"
-          ref={node => (tableE2 = node)}
-          dataSource={otherTask}
-          rowKey="taskId"
-          pagination={false}
-          onCellFieldsChange={onOtherCellFieldsChange}
-          columns={[
-            {
-              title: '节点名称',
-              dataIndex: 'taskName',
-              width: 200,
-              render: (value, record, index, { form, editing }) => {
-                return value;
-              },
-            },
-            {
-              title: '审批组',
-              dataIndex: 'approveGroupList',
-              width: 450,
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
-                );
-              },
-            },
-          ]}
-        />
-      </Modal>
-      <Modal
-        visible={targetVisible}
-        width={520}
-        title="选择触发器"
-        onOk={handleTargetOk}
-        onCancel={handleTargetCancel}
-      >
-        <Form2
-          ref={node => ($form = node)}
-          layout="horizontal"
-          footer={false}
-          dataSource={[]}
-          wrapperCol={{ span: 16 }}
-          labelCol={{ span: 8 }}
-          onFieldsChange={onFormChange}
-          columns={[
-            {
-              title: '触发方式',
-              dataIndex: 'triggerType',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true }],
-                    })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-                  </FormItem>
-                );
-              },
-            },
-            {
-              title: '选择触发器',
-              dataIndex: 'triggerName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true }],
-                    })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-                  </FormItem>
-                );
-              },
-            },
-            {
-              title: '组合方式',
-              dataIndex: 'operation',
-              render: (value, record, index, { form, editing }) => {
-                return value;
-              },
-            },
-            {
-              title: '条件列表',
-              dataIndex: 'conditions',
-              render: (value, record, index, { form, editing }) => {
-                return value;
-              },
-            },
-          ]}
+          columns={COLUMNS(reviewMove, reviewInsert, reviewDelete, reviewTask)}
         />
       </Modal>
     </>
