@@ -3,7 +3,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useEffect, useState, useRef } from 'react';
 import { Table2, Select, Form2, Input } from '@/containers';
 import { operation, symbol, RETURN_NUMBER } from './constants';
-import { Card, Icon, Row, Col, Modal, message } from 'antd';
+import { InputNumber, Icon, Row, Col, Modal, message } from 'antd';
 import { wkIndexList } from '@/services/approvalProcessConfiguration';
 import uuidv4 from 'uuid/v4';
 
@@ -11,37 +11,16 @@ const GroupList = memo<any>(props => {
   const [options, setOptions] = useState(null);
   const { record, index, onChange, getCurrent } = props;
   const { value } = props;
-  // value = value.map(item => {
-
-  // })
-
-  useEffect(() => {
-    fetchOptions();
-  }, []);
-
-  const fetchOptions = async () => {
-    // let data = props.value ? props.value : [];
-    // data = data.map(item => {
-    //   item.leftIndex = _.get(item, 'leftIndex.indexClass');
-    //   item.rightIndex = _.get(item, 'rightIndex.indexClass');
-    //   item.rightValue = _.get(item, 'rightValue.number') ? _.get(item, 'rightValue.number') : _.get(item, 'rightValue');
-    //   return {
-    //     ...Form2.createFields(item),
-    //     conditionId: item.conditionId,
-    //   };
-    // });
-    // onChange(data);
-  };
 
   const handleAdd = () => {
     const block = {
       ...Form2.createFields({
         description: '',
-        leftIndex: '',
+        // leftIndex: '',
         leftValue: {},
-        rightIndex: '',
-        rightValue: null,
-        symbol: '',
+        // rightIndex: '',
+        // rightValue: null,
+        // symbol: '',
       }),
       conditionId: uuidv4(),
     };
@@ -68,13 +47,14 @@ const GroupList = memo<any>(props => {
   const $childForm = useRef<Form2>({});
 
   const validate = () => {
-    let err = null;
-    value.map(async (item, index) => {
-      const { error, _error } = await $childForm.current[index].validate();
-      if (_error) err = _error;
-    });
-    console.log(err);
-    return err;
+    return Promise.all(
+      value.map((item, index) => {
+        if (!item) {
+          return null;
+        }
+        return $childForm.current[index].validate();
+      })
+    );
   };
 
   if (getCurrent) {
@@ -114,7 +94,7 @@ const GroupList = memo<any>(props => {
                     return (
                       <FormItem>
                         {form.getFieldDecorator({
-                          rules: [{ required: true }],
+                          rules: [{ required: true, message: '指标为必填项' }],
                         })(
                           <Select
                             style={{ width: '150px' }}
@@ -145,12 +125,12 @@ const GroupList = memo<any>(props => {
                     return (
                       <FormItem>
                         {form.getFieldDecorator({
-                          rules: [{ required: true }],
+                          rules: [{ required: true, message: '计算符为必填项' }],
                         })(
                           <Select
                             style={{ width: '150px' }}
                             options={symbol}
-                            placeholder="请选择计算福"
+                            placeholder="请选择计算符"
                           />
                         )}
                       </FormItem>
@@ -163,7 +143,7 @@ const GroupList = memo<any>(props => {
                     return (
                       <FormItem>
                         {form.getFieldDecorator({
-                          rules: [{ required: true }],
+                          rules: [{ required: true, message: '指标为必填项' }],
                         })(
                           <Select
                             style={{ width: '150px' }}
@@ -191,8 +171,8 @@ const GroupList = memo<any>(props => {
                     return (
                       <FormItem>
                         {form.getFieldDecorator({
-                          rules: [{ required: true }],
-                        })(<Input style={{ width: '150px' }} disabled={!disabled} />)}
+                          rules: [{ required: disabled, message: '数值为必填项' }],
+                        })(<InputNumber style={{ width: '150px' }} disabled={!disabled} />)}
                       </FormItem>
                     );
                   },

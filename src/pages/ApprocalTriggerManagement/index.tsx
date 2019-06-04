@@ -77,7 +77,6 @@ const ApprocalTriggerManagement = props => {
   };
 
   const findName = (data, filed, item) => {
-    // debugger
     const Index = _.findIndex(data, p => {
       return p[filed] === item;
     });
@@ -90,18 +89,12 @@ const ApprocalTriggerManagement = props => {
   const handleOk = async () => {
     const rsp = await $form.validate();
     if (rsp.error) return;
-    console.log(rsp);
 
     const currentTriggerData = Form2.getFieldsValue(_.cloneDeep(currentTrigger));
     let conditionsData = [...currentTriggerData.conditions];
-    console.log($formModel);
-    const cerror = $formModel.validate();
-    console.log(cerror);
-    // conditionsData.forEach(async (item,index) => {
-    //   console.log(item);
-    //   const _res = await item.validate();
-    //   console.log(_res);
-    // })
+    const cerror = await $formModel.validate();
+    const errLen = cerror.filter(item => item && item.error).length;
+    if (errLen > 0) return;
     conditionsData = conditionsData
       .filter(item => !!item)
       .map(item => {
@@ -113,11 +106,10 @@ const ApprocalTriggerManagement = props => {
     }
 
     conditionsData = conditionsData.map(item => {
-      item.rightValue = { number: item.rightValue };
+      item.rightValue = item.rightValue ? { number: item.rightValue } : {};
       return item;
     });
     const { data: _data, error: _error } = await wkIndexList({});
-    // debugger
     const strArr = conditionsData.map(item => {
       return `${findName(_data, 'indexClass', item.leftIndex)}${SYMBOL_MAP[item.symbol]}${
         item.rightIndex === 'returnNumberIndexImpl'
@@ -168,7 +160,6 @@ const ApprocalTriggerManagement = props => {
   };
 
   const onFormChange = (props, changedFields, allFields) => {
-    // debugger
     setCurrentTrigger({
       ...currentTrigger,
       ...changedFields,
@@ -176,7 +167,6 @@ const ApprocalTriggerManagement = props => {
   };
 
   const conditionLength = 3;
-  console.log(currentTrigger);
   return (
     <Page title="流程管理" footer={false} card={false}>
       <Spin size="large" tip="Loading..." spinning={loading}>
@@ -248,7 +238,7 @@ const ApprocalTriggerManagement = props => {
                 return (
                   <FormItem>
                     {form.getFieldDecorator({
-                      rules: [{ required: true }],
+                      rules: [{ required: true, message: '触发器名称为必填项' }],
                     })(<Input style={{ width: 250 }} />)}
                   </FormItem>
                 );
@@ -261,7 +251,7 @@ const ApprocalTriggerManagement = props => {
                 return (
                   <FormItem>
                     {form.getFieldDecorator({
-                      rules: [{ required: true }],
+                      rules: [{ required: true, message: '组合方式为必填项' }],
                     })(<Select style={{ width: 250 }} options={operation} />)}
                   </FormItem>
                 );
@@ -271,8 +261,6 @@ const ApprocalTriggerManagement = props => {
               title: '条件列表',
               dataIndex: 'conditions',
               render: (value, record, index, { form, editing }) => {
-                // debugger
-                console.log(value);
                 return (
                   <FormItem>
                     {form.getFieldDecorator({
