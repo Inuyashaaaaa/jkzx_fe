@@ -29,7 +29,13 @@ const TradingTemplate = memo(props => {
     const { error, data } = await docPoiTemplateList();
     setLoading(false);
     if (error) return;
-    setTradeData(data);
+    const newData = [...data];
+    newData.sort((item1, item2) => {
+      const data1 = item1.docType + item1.tradeType;
+      const data2 = item2.docType + item2.tradeType;
+      return data1.localeCompare(data2);
+    });
+    setTradeData(newData);
   };
 
   const removeTemplate = async record => {

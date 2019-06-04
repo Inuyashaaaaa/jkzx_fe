@@ -9,19 +9,7 @@ class TradeModal extends PureComponent {
   public $form: Form = null;
 
   public state = {
-    modalData: {
-      marketDisruption:
-        '到期日因标的资产、构成标的资产的任一股票或股票指数停牌而展期的，乙方应按年化利率6%于到期日向甲方支付资金成本，计算公式如下：资金成本=名义本金额x[0.00%]x(T/365)，其中T为自原定到期日(不含)起至实际到期日(含)期间的日历日天数。',
-      tradeOption:
-        '自期初观察日(含)至期末观察日(含)期间，交易所对标的资产、构成标的资产的任一股票或股票指数有价格涨跌幅限制的，若其连续[3]个交易日收盘价格达到交易所规定的当日涨跌幅限制时，甲方有权提前终止期权交易。',
-    },
     visible: false,
-  };
-
-  public handleChange = params => {
-    this.setState({
-      modalData: params.values,
-    });
   };
 
   public onClick = () => {
@@ -41,8 +29,6 @@ class TradeModal extends PureComponent {
     const { error } = await emlSendSupplementaryAgreementReport({
       tos: this.props.data.tradeEmail,
       tradeId: this.props.data.tradeId,
-      description7: this.state.modalData.marketDisruption,
-      description8: this.state.modalData.tradeOption,
       partyName: this.props.data.partyName,
     });
     if (error) {

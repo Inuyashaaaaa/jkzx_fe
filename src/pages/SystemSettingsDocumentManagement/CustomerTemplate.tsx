@@ -1,20 +1,18 @@
-import React, { memo, useState } from 'react';
-import { Table2, Form2, Input, Upload } from '@/containers';
-import { PRODUCTTYPE_ZHCH_MAP, DOC_MAP } from '@/constants/common';
-import { Divider, Popconfirm, Button, Modal, Icon, notification, Row, Col, Alert } from 'antd';
+import { DOC_MAP, PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
+import { Form2, Input, Table2, Upload } from '@/containers';
 import {
-  queryTemplateList,
   deleteTemplate,
-  docPoiTemplateList,
   HREF_UPLOAD_URL,
+  queryTemplateList,
   UPLOAD_URL,
-  COMFIRM_POI_URL,
-  docPoiTemplateDelete,
 } from '@/services/document';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import FormItem from 'antd/lib/form/FormItem';
-import { getToken } from '@/tools/authority';
 import { getMoment } from '@/tools';
+import { getToken } from '@/tools/authority';
+import { Alert, Button, Col, Divider, Icon, Modal, notification, Popconfirm, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React, { memo, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
 
 const CustomerTemplate = memo(props => {
   const [loading, setLoading] = useState(false);
