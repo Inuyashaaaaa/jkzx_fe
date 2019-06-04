@@ -58,7 +58,7 @@ const ApprocalTriggerManagement = props => {
   const showModel = (e, param) => {
     if (param) {
       let data = param.conditions;
-      data = data.map(item => {
+      data = (data || []).map(item => {
         item.leftIndex = _.get(item, 'leftIndex.indexClass');
         item.rightIndex = _.get(item, 'rightIndex.indexClass');
         item.rightValue = _.get(item, 'rightValue.number');

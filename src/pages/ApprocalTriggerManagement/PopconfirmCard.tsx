@@ -23,7 +23,7 @@ const PopconfirmCard = props => {
 
   return (
     <>
-      <Popover content={content} title={data.triggerName} trigger="click">
+      <Popover placement="bottomLeft" content={content} title={data.triggerName} trigger="click">
         <Icon type="info-circle" style={{ margin: '0 5px' }} />
       </Popover>
     </>

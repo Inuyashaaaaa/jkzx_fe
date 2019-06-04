@@ -32,13 +32,18 @@ export function GTE_PROCESS_CONFIGS(value) {
 export const TRIGGERTYPE = [
   {
     label: '全部触发',
-    value: '1',
+    value: false,
   },
   {
     label: '通过触发器',
-    value: '2',
+    value: true,
   },
 ];
+
+export const OPERATION_MAP = {
+  OR: '满足任一条件时触发',
+  AND: '满足所有条件时触发',
+};
 
 export function COLUMNS(reviewMove, reviewInsert, reviewDelete, reviewTask) {
   return [
