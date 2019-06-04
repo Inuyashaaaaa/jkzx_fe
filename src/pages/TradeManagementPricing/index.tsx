@@ -355,8 +355,10 @@ const TradeManagementPricing = props => {
 
           if (item == null) return record;
 
-          console.log(record);
-          if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.VANILLA_AMERICAN) {
+          if (
+            record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+            record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN
+          ) {
             return {
               ...record,
               ...Form2.createFields({

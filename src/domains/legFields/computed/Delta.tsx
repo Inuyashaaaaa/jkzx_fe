@@ -9,6 +9,7 @@ import { InputBase } from '@/components/type';
 import { Tag, Icon } from 'antd';
 import Import4 from '@/containers/DeltaModalInput';
 import _ from 'lodash';
+import { LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 
 class DeltaModalInput extends InputBase {
   public state = {
@@ -23,7 +24,6 @@ class DeltaModalInput extends InputBase {
 
   public renderEditing() {
     const { value = {}, onChange, onValueChange, record } = this.props;
-    console.log(this.props);
     return (
       <>
         <div style={{ position: 'relative' }}>
@@ -55,26 +55,13 @@ class DeltaModalInput extends InputBase {
 
   public renderRendering() {
     const { editing, value = [], onChange, onValueChange } = this.props;
-    return (
-      <>
-        {_.values(value).join(', ')}
-        {/* <a
-          href="javascript:;"
-          style={{ position: 'absolute', right: 20, transform: 'translateY(-50%)', top: '50%' }}
-          onClick={() => {
-            this.setState({ visible: true });
-          }}
-        >
-          详情
-        </a> */}
-      </>
-    );
+    return <>{_.values(value).join(', ')}</>;
   }
 }
 
-{
-  /* <FormItem>{form.getFieldDecorator()(<UnitInputNumber unit="手" editing={false} />)}</FormItem> */
-}
+// {
+//   /* <FormItem>{form.getFieldDecorator()(<UnitInputNumber unit="手" editing={false} />)}</FormItem> */
+// }
 
 export const Delta: ILegColDef = {
   title: 'DELTA',
@@ -86,6 +73,17 @@ export const Delta: ILegColDef = {
     };
   },
   render: (value, record, index, { form, editing, colDef }) => {
-    return <FormItem>{form.getFieldDecorator()(<DeltaModalInput record={record} />)}</FormItem>;
+    return (
+      <FormItem>
+        {form.getFieldDecorator()(
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+            record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN ? (
+            <DeltaModalInput record={record} />
+          ) : (
+            <UnitInputNumber unit="手" editing={false} />
+          )
+        )}
+      </FormItem>
+    );
   },
 };

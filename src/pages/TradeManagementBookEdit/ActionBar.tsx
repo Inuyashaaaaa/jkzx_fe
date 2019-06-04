@@ -15,7 +15,11 @@ const ActionBar = memo<{
   const getDisabled = () => {
     const result = tableData.every(record => {
       const legType = Form2.getFieldValue(record[LEG_TYPE_FIELD]);
-      return legType === LEG_TYPE_MAP.MODEL_XY;
+      return (
+        legType === LEG_TYPE_MAP.MODEL_XY ||
+        legType === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN ||
+        legType === LEG_TYPE_MAP.SPREAD_EUROPEAN
+      );
     });
     return result;
   };
