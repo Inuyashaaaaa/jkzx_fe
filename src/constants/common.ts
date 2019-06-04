@@ -573,7 +573,6 @@ export const LEG_FIELD = {
   COMMENT: 'comment',
   UNIT: 'unit',
   TRADE_NUMBER: 'tradeNumber',
-  DYNAMIC_UNDERLYER: 'dynamicUnderlyer',
 };
 
 /**
