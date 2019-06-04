@@ -68,60 +68,16 @@ class TradeModal extends PureComponent {
           <>
             <Alert
               style={{ marginBottom: 40 }}
-              message="交易确认书使用最新模板和下方输入的内容即时生成，系统不会留存每次生成的文档。"
-              description="请在下载或发送前，确认以下自定义内容。"
+              message="交易确认书基于最新的模板即时生成，系统不会留存每次生成的结果。"
               type="info"
               showIcon={true}
-            />
-            <Form
-              wrappedComponentRef={element => {
-                if (element) {
-                  this.$form = element.props.form;
-                }
-                return;
-              }}
-              controls={[
-                {
-                  field: 'marketDisruption',
-                  control: {
-                    label: '市场中断事件的处理',
-                  },
-                  input: {
-                    type: 'textarea',
-                    autosize: { minRows: 6, maxRows: 6 },
-                    maxLength: 500,
-                    showMaxLength: true,
-                    showResetButton: true,
-                  },
-                },
-                {
-                  field: 'tradeOption',
-                  control: {
-                    label: '提前终止期权交易的情形',
-                  },
-                  input: {
-                    type: 'textarea',
-                    autosize: { minRows: 6, maxRows: 6 },
-                    maxLength: 500,
-                    showMaxLength: true,
-                    showResetButton: true,
-                  },
-                },
-              ]}
-              dataSource={this.state.modalData}
-              onValueChange={this.handleChange}
-              controlNumberOneRow={1}
-              layout="vertical"
-              footer={false}
             />
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <Col>
                 <Button type="default">
                   <a
                     href={encodeURI(
-                      `${DOWN_LOAD_TRADE_URL}tradeId=${this.props.data.tradeId}&description7=${
-                        this.state.modalData.marketDisruption
-                      }&description8=${this.state.modalData.tradeOption}&partyName=${
+                      `${DOWN_LOAD_TRADE_URL}tradeId=${this.props.data.tradeId}&partyName=${
                         this.props.data.partyName
                       }`
                     )}
