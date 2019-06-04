@@ -21,6 +21,12 @@ export default {
         type: 'replenishUserInfo',
         payload: userInfo,
       });
+
+      // eslint-disable-next-line no-underscore-dangle
+      if (window._hmt && userInfo.username) {
+        // eslint-disable-next-line no-underscore-dangle
+        window._hmt.push(['_setUserTag', '7350', userInfo.username]);
+      }
     },
 
     *replenishUserInfo(action, { put }) {

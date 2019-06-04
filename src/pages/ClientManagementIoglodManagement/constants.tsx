@@ -42,6 +42,7 @@ export const PROCESSED_FORM_CONTROLS: (tabKey) => IFormControl[] = tabKey => {
         showSearch: true,
         allowClear: true,
         placeholder: '请输入内容搜索',
+        fetchOptionsOnSearch: true,
         options: async (value: string = '') => {
           const { data, error } = await refSimilarLegalNameList({
             similarLegalName: value,
@@ -64,6 +65,7 @@ export const PROCESSED_FORM_CONTROLS: (tabKey) => IFormControl[] = tabKey => {
         type: 'select',
         showSearch: true,
         placeholder: '请输入内容搜索',
+        fetchOptionsOnSearch: true,
         options: async (value: string = '') => {
           const { data, error } = await refMasterAgreementSearch({
             masterAgreementId: value,
@@ -85,6 +87,7 @@ export const PROCESSED_FORM_CONTROLS: (tabKey) => IFormControl[] = tabKey => {
         showSearch: true,
         allowClear: true,
         placeholder: '请输入内容搜索',
+        fetchOptionsOnSearch: true,
         options: async (value: string = '') => {
           const { data, error } = await trdTradeListBySimilarTradeId({
             similarTradeId: value,

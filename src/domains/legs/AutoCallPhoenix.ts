@@ -229,13 +229,10 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
       LEG_FIELD.IS_ANNUAL,
       ...COMPUTED_FIELDS,
     ]);
-    nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
+    // nextPosition.assetClass = ASSET_CLASS_MAP.EQUITY;
 
     if (!dataItem[AlreadyBarrier.dataIndex]) {
       nextPosition.asset[DownBarrierDate.dataIndex] = undefined;
-      nextPosition.lcmEventType = 'OPEN';
-    } else {
-      nextPosition.lcmEventType = 'KNOCK_IN';
     }
 
     nextPosition.asset.barrier = dataItem[LEG_FIELD.UP_BARRIER];
@@ -260,13 +257,12 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
         ? nextPosition.asset.expirationDate
         : nextPosition.asset.settlementDate;
 
-    nextPosition.asset.fixingObservations = dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
-      (result, item) => {
+    nextPosition.asset.fixingObservations =
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce((result, item) => {
         result[item[OB_DAY_FIELD]] = item.price !== undefined ? item.price : null;
         return result;
-      },
-      {}
-    );
+      }, {});
 
     nextPosition.asset.annualized = true;
 

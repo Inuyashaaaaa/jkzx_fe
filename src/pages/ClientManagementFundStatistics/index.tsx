@@ -195,11 +195,11 @@ class ClientManagementFundStatistics extends PureComponent {
                           },
                           {
                             label: '正常',
-                            value: 'true',
+                            value: true,
                           },
                           {
                             label: '异常',
-                            value: 'false',
+                            value: false,
                           },
                         ]}
                       />

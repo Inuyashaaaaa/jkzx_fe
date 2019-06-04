@@ -10,11 +10,12 @@ import { IFormControl } from '@/containers/_Form2';
 import { IColumnDef } from '@/containers/_Table2';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { getDate, getUnit } from '@/tools/format';
-import { formatNumber } from '@/tools';
+import { formatNumber, getMoment } from '@/tools';
 import { IFormColDef } from '@/components/type';
 import FormItem from 'antd/lib/form/FormItem';
 import { Select, DatePicker, InputNumber } from '@/containers';
 import React from 'react';
+import moment from 'moment';
 
 export const columns = [
   {
@@ -57,15 +58,23 @@ export const columns = [
   {
     title: '今收 (¥)',
     dataIndex: 'close',
-    render: (value, record, index) => formatNumber(value, 4),
+    render: (value, record, index) => {
+      if (
+        record.closeValuationDate &&
+        getMoment(record.closeValuationDate).isSame(moment(), 'day')
+      ) {
+        return formatNumber(value, 4);
+      }
+      return '-';
+    },
     width: 150,
   },
-  {
-    title: '昨收 (¥)',
-    dataIndex: 'yesterdayClose',
-    render: (value, record, index) => formatNumber(value, 4),
-    width: 150,
-  },
+  // {
+  //   title: '昨收 (¥)',
+  //   dataIndex: 'close',
+  //   render: (value, record, index) => formatNumber(value, 4),
+  //   width: 150,
+  // },
   {
     title: '交易所',
     dataIndex: 'exchange',

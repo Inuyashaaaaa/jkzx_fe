@@ -250,3 +250,13 @@ export async function rptCustomReportSearchPaged(params) {
     },
   });
 }
+
+export async function rptFinanicalOtcClientFundReportSearchPaged(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptFinanicalOtcClientFundReportSearchPaged',
+      params,
+    },
+  });
+}

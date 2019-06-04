@@ -13,6 +13,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     editVisible: false,
     editFormControls: {},
     editFormData: {},
+    editing: false,
   };
 
   public onRemove = async () => {
@@ -29,7 +30,10 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
 
   public switchModal = () => {
     const data = _.mapValues(this.props.record, (value, key) => {
-      if (key === 'maturity') {
+      if ('expirationTime' === key) {
+        return moment(value, 'HH:mm:ss');
+      }
+      if (['maturity', 'expirationDate'].indexOf(key) !== -1) {
         return moment(value);
       }
       return value;
@@ -42,8 +46,22 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   };
 
   public composeInstrumentInfo = modalFormData => {
-    const instrumentInfoFields = ['multiplier', 'name', 'exchange', 'maturity'];
-    let instrumentInfoSomeFields = ['multiplier', 'name', 'exchange', 'maturity'];
+    modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
+    modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
+    const instrumentInfoFields = [
+      'multiplier',
+      'name',
+      'exchange',
+      'maturity',
+      'expirationDate',
+      'expirationTime',
+      'optionType',
+      'exerciseType',
+      'strike',
+      'multiplier',
+      'underlyerInstrumentId',
+    ];
+    let instrumentInfoSomeFields = instrumentInfoFields;
     if (modalFormData.instrumentType === 'INDEX') {
       instrumentInfoSomeFields = ['name', 'exchange'];
     }
@@ -59,8 +77,19 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public onEdit = async () => {
     const rsp = await this.$form.validate();
     if (rsp.error) return;
-    const editFormData = Form2.getFieldsValue(this.state.editFormData);
-    const { error, data } = await mktInstrumentCreate(this.composeInstrumentInfo(editFormData));
+    this.setState({
+      editing: true,
+    });
+    let editFormData = Form2.getFieldsValue(this.state.editFormData);
+    editFormData = this.composeInstrumentInfo(editFormData);
+    editFormData.instrumentInfo.maturity = isMoment(editFormData.instrumentInfo.maturity)
+      ? moment(editFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
+      : editFormData.instrumentInfo.maturity;
+
+    const { error, data } = await mktInstrumentCreate(editFormData);
+    this.setState({
+      editing: false,
+    });
     if (error) {
       message.error('编辑失败');
       return;
@@ -115,6 +144,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
           visible={this.state.editVisible}
           onOk={this.onEdit}
           onCancel={this.switchModal}
+          okButtonProps={{ loading: this.state.editing }}
           title={'编辑标的物'}
         >
           <Form2
