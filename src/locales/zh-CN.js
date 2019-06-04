@@ -75,6 +75,7 @@ export default {
   'menu.approvalProcess.approvalProcessManagement': '流程管理',
   'menu.approvalProcess.auditingManagement': '审批组管理',
   'menu.approvalProcess.processConfiguration': '审批流程配置',
+  'menu.approvalProcess.triggerManagement': '触发器管理',
   'menu.reports': '报告',
   'menu.reports.spotLadder': '标的物情景分析',
   'menu.reports.pnlAttribution': '盈亏归因',

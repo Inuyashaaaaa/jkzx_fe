@@ -651,6 +651,21 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
             },
             width: 150,
           },
+          {
+            headerName: '触发器管理',
+            field: 'approcalTriggerManagement',
+            editable: true,
+            input: {
+              type: 'checkbox',
+              formatValue(value) {
+                if (value) {
+                  return <Icon type="check" />;
+                }
+                return <Icon type="close" />;
+              },
+            },
+            width: 150,
+          },
         ],
       },
       {
