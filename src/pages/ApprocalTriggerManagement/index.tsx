@@ -51,6 +51,7 @@ const ApprocalTriggerManagement = props => {
 
   const [visible, setVisible] = useState(false);
   const { triggerList, setTriggerList, loading, setLoading } = useList();
+
   const [currentTrigger, setCurrentTrigger] = useState({});
   const [create, setCreate] = useState(false);
 
@@ -167,6 +168,8 @@ const ApprocalTriggerManagement = props => {
   };
 
   const conditionLength = 3;
+  const triggerListSort = _.sortBy(_.cloneDeep(triggerList), 'triggerName');
+
   return (
     <Page title="流程管理" footer={false} card={false}>
       <Spin size="large" tip="Loading..." spinning={loading}>
@@ -179,7 +182,7 @@ const ApprocalTriggerManagement = props => {
               </span>
             </Card>
           </Col>
-          {triggerList.map(item => {
+          {triggerListSort.map(item => {
             return (
               <Col span={8} key={item.triggerId}>
                 <Card title={item.triggerName} className={styles.card}>
