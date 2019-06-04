@@ -1,9 +1,49 @@
-import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
+import { LEG_FIELD, RULES_REQUIRED, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
+import { InputBase } from '@/components/type';
+import { Import2 } from '@/containers/InstrumentModalInput';
+import { Tag, Icon } from 'antd';
 import React from 'react';
+
+class InstrumentModalInput extends InputBase {
+  public renderEditing() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        <div style={{ position: 'relative' }}>
+          {value.map((item, index) => {
+            return <Tag key="index">{item.initialSpot}</Tag>;
+          })}
+          <Icon
+            type="alert"
+            theme="twoTone"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 0,
+              transform: 'translateY(-50%)',
+            }}
+          />
+        </div>
+        <Import2 value={value} onChange={onChange} onValueChange={onValueChange} />
+      </>
+    );
+  }
+
+  public renderRendering() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        {value.map((item, index) => {
+          return <Tag key="index">{item.initialSpot}</Tag>;
+        })}
+      </>
+    );
+  }
+}
 
 export const InitialSpot: ILegColDef = {
   title: '期初价格',
@@ -16,6 +56,7 @@ export const InitialSpot: ILegColDef = {
     }
     return false;
   },
+  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -24,10 +65,14 @@ export const InitialSpot: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          <UnitInputNumber
-            autoSelect={isBooking || isPricing}
-            editing={isBooking || isPricing ? editing : false}
-          />
+          record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN') ? (
+            <InstrumentModalInput editing={editing} />
+          ) : (
+            <UnitInputNumber
+              autoSelect={isBooking || isPricing}
+              editing={isBooking || isPricing ? editing : false}
+            />
+          )
         )}
       </FormItem>
     );

@@ -18,7 +18,7 @@ import {
 } from '@/constants/global';
 import {
   LEG_ENV,
-  TOTAL_COMPUTED_FIELDS,
+  GENERAL_COMPUTED_FIELDS,
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
@@ -82,7 +82,7 @@ export const Eagle: ILeg = legPipeLine({
         NotionalAmount,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
-        ...TOTAL_COMPUTED_FIELDS,
+        ...GENERAL_COMPUTED_FIELDS,
       ];
     }
     if (env === LEG_ENV.EDITING) {

@@ -82,6 +82,7 @@ export const COMPUTED_LEG_FIELD_MAP = {
   VEGA: 'VEGA',
   THETA: 'THETA',
   RHO_R: 'RHO_R',
+  CEGA: 'CEGA',
 };
 
 export const COMPUTED_LEG_FIELDS = _.map(COMPUTED_LEG_FIELD_MAP, val => val);

@@ -17,7 +17,11 @@ export default class MultilLegCreateButton extends PureComponent<{
   public normalLegMenus = () => {
     const filterLegs = _.reject(TOTAL_LEGS, item => {
       if (!item) return true;
-      return item.type === LEG_TYPE_MAP.MODEL_XY;
+      return (
+        item.type === LEG_TYPE_MAP.MODEL_XY ||
+        item.type === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+        item.type === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN
+      );
     });
     const usedLegs = this.props.isPricing ? filterLegs : TOTAL_LEGS;
     return usedLegs;
