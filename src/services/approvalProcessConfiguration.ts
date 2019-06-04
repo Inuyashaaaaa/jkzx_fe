@@ -220,3 +220,23 @@ export async function wkProcessTriggerBusinessCreate(params = {}) {
     },
   });
 }
+
+export async function wkProcessTriggerBind(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerBind',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerUnbind(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerUnbind',
+      params,
+    },
+  });
+}

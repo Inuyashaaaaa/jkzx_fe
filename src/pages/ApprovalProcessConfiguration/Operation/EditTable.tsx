@@ -92,13 +92,13 @@ const EditTable = memo<any>(props => {
               return value;
             },
           },
-          {
-            title: '节点触发器',
-            dataIndex: 'triggers',
-            render: (value, record, index, { form, editing }) => {
-              return value;
-            },
-          },
+          // {
+          //   title: '节点触发器',
+          //   dataIndex: 'triggers',
+          //   render: (value, record, index, { form, editing }) => {
+          //     return value;
+          //   },
+          // },
           {
             title: '审批组',
             dataIndex: 'approveGroups',

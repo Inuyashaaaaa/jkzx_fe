@@ -384,7 +384,7 @@ const Operation = props => {
   return (
     <>
       <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
-        <Col xs={24} sm={4}>
+        <Col xs={24} sm={6}>
           <div>
             <Card bordered={false}>
               <Switch
@@ -397,7 +397,11 @@ const Operation = props => {
                 {process.status ? '流程已启用' : '流程已停用'}
               </span>
             </Card>
-            <TriggerCard />
+            <TriggerCard
+              triggers={process.triggers}
+              processName={process.processName}
+              fetchData={fetchData}
+            />
             <Card
               title="谁能发起"
               style={{ marginTop: '10px' }}
@@ -425,7 +429,7 @@ const Operation = props => {
             </Card>
           </div>
         </Col>
-        <Col xs={24} sm={20} style={{ background: '#fff', minHeight: '700px', padding: '20px' }}>
+        <Col xs={24} sm={18} style={{ background: '#fff', minHeight: '700px', padding: '20px' }}>
           <Button type="primary" onClick={showReview}>
             编辑流程
           </Button>
