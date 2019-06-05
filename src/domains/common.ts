@@ -29,11 +29,6 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
-    if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
-      const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
-      record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
-      return;
-    }
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
     const curLegHasUnitField = !!getLegByRecord(record)
@@ -86,13 +81,6 @@ const fetchInitialSpot = _.debounce(
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
-    if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
-      const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
-      record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
-      record[LEG_FIELD.WEIGHT] = Form2.createField(value);
-      return;
-    }
-
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
     setColLoading(LEG_FIELD.INITIAL_SPOT, true);
@@ -153,7 +141,7 @@ const computedTradeNumber = (
   );
 };
 
-export const commonLinkage = (
+export const inline = (
   env: string,
   changeFieldsParams: ITableTriggerCellFieldsChangeParams,
   record: ITableData,
@@ -164,32 +152,6 @@ export const commonLinkage = (
   setTableData: (newData: ITableData[]) => void
 ) => {
   const { changedFields } = changeFieldsParams;
-
-  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
-    fetchUnderlyerMultiplierAndUnit(
-      env,
-      changeFieldsParams,
-      record,
-      tableData,
-      setColLoading,
-      setLoading,
-      setColValue,
-      setTableData
-    );
-  }
-
-  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
-    fetchInitialSpot(
-      env,
-      changeFieldsParams,
-      record,
-      tableData,
-      setColLoading,
-      setLoading,
-      setColValue,
-      setTableData
-    );
-  }
 
   if (
     Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
@@ -248,14 +210,6 @@ export const commonLinkage = (
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
         .toNumber()
     );
-  }
-
-  if (Form2.fieldValueIsChange(LEG_FIELD.PREMIUM_TYPE, changedFields)) {
-    const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
-    record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
-      permiumType === PREMIUM_TYPE_MAP.PERCENT
-        ? Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.CNY)
-        : Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.LOT);
   }
 
   if (Form2.fieldValueIsChange(LEG_FIELD.IS_ANNUAL, changedFields)) {
@@ -359,6 +313,64 @@ export const commonLinkage = (
       record[LEG_FIELD.VOL] = Form2.createField(value);
     }
   }
+};
+
+export const commonLinkage = (
+  env: string,
+  changeFieldsParams: ITableTriggerCellFieldsChangeParams,
+  record: ITableData,
+  tableData: ITableData[],
+  setColLoading: (colId: string, loading: boolean) => void,
+  setLoading: (rowId: string, colId: string, loading: boolean) => void,
+  setColValue: (colId: string, newVal: IFormField) => void,
+  setTableData: (newData: ITableData[]) => void
+) => {
+  const { changedFields } = changeFieldsParams;
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
+    fetchUnderlyerMultiplierAndUnit(
+      env,
+      changeFieldsParams,
+      record,
+      tableData,
+      setColLoading,
+      setLoading,
+      setColValue,
+      setTableData
+    );
+  }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
+    fetchInitialSpot(
+      env,
+      changeFieldsParams,
+      record,
+      tableData,
+      setColLoading,
+      setLoading,
+      setColValue,
+      setTableData
+    );
+  }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.PREMIUM_TYPE, changedFields)) {
+    const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
+    record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
+      permiumType === PREMIUM_TYPE_MAP.PERCENT
+        ? Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.CNY)
+        : Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.LOT);
+  }
+
+  inline(
+    env,
+    changeFieldsParams,
+    record,
+    tableData,
+    setColLoading,
+    setLoading,
+    setColValue,
+    setTableData
+  );
 };
 
 export const commonGetPosition = (leg: ILeg) => {

@@ -440,7 +440,7 @@ class CommonModel extends PureComponent<any> {
             <SmartTable
               pagination={false}
               rowKey={'positionId'}
-              scroll={{ x: 2500 }}
+              scroll={{ x: 2650 }}
               dataSource={tableDataSource}
               columns={BOOKING_TABLE_COLUMN_DEFS(this.search, this.props.name)}
               onRow={record => {

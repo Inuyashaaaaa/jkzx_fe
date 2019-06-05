@@ -40,6 +40,7 @@ const Operation = props => {
   const [processConfigs, setProcessConfigs] = useState([]);
   let tableE1 = useRef<Table2>(null);
   let $editTable = useRef<Table2>(null);
+  const [isInstanceList, setIsInstanceList] = useState(false);
 
   useEffect(
     () => {
@@ -141,14 +142,21 @@ const Operation = props => {
 
   const featchProcessModify = async tasks => {
     const { processName } = process;
-    const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
-      processName,
-    });
-    if (_error) return;
-    if (_data.length > 0) {
-      setExcelData(_data);
-      return setWarningVisible(true);
+    let modify = true;
+    console.log(isInstanceList);
+    if (isInstanceList) {
+      const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
+        processName,
+      });
+      if (_error) return (modify = false);
+      if (_data.length > 0) {
+        setExcelData(_data);
+        return setWarningVisible(true);
+      }
     }
+
+    if (!modify) return;
+
     const taskList = tasks.map((item, index) => {
       return {
         ...item,
@@ -190,6 +198,7 @@ const Operation = props => {
   };
 
   const showReview = () => {
+    setIsInstanceList(true);
     setReviewVisible(true);
   };
 
@@ -284,6 +293,7 @@ const Operation = props => {
   };
 
   const showOtherModel = (e, currentTaskIdData) => {
+    setIsInstanceList(false);
     setCurrentTaskId(currentTaskIdData);
     let otherTaskData = (process.tasks || []).filter(item => item.taskId === currentTaskIdData);
     otherTaskData = otherTaskData.map(item => {
@@ -308,14 +318,6 @@ const Operation = props => {
     }
 
     const { processName } = process;
-    const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
-      processName,
-    });
-    if (_error) return;
-    if (_data.length > 0) {
-      setExcelData(_data);
-      return setWarningVisible(true);
-    }
 
     let tasks = _.cloneDeep(process.tasks);
     tasks = _.sortBy(tasks, 'sequence');
@@ -433,6 +435,29 @@ const Operation = props => {
           <Button type="primary" onClick={showReview} style={{ marginBottom: 15 }}>
             编辑流程
           </Button>
+          <Modal
+            title="编辑流程"
+            visible={reviewVisible}
+            onOk={handleReviewOk}
+            onCancel={handleReviewCancel}
+            okText="保存"
+            cancelText="放弃修改"
+            width={800}
+          >
+            <Alert
+              message="如果不需要增删节点、调整节点顺序或修改节点名称，建议通过编辑节点来实现审批组或触发器的修改。"
+              type="info"
+              showIcon={true}
+            />
+            <Table2
+              ref={node => (tableE1 = node)}
+              dataSource={reviewTask}
+              rowKey="taskId"
+              pagination={false}
+              onCellFieldsChange={onReviewCellFieldsChange}
+              columns={COLUMNS(reviewMove, reviewInsert, reviewDelete, reviewTask)}
+            />
+          </Modal>
           <EditTable
             reviewTask={reviewTask}
             showOtherModel={showOtherModel}
@@ -450,29 +475,6 @@ const Operation = props => {
           />
         </Col>
       </Row>
-      <Modal
-        title="编辑流程"
-        visible={reviewVisible}
-        onOk={handleReviewOk}
-        onCancel={handleReviewCancel}
-        okText="保存"
-        cancelText="放弃修改"
-        width={800}
-      >
-        <Alert
-          message="如果不需要增删节点、调整节点顺序或修改节点名称，建议通过编辑节点来实现审批组或触发器的修改。"
-          type="info"
-          showIcon={true}
-        />
-        <SmartTable
-          ref={node => (tableE1 = node)}
-          dataSource={reviewTask}
-          rowKey="taskId"
-          pagination={false}
-          onCellFieldsChange={onReviewCellFieldsChange}
-          columns={COLUMNS(reviewMove, reviewInsert, reviewDelete, reviewTask)}
-        />
-      </Modal>
     </>
   );
 };

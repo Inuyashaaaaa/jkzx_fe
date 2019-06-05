@@ -427,54 +427,42 @@ class PricingSettingVolSurface extends PureComponent {
               columns={SEARCH_FORM(this.state.groups, this.state.searchFormData)}
             />
             <Divider type="horizontal" />
-            <div style={{ display: 'flex' }}>
+            <Row>
               <Button type="primary" onClick={this.handleSaveTable}>
                 保存
               </Button>
-              {/* <InputButton
-                // disabled={!this.lastFetchedDataSource}
-                key="快捷设置常数"
-                type="primary"
-                onClick={this.onSetConstantsButtonClick}
-                input={{
-                  type: 'number',
-                  formatter: value => `${value}%`,
-                  parser: value => value.replace('%', ''),
-                }}
-              >
-                快捷设置常数
-                </InputButton> */}
-            </div>
-            <Divider type="horizontal" />
+            </Row>
             {this.underlyer ? (
-              <Form2
-                layout="inline"
-                dataSource={Form2.createFields(this.state.tableFormData)}
-                submitable={false}
-                resetable={false}
-                onFieldsChange={this.onTableFormChange}
-                columns={[
-                  {
-                    dataIndex: 'quote',
-                    title: '标的物价格',
-                    render: (value, record, index, { form, editing }) => {
-                      return (
-                        <FormItem>
-                          {form.getFieldDecorator({
-                            rules: [
-                              {
-                                required: true,
-                              },
-                            ],
-                          })(<InputNumber style={{ width: 200 }} />)}
-                        </FormItem>
-                      );
+              <>
+                <Divider type="horizontal" />
+                <Form2
+                  layout="inline"
+                  dataSource={Form2.createFields(this.state.tableFormData)}
+                  submitable={false}
+                  resetable={false}
+                  onFieldsChange={this.onTableFormChange}
+                  columns={[
+                    {
+                      dataIndex: 'quote',
+                      title: '标的物价格',
+                      render: (value, record, index, { form, editing }) => {
+                        return (
+                          <FormItem>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: true,
+                                },
+                              ],
+                            })(<InputNumber style={{ width: 200 }} />)}
+                          </FormItem>
+                        );
+                      },
                     },
-                  },
-                ]}
-              />
+                  ]}
+                />
+              </>
             ) : null}
-
             <SmartTable
               dataSource={tableDataSource}
               columns={columns}

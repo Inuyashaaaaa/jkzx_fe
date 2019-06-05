@@ -165,7 +165,7 @@ const MultiLegTable = memo<
         ...item,
         onCell() {
           return {
-            width: '180px',
+            width: '190px',
             ...(item.onCell ? item.onCell.apply(this, arguments) : null),
           };
         },

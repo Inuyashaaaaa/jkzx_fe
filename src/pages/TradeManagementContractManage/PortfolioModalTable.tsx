@@ -1,15 +1,15 @@
-import ModalButton from '@/containers/ModalButton';
-import SourceTable from '@/containers/SourceTable';
 import {
   trdPortfolioListBySimilarPortfolioName,
   trdTradePortfolioCreateBatch,
-  trdTradePortfolioDelete,
 } from '@/services/trade-service';
-import { message, Modal } from 'antd';
+import { Divider, message, Modal } from 'antd';
+import SmartTable from '@/containers/SmartTable';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import ActionCol from './ActionCol';
+import { Form2, Select } from '@/containers';
 
 class PortfolioModalTable extends PureComponent<
   { rowData: any; portfolioModalVisible: boolean; handlePortfolioVisible: any },
@@ -19,13 +19,18 @@ class PortfolioModalTable extends PureComponent<
     modalVisible: false,
     value: [],
     dataSource: [],
+    options: [],
+    portfolioNames: [],
   };
+
+  private form: Form2 = null;
+
   public componentDidMount = () => {
     if (!this.props.rowData.portfolioNames) {
       return;
     }
     const portfolioNames = this.props.rowData.portfolioNames;
-
+    this.setOptions();
     this.setState({
       dataSource: portfolioNames.map(item => {
         return {
@@ -48,20 +53,22 @@ class PortfolioModalTable extends PureComponent<
 
   public onRemove = params => {
     const clone = [...this.state.dataSource];
-    const index = this.state.dataSource.findIndex(item => item.portfolio === params.data.portfolio);
+    const index = this.state.dataSource.findIndex(item => item.portfolio === params.portfolio);
     clone.splice(index, 1);
     this.setState({
       dataSource: clone,
     });
   };
 
-  public handleCreate = async params => {
+  public handleCreate = async () => {
+    const rsp = await this.form.validate();
+    if (rsp.error) return;
     const { error, data } = await trdTradePortfolioCreateBatch({
       tradeId: this.props.rowData.tradeId,
-      portfolioNames: params.searchFormData.create,
+      portfolioNames: this.state.portfolioNames,
     });
     if (error) return;
-    const datas = params.searchFormData.create.map(item => {
+    const datas = this.state.portfolioNames.map(item => {
       return {
         uuid: uuidv4(),
         portfolio: item,
@@ -71,6 +78,28 @@ class PortfolioModalTable extends PureComponent<
     this.setState({
       dataSource: [...this.state.dataSource, ...datas],
     });
+  };
+
+  public onSearchFormChange = (props, fields, allFields) => {
+    this.setState({ portfolioNames: allFields.portfolioNames.value });
+  };
+
+  public setOptions = async (value?) => {
+    const options = await this.getOptions(value);
+    this.setState({ options });
+  };
+
+  public getOptions = async (value: string = '') => {
+    const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+      similarPortfolioName: value,
+    });
+    if (error) {
+      return [];
+    }
+    return data.map(item => ({
+      label: item,
+      value: item,
+    }));
   };
 
   public render() {
@@ -85,58 +114,66 @@ class PortfolioModalTable extends PureComponent<
           visible={this.props.portfolioModalVisible}
         >
           <>
-            <SourceTable
-              rowKey="uuid"
-              title="已加入的投资组合"
-              dataSource={this.state.dataSource}
-              columnDefs={[
-                { headerName: '投资组合', field: 'portfolio' },
+            <Form2
+              ref={node => (this.form = node)}
+              layout="inline"
+              resetable={false}
+              submitText="加入"
+              onSubmit={this.handleCreate}
+              onFieldsChange={this.onSearchFormChange}
+              columns={[
                 {
-                  headerName: '操作',
-                  render: params => {
+                  title: '请选择投资组合',
+                  dataIndex: 'portfolioNames',
+                  render: (value, record, index, { form, editing }) => {
                     return (
-                      <ActionCol
-                        params={params}
-                        rowData={this.props.rowData}
-                        onRemove={this.onRemove.bind(this)}
-                      />
+                      <FormItem>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: true,
+                              message: '投资组合为必填项',
+                            },
+                          ],
+                        })(
+                          <Select
+                            style={{ minWidth: 180 }}
+                            mode="multiple"
+                            placeholder="请输入内容搜索"
+                            showSearch={true}
+                            allowClear={true}
+                            onSearch={this.setOptions}
+                            options={this.state.options}
+                          />
+                        )}
+                      </FormItem>
                     );
                   },
                 },
               ]}
-              searchable={true}
-              onSearchButtonClick={this.handleCreate}
-              searchButtonProps={{ icon: null }}
-              searchText={'加入'}
-              searchFormControls={[
+            />
+            <Divider />
+            <SmartTable
+              title={() => '已加入的投资组合'}
+              rowKey="uuid"
+              bordered={true}
+              dataSource={this.state.dataSource}
+              size="small"
+              columns={[
                 {
-                  field: 'create',
-                  control: {
-                    label: '请选择投资组合',
-                  },
-                  input: {
-                    type: 'select',
-                    mode: 'multiple',
-                    placeholder: '请输入内容搜索',
-                    showSearch: true,
-                    allowClear: true,
-                    options: async (value: string = '') => {
-                      const { data, error } = await trdPortfolioListBySimilarPortfolioName({
-                        similarPortfolioName: value,
-                      });
-                      if (error) return [];
-                      return data.map(item => ({
-                        label: item,
-                        value: item,
-                      }));
-                    },
-                  },
-                  decorator: {
-                    rules: [
-                      {
-                        required: true,
-                      },
-                    ],
+                  title: '投资组合',
+                  dataIndex: 'portfolio',
+                },
+                {
+                  title: '操作',
+                  render: (value, record, index) => {
+                    return (
+                      <ActionCol
+                        params={record}
+                        rowData={this.props.rowData}
+                        onRemove={this.onRemove}
+                      />
+                    );
                   },
                 },
               ]}

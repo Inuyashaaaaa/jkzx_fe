@@ -13,6 +13,7 @@ import React from 'react';
 import Operations from './containers/CommonModel/Operations';
 import styles from '@/styles/index.less';
 import _ from 'lodash';
+import moment = require('moment');
 
 const TimelineItem = Timeline.Item;
 
@@ -69,7 +70,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
   {
     title: '标的物',
     dataIndex: 'underlyerInstrumentId',
-    width: 100,
+    width: 200,
     render: (val, record, index) => {
       if (
         record.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
@@ -93,7 +94,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
   {
     title: '期权类型',
     dataIndex: 'productType',
-    width: 100,
+    width: 150,
     // width: 150,
     render: (text, record, index) => {
       return PRODUCTTYPE_ZHCH_MAP[text];
@@ -158,38 +159,32 @@ export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
   },
 ];
 
-export const OVERVIEW_TABLE_COLUMNDEFS: IColumnDef[] = [
+export const OVERVIEW_TABLE_COLUMNDEFS = [
   {
-    headerName: '交易编号',
-    field: 'tradeId',
+    title: '交易编号',
+    dataIndex: 'tradeId',
     width: 150,
   },
   {
-    headerName: '持仓编号',
-    field: 'positionId',
+    title: '持仓编号',
+    dataIndex: 'positionId',
     width: 150,
   },
   {
-    headerName: '操作用户',
-    field: 'userLoginId',
+    title: '操作用户',
+    dataIndex: 'userLoginId',
     width: 150,
   },
   {
-    headerName: '操作时间',
-    field: 'createdAt',
+    title: '操作时间',
+    dataIndex: 'createdAt',
     width: 150,
-    input: {
-      type: 'date',
-      format: 'YYYY-MM-DD HH:mm:ss',
-    },
+    render: value => moment(value).format('YYYY-MM-DD HH:mm:ss'),
   },
   {
-    headerName: '生命周期事件',
-    field: 'lcmEventType',
+    title: '生命周期事件',
+    dataIndex: 'lcmEventType',
     width: 150,
-    input: {
-      type: 'select',
-      options: LCM_EVENT_TYPE_OPTIONS,
-    },
+    render: value => LCM_EVENT_TYPE_ZHCN_MAP[value] || value,
   },
 ];
