@@ -124,17 +124,17 @@ const Operation = props => {
     // 授信
     if (processName === '授信额度变更') {
       if (taskType === 'REVIEW_DATA') {
-        return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
+        return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
       }
-      return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
+      return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
     }
 
     // 交易
     if (processName === '交易录入') {
       if (taskType === 'REVIEW_DATA') {
-        return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
+        return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
       }
-      return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
+      return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
     }
 
     throw new Error('getActionClass: no match');
