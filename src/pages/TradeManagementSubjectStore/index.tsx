@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Form } from '@/containers';
+import { Form2 } from '@/containers';
 import Page from '@/containers/Page';
 import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
 import { Button, Divider, message, Modal, Table } from 'antd';
@@ -229,7 +229,6 @@ const TradeManagementMarketManagement = props => {
       >
         <Form2
           ref={node => ($form = node)}
-          layout="horizontal"
           columns={createFormControlsState}
           dataSource={createFormData}
           onFieldsChange={onCreateFormChange}
