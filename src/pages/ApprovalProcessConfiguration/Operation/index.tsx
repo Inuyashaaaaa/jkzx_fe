@@ -399,11 +399,13 @@ const Operation = props => {
                 {process.status ? '流程已启用' : '流程已停用'}
               </span>
             </Card>
-            <TriggerCard
-              triggers={process.triggers}
-              processName={process.processName}
-              fetchData={fetchData}
-            />
+            {process.processName === '交易录入' ? (
+              <TriggerCard
+                triggers={process.triggers}
+                processName={process.processName}
+                fetchData={fetchData}
+              />
+            ) : null}
             <Card
               title="谁能发起"
               style={{ marginTop: '10px' }}
