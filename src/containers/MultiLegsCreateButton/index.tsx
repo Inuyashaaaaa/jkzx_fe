@@ -1,6 +1,6 @@
 import { TOTAL_LEGS } from '@/constants/legs';
 import { ILeg } from '@/types/leg';
-import { Button, Dropdown, Menu } from 'antd';
+import { Button, Dropdown, Menu, Icon } from 'antd';
 import React, { PureComponent } from 'react';
 import { getLegByType } from '@/tools';
 import { LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
@@ -46,6 +46,14 @@ export default class MultilLegCreateButton extends PureComponent<{
         trigger={['click']}
         overlay={
           <Menu
+            style={{
+              height: '400px',
+              width: '300px',
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start',
+            }}
             onClick={event => {
               const leg = getLegByType(event.key);
               this.props.handleAddLeg(leg);
@@ -56,7 +64,10 @@ export default class MultilLegCreateButton extends PureComponent<{
         }
         placement="bottomLeft"
       >
-        <Button type="primary">添加期权结构</Button>
+        <Button type="primary">
+          添加期权结构
+          <Icon type="down" />
+        </Button>
       </Dropdown>
     );
   }

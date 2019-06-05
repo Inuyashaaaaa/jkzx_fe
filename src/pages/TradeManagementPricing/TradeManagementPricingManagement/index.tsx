@@ -383,7 +383,7 @@ const TradeManagementPricingManagement = props => {
                               <TimelineItem
                                 style={{
                                   paddingBottom:
-                                    index === record.quotePositions.length - 1 ? 0 : 37,
+                                    index === record.quotePositions.length - 1 ? 0 : 30.5,
                                 }}
                                 key={index}
                               />

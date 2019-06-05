@@ -140,7 +140,7 @@ class Select extends InputBase<
   public renderRendering() {
     const { value } = this.props;
     return (
-      <span style={{ display: 'inline-block', width: '100%', lineHeight: '40px' }}>
+      <span style={{ display: 'inline-block', width: '100%' }}>
         {value &&
           (Array.isArray(value) ? value : [value])
             .map(val => {

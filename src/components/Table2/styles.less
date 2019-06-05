@@ -89,70 +89,156 @@
     }
 
     &.@{ant-prefix}-table-default {
-      > .ant-table-content {
-        > .ant-table-body {
-          > table {
-            > .ant-table-tbody {
-              > tr {
-                &.@{ant-prefix}-table-expanded-row {
-                  > td {
-                    padding: @table-padding-vertical @table-padding-horizontal;
-                  }
-                }
-                > td {
-                  padding: 0 @table-padding-horizontal;
-                  height: @table-cell-height;
-                }
-              }
+      table {
+        tr {
+          &.@{ant-prefix}-table-expanded-row {
+            td {
+              padding: @table-padding-vertical @table-padding-horizontal !important;
             }
+          }
+          td {
+            padding: 0 @table-padding-horizontal !important;
+            height: @table-cell-height;
           }
         }
       }
     }
 
     &.@{ant-prefix}-table-middle {
-      > .ant-table-content {
-        > .ant-table-body {
-          > table {
-            > .ant-table-tbody {
-              > tr {
-                &.@{ant-prefix}-table-expanded-row {
-                  > td {
-                    padding: @table-padding-vertical-md @table-padding-horizontal-md;
-                  }
-                }
-                > td {
-                  padding: 0 @table-padding-horizontal-md;
-                  height: @table-cell-height-md;
-                }
-              }
+      table {
+        tr {
+          &.@{ant-prefix}-table-expanded-row {
+            td {
+              padding: @table-padding-vertical-md @table-padding-horizontal-md !important;
             }
+          }
+          td {
+            padding: 0 @table-padding-horizontal-md !important;
+            height: @table-cell-height-md;
           }
         }
       }
     }
 
     &.@{ant-prefix}-table-small {
-      > .ant-table-content {
-        > .ant-table-body {
-          > table {
-            > .ant-table-tbody {
-              > tr {
-                &.@{ant-prefix}-table-expanded-row {
-                  > td {
-                    padding: @table-padding-vertical-sm @table-padding-horizontal-sm;
-                  }
-                }
-                > td {
-                  padding: 0 @table-padding-horizontal-sm;
-                  height: @table-cell-height-sm;
-                }
-              }
+      table {
+        tr {
+          &.@{ant-prefix}-table-expanded-row {
+            td {
+              padding: @table-padding-vertical-sm @table-padding-horizontal-sm !important;
             }
           }
         }
       }
     }
+  }
+
+  .ant-table-small > .ant-table-content > .ant-table-header > table > .ant-table-thead > tr > th,
+  .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-thead > tr > th,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-scroll
+    > .ant-table-header
+    > table
+    > .ant-table-thead
+    > tr
+    > th,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-scroll
+    > .ant-table-body
+    > table
+    > .ant-table-thead
+    > tr
+    > th,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-left
+    > .ant-table-header
+    > table
+    > .ant-table-thead
+    > tr
+    > th,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-right
+    > .ant-table-header
+    > table
+    > .ant-table-thead
+    > tr
+    > th,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-left
+    > .ant-table-body-outer
+    > .ant-table-body-inner
+    > table
+    > .ant-table-thead
+    > tr
+    > th,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-right
+    > .ant-table-body-outer
+    > .ant-table-body-inner
+    > table
+    > .ant-table-thead
+    > tr
+    > th,
+  .ant-table-small > .ant-table-content > .ant-table-header > table > .ant-table-tbody > tr > td,
+  .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-scroll
+    > .ant-table-header
+    > table
+    > .ant-table-tbody
+    > tr
+    > td,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-scroll
+    > .ant-table-body
+    > table
+    > .ant-table-tbody
+    > tr
+    > td,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-left
+    > .ant-table-header
+    > table
+    > .ant-table-tbody
+    > tr
+    > td,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-right
+    > .ant-table-header
+    > table
+    > .ant-table-tbody
+    > tr
+    > td,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-left
+    > .ant-table-body-outer
+    > .ant-table-body-inner
+    > table
+    > .ant-table-tbody
+    > tr
+    > td,
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-right
+    > .ant-table-body-outer
+    > .ant-table-body-inner
+    > table
+    > .ant-table-tbody
+    > tr
+    > td {
+    padding: 0 @table-padding-horizontal-sm;
+    height: @table-cell-height-sm;
   }
 
   .@{ant-prefix}-table-vertical {

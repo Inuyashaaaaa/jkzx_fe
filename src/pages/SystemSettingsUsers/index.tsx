@@ -207,7 +207,6 @@ class SystemSettingsUsers extends PureComponent {
                 departmentsTreeData(this.state.departments),
                 this.fetchData
               )}
-              size={'middle'}
               scroll={{ x: 1800 }}
               onCellFieldsChange={this.handleCellValueChanged}
               onCellEditingChanged={async params => {

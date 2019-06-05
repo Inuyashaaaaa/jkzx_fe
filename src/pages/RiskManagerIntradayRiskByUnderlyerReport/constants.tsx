@@ -32,6 +32,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4) + '%';
     },
+    align: 'right',
   },
   {
     title: '标的物持仓 (手)',
