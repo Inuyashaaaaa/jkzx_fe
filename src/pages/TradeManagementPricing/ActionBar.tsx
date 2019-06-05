@@ -127,7 +127,6 @@ const ActionBar = memo<any>(props => {
           </Button>
           <Button
             key="历史试定价"
-            type="primary"
             onClick={() => {
               setVisible(true);
             }}
