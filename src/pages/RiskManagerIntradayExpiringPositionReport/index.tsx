@@ -16,7 +16,7 @@ const RiskManagerIntradayExpiringPositionReport = memo<any>(props => {
       defaultDirection={'desc'}
       searchMethod={rptIntradayTradeExpiringReportPaged}
       downloadName={'到期合约'}
-      scrollWidth={2800}
+      scrollWidth={3000}
       colSwitch={[{ dataIndex: 'productType', options: PRODUCTTYPE_ZHCH_MAP }]}
     />
   );

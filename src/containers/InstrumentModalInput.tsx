@@ -102,7 +102,9 @@ export const Import2 = memo<{
                 .omitBy(_.isNull)
                 .get('last', 1)
                 .value()
-            ).toNumber();
+            )
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber();
 
             const weight = new BigNumber(1)
               .div(initialSpot)
@@ -195,7 +197,7 @@ export const Import2 = memo<{
             },
           },
           {
-            title: '期初价格￥',
+            title: '期初价格(￥)',
             dataIndex: 'initialSpot',
             editable: true,
             defaultEditing: false,
@@ -218,7 +220,7 @@ export const Import2 = memo<{
               return (
                 <FormItem>
                   {form.getFieldDecorator({})(
-                    <UnitInputNumber editing={editing} autoSelect={true} />
+                    <UnitInputNumber editing={editing} autoSelect={true} unit="" />
                   )}
                 </FormItem>
               );

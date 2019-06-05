@@ -37,7 +37,7 @@ import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { Forward } from '@/domains/legs/Forward';
-import { LinearSpreadEuropean } from '@/domains/legs/LinearSpreadEuropean';
+import { SpreadEuropean } from '@/domains/legs/SpreadEuropean';
 import { RatioSpreadEuropean } from '@/domains/legs/RatioSpreadEuropean';
 import { Cega } from '@/domains/legFields/computed/Cega';
 
@@ -63,7 +63,7 @@ export const TOTAL_LEGS = [
   Asia,
   Straddle,
   Forward,
-  LinearSpreadEuropean,
+  SpreadEuropean,
   RatioSpreadEuropean,
 ];
 

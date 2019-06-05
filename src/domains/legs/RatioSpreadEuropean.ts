@@ -5,6 +5,7 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
+  LEG_TYPE_FIELD,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -30,7 +31,7 @@ import {
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '../../constants/common';
-import { commonLinkage } from '../common';
+import { commonLinkage, inline } from '../common';
 import { Direction } from '../legFields';
 import { DaysInYear } from '../legFields/DaysInYear';
 import { DynamicUnderlyer } from '../legFields/DynamicUnderlyer';
@@ -257,7 +258,18 @@ export const RatioSpreadEuropean: ILeg = legPipeLine({
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
-    commonLinkage(
+    const { changedFields } = changeFieldsParams;
+
+    if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
+      if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+        const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
+        record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
+        record[LEG_FIELD.WEIGHT] = Form2.createField(value);
+        record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+      }
+    }
+
+    inline(
       env,
       changeFieldsParams,
       record,

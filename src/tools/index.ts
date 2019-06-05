@@ -29,7 +29,7 @@ import { ModelXy } from '@/domains/legs/ModelXy';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
-import { LinearSpreadEuropean } from '@/domains/legs/LinearSpreadEuropean';
+import { SpreadEuropean } from '@/domains/legs/SpreadEuropean';
 import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Asia } from '@/domains/legs/Asia';
@@ -269,7 +269,7 @@ export const getLegByProductType = (productType, exerciseType?) => {
     return Forward;
   }
   if (productType === PRODUCT_TYPE_MAP.SPREAD_EUROPEAN) {
-    return LinearSpreadEuropean;
+    return SpreadEuropean;
   }
   if (productType === PRODUCT_TYPE_MAP.RATIO_SPREAD_EUROPEAN) {
     return RatioSpreadEuropean;
@@ -316,7 +316,7 @@ export const formatNumber = (
   roundingMode?: BigNumber.RoundingMode,
   config?: BigNumber.Format
 ) => {
-  if (!value) {
+  if (value == null) {
     return value;
   }
   return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
@@ -330,7 +330,7 @@ export const formatMoney = (
     decimalPlaces?: number;
   }
 ) => {
-  const { unit = '', space = false, decimalPlaces = 4 } = config;
+  const { unit = '', space = false, decimalPlaces = 4 } = config || {};
   return formatNumber(value, decimalPlaces, null, {
     // the decimal separator
     decimalSeparator: '.',

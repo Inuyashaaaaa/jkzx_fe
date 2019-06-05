@@ -14,9 +14,11 @@ class InstrumentModalInput extends InputBase {
     return (
       <>
         <div style={{ position: 'relative' }}>
-          {value.map((item, index) => {
-            return <Tag key="index">{item.initialSpot}</Tag>;
-          })}
+          {value
+            .map((item, index) => {
+              return '¥' + item.initialSpot;
+            })
+            .join(', ')}
           <Icon
             type="alert"
             theme="twoTone"
@@ -37,9 +39,11 @@ class InstrumentModalInput extends InputBase {
     const { editing, value = [], onChange, onValueChange } = this.props;
     return (
       <>
-        {value.map((item, index) => {
-          return <Tag key="index">{item.initialSpot}</Tag>;
-        })}
+        {value
+          .map((item, index) => {
+            return '¥' + item.initialSpot;
+          })
+          .join(', ')}
       </>
     );
   }

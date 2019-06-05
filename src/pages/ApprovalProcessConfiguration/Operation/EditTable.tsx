@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React, { memo, useEffect, useState, useRef } from 'react';
-import { Table2, Select, Form2, Input } from '@/containers';
+import { Table2, Select, Form2, Input, SmartTable } from '@/containers';
 import { Button, Icon, Tag, Alert, Modal, message } from 'antd';
 import GroupSelcet from './GroupSelcet';
 import XLSX from 'xlsx';
@@ -126,7 +126,7 @@ const EditTable = memo<any>(props => {
         cancelText="放弃修改"
         width={800}
       >
-        <Table2
+        <SmartTable
           size="small"
           ref={node => (tableE2.current = node)}
           dataSource={otherTask}

@@ -16,7 +16,8 @@ import { ILegColDef } from '@/types/leg';
 import { Tag } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState, forwardRef } from 'react';
+import SmartTable from '../SmartTable';
 
 const MultiLegTable = memo<
   {
@@ -164,7 +165,7 @@ const MultiLegTable = memo<
         ...item,
         onCell() {
           return {
-            width: '180px',
+            width: '190px',
             ...(item.onCell ? item.onCell.apply(this, arguments) : null),
           };
         },
@@ -246,7 +247,7 @@ const MultiLegTable = memo<
   };
 
   return (
-    <Table2
+    <SmartTable
       size="small"
       rowKey={LEG_ID_FIELD}
       pagination={false}
@@ -254,13 +255,13 @@ const MultiLegTable = memo<
       {...tableProps}
       dataSource={injectTotalRecord()}
       columns={columns}
-      ref={node =>
-        (tableEl.current = {
+      ref={node => {
+        tableEl.current = {
           table: node,
           setLoadings,
           setLoadingsByRow,
-        })
-      }
+        };
+      }}
       onCellFieldsChange={(...args) => {
         if (tableProps.onCellFieldsChange) {
           tableProps.onCellFieldsChange(...args);

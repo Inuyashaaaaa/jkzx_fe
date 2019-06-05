@@ -1,25 +1,19 @@
+import { Form2, Select, SmartTable } from '@/containers';
+import Page from '@/containers/Page';
 import SourceTable from '@/containers/SourceTable';
 import ImportExcelButton from '@/containers/_ImportExcelButton';
-import Page from '@/containers/Page';
-import { delay, mockData } from '@/tools';
-import { message, Modal, Button, Icon, Divider, Table, Row } from 'antd';
-import React, { PureComponent } from 'react';
-import uuidv4 from 'uuid';
+import { downloadUrl } from '@/services/onBoardTransaction';
 import {
-  PAGE_TABLE_COL_DEFS,
-  SEARCH_FORM_CONTROLS,
-  TABLE_COL_DEFS,
-  TABLE_COLUMNS,
-} from './constants';
-import { docBctTemplateList, downloadUrl } from '@/services/onBoardTransaction';
-import { Form2, Select } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
-import {
-  refMasterAgreementSearch,
-  refSimilarLegalNameList,
   mgnMarginSearch,
   mgnMarginsUpdate,
+  refMasterAgreementSearch,
+  refSimilarLegalNameList,
 } from '@/services/reference-data-service';
+import { Button, Divider, Icon, message, Modal, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import React, { PureComponent } from 'react';
+import uuidv4 from 'uuid';
+import { PAGE_TABLE_COL_DEFS, TABLE_COLUMNS } from './constants';
 class ClientManagementMarginManagement extends PureComponent {
   public $marginSourceTable: SourceTable = null;
   public $sourceTable: Form2 = null;
@@ -202,7 +196,7 @@ class ClientManagementMarginManagement extends PureComponent {
             批量更新
           </Button>
         </Row>
-        <Table
+        <SmartTable
           dataSource={this.state.dataSource}
           columns={TABLE_COLUMNS(this.fetchTable)}
           pagination={{
@@ -211,7 +205,6 @@ class ClientManagementMarginManagement extends PureComponent {
           }}
           loading={this.state.loading}
           rowKey="uuid"
-          size="middle"
           scroll={
             this.state.dataSource && this.state.dataSource.length > 0
               ? { x: '1200px' }

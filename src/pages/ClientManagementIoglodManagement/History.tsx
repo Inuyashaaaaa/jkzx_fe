@@ -1,20 +1,17 @@
-import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/containers/SourceTable';
-import { sortByCreateAt } from '@/services/sort';
-import React, { PureComponent } from 'react';
-import CapitalInputModal from './CapitalInputModal';
-import { HISTORY_COL_DEFS, PROCESSED_FORM_CONTROLS, HISTORY_CLOUNMS } from './constants';
-import { Form2, Select } from '@/containers';
 import { IOGLOD_EVENT_TYPE_OPTIONS } from '@/constants/common';
+import { Form2, Select, SmartTable } from '@/containers';
+import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import {
+  clientAccountOpRecordSearch,
   refMasterAgreementSearch,
   refSimilarLegalNameList,
-  cliTradeTaskSearch,
-  clientAccountOpRecordSearch,
 } from '@/services/reference-data-service';
+import { sortByCreateAt } from '@/services/sort';
+import { Divider, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
-import { trdTradeListBySimilarTradeId } from '@/services/general-service';
-import { Button, Divider, Row, Table } from 'antd';
+import React, { PureComponent } from 'react';
+import CapitalInputModal from './CapitalInputModal';
+import { HISTORY_CLOUNMS } from './constants';
 
 class History extends PureComponent {
   public state = {
@@ -186,7 +183,7 @@ class History extends PureComponent {
         <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
           <CapitalInputModal fetchTable={this.fetchTable} />
         </Row>
-        <Table
+        <SmartTable
           dataSource={this.state.dataSource}
           columns={HISTORY_CLOUNMS(this.fetchTable)}
           pagination={{
@@ -194,7 +191,6 @@ class History extends PureComponent {
             showQuickJumper: true,
           }}
           loading={this.state.loading}
-          size="middle"
           rowKey="uuid"
           scroll={this.state.dataSource ? { x: '3600px' } : { x: false }}
         />

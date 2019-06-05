@@ -39,13 +39,13 @@ export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
           <span style={{ position: 'relative' }}>
             {record.tradeId}
             <Timeline
-              style={{ position: 'absolute', left: '-20px', top: '5px' }}
+              style={{ position: 'absolute', left: '-15px', top: '5px' }}
               className={styles.timelines}
             >
               {record.positions.map((item, index) => {
                 return (
                   <TimelineItem
-                    style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 46 }}
+                    style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 37 }}
                     key={index}
                   />
                 );
@@ -70,7 +70,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
   {
     title: '标的物',
     dataIndex: 'underlyerInstrumentId',
-    width: 100,
+    width: 200,
     render: (val, record, index) => {
       if (
         record.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
@@ -94,7 +94,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
   {
     title: '期权类型',
     dataIndex: 'productType',
-    width: 100,
+    width: 150,
     // width: 150,
     render: (text, record, index) => {
       return PRODUCTTYPE_ZHCH_MAP[text];

@@ -1,4 +1,4 @@
-import { Form2, Input, Loading, Select } from '@/containers';
+import { Form2, Input, Loading, Select, SmartTable } from '@/containers';
 import {
   DIRECTION_OPTIONS,
   DIRECTION_TYPE_ZHCN_MAP,
@@ -42,6 +42,8 @@ import moment, { isMoment } from 'moment';
 import React, { memo, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import BigNumber from 'bignumber.js';
+import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
+import SmartForm from '@/containers/SmartForm';
 
 const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
 
@@ -51,7 +53,7 @@ const TradeManagementPricingManagement = props => {
   const [tableDataSource, setTableDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: PAGE_SIZE,
     total: 0,
   });
 
@@ -180,16 +182,17 @@ const TradeManagementPricingManagement = props => {
 
   return (
     <>
-      <Form2
+      <SmartForm
+        spread={3}
         submitText="搜索"
         onSubmitButtonClick={() => {
-          onTradeTableSearch({ paramsPagination: { current: 1, pageSize: 10 } });
+          onTradeTableSearch({ paramsPagination: { current: 1, pageSize: PAGE_SIZE } });
         }}
         onResetButtonClick={() => {
           setSearchFormData({});
           onTradeTableSearch({
             paramsSearchFormData: {},
-            paramsPagination: { current: 1, pageSize: 10 },
+            paramsPagination: { current: 1, pageSize: PAGE_SIZE },
           });
         }}
         onFieldsChange={(props, changedFields, allFields) => {
@@ -345,8 +348,7 @@ const TradeManagementPricingManagement = props => {
       <Divider />
       <div style={{ marginTop: VERTICAL_GUTTER }}>
         <Loading loading={loading}>
-          <Table
-            size="middle"
+          <SmartTable
             pagination={false}
             rowKey={'uuid'}
             scroll={{ x: 2500 }}
@@ -373,7 +375,7 @@ const TradeManagementPricingManagement = props => {
                       <span style={{ position: 'relative' }}>
                         {PRODUCTTYPE_ZHCH_MAP[text] || '--'}
                         <Timeline
-                          style={{ position: 'absolute', left: '-20px', top: '5px' }}
+                          style={{ position: 'absolute', left: '-15px', top: '5px' }}
                           className={styles.timelines}
                         >
                           {record.quotePositions.map((item, index) => {
@@ -381,7 +383,7 @@ const TradeManagementPricingManagement = props => {
                               <TimelineItem
                                 style={{
                                   paddingBottom:
-                                    index === record.quotePositions.length - 1 ? 0 : 46,
+                                    index === record.quotePositions.length - 1 ? 0 : 37,
                                 }}
                                 key={index}
                               />
@@ -417,6 +419,8 @@ const TradeManagementPricingManagement = props => {
                 title: '期初价格（￥）',
                 dataIndex: `asset.${LEG_FIELD.INITIAL_SPOT}`,
                 width: 150,
+                align: 'right',
+                render: val => formatMoney(val),
               },
               {
                 title: '涨/跌',
@@ -441,6 +445,7 @@ const TradeManagementPricingManagement = props => {
                 title: '行权价',
                 dataIndex: `asset.${LEG_FIELD.STRIKE}`,
                 width: 150,
+                align: 'right',
                 render: (val, record) => {
                   if (val == null) return null;
                   if (
@@ -456,6 +461,7 @@ const TradeManagementPricingManagement = props => {
               },
               {
                 title: '名义本金',
+                align: 'right',
                 dataIndex: `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`,
                 width: 150,
                 render: (val, record) => {
@@ -472,6 +478,7 @@ const TradeManagementPricingManagement = props => {
               },
               {
                 title: 'vol（%）',
+                align: 'right',
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
                 width: 150,
                 render: (val, record) => {
@@ -480,6 +487,7 @@ const TradeManagementPricingManagement = props => {
               },
               {
                 title: 'r（%）',
+                align: 'right',
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.R,
                 width: 150,
                 render: (val, record) => {
@@ -488,6 +496,7 @@ const TradeManagementPricingManagement = props => {
               },
               {
                 title: 'q（%）',
+                align: 'right',
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.Q,
                 width: 150,
                 render: (val, record) => {
@@ -590,7 +599,8 @@ const TradeManagementPricingManagement = props => {
                 onShowSizeChange: handleShowSizeChange,
                 showQuickJumper: true,
                 current: pagination.current,
-                pageSize: pageSizeCurrent,
+                pageSize: PAGE_SIZE,
+                pageSizeOptions: PAGE_SIZE_OPTIONS,
                 onChange: handlePaninationChange,
                 total: pagination.total,
               }}

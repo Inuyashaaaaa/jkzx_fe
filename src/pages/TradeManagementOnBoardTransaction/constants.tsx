@@ -6,7 +6,7 @@ import {
 import { IFormControl } from '@/containers/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
-import { formatMoney } from '@/tools';
+import { formatMoney, formatMoney } from '@/tools';
 
 const bookId = {
   dataIndex: 'bookId',
@@ -36,12 +36,14 @@ const dealPrice = {
   dataIndex: 'dealPrice',
   width: 150,
   title: '价格',
+  align: 'right',
 };
 
 const dealAmount = {
   dataIndex: 'dealAmount',
   width: 150,
   title: '手数/股数',
+  align: 'right',
 };
 
 const dealTime = {
@@ -66,14 +68,16 @@ const multiplier = {
   dataIndex: 'multiplier',
   width: 150,
   title: '合约乘数',
+  align: 'right',
 };
 
 const historyBuyAmount = {
   dataIndex: 'historyBuyAmount',
   width: 150,
+  align: 'right',
   title: '总买金额(￥)',
   render: (text, record, index) => {
-    return text ? formatMoney(text, {}) : text;
+    return formatMoney(text);
   },
 };
 
@@ -81,8 +85,9 @@ const historySellAmount = {
   dataIndex: 'historySellAmount',
   width: 150,
   title: '总卖金额(￥)',
+  align: 'right',
   render: (text, record, index) => {
-    return text ? formatMoney(text, {}) : text;
+    return formatMoney(text);
   },
 };
 
@@ -90,44 +95,54 @@ const totalBuy = {
   width: 150,
   dataIndex: 'totalBuy',
   title: '总买量',
+  align: 'right',
 };
 
 const longPosition = {
   dataIndex: 'longPosition',
   width: 150,
   title: '多头持仓',
+  align: 'right',
 };
 
 const shortPosition = {
   dataIndex: 'shortPosition',
   width: 150,
   title: '空头持仓',
+  align: 'right',
 };
 
 const netPosition = {
   dataIndex: 'netPosition',
   width: 150,
   title: '持仓数量',
+  align: 'right',
 };
 
 const totalSell = {
   dataIndex: 'totalSell',
   width: 150,
   title: '总卖量',
+  align: 'right',
 };
 
 const totalPnl = {
   dataIndex: 'totalPnl',
   width: 150,
   title: '总盈亏',
+  align: 'right',
+  render: (text, record, index) => {
+    return formatMoney(text);
+  },
 };
 
 const marketValue = {
   dataIndex: 'marketValue',
   width: 150,
+  align: 'right',
   title: '市值(￥)',
   render: (text, record, index) => {
-    return text ? formatMoney(text, {}) : text;
+    return formatMoney(text);
   },
 };
 

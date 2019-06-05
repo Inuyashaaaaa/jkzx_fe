@@ -14,32 +14,38 @@ export const UnitInputNumber = memo<
       unit?: string;
     }
 >(({ unit = '¥', onChange, ...props }) => {
-  let formatter;
-  let parser;
-  const options = undefined;
+  const getFormat = (): {
+    formatter?: (value: number | string | undefined) => string;
+    parser?: (displayValue: string | undefined) => number;
+  } => {
+    if (unit === '$' || unit === '¥') {
+      return {
+        formatter: value => {
+          if (value == null) return unit;
 
-  if (unit === '$' || unit === '¥') {
-    formatter = value => {
-      if (value == null) return unit;
+          const parsed = parseFloat(String(value));
+          if (isNaN(parsed)) {
+            return unit;
+          }
 
-      const parsed = parseFloat(value);
-      if (isNaN(parsed)) {
-        return unit;
-      }
+          if (typeof value === 'string' && value.endsWith('.')) {
+            return `${formatMoney(parsed, { unit, decimalPlaces: null })}.`;
+          }
 
-      if (typeof value === 'string' && value.endsWith('.')) {
-        return `${formatMoney(parsed, { unit, decimalPlaces: null })}.`;
-      }
-
-      return formatMoney(value, { unit, decimalPlaces: null });
-    };
-    parser = value => parseMoney(value, unit);
-  } else {
-    formatter = value => {
-      return `${value}${unit}`;
-    };
-    parser = value => value.replace(unit, '');
-  }
+          // @todo
+          return formatMoney(value, { unit, decimalPlaces: null }) as string;
+        },
+        parser: value => parseMoney(value, unit),
+      };
+    } else {
+      return {
+        formatter: value => {
+          return `${value}${unit}`;
+        },
+        parser: value => parseFloat(value.replace(unit, '')),
+      };
+    }
+  };
 
   const handleChange = value => {
     value = parseFloat(value);
@@ -49,14 +55,5 @@ export const UnitInputNumber = memo<
     onChange(value);
   };
 
-  return (
-    <InputNumber
-      precision={4}
-      {...props}
-      {...options}
-      formatter={formatter}
-      parser={parser}
-      onChange={handleChange}
-    />
-  );
+  return <InputNumber precision={4} {...props} {...getFormat()} onChange={handleChange} />;
 });

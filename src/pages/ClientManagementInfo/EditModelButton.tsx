@@ -1,6 +1,15 @@
 import EmailInput from '@/containers/EmailInput';
 import Upload from '@/containers/Upload';
-import { DatePicker, Form2, Input, InputNumber, ModalButton, Select, Table2 } from '@/containers';
+import {
+  DatePicker,
+  Form2,
+  Input,
+  InputNumber,
+  ModalButton,
+  Select,
+  Table2,
+  SmartTable,
+} from '@/containers';
 import { remove, uuid, getMoment } from '@/tools';
 import { getPartyDoc, HREF_UPLOAD_URL, UPLOAD_URL } from '@/services/document';
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
@@ -1047,7 +1056,7 @@ const EditModalButton = memo<any>(props => {
                 />
               </TabPane>
               <TabPane tab="交易授权人" key="4">
-                <Table2
+                <SmartTable
                   size="small"
                   rowKey={'uuid'}
                   pagination={false}

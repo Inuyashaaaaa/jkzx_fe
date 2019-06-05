@@ -14,7 +14,7 @@ const ReportsEodDailyPnlByUnderlyer = memo<any>(props => {
       reportType={'RISK'}
       searchMethod={rptRiskReportSearchPaged}
       downloadName={'汇总风险'}
-      scrollWidth={1930}
+      scrollWidth={2100}
     />
   );
 });

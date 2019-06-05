@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Input, Select } from '@/containers';
+import { Form2, Input, Select, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
 import ModalButton from '@/containers/ModalButton';
 import SourceTable from '@/containers/SourceTable';
@@ -51,10 +51,6 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     visible: false,
     dataSource: [],
     loading: false,
-    pagination: {
-      showSizeChanger: true,
-      showQuickJumper: true,
-    },
     searchFormData: {},
     createFormData: {},
   };
@@ -229,8 +225,7 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
             新建
           </ModalButton>
         </Row>
-        <Table
-          size="middle"
+        <SmartTable
           rowKey="uuid"
           dataSource={this.state.dataSource}
           columns={[
@@ -241,13 +236,12 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
             {
               title: '操作',
               dataIndex: '操作',
-              width: 250,
+              width: 150,
               render: (text, record, index) => {
                 return <Action params={{ data: record }} reload={this.search} />;
               },
             },
           ]}
-          pagination={this.state.pagination}
           loading={this.state.loading}
         />
       </Page>

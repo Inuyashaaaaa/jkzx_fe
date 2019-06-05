@@ -200,6 +200,7 @@ export const TABLE_COLUMN = tableDataSource => [
     dataIndex: '80% SPOT',
     title: '80% SPOT',
     percent: 0.8,
+    align: 'right',
     editable: record => {
       return true;
     },
@@ -217,6 +218,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '90% SPOT',
     title: '90% SPOT',
+    align: 'right',
     percent: 0.9,
     editable: record => {
       return true;
@@ -235,6 +237,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '95% SPOT',
     title: '95% SPOT',
+    align: 'right',
     percent: 0.95,
     editable: record => {
       return true;
@@ -253,6 +256,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '100% SPOT',
     title: '100% SPOT',
+    align: 'right',
     percent: 1,
     editable: record => {
       return true;
@@ -272,6 +276,7 @@ export const TABLE_COLUMN = tableDataSource => [
     dataIndex: '105% SPOT',
     title: '105% SPOT',
     percent: 1.05,
+    align: 'right',
     editable: record => {
       return true;
     },
@@ -289,6 +294,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '110% SPOT',
     title: '110% SPOT',
+    align: 'right',
     percent: 1.1,
     editable: record => {
       return true;
@@ -307,6 +313,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '120% SPOT',
     title: '120% SPOT',
+    align: 'right',
     percent: 1.2,
     editable: record => {
       return true;

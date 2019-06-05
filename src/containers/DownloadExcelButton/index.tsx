@@ -87,15 +87,26 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     const title = _.flatten(
       cols.map(item => (item.children ? item.children.map(iitem => iitem.title) : item.title))
     );
-    const newData = _data.page.map(item => {
-      return _.mapValues(item, (value, key) => {
-        const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
-        if (col) {
-          return col.options[value];
-        }
-        return value;
-      });
-    });
+    const newData =
+      name === '定制化报告'
+        ? _data.page.map(item => {
+            return _.mapValues(item.reportData, (value, key) => {
+              const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
+              if (col) {
+                return col.options[value];
+              }
+              return value;
+            });
+          })
+        : _data.page.map(item => {
+            return _.mapValues(item, (value, key) => {
+              const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
+              if (col) {
+                return col.options[value];
+              }
+              return value;
+            });
+          });
     const dataSource = this.handleData(newData, dataIndex, title);
     if (this.props.tabs) {
       // 多sheet表导出

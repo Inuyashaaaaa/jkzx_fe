@@ -1,4 +1,4 @@
-import { DatePicker, Form2, Input, Loading, ModalButton, Select, Table2 } from '@/containers';
+import { DatePicker, Form2, Input, Loading, ModalButton, Select, SmartTable } from '@/containers';
 import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,
@@ -251,7 +251,7 @@ const CreateForm = memo<any>(props => {
                           <Title level={4} style={{ fontSize: 14, marginBottom: 20 }}>
                             交易授权人
                           </Title>
-                          <Table2
+                          <SmartTable
                             pagination={false}
                             rowKey="tradeAuthorizerIdNumber"
                             columns={[

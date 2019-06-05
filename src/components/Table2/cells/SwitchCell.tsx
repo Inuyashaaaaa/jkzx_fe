@@ -80,12 +80,18 @@ class SwitchCell extends PureComponent<
   }
 
   public componentDidMount = () => {
+    if (this.isSelectionCell()) {
+      return;
+    }
     this.registeCell();
     this.props.api.eventBus.listen(TABLE_KEY_DOWN, this.onTableKeyDown);
     this.props.api.eventBus.listen(TABLE_STOP_ACTIVE, this.onStopActive);
   };
 
   public componentWillUnmount = () => {
+    if (this.isSelectionCell()) {
+      return;
+    }
     this.deleteCell();
     this.props.api.eventBus.unListen(TABLE_KEY_DOWN, this.onTableKeyDown);
     this.props.api.eventBus.unListen(TABLE_STOP_ACTIVE, this.onStopActive);
@@ -153,6 +159,10 @@ class SwitchCell extends PureComponent<
   };
 
   public onCellClick = event => {
+    if (this.isSelectionCell()) {
+      return;
+    }
+
     event.stopPropagation();
     this.props.tableApi.saveBy((rowId, colId) => {
       if (rowId === this.props.rowId && colId === this.props.colDef.dataIndex) {

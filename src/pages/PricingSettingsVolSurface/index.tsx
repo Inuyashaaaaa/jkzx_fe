@@ -28,7 +28,7 @@ import {
   TABLE_COLUMN,
 } from './constants';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, InputNumber, Table2, Input } from '@/containers';
+import { Form2, Select, InputNumber, Table2, Input, SmartTable } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 
 class PricingSettingVolSurface extends PureComponent {
@@ -475,17 +475,13 @@ class PricingSettingVolSurface extends PureComponent {
               />
             ) : null}
 
-            <Table2
+            <SmartTable
               dataSource={tableDataSource}
               columns={columns}
-              pagination={{
-                showSizeChanger: true,
-                showQuickJumper: true,
-              }}
               onCellFieldsChange={this.handleCellValueChanged}
               loading={this.state.tableLoading}
               rowKey="id"
-              size="middle"
+              pagination={false}
               style={{ marginTop: 20 }}
             />
           </Col>
