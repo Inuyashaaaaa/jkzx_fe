@@ -6,6 +6,7 @@ import 'animate.css';
 import BigNumber from 'bignumber.js';
 import { setAutoFreeze } from 'immer';
 import numeral from 'numeral';
+import './components/style/common.less';
 
 numeral.register('format', 'de', {
   regexps: {

@@ -1,5 +1,4 @@
 @import '~antd/lib/style/themes/default.less';
-@import '../style/common.less';
 @import '../style/themes.less';
 
 @table-padding-vertical-md: @table-padding-vertical * 3 / 4;
@@ -90,48 +89,66 @@
     }
 
     &.@{ant-prefix}-table-default {
-      tbody {
-        > tr {
-          &.@{ant-prefix}-table-expanded-row {
-            > td {
-              padding: @table-padding-vertical @table-padding-horizontal;
+      > .ant-table-content {
+        > .ant-table-body {
+          > table {
+            > .ant-table-tbody {
+              > tr {
+                &.@{ant-prefix}-table-expanded-row {
+                  > td {
+                    padding: @table-padding-vertical @table-padding-horizontal;
+                  }
+                }
+                > td {
+                  padding: 0 @table-padding-horizontal;
+                  height: @table-cell-height;
+                }
+              }
             }
-          }
-          > td {
-            padding: 0 @table-padding-horizontal;
-            height: @table-cell-height;
           }
         }
       }
     }
 
     &.@{ant-prefix}-table-middle {
-      tbody {
-        > tr {
-          &.@{ant-prefix}-table-expanded-row {
-            > td {
-              padding: @table-padding-vertical-md @table-padding-horizontal-md;
+      > .ant-table-content {
+        > .ant-table-body {
+          > table {
+            > .ant-table-tbody {
+              > tr {
+                &.@{ant-prefix}-table-expanded-row {
+                  > td {
+                    padding: @table-padding-vertical-md @table-padding-horizontal-md;
+                  }
+                }
+                > td {
+                  padding: 0 @table-padding-horizontal-md;
+                  height: @table-cell-height-md;
+                }
+              }
             }
-          }
-          > td {
-            padding: 0 @table-padding-horizontal-md;
-            height: @table-cell-height-md;
           }
         }
       }
     }
 
     &.@{ant-prefix}-table-small {
-      tbody {
-        > tr {
-          &.@{ant-prefix}-table-expanded-row {
-            > td {
-              padding: @table-padding-vertical-sm @table-padding-horizontal-sm;
+      > .ant-table-content {
+        > .ant-table-body {
+          > table {
+            > .ant-table-tbody {
+              > tr {
+                &.@{ant-prefix}-table-expanded-row {
+                  > td {
+                    padding: @table-padding-vertical-sm @table-padding-horizontal-sm;
+                  }
+                }
+                > td {
+                  padding: 0 @table-padding-horizontal-sm;
+                  height: @table-cell-height-sm;
+                }
+              }
             }
-          }
-          > td {
-            padding: 0 @table-padding-horizontal-sm;
-            height: @table-cell-height-sm;
           }
         }
       }
