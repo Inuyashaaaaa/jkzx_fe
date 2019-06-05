@@ -1,35 +1,16 @@
 import Page from '@/containers/Page';
+import { Button } from 'antd';
 import { connect } from 'dva';
-import produce from 'immer';
-import React, { PureComponent } from 'react';
-import router from 'umi/router';
-import { ROW_KEY } from './constants';
+import React, { memo, useEffect, useState } from 'react';
 import CommonModel from './containers/CommonModel';
+import Settlement from './Settlement';
 import TabHeaderWrapper from './TabHeaderWrapper';
-import { PAGE_SIZE } from '@/constants/component';
 
-class TradeManagementContractManage extends PureComponent<any> {
-  public curRowId: any;
+const TradeManagementContractManage = props => {
+  const { activeTabKey } = props.tradeManagementContractManage;
+  const [modalVisible, setModalVisible] = useState(false);
 
-  public state = {
-    loading: false,
-    modalVisiable: false,
-    selectedRows: [],
-    bookList: [],
-    bookIdList: [],
-    searchFormData: {},
-    tableDataSource: [],
-    pagination: {
-      current: 1,
-      pageSize: PAGE_SIZE,
-    },
-    lifeLoading: false,
-    lifeTableData: [],
-    tradeLoading: false,
-  };
-
-  constructor(props) {
-    super(props);
+  useEffect(() => {
     const { preRouting, dispatch } = props;
     if (preRouting && preRouting.pathname !== '/trade-management/book-edit') {
       dispatch({
@@ -37,51 +18,38 @@ class TradeManagementContractManage extends PureComponent<any> {
         payload: 'contractManagement',
       });
     }
-  }
+  }, []);
 
-  public onCheckContract = async event => {
-    router.push({
-      pathname: '/trade-management/book-edit',
-      query: {
-        // from: 'control',
-        id: event.rowId,
-      },
-    });
-  };
+  return (
+    <Page
+      title="合约管理"
+      footer={<TabHeaderWrapper />}
+      extra={[
+        <Button
+          key="1"
+          onClick={() => {
+            setModalVisible(true);
+          }}
+        >
+          批量结算
+        </Button>,
+      ]}
+    >
+      {activeTabKey === 'contractManagement' && <CommonModel name="contractManagement" />}
+      {activeTabKey === 'open' && <CommonModel status="OPEN_TODAY" name="open" />}
+      {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" name="unwind" />}
+      {activeTabKey === 'expiration' && <CommonModel status="EXPIRATION_TODAY" name="expiration" />}
+      {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" name="overlate" />}
+      <Settlement modalVisible={modalVisible} setModalVisible={setModalVisible} />
+    </Page>
+  );
+};
 
-  public bindCheckContract = rowData => () => {
-    this.onCheckContract({
-      rowId: rowData[ROW_KEY],
-    });
-  };
-
-  public switchTradeLoading = () => {
-    this.setState(
-      produce((state: any) => {
-        state.tradeLoading = !state.tradeLoading;
-      })
-    );
-  };
-
-  public render() {
-    const { activeTabKey } = this.props.tradeManagementContractManage;
-    return (
-      <Page title="合约管理" footer={<TabHeaderWrapper />}>
-        {activeTabKey === 'contractManagement' && <CommonModel name="contractManagement" />}
-        {activeTabKey === 'open' && <CommonModel status="OPEN_TODAY" name="open" />}
-        {activeTabKey === 'unwind' && <CommonModel status="UNWIND_TODAY" name="unwind" />}
-        {activeTabKey === 'expiration' && (
-          <CommonModel status="EXPIRATION_TODAY" name="expiration" />
-        )}
-        {activeTabKey === 'overlate' && <CommonModel status="EXPIRATION" name="overlate" />}
-      </Page>
-    );
-  }
-}
-
-export default connect(state => {
-  return {
-    tradeManagementContractManage: state.tradeManagementContractManage,
-    preRouting: state.preRouting.location,
-  };
-})(TradeManagementContractManage);
+export default memo<any>(
+  connect(state => {
+    return {
+      tradeManagementContractManage: state.tradeManagementContractManage,
+      preRouting: state.preRouting.location,
+    };
+  })(TradeManagementContractManage)
+);

@@ -483,10 +483,20 @@ export const REBATETYPE_UNIT_MAP = UNIT_ENUM_MAP;
 
 export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
 
+export const TRADE_GENERAL_FIELD_MAP = {
+  BOOK_NAME: 'bookName',
+  TRADE_ID: 'trade_id',
+  TRADE_DATE: 'tradeDate',
+  PRODUCT_TYPE: 'producyType',
+  SETTLE_AMOUNT: 'SETTLE_AMOUNT', // 结算金额
+  SETTLE_STATUS: 'SETTLE_STATUS', // 结算状态
+};
+
 /**
  * 多腿字段名
  */
 export const LEG_FIELD = {
+  ...TRADE_GENERAL_FIELD_MAP,
   ...COMPUTED_LEG_FIELD_MAP,
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
   POSITION_ID: 'POSITION_ID',
