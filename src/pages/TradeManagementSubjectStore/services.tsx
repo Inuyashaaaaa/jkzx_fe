@@ -500,7 +500,25 @@ const underlyerInstrumentId = {
               message: '标的代码是必填项',
             },
           ],
-        })(<Input />)}
+        })(
+          <Select
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={async (value: string = '') => {
+              const { data = [], error } = await mktInstrumentSearch({
+                instrumentIdPart: value,
+                excludeOption: true,
+              });
+              if (error) return [];
+              return data.slice(0, 50).map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />
+        )}
       </FormItem>
     );
   },
