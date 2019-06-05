@@ -1,36 +1,10 @@
 import { getPageQuery } from '@/tools';
-import { initPagePermissions } from '@/services/role';
 import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
 import { notification } from 'antd';
 import pageRouters from '../../config/router.config';
 import router from 'umi/router';
-
-function setPagePermissions(user, roles, rolePagesPermission, pagePermissionTree, userPermissions) {
-  function setPermission(pageTree, pageIds) {
-    if (!pageTree || typeof pageTree !== 'object') {
-      return;
-    }
-    const { id, children, pageName } = pageTree;
-    if (pageIds.includes(id)) {
-      userPermissions[pageName] = true;
-    }
-    if (children && children.length > 0) {
-      children.forEach(child => setPermission(child, pageIds));
-    }
-  }
-  let pageIds = [];
-  rolePagesPermission.forEach(page => {
-    const role = roles.find(r => r.id === page.roleId);
-    page.roleName = (role && role.roleName) || '';
-  });
-  user.roles.forEach(role => {
-    const hint = rolePagesPermission.find(rolePage => rolePage.roleName === role);
-    if (hint) {
-      pageIds = pageIds.concat(hint.pageComponentId);
-    }
-  });
-  setPermission(pagePermissionTree, pageIds);
-}
+import { updatePermission } from '@/services/permission';
+import { PERMISSIONS } from '@/constants/user';
 
 function validateRedirect(routers, redirect, userPermissions) {
   let valid = false;
@@ -92,30 +66,14 @@ export default {
         return;
       }
 
-      const permissionRsps = yield call(initPagePermissions, userInfo.token);
-
-      const allRolePermissions = permissionRsps[0].data;
-      const allPagePermissions = permissionRsps[1].data;
-      const roles = permissionRsps[2].data;
-      const permissions = {
-        welcomePage: true,
-      };
-
-      setPagePermissions(
-        userInfo,
-        roles || [],
-        allRolePermissions || [],
-        allPagePermissions,
-        permissions
-      );
+      const updatedPermissionUserInfo = yield call(updatePermission, {
+        ...userInfo,
+        permissions: PERMISSIONS,
+      });
 
       yield put({
         type: 'user/replenishUserInfo',
-        payload: {
-          ...userInfo,
-          roles,
-          permissions,
-        },
+        payload: updatedPermissionUserInfo,
       });
 
       const urlParams = new URL(window.location.href);
@@ -137,7 +95,7 @@ export default {
       }
 
       const appRoutes = pageRouters.find(item => !!item.appRoute);
-      if (!validateRedirect(appRoutes, redirect, permissions)) {
+      if (!validateRedirect(appRoutes, redirect, updatedPermissionUserInfo.permissions)) {
         redirect = '/welcome-page';
       }
 
