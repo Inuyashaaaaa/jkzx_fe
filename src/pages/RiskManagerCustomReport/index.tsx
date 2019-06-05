@@ -181,6 +181,7 @@ const RiskManagerCustomReport = memo<any>(props => {
           argument: {
             searchFormData: excelFormData,
           },
+          colSwitch: [],
         }}
       >
         导出Excel
