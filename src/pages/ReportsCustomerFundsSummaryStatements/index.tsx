@@ -7,6 +7,7 @@ import ReportCommonTable from '@/containers/ReportCommonTable';
 const ReportsCustomerFundsSummaryStatements = memo<any>(props => {
   return (
     <ReportCommonTable
+      antd={true}
       tableColDefs={TABLE_COL_DEFS}
       searchFormControls={searchFormControls}
       defaultSort={'clientName'}

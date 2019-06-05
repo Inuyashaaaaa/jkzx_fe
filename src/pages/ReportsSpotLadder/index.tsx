@@ -1,12 +1,12 @@
+import { ITableColDef } from '@/components/type';
 // import SourceTable from '@/containers/SourceTable';
 import { ASSET_CLASS_ZHCN_MAP, INSTRUMENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Table2 } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderExcelButton';
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import RangeNumberInput from '@/containers/RangeNumberInput';
-import { ITableColDef } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,
@@ -20,7 +20,7 @@ import {
 import { mktInstrumentInfo } from '@/services/market-data-service';
 import { prcSpotScenarios } from '@/services/pricing-service';
 import { trdBookListBySimilarBookName, trdInstrumentListByBook } from '@/services/trade-service';
-import { Card, Empty, Tabs, Divider } from 'antd';
+import { Card, Divider, Empty, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -347,7 +347,7 @@ class Component extends PureComponent<
                         footer={false}
                         layout="inline"
                       />
-                      <Table2
+                      <SmartTable
                         vertical={true}
                         pagination={false}
                         rowKey="scenarioId"

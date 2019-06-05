@@ -1,15 +1,15 @@
-import React, { PureComponent } from 'react';
-import CommonForm from './components/CommonForm';
-import { Modal, Button, notification, Table, Popconfirm } from 'antd';
+import { SmartTable } from '@/containers';
 import Page from '@/containers/Page';
-
 import {
-  queryAuthDepartmentList,
   creatAuthDepartment,
   modifyAuthDepartment,
   moveAuthDepartment,
+  queryAuthDepartmentList,
   removeAuthDepartment,
 } from '@/services/department';
+import { Button, Modal, notification, Popconfirm } from 'antd';
+import React, { PureComponent } from 'react';
+import CommonForm from './components/CommonForm';
 
 const LEAF = '_$leaf_';
 const EXTENDED = '_$extended_';
@@ -410,7 +410,7 @@ export default class DepartmentManagement extends PureComponent {
             创建部门
           </Button>
         </div>
-        <Table
+        <SmartTable
           bordered
           rowKey="id"
           size="small"

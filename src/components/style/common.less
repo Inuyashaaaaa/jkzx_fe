@@ -1,5 +1,14 @@
 @import '~antd/lib/style/themes/default.less';
 
+@keyframes showSlow {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .editingIcon {
   content: '';
   display: block;
@@ -12,6 +21,9 @@
   background: url('../assets/editing.png') top center;
   background-size: 100% auto;
   visibility: visible;
+  :local {
+    animation: showSlow 0.3s;
+  }
 }
 
 .commonCell(@n) {

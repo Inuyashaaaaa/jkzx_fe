@@ -1,6 +1,6 @@
 import { PROCESS_STATUS_TYPE_MAP, PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Table2 } from '@/containers';
+import { Table2, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
 import { IFormControl } from '@/containers/Form/types';
 import { wkProcessInstanceComplexList } from '@/services/approval';
@@ -117,13 +117,12 @@ class Related extends PureComponent {
             footer={false}
           />
         </div>
-        <Table2
+        <SmartTable
           rowKey="processInstanceId"
           loading={this.state.loading}
           dataSource={this.state.dataSource}
           columns={RELATED_COL_DEFS(this.fetchTable)}
           scroll={{ x: 1600 }}
-          size="middle"
         />
       </>
     );

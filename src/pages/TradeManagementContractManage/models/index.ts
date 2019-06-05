@@ -1,3 +1,5 @@
+import { PAGE_SIZE } from '@/constants/component';
+
 const FIRST_ACTIVE_TAB_KEY = 'contractManagement';
 
 export default {
@@ -10,7 +12,7 @@ export default {
       collapse: true,
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: PAGE_SIZE,
         total: 0,
       },
     },
@@ -19,7 +21,7 @@ export default {
       collapse: true,
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: PAGE_SIZE,
         total: 0,
       },
     },
@@ -28,7 +30,7 @@ export default {
       collapse: true,
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: PAGE_SIZE,
         total: 0,
       },
     },
@@ -37,7 +39,7 @@ export default {
       collapse: true,
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: PAGE_SIZE,
         total: 0,
       },
     },
@@ -46,7 +48,7 @@ export default {
       collapse: true,
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: PAGE_SIZE,
         total: 0,
       },
     },

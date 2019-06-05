@@ -38,13 +38,13 @@ export const BOOKING_TABLE_COLUMN_DEFS = (onSearch, name) => [
           <span style={{ position: 'relative' }}>
             {record.tradeId}
             <Timeline
-              style={{ position: 'absolute', left: '-20px', top: '5px' }}
+              style={{ position: 'absolute', left: '-15px', top: '5px' }}
               className={styles.timelines}
             >
               {record.positions.map((item, index) => {
                 return (
                   <TimelineItem
-                    style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 46 }}
+                    style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 37 }}
                     key={index}
                   />
                 );

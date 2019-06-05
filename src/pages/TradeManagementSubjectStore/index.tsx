@@ -1,13 +1,14 @@
+import { PAGE_SIZE } from '@/constants/component';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2 } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
-import { Button, Divider, message, Modal, Table } from 'antd';
+import { Button, Divider, message, Modal } from 'antd';
 import _ from 'lodash';
-import React, { useRef, useState, useEffect, memo } from 'react';
+import moment, { isMoment } from 'moment';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { createFormControls, searchFormControls } from './services';
-import moment, { isMoment } from 'moment';
 
 const TradeManagementMarketManagement = props => {
   let $form = useRef<Form2>(null);
@@ -167,7 +168,7 @@ const TradeManagementMarketManagement = props => {
   const onSearch = () => {
     const next = {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     };
     setPagination(next);
     fetchTable(next);
@@ -188,7 +189,7 @@ const TradeManagementMarketManagement = props => {
       <Button style={{ marginBottom: VERTICAL_GUTTER }} type="primary" onClick={switchModal}>
         新建标的物
       </Button>
-      <Table
+      <SmartTable
         rowKey="instrumentId"
         columns={TABLE_COL_DEFS(fetchTable)}
         loading={loading}

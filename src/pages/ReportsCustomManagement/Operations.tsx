@@ -1,8 +1,8 @@
-import React, { memo, useState } from 'react';
-import { Modal, Table } from 'antd';
-import XLSX from 'xlsx';
+import { SmartTable } from '@/containers';
+import { Modal } from 'antd';
 import _ from 'lodash';
-import moment from 'moment';
+import React, { memo, useState } from 'react';
+import XLSX from 'xlsx';
 
 const Operations = memo<any>(props => {
   const [visible, setVisible] = useState(false);
@@ -61,8 +61,7 @@ const Operations = memo<any>(props => {
         footer={false}
         width={700}
       >
-        <Table
-          size="middle"
+        <SmartTable
           rowKey="uuid"
           dataSource={record.reportData || []}
           columns={Object.keys(record.reportData[0]).map(item => {

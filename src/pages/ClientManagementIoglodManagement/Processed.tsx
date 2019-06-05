@@ -1,18 +1,16 @@
-import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/containers/SourceTable';
-import { sortByCreateAt } from '@/services/sort';
-import React, { PureComponent } from 'react';
-import CapitalInputModal from './CapitalInputModal';
-import { PROCESSED_COL_DEFS, PROCESSED_FORM_CONTROLS, PROCESSED_COLUMN } from './constants';
-import FormItem from 'antd/lib/form/FormItem';
-import { Button, Divider, Row, Table } from 'antd';
-import { Form2, Select } from '@/containers';
+import { Form2, Select, SmartTable } from '@/containers';
+import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import {
+  cliTradeTaskSearch,
   refMasterAgreementSearch,
   refSimilarLegalNameList,
-  cliTradeTaskSearch,
 } from '@/services/reference-data-service';
-import { trdTradeListBySimilarTradeId } from '@/services/general-service';
+import { sortByCreateAt } from '@/services/sort';
+import { Divider, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import React, { PureComponent } from 'react';
+import CapitalInputModal from './CapitalInputModal';
+import { PROCESSED_COLUMN } from './constants';
 
 class Processed extends PureComponent {
   public state = {
@@ -165,7 +163,7 @@ class Processed extends PureComponent {
         <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
           <CapitalInputModal fetchTable={this.fetchTable} />
         </Row>
-        <Table
+        <SmartTable
           dataSource={this.state.dataSource}
           columns={PROCESSED_COLUMN(this.fetchTable)}
           pagination={{
@@ -173,7 +171,6 @@ class Processed extends PureComponent {
             showQuickJumper: true,
           }}
           loading={this.state.loading}
-          size="middle"
           rowKey="uuid"
           scroll={this.state.dataSource ? { x: '1200px' } : { x: false }}
         />

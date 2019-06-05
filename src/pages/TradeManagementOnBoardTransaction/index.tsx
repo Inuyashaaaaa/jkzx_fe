@@ -23,6 +23,7 @@ import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants';
 import TabHeader from '@/containers/TabHeader';
+import { SmartTable } from '@/containers';
 
 const { TabPane } = Tabs;
 const RadioButton = Radio.Button;
@@ -508,11 +509,10 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                 新建
               </Button>
             </div>
-            <Table
+            <SmartTable
               dataSource={flowData}
               columns={flowColumns}
               loading={loading}
-              size="middle"
               rowKey="uuid"
               scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
             />
@@ -552,23 +552,21 @@ class TradeManagementOnBoardTansaction extends PureComponent {
               </RadioGroup>
             </Row>
             {positionMode === 'detail' && (
-              <Table
+              <SmartTable
                 dataSource={positionData}
                 columns={detailColumns}
                 loading={loading}
                 rowKey="uuid"
-                size="middle"
                 scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
               />
             )}
             {positionMode === 'summary' && (
-              <Table
+              <SmartTable
                 dataSource={positionData}
                 columns={summaryColumns}
                 loading={loading}
                 scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
                 rowKey="uuid"
-                size="middle"
               />
             )}
           </>

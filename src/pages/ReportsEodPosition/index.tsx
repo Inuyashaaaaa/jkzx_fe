@@ -4,6 +4,7 @@ import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
 import React, { memo } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { searchFormControls } from './services';
+
 const ReportsEodPosition = memo<any>(props => {
   return (
     <ReportCommonTable
@@ -14,7 +15,7 @@ const ReportsEodPosition = memo<any>(props => {
       reportType={'LIVE_POSITION_INFO'}
       searchMethod={rptPositionReportSearchPaged}
       downloadName={'持仓明细'}
-      scrollWidth={3450}
+      scrollWidth={4000}
       colSwitch={[{ dataIndex: 'productType', options: PRODUCTTYPE_ZHCH_MAP }]}
     />
   );

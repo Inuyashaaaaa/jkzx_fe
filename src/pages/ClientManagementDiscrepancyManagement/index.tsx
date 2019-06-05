@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Table2, Form2 } from '@/containers';
+import { Table2, Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { createApprovalProcess } from '@/services/approval';
 import { cliFundEventSearch, refBankAccountSearch } from '@/services/reference-data-service';
@@ -10,6 +10,7 @@ import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
 import router from 'umi/router';
+import SmartForm from '@/containers/SmartForm';
 
 class ClientManagementDiscrepancyManagement extends PureComponent {
   public $searchForm: Form2 = null;
@@ -162,7 +163,8 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
   public render() {
     return (
       <Page>
-        <Form2
+        <SmartForm
+          spread={3}
           ref={node => (this.$searchForm = node)}
           dataSource={this.state.searchFormData}
           columns={SEARCH_FORM_CONTROLS}
@@ -176,7 +178,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
         <Button type="primary" style={{ marginBottom: VERTICAL_GUTTER }} onClick={this.showModal}>
           出入金录入
         </Button>
-        <Table2
+        <SmartTable
           rowKey="uuid"
           columns={TABLE_COL_DEFS}
           loading={this.state.loading}

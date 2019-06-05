@@ -42,6 +42,7 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
   },
   {
     title: '利率(%)',
+    align: 'right',
     dataIndex: 'quote',
     editable: record => {
       return true;

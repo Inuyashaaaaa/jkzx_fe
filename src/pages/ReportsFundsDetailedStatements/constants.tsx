@@ -1,4 +1,4 @@
-import { formatNumber } from '@/tools';
+import { formatNumber, formatMoney } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -12,7 +12,7 @@ export const TABLE_COL_DEFS = [
     width: 100,
   },
   {
-    title: '出入金日期 (¥)',
+    title: '出入金日期',
     dataIndex: 'paymentDate',
     sorter: true,
     sortDirections: ['ascend', 'descend'],
@@ -20,20 +20,23 @@ export const TABLE_COL_DEFS = [
   },
   {
     title: '入金 (¥)',
+    align: 'right',
     dataIndex: 'paymentIn',
-    render: (value, record, index) => formatNumber(value, 4),
+    render: (value, record, index) => formatMoney(value),
     width: 100,
   },
   {
     title: '出金 (¥)',
+    align: 'right',
     dataIndex: 'paymentOut',
-    render: (value, record, index) => formatNumber(value, 4),
+    render: (value, record, index) => formatMoney(value),
     width: 100,
   },
   {
     title: '出入金净额 (¥)',
+    align: 'right',
     dataIndex: 'paymentAmount',
-    render: (value, record, index) => formatNumber(value, 4),
+    render: (value, record, index) => formatMoney(value),
     width: 100,
   },
 ];
