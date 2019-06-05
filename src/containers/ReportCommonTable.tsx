@@ -1,7 +1,7 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import { Form2 } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { rptReportNameList } from '@/services/report-service';
 import { getMoment } from '@/tools';
@@ -10,6 +10,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import { PAGE_SIZE } from '@/constants/component';
 
 const ReportCommonTable = memo<any>(props => {
   const form = useRef<Form2>(null);
@@ -24,12 +25,13 @@ const ReportCommonTable = memo<any>(props => {
     scrollWidth,
     bordered = false,
     colSwitch = [],
+    antd,
   } = props;
   const [markets, setMarkets] = useState([]);
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: PAGE_SIZE,
   });
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState(true);
@@ -188,9 +190,9 @@ const ReportCommonTable = memo<any>(props => {
           setIsMount(false);
           setPagination({
             current: 1,
-            pageSize: 10,
+            pageSize: PAGE_SIZE,
           });
-          fetchTable(searchFormData, { current: 1, pageSize: 10 });
+          fetchTable(searchFormData, { current: 1, pageSize: PAGE_SIZE });
         }}
         resetable={false}
       />
@@ -213,8 +215,8 @@ const ReportCommonTable = memo<any>(props => {
         导出Excel
       </DownloadExcelButton>
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
-        <Table
-          size="middle"
+        <SmartTable
+          antd={antd}
           rowKey="uuid"
           loading={loading}
           dataSource={dataSource}
@@ -229,7 +231,6 @@ const ReportCommonTable = memo<any>(props => {
           columns={tableColDefs}
           onChange={onChange}
           scroll={{ x: scrollWidth }}
-          bordered={bordered}
         />
       </ConfigProvider>
     </Page>

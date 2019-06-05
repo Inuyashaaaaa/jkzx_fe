@@ -2,12 +2,13 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import ReloadGreekButton from '@/containers/ReloadGreekButton';
-import { Form2 } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useRef, useState, memo } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import { PAGE_SIZE } from '@/constants/component';
 
 const RiskCommonTable = memo<any>(props => {
   const form = useRef<Form2>(null);
@@ -27,7 +28,7 @@ const RiskCommonTable = memo<any>(props => {
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: PAGE_SIZE,
   });
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState(true);
@@ -170,9 +171,9 @@ const RiskCommonTable = memo<any>(props => {
               setIsMount(false);
               setPagination({
                 current: 1,
-                pageSize: 10,
+                pageSize: PAGE_SIZE,
               });
-              fetchTable(searchFormData, { current: 1, pageSize: 10 });
+              fetchTable(searchFormData, { current: 1, pageSize: PAGE_SIZE });
             }}
             resetable={false}
           />
@@ -200,8 +201,7 @@ const RiskCommonTable = memo<any>(props => {
         <ReloadGreekButton fetchTable={fetchTable} id={id} hideReload={hideReload} />
       </Row>
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
-        <Table
-          size="middle"
+        <SmartTable
           rowKey={(data, index) => index}
           loading={loading}
           dataSource={dataSource}

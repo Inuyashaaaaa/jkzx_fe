@@ -1,12 +1,12 @@
+import { ITableColDef } from '@/components/type';
 // import SourceTable from '@/containers/SourceTable';
 import { ASSET_CLASS_ZHCN_MAP, INSTRUMENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Table2 } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import SpotLadderExcelButton from '@/containers/DownloadExcelButton/SpotLadderExcelButton';
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import RangeNumberInput from '@/containers/RangeNumberInput';
-import { ITableColDef } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,
@@ -20,7 +20,7 @@ import {
 import { mktInstrumentInfo } from '@/services/market-data-service';
 import { prcSpotScenarios } from '@/services/pricing-service';
 import { trdBookListBySimilarBookName, trdInstrumentListByBook } from '@/services/trade-service';
-import { Card, Empty, Tabs, Divider } from 'antd';
+import { Card, Divider, Empty, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -319,45 +319,47 @@ class Component extends PureComponent<
         />
         <Divider />
         <Card loading={this.state.loading} bordered={false}>
-          <SpotLadderExcelButton
-            style={{ marginBottom: VERTICAL_GUTTER }}
-            key="export"
-            type="primary"
-            data={{
-              dataSource: _data,
-              cols: headers,
-              name: '标的物情景分析',
-            }}
-            tabs={this.state.instruments.map(item => item.underlyerInstrumentId)}
-          >
-            导出Excel
-          </SpotLadderExcelButton>
           {this.state.instruments && !!this.state.instruments.length ? (
-            <Tabs animated={false}>
-              {this.state.instruments.map(item => {
-                return (
-                  <TabPane tab={item.underlyerInstrumentId} key={item.underlyerInstrumentId}>
-                    <Form2
-                      columns={TABLE_FORM_CONTROLS}
-                      style={{ marginBottom: VERTICAL_GUTTER }}
-                      dataSource={Form2.createFields(
-                        _.pick(item, ['underlyerInstrumentId', 'assetClass', 'instrumentType'])
-                      )}
-                      footer={false}
-                      layout="inline"
-                    />
-                    <Table2
-                      vertical={true}
-                      pagination={false}
-                      rowKey="scenarioId"
-                      bordered={true}
-                      dataSource={item.tableDataSource}
-                      columns={TABLE_COL_DEFS}
-                    />
-                  </TabPane>
-                );
-              })}
-            </Tabs>
+            <>
+              <SpotLadderExcelButton
+                style={{ marginBottom: VERTICAL_GUTTER }}
+                key="export"
+                type="primary"
+                data={{
+                  dataSource: _data,
+                  cols: headers,
+                  name: '标的物情景分析',
+                }}
+                tabs={this.state.instruments.map(item => item.underlyerInstrumentId)}
+              >
+                导出Excel
+              </SpotLadderExcelButton>
+              <Tabs animated={false}>
+                {this.state.instruments.map(item => {
+                  return (
+                    <TabPane tab={item.underlyerInstrumentId} key={item.underlyerInstrumentId}>
+                      <Form2
+                        columns={TABLE_FORM_CONTROLS}
+                        style={{ marginBottom: VERTICAL_GUTTER }}
+                        dataSource={Form2.createFields(
+                          _.pick(item, ['underlyerInstrumentId', 'assetClass', 'instrumentType'])
+                        )}
+                        footer={false}
+                        layout="inline"
+                      />
+                      <SmartTable
+                        vertical={true}
+                        pagination={false}
+                        rowKey="scenarioId"
+                        bordered={true}
+                        dataSource={item.tableDataSource}
+                        columns={TABLE_COL_DEFS}
+                      />
+                    </TabPane>
+                  );
+                })}
+              </Tabs>
+            </>
           ) : (
             <Empty style={{ padding: 100 }} description={<span>暂无分析结果</span>} />
           )}

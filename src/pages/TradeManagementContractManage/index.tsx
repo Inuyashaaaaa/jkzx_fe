@@ -6,6 +6,7 @@ import router from 'umi/router';
 import { ROW_KEY } from './constants';
 import CommonModel from './containers/CommonModel';
 import TabHeaderWrapper from './TabHeaderWrapper';
+import { PAGE_SIZE } from '@/constants/component';
 
 class TradeManagementContractManage extends PureComponent<any> {
   public curRowId: any;
@@ -20,7 +21,7 @@ class TradeManagementContractManage extends PureComponent<any> {
     tableDataSource: [],
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     },
     lifeLoading: false,
     lifeTableData: [],

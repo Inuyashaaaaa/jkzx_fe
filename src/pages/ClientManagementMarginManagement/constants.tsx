@@ -63,39 +63,38 @@ export const TABLE_COLUMNS = fetchTable => [
   },
   {
     title: '可用资金 (¥)',
-    width: 150,
+    align: 'right',
     dataIndex: 'cash',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text, {});
     },
   },
   {
     title: '剩余授信额度 (¥)',
-    width: 150,
     dataIndex: 'credit',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text, {});
     },
   },
   {
     title: '冻结保证金 (¥)',
-    width: 150,
+    align: 'right',
     dataIndex: 'margin',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text, {});
     },
   },
   {
     title: '维持保证金 (¥)',
-    width: 150,
+    align: 'right',
     dataIndex: 'maintenanceMargin',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text, {});
     },
   },
   {
     title: '状态',
-    width: 150,
     dataIndex: 'status',
     render: (value, record, index) => {
       return MARGIN_STATUS_TYPE_OPTIONS[

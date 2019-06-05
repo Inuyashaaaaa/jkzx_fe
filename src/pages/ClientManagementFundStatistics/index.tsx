@@ -1,4 +1,4 @@
-import { Form2, Select } from '@/containers';
+import { Form2, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import {
   clientAccountSearch,
@@ -7,7 +7,7 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { sortByCreateAt } from '@/services/sort';
-import { formatMoney } from '@/tools';
+import { formatMoney, formatNumber } from '@/tools';
 import { Divider, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -211,18 +211,18 @@ class ClientManagementFundStatistics extends PureComponent {
           ]}
         />
         <Divider type="horizontal" />
-        <Table
+        <SmartTable
           dataSource={this.state.tableDataSource}
           columns={[
             {
               title: '交易对手',
               dataIndex: 'legalName',
               width: 180,
+              fixed: 'left',
             },
             {
               title: '状态',
               dataIndex: 'normalStatus',
-              width: 150,
               render: (text, record, index) => {
                 if (text) return '正常';
                 return '错误';
@@ -230,95 +230,94 @@ class ClientManagementFundStatistics extends PureComponent {
             },
             {
               title: '账户信息',
-              width: 150,
               dataIndex: 'accountInformation',
             },
             {
               title: '保证金 (¥)',
-              width: 150,
+              align: 'right',
               dataIndex: 'margin',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '现金余额 (¥)',
-              width: 150,
+              align: 'right',
               dataIndex: 'cash',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '已用授信额度 (¥)',
-              width: 170,
+              align: 'right',
               dataIndex: 'creditUsed',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '负债 (¥)',
-              width: 150,
               dataIndex: 'debt',
+              align: 'right',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '出入金总额 (¥)',
-              width: 150,
+              align: 'right',
               dataIndex: 'netDeposit',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '已实现盈亏 (¥)',
-              width: 150,
+              align: 'right',
               dataIndex: 'realizedPnL',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '授信总额 (¥)',
-              width: 150,
+              align: 'right',
               dataIndex: 'credit',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '我方授信总额 (¥)',
-              width: 170,
               dataIndex: 'counterPartyCredit',
+              align: 'right',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '我方剩余授信余额 (¥)',
-              width: 200,
               dataIndex: 'counterPartyCreditBalance',
+              align: 'right',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '我方可用资金 (¥)',
-              width: 200,
               dataIndex: 'counterPartyFund',
+              align: 'right',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
               title: '我方冻结保证金 (¥)',
-              width: 200,
               dataIndex: 'counterPartyMargin',
+              align: 'right',
               render: (text, record, index) => {
-                return text ? formatMoney(text, {}) : text;
+                return formatNumber(text, 4);
               },
             },
             {
@@ -326,7 +325,7 @@ class ClientManagementFundStatistics extends PureComponent {
               fixed: 'right',
               width: 150,
               render: (text, record, index) => {
-                return <Operation record={text} fetchTable={this.fetchTable} />;
+                return <Operation record={record} fetchTable={this.fetchTable} />;
               },
             },
           ]}
@@ -336,23 +335,8 @@ class ClientManagementFundStatistics extends PureComponent {
           }}
           loading={this.state.loading}
           rowKey="accountId"
-          size="middle"
           scroll={this.state.tableDataSource ? { x: '2000px' } : { x: false }}
         />
-        {/* <SourceTable
-          rowKey="accountId"
-          loading={this.state.loading}
-          columnDefs={TABLE_COL_DEF(this.fetchTable)}
-          dataSource={this.state.tableDataSource}
-          autoSizeColumnsToFit={false}
-          searchable={true}
-          resetable={true}
-          onResetButtonClick={this.onReset}
-          searchFormControls={SEARCH_FORM_CONTROLS(this.state.branchSalesList)}
-          searchFormData={this.state.searchFormData}
-          onSearchButtonClick={this.fetchTable}
-          onSearchFormChange={this.onSearchFormChange}
-        /> */}
       </Page>
     );
   }

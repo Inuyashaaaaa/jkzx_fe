@@ -21,6 +21,8 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import XLSX from 'xlsx';
 import styles from './customModel.less';
+import { SmartTable } from '@/containers';
+import { PAGE_SIZE } from '@/constants/component';
 
 const Search = Input.Search;
 const TabPane = Tabs.TabPane;
@@ -53,6 +55,7 @@ const columnsData = [
   {
     title: '标的物价格',
     dataIndex: 's',
+    align: 'right',
   },
   {
     title: '2019-04-19 09:00',
@@ -406,7 +409,7 @@ const CustomModel = memo(() => {
     });
     XLSX.writeFile(wb, `${PRODUCTTYPE}_${currentTrade.tradeId}.xlsx`);
   };
-  console.log(currentTrade);
+
   return (
     <div className={styles.customModel}>
       <Page title="自定义模型（MODEL_XY）">
@@ -419,32 +422,6 @@ const CustomModel = memo(() => {
             />
           </p>
           <Spin spinning={loading}>
-            {/* <ul style={{ marginTop: '20px' }} className={styles.searchList}>
-              {tradeList.map((item, index) => {
-                return (
-                  <li
-                    key={index}
-                    className={
-                      currentTrade &&
-                      currentTrade.positions &&
-                      currentTrade.positions.positionId === item.positions.positionId
-                        ? styles.checked
-                        : styles.liItme
-                    }
-                    onClick={() => handleSelect(item)}
-                  >
-                    <span className={styles.itemName}>
-                      {item.tradeId}
-                      <br />
-                      标的物 {item.positions.asset.underlyerInstrumentId}
-                      <br />
-                      到期日 {item.positions.asset.expirationDate}
-                      <br />
-                    </span>
-                  </li>
-                );
-              })}
-            </ul> */}
             <List
               itemLayout="vertical"
               size="large"
@@ -452,7 +429,7 @@ const CustomModel = memo(() => {
                 onChange: page => {
                   console.log(page);
                 },
-                pageSize: 10,
+                pageSize: PAGE_SIZE,
                 size: 'small',
               }}
               dataSource={tradeList}
@@ -527,8 +504,7 @@ const CustomModel = memo(() => {
                   const tablecolumns = item.columns || columns;
                   return (
                     <TabPane tab={item.tab} key={index}>
-                      <Table
-                        size="middle"
+                      <SmartTable
                         pagination={false}
                         rowKey={'key'}
                         dataSource={tabledataSource}

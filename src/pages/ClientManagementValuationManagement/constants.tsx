@@ -7,6 +7,7 @@ import {
 } from '@/services/reference-data-service';
 import React from 'react';
 import ValuationCellRenderer from './ValuationCellRenderer';
+import { formatMoney } from '@/tools';
 
 export const VALUATION_COL_DEFS = (uploading, unUploading) => [
   {
@@ -21,21 +22,16 @@ export const VALUATION_COL_DEFS = (uploading, unUploading) => [
   {
     title: '估值日',
     dataIndex: 'valuationDate',
-    input: {
-      type: 'date',
-    },
   },
   {
     title: '估值',
     dataIndex: 'price',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    align: 'right',
+    render: val => formatMoney(val),
   },
   {
     title: '交易邮箱',
     dataIndex: 'tradeEmail',
-    input: {
-      type: 'email',
-    },
   },
   {
     title: '操作',

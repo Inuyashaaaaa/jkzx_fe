@@ -1,4 +1,4 @@
-import { Form2, Input, InputNumber, Table2 } from '@/containers';
+import { Form2, Input, InputNumber, SmartTable } from '@/containers';
 import { Button, Menu } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useRef, useState } from 'react';
@@ -143,7 +143,7 @@ const ControlTable = memo(() => {
           setVertical
         </Button>
       </div>
-      <Table2
+      <SmartTable
         getContextMenu={params => {
           if (params.rowIndex % 2) {
             return (

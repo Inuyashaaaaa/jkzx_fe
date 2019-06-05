@@ -53,21 +53,31 @@ class RenderingCell extends PureComponent<ITableCellProps, any> {
     return this.props.cellApi.getValue();
   };
 
+  public getRenderParams = () => {
+    const { record, rowIndex, form, colDef, api, context } = this.props;
+    const value = this.getValue();
+
+    const inject = {
+      form,
+      editing: false,
+      colDef,
+      api,
+      context,
+    };
+
+    if ('dataIndex' in colDef) {
+      return [value, record, rowIndex, inject];
+    }
+    return [record, record, rowIndex, inject];
+  };
+
   public getRenderResult = () => {
-    const { record, rowIndex, $$render, form, colDef, cellApi, api, context } = this.props;
+    const { $$render, cellApi } = this.props;
     const value = this.getValue();
 
     if (!$$render) return value;
 
-    const node = cellApi.renderElement(
-      $$render(value, record, rowIndex, {
-        form,
-        editing: false,
-        colDef,
-        api,
-        context,
-      })
-    );
+    const node = cellApi.renderElement($$render.apply(this, this.getRenderParams()));
     if (React.isValidElement(node)) {
       return React.cloneElement(node, {
         key: 'last',

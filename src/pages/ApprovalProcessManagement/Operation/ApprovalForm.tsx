@@ -5,7 +5,6 @@ import {
   terminateProcess,
 } from '@/services/approval';
 import moment from 'moment';
-
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
 import React, { PureComponent } from 'react';
@@ -13,6 +12,7 @@ import CommonForm from '@/pages/SystemSettingDepartment/components/CommonForm';
 import { generateColumns } from '../constants';
 import _ from 'lodash';
 const { TextArea } = Input;
+import { SmartTable } from '@/containers';
 
 class ApprovalForm extends PureComponent {
   constructor(props) {
@@ -378,7 +378,7 @@ class ApprovalForm extends PureComponent {
       <div>
         {!loading && (
           <div>
-            <Table
+            <SmartTable
               columns={approvalColumns}
               dataSource={processData}
               size="small"
@@ -401,7 +401,7 @@ class ApprovalForm extends PureComponent {
               <CommonForm data={formItems} ref={ele => (this.$formBuilder = ele)} />
             </div>
             <div style={{ marginTop: 20 }}>
-              <Table
+              <SmartTable
                 columns={processColumns}
                 dataSource={histories}
                 size="small"

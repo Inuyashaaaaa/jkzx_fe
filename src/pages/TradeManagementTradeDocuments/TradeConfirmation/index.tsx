@@ -1,26 +1,16 @@
+import { Form2, Select, SmartTable } from '@/containers';
 import SourceTable from '@/containers/SourceTable';
+import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
+import { refSimilarLegalNameList } from '@/services/reference-data-service';
+import { tradeDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
+import { DatePicker, Divider, Row, Table } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { SEARCH_FORM_CONTROLS_TRADE, TRADE_COLUMN_DEFS, columns } from './constants';
-import { Button, Divider, Row, Table, DatePicker } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select } from '@/containers';
-import {
-  trdBookListBySimilarBookName,
-  trdPortfolioListBySimilarPortfolioName,
-  tradeDocSearch,
-} from '@/services/trade-service';
-import {
-  trdTradeListBySimilarTradeId,
-  trdTradeSearchIndexPaged,
-  trdTradeListByBook,
-} from '@/services/general-service';
-import {
-  refSimilarLegalNameList,
-  refSimilarSalesNameList,
-} from '@/services/reference-data-service';
 import TradeModal from './TradeModal';
+import SmartForm from '@/containers/SmartForm';
+import { PAGE_SIZE } from '@/constants/component';
 
 const { RangePicker } = DatePicker;
 
@@ -33,7 +23,7 @@ class TradeConfirmation extends PureComponent {
     searchFormData: {},
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       showSizeChanger: true,
       showQuickJumper: true,
       onChange: (page, pagesize) => {
@@ -137,7 +127,7 @@ class TradeConfirmation extends PureComponent {
         searchFormData,
       },
       () => {
-        this.onFetch({ current: 1, pageSize: 10 });
+        this.onFetch({ current: 1, pageSize: PAGE_SIZE });
       }
     );
   };
@@ -167,14 +157,15 @@ class TradeConfirmation extends PureComponent {
   };
 
   public onSearch = () => {
-    this.onFetch({ current: 1, pageSize: 10 });
+    this.onFetch({ current: 1, pageSize: PAGE_SIZE });
   };
 
   public render() {
     const { searchFormData } = this.state;
     return (
       <>
-        <Form2
+        <SmartForm
+          spread={3}
           ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={searchFormData}
@@ -329,7 +320,7 @@ class TradeConfirmation extends PureComponent {
           ]}
         />
         <Divider type="horizontal" />
-        <Table
+        <SmartTable
           dataSource={this.state.dataSource}
           rowKey="tradeId"
           columns={[

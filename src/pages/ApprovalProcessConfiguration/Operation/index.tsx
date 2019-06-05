@@ -1,29 +1,29 @@
+import { Form2, SmartTable, Table2 } from '@/containers';
 import {
-  wkProcessGet,
-  wkProcessStatusModify,
   wkProcessConfigModify,
-  wkProcessModify,
-  wkTaskApproveGroupBind,
+  wkProcessGet,
   wkProcessInstanceListByProcessName,
+  wkProcessModify,
+  wkProcessStatusModify,
+  wkTaskApproveGroupBind,
 } from '@/services/approvalProcessConfiguration';
-import uuidv4 from 'uuid/v4';
-import _ from 'lodash';
-import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE, COLUMNS } from '../constants';
 import {
-  Switch,
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  message,
+  Modal,
   notification,
   Row,
-  Col,
-  Checkbox,
-  Alert,
+  Switch,
   Tag,
-  Modal,
-  Button,
-  message,
-  Card,
 } from 'antd';
-import { Table2, Select, Form2, Input } from '@/containers';
-import React, { useRef, useEffect, useState } from 'react';
+import _ from 'lodash';
+import { default as React, default as React, useEffect, useRef, useState } from 'react';
+import uuidv4 from 'uuid/v4';
+import { COLUMNS, GTE_PROCESS_CONFIGS, TASKTYPE } from '../constants';
 import EditTable from './EditTable';
 import TriggerCard from './TriggerCard';
 

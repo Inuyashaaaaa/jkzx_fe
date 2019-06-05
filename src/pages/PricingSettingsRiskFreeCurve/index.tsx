@@ -1,24 +1,21 @@
-import { INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
+import { Form2, Input, Select, Table2, SmartTable } from '@/containers';
 import { PureStateComponent } from '@/containers/Components';
-import { IFormControl } from '@/containers/_Form2';
+import Page from '@/containers/Page';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import ModalButton from '@/containers/_ModalButton2';
 import SourceTable from '@/containers/_SourceTable';
-import Page from '@/containers/Page';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
 import { queryModelName, queryModelRiskFreeCurve, saveModelRiskFreeCurve } from '@/services/model';
-import { message, Divider, Table, Modal, Row, Button, Popconfirm } from 'antd';
+import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
-import { GROUP_KEY } from './constants';
-import { Form2, Input, Select, Table2 } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import uuidv4 from 'uuid/v4';
-import Item from 'antd/lib/list/Item';
+import { GROUP_KEY } from './constants';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
@@ -294,8 +291,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             </Button>
           ) : null}
         </Row>
-        <Table2
-          size="middle"
+        <SmartTable
           rowKey="id"
           onCellFieldsChange={this.handleCellValueChanged}
           dataSource={tableDataSource}
@@ -329,6 +325,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             {
               title: '利率(%)',
               dataIndex: 'quote',
+              align: 'right',
               editable: record => {
                 return true;
               },

@@ -1,5 +1,5 @@
 import { ALL_OPTIONS_VALUE, VERTICAL_GUTTER } from '@/constants/global';
-import { Cascader, Form2, Input, Select, Table2 } from '@/containers';
+import { Cascader, Form2, Input, Select, Table2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import {
   clientAccountDel,
@@ -220,9 +220,8 @@ const ClientManagementInfo = memo(() => {
       />
       <Divider />
       <CreateModalButton salesCascaderList={salesCascaderList} fetchTableData={fetchTableData} />
-      <Table2
+      <SmartTable
         style={{ marginTop: VERTICAL_GUTTER }}
-        size="middle"
         pagination={{
           showQuickJumper: true,
           showSizeChanger: true,
