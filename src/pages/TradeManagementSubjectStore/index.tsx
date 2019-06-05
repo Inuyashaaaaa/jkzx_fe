@@ -24,7 +24,7 @@ const TradeManagementMarketManagement = props => {
 
   const [searchFormData, setSearchFormData] = useState(defaultSearchFormData);
   const [createFormData, setCreateFormData] = useState({});
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [pagination, setPagination] = useState(defaultPagination);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [tableDataSource, setTableDataSource] = useState([]);
@@ -184,12 +184,8 @@ const TradeManagementMarketManagement = props => {
   };
 
   const onSearch = () => {
-    const next = {
-      current: 1,
-      pageSize: PAGE_SIZE,
-    };
-    setPagination(next);
-    fetchTable(next);
+    setPagination(defaultPagination);
+    fetchTable(defaultPagination);
   };
 
   return (
