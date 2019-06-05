@@ -1,6 +1,6 @@
+import { formatNumber } from '@/tools';
 import { InputNumber as AntdInputNumber } from 'antd';
 import { InputNumberProps } from 'antd/lib/input-number';
-import BigNumber from 'bignumber.js';
 import { omit } from 'lodash';
 import React from 'react';
 import { InputBase } from '../../components/type';
@@ -42,16 +42,13 @@ class InputNumber extends InputBase<IInputNumberProps> {
     );
   }
 
-  public getValue = value => {
-    if (typeof value === 'string') {
-      return value.replace(/\.(.{4}).*/, '.$1');
-    }
-    return value;
+  public sliceValue = () => {
+    const { value, precision } = this.props;
+    return precision != null ? formatNumber(value, precision) : value;
   };
 
   public renderRendering() {
     const { value, formatter, style } = this.props;
-    const nextVal = this.getValue(value);
 
     return (
       <span
@@ -61,7 +58,7 @@ class InputNumber extends InputBase<IInputNumberProps> {
           ...style,
         }}
       >
-        {formatter && nextVal != null ? formatter(nextVal) : nextVal}
+        {formatter && value != null ? formatter(value) : this.sliceValue()}
       </span>
     );
   }

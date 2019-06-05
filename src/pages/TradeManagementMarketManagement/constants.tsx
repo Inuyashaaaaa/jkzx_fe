@@ -34,18 +34,21 @@ export const columns = [
     dataIndex: 'bid',
     render: (value, record, index) => formatNumber(value, 4),
     width: 150,
+    align: 'right',
   },
   {
     title: '卖价 (¥)',
     dataIndex: 'ask',
     render: (value, record, index) => formatNumber(value, 4),
     width: 150,
+    align: 'right',
   },
   {
     title: '最新成交价 (¥)',
     dataIndex: 'last',
     render: (value, record, index) => formatNumber(value, 4),
     width: 150,
+    align: 'right',
   },
   {
     title: '时间戳',
@@ -57,6 +60,7 @@ export const columns = [
   },
   {
     title: '今收 (¥)',
+    align: 'right',
     dataIndex: 'close',
     render: (value, record, index) => {
       if (
@@ -91,6 +95,7 @@ export const columns = [
     dataIndex: 'multiplier',
     render: (value, record, index) => formatNumber(value, 4),
     width: 150,
+    align: 'right',
   },
   {
     title: '合约类型',

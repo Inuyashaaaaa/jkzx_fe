@@ -6,6 +6,7 @@ import { formatMoney, formatNumber } from '@/tools';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React from 'react';
+import styles from './index.less';
 
 export const TABLE_COL_DEFS: ITableColDef[] = [
   {
@@ -13,53 +14,73 @@ export const TABLE_COL_DEFS: ITableColDef[] = [
     dataIndex: 'scenarioId',
   },
   {
-    title: '标的物价格',
+    title: '标的物价格(￥)',
+    align: 'right',
     dataIndex: 'underlyerPrice',
-    render: (val, record, index) => formatMoney(val, { unit: '￥' }),
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
-    title: '价格',
+    title: '价格(￥)',
+    align: 'right',
     dataIndex: 'price',
-    render: (val, record, index) => formatMoney(val, { unit: '￥' }),
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
-    title: 'PNL变动',
+    title: 'PNL变动(￥)',
+    align: 'right',
     dataIndex: 'pnlChange',
-    render: (val, record, index) => formatMoney(val, { unit: '￥' }),
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
-    title: 'DELTA',
+    title: 'DELTA(手)',
+    align: 'right',
     dataIndex: 'delta',
-    render: (val, record, index) => formatNumber(val, 4) + ' 手',
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
-    title: 'DELTA CASH',
+    title: 'DELTA CASH(￥)',
+    align: 'right',
     dataIndex: 'deltaCash',
-    render: (val, record, index) => formatMoney(val, { unit: '￥' }),
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
     title: 'GAMMA',
+    align: 'right',
     dataIndex: 'gamma',
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
     render: (val, record, index) => formatNumber(val, 4),
   },
   {
-    title: 'GAMMA CASH',
+    title: 'GAMMA CASH(￥)',
+    align: 'right',
     dataIndex: 'gammaCash',
-    render: (val, record, index) => formatMoney(val, { unit: '￥' }),
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
-    title: 'VEGA',
+    title: 'VEGA(￥)',
+    align: 'right',
     dataIndex: 'vega',
-    render: (val, record, index) => formatMoney(val, { unit: '￥' }),
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
-    title: 'THETA',
+    title: 'THETA(￥)',
+    align: 'right',
     dataIndex: 'theta',
-    render: (val, record, index) => formatMoney(val, { unit: '￥' }),
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
+    render: (val, record, index) => formatMoney(val),
   },
   {
     title: 'RHO_R',
+    align: 'right',
     dataIndex: 'rhoR',
+    onCell: () => ({ style: { justifyContent: 'flex-end' } }),
     render: (val, record, index) => formatNumber(val, 4),
   },
 ];

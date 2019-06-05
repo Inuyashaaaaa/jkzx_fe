@@ -1,5 +1,5 @@
 import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
-import { Form2, Select } from '@/containers';
+import { Form2, Select, SmartTable } from '@/containers';
 import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { removeCalendar } from '@/services/calendars';
@@ -202,9 +202,9 @@ class TradeManagementNotifications extends PureComponent<any, any> {
               ]}
             />
             <Divider type="horizontal" />
-            <Table
+            <SmartTable
               scroll={{
-                x: 2300,
+                x: 2000,
               }}
               dataSource={this.state.tableDataSource}
               rowKey="positionId"
@@ -262,6 +262,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 },
                 {
                   title: '当前价格 (¥)',
+                  align: 'right',
                   dataIndex: 'underlyerPrice',
                   width: 200,
                   render: (text, record, index) => {
@@ -270,6 +271,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 },
                 {
                   title: '障碍价 (¥)',
+                  align: 'right',
                   dataIndex: 'barriers',
                   width: 200,
                 },
@@ -280,6 +282,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 },
                 {
                   title: '支付金额 (¥)',
+                  align: 'right',
                   dataIndex: 'payment',
                   width: 200,
                   render: (text, record, index) => {
@@ -287,7 +290,6 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   },
                 },
               ]}
-              pagination={this.state.pagination}
               loading={this.state.loading}
             />
           </div>

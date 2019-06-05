@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, Table2 } from '@/containers';
+import { Form2, Select, Table2, SmartTable } from '@/containers';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { Pagination, Divider, Row, Table, DatePicker } from 'antd';
@@ -9,6 +9,7 @@ import { rptCustomReportNameList, rptCustomReportSearchPaged } from '@/services/
 import { TABLE_COL_DEFS, REPORT_TYPE } from './constants';
 import _ from 'lodash';
 import { async } from 'q';
+import { PAGE_SIZE } from '@/constants/component';
 const { RangePicker } = DatePicker;
 
 const ReportsCustomManagement = memo<any>(props => {
@@ -22,14 +23,9 @@ const ReportsCustomManagement = memo<any>(props => {
   });
   const [pagination, setPagination] = useState({
     page: 1,
-    pageSize: 20,
+    pageSize: PAGE_SIZE,
     total: 1,
   });
-  // const pagination = {
-  //   page: 1,
-  //   pageSize: 20,
-  //   total: 1,
-  // };
   const [tabelData, setTabelData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -169,8 +165,7 @@ const ReportsCustomManagement = memo<any>(props => {
           ]}
         />
         <Divider type="horizontal" />
-        <Table
-          size="middle"
+        <SmartTable
           rowKey="uuid"
           dataSource={tabelData}
           columns={TABLE_COL_DEFS()}

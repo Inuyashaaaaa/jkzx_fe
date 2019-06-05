@@ -134,7 +134,7 @@ export default [
             {
               path: '/pricingSettings/customModel',
               name: 'customModel',
-              component: './CustomModel/index',
+              component: './PricingSettingCustomModal/index',
             },
           ],
         },
@@ -231,7 +231,7 @@ export default [
               component: './ReportsCustomerFundsSummaryStatements/index',
             },
             {
-              path: '/reports/custom',
+              path: '/reports/custom-management',
               name: 'reportsCustomManagement',
               component: './ReportsCustomManagement/index',
             },
@@ -277,7 +277,7 @@ export default [
         {
           path: '/approval-process',
           name: 'approvalProcess',
-          icon: 'interation',
+          icon: 'redo',
           routes: [
             {
               path: '/approval-process/process-manangement',

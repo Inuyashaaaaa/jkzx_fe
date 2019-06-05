@@ -2,7 +2,6 @@ import {
   INPUT_NUMBER_DIGITAL_CONFIG,
   IOGLOD_EVENT_TYPE_OPTIONS,
   LCM_EVENT_TYPE_OPTIONS,
-  PROCESS_STATUS_TYPE_OPTIONS,
 } from '@/constants/common';
 import CashInsertModal from '@/containers/CashInsertModal';
 import { IFormControl } from '@/containers/Form/types';
@@ -12,12 +11,10 @@ import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
-import React from 'react';
-import CapitalInputModal from './CapitalInputModal';
-import CommonCapitalInput from './CommonCapitalInput';
 import { formatMoney } from '@/tools';
-import { Select } from '@/containers';
 import _ from 'lodash';
+import React from 'react';
+
 export const PROCESSED_FORM_CONTROLS: (tabKey) => IFormControl[] = tabKey => {
   const event = {
     control: {
@@ -153,16 +150,18 @@ export const PROCESSED_COLUMN = fetchTable => [
     title: '现金流 (¥)',
     width: 200,
     dataIndex: 'cashFlow',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '期权费 (¥)',
     width: 200,
     dataIndex: 'premium',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
@@ -236,96 +235,108 @@ export const HISTORY_CLOUNMS = fetchTable => [
     title: '保证金变化 (¥)',
     width: 150,
     dataIndex: 'marginChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '现金变化 (¥)',
     width: 150,
     dataIndex: 'cashChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '存续期权利金变化 (¥)',
     width: 200,
     dataIndex: 'premiumChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '已用授信变化 (¥)',
     width: 150,
     dataIndex: 'creditUsedChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '负债变化 (¥)',
     width: 150,
     dataIndex: 'debtChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '出入金总额变化 (¥)',
     width: 150,
     dataIndex: 'netDepositChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '已实现盈亏变化 (¥)',
     width: 200,
     dataIndex: 'realizedPnLChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '授信总额变化 (¥)',
     width: 200,
     dataIndex: 'creditChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '我方授信总额变化 (¥)',
     width: 200,
     dataIndex: 'counterPartyCreditChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '我方剩余授信余额变化 (¥)',
     width: 200,
     dataIndex: 'counterPartyCreditBalanceChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '我方可用资金变化 (¥)',
     width: 200,
     dataIndex: 'counterPartyFundChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {
     title: '我方冻结保证金变化 (¥)',
     width: 200,
     dataIndex: 'counterPartyMarginChange',
+    align: 'right',
     render: (text, record, index) => {
-      return text ? formatMoney(text, {}) : text;
+      return formatMoney(text);
     },
   },
   {

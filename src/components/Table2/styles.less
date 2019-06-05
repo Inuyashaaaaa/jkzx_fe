@@ -139,6 +139,11 @@
   }
 
   .@{ant-prefix}-table-vertical {
+    .ant-table-small.ant-table-bordered .ant-table-thead > tr > th:last-child,
+    .ant-table-small.ant-table-bordered .ant-table-tbody > tr > td:last-child {
+      border-right: 1px solid #e8e8e8;
+    }
+
     // 修复表头不对齐
     .ant-table-small > .ant-table-content > .ant-table-header > table > .ant-table-thead > tr,
     .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-thead > tr,

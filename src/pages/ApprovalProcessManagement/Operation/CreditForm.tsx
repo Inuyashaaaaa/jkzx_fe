@@ -10,7 +10,7 @@ import {
   downloadTradeAttachment,
 } from '@/services/approval';
 import moment from 'moment';
-import { Form2, Upload, Input as Input2, InputNumber } from '@/containers';
+import { Form2, Upload, Input as Input2, InputNumber, SmartTable } from '@/containers';
 import {
   refBankAccountSearch,
   refSimilarLegalNameList,
@@ -726,7 +726,7 @@ class ApprovalForm extends PureComponent<any, any> {
               流程记录
             </Title>
             <div style={{ marginTop: 20 }}>
-              <Table
+              <SmartTable
                 columns={processColumns}
                 dataSource={histories}
                 size="small"

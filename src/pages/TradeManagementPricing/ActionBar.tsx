@@ -233,7 +233,7 @@ const ActionBar = memo<any>(props => {
       </Modal>
 
       <Drawer
-        width={1000}
+        width={1200}
         title="历史定价管理"
         placement={'right'}
         onClose={() => {

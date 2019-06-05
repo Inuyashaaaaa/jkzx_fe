@@ -17,6 +17,7 @@ import Item from 'antd/lib/list/Item';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import styles from './AuditGourpLists.less';
+import { SmartTable } from '@/containers';
 
 const TreeNode = TreeSelect.TreeNode;
 const { Option } = Select;
@@ -375,7 +376,7 @@ class Operation extends PureComponent {
               <Button type="primary">批量加入</Button>
             </Popconfirm>
           </Row>
-          <Table
+          <SmartTable
             rowSelection={rowSelection}
             columns={this.state.columns}
             dataSource={this.state.dataSource}

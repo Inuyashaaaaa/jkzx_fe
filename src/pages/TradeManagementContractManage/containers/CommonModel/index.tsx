@@ -1,4 +1,4 @@
-import { Form2, Loading, Select, Table2 } from '@/containers';
+import { Form2, Loading, Select, Table2, SmartTable } from '@/containers';
 import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
@@ -19,6 +19,8 @@ import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import { BOOKING_TABLE_COLUMN_DEFS } from '../../constants';
 import SmartForm from '@/containers/SmartForm';
+import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
+import { showTotal } from '@/tools/component';
 
 class CommonModel extends PureComponent<any> {
   public $table2: Table2 = null;
@@ -45,12 +47,12 @@ class CommonModel extends PureComponent<any> {
         payload: null,
       });
     }
-    this.onTradeTableSearch({ current: 1, pageSize: 10 });
+    this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
   };
 
   public onSearch = ({ domEvent }) => {
     domEvent.preventDefault();
-    this.onTradeTableSearch({ current: 1, pageSize: 10 });
+    this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
   };
 
   public search = () => {
@@ -152,7 +154,7 @@ class CommonModel extends PureComponent<any> {
         bookIdList: [],
       },
       () => {
-        this.onTradeTableSearch({ current: 1, pageSize: 10 });
+        this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
       }
     );
   };
@@ -435,11 +437,10 @@ class CommonModel extends PureComponent<any> {
         <Divider />
         <div style={{ marginTop: VERTICAL_GUTTER }}>
           <Loading loading={this.state.loading}>
-            <Table
-              size="middle"
+            <SmartTable
               pagination={false}
               rowKey={'positionId'}
-              scroll={{ x: 2500 }}
+              scroll={{ x: 2650 }}
               dataSource={tableDataSource}
               columns={BOOKING_TABLE_COLUMN_DEFS(this.search, this.props.name)}
               onRow={record => {
@@ -457,6 +458,8 @@ class CommonModel extends PureComponent<any> {
                   pageSize: pageSizeCurrent,
                   onChange: this.onChange,
                   total: pagination.total,
+                  pageSizeOptions: PAGE_SIZE_OPTIONS,
+                  showTotal,
                 }}
               />
             </Row>

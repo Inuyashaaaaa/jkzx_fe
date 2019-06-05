@@ -1,16 +1,16 @@
+import { PAGE_SIZE } from '@/constants/component';
+import { Form2, Select, SmartTable } from '@/containers';
+import SmartForm from '@/containers/SmartForm';
 import SourceTable from '@/containers/SourceTable';
-import { delay, mockData } from '@/tools';
 import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
+import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { positionDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
+import { DatePicker, Divider, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { SEARCH_FORM_CONTROLS_SETTLE, SETTLE_COLUMN_DEFS, columns } from './constants';
-import { Divider, Row, Table, DatePicker } from 'antd';
-import { Form2, Select } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
 import SettlementModal from './SettlementModal';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
 const { RangePicker } = DatePicker;
 class SettlementAdvice extends PureComponent {
@@ -22,7 +22,7 @@ class SettlementAdvice extends PureComponent {
     searchFormData: {},
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       showSizeChanger: true,
       showQuickJumper: true,
       onChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
@@ -123,7 +123,7 @@ class SettlementAdvice extends PureComponent {
         searchFormData,
       },
       () => {
-        this.onFetch({ current: 1, pageSize: 10 });
+        this.onFetch({ current: 1, pageSize: PAGE_SIZE });
       }
     );
   };
@@ -168,7 +168,7 @@ class SettlementAdvice extends PureComponent {
   };
 
   public onSearch = () => {
-    this.onFetch({ current: 1, pageSize: 10 });
+    this.onFetch({ current: 1, pageSize: PAGE_SIZE });
   };
 
   public render() {
@@ -176,7 +176,8 @@ class SettlementAdvice extends PureComponent {
 
     return (
       <>
-        <Form2
+        <SmartForm
+          spread={3}
           ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={searchFormData}
@@ -356,7 +357,7 @@ class SettlementAdvice extends PureComponent {
           ]}
         />
         <Divider type="horizontal" />
-        <Table
+        <SmartTable
           dataSource={this.state.dataSource}
           columns={[
             {

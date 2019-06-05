@@ -1,21 +1,11 @@
-import {
-  DIRECTION_TYPE_ZHCN_MAP,
-  LCM_EVENT_TYPE_ZHCN_MAP,
-  RULES_REQUIRED,
-} from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Input, Select } from '@/containers';
-import { clientNewTrade, clientSettleTrade } from '@/services/client-service';
+import { Form2, SmartTable } from '@/containers';
 import {
   clientAccountGetByLegalName,
   clientSaveAccountOpRecord,
-  refSimilarLegalNameList,
   trdTradeIdListByCounterPartyName,
 } from '@/services/reference-data-service';
-import { Button, Card, Col, message, Modal, Row, Table } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
+import { Button, Card, Col, message, Modal, Row } from 'antd';
 import React, { memo, useRef, useState } from 'react';
 import {
   COUNTER_PARTY_FORM_CONTROLS,
@@ -204,12 +194,11 @@ const ClientManagementInsert = memo<any>(props => {
           onFieldsChange={legalFormChange}
           onValuesChange={legalFormValueChange}
         />
-        <Table
+        <SmartTable
           rowKey="id"
           columns={TABLE_COL_DEF}
           dataSource={tableDataSource}
           pagination={false}
-          size="middle"
           style={{ marginBottom: VERTICAL_GUTTER }}
         />
         <Form2
