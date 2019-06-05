@@ -277,7 +277,7 @@ export default [
         {
           path: '/approval-process',
           name: 'approvalProcess',
-          icon: 'interation',
+          icon: 'redo',
           routes: [
             {
               path: '/approval-process/process-manangement',
