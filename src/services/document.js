@@ -11,6 +11,17 @@ export async function queryTemplateList(params = {}) {
   });
 }
 
+// 查询交易确认书模版信息
+export async function docPoiTemplateList(params = {}) {
+  return request(`${HOST_TEST}document-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'docPoiTemplateList',
+      params,
+    },
+  });
+}
+
 // 创建模板
 export async function createTemplate(params = {}) {
   return request(`${HOST_TEST}document-service/api/rpc`, {
@@ -28,6 +39,17 @@ export async function deleteTemplate(params = {}) {
     method: `POST`,
     body: {
       method: 'docBctTemplateDelete',
+      params,
+    },
+  });
+}
+
+// 删除交易文档模板
+export async function docPoiTemplateDelete(params = {}) {
+  return request(`${HOST_TEST}document-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'docPoiTemplateDelete',
       params,
     },
   });
@@ -81,10 +103,12 @@ export const UPLOAD_URL = `${HOST_TEST}document-service/api/upload/rpc`;
 
 export const HREF_UPLOAD_URL = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;
 
+export const COMFIRM_POI_URL = `${HOST_TEST}document-service/bct/download/poi/poi-template?poiTemplateId=`;
+
 export const DOWN_LOAD_FIEL_URL = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;
 
 export const DOWN_LOAD_VALUATION_URL = `${HOST_TEST}document-service/bct/download/valuationReport?valuationReportId=`;
 
-export const DOWN_LOAD_TRADE_URL = `${HOST_TEST}document-service/bct/download/supplementary_agreement?`;
+export const DOWN_LOAD_TRADE_URL = `${HOST_TEST}document-service/bct/download/poi/supplementary_agreement?`;
 
-export const DOWN_LOAD_SETTLEMENT_URL = `${HOST_TEST}document-service/bct/download/settlement?`;
+export const DOWN_LOAD_SETTLEMENT_URL = `${HOST_TEST}document-service/bct/download/poi/settlement?`;
