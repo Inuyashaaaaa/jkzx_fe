@@ -40,6 +40,7 @@ export const TABLE_COL_DEFS = fetchTable => [
   {
     title: '合约乘数',
     dataIndex: 'multiplier',
+    align: 'right',
     render: (value, record, index) => formatNumber(value, 4),
   },
   {

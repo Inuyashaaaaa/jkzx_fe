@@ -1,7 +1,9 @@
-import ImportExcelButton from '@/containers/_ImportExcelButton';
-import SourceTable, { SourceTableState } from '@/containers/_SourceTable';
+import { Form2, Input, InputNumber, Select, SmartTable } from '@/containers';
 // import Table from '@/containers/_Table2';
 import Page from '@/containers/Page';
+import TabHeader from '@/containers/TabHeader';
+import ImportExcelButton from '@/containers/_ImportExcelButton';
+import SourceTable from '@/containers/_SourceTable';
 import {
   mktAllInstrumentWhitelistSave,
   mktInstrumentWhitelistDelete,
@@ -10,14 +12,13 @@ import {
   mktInstrumentWhitelistSearch,
 } from '@/services/market-data-service';
 import { tradeReferenceGet } from '@/services/trade-service';
-import { message, Modal, Table, Divider, Row, Button, Popconfirm } from 'antd';
+import { formatMoney } from '@/tools';
+import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS, SEARCH_FORM_CONTROLS } from './constants';
-import { Form2, Select, InputNumber, Input } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
-import { formatMoney } from '@/tools';
-import TabHeader from '@/containers/TabHeader';
+import { PAGE_TABLE_COL_DEFS } from './constants';
+import { PAGE_SIZE } from '@/constants/component';
 
 class SystemSettingsRiskSettings extends PureComponent {
   public $createFrom: Form2 = null;
@@ -41,7 +42,7 @@ class SystemSettingsRiskSettings extends PureComponent {
     venueCodes: [],
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     },
     createVisible: false,
     createFormData: {},
@@ -324,7 +325,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                 导入Excel
               </ImportExcelButton>
             </Row>
-            <Table
+            <SmartTable
               dataSource={this.state.tableDataSource}
               columns={[
                 {
@@ -336,6 +337,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                   dataIndex: 'instrumentId',
                 },
                 {
+                  align: 'right',
                   title: '存续期名义金额上限（￥）',
                   dataIndex: 'notionalLimit',
                   render: (text, record, index) => {
@@ -362,7 +364,6 @@ class SystemSettingsRiskSettings extends PureComponent {
               }}
               loading={this.state.loading}
               rowKey="uuid"
-              size="middle"
               scroll={
                 this.state.tableDataSource && this.state.tableDataSource.length > 0
                   ? { x: '1000px' }

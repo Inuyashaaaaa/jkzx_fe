@@ -1,10 +1,9 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Table2 } from '@/containers';
+import { Form2, SmartTable, Table2 } from '@/containers';
 import Page from '@/containers/Page';
-import { delay, getMoment } from '@/tools';
 import { createCalendar, queryCalendar, removeCalendar } from '@/services/calendars';
-import { Button, Col, DatePicker, message, Row, Modal } from 'antd';
-import produce from 'immer';
+import { delay, getMoment } from '@/tools';
+import { Button, Col, DatePicker, message, Modal, Row } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -197,7 +196,7 @@ class SystemTradeDate extends PureComponent<any, any> {
             >
               创建
             </Button>
-            <Table2
+            <SmartTable
               loading={this.state.loading}
               rowKey="uuid"
               size="small"

@@ -308,7 +308,7 @@ export const formatNumber = (
   roundingMode?: BigNumber.RoundingMode,
   config?: BigNumber.Format
 ) => {
-  if (!value) {
+  if (value == null) {
     return value;
   }
   return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
@@ -322,7 +322,7 @@ export const formatMoney = (
     decimalPlaces?: number;
   }
 ) => {
-  const { unit = '', space = false, decimalPlaces = 4 } = config;
+  const { unit = '', space = false, decimalPlaces = 4 } = config || {};
   return formatNumber(value, decimalPlaces, null, {
     // the decimal separator
     decimalSeparator: '.',

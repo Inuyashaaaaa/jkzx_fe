@@ -1,6 +1,6 @@
+import { SmartTable } from '@/containers';
+import { Button, Checkbox, Input, Popconfirm } from 'antd';
 import React, { Component } from 'react';
-import { Table, Checkbox, Button, Input, Popconfirm } from 'antd';
-
 import AUTHES from './constants';
 
 const { Search } = Input;
@@ -227,11 +227,10 @@ export default class AuthTable extends Component {
           />
           <Button onClick={this.cancelSearch}>取消筛选</Button>
         </div>
-        <Table
+        <SmartTable
           rowKey="value"
           style={{ marginTop: 10 }}
           bordered={false}
-          size="middle"
           pagination
           dataSource={authorities || []}
           columns={columns}

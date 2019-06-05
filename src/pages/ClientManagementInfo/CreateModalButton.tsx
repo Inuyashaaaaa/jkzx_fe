@@ -7,6 +7,7 @@ import {
   Select,
   Table2,
   Upload,
+  SmartTable,
 } from '@/containers';
 import { remove, uuid } from '@/tools';
 import { UPLOAD_URL } from '@/services/document';
@@ -856,7 +857,7 @@ const CreateModalButton = memo<any>(props => {
           )}
           {currenStep === 3 && (
             <>
-              <Table2
+              <SmartTable
                 size="small"
                 rowKey={'uuid'}
                 pagination={false}

@@ -1,37 +1,33 @@
-import Page from '@/containers/Page';
-import TabHeader from '@/containers/TabHeader';
+import { Form2, Input, SmartTable, Table2 } from '@/containers';
 import {
-  wkProcessGet,
-  wkProcessStatusModify,
   wkProcessConfigModify,
-  wkProcessModify,
-  wkTaskApproveGroupBind,
+  wkProcessGet,
   wkProcessInstanceListByProcessName,
+  wkProcessModify,
+  wkProcessStatusModify,
+  wkTaskApproveGroupBind,
 } from '@/services/approvalProcessConfiguration';
-import uuidv4 from 'uuid/v4';
-import { wkApproveGroupList } from '@/services/auditing';
-import _ from 'lodash';
-import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE } from '../constants';
 import {
-  List,
-  Switch,
-  notification,
-  Row,
-  Col,
-  Checkbox,
   Alert,
-  Tag,
-  Modal,
   Button,
+  Card,
+  Checkbox,
+  Col,
   Icon,
   message,
-  Card,
+  Modal,
+  notification,
+  Row,
+  Switch,
+  Tag,
 } from 'antd';
-import { Table2, Select, Form2, Input } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
-import React, { useRef, useEffect, useState } from 'react';
-import GroupSelcet from './GroupSelcet';
+import _ from 'lodash';
+import React, { useEffect, useRef, useState } from 'react';
+import uuidv4 from 'uuid/v4';
 import XLSX from 'xlsx';
+import { GTE_PROCESS_CONFIGS, TASKTYPE } from '../constants';
+import GroupSelcet from './GroupSelcet';
 
 const Operation = props => {
   const [process, setProcess] = useState({});
@@ -79,7 +75,7 @@ const Operation = props => {
   };
 
   const handleReviewData = processData => {
-    console.log(processData)
+    console.log(processData);
     const data = processData ? processData : process;
     let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
     reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
@@ -177,9 +173,9 @@ const Operation = props => {
     }
     const cloneData = { ...data };
     cloneData.tasks = cloneData.tasks.map(item => {
-      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
       return item;
-    })
+    });
 
     setProcess(cloneData);
     setProcessConfigs(data.processConfigs);
@@ -382,9 +378,9 @@ const Operation = props => {
     }
     const cloneData = { ...data };
     cloneData.tasks = cloneData.tasks.map(item => {
-      item.approveGroupList = item.approveGroups.map(i =>i.approveGroupId);
+      item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
       return item;
-    })
+    });
     setProcess(cloneData);
     setProcessConfigs(cloneData.processConfigs);
     handleReviewData(cloneData);
@@ -460,7 +456,7 @@ const Operation = props => {
           <Button type="primary" onClick={showReview}>
             编辑流程
           </Button>
-          <Table2
+          <SmartTable
             dataSource={reviewTask}
             rowKey="taskId"
             pagination={false}
@@ -506,7 +502,7 @@ const Operation = props => {
           type="info"
           showIcon={true}
         />
-        <Table2
+        <SmartTable
           ref={node => (tableE1 = node)}
           dataSource={reviewTask}
           rowKey="taskId"
@@ -606,7 +602,7 @@ const Operation = props => {
         cancelText="放弃修改"
         width={800}
       >
-        <Table2
+        <SmartTable
           size="small"
           ref={node => (tableE2 = node)}
           dataSource={otherTask}

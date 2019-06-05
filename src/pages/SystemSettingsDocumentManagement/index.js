@@ -1,17 +1,18 @@
+import { SmartTable } from '@/containers';
 import Page from '@/containers/Page';
-import { Button, Modal, Table, Popconfirm, Divider } from 'antd';
-import React, { PureComponent } from 'react';
-import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import moment from 'moment';
+import TabHeader from '@/containers/TabHeader';
 import {
-  queryTemplateList,
   // updateTemplate,
   // dowmloadTemplate,
   deleteTemplate,
   HREF_UPLOAD_URL,
+  queryTemplateList,
   UPLOAD_URL,
 } from '@/services/document';
-import TabHeader from '@/containers/TabHeader';
+import { Button, Divider, Modal, Popconfirm } from 'antd';
+import moment from 'moment';
+import React, { PureComponent } from 'react';
+import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 
 const TRADE_MAP = {
   EUROPEAN: '欧式',
@@ -272,13 +273,12 @@ class ClientManagementDocument extends PureComponent {
         }
       >
         {activeKey === '1' && (
-          <Table
+          <SmartTable
             loading={loading}
             columns={tradeColumns}
             dataSource={tradeData}
             rowKey="uuid"
             pagination={{
-              pageSizeOptions: ['10', '20', '30'],
               showSizeChanger: true,
               showQuickJumper: true,
               onShowSizeChange: (page, size) => {
@@ -293,15 +293,12 @@ class ClientManagementDocument extends PureComponent {
           />
         )}
         {activeKey === '2' && (
-          <Table
+          <SmartTable
             loading={loading}
             columns={customerColumns}
             rowKey="uuid"
             dataSource={customerData}
             pagination={{
-              pageSizeOptions: ['10', '20', '30'],
-              showSizeChanger: true,
-              showQuickJumper: true,
               onShowSizeChange: (page, size) => {
                 this.setState({ customerPageSize: size });
               },

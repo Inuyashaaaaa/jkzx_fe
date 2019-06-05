@@ -1,8 +1,8 @@
-import React, { PureComponent, memo, useState } from 'react';
-import { Form2 } from '..';
-import { IFormProps } from '../type';
 import { Button } from 'antd';
 import { FormCreateOption } from 'antd/lib/form';
+import React, { memo, useState } from 'react';
+import { Form2 } from '..';
+import { IFormProps } from '@/components/type';
 
 export interface ISmartFormProps extends IFormProps {
   spread?: number;

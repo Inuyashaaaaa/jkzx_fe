@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2 } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
 import { Button, Divider, message, Modal, Table } from 'antd';
@@ -8,6 +8,7 @@ import React, { PureComponent } from 'react';
 import { TABLE_COL_DEFS } from './constants';
 import { createFormControls, searchFormControls } from './services';
 import moment, { isMoment } from 'moment';
+import { PAGE_SIZE } from '@/constants/component';
 
 class TradeManagementMarketManagement extends PureComponent {
   public $form: Form2 = null;
@@ -17,7 +18,7 @@ class TradeManagementMarketManagement extends PureComponent {
     searchFormData: {},
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     },
     total: 0,
     loading: false,
@@ -38,7 +39,7 @@ class TradeManagementMarketManagement extends PureComponent {
       {
         pagination: {
           current: 1,
-          pageSize: 10,
+          pageSize: PAGE_SIZE,
         },
         searchFormData: {},
       },
@@ -142,10 +143,10 @@ class TradeManagementMarketManagement extends PureComponent {
       createFormControls: createFormControls({}, 'create'),
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: PAGE_SIZE,
       },
     });
-    this.fetchTable({ current: 1, pageSize: 10 });
+    this.fetchTable({ current: 1, pageSize: PAGE_SIZE });
   };
 
   public onSearchFormChange = (props, fields, allFields) => {
@@ -190,7 +191,7 @@ class TradeManagementMarketManagement extends PureComponent {
       {
         pagination: {
           current: 1,
-          pageSize: 10,
+          pageSize: PAGE_SIZE,
         },
       },
       () => {
@@ -215,7 +216,7 @@ class TradeManagementMarketManagement extends PureComponent {
         <Button style={{ marginBottom: VERTICAL_GUTTER }} type="primary" onClick={this.switchModal}>
           新建标的物
         </Button>
-        <Table
+        <SmartTable
           rowKey="instrumentId"
           columns={TABLE_COL_DEFS(this.fetchTable)}
           loading={this.state.loading}

@@ -23,6 +23,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '标的物价格变化 (%)',
@@ -39,6 +40,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '期权 Delta (手)',
@@ -47,6 +49,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '净 Delta (手)',
@@ -55,6 +58,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Delta Cash (手)',
@@ -63,6 +67,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Delta Decay (手)',
@@ -71,6 +76,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
 
   {
@@ -80,6 +86,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Gamma (手)',
@@ -88,6 +95,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Gamma 金额 (¥)',
@@ -96,6 +104,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Vega/1% (¥)',
@@ -104,6 +113,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Theta/1天 (¥)',
@@ -112,6 +122,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Rho/1% (¥)',
@@ -119,5 +130,6 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
 ];

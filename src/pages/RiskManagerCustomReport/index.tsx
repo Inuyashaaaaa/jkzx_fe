@@ -1,17 +1,16 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2, Select, SmartTable } from '@/containers';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import ReloadGreekButton from '@/containers/ReloadGreekButton';
-import { Form2, Select } from '@/containers';
 import Page from '@/containers/Page';
-import { socketHOC } from '@/tools/socketHOC';
-import { ConfigProvider, Divider, message, Row, Table } from 'antd';
-import _ from 'lodash';
-import React, { useEffect, useRef, useState, memo } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import FormItem from 'antd/lib/form/FormItem';
 import { rptIntradayReportNamesList, rptIntradayReportPaged } from '@/services/report-service';
+import { ConfigProvider, Divider, message } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
 import uuidV4 from 'uuid';
+import { PAGE_SIZE } from '@/constants/component';
 
 const RiskManagerCustomReport = memo<any>(props => {
   const form = useRef<Form2>(null);
@@ -19,7 +18,7 @@ const RiskManagerCustomReport = memo<any>(props => {
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: PAGE_SIZE,
   });
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState(true);
@@ -186,8 +185,7 @@ const RiskManagerCustomReport = memo<any>(props => {
         导出Excel
       </DownloadExcelButton>
       <ConfigProvider renderEmpty={!info && (() => <CustomNoDataOverlay />)}>
-        <Table
-          size="middle"
+        <SmartTable
           rowKey="uuid"
           loading={loading}
           dataSource={dataSource}

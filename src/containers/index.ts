@@ -6,4 +6,5 @@ export { default as SourceList } from './SourceList';
 export { default as SourceTable } from './SourceTable';
 export { default as Table2 } from '../components/Table2';
 export { default as Form2 } from '../components/Form2';
+export { default as SmartTable } from './SmartTable';
 export * from './Input';

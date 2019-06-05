@@ -1,4 +1,4 @@
-import { Form2, Input } from '@/containers';
+import { Form2, Input, SmartTable } from '@/containers';
 import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
 import SourceTable from '@/containers/SourceTable';
@@ -14,11 +14,12 @@ import {
   refSubsidiaryUpdate,
 } from '@/services/sales';
 import { arr2treeOptions, getMoment } from '@/tools';
-import { Col, Divider, Icon, message, Modal, Popconfirm, Row, Table, Tree } from 'antd';
+import { Col, Divider, Icon, message, Modal, Popconfirm, Row, Tree } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
 import Operation from './Operation';
+import { PAGE_SIZE } from '@/constants/component';
 
 const { TreeNode } = Tree;
 
@@ -49,7 +50,7 @@ class ClientManagementSalesManagement extends PureComponent {
     subsidiaryId: '',
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     },
   };
 
@@ -471,7 +472,6 @@ class ClientManagementSalesManagement extends PureComponent {
           <Col>
             <ModalButton
               key="create"
-              style={{ marginBottom: '20px' }}
               type="primary"
               onClick={this.switchModal}
               modalProps={{
@@ -493,7 +493,7 @@ class ClientManagementSalesManagement extends PureComponent {
               新建销售
             </ModalButton>
             <Divider type="horizontal" />
-            <Table
+            <SmartTable
               dataSource={this.state.dataSource}
               columns={[
                 {
@@ -523,13 +523,12 @@ class ClientManagementSalesManagement extends PureComponent {
                   title: '操作',
                   width: 250,
                   render: (text, record, index) => {
-                    return <Operation record={text} fetchTable={this.fetchTable} />;
+                    return <Operation record={record} fetchTable={this.fetchTable} />;
                   },
                 },
               ]}
               loading={this.state.loading}
               rowKey="uuid"
-              size="middle"
               pagination={{
                 ...this.state.pagination,
                 showSizeChanger: true,
