@@ -5,6 +5,7 @@ import {
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
+  LEG_TYPE_FIELD,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -30,10 +31,9 @@ import {
   SPECIFIED_PRICE_MAP,
   STRIKE_TYPES_MAP,
 } from '../../constants/common';
-import { commonLinkage } from '../common';
+import { commonLinkage, inline } from '../common';
 import { Direction } from '../legFields';
 import { DaysInYear } from '../legFields/DaysInYear';
-import { DynamicUnderlyer } from '../legFields/DynamicUnderlyer';
 import { EffectiveDate } from '../legFields/EffectiveDate';
 import { ExpirationDate } from '../legFields/ExpirationDate';
 import { FrontPremium } from '../legFields/FrontPremium';
@@ -57,7 +57,7 @@ import { legPipeLine } from '../_utils';
 import { Weight } from '../legFields/Weight';
 import { Cega } from '../legFields/computed/Cega';
 
-export const LinearSpreadEuropean: ILeg = legPipeLine({
+export const SpreadEuropean: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.SPREAD_EUROPEAN],
   type: LEG_TYPE_MAP.SPREAD_EUROPEAN,
   assetClass: ASSET_CLASS_MAP.EQUITY,
@@ -211,6 +211,21 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
     return nextPosition;
   },
   getPageData: (env: string, position: any) => {
+    if (position.asset.constituents) {
+      const values = position.asset.constituents.map((item, index) => {
+        return {
+          ...item,
+          name: '标的物' + (index + 1),
+        };
+      });
+
+      return Form2.createFields({
+        [LEG_FIELD.UNDERLYER_INSTRUMENT_ID]: values,
+        [LEG_FIELD.UNDERLYER_MULTIPLIER]: values,
+        [LEG_FIELD.INITIAL_SPOT]: values,
+        [LEG_FIELD.WEIGHT]: values,
+      });
+    }
     const value = [
       _.mapKeys(
         _.pick(position.asset, [
@@ -257,7 +272,18 @@ export const LinearSpreadEuropean: ILeg = legPipeLine({
     setColValue: (colId: string, newVal: IFormField) => void,
     setTableData: (newData: ITableData[]) => void
   ) => {
-    commonLinkage(
+    const { changedFields } = changeFieldsParams;
+
+    if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
+      if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+        const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
+        record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
+        record[LEG_FIELD.WEIGHT] = Form2.createField(value);
+        record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+      }
+    }
+
+    inline(
       env,
       changeFieldsParams,
       record,

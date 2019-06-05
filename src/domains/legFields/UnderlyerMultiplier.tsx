@@ -13,9 +13,11 @@ class MultiplierModalInput extends InputBase {
     const { editing, value = [], onChange, onValueChange } = this.props;
     return (
       <>
-        {value.map((item, index) => {
-          return <Tag key="index">{item.underlyerMultiplier}</Tag>;
-        })}
+        {value
+          .map((item, index) => {
+            return item.underlyerMultiplier;
+          })
+          .join(', ')}
         <Import2 value={value} onChange={onChange} onValueChange={onValueChange} />
       </>
     );
@@ -25,9 +27,11 @@ class MultiplierModalInput extends InputBase {
     const { editing, value = [], onChange, onValueChange } = this.props;
     return (
       <>
-        {value.map((item, index) => {
-          return <Tag key="index">{item.underlyerMultiplier}</Tag>;
-        })}
+        {value
+          .map((item, index) => {
+            return item.underlyerMultiplier;
+          })
+          .join(', ')}
       </>
     );
   }
