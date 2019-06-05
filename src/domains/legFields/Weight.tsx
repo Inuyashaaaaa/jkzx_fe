@@ -13,9 +13,11 @@ class WeightModalInput extends InputBase {
     return (
       <>
         <div style={{ position: 'relative' }}>
-          {value.map((item, index) => {
-            return <Tag key="index">{item.weight}</Tag>;
-          })}
+          {value
+            .map((item, index) => {
+              return item.weight;
+            })
+            .join(', ')}
           <Icon
             type="alert"
             theme="twoTone"
@@ -36,9 +38,11 @@ class WeightModalInput extends InputBase {
     const { editing, value = [], onChange, onValueChange } = this.props;
     return (
       <>
-        {value.map((item, index) => {
-          return <Tag key="index">{item.weight}</Tag>;
-        })}
+        {value
+          .map((item, index) => {
+            return item.weight;
+          })
+          .join(', ')}
       </>
     );
   }
