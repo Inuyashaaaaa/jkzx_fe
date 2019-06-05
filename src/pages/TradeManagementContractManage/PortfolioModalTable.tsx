@@ -2,7 +2,7 @@ import {
   trdPortfolioListBySimilarPortfolioName,
   trdTradePortfolioCreateBatch,
 } from '@/services/trade-service';
-import { Divider, message, Modal, Form, Input } from 'antd';
+import { Divider, message, Modal } from 'antd';
 import SmartTable from '@/containers/SmartTable';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';

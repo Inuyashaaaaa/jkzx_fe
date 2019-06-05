@@ -92,6 +92,7 @@ class LifeModalTable extends PureComponent<
           rowKey="uuid"
           loading={this.state.lifeLoading}
           columns={OVERVIEW_TABLE_COLUMNDEFS}
+          pagination={false}
         />
       </Modal>
     );
