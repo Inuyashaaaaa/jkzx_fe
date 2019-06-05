@@ -1,18 +1,15 @@
-import ModalButton from '@/containers/ModalButton';
-import SourceTable from '@/containers/SourceTable';
 import {
   trdPortfolioListBySimilarPortfolioName,
   trdTradePortfolioCreateBatch,
-  trdTradePortfolioDelete,
 } from '@/services/trade-service';
-import { Divider, Table, message, Modal, Form, Input } from 'antd';
+import { Divider, message, Modal, Form, Input } from 'antd';
+import SmartTable from '@/containers/SmartTable';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import ActionCol from './ActionCol';
 import { Form2, Select } from '@/containers';
-import Page from '@/containers/Page';
 
 class PortfolioModalTable extends PureComponent<
   { rowData: any; portfolioModalVisible: boolean; handlePortfolioVisible: any },
@@ -25,6 +22,9 @@ class PortfolioModalTable extends PureComponent<
     options: [],
     portfolioNames: [],
   };
+
+  private form: Form2 = null;
+
   public componentDidMount = () => {
     if (!this.props.rowData.portfolioNames) {
       return;
@@ -61,6 +61,8 @@ class PortfolioModalTable extends PureComponent<
   };
 
   public handleCreate = async () => {
+    const rsp = await this.form.validate();
+    if (rsp.error) return;
     const { error, data } = await trdTradePortfolioCreateBatch({
       tradeId: this.props.rowData.tradeId,
       portfolioNames: this.state.portfolioNames,
@@ -82,7 +84,7 @@ class PortfolioModalTable extends PureComponent<
     this.setState({ portfolioNames: allFields.portfolioNames.value });
   };
 
-  public setOptions = async (value: string = '') => {
+  public setOptions = async (value?) => {
     const options = await this.getOptions(value);
     this.setState({ options });
   };
@@ -113,6 +115,7 @@ class PortfolioModalTable extends PureComponent<
         >
           <>
             <Form2
+              ref={node => (this.form = node)}
               layout="inline"
               resetable={false}
               submitText="加入"
@@ -125,7 +128,14 @@ class PortfolioModalTable extends PureComponent<
                   render: (value, record, index, { form, editing }) => {
                     return (
                       <FormItem>
-                        {form.getFieldDecorator({})(
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: true,
+                              message: '投资组合为必填项',
+                            },
+                          ],
+                        })(
                           <Select
                             style={{ minWidth: 180 }}
                             mode="multiple"
@@ -143,7 +153,7 @@ class PortfolioModalTable extends PureComponent<
               ]}
             />
             <Divider />
-            <Table
+            <SmartTable
               title={() => '已加入的投资组合'}
               rowKey="uuid"
               bordered={true}
@@ -168,62 +178,6 @@ class PortfolioModalTable extends PureComponent<
                 },
               ]}
             />
-            {/* <SourceTable
-              rowKey="uuid"
-              title="已加入的投资组合"
-              dataSource={this.state.dataSource}
-              columnDefs={[
-                { headerName: '投资组合', field: 'portfolio' },
-                {
-                  headerName: '操作',
-                  render: params => {
-                    return (
-                      <ActionCol
-                        params={params}
-                        rowData={this.props.rowData}
-                        onRemove={this.onRemove.bind(this)}
-                      />
-                    );
-                  },
-                },
-              ]}
-              searchable={true}
-              onSearchButtonClick={this.handleCreate}
-              searchButtonProps={{ icon: null }}
-              searchText={'加入'}
-              searchFormControls={[
-                {
-                  field: 'create',
-                  control: {
-                    label: '请选择投资组合',
-                  },
-                  input: {
-                    type: 'select',
-                    mode: 'multiple',
-                    placeholder: '请输入内容搜索',
-                    showSearch: true,
-                    allowClear: true,
-                    options: async (value: string = '') => {
-                      const { data, error } = await trdPortfolioListBySimilarPortfolioName({
-                        similarPortfolioName: value,
-                      });
-                      if (error) return [];
-                      return data.map(item => ({
-                        label: item,
-                        value: item,
-                      }));
-                    },
-                  },
-                  decorator: {
-                    rules: [
-                      {
-                        required: true,
-                      },
-                    ],
-                  },
-                },
-              ]}
-            /> */}
           </>
         </Modal>
       </>

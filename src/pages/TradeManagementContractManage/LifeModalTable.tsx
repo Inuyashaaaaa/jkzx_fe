@@ -1,5 +1,6 @@
 import { trdTradeLCMEventList } from '@/services/general-service';
-import { Modal, Table } from 'antd';
+import { Modal } from 'antd';
+import SmartTable from '@/containers/SmartTable';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -84,14 +85,13 @@ class LifeModalTable extends PureComponent<
         visible={this.props.modalVisible}
         onCancel={this.handleCancel}
       >
-        <Table
+        <SmartTable
           size="small"
           bordered={true}
           dataSource={lifeTableData}
           rowKey="uuid"
           loading={this.state.lifeLoading}
           columns={OVERVIEW_TABLE_COLUMNDEFS}
-          pagination={false}
         />
       </Modal>
     );
