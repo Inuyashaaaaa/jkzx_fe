@@ -123,7 +123,7 @@ class PortfolioModalTable extends PureComponent<
               onFieldsChange={this.onSearchFormChange}
               columns={[
                 {
-                  title: '投资组合',
+                  title: '请选择投资组合',
                   dataIndex: 'portfolioNames',
                   render: (value, record, index, { form, editing }) => {
                     return (
