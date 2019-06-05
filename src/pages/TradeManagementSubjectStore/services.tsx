@@ -2,7 +2,6 @@ import { DatePicker, Input, InputNumber, Select, Form2, TimePicker } from '@/con
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
-import moment from 'moment';
 
 const multiplier = {
   title: '合约乘数',
@@ -551,7 +550,6 @@ const expirationTime = {
     return (
       <FormItem>
         {form.getFieldDecorator({
-          initialValue: moment('15:00:00', 'HH:mm:ss'),
           rules: [
             {
               required: true,

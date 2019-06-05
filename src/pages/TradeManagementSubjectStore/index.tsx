@@ -18,7 +18,7 @@ const TradeManagementMarketManagement = props => {
     instrumentType: Form2.createField('FUTURES'),
   };
   const defaultPagination = {
-    pageSize: 10,
+    pageSize: PAGE_SIZE,
     current: 1,
   };
 
@@ -39,7 +39,7 @@ const TradeManagementMarketManagement = props => {
   }, []);
 
   const onReset = () => {
-    setPagination({ current: 1, pageSize: 10 });
+    setPagination(defaultPagination);
     setSearchFormData(defaultSearchFormData);
     fetchTable();
   };
