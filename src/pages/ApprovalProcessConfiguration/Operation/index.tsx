@@ -430,7 +430,7 @@ const Operation = props => {
           </div>
         </Col>
         <Col xs={24} sm={18} style={{ background: '#fff', minHeight: '700px', padding: '20px' }}>
-          <Button type="primary" onClick={showReview}>
+          <Button type="primary" onClick={showReview} style={{ marginBottom: 15 }}>
             编辑流程
           </Button>
           <EditTable
