@@ -18,6 +18,7 @@ class TradeModal extends PureComponent {
   public onClick = () => {
     this.setState({
       visible: true,
+      loading: false,
     });
   };
 
@@ -29,12 +30,14 @@ class TradeModal extends PureComponent {
   };
 
   public onConfirm = async () => {
+    this.setState({ loading: true });
     const { error } = await emlSendSettleReport({
       tos: this.props.data.tradeEmail,
       tradeId: this.props.data.tradeId,
       positionId: this.props.data.positionId,
       partyName: this.props.data.partyName,
     });
+    this.setState({ loading: false });
     if (error) {
       message.error('发送失败');
       return;
@@ -77,7 +80,7 @@ class TradeModal extends PureComponent {
               </Button>
             </Col>
             <Col>
-              <Button type="primary" onClick={this.onConfirm}>
+              <Button type="primary" onClick={this.onConfirm} loading={this.state.loading}>
                 发送至客户邮箱
               </Button>
             </Col>
