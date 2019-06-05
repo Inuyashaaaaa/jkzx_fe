@@ -2,6 +2,7 @@ import { DatePicker, Input, InputNumber, Select, Form2, TimePicker } from '@/con
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
+import moment from 'moment';
 
 const multiplier = {
   title: '合约乘数',
@@ -500,7 +501,25 @@ const underlyerInstrumentId = {
               message: '标的代码是必填项',
             },
           ],
-        })(<Input />)}
+        })(
+          <Select
+            placeholder="请输入内容搜索"
+            allowClear={true}
+            showSearch={true}
+            fetchOptionsOnSearch={true}
+            options={async (value: string = '') => {
+              const { data = [], error } = await mktInstrumentSearch({
+                instrumentIdPart: value,
+                excludeOption: true,
+              });
+              if (error) return [];
+              return data.slice(0, 50).map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />
+        )}
       </FormItem>
     );
   },
@@ -532,6 +551,7 @@ const expirationTime = {
     return (
       <FormItem>
         {form.getFieldDecorator({
+          initialValue: moment('15:00:00', 'HH:mm:ss'),
           rules: [
             {
               required: true,
