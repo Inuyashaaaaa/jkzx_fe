@@ -13,7 +13,7 @@ class ActionCol extends PureComponent<any> {
     const { params, rowData } = this.props;
     const { error, data } = await trdTradePortfolioDelete({
       tradeId: rowData.tradeId,
-      portfolioName: params.data.portfolio,
+      portfolioName: params.portfolio,
     });
     if (error) return;
     message.success('移除成功');

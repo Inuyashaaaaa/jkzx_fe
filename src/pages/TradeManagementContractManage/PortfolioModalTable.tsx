@@ -5,11 +5,14 @@ import {
   trdTradePortfolioCreateBatch,
   trdTradePortfolioDelete,
 } from '@/services/trade-service';
-import { message, Modal } from 'antd';
+import { Divider, Table, message, Modal, Form, Input } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
 import ActionCol from './ActionCol';
+import { Form2, Select } from '@/containers';
+import Page from '@/containers/Page';
 
 class PortfolioModalTable extends PureComponent<
   { rowData: any; portfolioModalVisible: boolean; handlePortfolioVisible: any },
@@ -19,13 +22,15 @@ class PortfolioModalTable extends PureComponent<
     modalVisible: false,
     value: [],
     dataSource: [],
+    options: [],
+    portfolioNames: [],
   };
   public componentDidMount = () => {
     if (!this.props.rowData.portfolioNames) {
       return;
     }
     const portfolioNames = this.props.rowData.portfolioNames;
-
+    this.setOptions();
     this.setState({
       dataSource: portfolioNames.map(item => {
         return {
@@ -48,20 +53,20 @@ class PortfolioModalTable extends PureComponent<
 
   public onRemove = params => {
     const clone = [...this.state.dataSource];
-    const index = this.state.dataSource.findIndex(item => item.portfolio === params.data.portfolio);
+    const index = this.state.dataSource.findIndex(item => item.portfolio === params.portfolio);
     clone.splice(index, 1);
     this.setState({
       dataSource: clone,
     });
   };
 
-  public handleCreate = async params => {
+  public handleCreate = async () => {
     const { error, data } = await trdTradePortfolioCreateBatch({
       tradeId: this.props.rowData.tradeId,
-      portfolioNames: params.searchFormData.create,
+      portfolioNames: this.state.portfolioNames,
     });
     if (error) return;
-    const datas = params.searchFormData.create.map(item => {
+    const datas = this.state.portfolioNames.map(item => {
       return {
         uuid: uuidv4(),
         portfolio: item,
@@ -71,6 +76,28 @@ class PortfolioModalTable extends PureComponent<
     this.setState({
       dataSource: [...this.state.dataSource, ...datas],
     });
+  };
+
+  public onSearchFormChange = (props, fields, allFields) => {
+    this.setState({ portfolioNames: allFields.portfolioNames.value });
+  };
+
+  public setOptions = async (value: string = '') => {
+    const options = await this.getOptions(value);
+    this.setState({ options });
+  };
+
+  public getOptions = async (value: string = '') => {
+    const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+      similarPortfolioName: value,
+    });
+    if (error) {
+      return [];
+    }
+    return data.map(item => ({
+      label: item,
+      value: item,
+    }));
   };
 
   public render() {
@@ -85,7 +112,63 @@ class PortfolioModalTable extends PureComponent<
           visible={this.props.portfolioModalVisible}
         >
           <>
-            <SourceTable
+            <Form2
+              layout="inline"
+              resetable={false}
+              submitText="加入"
+              onSubmit={this.handleCreate}
+              onFieldsChange={this.onSearchFormChange}
+              columns={[
+                {
+                  title: '投资组合',
+                  dataIndex: 'portfolioNames',
+                  render: (value, record, index, { form, editing }) => {
+                    return (
+                      <FormItem>
+                        {form.getFieldDecorator({})(
+                          <Select
+                            style={{ minWidth: 180 }}
+                            mode="multiple"
+                            placeholder="请输入内容搜索"
+                            showSearch={true}
+                            allowClear={true}
+                            onSearch={this.setOptions}
+                            options={this.state.options}
+                          />
+                        )}
+                      </FormItem>
+                    );
+                  },
+                },
+              ]}
+            />
+            <Divider />
+            <Table
+              title={() => '已加入的投资组合'}
+              rowKey="uuid"
+              bordered={true}
+              dataSource={this.state.dataSource}
+              size="small"
+              columns={[
+                {
+                  title: '投资组合',
+                  dataIndex: 'portfolio',
+                },
+                {
+                  title: '操作',
+                  render: (value, record, index) => {
+                    return (
+                      <ActionCol
+                        params={record}
+                        rowData={this.props.rowData}
+                        onRemove={this.onRemove}
+                      />
+                    );
+                  },
+                },
+              ]}
+            />
+            {/* <SourceTable
               rowKey="uuid"
               title="已加入的投资组合"
               dataSource={this.state.dataSource}
@@ -140,7 +223,7 @@ class PortfolioModalTable extends PureComponent<
                   },
                 },
               ]}
-            />
+            /> */}
           </>
         </Modal>
       </>
