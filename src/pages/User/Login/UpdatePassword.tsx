@@ -80,9 +80,6 @@ class UpdatePassword extends PureComponent<any> {
                         required: true,
                         message: '请输入原密码',
                       },
-                      {
-                        validator: this.testPassword,
-                      },
                     ],
                   })(<Input.Password />)}
                 </FormItem>
