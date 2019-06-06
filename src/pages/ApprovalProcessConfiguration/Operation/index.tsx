@@ -113,9 +113,11 @@ const Operation = props => {
   };
 
   const getActionClass = (taskType, processName) => {
+    console.log(taskType);
+    // debugger
     // 资金
     if (processName === '财务出入金') {
-      if (taskType === 'REVIEW_DATA') {
+      if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
         return `tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction`;
       }
       return `tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction`;
@@ -123,7 +125,7 @@ const Operation = props => {
 
     // 授信
     if (processName === '授信额度变更') {
-      if (taskType === 'REVIEW_DATA') {
+      if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
         return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
       }
       return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
@@ -131,7 +133,7 @@ const Operation = props => {
 
     // 交易
     if (processName === '交易录入') {
-      if (taskType === 'REVIEW_DATA') {
+      if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
         return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
       }
       return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
@@ -158,6 +160,7 @@ const Operation = props => {
 
     // 修改审批组与发起审批组一致
     tasks[tasks.length - 1].approveGroupList = tasks[0].approveGroupList;
+    // debugger
     const taskList = tasks.map((item, index) => {
       return {
         ...item,
