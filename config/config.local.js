@@ -1,4 +1,3 @@
-// hongji 10.1.100.219
 export default {
   proxy: {
     '/api': {

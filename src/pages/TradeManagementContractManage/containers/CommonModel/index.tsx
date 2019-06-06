@@ -31,7 +31,6 @@ class CommonModel extends PureComponent<any> {
     loading: false,
     searchFormData: {},
     bookIdList: [],
-    pageSizeCurrent: 0,
     bookList: [],
   };
 
@@ -118,7 +117,6 @@ class CommonModel extends PureComponent<any> {
           ...paramsPagination,
           total: data.totalCount,
         },
-        pageSizeCurrent: (paramsPagination || pagination).pageSize,
       },
     });
   };
@@ -161,7 +159,7 @@ class CommonModel extends PureComponent<any> {
 
   public render() {
     const { activeTabKey } = this.props;
-    const { tableDataSource, pagination, pageSizeCurrent, collapse } = this.props[activeTabKey];
+    const { tableDataSource, pagination, collapse } = this.props[activeTabKey];
     return (
       <>
         <SmartForm
@@ -455,7 +453,7 @@ class CommonModel extends PureComponent<any> {
                   onShowSizeChange: this.onShowSizeChange,
                   showQuickJumper: true,
                   current: pagination.current,
-                  pageSize: pageSizeCurrent,
+                  pageSize: pagination.pageSize,
                   onChange: this.onChange,
                   total: pagination.total,
                   pageSizeOptions: PAGE_SIZE_OPTIONS,
