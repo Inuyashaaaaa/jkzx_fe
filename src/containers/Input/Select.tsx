@@ -27,7 +27,7 @@ class Select extends InputBase<
   };
 
   public state = {
-    loading: true,
+    loading: null,
     options: [],
   };
 
@@ -113,7 +113,7 @@ class Select extends InputBase<
       <AntdSelect
         filterOption={this.isRemoteOptions() ? false : undefined}
         onSearch={this.onSearch}
-        notFoundContent={this.state.loading ? <Loading /> : undefined}
+        notFoundContent={this.state.loading === true ? <Loading /> : undefined}
         {...omit(this.props, ['autoSelect', 'onValueChange', 'editing', 'defaultOpen'])}
         style={{ width: '100%', ...this.props.style }}
         onChange={this.onChange}
