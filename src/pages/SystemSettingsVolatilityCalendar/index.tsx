@@ -342,22 +342,6 @@ class VolatilityCalendar extends PureComponent {
                 loading={loading}
                 rowKey="uuid"
               />
-              {/* <SourceTable
-                loading={loading}
-                rowKey="uuid"
-                dataSource={dates}
-                columnDefs={PAGE_TABLE_COL_DEFS(this.fetchData, this.showModal)}
-                header={
-                  <Button
-                    style={{ marginTop: VERTICAL_GUTTER, marginBottom: VERTICAL_GUTTER }}
-                    key="edit"
-                    type="primary"
-                    onClick={() => this.showModal('create')}
-                  >
-                    新增特殊日期
-                  </Button>
-                }
-              /> */}
             </div>
           </Col>
         </Row>

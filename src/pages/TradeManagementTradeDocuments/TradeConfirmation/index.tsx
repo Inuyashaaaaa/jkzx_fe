@@ -1,5 +1,4 @@
 import { Form2, Select, SmartTable } from '@/containers';
-import SourceTable from '@/containers/SourceTable';
 import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { tradeDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -15,8 +14,6 @@ import { PAGE_SIZE } from '@/constants/component';
 const { RangePicker } = DatePicker;
 
 class TradeConfirmation extends PureComponent {
-  public $sourceTable: SourceTable = null;
-
   public state = {
     loading: false,
     dataSource: [],
@@ -166,7 +163,6 @@ class TradeConfirmation extends PureComponent {
       <>
         <SmartForm
           spread={3}
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={searchFormData}
           submitText={`搜索`}

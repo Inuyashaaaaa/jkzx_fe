@@ -1,5 +1,4 @@
 import { Form2, Select, SmartTable } from '@/containers';
-import SourceTable from '@/containers/_SourceTable';
 import Page from '@/containers/Page';
 import {
   mktInstrumentSearch,
