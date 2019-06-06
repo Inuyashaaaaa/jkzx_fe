@@ -143,7 +143,6 @@ const Operation = props => {
   const featchProcessModify = async tasks => {
     const { processName } = process;
     let modify = true;
-    console.log(isInstanceList);
     if (isInstanceList) {
       const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
         processName,
@@ -157,6 +156,8 @@ const Operation = props => {
 
     if (!modify) return;
 
+    // 修改审批组与发起审批组一致
+    tasks[tasks.length - 1].approveGroupList = tasks[0].approveGroupList;
     const taskList = tasks.map((item, index) => {
       return {
         ...item,
@@ -327,6 +328,10 @@ const Operation = props => {
       }
       return item;
     });
+
+    // 修改审批组与发起审批组一致
+    tasks[tasks.length - 1].approveGroupList = tasks[0].approveGroupList;
+
     const { error, data } = await wkTaskApproveGroupBind({
       processName,
       taskList: tasks.map(item => {
