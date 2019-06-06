@@ -5,6 +5,7 @@ import { IColumnDef } from '@/containers/_Table2';
 import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 import { Input } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 
 export const SEARCH_FORM_CONTROLS: IFormControl[] = [
   {
@@ -133,7 +134,7 @@ export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
                 message: '不能为空',
               },
             ],
-          })(<Input editing={editing} />)}
+          })(<UnitInputNumber unit="￥" editing={editing} />)}
         </FormItem>
       );
     },
