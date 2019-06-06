@@ -123,7 +123,7 @@ export const TABLE_COL_DEFS = [
     },
   },
   {
-    title: 'Delta Cash (手)',
+    title: 'Delta Cash (￥)',
     dataIndex: 'deltaCash',
     width: 130,
     align: 'right',
