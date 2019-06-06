@@ -64,7 +64,7 @@ export const TABLE_COL_DEFS = [
     align: 'right',
   },
   {
-    title: 'Delta Cash (手)',
+    title: 'Delta Cash (￥)',
     dataIndex: 'deltaCash',
     width: 130,
     render: (value, record, index) => {

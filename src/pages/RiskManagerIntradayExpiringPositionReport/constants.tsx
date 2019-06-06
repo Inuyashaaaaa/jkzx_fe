@@ -80,7 +80,7 @@ export const TABLE_COL_DEFS = [
     align: 'right',
   },
   {
-    title: 'Delta Cash (手)',
+    title: 'Delta Cash (￥)',
     dataIndex: 'deltaCash',
     render: (value, record, index) => {
       return formatNumber(value, 4);
