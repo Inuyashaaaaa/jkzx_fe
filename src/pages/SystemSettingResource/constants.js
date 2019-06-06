@@ -292,12 +292,34 @@ const APPROVAL_GROUP_INFO = common.concat([
   },
 ]);
 
+const TRIGGER = common.concat([
+  {
+    value: 'CREATE_TRIGGER',
+    zh: '创建触发器',
+  },
+]);
+
+const TRIGGER_INFO = common.concat([
+  {
+    value: 'UPDATE_TRIGGER',
+    zh: '更新触发器',
+  },
+  {
+    value: 'DELETE_TRIGGER',
+    zh: '删除触发器"',
+  },
+]);
+
 const PROCESS_DEFINITION = [];
 
 const PROCESS_DEFINITION_INFO = common.concat([
   {
     value: 'UPDATE_PROCESS_DEFINITION',
     zh: '流程定义修改',
+  },
+  {
+    value: 'BIND_PROCESS_TRIGGER',
+    zh: '流程绑定触发器',
   },
 ]);
 
@@ -317,6 +339,8 @@ export const RESOURCE_ENUM = [
   'APPROVAL_GROUP_INFO',
   'PROCESS_DEFINITION',
   'PROCESS_DEFINITION_INFO',
+  'TRIGGER',
+  'TRIGGER_INFO',
 ];
 
 export default {
@@ -335,4 +359,6 @@ export default {
   APPROVAL_GROUP_INFO,
   PROCESS_DEFINITION,
   PROCESS_DEFINITION_INFO,
+  TRIGGER,
+  TRIGGER_INFO,
 };
