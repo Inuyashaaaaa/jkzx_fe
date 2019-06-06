@@ -143,8 +143,12 @@ export default {
     },
 
     *updatePassword({ payload }, { call, put }) {
-      const { error } = yield call(updateOwnPassword, payload);
-      if (error) return;
+      const { data } = yield call(updateOwnPassword, payload);
+      if (!data || data.error) {
+        return notification.error({
+          message: `${data.error.message}`,
+        });
+      }
       notification.success({
         message: `更新成功`,
       });
