@@ -2,7 +2,6 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import { SmartTable } from '@/containers';
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
-import SourceTable from '@/containers/SourceTable';
 import { queryAuthDepartmentList } from '@/services/department';
 import { trdTradeListByBook } from '@/services/general-service';
 import {
@@ -38,8 +37,6 @@ function findDepartment(departs, departId) {
 }
 
 class SystemSettingsTradeBooks extends PureComponent {
-  public $table: SourceTable = null;
-
   public initialFetchTableData = null;
 
   public state = {
@@ -172,22 +169,6 @@ class SystemSettingsTradeBooks extends PureComponent {
           rowKey="resourceName"
           loading={loading}
         />
-        {/* <SourceTable
-          loading={loading}
-          rowKey={'id'}
-          dataSource={books}
-          columnDefs={PAGE_TABLE_COL_DEFS(this.fetchTable)}
-          onCellValueChanged={this.handleCellValueChanged}
-          header={
-            <Button
-              type="primary"
-              style={{ marginBottom: VERTICAL_GUTTER }}
-              onClick={this.switchModal}
-            >
-              新建交易簿
-            </Button>
-          }
-        /> */}
         <Modal
           title="新建交易簿"
           onOk={this.onCreateBook}

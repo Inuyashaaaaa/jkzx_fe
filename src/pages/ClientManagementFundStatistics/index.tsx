@@ -106,7 +106,6 @@ class ClientManagementFundStatistics extends PureComponent {
     return (
       <Page>
         <Form2
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText={'查询'}

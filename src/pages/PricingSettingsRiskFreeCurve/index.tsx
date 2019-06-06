@@ -4,7 +4,6 @@ import { PureStateComponent } from '@/containers/Components';
 import Page from '@/containers/Page';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import ModalButton from '@/containers/_ModalButton2';
-import SourceTable from '@/containers/_SourceTable';
 import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
@@ -19,8 +18,6 @@ import { GROUP_KEY } from './constants';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
-
-  public $sourceTable: SourceTable = null;
 
   public $insertForm: Form2 = null;
 
@@ -243,7 +240,6 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     return (
       <Page>
         <Form2
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText="搜索"

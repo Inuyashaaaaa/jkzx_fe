@@ -1,4 +1,3 @@
-import SourceTable from '@/containers/_SourceTable';
 import {
   completeTaskProcess,
   queryProcessForm,
@@ -41,8 +40,6 @@ import styles from '../index.less';
 const { TextArea } = AntdInput;
 const { Title } = Typography;
 class ApprovalForm extends PureComponent<any, any> {
-  public $sourceTable: SourceTable = null;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -526,7 +523,6 @@ class ApprovalForm extends PureComponent<any, any> {
         {!loading && (
           <div>
             <Form2
-              ref={node => (this.$sourceTable = node)}
               layout="horizontal"
               dataSource={_data}
               resetable={false}

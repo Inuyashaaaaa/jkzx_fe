@@ -3,7 +3,6 @@ import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Input, Select, SmartTable } from '@/containers';
 import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
-import SourceTable from '@/containers/SourceTable';
 import {
   queryCompanys,
   querySalers,
@@ -29,8 +28,6 @@ class ClientManagementSalesManagement extends PureComponent {
   public $subModalForm: Form2 = null;
   public $branchModalForm: Form2 = null;
   public $refCreateFormModal: Form2 = null;
-
-  public $sourceTable: SourceTable = null;
 
   public state = {
     dataSource: [],

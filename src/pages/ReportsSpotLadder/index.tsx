@@ -1,5 +1,4 @@
 import { ITableColDef } from '@/components/type';
-// import SourceTable from '@/containers/SourceTable';
 import { ASSET_CLASS_ZHCN_MAP, INSTRUMENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, SmartTable } from '@/containers';

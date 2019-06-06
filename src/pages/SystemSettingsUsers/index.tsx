@@ -55,8 +55,6 @@ function departmentsTreeData(departments) {
 class SystemSettingsUsers extends PureComponent {
   public rowKey = 'id';
 
-  public $sourceTable: Table2 = null;
-
   public $form: Form2 = null;
 
   public state = {
@@ -198,7 +196,6 @@ class SystemSettingsUsers extends PureComponent {
             </Row>
             <SmartTable
               loading={loading}
-              ref={node => (this.$sourceTable = node)}
               rowKey={this.rowKey}
               dataSource={users}
               columns={createPageTableColDefs(

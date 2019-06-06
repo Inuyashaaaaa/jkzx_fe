@@ -1,6 +1,5 @@
 import { Form2, Select, SmartTable, Table2 } from '@/containers';
 import Page from '@/containers/Page';
-import SourceTable from '@/containers/SourceTable';
 import ImportExcelButton from '@/containers/_ImportExcelButton';
 import { downloadUrl } from '@/services/onBoardTransaction';
 import {
@@ -16,8 +15,6 @@ import uuidv4 from 'uuid';
 import { PAGE_TABLE_COL_DEFS, TABLE_COLUMNS } from './constants';
 import _ from 'lodash';
 class ClientManagementMarginManagement extends PureComponent {
-  public $marginSourceTable: SourceTable = null;
-  public $sourceTable: Form2 = null;
   public state = {
     dataSource: [],
     loading: false,
@@ -62,7 +59,6 @@ class ClientManagementMarginManagement extends PureComponent {
     this.setState({
       dataSource: data,
     });
-    // this.$marginSourceTable.$baseSourceTable.$table.$baseTable.gridApi.refreshView();
   };
 
   public handleConfirmExcel = () => {
@@ -127,7 +123,6 @@ class ClientManagementMarginManagement extends PureComponent {
     return (
       <Page>
         <Form2
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText={'查询'}
@@ -233,11 +228,6 @@ class ClientManagementMarginManagement extends PureComponent {
           onOk={this.handleConfirmExcel}
           onCancel={this.handleCancelExcel}
         >
-          {/* <SourceTable
-            rowKey="uuid"
-            columnDefs={PAGE_TABLE_COL_DEFS}
-            dataSource={this.state.excelData}
-          /> */}
           <SmartTable
             rowKey="uuid"
             columns={PAGE_TABLE_COL_DEFS}

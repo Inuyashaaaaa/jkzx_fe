@@ -1,5 +1,4 @@
 import ModalButton from '@/containers/ModalButton';
-import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { Form2, Select, SmartTable } from '@/containers';
 import { message, Divider, Table } from 'antd';
@@ -16,8 +15,6 @@ import {
 import Operation from './Operation';
 
 class ClientManagementBankAccount extends PureComponent {
-  public $sourceTable: SourceTable = null;
-
   public state = {
     dataSource: [],
     searchFormData: {},
@@ -151,7 +148,6 @@ class ClientManagementBankAccount extends PureComponent {
     return (
       <Page>
         <Form2
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText={'搜索'}

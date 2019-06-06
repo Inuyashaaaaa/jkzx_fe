@@ -194,21 +194,6 @@ class History extends PureComponent {
           rowKey="uuid"
           scroll={this.state.dataSource ? { x: '3600px' } : { x: false }}
         />
-        {/* <SourceTable
-        rowKey="uuid"
-        dataSource={this.state.dataSource}
-        loading={this.state.loading}
-        searchable={true}
-        resetable={true}
-        onResetButtonClick={this.onReset}
-        columnDefs={HISTORY_COL_DEFS}
-        searchFormControls={PROCESSED_FORM_CONTROLS('history')}
-        searchFormData={this.state.searchFormData}
-        onSearchButtonClick={this.fetchTable}
-        onSearchFormChange={this.onSearchFormChange}
-        autoSizeColumnsToFit={false}
-        header={<CapitalInputModal fetchTable={this.fetchTable} />}
-      /> */}
       </>
     );
   }
