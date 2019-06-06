@@ -1,4 +1,3 @@
-import SourceTable from '@/containers/SourceTable';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
 import { authUserList } from '@/services/user';
@@ -23,8 +22,6 @@ const TreeNode = TreeSelect.TreeNode;
 const { Option } = Select;
 
 class Operation extends PureComponent {
-  public $sourceTable: SourceTable = null;
-
   public state = {
     columns: [
       {

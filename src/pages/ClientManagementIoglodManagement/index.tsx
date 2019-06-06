@@ -1,4 +1,3 @@
-import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { delay, mockData } from '@/tools';
 import React, { PureComponent } from 'react';

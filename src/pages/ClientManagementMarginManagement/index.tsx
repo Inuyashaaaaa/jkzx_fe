@@ -1,6 +1,5 @@
-import { Form2, Select, SmartTable } from '@/containers';
+import { Form2, Select, SmartTable, Table2 } from '@/containers';
 import Page from '@/containers/Page';
-import SourceTable from '@/containers/SourceTable';
 import ImportExcelButton from '@/containers/_ImportExcelButton';
 import { downloadUrl } from '@/services/onBoardTransaction';
 import {
@@ -14,9 +13,8 @@ import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid';
 import { PAGE_TABLE_COL_DEFS, TABLE_COLUMNS } from './constants';
+import _ from 'lodash';
 class ClientManagementMarginManagement extends PureComponent {
-  public $marginSourceTable: SourceTable = null;
-  public $sourceTable: Form2 = null;
   public state = {
     dataSource: [],
     loading: false,
@@ -61,7 +59,6 @@ class ClientManagementMarginManagement extends PureComponent {
     this.setState({
       dataSource: data,
     });
-    // this.$marginSourceTable.$baseSourceTable.$table.$baseTable.gridApi.refreshView();
   };
 
   public handleConfirmExcel = () => {
@@ -70,7 +67,11 @@ class ClientManagementMarginManagement extends PureComponent {
         excelVisible: false,
       },
       () => {
-        this.handleExcelFile(this.state.excelData);
+        this.handleExcelFile(
+          this.state.excelData.map(item => {
+            return Form2.getFieldsValue(item);
+          })
+        );
       }
     );
   };
@@ -107,11 +108,21 @@ class ClientManagementMarginManagement extends PureComponent {
     window.open(`${downloadUrl}margin.xlsx`);
   };
 
+  public handleCellValueChanged = params => {
+    this.setState({
+      excelData: this.state.excelData.map(item => {
+        if (item.uuid === params.record.uuid) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
+  };
+
   public render() {
     return (
       <Page>
         <Form2
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText={'查询'}
@@ -217,10 +228,11 @@ class ClientManagementMarginManagement extends PureComponent {
           onOk={this.handleConfirmExcel}
           onCancel={this.handleCancelExcel}
         >
-          <SourceTable
+          <SmartTable
             rowKey="uuid"
-            columnDefs={PAGE_TABLE_COL_DEFS}
+            columns={PAGE_TABLE_COL_DEFS}
             dataSource={this.state.excelData}
+            onCellFieldsChange={this.handleCellValueChanged}
           />
         </Modal>
         <Modal
@@ -246,9 +258,11 @@ class ClientManagementMarginManagement extends PureComponent {
                   excelVisible: true,
                   excelData: _data.map(item => {
                     return {
+                      ...Form2.createFields({
+                        legalName: item[0],
+                        maintenanceMargin: _.isNumber(item[1]) ? item[1] : 0,
+                      }),
                       uuid: uuidv4(),
-                      legalName: item[0],
-                      maintenanceMargin: item[1],
                     };
                   }),
                 });

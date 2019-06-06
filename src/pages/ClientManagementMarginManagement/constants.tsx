@@ -12,8 +12,11 @@ import {
 import React from 'react';
 import Operations from './Operations';
 import { formatMoney } from '@/tools';
-import { Select } from '@/containers';
+import { Select, InputNumber, Input } from '@/containers';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
+
 export const TABLE_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
   {
     headerName: '交易对手',
@@ -172,16 +175,59 @@ export const SEARCH_FORM_CONTROLS: IFormControl[] = [
   // },
 ];
 
+// export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
+//   {
+//     headerName: '客户名称',
+//     field: 'legalName',
+//   },
+//   {
+//     headerName: '维持保证金 (¥)',
+//     field: 'maintenanceMargin',
+//     editable: true,
+//     input: INPUT_NUMBER_DIGITAL_CONFIG,
+//   },
+// ];
+
 export const PAGE_TABLE_COL_DEFS: IColumnDef[] = [
   {
-    headerName: '客户名称',
-    field: 'legalName',
+    title: '客户名称',
+    dataIndex: 'legalName',
+    editable: record => {
+      return false;
+    },
+    render: (value, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+              },
+            ],
+          })(<Input editing={false} />)}
+        </FormItem>
+      );
+    },
   },
   {
-    headerName: '维持保证金 (¥)',
-    field: 'maintenanceMargin',
-    editable: true,
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
+    title: '维持保证金 (¥)',
+    dataIndex: 'maintenanceMargin',
+    editable: record => {
+      return true;
+    },
+    render: (value, record, index, { form, editing }) => {
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+              },
+            ],
+          })(<InputNumber editing={editing} min={0} precision={4} />)}
+        </FormItem>
+      );
+    },
   },
 ];
 

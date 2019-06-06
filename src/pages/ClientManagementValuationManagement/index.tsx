@@ -16,8 +16,6 @@ import { VALUATION_COL_DEFS } from './constants';
 import { PAGE_SIZE } from '@/constants/component';
 
 class ClientManagementValuationManagement extends PureComponent {
-  public $sourceTable: Table2 = null;
-
   public $form: Form2 = null;
 
   public state = {

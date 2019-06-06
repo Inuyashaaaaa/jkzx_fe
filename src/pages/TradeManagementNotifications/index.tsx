@@ -1,6 +1,5 @@
 import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
 import { Form2, Select, SmartTable } from '@/containers';
-import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { removeCalendar } from '@/services/calendars';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
@@ -17,8 +16,6 @@ import TabHeader from '@/containers/TabHeader';
 const { RangePicker } = DatePicker;
 
 class TradeManagementNotifications extends PureComponent<any, any> {
-  public $sourceTable: SourceTable = null;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -155,7 +152,6 @@ class TradeManagementNotifications extends PureComponent<any, any> {
         {this.state.activeTabKey === 'list' && (
           <div>
             <Form2
-              ref={node => (this.$sourceTable = node)}
               layout="inline"
               dataSource={this.state.searchFormData}
               submitText={`搜索`}

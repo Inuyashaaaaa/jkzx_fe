@@ -1,7 +1,6 @@
 import { PAGE_SIZE } from '@/constants/component';
 import { Form2, Select, SmartTable } from '@/containers';
 import SmartForm from '@/containers/SmartForm';
-import SourceTable from '@/containers/SourceTable';
 import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { positionDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -14,8 +13,6 @@ import SettlementModal from './SettlementModal';
 
 const { RangePicker } = DatePicker;
 class SettlementAdvice extends PureComponent {
-  public $sourceTable: SourceTable = null;
-
   public state = {
     loading: false,
     dataSource: [],
@@ -178,7 +175,6 @@ class SettlementAdvice extends PureComponent {
       <>
         <SmartForm
           spread={3}
-          ref={node => (this.$sourceTable = node)}
           layout="inline"
           dataSource={searchFormData}
           submitText={`搜索`}
@@ -402,29 +398,6 @@ class SettlementAdvice extends PureComponent {
           pagination={this.state.pagination}
           loading={this.state.loading}
         />
-        {/* <SourceTable
-          rowKey="uuid"
-          ref={node => (this.$sourceTable = node)}
-          columnDefs={SETTLE_COLUMN_DEFS(this.onFetch)}
-          searchFormControls={SEARCH_FORM_CONTROLS_SETTLE(
-            this.state.bookIdList,
-            this.state.positionIdList
-          )}
-          searchable={true}
-          resetable={true}
-          loading={this.state.loading}
-          onSearchButtonClick={this.onSearch}
-          onResetButtonClick={this.onReset}
-          dataSource={this.state.dataSource}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          paginationProps={{
-            backend: true,
-          }}
-          pagination={this.state.pagination}
-          onPaginationChange={this.onTablePaginationChange}
-          onPaginationShowSizeChange={this.onTablePaginationChange}
-        /> */}
       </>
     );
   }

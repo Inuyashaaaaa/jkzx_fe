@@ -4,7 +4,6 @@ import MarketSourceTable from '@/containers/MarketSourceTable';
 import { IFormControl } from '@/containers/_Form2';
 import InputButton from '@/containers/_InputButton';
 import ModalButton from '@/containers/_ModalButton2';
-import SourceTable from '@/containers/_SourceTable';
 import Page from '@/containers/Page';
 import {
   getCanUsedTranors,
@@ -34,7 +33,7 @@ import { UnitInputNumber } from '@/containers/UnitInputNumber';
 class PricingSettingVolSurface extends PureComponent {
   public lastFetchedDataSource = null;
 
-  public $sourceTable: SourceTable = null;
+  public $sourceForm: Form2 = null;
 
   public $insertForm: Form2 = null;
 
@@ -258,7 +257,7 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public onSetConstantsButtonClick = event => {
-    if (!this.$sourceTable) return;
+    if (!this.$sourceForm) return;
     if (_.filter(this.selectedColumns, { colId: 'tenor' }).length) {
       this.selectedColumns = _.drop(this.selectedColumns);
     }
@@ -268,7 +267,7 @@ class PricingSettingVolSurface extends PureComponent {
   public setRangeSelectionCellValue = value => {
     this.selectedRowNodes.map(rowNode => {
       this.selectedColumns.map(column => {
-        (this.$sourceTable.$baseSourceTable.$table.$baseTable.gridApi as any).valueService.setValue(
+        (this.$sourceForm.$baseSourceTable.$table.$baseTable.gridApi as any).valueService.setValue(
           rowNode,
           column.getColId(),
           value
@@ -320,7 +319,7 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public onRangeSelectionChanged = value => {
-    const { gridApi, props } = this.$sourceTable.$baseSourceTable.$table.$baseTable;
+    const { gridApi, props } = this.$sourceForm.$baseSourceTable.$table.$baseTable;
 
     const rangeSelections = gridApi.getRangeSelections();
     if (!rangeSelections) return;
@@ -414,7 +413,7 @@ class PricingSettingVolSurface extends PureComponent {
           </Col>
           <Col xs={24} sm={20}>
             <Form2
-              ref={node => (this.$sourceTable = node)}
+              ref={node => (this.$sourceForm = node)}
               layout="inline"
               dataSource={this.state.searchFormData}
               submitText={'搜索'}
