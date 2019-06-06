@@ -171,7 +171,11 @@ class SystemSettingsRiskSettings extends PureComponent {
         visible: false,
       },
       () => {
-        this.handleExcelFile(this.state.excelData);
+        this.handleExcelFile(
+          this.state.excelData.map(item => {
+            return Form2.getFieldsValue(item);
+          })
+        );
       }
     );
   };
@@ -235,6 +239,17 @@ class SystemSettingsRiskSettings extends PureComponent {
     });
   };
 
+  public handleCellValueChanged = params => {
+    this.setState({
+      excelData: this.state.excelData.map(item => {
+        if (item.uuid === params.record.uuid) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
+  };
+
   public render() {
     return (
       <Page
@@ -255,7 +270,7 @@ class SystemSettingsRiskSettings extends PureComponent {
               submitButtonProps={{
                 icon: 'search',
               }}
-              onSubmitButtonClick={this.fetchTable}
+              onSubmitButtonClick={() => this.fetchTable({ current: 1 })}
               onResetButtonClick={this.onReset}
               onFieldsChange={this.onSearchFormChange}
               columns={[
@@ -314,9 +329,12 @@ class SystemSettingsRiskSettings extends PureComponent {
                     visible: true,
                     excelData: _data.slice(1).map(item => {
                       return {
-                        venueCode: item[0],
-                        instrumentId: item[1],
-                        notionalLimit: item[2] ? item[2] : 100000000,
+                        ...Form2.createFields({
+                          venueCode: item[0],
+                          instrumentId: item[1],
+                          notionalLimit: item[2] ? item[2] : 100000000,
+                        }),
+                        uuid: uuidv4(),
                       };
                     }),
                   });
@@ -379,11 +397,17 @@ class SystemSettingsRiskSettings extends PureComponent {
           onCancel={this.handleCancel}
           width={800}
         >
-          <SourceTable
+          {/* <SourceTable
             rowKey="instrumentId"
             tableColumnDefs={PAGE_TABLE_COL_DEFS}
             dataSource={this.state.excelData}
             editable={false}
+          /> */}
+          <SmartTable
+            rowKey="uuid"
+            columns={PAGE_TABLE_COL_DEFS}
+            dataSource={this.state.excelData}
+            onCellFieldsChange={this.handleCellValueChanged}
           />
         </Modal>
         <Modal
