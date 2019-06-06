@@ -485,9 +485,9 @@ export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
 
 export const TRADE_GENERAL_FIELD_MAP = {
   BOOK_NAME: 'bookName',
-  TRADE_ID: 'trade_id',
+  TRADE_ID: 'tradeId',
   TRADE_DATE: 'tradeDate',
-  PRODUCT_TYPE: 'producyType',
+  PRODUCT_TYPE: 'productType',
   SETTLE_AMOUNT: 'SETTLE_AMOUNT', // 结算金额
   SETTLE_STATUS: 'SETTLE_STATUS', // 结算状态
 };
