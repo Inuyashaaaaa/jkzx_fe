@@ -8,6 +8,7 @@ import {
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
   wkProcessGet,
+  wkValidProcessCanStart,
   wkProcessInstanceCreate,
 } from '@/services/approval';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
@@ -137,8 +138,23 @@ const ActionBar = memo<any>(props => {
               onOk: async () => {
                 const res = await currentCreateFormRef.validate();
                 if (res.error) return;
-                const { error: _error, data: _data } = await wkProcessGet({
+                const _createFormData = Form2.getFieldsValue(createFormData);
+                Object.keys(_createFormData).forEach(item => {
+                  if (!_.endsWith(item, 'Date')) {
+                    _createFormData[item] = _.trim(_createFormData[item]);
+                  }
+                });
+                const trade = convertTradePageData2ApiData(
+                  tableData.map(item => Form2.getFieldsValue(item)),
+                  _createFormData,
+                  currentUser.username,
+                  LEG_ENV.BOOKING
+                );
+                const { error: _error, data: _data } = await wkValidProcessCanStart({
                   processName: '交易录入',
+                  data: {
+                    trade,
+                  },
                 });
                 if (_error) return;
                 if (_data.status) {
