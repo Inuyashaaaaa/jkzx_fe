@@ -14,7 +14,7 @@ import {
 import { SmartTable, InputNumber, Loading, Form2, Table, Table2 } from '@/containers';
 import { Modal, Button, Row, Pagination, message, Icon, Col } from 'antd';
 import _, { get } from 'lodash';
-import React, { memo, useState, useEffect, useRef } from 'react';
+import React, { memo, useState, useEffect, useRef, forwardRef } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
@@ -35,28 +35,30 @@ import { ITableProps } from '@/components/type';
 
 const ALREADY = 'ALREADY';
 
-const SettleInputNumber = memo<any>(props => {
-  const { onReload, editing, ...restProps } = props;
+const SettleInputNumber = memo<any>(
+  forwardRef(props => {
+    const { onReload, editing, ...restProps } = props;
 
-  return editing ? (
-    <InputNumber {...restProps} editing={editing} />
-  ) : (
-    <Row type="flex" justify="space-between" align="middle">
-      <InputNumber {...restProps} editing={editing} style={{ width: 'auto', flexGrow: 1 }} />
-      <Icon
-        type="reload"
-        onClick={event => {
-          event.preventDefault();
-          event.stopPropagation();
-          if (onReload) {
-            onReload();
-          }
-        }}
-        style={{ paddingLeft: 5, color: '#1890ff' }}
-      />
-    </Row>
-  );
-});
+    return editing ? (
+      <InputNumber {...restProps} editing={editing} />
+    ) : (
+      <Row type="flex" justify="space-between" align="middle">
+        <InputNumber {...restProps} editing={editing} style={{ width: 'auto', flexGrow: 1 }} />
+        <Icon
+          type="reload"
+          onClick={event => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (onReload) {
+              onReload();
+            }
+          }}
+          style={{ paddingLeft: 5, color: '#1890ff' }}
+        />
+      </Row>
+    );
+  })
+);
 
 const Settlement = props => {
   const POSITION_ID = 'positionId';
@@ -129,56 +131,6 @@ const Settlement = props => {
   };
 
   const settlement = async () => {
-    // @todo validate
-    // selectedRows.map(row => {
-    //   if (!Form2.getFieldValue(row[LEG_FIELD.UNDERLYER_PRICE])) {
-    //     setTableData(pre => {
-    //       return pre.map(item => {
-    //         if (item[POSITION_ID] === row[POSITION_ID]) {
-    //           return {
-    //             ...item,
-    //             [LEG_FIELD.UNDERLYER_PRICE]: {
-    //               ...item[LEG_FIELD.UNDERLYER_PRICE],
-    //               type: 'field',
-    //               errors: [{ message: '必填', field: LEG_FIELD.UNDERLYER_PRICE }],
-    //             },
-    //           };
-    //         }
-    //         return item;
-    //       });
-    //     });
-    //   }
-
-    //   if (!Form2.getFieldValue(row[LEG_FIELD.SETTLE_AMOUNT])) {
-    //     setTableData(pre => {
-    //       return pre.map(item => {
-    //         if (item[POSITION_ID] === row[POSITION_ID]) {
-    //           return {
-    //             ...item,
-    //             [LEG_FIELD.SETTLE_AMOUNT]: {
-    //               ...item[LEG_FIELD.SETTLE_AMOUNT],
-    //               type: 'field',
-    //               errors: [{ message: '必填', field: LEG_FIELD.SETTLE_AMOUNT }],
-    //             },
-    //           };
-    //         }
-    //         return item;
-    //       });
-    //     });
-    //   }
-    // });
-
-    // if (
-    //   selectedRows.some(row => {
-    //     return (
-    //       !Form2.getFieldValue(row[LEG_FIELD.UNDERLYER_PRICE]) ||
-    //       !Form2.getFieldValue(row[LEG_FIELD.SETTLE_AMOUNT])
-    //     );
-    //   })
-    // ) {
-    //   return message.warn('请输入完整内容');
-    // }
-
     const validates = await tableEl.current.validate({}, selectedRowKeys);
 
     if (validates.some(item => !_.isEmpty(item.errors))) {
@@ -259,7 +211,17 @@ const Settlement = props => {
     setFetched(true);
   };
 
-  const preSettlement = async record => {
+  const preSettlement = async (record): Promise<boolean> => {
+    const validates = await tableEl.current.validate(
+      {},
+      [record[POSITION_ID]],
+      [LEG_FIELD.UNDERLYER_PRICE]
+    );
+
+    if (validates.some(item => !_.isEmpty(item.errors))) {
+      return true;
+    }
+
     const values = Form2.getFieldsValue(record);
 
     const { error, data } = await tradeExercisePreSettle({
@@ -421,7 +383,6 @@ const Settlement = props => {
             }
           }}
           onCellFieldsChange={({ record, rowIndex, value, rowId, changedFields, allFields }) => {
-            console.log(changedFields);
             setTableData(pre => {
               return pre.map(item => {
                 if (item[POSITION_ID] === rowId) {
@@ -437,7 +398,7 @@ const Settlement = props => {
           pagination={false}
           rowKey={POSITION_ID}
           dataSource={tableData}
-          scroll={_.isEmpty(tableData) ? undefined : { x: 2000 }}
+          scroll={{ x: 2000 }}
           columns={[
             {
               title: '交易簿',
@@ -463,6 +424,7 @@ const Settlement = props => {
             },
             {
               title: '期权类型',
+              width: 100,
               dataIndex: LEG_FIELD.PRODUCT_TYPE,
               render: val => PRODUCTTYPE_ZHCH_MAP[val],
             },
@@ -481,6 +443,14 @@ const Settlement = props => {
               },
             },
             {
+              title: '到期日',
+              width: 150,
+              dataIndex: `asset.${LEG_FIELD.EXPIRATION_DATE}`,
+              render: (value, record, index, { form, editing }) => {
+                return value;
+              },
+            },
+            {
               title: '标的物',
               fixed: 'right',
               width: 150,
@@ -489,7 +459,7 @@ const Settlement = props => {
             {
               title: '结算方式',
               fixed: 'right',
-              width: 150,
+              width: 100,
               dataIndex: `asset.${LEG_FIELD.SPECIFIED_PRICE}`,
               render: val => SPECIFIED_PRICE_ZHCN_MAP[val],
             },

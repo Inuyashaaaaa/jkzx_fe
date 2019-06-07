@@ -26,6 +26,7 @@ const TradeManagementContractManage = props => {
       footer={<TabHeaderWrapper />}
       extra={[
         <Button
+          type="primary"
           key="1"
           onClick={() => {
             setModalVisible(true);

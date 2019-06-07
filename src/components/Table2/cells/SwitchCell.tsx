@@ -111,7 +111,7 @@ class SwitchCell extends PureComponent<
       return;
     }
     const { record, getRowKey, api } = this.props;
-    api.tableManager.registeCell(record[getRowKey()], this.getDataIndex(), this);
+    api.tableManager.registeCell(this.getRowId(), this.getDataIndex(), this);
   };
 
   public deleteCell = () => {
@@ -120,12 +120,12 @@ class SwitchCell extends PureComponent<
     }
 
     const { record, getRowKey, api } = this.props;
-    api.tableManager.deleteCell(record[getRowKey()], this.getDataIndex());
+    api.tableManager.deleteCell(this.getRowId(), this.getDataIndex());
   };
 
   public getRowId = () => {
     const { record, getRowKey } = this.props;
-    return record[getRowKey()];
+    return get(record, getRowKey());
   };
 
   public renderElement = elements => {
