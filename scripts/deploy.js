@@ -91,9 +91,6 @@ function test() {
   bundle(prodContainerPath, '../dist/*');
 
   upload();
-  upload({
-    bundleName: DOC_BUNDLE_NAME,
-  });
 }
 
 function release() {
@@ -102,17 +99,29 @@ function release() {
   bundle(prodContainerPath, '../dist/*');
 
   upload();
-  upload({ branchName: `release/${BRANCH_NAME_LATEST}` });
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
+  });
 }
 
 function hotfix() {
   upload();
-  upload({ branchName: `hotfix/${BRANCH_NAME_LATEST}` });
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
+  });
 }
 
 function feature() {
   upload();
-  upload({ branchName: `feature/${BRANCH_NAME_LATEST}` });
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
+  });
+}
+
+function doc() {
+  upload({
+    bundleName: DOC_BUNDLE_NAME,
+  });
 }
 
 console.log('deploy start!');
@@ -138,4 +147,8 @@ if (denv === 'test') {
 
 if (denv === 'feature') {
   feature();
+}
+
+if (denv === 'doc') {
+  doc();
 }
