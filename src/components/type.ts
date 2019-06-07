@@ -234,6 +234,7 @@ export type ITableContext = any;
 export interface ITableApi {
   tableManager: TableManager;
   eventBus: any;
+  tableApi: Table2;
 }
 
 export interface IFormBaseProps<T = IFormData> extends FormProps {

@@ -42,6 +42,7 @@ class Table2 extends PureComponent<ITableProps> {
     this.domId = uuid();
 
     this.api = {
+      tableApi: this,
       eventBus,
       tableManager: new TableManager(),
     };
@@ -75,14 +76,17 @@ class Table2 extends PureComponent<ITableProps> {
     ) {
       this.looseActive();
       this.save();
+      return;
     }
 
     if (event.target === this.getTbody()) {
       this.save();
+      return;
     }
 
     if (event.target instanceof HTMLElement && hasElement(this.getThead(), event.target)) {
       this.save();
+      return;
     }
   };
 
