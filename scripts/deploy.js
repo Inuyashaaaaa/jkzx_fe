@@ -8,7 +8,8 @@ const PROD_CONTAINER = 'FE-prod';
 const RELEASE_CONTAINER = 'FE-release';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 const BUNDLE_NAME = 'dist';
-const BUNDLE_NAME_LATEST = 'latest';
+const DOC_BUNDLE_NAME = 'docs';
+const BRANCH_NAME_LATEST = 'latest';
 
 const exists = src => {
   return fs.existsSync(src);
@@ -33,13 +34,14 @@ function cp(from, to) {
 function upload(config = {}) {
   const {
     bundleName = BUNDLE_NAME,
+    remoteBundleName = bundleName,
     branchName = process.env.CI_BUILD_REF_NAME,
-    console = true,
+    notifaction = true,
   } = config;
   const remoteUsername = 'root';
   const remoteIp = '10.1.5.28';
   const remoteFolder = `/home/share/bct_product/frontend/${branchName}/`;
-  const remotePaths = path.join(remoteFolder, bundleName);
+  const remotePaths = path.join(remoteFolder, remoteBundleName);
   console.log(
     `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${bundleName}`
   );
@@ -51,7 +53,7 @@ function upload(config = {}) {
     shell.exec(
       `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
     );
-    if (console) {
+    if (notifaction) {
       shell.exec(
         `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remotePaths} ${`前端打包上传完毕`} ${
           process.env.CI_COMMIT_SHA
@@ -77,51 +79,43 @@ function bundle(prodContainerPath, distpath, filename = new Date().toISOString()
 
 function prod() {
   const prodContainerPath = path.join(USER_PATH, PROD_CONTAINER);
-
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
   upload();
-  upload({ bundleName: BUNDLE_NAME_LATEST, console: false });
 }
 
 function test() {
   const prodContainerPath = path.join(USER_PATH, TEST_CONTAINER);
-
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
   upload();
-  upload({ bundleName: BUNDLE_NAME_LATEST, console: false });
+  upload({
+    bundleName: DOC_BUNDLE_NAME,
+  });
 }
 
 function release() {
   const prodContainerPath = path.join(USER_PATH, RELEASE_CONTAINER);
-
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
   upload();
-  upload({ bundleName: BUNDLE_NAME_LATEST, console: false });
+  upload({ branchName: `release/${BRANCH_NAME_LATEST}` });
 }
 
 function hotfix() {
   upload();
-  upload({ bundleName: BUNDLE_NAME_LATEST, console: false });
+  upload({ branchName: `hotfix/${BRANCH_NAME_LATEST}` });
 }
 
 function feature() {
   upload();
-  upload({ bundleName: BUNDLE_NAME_LATEST, console: false });
-}
-
-function doc() {
-  upload();
-  upload({ bundleName: BUNDLE_NAME_LATEST, console: false });
+  upload({ branchName: `feature/${BRANCH_NAME_LATEST}` });
 }
 
 console.log('deploy start!');
-
 // 读取环境变量，区分测试和生产环境
 const denv = process.env.DEPLOY_DIST;
 console.log(`发布环境：${denv}`);
@@ -144,8 +138,4 @@ if (denv === 'test') {
 
 if (denv === 'feature') {
   feature();
-}
-
-if (denv === 'doc') {
-  doc();
 }
