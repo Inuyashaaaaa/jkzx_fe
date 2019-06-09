@@ -9,6 +9,8 @@ cache:
   paths:
     - node_modules/
     - dist/
+    - docs/
+    - cdocs/
 
 before_script:
   - source ~/.bashrc
@@ -60,6 +62,20 @@ Build:
     - /develop.*/
     - /release.*/
     - /hotfix.*/
+
+Build-Doc:
+  stage: build
+  script:
+    - yarn run doc:build
+  only:
+    - /develop.*/
+
+Build-CDoc:
+  stage: build
+  script:
+    - yarn run cdoc:build
+  only:
+    - /develop.*/
 
 Deploy-Release:
   stage: deploy
