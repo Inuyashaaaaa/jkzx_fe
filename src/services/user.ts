@@ -12,20 +12,6 @@ import _ from 'lodash';
  * @param {object} params
  * @param {string} params.userName
  * @param {string} params.password
- * @returns
- * {
- *     "jsonrpc": "2.0",
- *     "id": "1",
- *     "result": {
- *         "roles": [
- *             "admin"
- *         ],
- *         "pages": "some pages",
- *         "locked": false,
- *         "expired": false,
- *         "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6ImFkbWluIiwicm9sZXMiOlsiYWRtaW4iXSwic3ViIjoiYWRtaW4iLCJleHAiOjE1NTIxOTg1NzE0NjUsImlhdCI6MTU0NDQyMjU3MTQ2NX0.ZaQ4RK-Un-M3iU7lKgtIakIrIDgbiLnKXKfyXgmCIMY"
- *     }
- * }
  */
 export async function login(params) {
   const getLoginErrorMessage = data => {

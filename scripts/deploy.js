@@ -9,6 +9,7 @@ const RELEASE_CONTAINER = 'FE-release';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
+const CDOC_BUNDLE_NAME = 'cdocs';
 const BRANCH_NAME_LATEST = 'latest';
 
 const exists = src => {
@@ -121,6 +122,14 @@ function feature() {
 function doc() {
   upload({
     bundleName: DOC_BUNDLE_NAME,
+    notifaction: false,
+  });
+}
+
+function cdoc() {
+  upload({
+    bundleName: CDOC_BUNDLE_NAME,
+    notifaction: false,
   });
 }
 
@@ -151,4 +160,8 @@ if (denv === 'feature') {
 
 if (denv === 'doc') {
   doc();
+}
+
+if (denv === 'cdoc') {
+  cdoc();
 }

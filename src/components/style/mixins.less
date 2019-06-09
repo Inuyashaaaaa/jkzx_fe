@@ -1,0 +1,28 @@
+// @import "../CustomButton/index.less";
+
+@keyframes showSlow {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.editingIcon() {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  visibility: visible;
+  border: 3px solid;
+  border-color: @primary-7 @primary-7 transparent transparent;
+  :local {
+    animation: showSlow 0.3s;
+  }
+}
+
+.diffCell() {
+  background-color: @primary-3 !important;
+}

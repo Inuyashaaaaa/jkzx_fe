@@ -49,4 +49,5 @@ export default {
 
     return config;
   },
+  filterComponents: files => files.filter(filepath => /w*.(js|jsx|ts|tsx)$/.test(filepath)),
 };

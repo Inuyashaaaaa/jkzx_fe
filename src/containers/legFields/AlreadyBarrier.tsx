@@ -5,6 +5,7 @@ import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 
+/** asdlfj */
 export const AlreadyBarrier: ILegColDef = {
   title: '已经敲入',
   dataIndex: LEG_FIELD.ALREADY_BARRIER,

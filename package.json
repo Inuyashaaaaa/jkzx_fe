@@ -2,8 +2,6 @@
   "private": true,
   "scripts": {
     "check-env": "node ./scripts/node-env.js",
-    "jsdoc": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md",
-    "doc:dev": "gulp",
     "precommit": "yarn run lint-staged",
     "dev": "umi dev",
     "start": "yarn run check-env && yarn run dev",
@@ -15,7 +13,8 @@
     "deploy:prod": "cross-env DEPLOY_DIST=prod node ./scripts/deploy.js",
     "deploy:hotfix": "cross-env DEPLOY_DIST=hotfix node ./scripts/deploy.js",
     "deploy:feature": "cross-env DEPLOY_DIST=feature node ./scripts/deploy.js",
-    "deploy:doc": "yarn run jsdoc && cross-env DEPLOY_DIST=doc node ./scripts/deploy.js",
+    "deploy:doc": "yarn run doc:build && cross-env DEPLOY_DIST=doc node ./scripts/deploy.js",
+    "deploy:cdoc": "yarn run cdoc:build && cross-env DEPLOY_DIST=cdoc node ./scripts/deploy.js",
     "analyze": "cross-env ANALYZE=1 umi build",
     "lint-staged": "lint-staged",
     "test": "umi test",
@@ -27,7 +26,9 @@
     "lint": "yarn run lint:js && yarn run lint:ts && yarn run lint:less",
     "e2e:dev": "cypress open",
     "cdoc:dev": "docz dev",
-    "cdoc:build": "docz build"
+    "cdoc:build": "docz build",
+    "doc:dev": "gulp",
+    "doc:build": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md"
   },
   "dependencies": {
     "@antv/data-set": "^0.9.6",
@@ -55,6 +56,7 @@
     "import-all.macro": "^2.0.3",
     "invariant": "^2.2.4",
     "jquery": "^3.3.1",
+    "jsdoc-babel": "^0.5.0",
     "lodash": "^4.17.10",
     "lodash-decorators": "^6.0.0",
     "log-with-style": "^0.3.0",
@@ -100,6 +102,7 @@
   },
   "devDependencies": {
     "@babel/polyfill": "^7.0.0",
+    "@babel/preset-typescript": "^7.3.3",
     "@types/d3-scale": "^2.1.0",
     "@types/lodash": "^4.14.118",
     "@types/react": "^16.4.16",

@@ -3,7 +3,7 @@ const shelljs = require('shelljs');
 const browserSync = require('browser-sync').create();
 
 const build = () => {
-  shelljs.exec('yarn run jsdoc');
+  shelljs.exec('yarn run doc:build');
 };
 
 const serve = () => {

@@ -8,12 +8,13 @@ import {
 } from 'antd/lib/form/Form';
 import { ColumnProps, TableProps } from 'antd/lib/table';
 import React, { CSSProperties } from 'react';
-import { Omit } from '../containers/common/types';
-import FormSwitchCell from './Form2/cells/SwitchCell';
-import FormBase from './Form2/FormBase';
-import Table2 from './Table2';
-import TableManager from './Table2/api';
-import TableSwitchCell from './Table2/cells/SwitchCell';
+import FormSwitchCell from '../Form2/cells/SwitchCell';
+import FormBase from '../Form2/FormBase';
+import Table2 from '../Table2';
+import TableManager from '../Table2/api';
+import TableSwitchCell from '../Table2/cells/SwitchCell';
+
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export interface IFormField {
   type: 'field';

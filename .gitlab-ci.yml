@@ -95,5 +95,11 @@ Deploy-Doc:
   script:
     - yarn run deploy:doc
   only:
-    - /master.*/
+    - /develop.*/
+
+Deploy-CDoc:
+  stage: deploy
+  script:
+    - yarn run deploy:cdoc
+  only:
     - /develop.*/
