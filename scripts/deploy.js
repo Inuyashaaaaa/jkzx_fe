@@ -121,14 +121,18 @@ function feature() {
 
 function doc() {
   upload({
+    branchName: DOC_BUNDLE_NAME,
     bundleName: DOC_BUNDLE_NAME,
+    remoteBundleName: BUNDLE_NAME,
     notifaction: false,
   });
 }
 
 function cdoc() {
   upload({
+    branchName: CDOC_BUNDLE_NAME,
     bundleName: CDOC_BUNDLE_NAME,
+    remoteBundleName: BUNDLE_NAME,
     notifaction: false,
   });
 }
