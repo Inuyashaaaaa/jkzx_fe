@@ -1642,8 +1642,8 @@
 
 "@babel/preset-react@7.0.0", "@babel/preset-react@^7.0.0":
   version "7.0.0"
-  resolved "https://registry.npmjs.org/@babel/preset-react/-/preset-react-7.0.0.tgz#e86b4b3d99433c7b3e9e91747e2653958bc6b3c0"
-  integrity sha512-oayxyPS4Zj+hF6Et11BwuBkmpgT/zMxyuZgFrMeZID6Hdh3dGlk4sHCAhdBCpuCKW2ppBfl2uCCetlrUIJRY3w==
+  resolved "https://registry.npm.taobao.org/@babel/preset-react/download/@babel/preset-react-7.0.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fpreset-react%2Fdownload%2F%40babel%2Fpreset-react-7.0.0.tgz#e86b4b3d99433c7b3e9e91747e2653958bc6b3c0"
+  integrity sha1-6GtLPZlDPHs+npF0fiZTlYvGs8A=
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-transform-react-display-name" "^7.0.0"
@@ -1659,7 +1659,7 @@
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-transform-typescript" "^7.1.0"
 
-"@babel/preset-typescript@7.3.3":
+"@babel/preset-typescript@7.3.3", "@babel/preset-typescript@^7.3.3":
   version "7.3.3"
   resolved "https://registry.npm.taobao.org/@babel/preset-typescript/download/@babel/preset-typescript-7.3.3.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fpreset-typescript%2Fdownload%2F%40babel%2Fpreset-typescript-7.3.3.tgz#88669911053fa16b2b276ea2ede2ca603b3f307a"
   integrity sha1-iGaZEQU/oWsrJ26i7eLKYDs/MHo=
@@ -12388,6 +12388,19 @@ jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.npmjs.org/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
+
+jsdoc-babel@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.npm.taobao.org/jsdoc-babel/download/jsdoc-babel-0.5.0.tgz#7217b8820469fe600dccfdee895648c6a0dd4a2e"
+  integrity sha1-che4ggRp/mANzP3uiVZIxqDdSi4=
+  dependencies:
+    jsdoc-regex "^1.0.1"
+    lodash "^4.17.10"
+
+jsdoc-regex@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npm.taobao.org/jsdoc-regex/download/jsdoc-regex-1.0.1.tgz#8424428d5b563ad8c5c7fbec079b9a8b09c8dcfa"
+  integrity sha1-hCRCjVtWOtjFx/vsB5uaiwnI3Po=
 
 jsdoc@^3.5.5:
   version "3.5.5"

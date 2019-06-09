@@ -9,7 +9,6 @@ import SwitchCell from './cells/SwitchCell';
 import { FORM_CELL_EDITING_CHANGED } from './constants';
 import DefaultFooter from './DefaultFooter';
 import FormManager from './formManager';
-import './index.less';
 
 class FormBase extends PureComponent<IFormBaseProps & FormComponentProps, any> {
   public static defaultProps = {

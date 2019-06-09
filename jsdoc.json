@@ -1,10 +1,27 @@
 {
   "opts": {
-    "destination": "docs"
+    "allowUnknownTags": true,
+    "destination": "docs",
+    "recurse": true,
+    "target": "esnext"
   },
   "source": {
     "include": "src",
-    "includePattern": ".(ts|tsx)$"
+    "includePattern": ".+\\.ts$",
+    "excludePattern": "node_modules"
   },
-  "plugins": ["plugins/markdown"]
+  "plugins": ["plugins/markdown", "node_modules/jsdoc-babel"],
+  "babel": {
+    "babelrc": false,
+    "extensions": ["ts"],
+    "presets": [
+      [
+        "@babel/preset-typescript",
+        {
+          "isTSX": true,
+          "allExtensions": true
+        }
+      ]
+    ]
+  }
 }

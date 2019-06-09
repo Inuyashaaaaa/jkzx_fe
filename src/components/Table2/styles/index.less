@@ -1,18 +1,5 @@
-@import '~antd/lib/style/themes/default.less';
-@import '../style/themes.less';
-
-@table-padding-vertical-md: @table-padding-vertical * 3 / 4;
-@table-padding-horizontal-md: @table-padding-horizontal / 2;
-@table-padding-vertical-sm: @table-padding-vertical / 2;
-@table-padding-horizontal-sm: @table-padding-horizontal / 2;
-
-@table-cell-width: 300px;
-@table-cell-width-md: 250px;
-@table-cell-width-sm: 200px;
-
-@table-cell-height: @input-height-lg * 1.3;
-@table-cell-height-md: @input-height-base * 1.3;
-@table-cell-height-sm: @input-height-sm * 1.3;
+@import '../../style/themes.less';
+@import '../../style/mixins.less';
 
 @keyframes antShowHelpIn {
   0% {
@@ -24,6 +11,7 @@
     opacity: 1;
   }
 }
+
 @keyframes antShowHelpOut {
   to {
     transform: translateY(-5px);
@@ -31,8 +19,56 @@
   }
 }
 
+.commonCell(@zindex) {
+  .tongyu-table-cell {
+    transition: background-color 0.5s;
+    &.editable {
+      position: relative;
+      &.rendering {
+        &:hover {
+          cursor: pointer;
+          -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          z-index: @zindex;
+        }
+      }
+    }
+  }
+}
+
 :global {
-  .@{ant-prefix}-table {
+  .tongyu-table-cell-diff {
+    .diffCell();
+  }
+
+  .ant-table-horizontal {
+    .tongyu-table-row {
+      .tongyu-table-cell {
+        &.active {
+          outline: 1px solid @primary-color !important;
+        }
+      }
+    }
+
+    .commonCell(inherit);
+  }
+
+  .tongyu-table-row {
+    &:hover {
+      .tongyu-table-cell {
+        transition: background-color 0.5s;
+        &.editable {
+          &.rendering {
+            &::after {
+              .editingIcon();
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .ant-table {
     .ant-form-explain,
     .ant-form-extra {
       right: 0;
@@ -88,10 +124,10 @@
       margin-bottom: 0;
     }
 
-    &.@{ant-prefix}-table-default {
+    &.ant-table-default {
       table {
         tr {
-          &.@{ant-prefix}-table-expanded-row {
+          &.ant-table-expanded-row {
             td {
               padding: @table-padding-vertical @table-padding-horizontal !important;
             }
@@ -104,10 +140,10 @@
       }
     }
 
-    &.@{ant-prefix}-table-middle {
+    &.ant-table-middle {
       table {
         tr {
-          &.@{ant-prefix}-table-expanded-row {
+          &.ant-table-expanded-row {
             td {
               padding: @table-padding-vertical-md @table-padding-horizontal-md !important;
             }
@@ -120,10 +156,10 @@
       }
     }
 
-    &.@{ant-prefix}-table-small {
+    &.ant-table-small {
       table {
         tr {
-          &.@{ant-prefix}-table-expanded-row {
+          &.ant-table-expanded-row {
             td {
               padding: @table-padding-vertical-sm @table-padding-horizontal-sm !important;
             }
@@ -241,7 +277,17 @@
     height: @table-cell-height-sm;
   }
 
-  .@{ant-prefix}-table-vertical {
+  .ant-table-vertical {
+    .commonCell(9);
+
+    .tongyu-table-row {
+      .tongyu-table-cell {
+        &.active {
+          border: 1px solid @primary-color !important;
+        }
+      }
+    }
+
     .ant-table-small.ant-table-bordered .ant-table-thead > tr > th:last-child,
     .ant-table-small.ant-table-bordered .ant-table-tbody > tr > td:last-child {
       border-right: 1px solid #e8e8e8;
@@ -340,21 +386,21 @@
       }
     }
 
-    .@{ant-prefix}-table-default {
+    .ant-table-default {
       .ant-form-explain,
       .ant-form-extra {
         left: calc(100% + @table-padding-horizontal + 5px);
       }
     }
 
-    .@{ant-prefix}-table-middle {
+    .ant-table-middle {
       .ant-form-explain,
       .ant-form-extra {
         left: calc(100% + @table-padding-horizontal-md + 5px);
       }
     }
 
-    .@{ant-prefix}-table-small {
+    .ant-table-small {
       .ant-form-explain,
       .ant-form-extra {
         left: calc(100% + @table-padding-horizontal-sm + 5px);
@@ -379,12 +425,12 @@
       z-index: 2;
     }
 
-    .@{ant-prefix}-table-row-indent {
+    .ant-table-row-indent {
       display: none;
     }
 
-    .@{ant-prefix}-table-row-expand-icon {
-      &.@{ant-prefix}-table-row-spaced {
+    .ant-table-row-expand-icon {
+      &.ant-table-row-spaced {
         display: none;
       }
     }

@@ -1,12 +1,8 @@
-// import { Modal, message } from 'antd';
-// import { formatMessage } from 'umi/locale';
-import { SOCKET_EVENT_TYPE } from '@/constants/socket';
-import { connectSocket, disconnectSocket, socketEventBus } from '@/services/socket';
+import { connectSocket, disconnectSocket } from '@/services/socket';
 import 'animate.css';
 import BigNumber from 'bignumber.js';
 import { setAutoFreeze } from 'immer';
 import numeral from 'numeral';
-import './components/style/common.less';
 
 numeral.register('format', 'de', {
   regexps: {
