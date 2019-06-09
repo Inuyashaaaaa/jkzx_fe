@@ -121,7 +121,7 @@ function feature() {
 
 function doc() {
   upload({
-    branchName: DOC_BUNDLE_NAME,
+    branchName: `${process.env.CI_BUILD_REF_NAME}/${DOC_BUNDLE_NAME}`,
     bundleName: DOC_BUNDLE_NAME,
     remoteBundleName: BUNDLE_NAME,
     notifaction: false,
@@ -130,7 +130,7 @@ function doc() {
 
 function cdoc() {
   upload({
-    branchName: CDOC_BUNDLE_NAME,
+    branchName: `${process.env.CI_BUILD_REF_NAME}/${CDOC_BUNDLE_NAME}`,
     bundleName: CDOC_BUNDLE_NAME,
     remoteBundleName: BUNDLE_NAME,
     notifaction: false,
