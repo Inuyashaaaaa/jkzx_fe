@@ -54,6 +54,7 @@ const ApprocalTriggerManagement = props => {
 
   const [currentTrigger, setCurrentTrigger] = useState({});
   const [create, setCreate] = useState(false);
+  const [text, setText] = useState('');
 
   const showModel = (e, param) => {
     if (param) {
@@ -70,11 +71,13 @@ const ApprocalTriggerManagement = props => {
       setCurrentTrigger(Form2.createFields({ ...param, conditions: data }));
       setCreate(!param);
       setVisible(true);
+      setText('编辑触发器');
       return;
     }
     setCurrentTrigger({});
     setCreate(!param);
     setVisible(true);
+    setText('新增触发器');
   };
 
   const findName = (data, filed, item) => {
@@ -171,7 +174,7 @@ const ApprocalTriggerManagement = props => {
   const triggerListSort = _.sortBy(_.cloneDeep(triggerList), 'triggerName');
 
   return (
-    <Page title="流程管理" footer={false} card={false}>
+    <Page title="触发器管理" footer={false} card={false}>
       <Spin size="large" tip="Loading..." spinning={loading}>
         <Row type="flex" justify="start" align="top">
           <Col span={8}>
@@ -218,13 +221,7 @@ const ApprocalTriggerManagement = props => {
           })}
         </Row>
       </Spin>
-      <Modal
-        title="编辑触发器"
-        visible={visible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={1000}
-      >
+      <Modal title={text} visible={visible} onOk={handleOk} onCancel={handleCancel} width={1000}>
         <Form2
           ref={node => ($form = node)}
           layout="horizontal"

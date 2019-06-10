@@ -222,6 +222,7 @@ const TriggerCard = memo<any>(props => {
             </p>
           );
         })}
+        {!triggers || triggers.length <= 0 ? '全部触发' : null}
       </Card>
       <Modal
         visible={targetVisible}

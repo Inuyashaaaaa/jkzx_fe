@@ -253,7 +253,7 @@ const Operation = props => {
 
     handleReviewData(processData);
     notification.success({
-      message: `修改全局配置成功`,
+      message: `修改审批配置成功`,
     });
   };
 
