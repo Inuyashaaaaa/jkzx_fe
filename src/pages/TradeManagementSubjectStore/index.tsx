@@ -87,13 +87,15 @@ const TradeManagementMarketManagement = props => {
     return allFields;
   };
 
+  const optionInstrumentType = ['FUTURES_OPTION', 'STOCK_OPTION', 'INDEX_OPTION'];
+
   const onCreateFormChange = (props, fields, allFields) => {
     const nextAllFields = {
       ...createFormData,
       ...fields,
     };
     const instrumentType = Form2.getFieldValue(fields.instrumentType);
-    if (['FUTURES_OPTION', 'STOCK_OPTION', 'INDEX_OPTION'].indexOf(instrumentType) !== -1) {
+    if (optionInstrumentType.indexOf(instrumentType) !== -1) {
       nextAllFields.expirationTime = Form2.createField(moment('15:00:00', 'HH:mm:ss'));
     }
     const columns = createFormControls(Form2.getFieldsValue(nextAllFields), 'create');
@@ -102,8 +104,10 @@ const TradeManagementMarketManagement = props => {
   };
 
   const composeInstrumentInfo = modalFormData => {
-    modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
-    modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
+    if (optionInstrumentType.indexOf(modalFormData.instrumentType) !== -1) {
+      modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
+      modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
+    }
     const instrumentInfoFields = [
       'multiplier',
       'name',
