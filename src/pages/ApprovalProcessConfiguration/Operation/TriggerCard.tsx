@@ -26,7 +26,7 @@ const TriggerCard = memo<any>(props => {
         return (
           <FormItem>
             {form.getFieldDecorator({
-              rules: [{ required: true }],
+              rules: [{ required: true, message: '触发方式为必填项' }],
             })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
           </FormItem>
         );
@@ -44,7 +44,7 @@ const TriggerCard = memo<any>(props => {
           return (
             <FormItem>
               {form.getFieldDecorator({
-                rules: [{ required: true }],
+                rules: [{ required: true, message: '触发方式为必填项' }],
               })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
             </FormItem>
           );
@@ -56,6 +56,7 @@ const TriggerCard = memo<any>(props => {
 
   const handleTargetOk = async () => {
     const res = await $form.validate();
+    if (res.error) return;
 
     const formData = Form2.getFieldsValue(targetData);
     if (formData.byTrigger === true) {
@@ -96,7 +97,7 @@ const TriggerCard = memo<any>(props => {
             return (
               <FormItem>
                 {form.getFieldDecorator({
-                  rules: [{ required: true }],
+                  rules: [{ required: true, message: '触发方式为必填项' }],
                 })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
               </FormItem>
             );
@@ -109,7 +110,7 @@ const TriggerCard = memo<any>(props => {
             return (
               <FormItem>
                 {form.getFieldDecorator({
-                  rules: [{ required: true }],
+                  rules: [{ required: true, message: '选择触发器为必填项' }],
                 })(
                   <Select
                     style={{ width: 250 }}
@@ -136,7 +137,7 @@ const TriggerCard = memo<any>(props => {
             return (
               <FormItem>
                 {form.getFieldDecorator({
-                  rules: [{ required: true }],
+                  rules: [{ required: true, message: '组合方式为必填项' }],
                 })(<Input style={{ width: 250 }} editing={false} />)}
               </FormItem>
             );
@@ -150,7 +151,7 @@ const TriggerCard = memo<any>(props => {
             return (
               <FormItem>
                 {form.getFieldDecorator({
-                  rules: [{ required: true }],
+                  rules: [{ required: true, message: '条件列表为必填项' }],
                 })(
                   // <Input style={{ width: 250 }} editing={false}/>
                   <>
@@ -174,7 +175,7 @@ const TriggerCard = memo<any>(props => {
             return (
               <FormItem>
                 {form.getFieldDecorator({
-                  rules: [{ required: true }],
+                  rules: [{ required: true, message: '触发方式为必填项' }],
                 })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
               </FormItem>
             );
