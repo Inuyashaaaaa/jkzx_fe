@@ -302,7 +302,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               render: (val, record, index, { form, editing }) => {
                 return (
                   <FormItem>
-                    {form.getFieldDecorator({})(
+                    {form.getFieldDecorator({
+                      rules: [{ required: true }],
+                    })(
                       <Select
                         defaultOpen={true}
                         autoSelect={true}
