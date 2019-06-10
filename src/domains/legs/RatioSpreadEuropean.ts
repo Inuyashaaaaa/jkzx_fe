@@ -212,6 +212,21 @@ export const RatioSpreadEuropean: ILeg = legPipeLine({
     return nextPosition;
   },
   getPageData: (env: string, position: any) => {
+    if (position.asset.constituents) {
+      const values = position.asset.constituents.map((item, index) => {
+        return {
+          ...item,
+          name: '标的物' + (index + 1),
+        };
+      });
+
+      return Form2.createFields({
+        [LEG_FIELD.UNDERLYER_INSTRUMENT_ID]: values,
+        [LEG_FIELD.UNDERLYER_MULTIPLIER]: values,
+        [LEG_FIELD.INITIAL_SPOT]: values,
+        [LEG_FIELD.WEIGHT]: values,
+      });
+    }
     const value = [
       _.mapKeys(
         _.pick(position.asset, [

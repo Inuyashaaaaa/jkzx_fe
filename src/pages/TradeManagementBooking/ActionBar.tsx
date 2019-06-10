@@ -157,7 +157,8 @@ const ActionBar = memo<any>(props => {
                   },
                 });
                 if (_error) return;
-                if (_data.status) {
+                // 是否可以发起审批
+                if (_data === true) {
                   return setTransactionModalVisible(true);
                 }
 
