@@ -157,7 +157,7 @@ const ActionBar = memo<any>(props => {
                   },
                 });
                 if (_error) return;
-                if (_data.status) {
+                if (_data) {
                   return setTransactionModalVisible(true);
                 }
 
