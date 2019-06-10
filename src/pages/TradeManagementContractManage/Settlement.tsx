@@ -67,7 +67,7 @@ const Settlement = props => {
   const [pagination, setPagination] = useState({
     current: 1,
     total: 0,
-    pageSize: 10,
+    pageSize: PAGE_SIZE,
   });
   const [loading, setLoading] = useState(false);
 
