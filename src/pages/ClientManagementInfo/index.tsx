@@ -276,14 +276,18 @@ const ClientManagementInfo = memo(() => {
                   <EditModalButton
                     salesCascaderList={salesCascaderList}
                     name="查看"
+                    modelEditable={false}
                     fetchTable={fetchTable}
+                    content={<a>查看</a>}
                     record={record}
                   />
                   <Divider type="vertical" />
                   <EditModalButton
                     salesCascaderList={salesCascaderList}
                     name="编辑"
+                    content={<a>编辑</a>}
                     record={record}
+                    modelEditable={true}
                     fetchTable={fetchTable}
                   />
                   <Divider type="vertical" />

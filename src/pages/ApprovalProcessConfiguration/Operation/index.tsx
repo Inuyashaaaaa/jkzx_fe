@@ -59,14 +59,20 @@ const Operation = props => {
       return setLoading(false);
     }
     const processData = { ...data };
-    processData.tasks.map(task => {
+    // let { tasks } = processData;
+    let tasks = processData.tasks.map(task => {
       task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
         return item.approveGroupId;
       });
+      if (task.taskType === 'modifyData') {
+        task.sequence = 9999;
+      }
+      if (task.taskType === 'insertData') {
+        task.sequence = -9999;
+      }
       return task;
     });
     setLoading(false);
-    let { tasks } = processData;
     tasks = _.sortBy(tasks, 'sequence');
     setProcess(processData);
     setProcessConfigs(processData.processConfigs);
@@ -139,6 +145,14 @@ const Operation = props => {
       return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
     }
 
+    // 交易
+    if (processName === '开户' || processName === '开户审批') {
+      if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.account.AccountReviewTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.account.AccountInputTaskAction`;
+    }
+
     throw new Error('getActionClass: no match');
   };
 
@@ -201,8 +215,19 @@ const Operation = props => {
     setReviewVisible(false);
   };
 
-  const showReview = () => {
+  const showReview = async () => {
     setIsInstanceList(true);
+    const { processName } = process;
+    let modify = true;
+    const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
+      processName,
+    });
+    if (_error) return (modify = false);
+    if (_data.length > 0) {
+      setExcelData(_data);
+      return setWarningVisible(true);
+    }
+    if (!modify) return;
     setReviewVisible(true);
   };
 
@@ -325,6 +350,7 @@ const Operation = props => {
 
     let tasks = _.cloneDeep(process.tasks);
     tasks = _.sortBy(tasks, 'sequence');
+    console.log(tasks);
     tasks = tasks.map(item => {
       if (item.taskId === currentTaskId) {
         return Form2.getFieldsValue(otherTask[0]);
