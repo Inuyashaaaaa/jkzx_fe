@@ -261,6 +261,10 @@ class Action extends PureComponent<any, any> {
     this.onPagination(current, pageSize);
   };
 
+  public handleShowSizeChange = (current, pageSize) => {
+    this.onPagination(current, pageSize);
+  };
+
   public onPagination = (current, pageSize) => {
     this.setState(
       {
@@ -364,9 +368,11 @@ class Action extends PureComponent<any, any> {
                 position: 'bottom',
                 showQuickJumper: true,
                 current: this.state.pagination.current,
-                pageSize: this.state.pageSizeCurrent,
+                // pageSize: this.state.pageSizeCurrent,
+                pageSize: this.state.pagination.pageSize,
                 onChange: this.onPaginationChange,
                 total: this.state.pagination.total,
+                onShowSizeChange: this.handleShowSizeChange,
               }}
               rowKey={'positionId'}
               scroll={{ x: 2300 }}
