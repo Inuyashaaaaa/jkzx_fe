@@ -22,7 +22,6 @@ import {
   INSTANCE_KEY,
   MARKET_KEY,
   SEARCH_FORM_CONTROLS,
-  TABLE_COLUMN_DEFS,
   SEARCH_FORM,
   TABLE_COLUMN,
 } from './constants';
@@ -379,6 +378,11 @@ class PricingSettingVolSurface extends PureComponent {
       item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
       return item;
     });
+    const durationMap = { W: 7, D: 1, M: 30, Y: 365 };
+    const tds = _.sortBy(tableDataSource, o => {
+      const value = o.tenor.value;
+      return durationMap[value.substring(value.length - 1)] * Number.parseInt(value, 10) * 7;
+    });
     return (
       <Page>
         <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
@@ -463,7 +467,7 @@ class PricingSettingVolSurface extends PureComponent {
               </>
             ) : null}
             <SmartTable
-              dataSource={tableDataSource}
+              dataSource={tds}
               columns={columns}
               onCellFieldsChange={this.handleCellValueChanged}
               loading={this.state.tableLoading}
