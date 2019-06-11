@@ -201,8 +201,19 @@ const Operation = props => {
     setReviewVisible(false);
   };
 
-  const showReview = () => {
+  const showReview = async () => {
     setIsInstanceList(true);
+    const { processName } = process;
+    let modify = true;
+    const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
+      processName,
+    });
+    if (_error) return (modify = false);
+    if (_data.length > 0) {
+      setExcelData(_data);
+      return setWarningVisible(true);
+    }
+    if (!modify) return;
     setReviewVisible(true);
   };
 
@@ -325,6 +336,7 @@ const Operation = props => {
 
     let tasks = _.cloneDeep(process.tasks);
     tasks = _.sortBy(tasks, 'sequence');
+    console.log(tasks);
     tasks = tasks.map(item => {
       if (item.taskId === currentTaskId) {
         return Form2.getFieldsValue(otherTask[0]);

@@ -6,6 +6,8 @@ import ApprovalForm from './ApprovalForm';
 import TransactionForm from './TransactionForm';
 import CreditForm from './CreditForm';
 import _ from 'lodash';
+import AccountOpeningApproval from './AccountOpeningApproval';
+
 class Operation extends PureComponent {
   public state = {
     visible: false,
@@ -43,13 +45,20 @@ class Operation extends PureComponent {
   };
 
   public handleContent = () => {
+    console.log(this.state.type);
     if (_.includes(this.state.type, '交易录入')) {
       return <TransactionForm {...this.props} handleFormChange={this.handleFormChange} />;
     }
     if (_.includes(this.state.type, '授信额度变更')) {
       return <CreditForm {...this.props} handleFormChange={this.handleFormChange} />;
     }
-    return <ApprovalForm {...this.props} handleFormChange={this.handleFormChange} />;
+    if (_.includes(this.state.type, '财务出入金')) {
+      return <ApprovalForm {...this.props} handleFormChange={this.handleFormChange} />;
+    }
+    if (_.includes(this.state.type, '开户')) {
+      return <AccountOpeningApproval {...this.props} handleFormChange={this.handleFormChange} />;
+    }
+    return null;
   };
 
   public render() {

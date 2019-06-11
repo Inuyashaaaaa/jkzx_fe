@@ -12,13 +12,15 @@ import {
 import { remove, uuid } from '@/tools';
 import { UPLOAD_URL } from '@/services/document';
 import { createRefParty } from '@/services/reference-data-service';
-import { AutoComplete, Button, Cascader, Divider, Icon, notification, Row, Steps } from 'antd';
+import { Modal, Button, Cascader, Divider, Icon, notification, Row, Steps, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
 import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 import EmailInput from '@/containers/EmailInput';
 import { getToken } from '@/tools/authority';
+import { wkValidProcessCanStart, wkProcessInstanceCreate } from '@/services/approval';
+import router from 'umi/router';
 
 const CreateModalButton = memo<any>(props => {
   const { salesCascaderList, fetchTableData } = props;
@@ -38,6 +40,8 @@ const CreateModalButton = memo<any>(props => {
   const [modalVisible, setModalVisible] = useState(false);
   const [trustorSource, setTrustorSource] = useState([]);
   const [tradeSource, setTradeSource] = useState([]);
+  const [startApprovalVisible, setStartApprovalVisible] = useState(false);
+  const [formData, setFormData] = useState(null);
 
   const getProduceIcon = () => {
     if (baseFormData[BASE_FORM_FIELDS.TRADER_TYPE] === TRADER_TYPE.PRODUCT) {
@@ -71,6 +75,27 @@ const CreateModalButton = memo<any>(props => {
       const tradeSource = [];
     }
     setTradeSource(tradeSource);
+  };
+
+  const approveHandleOk = async () => {
+    // 发起审批
+    const { error: _error, data: _data } = await wkProcessInstanceCreate({
+      processName: '开户',
+      processData: formData,
+    });
+    if (_error) return;
+    if (_data.processInstanceId) {
+      message.success('已进入流程');
+      router.push('/approval-process/process-manangement');
+    }
+    // notification.success({
+    //   message: '发起审批成功，已进入流程',
+    // });
+    // setStartApprovalVisible(false);
+  };
+
+  const approveHandleCancel = () => {
+    setStartApprovalVisible(false);
   };
 
   return (
@@ -1399,6 +1424,19 @@ const CreateModalButton = memo<any>(props => {
                   baseData.branchName = branchName;
                   baseData.salesName = salesName;
                   baseData.tradeAuthorizer = tradeAuthorizer;
+                  setFormData(baseData);
+                  // 是否符合开户审批条件
+                  const { error: _error, data: _data } = await wkValidProcessCanStart({
+                    processName: '开户',
+                    data: {
+                      baseData,
+                    },
+                  });
+
+                  if (_error) return;
+                  if (_data === true) {
+                    return setStartApprovalVisible(true);
+                  }
 
                   const { data, error } = await createRefParty(baseData);
                   if (error) return;
@@ -1437,6 +1475,20 @@ const CreateModalButton = memo<any>(props => {
             >
               {currenStep === 4 ? '确认提交' : '下一步'}
             </Button>
+            <Modal
+              title="发起审批"
+              visible={startApprovalVisible}
+              okText="发起审批"
+              onOk={approveHandleOk}
+              onCancel={approveHandleCancel}
+            >
+              <div style={{ margin: '20px' }}>
+                <p>
+                  您提交的交易对手信息需要通过审批才能成功开户。请确认录入的信息无误后，确认发起审批。
+                </p>
+                <p>审批进展请在“审批管理”模块中查看</p>
+              </div>
+            </Modal>
           </Row>
         ),
       }}

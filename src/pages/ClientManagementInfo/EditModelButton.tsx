@@ -29,10 +29,11 @@ import { getToken } from '@/tools/authority';
 const TabPane = Tabs.TabPane;
 
 const useTableData = props => {
-  const { record, name } = props;
+  const { record = {}, modelEditable } = props;
   const [loading, setLoading] = useState(false);
   const [baseFormData, setBaseFormData] = useState({});
   const [traderList, setTraderList] = useState([]);
+
   const fetchData = async () => {
     setLoading(true);
     const { error, data } = await refPartyGetByLegalName({ legalName: record.legalName });
@@ -40,7 +41,7 @@ const useTableData = props => {
     if (error) return;
     const newData = {};
     const authorizers = data.authorizers;
-    if (name !== '查看') {
+    if (modelEditable !== false) {
       data.salesName = [
         data.subsidiaryName ? data.subsidiaryName : '',
         data.branchName ? data.branchName : '',
@@ -212,7 +213,7 @@ const EditModalButton = memo<any>(props => {
     },
   ];
 
-  const { salesCascaderList, name, fetchTable, formData } = props;
+  const { salesCascaderList = [], name, fetchTable, formData, modelEditable, content } = props;
   const formRef = useRef<Form2>(null);
   const initialFormDatas: any = {};
   const {
@@ -229,7 +230,8 @@ const EditModalButton = memo<any>(props => {
   let disabled = false;
   let editable = true;
   const [modalVisible, setModalVisible] = useState(false);
-  if (name === '查看') {
+
+  if (modelEditable === false) {
     disabled = true;
     editable = false;
   }
@@ -1466,6 +1468,7 @@ const EditModalButton = memo<any>(props => {
           </>
         </Spin>
       }
+      style={{ ...props.style }}
       onClick={() => {
         setModalVisible(true);
         fetchData();
@@ -1532,7 +1535,9 @@ const EditModalButton = memo<any>(props => {
                 setLoading(false);
                 if (error) return;
                 setModalVisible(false);
-                fetchTable();
+                if (fetchTable) {
+                  fetchTable();
+                }
                 notification.success({
                   message: '保存成功',
                 });
@@ -1544,7 +1549,8 @@ const EditModalButton = memo<any>(props => {
         ),
       }}
     >
-      {name}
+      {/* {name} */}
+      {content}
     </ModalButton>
   );
 });
