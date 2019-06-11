@@ -63,8 +63,9 @@ export const TOTAL_LEGS = [
   Asia,
   Straddle,
   Forward,
-  SpreadEuropean,
-  RatioSpreadEuropean,
+  // 2019年06月11日 暂时移除
+  // SpreadEuropean,
+  // RatioSpreadEuropean,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
