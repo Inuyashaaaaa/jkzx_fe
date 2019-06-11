@@ -74,14 +74,6 @@ const Operation = props => {
     });
     setLoading(false);
     tasks = _.sortBy(tasks, 'sequence');
-    // tasks = tasks.map(task => {
-    //   console.log(task);
-    //   if (task.taskType === 'modifyData') {
-    //     task
-    //   }
-    //   return task;
-    //   // if ()
-    // })
     setProcess(processData);
     setProcessConfigs(processData.processConfigs);
     handleReviewData(processData);
