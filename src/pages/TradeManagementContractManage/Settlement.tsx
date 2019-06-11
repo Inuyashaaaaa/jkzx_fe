@@ -1,37 +1,32 @@
 import {
-  LEG_FIELD,
-  DIRECTION_MAP,
-  OPTION_TYPE_MAP,
+  BIG_NUMBER_CONFIG,
   DIRECTION_ZHCN_MAP,
+  LCM_EVENT_TYPE_MAP,
+  LEG_FIELD,
+  LEG_TYPE_MAP,
   OPTION_TYPE_ZHCN_MAP,
   PRODUCTTYPE_ZHCH_MAP,
   SPECIFIED_PRICE_ZHCN_MAP,
   STRIKE_TYPES_MAP,
-  LCM_EVENT_TYPE_MAP,
-  BIG_NUMBER_CONFIG,
-  LEG_TYPE_MAP,
 } from '@/constants/common';
-import { SmartTable, InputNumber, Loading, Form2, Table, Table2 } from '@/containers';
-import { Modal, Button, Row, Pagination, message, Icon, Col } from 'antd';
-import _, { get } from 'lodash';
-import React, { memo, useState, useEffect, useRef, forwardRef } from 'react';
-import FormItem from 'antd/lib/form/FormItem';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
-import {
-  trdTradeSettleablePaged,
-  trdTradeLCMEventProcess,
-  tradeExercisePreSettle,
-} from '@/services/trade-service';
-import { showTotal } from '@/tools/component';
-import { formatMoney, getRequiredRule, remove } from '@/tools';
-import BigNumber from 'bignumber.js';
-import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS } from '@/constants/global';
-import { connect } from 'dva';
+import { PAGE_SIZE_OPTIONS } from '@/constants/component';
+import { Form2, InputNumber, Loading, SmartTable, Table2 } from '@/containers';
 import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
+import {
+  tradeExercisePreSettle,
+  trdTradeLCMEventProcess,
+  trdTradeSettleablePaged,
+} from '@/services/trade-service';
+import { formatMoney, getRequiredRule } from '@/tools';
+import { showTotal } from '@/tools/component';
 import { getNumOfOptionsByNotionalAmount } from '@/tools/getNumOfOptions';
+import { Button, Col, Icon, message, Modal, Pagination, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import BigNumber from 'bignumber.js';
+import { connect } from 'dva';
+import _, { get } from 'lodash';
 import moment from 'moment';
-import { ITableProps } from '@/components/type';
+import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
 const ALREADY = 'ALREADY';
 
@@ -537,15 +532,11 @@ const Settlement = props => {
           <Pagination
             {...{
               size: 'small',
-              showSizeChanger: true,
-              onShowSizeChange,
-              showQuickJumper: true,
-              current: pagination.current,
               pageSize: pagination.pageSize,
+              current: pagination.current,
               onChange,
               total: pagination.total,
-              pageSizeOptions: PAGE_SIZE_OPTIONS,
-              showTotal,
+              simple: true,
             }}
           />
         </Row>
