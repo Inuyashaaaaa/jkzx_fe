@@ -6,20 +6,20 @@ import {
   LEG_TYPE_MAP,
   OPTION_TYPE_ZHCN_MAP,
   PRODUCTTYPE_ZHCH_MAP,
+  SPECIFIED_PRICE_MAP,
   SPECIFIED_PRICE_ZHCN_MAP,
   STRIKE_TYPES_MAP,
-  SPECIFIED_PRICE_MAP,
 } from '@/constants/common';
-import { PAGE_SIZE_OPTIONS, PAGE_SIZE } from '@/constants/component';
+import { PAGE_SIZE } from '@/constants/component';
 import { Form2, InputNumber, Loading, SmartTable, Table2 } from '@/containers';
+import { mktQuotesListPaged } from '@/services/market-data-service';
 import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
 import {
   tradeExercisePreSettle,
   trdTradeLCMEventProcess,
   trdTradeSettleablePaged,
 } from '@/services/trade-service';
-import { formatMoney, getRequiredRule, formatNumber } from '@/tools';
-import { showTotal } from '@/tools/component';
+import { formatMoney, formatNumber, getRequiredRule } from '@/tools';
 import { getNumOfOptionsByNotionalAmount } from '@/tools/getNumOfOptions';
 import { Button, Col, Icon, message, Modal, Pagination, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -28,30 +28,31 @@ import { connect } from 'dva';
 import _, { get } from 'lodash';
 import moment from 'moment';
 import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
-import { mktQuotesListPaged } from '@/services/market-data-service';
 
 const ALREADY = 'ALREADY';
 
 const SettleInputNumber = memo<any>(
   forwardRef(props => {
-    const { onReload, editing, ...restProps } = props;
+    const { onReload, editing, showReload, ...restProps } = props;
 
     return editing ? (
       <InputNumber {...restProps} editing={editing} />
     ) : (
       <Row type="flex" justify="space-between" align="middle">
         <InputNumber {...restProps} editing={editing} style={{ width: 'auto', flexGrow: 1 }} />
-        <Icon
-          type="reload"
-          onClick={event => {
-            event.preventDefault();
-            event.stopPropagation();
-            if (onReload) {
-              onReload();
-            }
-          }}
-          style={{ paddingLeft: 5, color: '#1890ff' }}
-        />
+        {!!showReload && (
+          <Icon
+            type="reload"
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+              if (onReload) {
+                onReload();
+              }
+            }}
+            style={{ paddingLeft: 5, color: '#1890ff' }}
+          />
+        )}
       </Row>
     );
   })
@@ -69,7 +70,7 @@ const Settlement = props => {
   const [loading, setLoading] = useState(false);
 
   const [settLoading, setSettLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
+  const [setted, setSetted] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const tableEl = useRef<Table2>(null);
   const [cacheTableDataMapCurrent, setCacheTableDataMapCurrent] = useState({});
@@ -250,7 +251,7 @@ const Settlement = props => {
       );
     });
     setSettLoading(false);
-    setFetched(true);
+    setSetted(true);
   };
 
   const preSettlement = async (record): Promise<boolean> => {
@@ -310,7 +311,7 @@ const Settlement = props => {
   useEffect(
     () => {
       if (!modalVisible) {
-        setFetched(false);
+        setSetted(false);
         setSelectedRowKeys([]);
         return;
       }
@@ -348,14 +349,20 @@ const Settlement = props => {
   };
 
   const getFooter = () => {
-    if (fetched) {
+    if (setted) {
       return (
         <Row type="flex" gutter={10} justify="end">
           <Col>
             <Button onClick={() => setModalVisible(false)}>关闭</Button>
           </Col>
           <Col>
-            <Button type="primary" onClick={() => fetch()}>
+            <Button
+              type="primary"
+              onClick={() => {
+                fetch();
+                setSetted(false);
+              }}
+            >
               刷新
             </Button>
           </Col>
@@ -513,9 +520,10 @@ const Settlement = props => {
               editable: record => {
                 return canSett(record);
               },
+              defaultEditing: false,
               dataIndex: LEG_FIELD.UNDERLYER_PRICE,
               render: (val, record, index, { form, editing }) => {
-                if (!canSett(record)) {
+                if (!record[ALREADY] && !canSett(record)) {
                   return null;
                 }
                 return (
@@ -535,9 +543,10 @@ const Settlement = props => {
               editable: record => {
                 return canSett(record);
               },
+              defaultEditing: false,
               dataIndex: LEG_FIELD.SETTLE_AMOUNT,
               render: (val, record, index, { form, editing }) => {
-                if (!canSett(record)) {
+                if (!record[ALREADY] && !canSett(record)) {
                   return null;
                 }
                 return (
@@ -546,6 +555,7 @@ const Settlement = props => {
                       rules: [getRequiredRule()],
                     })(
                       <SettleInputNumber
+                        showReload={!record[ALREADY]}
                         editing={editing}
                         onReload={async () => {
                           const error = await preSettlement(record);
