@@ -25,20 +25,34 @@ import {
   TRADER_TYPE,
 } from './constants';
 import { getToken } from '@/tools/authority';
+import { wkProcessInstanceFormGet } from '@/services/approval';
 
 const TabPane = Tabs.TabPane;
 
 const useTableData = props => {
-  const { record = {}, modelEditable } = props;
+  const { record = {}, modelEditable, processInstanceId } = props;
   const [loading, setLoading] = useState(false);
   const [baseFormData, setBaseFormData] = useState({});
   const [traderList, setTraderList] = useState([]);
 
   const fetchData = async () => {
     setLoading(true);
-    const { error, data } = await refPartyGetByLegalName({ legalName: record.legalName });
+    // 开户审批
+    let result = {};
+    let data = {};
+    console.log(props);
+    if (processInstanceId) {
+      result = await wkProcessInstanceFormGet({
+        processInstanceId,
+      });
+      data = _.get(result, 'data.process._business_payload');
+    } else {
+      result = await refPartyGetByLegalName({ legalName: record.legalName });
+      data = result.data;
+    }
+    console.log(data);
     setLoading(false);
-    if (error) return;
+    if (result.error) return;
     const newData = {};
     const authorizers = data.authorizers;
     if (modelEditable !== false) {
@@ -1530,6 +1544,11 @@ const EditModalButton = memo<any>(props => {
                   baseData.salesName = salesName;
                 }
                 baseData.tradeAuthorizer = tradeAuthorizer;
+                // 开户审批提交修改
+                if (props.handleApprovalData) {
+                  props.handleApprovalData(baseData);
+                  return setModalVisible(false);
+                }
                 setLoading(true);
                 const { data, error } = await createRefParty(baseData);
                 setLoading(false);

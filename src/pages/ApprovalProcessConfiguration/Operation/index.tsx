@@ -59,15 +59,29 @@ const Operation = props => {
       return setLoading(false);
     }
     const processData = { ...data };
-    processData.tasks.map(task => {
+    // let { tasks } = processData;
+    let tasks = processData.tasks.map(task => {
       task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
         return item.approveGroupId;
       });
+      if (task.taskType === 'modifyData') {
+        task.sequence = 9999;
+      }
+      if (task.taskType === 'insertData') {
+        task.sequence = -9999;
+      }
       return task;
     });
     setLoading(false);
-    let { tasks } = processData;
     tasks = _.sortBy(tasks, 'sequence');
+    // tasks = tasks.map(task => {
+    //   console.log(task);
+    //   if (task.taskType === 'modifyData') {
+    //     task
+    //   }
+    //   return task;
+    //   // if ()
+    // })
     setProcess(processData);
     setProcessConfigs(processData.processConfigs);
     handleReviewData(processData);
@@ -137,6 +151,14 @@ const Operation = props => {
         return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
       }
       return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
+    }
+
+    // 交易
+    if (processName === '开户' || processName === '开户审批') {
+      if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.account.AccountReviewTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.account.AccountInputTaskAction`;
     }
 
     throw new Error('getActionClass: no match');

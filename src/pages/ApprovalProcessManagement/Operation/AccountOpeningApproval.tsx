@@ -123,7 +123,6 @@ class AccountOpeningApproval extends PureComponent<any, any> {
       instance.initiatorName = (instance.initiator && instance.initiator.userName) || '';
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
-    console.log(data);
     const _detailData = {
       legalName: _.get(data, 'process._business_payload.legalName'),
       salesName: _.get(data, 'process._business_payload.salesName'),
@@ -198,20 +197,16 @@ class AccountOpeningApproval extends PureComponent<any, any> {
         comment: modifyComment,
         abandon: false,
       },
-      businessProcessData: {
-        ..._.get(data, 'process._business_payload'),
-        ...Form2.getFieldsValue(this.state.creditForm),
-      },
+      businessProcessData: this.state.accountData,
     };
+    // 提交修改后数据
     this.executeModify(param, 'modify');
+  };
 
-    if (this.state.newAttachmentId) {
-      const { error: aerror, data: adata } = await wkAttachmentProcessInstanceBind({
-        attachmentId: this.state.newAttachmentId,
-        processInstanceId,
-      });
-      if (aerror) return true;
-    }
+  public handleGetData = param => {
+    this.setState({
+      accountData: param,
+    });
   };
 
   public queryBankAccount = async (data, status) => {
@@ -607,9 +602,8 @@ class AccountOpeningApproval extends PureComponent<any, any> {
                   <EditModalButton
                     salesCascaderList={[]}
                     name="查看"
-                    modelEditable={false}
-                    record={{ legalName: 'yl' }}
                     content={<Button>查看完整信息</Button>}
+                    processInstanceId={this.props.formData.processInstanceId}
                     style={{ color: 'rgba(0, 0, 0, 0.85)' }}
                   />
                 </Row>
@@ -621,7 +615,8 @@ class AccountOpeningApproval extends PureComponent<any, any> {
                     modelEditable={true}
                     content={<Button>修改客户信息</Button>}
                     style={{ color: 'rgba(0, 0, 0, 0.85)' }}
-                    record={{ legalName: 'yl' }}
+                    handleApprovalData={this.handleGetData}
+                    processInstanceId={this.props.formData.processInstanceId}
                   />
                 </Row>
               )}

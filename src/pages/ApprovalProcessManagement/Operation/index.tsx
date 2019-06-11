@@ -45,7 +45,6 @@ class Operation extends PureComponent {
   };
 
   public handleContent = () => {
-    console.log(this.state.type);
     if (_.includes(this.state.type, '交易录入')) {
       return <TransactionForm {...this.props} handleFormChange={this.handleFormChange} />;
     }
