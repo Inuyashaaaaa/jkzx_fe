@@ -16,6 +16,8 @@ import React from 'react';
 import uuidv4 from 'uuid/v4';
 import { GROUP_KEY } from './constants';
 
+const TableRow = null;
+
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
 
@@ -302,9 +304,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               render: (val, record, index, { form, editing }) => {
                 return (
                   <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true }],
-                    })(
+                    {form.getFieldDecorator({})(
                       <Select
                         defaultOpen={true}
                         autoSelect={true}
@@ -369,7 +369,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
                         ref={node => (this.$insertForm = node)}
                         dataSource={this.state.insertFormData}
                         footer={false}
-                        onFieldsChange={this.onInsertFormChange}
+                        onValuesChange={this.onInsertFormChange}
                         columns={[
                           {
                             title: '期限',
