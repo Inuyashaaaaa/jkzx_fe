@@ -9,7 +9,7 @@ import {
   SPECIFIED_PRICE_ZHCN_MAP,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
-import { PAGE_SIZE_OPTIONS } from '@/constants/component';
+import { PAGE_SIZE_OPTIONS, PAGE_SIZE } from '@/constants/component';
 import { Form2, InputNumber, Loading, SmartTable, Table2 } from '@/containers';
 import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
 import {
