@@ -287,7 +287,7 @@ class PricingSettingsDividendCurve extends PureComponent {
             dataSource={this.state.insertFormData}
             columns={INSERT_FORM_CONTROLS(this.state.tableDataSource)}
             footer={false}
-            onValuesChange={this.onInsertFormChange}
+            onFieldsChange={this.onInsertFormChange}
           />
         </Modal>
       </Page>
