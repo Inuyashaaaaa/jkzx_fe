@@ -137,6 +137,7 @@ class PricingSettingVolSurface extends PureComponent {
             instrumentId: searchFormData[MARKET_KEY],
             quote: 1,
           },
+          columns: TABLE_COLUMN(dataSource),
           failed: true,
         };
       } else {
