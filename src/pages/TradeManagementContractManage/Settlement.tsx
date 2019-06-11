@@ -8,6 +8,7 @@ import {
   PRODUCTTYPE_ZHCH_MAP,
   SPECIFIED_PRICE_ZHCN_MAP,
   STRIKE_TYPES_MAP,
+  SPECIFIED_PRICE_MAP,
 } from '@/constants/common';
 import { PAGE_SIZE_OPTIONS, PAGE_SIZE } from '@/constants/component';
 import { Form2, InputNumber, Loading, SmartTable, Table2 } from '@/containers';
@@ -17,7 +18,7 @@ import {
   trdTradeLCMEventProcess,
   trdTradeSettleablePaged,
 } from '@/services/trade-service';
-import { formatMoney, getRequiredRule } from '@/tools';
+import { formatMoney, getRequiredRule, formatNumber } from '@/tools';
 import { showTotal } from '@/tools/component';
 import { getNumOfOptionsByNotionalAmount } from '@/tools/getNumOfOptions';
 import { Button, Col, Icon, message, Modal, Pagination, Row } from 'antd';
@@ -27,6 +28,7 @@ import { connect } from 'dva';
 import _, { get } from 'lodash';
 import moment from 'moment';
 import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
+import { mktQuotesListPaged } from '@/services/market-data-service';
 
 const ALREADY = 'ALREADY';
 
@@ -70,6 +72,7 @@ const Settlement = props => {
   const [fetched, setFetched] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const tableEl = useRef<Table2>(null);
+  const [cacheTableDataMapCurrent, setCacheTableDataMapCurrent] = useState({});
 
   const fetch = async (paramsPagination?) => {
     setLoading(true);
@@ -77,12 +80,21 @@ const Settlement = props => {
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
     });
-    setLoading(false);
 
     if (error) return;
     if (_.isEmpty(data)) return;
 
     const { page = [], totalCount } = data;
+
+    const priceBySpecifedType = (type, priceInfo = {}) => {
+      if (type === SPECIFIED_PRICE_MAP.CLOSE) {
+        return priceInfo.close;
+      }
+      if (type === SPECIFIED_PRICE_MAP.TWAP) {
+        return priceInfo.settle;
+      }
+      return undefined;
+    };
 
     const tableDataSource = _.flatten(
       page.map(item => {
@@ -101,13 +113,48 @@ const Settlement = props => {
       })
     );
 
-    setTableData(tableDataSource);
-    setPagination(pre => ({
-      ...pre,
+    const nextPagination = {
+      ...pagination,
       total: totalCount,
       current: (paramsPagination || pagination).current,
       pageSize: (paramsPagination || pagination).pageSize,
-    }));
+    };
+
+    const instrumentIds = tableDataSource
+      .filter(record => canSett(record))
+      .filter(item => !!_.get(item, `asset.underlyerInstrumentId`))
+      .map(item => _.get(item, `asset.underlyerInstrumentId`));
+    const mktQuotesListPagedRsp = await mktQuotesListPaged({
+      instrumentIds,
+    });
+    setLoading(false);
+
+    if (mktQuotesListPagedRsp.error) return;
+    const quotes = _.get(mktQuotesListPagedRsp, 'data.page', []);
+
+    const nextTableData = tableDataSource.map(item => {
+      const result = quotes.find(
+        quote => _.get(item, `asset.underlyerInstrumentId`) === quote.instrumentId
+      );
+      if (result) {
+        return {
+          ...item,
+          [LEG_FIELD.UNDERLYER_PRICE]: Form2.createField(
+            formatNumber(
+              priceBySpecifedType(_.get(item, `asset.${LEG_FIELD.SPECIFIED_PRICE}`), result),
+              4
+            )
+          ),
+        };
+      }
+      return item;
+    });
+
+    setTableData(nextTableData);
+    setPagination(nextPagination);
+    setCacheTableDataMapCurrent({
+      [nextPagination.current]: nextTableData,
+    });
   };
 
   const onPagination = (current, pageSize) => {
