@@ -55,7 +55,7 @@ class TradeModal extends PureComponent {
           title="生成结算通知书"
           visible={this.state.visible}
           footer={false}
-          width={700}
+          width={1200}
           onCancel={this.onCancel}
         >
           <Alert

@@ -227,7 +227,7 @@ const TriggerCard = memo<any>(props => {
       </Card>
       <Modal
         visible={targetVisible}
-        width={700}
+        width={1200}
         title="选择触发器"
         onOk={handleTargetOk}
         onCancel={handleTargetCancel}
