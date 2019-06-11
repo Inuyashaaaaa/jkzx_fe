@@ -13,16 +13,12 @@ import { createFormControls, searchFormControls } from './services';
 const TradeManagementMarketManagement = props => {
   let $form = useRef<Form2>(null);
 
-  const defaultSearchFormData: {} = {
-    assetClass: Form2.createField('COMMODITY'),
-    instrumentType: Form2.createField('FUTURES'),
-  };
   const defaultPagination = {
     pageSize: PAGE_SIZE,
     current: 1,
   };
 
-  const [searchFormData, setSearchFormData] = useState(defaultSearchFormData);
+  const [searchFormData, setSearchFormData] = useState({});
   const [createFormData, setCreateFormData] = useState({});
   const [pagination, setPagination] = useState(defaultPagination);
   const [total, setTotal] = useState(0);
@@ -40,7 +36,7 @@ const TradeManagementMarketManagement = props => {
 
   const onReset = () => {
     setPagination(defaultPagination);
-    setSearchFormData(defaultSearchFormData);
+    setSearchFormData({});
     fetchTable();
   };
 
