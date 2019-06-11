@@ -121,19 +121,23 @@ const Settlement = props => {
       pageSize: (paramsPagination || pagination).pageSize,
     };
 
-    const instrumentIds = tableDataSource
-      .filter(record => canSett(record))
+    const canSettTableData = tableDataSource.filter(record => canSett(record));
+
+    const instrumentIds = canSettTableData
       .filter(item => !!_.get(item, `asset.underlyerInstrumentId`))
       .map(item => _.get(item, `asset.underlyerInstrumentId`));
     const mktQuotesListPagedRsp = await mktQuotesListPaged({
       instrumentIds,
     });
-    setLoading(false);
 
-    if (mktQuotesListPagedRsp.error) return;
+    // 如果标的物价格获取失败，结算金额就停止获取
+    if (mktQuotesListPagedRsp.error) {
+      return setLoading(false);
+    }
+
     const quotes = _.get(mktQuotesListPagedRsp, 'data.page', []);
 
-    const nextTableData = tableDataSource.map(item => {
+    const nextCanSettTableData = canSettTableData.map(item => {
       const result = quotes.find(
         quote => _.get(item, `asset.underlyerInstrumentId`) === quote.instrumentId
       );
@@ -151,11 +155,32 @@ const Settlement = props => {
       return item;
     });
 
-    setTableData(nextTableData);
-    setPagination(nextPagination);
-    setCacheTableDataMapCurrent({
-      [nextPagination.current]: nextTableData,
+    const startTradeExercisePreSettleRsps = await Promise.all(
+      nextCanSettTableData.map(item => startTradeExercisePreSettle(item))
+    ).then(rsps => {
+      return rsps.map((rsp, index) => ({
+        rsp,
+        record: nextCanSettTableData[index],
+      }));
     });
+
+    setLoading(false);
+
+    const successDtas = startTradeExercisePreSettleRsps.filter(item => !item.rsp.error);
+    const distTableData = nextCanSettTableData.map(item => {
+      const findItem = successDtas.find(meta => meta.record[POSITION_ID] === item[POSITION_ID]);
+      if (findItem) {
+        return {
+          ...item,
+          [LEG_FIELD.SETTLE_AMOUNT]: Form2.createField(findItem.rsp.data),
+        };
+      }
+      return item;
+    });
+
+    setTableData(distTableData);
+
+    setPagination(nextPagination);
   };
 
   const onPagination = (current, pageSize) => {
@@ -254,20 +279,10 @@ const Settlement = props => {
     setSetted(true);
   };
 
-  const preSettlement = async (record): Promise<boolean> => {
-    const validates = await tableEl.current.validate(
-      {},
-      [record[POSITION_ID]],
-      [LEG_FIELD.UNDERLYER_PRICE]
-    );
-
-    if (validates.some(item => !_.isEmpty(item.errors))) {
-      return true;
-    }
-
+  const startTradeExercisePreSettle = record => {
     const values = Form2.getFieldsValue(record);
 
-    const { error, data } = await tradeExercisePreSettle({
+    return tradeExercisePreSettle({
       positionId: record[POSITION_ID],
       eventDetail: {
         underlyerPrice: String(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`)),
@@ -280,6 +295,20 @@ const Settlement = props => {
       },
       eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
     });
+  };
+
+  const preSettlement = async (record): Promise<boolean> => {
+    const validates = await tableEl.current.validate(
+      {},
+      [record[POSITION_ID]],
+      [LEG_FIELD.UNDERLYER_PRICE]
+    );
+
+    if (validates.some(item => !_.isEmpty(item.errors))) {
+      return true;
+    }
+
+    const { error, data } = await startTradeExercisePreSettle(record);
 
     if (error) return;
 
