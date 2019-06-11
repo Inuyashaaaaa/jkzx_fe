@@ -62,7 +62,7 @@ class Operation extends PureComponent {
           <Modal
             title="流程图"
             visible={this.state.diagramVisible}
-            width={700}
+            width={1200}
             onCancel={this.hideDiagramModal}
             footer={false}
           >
