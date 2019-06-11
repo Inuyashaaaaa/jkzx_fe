@@ -126,11 +126,11 @@ export default [
               name: 'baseContractManagement',
               component: './PricingSettingsBaseContractManagement/index',
             },
-            {
-              path: '/pricingSettings/pricingEnvironment',
-              name: 'pricingEnvironment',
-              component: './PricingSettingsPricingEnvironment/index',
-            },
+            // {
+            //   path: '/pricingSettings/pricingEnvironment',
+            //   name: 'pricingEnvironment',
+            //   component: './PricingSettingsPricingEnvironment/index',
+            // },
             {
               path: '/pricingSettings/customModel',
               name: 'customModel',
