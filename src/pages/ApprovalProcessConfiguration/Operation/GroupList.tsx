@@ -161,7 +161,7 @@ const GroupList = memo<any>(props => {
   const onFormChange = (props, changedFields, allFields, rowIndex) => {
     const data = _.cloneDeep(value);
     if (changedFields.rightIndex && changedFields.rightIndex.value !== RETURN_NUMBER) {
-      let rightValue = data[rowIndex].rightValue || {};
+      const rightValue = data[rowIndex].rightValue || {};
       rightValue.errors = null;
       data[rowIndex] = {
         ...data[rowIndex],
