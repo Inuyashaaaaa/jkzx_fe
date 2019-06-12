@@ -10,6 +10,7 @@ import {
   wkIndexList,
   wkProcessTriggerBusinessCreate,
   wkProcessTriggerBusinessModify,
+  authCan,
 } from '@/services/approvalProcessConfiguration';
 import uuidv4 from 'uuid/v4';
 import { TRIGGERTYPE, OPERATION_MAP, operation, SYMBOL_MAP } from '../constants';
@@ -146,7 +147,19 @@ const TriggerCard = memo<any>(props => {
     return item;
   };
 
-  const showTargetModel = () => {
+  const showTargetModel = async () => {
+    // 是否有修改触发器权限
+    const { error, data } = await authCan({
+      resourceType: 'PROCESS_DEFINITION_INFO',
+      resourceName: ['交易录入'],
+      resourcePermissionType: 'BIND_PROCESS_TRIGGER',
+    });
+    if (error) return;
+    if (!data[0]) {
+      return notification.info({
+        message: '没有修改流程触发的权限',
+      });
+    }
     handleData();
     setTargetVisible(true);
   };
