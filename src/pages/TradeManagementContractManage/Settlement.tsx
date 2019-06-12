@@ -65,7 +65,7 @@ const Settlement = props => {
   const [pagination, setPagination] = useState({
     current: 1,
     total: 0,
-    pageSize: PAGE_SIZE,
+    pageSize: 10,
   });
   const [loading, setLoading] = useState(false);
 
@@ -172,7 +172,11 @@ const Settlement = props => {
       if (findItem) {
         return {
           ...item,
-          [LEG_FIELD.SETTLE_AMOUNT]: Form2.createField(findItem.rsp.data),
+          [LEG_FIELD.SETTLE_AMOUNT]: Form2.createField(
+            new BigNumber(findItem.rsp.data)
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber()
+          ),
         };
       }
       return item;
@@ -559,7 +563,7 @@ const Settlement = props => {
                   <FormItem>
                     {form.getFieldDecorator({
                       rules: [getRequiredRule()],
-                    })(<InputNumber autoFocus={true} editing={editing} />)}
+                    })(<InputNumber autoFocus={true} autoSelect={true} editing={editing} />)}
                   </FormItem>
                 );
               },
@@ -584,6 +588,7 @@ const Settlement = props => {
                       rules: [getRequiredRule()],
                     })(
                       <SettleInputNumber
+                        autoSelect={true}
                         showReload={!record[ALREADY]}
                         editing={editing}
                         onReload={async () => {

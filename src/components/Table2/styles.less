@@ -32,6 +32,12 @@
 }
 
 :global {
+  // fix table poptip zindex
+  .ant-table-fixed-left,
+  .ant-table-fixed-right {
+    z-index: 999;
+  }
+
   .@{ant-prefix}-table {
     .ant-form-explain,
     .ant-form-extra {
