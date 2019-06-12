@@ -35,14 +35,13 @@ function cp(from, to) {
 function upload(config = {}) {
   const {
     bundleName = BUNDLE_NAME,
-    remoteBundleName = bundleName,
     branchName = process.env.CI_BUILD_REF_NAME,
     notifaction = true,
   } = config;
   const remoteUsername = 'root';
   const remoteIp = '10.1.5.28';
   const remoteFolder = `/home/share/bct_product/frontend/${branchName}/`;
-  const remotePaths = path.join(remoteFolder, remoteBundleName);
+  const remotePaths = path.join(remoteFolder, bundleName);
   console.log(
     `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${bundleName}`
   );
@@ -123,7 +122,6 @@ function doc() {
   upload({
     branchName: `${process.env.CI_BUILD_REF_NAME}/${DOC_BUNDLE_NAME}`,
     bundleName: DOC_BUNDLE_NAME,
-    remoteBundleName: BUNDLE_NAME,
     notifaction: false,
   });
 }
@@ -132,7 +130,6 @@ function cdoc() {
   upload({
     branchName: `${process.env.CI_BUILD_REF_NAME}/${CDOC_BUNDLE_NAME}`,
     bundleName: CDOC_BUNDLE_NAME,
-    remoteBundleName: BUNDLE_NAME,
     notifaction: false,
   });
 }
