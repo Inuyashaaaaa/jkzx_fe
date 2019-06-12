@@ -175,7 +175,7 @@ class FixingModal extends PureComponent<
   };
 
   public countAvg = () => {
-    return countAvg(this.state.tableData);
+    return countAvg(this.state.tableData, this.data);
   };
 
   public onCellValueChanged = params => {
