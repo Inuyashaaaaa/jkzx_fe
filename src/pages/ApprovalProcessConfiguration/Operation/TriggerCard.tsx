@@ -7,11 +7,6 @@ import {
   wkProcessTriggerList,
   wkProcessTriggerBind,
   wkProcessTriggerUnbind,
-  wkTriggerConditionModify,
-  wkProcessTriggerModify,
-  wkProcessTriggerCreate,
-  wkTriggerConditionCreate,
-  wkProcessTriggerDelete,
   wkIndexList,
   wkProcessTriggerBusinessCreate,
   wkProcessTriggerBusinessModify,
@@ -104,9 +99,17 @@ const TriggerCard = memo<any>(props => {
   const [targetData, setTargetData] = useState({
     ...Form2.createFields({ processName }),
   });
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    let conditions = [...trigger.conditions];
+  const handleData = () => {
+    if (!trigger) {
+      setColumns(columns1);
+      return setTargetData({
+        ...Form2.createFields({ operation: 'all' }),
+      });
+    }
+    setColumns(columns2);
+    let conditions = _.cloneDeep(trigger.conditions);
     conditions = conditions.map(item => {
       item.leftIndex = _.get(item, 'leftIndex.indexClass');
       item.rightIndex = _.get(item, 'rightIndex.indexClass');
@@ -119,10 +122,17 @@ const TriggerCard = memo<any>(props => {
     setTargetData({
       ...Form2.createFields({
         operation: trigger.operation,
-        conditions: trigger.conditions,
+        conditions,
       }),
     });
-  }, []);
+  };
+
+  useEffect(
+    () => {
+      handleData();
+    },
+    [trigger]
+  );
 
   const [columns, setColumns] = useState(columns1);
 
@@ -137,8 +147,7 @@ const TriggerCard = memo<any>(props => {
   };
 
   const showTargetModel = () => {
-    setTargetData({});
-    setColumns(columns1);
+    handleData();
     setTargetVisible(true);
   };
 
@@ -147,21 +156,22 @@ const TriggerCard = memo<any>(props => {
     if (res.error) return;
 
     const formData = Form2.getFieldsValue(targetData);
-
     if (formData.operation === 'all') {
+      setColumns(columns1);
       // 解除触发器绑定
+      setLoading(true);
       const { error } = await wkProcessTriggerUnbind({
         processName,
       });
+      setLoading(false);
       if (error) return;
-      fetchData();
+      setTargetVisible(false);
       notification.success({
-        message: `${processName}流程触发器修改成功`,
+        message: `${processName}流程触发修改成功`,
       });
-      return setTargetVisible(false);
+      return fetchData();
     }
     // 修改触发器||创建绑定触发器
-
     let conditionsData = [...formData.conditions];
     const cerror = await $formModel.current.validate();
     const errLen = cerror.filter(item => item && item.error).length;
@@ -190,30 +200,34 @@ const TriggerCard = memo<any>(props => {
     });
     if (isCreate) {
       const triggerName = processName + Math.random();
+      setLoading(true);
       const { error, data } = await wkProcessTriggerBusinessCreate({
         triggerName,
         operation: formData.operation,
         description: strArr.join(','),
         conditions: conditionsData,
       });
+      setLoading(false);
       if (error) return;
       const triggerId = _.get(
         (data || []).filter(item => item.triggerName === triggerName),
         '[0]triggerId'
       );
+      setLoading(true);
       const { data: _data, error: _error } = await wkProcessTriggerBind({
         processName,
         triggerId,
       });
+      setLoading(false);
 
       if (_error) return;
-
+      setTargetVisible(false);
       notification.success({
-        message: `${processName}流程触发器修改成功`,
+        message: `${processName}流程触发修改成功`,
       });
-      return setTargetVisible(false);
+      return fetchData();
     }
-
+    setLoading(true);
     const { error: merror, data } = await wkProcessTriggerBusinessModify({
       triggerId: trigger.triggerId,
       triggerName: trigger.triggerName,
@@ -221,34 +235,14 @@ const TriggerCard = memo<any>(props => {
       description: strArr.join(','),
       conditions: conditionsData,
     });
+    setLoading(false);
 
     if (merror) return;
+    setTargetVisible(false);
     notification.success({
-      message: `${processName}流程触发器修改成功`,
+      message: `${processName}流程触发修改成功`,
     });
-    return setTargetVisible(false);
-
-    // if (formData.operation === true) {
-    //   const { data, error } = await wkProcessTriggerBind({
-    //     processName,
-    //     triggerId: formData.triggerName,
-    //   });
-    //   if (error) return;
-    //   fetchData();
-    //   notification.success({
-    //     message: `${processName}流程触发器修改成功`,
-    //   });
-    //   return setTargetVisible(false);
-    // }
-    // const { error } = await wkProcessTriggerUnbind({
-    //   processName,
-    // });
-    // if (error) return;
-    // fetchData();
-    // notification.success({
-    //   message: `${processName}流程触发器修改成功`,
-    // });
-    // setTargetVisible(false);
+    fetchData();
   };
 
   const handleTargetCancel = () => {
@@ -259,9 +253,12 @@ const TriggerCard = memo<any>(props => {
     const changedData = Form2.getFieldsValue(changedFields);
     if (changedData.operation === 'all') {
       setColumns(columns1);
-    } else {
-      setColumns(columns2);
+      return setTargetData({
+        ...targetData,
+        ...changedFields,
+      });
     }
+    setColumns(columns2);
     if (changedData.triggerName) {
       const { error, data } = await wkProcessTriggerList({});
       if (error) return;
@@ -283,7 +280,6 @@ const TriggerCard = memo<any>(props => {
     });
   };
 
-  console.log(targetData);
   return (
     <>
       <Card
@@ -293,13 +289,21 @@ const TriggerCard = memo<any>(props => {
         extra={<a onClick={showTargetModel}>修改</a>}
       >
         {trigger ? (
-          <p key={trigger.triggerId}>
-            触发方式：
-            <Tag style={{ margin: 5 }} key={trigger.approveGroupId}>
-              {trigger.triggerName}
-            </Tag>
-            <PopconfirmCard data={trigger} key={trigger.triggerId} />
-          </p>
+          <>
+            <p>
+              触发方式：
+              <Tag style={{ margin: 5 }} key={trigger.approveGroupId}>
+                {trigger.triggerName}
+              </Tag>
+            </p>
+            <p>
+              条件列表：
+              <Tag style={{ margin: 5 }} key={trigger.approveGroupId}>
+                {trigger.conditions.length}个条件
+              </Tag>
+              <PopconfirmCard data={trigger} key={trigger.triggerId} />
+            </p>
+          </>
         ) : (
           '触发方式：全部触发'
         )}
@@ -310,6 +314,7 @@ const TriggerCard = memo<any>(props => {
         title="配置流程触发"
         onOk={handleTargetOk}
         onCancel={handleTargetCancel}
+        confirmLoading={loading}
       >
         <Form2
           ref={node => ($form.current = node)}
