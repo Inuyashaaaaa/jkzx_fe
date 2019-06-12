@@ -435,7 +435,7 @@ const Operation = props => {
             </Card>
             {process.processName === '交易录入' ? (
               <TriggerCard
-                triggers={process.triggers}
+                trigger={process.triggers[0]}
                 processName={process.processName}
                 fetchData={fetchData}
               />

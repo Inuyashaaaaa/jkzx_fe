@@ -7,61 +7,151 @@ import {
   wkProcessTriggerList,
   wkProcessTriggerBind,
   wkProcessTriggerUnbind,
+  wkTriggerConditionModify,
+  wkProcessTriggerModify,
+  wkProcessTriggerCreate,
+  wkTriggerConditionCreate,
+  wkProcessTriggerDelete,
+  wkIndexList,
+  wkProcessTriggerBusinessCreate,
+  wkProcessTriggerBusinessModify,
 } from '@/services/approvalProcessConfiguration';
 import uuidv4 from 'uuid/v4';
-import { TRIGGERTYPE, OPERATION_MAP } from '../constants';
+import { TRIGGERTYPE, OPERATION_MAP, operation, SYMBOL_MAP } from '../constants';
+import GroupList from './GroupList';
 import PopconfirmCard from '../../ApprocalTriggerManagement/PopconfirmCard';
 
 const TriggerCard = memo<any>(props => {
-  const { processName, fetchData, triggers } = props;
-  let $form = useRef<Form2>(null);
+  const { processName, fetchData, trigger } = props;
+  const isCreate = !trigger;
 
-  const [targetVisible, setTargetVisible] = useState(false);
-  const [targetData, setTargetData] = useState({});
-  const [columns, setColumns] = useState([
+  const $formModel = useRef<Form2>(null);
+  const $form = useRef<Form2>(null);
+
+  const columns1 = [
     {
-      title: '触发方式',
-      dataIndex: 'byTrigger',
+      title: '当前流程',
+      dataIndex: 'processName',
       render: (value, record, index, { form, editing }) => {
         return (
           <FormItem>
-            {form.getFieldDecorator({
-              rules: [{ required: true }],
-            })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
+            {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
           </FormItem>
         );
       },
     },
-  ]);
+    {
+      title: '组合方式',
+      dataIndex: 'operation',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({
+              rules: [{ required: true, message: '组合方式为必填项' }],
+            })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
+          </FormItem>
+        );
+      },
+    },
+  ];
+
+  const columns2 = [
+    {
+      title: '当前流程',
+      dataIndex: 'processName',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
+          </FormItem>
+        );
+      },
+    },
+    {
+      title: '组合方式',
+      dataIndex: 'operation',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({
+              rules: [{ required: true, message: '组合方式为必填项' }],
+            })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
+          </FormItem>
+        );
+      },
+    },
+    {
+      title: '条件列表',
+      dataIndex: 'conditions',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({
+              rules: [{ required: true, message: '条件列表为必填项' }],
+            })(
+              <GroupList
+                getCurrent={node => ($formModel.current = node)}
+                {...{ record, index, form, editing }}
+              />
+            )}
+          </FormItem>
+        );
+      },
+    },
+  ];
+
+  const [targetVisible, setTargetVisible] = useState(false);
+  const [targetData, setTargetData] = useState({
+    ...Form2.createFields({ processName }),
+  });
+
+  useEffect(() => {
+    let conditions = [...trigger.conditions];
+    conditions = conditions.map(item => {
+      item.leftIndex = _.get(item, 'leftIndex.indexClass');
+      item.rightIndex = _.get(item, 'rightIndex.indexClass');
+      item.rightValue = _.get(item, 'rightValue.number');
+      return {
+        ...Form2.createFields(item),
+        conditionId: item.conditionId,
+      };
+    });
+    setTargetData({
+      ...Form2.createFields({
+        operation: trigger.operation,
+        conditions: trigger.conditions,
+      }),
+    });
+  }, []);
+
+  const [columns, setColumns] = useState(columns1);
+
+  const findName = (data, filed, item) => {
+    const Index = _.findIndex(data, p => {
+      return p[filed] === item;
+    });
+    if (Index >= 0) {
+      return data[Index].indexName;
+    }
+    return item;
+  };
 
   const showTargetModel = () => {
     setTargetData({});
-    setColumns([
-      {
-        title: '触发方式',
-        dataIndex: 'byTrigger',
-        render: (value, record, index, { form, editing }) => {
-          return (
-            <FormItem>
-              {form.getFieldDecorator({
-                rules: [{ required: true }],
-              })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-            </FormItem>
-          );
-        },
-      },
-    ]);
+    setColumns(columns1);
     setTargetVisible(true);
   };
 
   const handleTargetOk = async () => {
-    const res = await $form.validate();
+    const res = await $form.current.validate();
+    if (res.error) return;
 
     const formData = Form2.getFieldsValue(targetData);
-    if (formData.byTrigger === true) {
-      const { data, error } = await wkProcessTriggerBind({
+
+    if (formData.operation === 'all') {
+      // 解除触发器绑定
+      const { error } = await wkProcessTriggerUnbind({
         processName,
-        triggerId: formData.triggerName,
       });
       if (error) return;
       fetchData();
@@ -70,15 +160,95 @@ const TriggerCard = memo<any>(props => {
       });
       return setTargetVisible(false);
     }
-    const { error } = await wkProcessTriggerUnbind({
-      processName,
+    // 修改触发器||创建绑定触发器
+
+    let conditionsData = [...formData.conditions];
+    const cerror = await $formModel.current.validate();
+    const errLen = cerror.filter(item => item && item.error).length;
+    if (errLen > 0) return;
+    conditionsData = conditionsData
+      .filter(item => !!item)
+      .map(item => {
+        return Form2.getFieldsValue(item);
+      });
+
+    if (conditionsData.length <= 0) {
+      return message.info('至少添加一个条件');
+    }
+
+    conditionsData = conditionsData.map(item => {
+      item.rightValue = item.rightValue ? { number: item.rightValue } : {};
+      return item;
     });
-    if (error) return;
-    fetchData();
+    const { data: _data, error: _error } = await wkIndexList({});
+    const strArr = conditionsData.map(item => {
+      return `${findName(_data, 'indexClass', item.leftIndex)}${SYMBOL_MAP[item.symbol]}${
+        item.rightIndex === 'returnNumberIndexImpl'
+          ? _.get(item, 'rightValue.number')
+          : findName(_data, 'indexClass', item.rightIndex)
+      }`;
+    });
+    if (isCreate) {
+      const triggerName = processName + Math.random();
+      const { error, data } = await wkProcessTriggerBusinessCreate({
+        triggerName,
+        operation: formData.operation,
+        description: strArr.join(','),
+        conditions: conditionsData,
+      });
+      if (error) return;
+      const triggerId = _.get(
+        (data || []).filter(item => item.triggerName === triggerName),
+        '[0]triggerId'
+      );
+      const { data: _data, error: _error } = await wkProcessTriggerBind({
+        processName,
+        triggerId,
+      });
+
+      if (_error) return;
+
+      notification.success({
+        message: `${processName}流程触发器修改成功`,
+      });
+      return setTargetVisible(false);
+    }
+
+    const { error: merror, data } = await wkProcessTriggerBusinessModify({
+      triggerId: trigger.triggerId,
+      triggerName: trigger.triggerName,
+      operation: formData.operation,
+      description: strArr.join(','),
+      conditions: conditionsData,
+    });
+
+    if (merror) return;
     notification.success({
       message: `${processName}流程触发器修改成功`,
     });
-    setTargetVisible(false);
+    return setTargetVisible(false);
+
+    // if (formData.operation === true) {
+    //   const { data, error } = await wkProcessTriggerBind({
+    //     processName,
+    //     triggerId: formData.triggerName,
+    //   });
+    //   if (error) return;
+    //   fetchData();
+    //   notification.success({
+    //     message: `${processName}流程触发器修改成功`,
+    //   });
+    //   return setTargetVisible(false);
+    // }
+    // const { error } = await wkProcessTriggerUnbind({
+    //   processName,
+    // });
+    // if (error) return;
+    // fetchData();
+    // notification.success({
+    //   message: `${processName}流程触发器修改成功`,
+    // });
+    // setTargetVisible(false);
   };
 
   const handleTargetCancel = () => {
@@ -87,100 +257,10 @@ const TriggerCard = memo<any>(props => {
 
   const onFormChange = async (props, changedFields, allFields, rowIndex) => {
     const changedData = Form2.getFieldsValue(changedFields);
-    if (changedData.byTrigger === true) {
-      setColumns([
-        {
-          title: '触发方式',
-          dataIndex: 'byTrigger',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true }],
-                })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-              </FormItem>
-            );
-          },
-        },
-        {
-          title: '选择触发器',
-          dataIndex: 'triggerName',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true }],
-                })(
-                  <Select
-                    style={{ width: 250 }}
-                    options={async () => {
-                      const { error, data } = await wkProcessTriggerList({});
-                      if (error) return [];
-                      return data.map(item => {
-                        return {
-                          label: item.triggerName,
-                          value: item.triggerId,
-                        };
-                      });
-                    }}
-                  />
-                )}
-              </FormItem>
-            );
-          },
-        },
-        {
-          title: '组合方式',
-          dataIndex: 'operation',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true }],
-                })(<Input style={{ width: 250 }} editing={false} />)}
-              </FormItem>
-            );
-          },
-        },
-        {
-          title: '条件列表',
-          dataIndex: 'description',
-          render: (value, record, index, { form, editing }) => {
-            value = (value || '').split(',') || [];
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true }],
-                })(
-                  // <Input style={{ width: 250 }} editing={false}/>
-                  <>
-                    {value.map(item => (
-                      <Input key={item} value={item} style={{ width: 250 }} editing={false} />
-                    ))}
-                  </>
-                )}
-              </FormItem>
-            );
-          },
-        },
-      ]);
-    }
-    if (changedData.byTrigger === false) {
-      setColumns([
-        {
-          title: '触发方式',
-          dataIndex: 'byTrigger',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true }],
-                })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-              </FormItem>
-            );
-          },
-        },
-      ]);
+    if (changedData.operation === 'all') {
+      setColumns(columns1);
+    } else {
+      setColumns(columns2);
     }
     if (changedData.triggerName) {
       const { error, data } = await wkProcessTriggerList({});
@@ -203,6 +283,7 @@ const TriggerCard = memo<any>(props => {
     });
   };
 
+  console.log(targetData);
   return (
     <>
       <Card
@@ -211,32 +292,32 @@ const TriggerCard = memo<any>(props => {
         bordered={false}
         extra={<a onClick={showTargetModel}>修改</a>}
       >
-        {(triggers || []).map(item => {
-          return (
-            <p key={item.triggerId}>
-              触发器：
-              <Tag style={{ margin: 5 }} key={item.approveGroupId}>
-                {item.triggerName}
-              </Tag>
-              <PopconfirmCard data={item} key={item.triggerId} />
-            </p>
-          );
-        })}
+        {trigger ? (
+          <p key={trigger.triggerId}>
+            触发方式：
+            <Tag style={{ margin: 5 }} key={trigger.approveGroupId}>
+              {trigger.triggerName}
+            </Tag>
+            <PopconfirmCard data={trigger} key={trigger.triggerId} />
+          </p>
+        ) : (
+          '触发方式：全部触发'
+        )}
       </Card>
       <Modal
         visible={targetVisible}
-        width={700}
-        title="选择触发器"
+        width={1000}
+        title="配置流程触发"
         onOk={handleTargetOk}
         onCancel={handleTargetCancel}
       >
         <Form2
-          ref={node => ($form = node)}
+          ref={node => ($form.current = node)}
           layout="horizontal"
           footer={false}
           dataSource={targetData}
-          wrapperCol={{ span: 16 }}
-          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 20 }}
+          labelCol={{ span: 4 }}
           onFieldsChange={onFormChange}
           columns={columns}
         />
