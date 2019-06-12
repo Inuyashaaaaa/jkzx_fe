@@ -1,46 +1,32 @@
 ---
-name: Table
-route: /Table
-menu: Components
+name: MultiLegTable
+route: /multiLegTable
+menu: Containers
 ---
 
-import Table from '../index';
-import { Divider, Tag, Button } from 'antd';
-import { Playground, Props } from 'docz';
-
-# Table
+# MultiLegTable
 
 `data-display`
 
-extends https://ant.design/components/table-cn/#API
+支持多腿查看和编辑的表格
 
 ## 使用场景
 
-当有大量结构化的数据需要展现时；
+展示多腿结构数据下
 
-当需要对数据进行排序、搜索、分页、自定义操作等复杂行为时。
+当需要对多腿结构进行联动，计算，操作等行为时候
 
 ## 功能交互设计
 
-- 根据表格展示方向分为纵向表格（Vertical），横向表格（Horizontal）
-- 单元格可以切换”编辑“和”展示“状态
-    - 编辑状态下点击ESC，放弃对单元格的修改，回到选中单元格状态
-    - 编辑状态，支持表单验证消息，实时显示气泡提示和状态框颜色
-    - 单元格输入验证不通过时，不强制用户立即处理，允许用户退出单元格编辑状态，在单元格中通过icon或气泡方式轻提醒
-- 单元格悬停效果：单行高亮（移除单元格hover效果、移除角标）、表头高亮
-- 支持单元格选中状态
-    - 单元格选中状态，键入任意ascii字符时激活编辑状态，且对于文本输入框直接上屏
-- 表头样式，表头排序交互（未来查询选项也会放入表头）
-- 列宽：
-	- 当前实现是设置整张表的最小宽度和每列所占的百分比，考虑优化
-	- 超长内容elip悬停展示全部内容
-	- 未来允许用户自由调整列宽（调整列款时，右侧列整体位移）
-- 优化表格空状态
-- 内容过长时的样式自动省略
+- 单元格状态分为：可编辑、不可编辑（置灰）、无此字段
+- 表头样式、横向滚动时表头固定
+- 固定腿宽，超长内容elip悬停展示全部内容
+- tag样式：标的物列表之外下拉选项上屏后使用tag样式展示
+- 切换是否年化时使用switch组件，或直接改成下拉选项
 
 ## UI设计
 
-## Basic usage
+<!-- ## Basic usage
 
 <Playground>
  {() => {
@@ -127,4 +113,4 @@ extends https://ant.design/components/table-cn/#API
 ## API
 
 <Props of={Table} />
-
+ -->

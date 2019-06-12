@@ -1,4 +1,4 @@
-import Table from './Table';
 import './styles/index.less';
+import Table from './Table';
 
 export default Table;

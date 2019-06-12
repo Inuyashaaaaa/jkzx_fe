@@ -1,71 +1,117 @@
 ---
-name: Form test
+name: Form
+route: /Form
+menu: Components
 ---
 
-# Hello world
+# Form
 
-Hello, I'm a mdx file!
+`data-entry`
+
+extends https://ant-design.gitee.io/components/form-cn/
+
+## 使用场景
+
+具有数据收集、校验和提交功能的表单，包含复选框、单选框、输入框、下拉选择框等元素。
+
+用于创建一个实体或收集信息。
+
+需要对输入的数据类型进行校验时。
+
+## 功能交互设计
+
+- 支持三种排列布局
+  - 水平排列：标签和表单控件水平排列；（默认）
+  - 垂直排列：标签和表单控件上下垂直排列；
+  - 行内排列：表单项水平行内排列。
+- 支持表单验证消息，实时显示气泡提示和状态框颜色
+- 单元格可以切换”编辑“和”展示“状态
+- 支持修改间距、尺寸、字号等
+- 内容过长时的样式自动换行
+
+## 表单域
+
+表单一定会包含表单域，表单域可以是输入控件，标准表单域，标签，下拉菜单，文本域等。
+
+## UI 设计
 
 import Form from '../index';
 import FormItem from 'antd/lib/form/FormItem';
+import { Playground, Props } from 'docz';
 
-<Form
-  footer={false}
-  dataSource={{}}
-  columnNumberOneRow={2}
-  columns={[
-    {
-      dataIndex: 'tradingDirection',
-      title: '交易方向',
-      render: (value, record, index, { form }) => {
-        const val = () => {
-          if (value === 'BUY') {
-            return '买';
-          } else if (value === 'SELL') {
-            return '卖';
-          } else {
-            return '买卖';
-          }
-        };
-        return <FormItem>{val()}</FormItem>;
-      },
-    },
-    {
-      dataIndex: 'tradingPermission',
-      title: '交易权限',
-      render: (value, record, index) => {
-        const val = () => {
-          if (value === 'FULL') {
-            return '交易';
-          } else if (value === 'LIMITED') {
-            return '限制交易';
-          } else {
-            return '交易标的';
-          }
-        };
-        return <FormItem>{val()}</FormItem>;
-      },
-    },
-    {
-      dataIndex: 'tradingPermissionNote',
-      title: '交易权限备注',
-      render: (value, record, index) => {
-        return <FormItem>{value}</FormItem>;
-      },
-    },
-    {
-      dataIndex: 'tradingUnderlyers',
-      title: '交易标的',
-      render: value => {
-        const val = () => {
-          if (value === 'COMMODITY') {
-            return '商品';
-          } else {
-            return '个股商品';
-          }
-        };
-        return <FormItem>{val()}</FormItem>;
-      },
-    },
-  ]}
-/>
+## 展示表单
+
+<Playground>
+  {() => {
+    return (
+      <Form
+        footer={false}
+        dataSource={{
+          tradingDirection: 'BUY',
+          tradingPermission: 'FULL',
+          tradingPermissionNote: '备注',
+        }}
+        columnNumberOneRow={2}
+        columns={[
+          {
+            dataIndex: 'tradingDirection',
+            title: '交易方向',
+            render: (value, record, index, { form }) => {
+              const val = () => {
+                if (value === 'BUY') {
+                  return '买';
+                } else if (value === 'SELL') {
+                  return '卖';
+                } else {
+                  return '买卖';
+                }
+              };
+              return <FormItem label="交易方向">{val()}</FormItem>;
+            },
+          },
+          {
+            dataIndex: 'tradingPermission',
+            title: '交易权限',
+            render: (value, record, index) => {
+              const val = () => {
+                if (value === 'FULL') {
+                  return '交易';
+                } else if (value === 'LIMITED') {
+                  return '限制交易';
+                } else {
+                  return '交易标的';
+                }
+              };
+              return <FormItem label="交易权限">{val()}</FormItem>;
+            },
+          },
+          {
+            dataIndex: 'tradingPermissionNote',
+            title: '交易权限备注',
+            render: (value, record, index) => {
+              return <FormItem label="交易权限备注">{value}</FormItem>;
+            },
+          },
+          {
+            dataIndex: 'tradingUnderlyers',
+            title: '交易标的',
+            render: value => {
+              const val = () => {
+                if (value === 'COMMODITY') {
+                  return '商品';
+                } else {
+                  return '个股商品';
+                }
+              };
+              return <FormItem label="交易标的">{val()}</FormItem>;
+            },
+          },
+        ]}
+      />
+    );
+  }}
+</Playground>
+
+## API
+
+<Props of={Form} />
