@@ -1,13 +1,10 @@
 import { TRNORS_OPTS } from '@/constants/model';
-import { Form2, Input, Select, Table2, SmartTable } from '@/containers';
+import { Form2, Select, SmartTable } from '@/containers';
 import { PureStateComponent } from '@/containers/Components';
 import Page from '@/containers/Page';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import ModalButton from '@/containers/_ModalButton2';
-import {
-  getCanUsedTranorsOtions,
-  getCanUsedTranorsOtionsNotIncludingSelf,
-} from '@/services/common';
+import { getCanUsedTranorsOtions } from '@/services/common';
 import { queryModelName, queryModelRiskFreeCurve, saveModelRiskFreeCurve } from '@/services/model';
 import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -15,11 +12,10 @@ import _ from 'lodash';
 import React from 'react';
 import uuidv4 from 'uuid/v4';
 import { GROUP_KEY } from './constants';
+import Action from './Action';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
-
-  public $insertForm: Form2 = null;
 
   public state = {
     tableFormData: {},
@@ -28,7 +24,6 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     editings: {},
     saveLoading: false,
     options: [],
-    insertVisible: false,
     searchFormData: {},
     insertFormData: {},
     visible: [],
@@ -67,16 +62,27 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     });
   };
 
+  public onInsertConfirm = data => {
+    this.setState({
+      tableDataSource: this.sortDataSource(data),
+      insertFormData: {},
+    });
+  };
+
   public sortDataSource = dataSource => {
-    return dataSource
-      .map(record => {
-        return {
-          days: (TRNORS_OPTS.find(item => item.name === record.tenor.value) || {}).days,
-          record,
-        };
-      })
-      .sort((a, b) => a.days - b.days)
-      .map(item => item.record);
+    const a = dataSource.map(item => {
+      item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
+      return item;
+    });
+    const c = a.map(record => {
+      const tenor = record.tenor.value || record.tenor;
+      return {
+        record,
+        days: (TRNORS_OPTS.find(item => item.name === tenor) || {}).days,
+      };
+    });
+    const b = c.sort((a, b) => a.days - b.days).map(item => item.record);
+    return b;
   };
 
   public fetchTableData = async () => {
@@ -136,10 +142,6 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
         this.fetchTableData();
       }
     );
-    // this.fetchTableData({
-    //   ...this.state.searchFormData,
-    //   ...Form2.getFieldsValue(allFields)
-    // });
   };
 
   public onRemove = rowIndex => {
@@ -150,37 +152,6 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     });
 
     message.success('删除成功');
-  };
-
-  public onConfirm = async (rowIndex, param, record) => {
-    const { error } = await this.$insertForm.validate();
-    if (error) return;
-
-    const { insertFormData } = this.state;
-
-    const data = {
-      ...insertFormData,
-      id: uuidv4(),
-      visible: false,
-      expiry: Form2.createField(null),
-      use: Form2.createField(true),
-    };
-    const clone = _.concat(this.state.tableDataSource, data).map(item => {
-      if (item.id === record.id) {
-        return {
-          ...item,
-          visible: false,
-        };
-      }
-      return item;
-    });
-    this.setState({
-      insertVisible: false,
-      tableDataSource: this.sortDataSource(clone),
-      insertFormData: {},
-    });
-
-    message.success('插入成功');
   };
 
   public onClick = record => {
@@ -214,9 +185,23 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     };
   };
 
-  public onInsertFormChange = (props, changedFields, allFields) => {
+  public onInsertCancel = record => {
     this.setState({
-      insertFormData: allFields,
+      tableDataSource: this.state.tableDataSource.map(item => {
+        if (item.id === record.id) {
+          return { ...item, visible: false };
+        }
+        return item;
+      }),
+    });
+  };
+
+  public onInsertFormChange = (props, changedFields) => {
+    this.setState({
+      insertFormData: {
+        ...this.state.insertFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -232,11 +217,6 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public render() {
-    let { tableDataSource } = this.state;
-    tableDataSource = tableDataSource.map(item => {
-      item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
-      return item;
-    });
     return (
       <Page>
         <Form2
@@ -247,7 +227,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             icon: 'search',
           }}
           onSubmitButtonClick={this.fetchTableData}
-          onFieldsChange={this.onSearchFormChange}
+          onValuesChange={this.onSearchFormChange}
           resetable={false}
           columns={[
             {
@@ -290,7 +270,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
         <SmartTable
           rowKey="id"
           onCellFieldsChange={this.handleCellValueChanged}
-          dataSource={tableDataSource}
+          dataSource={this.state.tableDataSource}
           columns={[
             {
               title: '期限',
@@ -302,9 +282,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               render: (val, record, index, { form, editing }) => {
                 return (
                   <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true }],
-                    })(
+                    {form.getFieldDecorator({})(
                       <Select
                         defaultOpen={true}
                         autoSelect={true}
@@ -342,73 +320,18 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               title: '操作',
               render: (value, record, index) => {
                 return (
-                  <>
-                    <Popconfirm title="确认要删除吗？" onConfirm={() => this.onRemove(index)}>
-                      <a style={{ color: 'red' }}>删除</a>
-                    </Popconfirm>
-                    <Divider type="vertical" />
-                    <a onClick={() => this.onClick(record)}>插入</a>
-                    <Modal
-                      visible={
-                        this.state.tableDataSource.find(item => item.id === record.id).visible
-                      }
-                      onOk={e => this.onConfirm(index, value, record)}
-                      onCancel={() => {
-                        this.setState({
-                          tableDataSource: this.state.tableDataSource.map(item => {
-                            if (item.id === record.id) {
-                              return { ...item, visible: false };
-                            }
-                            return item;
-                          }),
-                        });
-                      }}
-                      closable={false}
-                    >
-                      <Form2
-                        ref={node => (this.$insertForm = node)}
-                        dataSource={this.state.insertFormData}
-                        footer={false}
-                        onFieldsChange={this.onInsertFormChange}
-                        columns={[
-                          {
-                            title: '期限',
-                            dataIndex: 'tenor',
-                            render: (val, record, index, { form }) => {
-                              return (
-                                <FormItem>
-                                  {form.getFieldDecorator({
-                                    rules: [
-                                      {
-                                        required: true,
-                                        message: '期限必填',
-                                      },
-                                    ],
-                                  })(
-                                    <Select
-                                      style={{ minWidth: 180 }}
-                                      options={getCanUsedTranorsOtionsNotIncludingSelf(
-                                        this.state.tableDataSource.map(item =>
-                                          Form2.getFieldsValue(item)
-                                        )
-                                      )}
-                                    />
-                                  )}
-                                </FormItem>
-                              );
-                            },
-                          },
-                          {
-                            title: '利率(%)',
-                            dataIndex: 'quote',
-                            render: (val, record, index, { form }) => {
-                              return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
-                            },
-                          },
-                        ]}
-                      />
-                    </Modal>
-                  </>
+                  <Action
+                    value={value}
+                    record={record}
+                    index={index}
+                    onRemove={this.onRemove}
+                    tableDataSource={this.state.tableDataSource}
+                    onClick={this.onClick}
+                    insertFormData={this.state.insertFormData}
+                    onInsertFormChange={this.onInsertFormChange}
+                    onInsertCancel={this.onInsertCancel}
+                    onInsertConfirm={this.onInsertConfirm}
+                  />
                 );
               },
             },
