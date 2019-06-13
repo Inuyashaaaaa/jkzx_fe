@@ -99,8 +99,8 @@ const TradeManagementPricing = props => {
           const leg = getLegByRecord(record);
           if (!leg) return record;
           const omits = _.difference(
-            leg.getColumns(LEG_ENV.EDITING).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex)
+            leg.getColumns(LEG_ENV.EDITING, record).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex)
           );
           return {
             ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
@@ -136,7 +136,7 @@ const TradeManagementPricing = props => {
     }
 
     const leftColumns = _.reject(
-      leg.getColumns(LEG_ENV.PRICING),
+      leg.getColumns(LEG_ENV.PRICING, record),
       item =>
         !![...TOTAL_TRADESCOL_FIELDS, ...TOTAL_COMPUTED_FIELDS].find(
           iitem => iitem.dataIndex === item.dataIndex
@@ -162,7 +162,7 @@ const TradeManagementPricing = props => {
   const getSelfTradesColDataIndexs = record => {
     const leg = getLegByRecord(record);
     const selfTradesColDataIndexs = _.intersection(
-      leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
+      leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
       TRADESCOL_FIELDS
     );
     return selfTradesColDataIndexs;

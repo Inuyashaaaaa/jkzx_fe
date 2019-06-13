@@ -11,6 +11,7 @@ import {
   KNOCK_DIRECTION_MAP,
   OPTION_TYPE_MAP,
   BIG_NUMBER_CONFIG,
+  OBSERVATION_TYPE_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -72,12 +73,17 @@ import BigNumber from 'bignumber.js';
 import { Unit } from '../../containers/legFields/Unit';
 import { legPipeLine } from '../_utils';
 import { TradeNumber } from '../../containers/legFields/TradeNumber';
+import { AlreadyBarrier } from '@/containers/legFields/AlreadyBarrier';
+import { ObservationStep } from '@/containers/legFields/ObservationStep';
+import ObserveModalInput from '@/containers/ObserveModalInput';
+import { ObservationDates } from '@/containers/legFields/ObservationDates';
+import { Shifted } from '@/containers/legFields/Shifted';
 
 export const BarrierLeg: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.BARRIER],
   type: LEG_TYPE_MAP.BARRIER,
   assetClass: ASSET_CLASS_MAP.EQUITY,
-  getColumns: env => {
+  getColumns: (env, record) => {
     if (env === LEG_ENV.PRICING) {
       return [
         IsAnnual,
@@ -142,6 +148,12 @@ export const BarrierLeg: ILeg = legPipeLine({
       ];
     }
     if (env === LEG_ENV.BOOKING) {
+      const obType = Form2.getFieldValue(record[ObservationType.dataIndex]);
+      const others =
+        obType === OBSERVATION_TYPE_MAP.DISCRETE
+          ? [ObservationStep, ObservationDates, Shifted]
+          : [];
+
       return [
         IsAnnual,
         Direction,
@@ -173,6 +185,7 @@ export const BarrierLeg: ILeg = legPipeLine({
         ObservationType,
         Unit,
         TradeNumber,
+        ...others,
       ];
     }
     throw new Error('getColumns get unknow leg env!');
@@ -269,6 +282,11 @@ export const BarrierLeg: ILeg = legPipeLine({
     );
 
     const { changedFields } = changeFieldsParams;
+
+    if (Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields)) {
+      const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
+      record[LEG_FIELD.SHIFTED] = Form2.createField(barrier);
+    }
 
     if (
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||

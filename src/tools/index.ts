@@ -281,8 +281,8 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
   const leg = getLegByRecord(record);
   if (!leg) return record;
   const omits = _.difference(
-    leg.getColumns(record[LEG_ENV_FIELD]).map(record => record.dataIndex),
-    leg.getColumns(toEnv).map(record => record.dataIndex)
+    leg.getColumns(record[LEG_ENV_FIELD], record).map(record => record.dataIndex),
+    leg.getColumns(toEnv, record).map(record => record.dataIndex)
   );
   return {
     ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),

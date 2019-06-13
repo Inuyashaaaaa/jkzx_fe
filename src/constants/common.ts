@@ -219,6 +219,7 @@ export const PROCESS_STATUS_TYPE_OPTIONS = convertOptions(
 );
 
 export const LCM_EVENT_TYPE_MAP = {
+  PAYMENT: 'PAYMENT',
   OPEN: 'OPEN',
   UNWIND: 'UNWIND',
   EXPIRATION: 'EXPIRATION',
@@ -235,6 +236,7 @@ export const LCM_EVENT_TYPE_MAP = {
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
+  PAYMENT: '支付',
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
   OPEN: '开仓',
@@ -394,14 +396,14 @@ export const OPTION_TYPE_OPTIONS = Object.keys(OPTION_TYPE_MAP).map(key => ({
 
 export const OBSERVATION_TYPE_ZHCN_MAP = {
   TERMINAL: '到期观察',
-  // DISCRETE: '离散观察',
+  DISCRETE: '离散观察',
   DAILY: '每日观察',
   CONTINUOUS: '连续观察',
 };
 
 export const OBSERVATION_TYPE_MAP = {
   TERMINAL: 'TERMINAL',
-  // DISCRETE: 'DISCRETE',
+  DISCRETE: 'DISCRETE',
   CONTINUOUS: 'CONTINUOUS',
   DAILY: 'DAILY',
 };
@@ -499,6 +501,7 @@ export const LEG_FIELD = {
   ...TRADE_GENERAL_FIELD_MAP,
   ...COMPUTED_LEG_FIELD_MAP,
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
+  SHIFTED: 'SHIFTED',
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
   WEIGHT: 'weight',

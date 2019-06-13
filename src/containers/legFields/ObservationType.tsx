@@ -57,7 +57,8 @@ export const ObservationType: ILegColDef = {
             defaultOpen={getDefaultOpen()}
             editing={editing}
             options={
-              Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DOUBLE_SHARK_FIN
+              Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DOUBLE_SHARK_FIN ||
+              Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.BARRIER
                 ? SPECIAL_OBSERVATION_TYPE_OPTIONS
                 : OBSERVATION_TYPE_OPTIONS
             }

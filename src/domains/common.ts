@@ -32,7 +32,7 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
     const curLegHasUnitField = !!getLegByRecord(record)
-      .getColumns(env)
+      .getColumns(env, record)
       .find(col => col.dataIndex === LEG_FIELD.UNIT);
 
     setColLoading(LEG_FIELD.UNDERLYER_MULTIPLIER, true);
