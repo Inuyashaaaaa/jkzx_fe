@@ -159,16 +159,23 @@ class FixingModal extends PureComponent<
   };
 
   public isCanExercise = () => {
+    if (_.isEmpty(this.data)) return false;
+
+    // 区间累计和亚式
+    const obdatas = getObservertionFieldData(this.data);
     const now = moment();
-    // 今天是最后一个观察日
-    const last = getMoment(_.get(_.last(this.state.tableData) || {}, [OB_DAY_FIELD]));
+    const last = getMoment(_.get(_.last(obdatas) || {}, [OB_DAY_FIELD]));
+
     const expirationDate = getMoment(this.data[LEG_FIELD.EXPIRATION_DATE]);
-    if (
-      ((last && (last.isBefore(now, 'day') || now.isSame(last, 'day'))) ||
-        (expirationDate &&
-          (expirationDate.isBefore(now, 'days') || now.isSame(expirationDate, 'day')))) &&
-      this.state.tableData.every(item => _.isNumber(item[OB_PRICE_FIELD]))
-    ) {
+
+    // 今天是最后一个观察日
+    const a = last.isSame(now, 'day');
+    // 所有观察日都已经填写观察到价格
+    const b = obdatas.every(item => _.isNumber(item[OB_PRICE_FIELD]));
+    // 今天是到期日
+    const c = expirationDate.isSame(now, 'day');
+
+    if ((a || c) && b) {
       return true;
     }
     return false;
