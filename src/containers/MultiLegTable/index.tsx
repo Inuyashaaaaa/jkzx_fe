@@ -29,7 +29,9 @@ const MultiLegTable = memo<
   } & ITableProps
 >(props => {
   const {
-    tableEl = useRef<Table2>(null),
+    tableEl = useRef<{
+      table: Table2;
+    }>(null),
     dataSource,
     env,
     chainColumns,
@@ -260,6 +262,7 @@ const MultiLegTable = memo<
           table: node,
           setLoadings,
           setLoadingsByRow,
+          columns,
         };
       }}
       onCellFieldsChange={(...args) => {

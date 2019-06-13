@@ -34,12 +34,14 @@ import {
   Row,
   Table,
   Timeline,
+  Tooltip,
+  Popover,
 } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import TimelineItem from 'antd/lib/timeline/TimelineItem';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import BigNumber from 'bignumber.js';
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
@@ -49,7 +51,7 @@ const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
 
 const TradeManagementPricingManagement = props => {
   const [searchFormData, setSearchFormData] = useState({});
-  const { setTableData, setVisible } = props;
+  const { setTableData, setVisible, visible } = props;
   const [tableDataSource, setTableDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -176,9 +178,13 @@ const TradeManagementPricingManagement = props => {
       .toNumber();
   };
 
-  useLifecycles(() => {
-    onTradeTableSearch();
-  });
+  useEffect(
+    () => {
+      if (!visible) return;
+      onTradeTableSearch();
+    },
+    [visible]
+  );
 
   return (
     <>
@@ -351,7 +357,7 @@ const TradeManagementPricingManagement = props => {
           <SmartTable
             pagination={false}
             rowKey={'uuid'}
-            scroll={{ x: 2500 }}
+            scroll={{ x: 2700 }}
             dataSource={tableDataSource}
             columns={[
               {
@@ -501,6 +507,49 @@ const TradeManagementPricingManagement = props => {
                 width: 150,
                 render: (val, record) => {
                   return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
+                },
+              },
+              {
+                title: '定价结果',
+                dataIndex: 'prcResult',
+                width: 200,
+                render: (val, record) => {
+                  const groups = _.toPairs(
+                    _.mapValues(val, (data = {}, key) => {
+                      const unit = _.get(data, 'unit', '');
+                      if (unit === '¥' || unit === '$') {
+                        return formatMoney(data.value, {
+                          unit,
+                        });
+                      }
+                      return `${formatNumber(data.value, 4)}${unit}`;
+                    })
+                  );
+
+                  const str = groups.map(([key, val]) => `${key}: ${val}`).join(',');
+
+                  if (str.length > 20) {
+                    return (
+                      <Popover
+                        content={
+                          <div style={{ width: 170 }}>
+                            {groups.map(([key, val]) => {
+                              return (
+                                <Row key={key} type="flex" justify="space-between">
+                                  <span>{key}:</span> <span>{val}</span>
+                                </Row>
+                              );
+                            })}
+                          </div>
+                        }
+                        title={'计算结果预览'}
+                      >
+                        {str.slice(0, 20)}...
+                      </Popover>
+                    );
+                  }
+
+                  return str;
                 },
               },
               {
