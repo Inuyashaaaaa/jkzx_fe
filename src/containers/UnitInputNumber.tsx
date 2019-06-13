@@ -19,7 +19,7 @@ export const UnitInputNumber = memo<
         {...rest}
         precision={precision}
         onChange={event => {
-          if (_.isNumber(event)) {
+          if (event === '' || _.isNumber(event)) {
             onChange(event);
           }
         }}
