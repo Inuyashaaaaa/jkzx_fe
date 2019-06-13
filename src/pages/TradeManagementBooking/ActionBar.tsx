@@ -107,6 +107,7 @@ const ActionBar = memo<any>(props => {
         <Button.Group>
           <MultilLegCreateButton
             isPricing={false}
+            env={LEG_ENV.BOOKING}
             key="create"
             handleAddLeg={(leg: ILeg) => {
               if (!leg) return;
