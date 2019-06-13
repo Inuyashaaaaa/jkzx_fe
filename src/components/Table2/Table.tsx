@@ -144,6 +144,8 @@ class Table2 extends PureComponent<ITableProps> {
     });
   };
 
+  public getValues = () => {};
+
   public getContext = (): ITableContext => {
     return {
       ...this.context,

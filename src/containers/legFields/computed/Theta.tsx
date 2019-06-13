@@ -14,6 +14,7 @@ export const Theta: ILegColDef = {
       style: COMPUTED_HEADER_CELL_STYLE,
     };
   },
+  getUnit: () => '¥',
   render: (value, record, index, { form, editing, colDef }) => {
     return (
       <FormItem>{form.getFieldDecorator()(<UnitInputNumber unit="¥" editing={false} />)}</FormItem>

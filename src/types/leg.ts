@@ -13,6 +13,7 @@ export interface ILegColDef extends ITableColDef {
   onCellEditingChanged?: (params: ITableTriggerCellEditingChangedParams) => void;
   onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
   onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
+  getUnit?: () => string;
 }
 
 export interface ILeg {

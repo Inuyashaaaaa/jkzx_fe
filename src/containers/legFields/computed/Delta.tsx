@@ -72,6 +72,7 @@ export const Delta: ILegColDef = {
       style: COMPUTED_HEADER_CELL_STYLE,
     };
   },
+  getUnit: () => '手',
   render: (value, record, index, { form, editing, colDef }) => {
     return (
       <FormItem>

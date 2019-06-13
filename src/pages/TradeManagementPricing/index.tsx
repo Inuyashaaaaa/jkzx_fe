@@ -525,6 +525,7 @@ const TradeManagementPricing = props => {
         fetchDefaultPricingEnvData={fetchDefaultPricingEnvData}
         testPricing={testPricing}
         pricingLoading={pricingLoading}
+        tableEl={tableEl}
       />
       <Divider />
       <MultiLegTable
