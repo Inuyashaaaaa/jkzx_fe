@@ -295,6 +295,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             {
               title: '期限',
               dataIndex: 'tenor',
+              width: 600,
               defaultEditing: false,
               editable: record => {
                 return true;
@@ -321,6 +322,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             {
               title: '利率(%)',
               dataIndex: 'quote',
+              width: 600,
               align: 'right',
               editable: record => {
                 return true;

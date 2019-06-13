@@ -18,6 +18,7 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
     title: '期限',
     dataIndex: 'tenor',
     defaultEditing: false,
+    width: 300,
     editable: record => {
       return true;
     },
@@ -43,6 +44,7 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
   {
     title: '利率(%)',
     align: 'right',
+    width: 300,
     dataIndex: 'quote',
     editable: record => {
       return true;
