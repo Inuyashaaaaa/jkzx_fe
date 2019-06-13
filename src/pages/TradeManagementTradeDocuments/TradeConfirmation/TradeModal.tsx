@@ -3,6 +3,7 @@ import { DOWN_LOAD_TRADE_URL, emlSendSupplementaryAgreementReport } from '@/serv
 import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 
 class TradeModal extends PureComponent {
   public $form: Form = null;
@@ -57,6 +58,7 @@ class TradeModal extends PureComponent {
 
   public render() {
     const { data } = this.props;
+    const currentUser = this.props.currentUser.username;
     return (
       <>
         <a onClick={this.onClick}>生成交易确认书</a>
@@ -144,12 +146,12 @@ class TradeModal extends PureComponent {
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <p style={{ lineHeight: '40px' }}>
                 {data.docProcessStatus === 'UN_PROCESSED'
-                  ? `${data.partyName}未处理过交易确认书`
+                  ? `${currentUser}未处理过交易确认书`
                   : data.docProcessStatus === 'DOWNLOADED'
-                  ? `${data.partyName} 于 ${moment(data.updateAt).format(
+                  ? `${currentUser} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm'
                     )}下载过交易确认书`
-                  : `${data.partyName} 于 ${moment(data.updateAt).format(
+                  : `${currentUser} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm'
                     )}发送过交易确认书`}
               </p>
@@ -161,4 +163,6 @@ class TradeModal extends PureComponent {
   }
 }
 
-export default TradeModal;
+export default connect(({ user }) => ({
+  currentUser: user.currentUser,
+}))(TradeModal);
