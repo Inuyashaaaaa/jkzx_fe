@@ -131,17 +131,12 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
 
   public onSearchFormChange = (props, changedFields, allFields) => {
     const { searchFormData } = this.state;
-    this.setState(
-      {
-        searchFormData: {
-          ...searchFormData,
-          ...changedFields,
-        },
+    this.setState({
+      searchFormData: {
+        ...searchFormData,
+        ...changedFields,
       },
-      () => {
-        this.fetchTableData();
-      }
-    );
+    });
   };
 
   public onRemove = rowIndex => {
@@ -227,7 +222,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             icon: 'search',
           }}
           onSubmitButtonClick={this.fetchTableData}
-          onValuesChange={this.onSearchFormChange}
+          onFieldsChange={this.onSearchFormChange}
           resetable={false}
           columns={[
             {
@@ -237,7 +232,12 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
                 return (
                   <FormItem>
                     {form.getFieldDecorator({
-                      rules: [{ required: true }],
+                      rules: [
+                        {
+                          required: true,
+                          message: '请选择分组后搜索',
+                        },
+                      ],
                     })(
                       <Select
                         {...{
@@ -247,7 +247,6 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
                           },
                           placeholder: '请输入内容搜索',
                           showSearch: true,
-                          allowClear: true,
                           fetchOptionsOnSearch: true,
                           options: this.state.options,
                         }}
