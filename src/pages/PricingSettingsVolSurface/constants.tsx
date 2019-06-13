@@ -173,7 +173,7 @@ export const SEARCH_FORM_CONTROLS: (groups: OptionProps[], formData: any) => IFo
 export const TABLE_COLUMN = tableDataSource => [
   {
     title: '期限',
-    width: 140,
+    width: 80,
     dataIndex: 'tenor',
     defaultEditing: false,
     editable: record => {
@@ -200,7 +200,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '80% SPOT',
     title: '80% SPOT',
-    width: 140,
+    width: 100,
     percent: 0.8,
     align: 'right',
     editable: record => {
@@ -220,7 +220,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '90% SPOT',
     title: '90% SPOT',
-    width: 140,
+    width: 100,
     align: 'right',
     percent: 0.9,
     editable: record => {
@@ -240,7 +240,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '95% SPOT',
     title: '95% SPOT',
-    width: 140,
+    width: 100,
     align: 'right',
     percent: 0.95,
     editable: record => {
@@ -260,7 +260,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '100% SPOT',
     title: '100% SPOT',
-    width: 140,
+    width: 100,
     align: 'right',
     percent: 1,
     editable: record => {
@@ -280,7 +280,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '105% SPOT',
     title: '105% SPOT',
-    width: 140,
+    width: 100,
     percent: 1.05,
     align: 'right',
     editable: record => {
@@ -300,7 +300,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '110% SPOT',
     title: '110% SPOT',
-    width: 140,
+    width: 100,
     align: 'right',
     percent: 1.1,
     editable: record => {
@@ -320,7 +320,7 @@ export const TABLE_COLUMN = tableDataSource => [
   {
     dataIndex: '120% SPOT',
     title: '120% SPOT',
-    width: 140,
+    width: 100,
     align: 'right',
     percent: 1.2,
     editable: record => {
