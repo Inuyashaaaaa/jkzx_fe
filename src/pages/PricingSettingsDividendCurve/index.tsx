@@ -205,12 +205,18 @@ class PricingSettingsDividendCurve extends PureComponent {
   };
 
   public onCancel = () => {
-    this.setState({ visible: false });
+    this.setState({
+      visible: false,
+      insertFormData: {},
+    });
   };
 
   public onInsertFormChange = (props, fields, allFields) => {
     this.setState({
-      insertFormData: allFields,
+      insertFormData: {
+        ...this.state.insertFormData,
+        ...fields,
+      },
     });
   };
 
