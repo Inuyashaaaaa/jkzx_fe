@@ -212,28 +212,17 @@ const TriggerCard = memo<any>(props => {
       }`;
     });
     if (isCreate) {
-      const triggerName = processName + Math.random();
+      const triggerName = processName;
       setLoading(true);
       const { error, data } = await wkProcessTriggerBusinessCreate({
         triggerName,
         operation: formData.operation,
         description: strArr.join(','),
         conditions: conditionsData,
+        processName,
       });
       setLoading(false);
       if (error) return;
-      const triggerId = _.get(
-        (data || []).filter(item => item.triggerName === triggerName),
-        '[0]triggerId'
-      );
-      setLoading(true);
-      const { data: _data, error: _error } = await wkProcessTriggerBind({
-        processName,
-        triggerId,
-      });
-      setLoading(false);
-
-      if (_error) return;
       setTargetVisible(false);
       notification.success({
         message: `${processName}流程触发修改成功`,
@@ -306,7 +295,7 @@ const TriggerCard = memo<any>(props => {
             <p>
               触发方式：
               <Tag style={{ margin: 5 }} key={trigger.approveGroupId}>
-                {trigger.triggerName}
+                {OPERATION_MAP[trigger.operation]}
               </Tag>
             </p>
             <p>
