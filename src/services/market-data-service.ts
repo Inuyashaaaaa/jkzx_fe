@@ -139,3 +139,13 @@ export async function mktQuoteSave(params = {}) {
     },
   });
 }
+
+export async function excListAllInstrumentsInTradeRecords(params = {}) {
+  return request(`${HOST_TEST}market-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'excListAllInstrumentsInTradeRecords',
+      params,
+    },
+  });
+}
