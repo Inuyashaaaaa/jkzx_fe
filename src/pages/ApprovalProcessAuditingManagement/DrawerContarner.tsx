@@ -100,13 +100,19 @@ class Operation extends PureComponent {
     }
     const { currentGroup } = this.props;
 
-    const cloneDepartments = JSON.parse(JSON.stringify(departments));
+    // const cloneDepartments = JSON.parse(JSON.stringify(departments));
+    // debugger
 
-    const array = this.toArray(cloneDepartments);
-    const dataSource = users.data.filter(item => {
-      return !currentGroup.userList.find(items => item.username === items.username);
-    });
-
+    const array = _.flattenDeep(this.toArray([departments])).filter(item => !!item);
+    const dataSource = users.data
+      .filter(item => {
+        return !currentGroup.userList.find(items => item.username === items.username);
+      })
+      .map(item => {
+        const Index = _.findIndex(array, dep => dep.id === item.departmentId);
+        item.departmentName = array[Index].departmentName;
+        return item;
+      });
     dataSource.sort((a, b) => {
       return a.username.localeCompare(b.username);
     });
@@ -146,17 +152,14 @@ class Operation extends PureComponent {
   };
 
   public toArray = data => {
-    let array = [];
-    const children = data.children || [];
-    delete data.children;
-    array.push(data);
-
-    array = array.concat(children);
-    if (!children) return;
-    children.forEach(item => {
-      this.toArray(item);
-    });
-    return array;
+    return data.concat(
+      data.map(item => {
+        if (item.children) {
+          return this.toArray(item.children);
+        }
+        return item.children;
+      })
+    );
   };
 
   public toTree = (data = []) => {
@@ -202,8 +205,13 @@ class Operation extends PureComponent {
   public onSearch = async () => {
     const { data, filterItem } = this.state;
     let dataSource = data;
+    const { currentGroup } = this.props;
     dataSource = data.filter(item => {
       return this.state[filterItem] ? item[filterItem].indexOf(this.state[filterItem]) >= 0 : true;
+    });
+
+    dataSource = dataSource.filter(item => {
+      return !currentGroup.userList.find(items => item.username === items.username);
     });
     this.setState({
       dataSource,

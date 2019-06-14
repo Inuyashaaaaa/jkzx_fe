@@ -119,8 +119,6 @@ const Operation = props => {
   };
 
   const getActionClass = (taskType, processName) => {
-    console.log(taskType);
-    // debugger
     // 资金
     if (processName === '财务出入金') {
       if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
@@ -174,7 +172,6 @@ const Operation = props => {
 
     // 修改审批组与发起审批组一致
     tasks[tasks.length - 1].approveGroupList = tasks[0].approveGroupList;
-    // debugger
     const taskList = tasks.map((item, index) => {
       return {
         ...item,
@@ -270,7 +267,7 @@ const Operation = props => {
 
     handleReviewData(processData);
     notification.success({
-      message: `修改全局配置成功`,
+      message: `修改审批配置成功`,
     });
   };
 
@@ -371,14 +368,8 @@ const Operation = props => {
       }),
     });
     if (error) {
-      let otherTaskData = (process.tasks || []).filter(item => item.taskId === currentTaskId);
+      const otherTaskData = (process.tasks || []).filter(item => item.taskId === currentTaskId);
 
-      otherTaskData = otherTask.map(item => {
-        return {
-          ...Form2.createFields(item),
-          taskId: item.taskId,
-        };
-      });
       setOtherTask(otherTaskData);
       return setOtherVisible(false);
     }

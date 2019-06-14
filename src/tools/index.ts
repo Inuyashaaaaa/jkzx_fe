@@ -318,8 +318,8 @@ export const formatNumber = (
   roundingMode?: BigNumber.RoundingMode,
   config?: BigNumber.Format
 ) => {
-  if (value == null) {
-    return value;
+  if (!_.isNumber(value)) {
+    return '';
   }
   return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
 };

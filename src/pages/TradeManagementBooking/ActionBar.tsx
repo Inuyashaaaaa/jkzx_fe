@@ -36,10 +36,12 @@ const ActionBar = memo<any>(props => {
     setCreateFormData({});
   };
 
-  const transactionHandleOk = () => {
+  const transactionHandleOk = async () => {
     setTransactionModalVisible(false);
-    handelTrdTradeCreate();
-    router.push('/approval-process/process-manangement');
+    const error = await handelTrdTradeCreate();
+    if (!error) {
+      router.push('/approval-process/process-manangement');
+    }
   };
 
   const transactionHandleCancel = () => {
@@ -69,7 +71,7 @@ const ActionBar = memo<any>(props => {
       },
     });
 
-    if (_error) return;
+    if (_error) return true;
     if (_data.processInstanceId) {
       message.success('已进入流程');
     } else {
@@ -86,7 +88,7 @@ const ActionBar = memo<any>(props => {
         attachmentId,
         processInstanceId: _data.processInstanceId,
       });
-      if (aerror) return;
+      if (aerror) return true;
     }
   };
 
@@ -104,6 +106,7 @@ const ActionBar = memo<any>(props => {
       >
         <MultilLegCreateButton
           isPricing={false}
+          env={LEG_ENV.BOOKING}
           key="create"
           handleAddLeg={(leg: ILeg) => {
             if (!leg) return;
@@ -158,7 +161,8 @@ const ActionBar = memo<any>(props => {
                 },
               });
               if (_error) return;
-              if (_data.status) {
+              // 是否可以发起审批
+              if (_data === true) {
                 return setTransactionModalVisible(true);
               }
 
