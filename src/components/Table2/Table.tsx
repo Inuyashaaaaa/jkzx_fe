@@ -14,6 +14,7 @@ import {
   TABLE_KEY_DOWN,
 } from './constants/EVENT';
 import FormRow from './rows/FormRow';
+import HeaderCell from './cells/HeaderCell';
 
 class Table2 extends PureComponent<ITableProps> {
   public static defaultProps = {
@@ -276,6 +277,9 @@ class Table2 extends PureComponent<ITableProps> {
       body: {
         row: FormRow,
         cell: SwitchCell,
+      },
+      header: {
+        cell: HeaderCell,
       },
     };
     return (
