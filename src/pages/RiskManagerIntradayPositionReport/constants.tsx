@@ -52,6 +52,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '平仓数量 (手)',
@@ -60,6 +61,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '持仓数量 (手)',
@@ -68,6 +70,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '期权费 (¥)',
@@ -76,6 +79,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '平仓金额 (¥)',
@@ -84,6 +88,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '市值 (¥)',
@@ -92,6 +97,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '盈亏 (¥)',
@@ -100,6 +106,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Delta (手)',
@@ -108,14 +115,16 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
-    title: 'Delta Cash (手)',
+    title: 'Delta Cash (￥)',
     dataIndex: 'deltaCash',
     width: 130,
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Delta Decay (手)',
@@ -124,6 +133,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '预期Delta (手)',
@@ -132,6 +142,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Gamma (手)',
@@ -140,6 +151,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Gamma金额 (¥)',
@@ -148,6 +160,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Vega/1% (¥)',
@@ -156,6 +169,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Theta/1天 (¥)',
@@ -164,6 +178,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: 'Rho/1% (¥)',
@@ -172,6 +187,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '错误信息',

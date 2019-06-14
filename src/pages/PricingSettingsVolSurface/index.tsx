@@ -4,7 +4,6 @@ import MarketSourceTable from '@/containers/MarketSourceTable';
 import { IFormControl } from '@/containers/_Form2';
 import InputButton from '@/containers/_InputButton';
 import ModalButton from '@/containers/_ModalButton2';
-import SourceTable from '@/containers/_SourceTable';
 import Page from '@/containers/Page';
 import {
   getCanUsedTranors,
@@ -23,18 +22,17 @@ import {
   INSTANCE_KEY,
   MARKET_KEY,
   SEARCH_FORM_CONTROLS,
-  TABLE_COLUMN_DEFS,
   SEARCH_FORM,
   TABLE_COLUMN,
 } from './constants';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, InputNumber, Table2, Input } from '@/containers';
+import { Form2, Select, InputNumber, Table2, Input, SmartTable } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 
 class PricingSettingVolSurface extends PureComponent {
   public lastFetchedDataSource = null;
 
-  public $sourceTable: SourceTable = null;
+  public $sourceForm: Form2 = null;
 
   public $insertForm: Form2 = null;
 
@@ -139,6 +137,7 @@ class PricingSettingVolSurface extends PureComponent {
             instrumentId: searchFormData[MARKET_KEY],
             quote: 1,
           },
+          columns: TABLE_COLUMN(dataSource),
           failed: true,
         };
       } else {
@@ -258,7 +257,7 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public onSetConstantsButtonClick = event => {
-    if (!this.$sourceTable) return;
+    if (!this.$sourceForm) return;
     if (_.filter(this.selectedColumns, { colId: 'tenor' }).length) {
       this.selectedColumns = _.drop(this.selectedColumns);
     }
@@ -268,7 +267,7 @@ class PricingSettingVolSurface extends PureComponent {
   public setRangeSelectionCellValue = value => {
     this.selectedRowNodes.map(rowNode => {
       this.selectedColumns.map(column => {
-        (this.$sourceTable.$baseSourceTable.$table.$baseTable.gridApi as any).valueService.setValue(
+        (this.$sourceForm.$baseSourceTable.$table.$baseTable.gridApi as any).valueService.setValue(
           rowNode,
           column.getColId(),
           value
@@ -320,7 +319,7 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public onRangeSelectionChanged = value => {
-    const { gridApi, props } = this.$sourceTable.$baseSourceTable.$table.$baseTable;
+    const { gridApi, props } = this.$sourceForm.$baseSourceTable.$table.$baseTable;
 
     const rangeSelections = gridApi.getRangeSelections();
     if (!rangeSelections) return;
@@ -380,6 +379,11 @@ class PricingSettingVolSurface extends PureComponent {
       item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
       return item;
     });
+    const durationMap = { W: 7, D: 1, M: 30, Y: 365 };
+    const tds = _.sortBy(tableDataSource, o => {
+      const value = o.tenor.value;
+      return durationMap[value.substring(value.length - 1)] * Number.parseInt(value, 10) * 7;
+    });
     return (
       <Page>
         <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
@@ -414,7 +418,7 @@ class PricingSettingVolSurface extends PureComponent {
           </Col>
           <Col xs={24} sm={20}>
             <Form2
-              ref={node => (this.$sourceTable = node)}
+              ref={node => (this.$sourceForm = node)}
               layout="inline"
               dataSource={this.state.searchFormData}
               submitText={'搜索'}
@@ -427,65 +431,49 @@ class PricingSettingVolSurface extends PureComponent {
               columns={SEARCH_FORM(this.state.groups, this.state.searchFormData)}
             />
             <Divider type="horizontal" />
-            <div style={{ display: 'flex' }}>
+            <Row>
               <Button type="primary" onClick={this.handleSaveTable}>
                 保存
               </Button>
-              {/* <InputButton
-                // disabled={!this.lastFetchedDataSource}
-                key="快捷设置常数"
-                type="primary"
-                onClick={this.onSetConstantsButtonClick}
-                input={{
-                  type: 'number',
-                  formatter: value => `${value}%`,
-                  parser: value => value.replace('%', ''),
-                }}
-              >
-                快捷设置常数
-                </InputButton> */}
-            </div>
-            <Divider type="horizontal" />
+            </Row>
             {this.underlyer ? (
-              <Form2
-                layout="inline"
-                dataSource={Form2.createFields(this.state.tableFormData)}
-                submitable={false}
-                resetable={false}
-                onFieldsChange={this.onTableFormChange}
-                columns={[
-                  {
-                    dataIndex: 'quote',
-                    title: '标的物价格',
-                    render: (value, record, index, { form, editing }) => {
-                      return (
-                        <FormItem>
-                          {form.getFieldDecorator({
-                            rules: [
-                              {
-                                required: true,
-                              },
-                            ],
-                          })(<InputNumber style={{ width: 200 }} />)}
-                        </FormItem>
-                      );
+              <>
+                <Divider type="horizontal" />
+                <Form2
+                  layout="inline"
+                  dataSource={Form2.createFields(this.state.tableFormData)}
+                  submitable={false}
+                  resetable={false}
+                  onFieldsChange={this.onTableFormChange}
+                  columns={[
+                    {
+                      dataIndex: 'quote',
+                      title: '标的物价格',
+                      render: (value, record, index, { form, editing }) => {
+                        return (
+                          <FormItem>
+                            {form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: true,
+                                },
+                              ],
+                            })(<InputNumber style={{ width: 200 }} />)}
+                          </FormItem>
+                        );
+                      },
                     },
-                  },
-                ]}
-              />
+                  ]}
+                />
+              </>
             ) : null}
-
-            <Table2
-              dataSource={tableDataSource}
+            <SmartTable
+              dataSource={tds}
               columns={columns}
-              pagination={{
-                showSizeChanger: true,
-                showQuickJumper: true,
-              }}
               onCellFieldsChange={this.handleCellValueChanged}
               loading={this.state.tableLoading}
               rowKey="id"
-              size="middle"
+              pagination={false}
               style={{ marginTop: 20 }}
             />
           </Col>

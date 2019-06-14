@@ -3,7 +3,7 @@ import { FormItemProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
-import _, { omit } from 'lodash';
+import _, { omit, get } from 'lodash';
 import React, { KeyboardEvent, PureComponent, CSSProperties } from 'react';
 import { EMPTY_VALUE } from '../../../containers/constants';
 import Form2 from '../../Form2';
@@ -80,12 +80,18 @@ class SwitchCell extends PureComponent<
   }
 
   public componentDidMount = () => {
+    if (this.isSelectionCell()) {
+      return;
+    }
     this.registeCell();
     this.props.api.eventBus.listen(TABLE_KEY_DOWN, this.onTableKeyDown);
     this.props.api.eventBus.listen(TABLE_STOP_ACTIVE, this.onStopActive);
   };
 
   public componentWillUnmount = () => {
+    if (this.isSelectionCell()) {
+      return;
+    }
     this.deleteCell();
     this.props.api.eventBus.unListen(TABLE_KEY_DOWN, this.onTableKeyDown);
     this.props.api.eventBus.unListen(TABLE_STOP_ACTIVE, this.onStopActive);
@@ -105,7 +111,7 @@ class SwitchCell extends PureComponent<
       return;
     }
     const { record, getRowKey, api } = this.props;
-    api.tableManager.registeCell(record[getRowKey()], this.getDataIndex(), this);
+    api.tableManager.registeCell(this.getRowId(), this.getDataIndex(), this);
   };
 
   public deleteCell = () => {
@@ -114,12 +120,12 @@ class SwitchCell extends PureComponent<
     }
 
     const { record, getRowKey, api } = this.props;
-    api.tableManager.deleteCell(record[getRowKey()], this.getDataIndex());
+    api.tableManager.deleteCell(this.getRowId(), this.getDataIndex());
   };
 
   public getRowId = () => {
     const { record, getRowKey } = this.props;
-    return record[getRowKey()];
+    return get(record, getRowKey());
   };
 
   public renderElement = elements => {
@@ -153,6 +159,10 @@ class SwitchCell extends PureComponent<
   };
 
   public onCellClick = event => {
+    if (this.isSelectionCell()) {
+      return;
+    }
+
     event.stopPropagation();
     this.props.tableApi.saveBy((rowId, colId) => {
       if (rowId === this.props.rowId && colId === this.props.colDef.dataIndex) {
@@ -205,7 +215,7 @@ class SwitchCell extends PureComponent<
   public getValue = () => {
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
-    const val = record[dataIndex];
+    const val = get(record, dataIndex);
     if (Form2.isField(val)) {
       return val.value;
     }
@@ -215,14 +225,14 @@ class SwitchCell extends PureComponent<
   public cellValueIsField = () => {
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
-    const val = record[dataIndex];
+    const val = get(record, dataIndex);
     return typeof val === 'object' && val.type === 'field';
   };
 
   public getCellValue = () => {
     const { record } = this.props;
     const dataIndex = this.getDataIndex();
-    const val = record[dataIndex];
+    const val = get(record, dataIndex);
     return val;
   };
 

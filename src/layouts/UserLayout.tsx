@@ -29,7 +29,7 @@ const links = [
 
 const copyright = (
   <Fragment>
-    Copyright <Icon type="copyright" /> 同余科技
+    Copyright <Icon type="copyright" /> 同余科技 version {require('@/defaultSettings').version}
   </Fragment>
 );
 

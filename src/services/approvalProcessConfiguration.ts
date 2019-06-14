@@ -120,3 +120,123 @@ export async function wkTaskApproveGroupBind(params = {}) {
     },
   });
 }
+
+export async function wkProcessInstanceListByProcessName(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessInstanceListByProcessName',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerList',
+      params,
+    },
+  });
+}
+
+export async function wkIndexList(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkIndexList',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerModify',
+      params,
+    },
+  });
+}
+
+export async function wkTriggerConditionModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkTriggerConditionModify',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerCreate(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerCreate',
+      params,
+    },
+  });
+}
+
+export async function wkTriggerConditionCreate(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkTriggerConditionCreate',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerDelete(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerDelete',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerBusinessModify(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerBusinessModify',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerBusinessCreate(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerBusinessCreate',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerBind(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerBind',
+      params,
+    },
+  });
+}
+
+export async function wkProcessTriggerUnbind(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkProcessTriggerUnbind',
+      params,
+    },
+  });
+}

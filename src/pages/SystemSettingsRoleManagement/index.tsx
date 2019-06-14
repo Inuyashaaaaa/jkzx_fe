@@ -1,11 +1,11 @@
+import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2, SmartTable, Table2 } from '@/containers';
 import Page from '@/containers/Page';
-import { authRolesList, createRole, queryAllPagePermissions, updateRole } from '@/services/role';
-import { Button, message, Row, Modal } from 'antd';
+import { authRolesList, createRole, queryAllPagePermissions } from '@/services/role';
+import { Button, message, Modal } from 'antd';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
 import { FORM_CONTROL, TABLE_COL_DEF } from './constants';
-import { Form2, Table2 } from '@/containers';
-import { VERTICAL_GUTTER } from '@/constants/global';
 
 class SystemSettingsRoleManagement extends PureComponent {
   public $table: Table2 = null;
@@ -129,7 +129,7 @@ class SystemSettingsRoleManagement extends PureComponent {
               >
                 新增
               </Button>
-              <Table2
+              <SmartTable
                 ref={node => (this.$table = node)}
                 rowKey={'id'}
                 dataSource={this.state.dataSource}

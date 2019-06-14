@@ -126,15 +126,15 @@ export default [
               name: 'baseContractManagement',
               component: './PricingSettingsBaseContractManagement/index',
             },
-            {
-              path: '/pricingSettings/pricingEnvironment',
-              name: 'pricingEnvironment',
-              component: './PricingSettingsPricingEnvironment/index',
-            },
+            // {
+            //   path: '/pricingSettings/pricingEnvironment',
+            //   name: 'pricingEnvironment',
+            //   component: './PricingSettingsPricingEnvironment/index',
+            // },
             {
               path: '/pricingSettings/customModel',
               name: 'customModel',
-              component: './CustomModel/index',
+              component: './PricingSettingCustomModal/index',
             },
           ],
         },
@@ -231,7 +231,7 @@ export default [
               component: './ReportsCustomerFundsSummaryStatements/index',
             },
             {
-              path: '/reports/custom',
+              path: '/reports/custom-management',
               name: 'reportsCustomManagement',
               component: './ReportsCustomManagement/index',
             },
@@ -277,7 +277,7 @@ export default [
         {
           path: '/approval-process',
           name: 'approvalProcess',
-          icon: 'interation',
+          icon: 'redo',
           routes: [
             {
               path: '/approval-process/process-manangement',
@@ -293,6 +293,11 @@ export default [
               path: '/approval-process/process-configuration',
               name: 'processConfiguration',
               component: './ApprovalProcessConfiguration/index',
+            },
+            {
+              path: '/approval-process/trigger-management',
+              name: 'triggerManagement',
+              component: './ApprocalTriggerManagement/index',
             },
           ],
         },

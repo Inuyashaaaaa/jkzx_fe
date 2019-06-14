@@ -483,14 +483,25 @@ export const REBATETYPE_UNIT_MAP = UNIT_ENUM_MAP;
 
 export const REBATETYPE_UNIT_OPTIONS = UNIT_ENUM_OPTIONS;
 
+export const TRADE_GENERAL_FIELD_MAP = {
+  BOOK_NAME: 'bookName',
+  TRADE_ID: 'tradeId',
+  TRADE_DATE: 'tradeDate',
+  PRODUCT_TYPE: 'productType',
+  SETTLE_AMOUNT: 'SETTLE_AMOUNT', // 结算金额
+  SETTLE_STATUS: 'SETTLE_STATUS', // 结算状态
+};
+
 /**
  * 多腿字段名
  */
 export const LEG_FIELD = {
+  ...TRADE_GENERAL_FIELD_MAP,
   ...COMPUTED_LEG_FIELD_MAP,
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
+  WEIGHT: 'weight',
   IS_ANNUAL: 'annualized', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
   DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
@@ -612,6 +623,9 @@ export const INSTRUMENT_TYPE_ZHCN_MAP = {
   STOCK: '股票',
   INDEX: '股指',
   INDEX_FUTURES: '股指期货',
+  INDEX_OPTION: '股指期权',
+  STOCK_OPTION: '个股/ETF期权',
+  FUTURES_OPTION: '期货期权',
   SPOT: '现货',
   FUTURES: '期货',
 };
@@ -632,6 +646,11 @@ export const ASSET_TYPE_ZHCN_MAP = {
 };
 
 export const ASSET_TYPE_OPTIONS = convertOptions(ASSET_TYPE_MAP, ASSET_TYPE_ZHCN_MAP);
+
+export const EXERCISETYPE_MAP_CN = {
+  EUROPEAN: '欧式',
+  AMERICAN: '美式',
+};
 
 export const EXERCISETYPE_MAP = {
   EUROPEAN: 'EUROPEAN',
@@ -715,6 +734,8 @@ export const LEG_TYPE_MAP = {
   MODEL_XY_UNANNUAL: 'MODEL_XY_UNANNUAL',
   FORWARD: 'FORWARD',
   FORWARD_UNANNUAL: 'FORWARD_UNANNUAL',
+  SPREAD_EUROPEAN: 'SPREAD_EUROPEAN',
+  RATIO_SPREAD_EUROPEAN: 'RATIO_SPREAD_EUROPEAN',
 };
 
 export const PRODUCT_TYPE_MAP = {
@@ -788,6 +809,8 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.MODEL_XY_UNANNUAL]: '自定义产品 - 非年化',
   [LEG_TYPE_MAP.FORWARD]: '远期',
   [LEG_TYPE_MAP.FORWARD_UNANNUAL]: '远期 - 非年化',
+  [LEG_TYPE_MAP.SPREAD_EUROPEAN]: '价差欧式(a-b)',
+  [LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN]: '价差欧式(a/b)',
 };
 
 export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, LEG_TYPE_ZHCH_MAP);
@@ -815,6 +838,9 @@ export const PRODUCTTYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间累积',
   [LEG_TYPE_MAP.STRADDLE]: '跨式',
   [LEG_TYPE_MAP.DIGITAL]: '二元',
+  // 暂时去掉下面2个类型
+  // [LEG_TYPE_MAP.SPREAD_EUROPEAN]: '价差欧式(a-b)',
+  // [LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN]: '价差欧式(a/b)',
 };
 
 export const PRODUCTTYPE_MAP = {
@@ -840,6 +866,9 @@ export const PRODUCTTYPE_MAP = {
   // DIGITAL_AMERICAN: 'DIGITAL_AMERICAN',
   // DIGITAL_EUROPEAN: 'DIGITAL_EUROPEAN',
   DIGITAL: 'DIGITAL',
+  // 暂时去掉下面2个类型
+  // SPREAD_EUROPEAN: 'SPREAD_EUROPEAN',
+  // RATIO_SPREAD_EUROPEAN: 'RATIO_SPREAD_EUROPEAN',
 };
 
 export const PRODUCTTYPE_OPTIONS = convertOptions(PRODUCTTYPE_MAP, PRODUCTTYPE_ZHCH_MAP);
@@ -944,3 +973,11 @@ export const DATE_ARRAY = [
   LEG_FIELD.OBSERVE_START_DAY,
   LEG_FIELD.OBSERVE_END_DAY,
 ];
+
+export const DOC_MAP = {
+  SETTLE_NOTIFICATION: '结算通知书',
+  CLOSE_CONFIRMATION: '平仓确认书',
+  SUPPLEMENTARY_AGREEMENT: '交易确认书',
+  VALUATION_REPORT: '估值报告',
+  MARGIN_CALL: '追保函',
+};

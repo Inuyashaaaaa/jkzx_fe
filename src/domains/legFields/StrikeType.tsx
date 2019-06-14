@@ -5,7 +5,7 @@ import {
   RULES_REQUIRED,
   STRIKE_TYPES_MAP,
 } from '@/constants/common';
-import { Select } from '@/containers';
+import { Select, Form2 } from '@/containers';
 import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
@@ -52,6 +52,12 @@ export const StrikeType: ILegColDef = {
   title: '行权价类型',
   dataIndex: LEG_FIELD.STRIKE_TYPE,
   editable: record => {
+    if (
+      Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+      Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN
+    ) {
+      return false;
+    }
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
     if (isBooking || isPricing) {
@@ -59,6 +65,7 @@ export const StrikeType: ILegColDef = {
     }
     return false;
   },
+  defaultEditing: false,
   render: (val, record, idnex, { form, editing, colDef }) => {
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
@@ -69,7 +76,7 @@ export const StrikeType: ILegColDef = {
         })(
           <Select
             {...getSelectProps(record)}
-            defaultOpen={isBooking || isPricing}
+            defaultOpen={true}
             editing={isBooking || isPricing ? editing : false}
           />
         )}

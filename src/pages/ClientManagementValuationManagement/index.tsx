@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/containers';
+import { Form2, Select, SmartTable, Table2 } from '@/containers';
 import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
 import {
@@ -8,15 +8,14 @@ import {
   rptValuationReportSearch,
 } from '@/services/reference-data-service';
 import { emlSendValuationReport } from '@/services/report-service';
-import { Divider, message, Row, Table } from 'antd';
+import { Divider, message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import { VALUATION_COL_DEFS } from './constants';
+import { PAGE_SIZE } from '@/constants/component';
 
 class ClientManagementValuationManagement extends PureComponent {
-  public $sourceTable: Table2 = null;
-
   public $form: Form2 = null;
 
   public state = {
@@ -28,7 +27,7 @@ class ClientManagementValuationManagement extends PureComponent {
     selectedRowKeys: [],
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       total: 0,
     },
   };
@@ -270,8 +269,7 @@ class ClientManagementValuationManagement extends PureComponent {
           </ModalButton>
         </Row>
         <div style={{ marginTop: VERTICAL_GUTTER }}>
-          <Table
-            size="middle"
+          <SmartTable
             pagination={{
               position: 'bottom',
               showSizeChanger: true,
@@ -281,7 +279,6 @@ class ClientManagementValuationManagement extends PureComponent {
               pageSize: this.state.pagination.pageSize,
               total: this.state.pagination.total,
               onChange: this.onChange,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} 条`,
             }}
             rowKey={'uuid'}
             loading={this.state.loading}

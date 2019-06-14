@@ -1,5 +1,5 @@
 import { ALL_OPTIONS_VALUE, VERTICAL_GUTTER } from '@/constants/global';
-import { Cascader, Form2, Input, Select, Table2 } from '@/containers';
+import { Cascader, Form2, Input, Select, Table2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import {
   clientAccountDel,
@@ -73,20 +73,21 @@ const ClientManagementInfo = memo(() => {
     if (error) return;
     const newData = arr2treeOptions(
       data,
-      ['subsidiaryName', 'branchName', 'salesName'],
+      ['subsidiaryId', 'branchId', 'salesId'],
       ['subsidiaryName', 'branchName', 'salesName']
     );
+
     const branchSalesList = newData.map(subsidiary => {
       return {
-        value: subsidiary.value,
+        value: subsidiary.label,
         label: subsidiary.label,
         children: subsidiary.children.map(branch => {
           return {
-            value: branch.value,
+            value: branch.label,
             label: branch.label,
             children: branch.children.map(salesName => {
               return {
-                value: salesName.value,
+                value: salesName.label,
                 label: salesName.label,
               };
             }),
@@ -220,9 +221,8 @@ const ClientManagementInfo = memo(() => {
       />
       <Divider />
       <CreateModalButton salesCascaderList={salesCascaderList} fetchTableData={fetchTableData} />
-      <Table2
+      <SmartTable
         style={{ marginTop: VERTICAL_GUTTER }}
-        size="middle"
         pagination={{
           showQuickJumper: true,
           showSizeChanger: true,

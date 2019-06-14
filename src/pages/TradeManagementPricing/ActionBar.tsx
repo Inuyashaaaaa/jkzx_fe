@@ -63,6 +63,7 @@ const ActionBar = memo<any>(props => {
           <Col>
             <MultilLegCreateButton
               isPricing={true}
+              env={LEG_ENV.PRICING}
               key="create"
               handleAddLeg={(leg: ILeg) => {
                 if (!leg) return;
@@ -127,7 +128,6 @@ const ActionBar = memo<any>(props => {
           </Button>
           <Button
             key="历史试定价"
-            type="primary"
             onClick={() => {
               setVisible(true);
             }}
@@ -233,7 +233,7 @@ const ActionBar = memo<any>(props => {
       </Modal>
 
       <Drawer
-        width={1000}
+        width={1200}
         title="历史定价管理"
         placement={'right'}
         onClose={() => {

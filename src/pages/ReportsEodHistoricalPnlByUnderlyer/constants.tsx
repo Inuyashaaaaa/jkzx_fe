@@ -22,6 +22,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '期权费 (¥)',
@@ -30,6 +31,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '期权平仓金额 (¥)',
@@ -38,6 +40,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '期权结算金额 (¥)',
@@ -46,6 +49,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '期权持仓市值 (¥)',
@@ -54,6 +58,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '期权盈亏 (¥)',
@@ -62,6 +67,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '标的物买入金额 (¥)',
@@ -70,6 +76,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '标的物卖出金额 (¥)',
@@ -78,6 +85,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '标的物持仓 (手)',
@@ -86,6 +94,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '标的物价格 (¥)',
@@ -94,6 +103,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '标的物市值 (¥)',
@@ -102,6 +112,7 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
   {
     title: '标的物盈亏 (¥)',
@@ -109,5 +120,6 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => {
       return formatNumber(value, 4);
     },
+    align: 'right',
   },
 ];

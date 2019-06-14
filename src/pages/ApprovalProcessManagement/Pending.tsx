@@ -1,4 +1,4 @@
-import { Table2 } from '@/containers';
+import { Table2, SmartTable } from '@/containers';
 import { queryProcessToDoList } from '@/services/approval';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -42,9 +42,8 @@ class Pending extends PureComponent {
   public render() {
     return (
       <>
-        <Table2
+        <SmartTable
           rowKey="taskId"
-          size="middle"
           loading={this.state.loading}
           dataSource={this.state.dataSource}
           columns={PENDING_COL_DEFS(this.fetchTable)}

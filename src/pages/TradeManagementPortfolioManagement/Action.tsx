@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2 } from '@/containers';
+import { Form2, Select, Table2, SmartTable } from '@/containers';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import {
   trdPortfolioDelete,
@@ -13,6 +13,7 @@ import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import styles from './Action.less';
 import { BOOKING_TABLE_COLUMN_DEFS } from './constants';
+import { PAGE_SIZE } from '@/constants/component';
 
 class Action extends PureComponent<any, any> {
   public $table2: Table2 = null;
@@ -29,7 +30,7 @@ class Action extends PureComponent<any, any> {
       bookIdList: [],
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: PAGE_SIZE,
         total: 0,
       },
       pageSizeCurrent: 0,
@@ -76,7 +77,7 @@ class Action extends PureComponent<any, any> {
     });
     this.onTradeTableSearch({
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       portfolioNames: [this.state.portfolio.portfolioName],
     });
   };
@@ -125,7 +126,7 @@ class Action extends PureComponent<any, any> {
     message.success(`${count - errors.length}笔加入投资组成功`);
     this.onTradeTableSearch({
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       portfolioNames: [this.state.portfolio.portfolioName],
     });
     this.setState({
@@ -136,7 +137,7 @@ class Action extends PureComponent<any, any> {
   public search = () => {
     this.onTradeTableSearch({
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       portfolioNames: [this.state.portfolio.portfolioName],
     });
   };
@@ -148,7 +149,7 @@ class Action extends PureComponent<any, any> {
         bookIdList: [],
       },
       () => {
-        this.onTradeTableSearch({ current: 1, pageSize: 10 });
+        this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
       }
     );
   };
@@ -174,7 +175,7 @@ class Action extends PureComponent<any, any> {
     this.setState({ loading: true });
     const { error, data } = await trdTradeSearchIndexPaged({
       page: (paramsPagination || pagination).current - 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       portfolioNames: paramsPagination ? paramsPagination.portfolioNames : null,
     });
     this.setState({ loading: false });
@@ -257,6 +258,10 @@ class Action extends PureComponent<any, any> {
   };
 
   public onPaginationChange = (current, pageSize) => {
+    this.onPagination(current, pageSize);
+  };
+
+  public handleShowSizeChange = (current, pageSize) => {
     this.onPagination(current, pageSize);
   };
 
@@ -358,15 +363,16 @@ class Action extends PureComponent<any, any> {
             ]}
           />
           <div style={{ marginTop: VERTICAL_GUTTER }}>
-            <Table
-              size="middle"
+            <SmartTable
               pagination={{
                 position: 'bottom',
                 showQuickJumper: true,
                 current: this.state.pagination.current,
-                pageSize: this.state.pageSizeCurrent,
+                // pageSize: this.state.pageSizeCurrent,
+                pageSize: this.state.pagination.pageSize,
                 onChange: this.onPaginationChange,
                 total: this.state.pagination.total,
+                onShowSizeChange: this.handleShowSizeChange,
               }}
               rowKey={'positionId'}
               scroll={{ x: 2300 }}

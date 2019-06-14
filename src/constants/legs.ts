@@ -37,6 +37,9 @@ import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { Forward } from '@/domains/legs/Forward';
+import { SpreadEuropean } from '@/domains/legs/SpreadEuropean';
+import { RatioSpreadEuropean } from '@/domains/legs/RatioSpreadEuropean';
+import { Cega } from '@/domains/legFields/computed/Cega';
 
 export const TOTAL_LEGS = [
   VanillaAmerican,
@@ -60,11 +63,14 @@ export const TOTAL_LEGS = [
   Asia,
   Straddle,
   Forward,
+  // 2019年06月11日 暂时移除
+  // SpreadEuropean,
+  // RatioSpreadEuropean,
 ];
 
 export const TOTAL_TRADESCOL_FIELDS = [UnderlyerPrice, Vol, R, Q];
 
-export const TOTAL_COMPUTED_FIELDS = [
+export const GENERAL_COMPUTED_FIELDS = [
   Delta,
   DeltaCash,
   Gamma,
@@ -76,6 +82,8 @@ export const TOTAL_COMPUTED_FIELDS = [
   Theta,
   Vega,
 ];
+
+export const TOTAL_COMPUTED_FIELDS = [...GENERAL_COMPUTED_FIELDS, Cega];
 
 export const TOTAL_EDITING_FIELDS = [
   PositionId,

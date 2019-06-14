@@ -1,28 +1,25 @@
-import SourceTable from '@/containers/SourceTable';
-import { delay, mockData } from '@/tools';
+import { PAGE_SIZE } from '@/constants/component';
+import { Form2, Select, SmartTable } from '@/containers';
+import SmartForm from '@/containers/SmartForm';
 import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
+import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { positionDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
+import { DatePicker, Divider, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { SEARCH_FORM_CONTROLS_SETTLE, SETTLE_COLUMN_DEFS, columns } from './constants';
-import { Divider, Row, Table, DatePicker } from 'antd';
-import { Form2, Select } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
 import SettlementModal from './SettlementModal';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
 
 const { RangePicker } = DatePicker;
 class SettlementAdvice extends PureComponent {
-  public $sourceTable: SourceTable = null;
-
   public state = {
     loading: false,
     dataSource: [],
     searchFormData: {},
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
       showSizeChanger: true,
       showQuickJumper: true,
       onChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
@@ -123,7 +120,7 @@ class SettlementAdvice extends PureComponent {
         searchFormData,
       },
       () => {
-        this.onFetch({ current: 1, pageSize: 10 });
+        this.onFetch({ current: 1, pageSize: PAGE_SIZE });
       }
     );
   };
@@ -168,7 +165,7 @@ class SettlementAdvice extends PureComponent {
   };
 
   public onSearch = () => {
-    this.onFetch({ current: 1, pageSize: 10 });
+    this.onFetch({ current: 1, pageSize: PAGE_SIZE });
   };
 
   public render() {
@@ -176,8 +173,8 @@ class SettlementAdvice extends PureComponent {
 
     return (
       <>
-        <Form2
-          ref={node => (this.$sourceTable = node)}
+        <SmartForm
+          spread={3}
           layout="inline"
           dataSource={searchFormData}
           submitText={`搜索`}
@@ -356,7 +353,7 @@ class SettlementAdvice extends PureComponent {
           ]}
         />
         <Divider type="horizontal" />
-        <Table
+        <SmartTable
           dataSource={this.state.dataSource}
           columns={[
             {
@@ -401,29 +398,6 @@ class SettlementAdvice extends PureComponent {
           pagination={this.state.pagination}
           loading={this.state.loading}
         />
-        {/* <SourceTable
-          rowKey="uuid"
-          ref={node => (this.$sourceTable = node)}
-          columnDefs={SETTLE_COLUMN_DEFS(this.onFetch)}
-          searchFormControls={SEARCH_FORM_CONTROLS_SETTLE(
-            this.state.bookIdList,
-            this.state.positionIdList
-          )}
-          searchable={true}
-          resetable={true}
-          loading={this.state.loading}
-          onSearchButtonClick={this.onSearch}
-          onResetButtonClick={this.onReset}
-          dataSource={this.state.dataSource}
-          searchFormData={this.state.searchFormData}
-          onSearchFormChange={this.onSearchFormChange}
-          paginationProps={{
-            backend: true,
-          }}
-          pagination={this.state.pagination}
-          onPaginationChange={this.onTablePaginationChange}
-          onPaginationShowSizeChange={this.onTablePaginationChange}
-        /> */}
       </>
     );
   }

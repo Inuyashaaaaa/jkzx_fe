@@ -1,6 +1,6 @@
 // import Table from '@/containers/_Table2';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import SourceTable from '@/containers/SourceTable';
+import { SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import {
   addVolSpecialDates,
@@ -10,24 +10,10 @@ import {
   setVolWeekendWeight,
   updateVolSpecialDates,
 } from '@/services/volatility';
-import {
-  Button,
-  Calendar,
-  Col,
-  Input,
-  message,
-  Modal,
-  notification,
-  Row,
-  Table,
-  Divider,
-} from 'antd';
+import { Button, Calendar, Col, Divider, Input, message, Modal, notification, Row } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { PAGE_TABLE_COL_DEFS } from './constants';
-import { Form2, Select } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
 import Operation from './Operation';
 
 class VolatilityCalendar extends PureComponent {
@@ -321,7 +307,7 @@ class VolatilityCalendar extends PureComponent {
               >
                 新增特殊日期
               </Button>
-              <Table
+              <SmartTable
                 dataSource={dates}
                 columns={[
                   {
@@ -355,24 +341,7 @@ class VolatilityCalendar extends PureComponent {
                 }}
                 loading={loading}
                 rowKey="uuid"
-                size="middle"
               />
-              {/* <SourceTable
-                loading={loading}
-                rowKey="uuid"
-                dataSource={dates}
-                columnDefs={PAGE_TABLE_COL_DEFS(this.fetchData, this.showModal)}
-                header={
-                  <Button
-                    style={{ marginTop: VERTICAL_GUTTER, marginBottom: VERTICAL_GUTTER }}
-                    key="edit"
-                    type="primary"
-                    onClick={() => this.showModal('create')}
-                  >
-                    新增特殊日期
-                  </Button>
-                }
-              /> */}
             </div>
           </Col>
         </Row>

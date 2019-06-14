@@ -48,7 +48,7 @@ export interface IColDef<T> {
   ) => React.ReactNode;
 }
 
-export interface IRenderOptions<C = any> {
+export interface IRenderOptions<C = any, A = any> {
   form?: Omit<WrappedFormUtils, 'getFieldDecorator'> & {
     getFieldDecorator<T extends object>(
       id: keyof T,
@@ -60,6 +60,9 @@ export interface IRenderOptions<C = any> {
   };
   editing?: boolean;
   colDef?: C;
+  api?: ITableApi;
+  cellApi?: A;
+  context?: ITableContext;
 }
 
 export interface IFormColDef<T = any> extends IColDef<T> {
@@ -72,7 +75,7 @@ export interface IFormColDef<T = any> extends IColDef<T> {
     value: any,
     record: T,
     index: number,
-    params: IRenderOptions<IFormColDef<T>>
+    params: IRenderOptions<IFormColDef<T>, FormSwitchCell>
   ) => React.ReactNode;
 }
 
@@ -119,7 +122,7 @@ export interface ITableColDef<T = any>
     value: any,
     record: T,
     index: number,
-    params: IRenderOptions<ITableColDef<T>>
+    params: IRenderOptions<ITableColDef<T>, TableSwitchCell>
   ) => React.ReactNode;
 }
 
@@ -231,6 +234,7 @@ export type ITableContext = any;
 export interface ITableApi {
   tableManager: TableManager;
   eventBus: any;
+  tableApi: Table2;
 }
 
 export interface IFormBaseProps<T = IFormData> extends FormProps {

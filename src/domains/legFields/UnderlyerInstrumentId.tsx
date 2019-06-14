@@ -1,15 +1,50 @@
-import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
+import { InputBase } from '@/components/type';
+import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { Input, Select } from '@/containers';
-import {
-  mktInstrumentSearch,
-  mktInstrumentWhitelistListPaged,
-  mktInstrumentWhitelistSearch,
-} from '@/services/market-data-service';
-import { legEnvIsBooking, legEnvIsPricing, getRequiredRule } from '@/tools';
+import { Import2 } from '@/containers/InstrumentModalInput';
+import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
+import { getRequiredRule, legEnvIsBooking, legEnvIsPricing } from '@/tools';
 import { ILegColDef } from '@/types/leg';
+import { Tag, Icon } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
-import { truncate } from 'fs';
+
+class InstrumentModalInput extends InputBase {
+  public renderEditing() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        <div style={{ position: 'relative' }}>
+          {value.map((item, index) => {
+            return <Tag key="index">{item.underlyerInstrumentId}</Tag>;
+          })}
+          <Icon
+            type="alert"
+            theme="twoTone"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: 0,
+              transform: 'translateY(-50%)',
+            }}
+          />
+        </div>
+        <Import2 value={value} onChange={onChange} onValueChange={onValueChange} />
+      </>
+    );
+  }
+
+  public renderRendering() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        {value.map((item, index) => {
+          return <Tag key="index">{item.underlyerInstrumentId}</Tag>;
+        })}
+      </>
+    );
+  }
+}
 
 export const UnderlyerInstrumentId: ILegColDef = {
   title: '标的物',
@@ -31,7 +66,10 @@ export const UnderlyerInstrumentId: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          editing ? (
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+            record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN ? (
+            <InstrumentModalInput editing={editing} />
+          ) : editing ? (
             <Select
               defaultOpen={isBooking || isPricing}
               {...{
@@ -46,6 +84,7 @@ export const UnderlyerInstrumentId: ILegColDef = {
                   // });
                   const { data, error } = await mktInstrumentWhitelistSearch({
                     instrumentIdPart: value,
+                    excludeOption: true,
                   });
                   if (error) return [];
                   return data.slice(0, 50).map(item => ({

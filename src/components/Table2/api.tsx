@@ -15,18 +15,26 @@ class TableManager {
   } = {};
 
   public registeRow(rowId: string, rowNode: EditableRow) {
-    if (this.rowNodes.findIndex(item => item.id === rowId) === -1) {
-      this.rowNodes.push({
-        node: rowNode,
-        id: rowId,
-      });
-    } else {
+    if (!this.rowNodes) {
       this.rowNodes = [
         {
           node: rowNode,
           id: rowId,
         },
       ];
+    } else {
+      const index = this.rowNodes.findIndex(item => item.id === rowId);
+      if (index === -1) {
+        this.rowNodes.push({
+          node: rowNode,
+          id: rowId,
+        });
+      } else {
+        this.rowNodes.splice(index, 1, {
+          node: rowNode,
+          id: rowId,
+        });
+      }
     }
   }
 
@@ -39,8 +47,14 @@ class TableManager {
 
   public registeCell(rowId: string, colId: string, cellNode: SwitchCell) {
     if (this.cellNodes[rowId]) {
-      if (this.cellNodes[rowId].findIndex(item => item.id === colId) === -1) {
+      const index = this.cellNodes[rowId].findIndex(item => item.id === colId);
+      if (index === -1) {
         this.cellNodes[rowId].push({
+          node: cellNode,
+          id: colId,
+        });
+      } else {
+        this.cellNodes[rowId].splice(index, 1, {
           node: cellNode,
           id: colId,
         });

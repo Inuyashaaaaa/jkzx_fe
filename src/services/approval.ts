@@ -247,3 +247,13 @@ export async function wkTaskComplete(params = {}) {
     },
   });
 }
+
+export async function wkValidProcessCanStart(params = {}) {
+  return request(`${HOST_TEST}workflow-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'wkValidProcessCanStart',
+      params,
+    },
+  });
+}

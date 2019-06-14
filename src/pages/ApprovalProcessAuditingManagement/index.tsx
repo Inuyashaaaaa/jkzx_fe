@@ -11,6 +11,8 @@ import React, { PureComponent } from 'react';
 import AuditGourpLists from './AuditGourpLists';
 import styles from './AuditGourpLists.less';
 import DrawerContarner from './DrawerContarner';
+import { SmartTable } from '@/containers';
+
 class SystemSettingsRoleManagement extends PureComponent {
   public $drawer: DrawerContarner = null;
 
@@ -275,7 +277,7 @@ class SystemSettingsRoleManagement extends PureComponent {
                 ) : null}
               </Row>
               {this.state.userList ? (
-                <Table
+                <SmartTable
                   className={styles.menberTable}
                   columns={this.state.columns}
                   dataSource={userList}

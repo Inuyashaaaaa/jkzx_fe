@@ -8,6 +8,7 @@ import {
   UPLOAD_URL,
   wkAttachmentProcessInstanceModify,
   wkProcessGet,
+  wkValidProcessCanStart,
   wkProcessInstanceCreate,
 } from '@/services/approval';
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
@@ -35,10 +36,12 @@ const ActionBar = memo<any>(props => {
     setCreateFormData({});
   };
 
-  const transactionHandleOk = () => {
+  const transactionHandleOk = async () => {
     setTransactionModalVisible(false);
-    handelTrdTradeCreate();
-    router.push('/approval-process/process-manangement');
+    const error = await handelTrdTradeCreate();
+    if (!error) {
+      router.push('/approval-process/process-manangement');
+    }
   };
 
   const transactionHandleCancel = () => {
@@ -68,7 +71,7 @@ const ActionBar = memo<any>(props => {
       },
     });
 
-    if (_error) return;
+    if (_error) return true;
     if (_data.processInstanceId) {
       message.success('已进入流程');
     } else {
@@ -85,7 +88,7 @@ const ActionBar = memo<any>(props => {
         attachmentId,
         processInstanceId: _data.processInstanceId,
       });
-      if (aerror) return;
+      if (aerror) return true;
     }
   };
 
@@ -104,6 +107,7 @@ const ActionBar = memo<any>(props => {
         <Button.Group>
           <MultilLegCreateButton
             isPricing={false}
+            env={LEG_ENV.BOOKING}
             key="create"
             handleAddLeg={(leg: ILeg) => {
               if (!leg) return;
@@ -137,11 +141,27 @@ const ActionBar = memo<any>(props => {
               onOk: async () => {
                 const res = await currentCreateFormRef.validate();
                 if (res.error) return;
-                const { error: _error, data: _data } = await wkProcessGet({
+                const _createFormData = Form2.getFieldsValue(createFormData);
+                Object.keys(_createFormData).forEach(item => {
+                  if (!_.endsWith(item, 'Date')) {
+                    _createFormData[item] = _.trim(_createFormData[item]);
+                  }
+                });
+                const trade = convertTradePageData2ApiData(
+                  tableData.map(item => Form2.getFieldsValue(item)),
+                  _createFormData,
+                  currentUser.username,
+                  LEG_ENV.BOOKING
+                );
+                const { error: _error, data: _data } = await wkValidProcessCanStart({
                   processName: '交易录入',
+                  data: {
+                    trade,
+                  },
                 });
                 if (_error) return;
-                if (_data.status) {
+                // 是否可以发起审批
+                if (_data === true) {
                   return setTransactionModalVisible(true);
                 }
 

@@ -1,4 +1,3 @@
-import SourceTable from '@/containers/_SourceTable';
 import {
   completeTaskProcess,
   queryProcessForm,
@@ -10,7 +9,7 @@ import {
   downloadTradeAttachment,
 } from '@/services/approval';
 import moment from 'moment';
-import { Form2, Upload } from '@/containers';
+import { Form2, Upload, SmartTable } from '@/containers';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import {
   Button,
@@ -37,8 +36,6 @@ import styles from '../index.less';
 const { TextArea } = Input;
 const { Title } = Typography;
 class ApprovalForm extends PureComponent<any, any> {
-  public $sourceTable: SourceTable = null;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -469,7 +466,6 @@ class ApprovalForm extends PureComponent<any, any> {
         {!loading && (
           <div>
             <Form2
-              ref={node => (this.$sourceTable = node)}
               layout="horizontal"
               dataSource={_data}
               resetable={false}
@@ -636,7 +632,7 @@ class ApprovalForm extends PureComponent<any, any> {
               流程记录
             </Title>
             <div style={{ marginTop: 20 }}>
-              <Table
+              <SmartTable
                 columns={processColumns}
                 dataSource={histories}
                 size="small"

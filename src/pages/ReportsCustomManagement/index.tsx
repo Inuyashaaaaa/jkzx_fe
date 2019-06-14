@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, Table2 } from '@/containers';
+import { Form2, Select, Table2, SmartTable } from '@/containers';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { Pagination, Divider, Row, Table, DatePicker } from 'antd';
@@ -9,10 +9,11 @@ import { rptCustomReportNameList, rptCustomReportSearchPaged } from '@/services/
 import { TABLE_COL_DEFS, REPORT_TYPE } from './constants';
 import _ from 'lodash';
 import { async } from 'q';
+import { PAGE_SIZE } from '@/constants/component';
 const { RangePicker } = DatePicker;
 
 const ReportsCustomManagement = memo<any>(props => {
-  let formSearch = useRef<Form2>(null);
+  const formSearch = useRef<Form2>(null);
   const [searchFormData, setSearchFormData] = useState({
     ...Form2.createFields({
       reportName: '',
@@ -22,19 +23,14 @@ const ReportsCustomManagement = memo<any>(props => {
   });
   const [pagination, setPagination] = useState({
     page: 1,
-    pageSize: 20,
-    total: 1,
+    pageSize: PAGE_SIZE,
+    total: null,
   });
-  // const pagination = {
-  //   page: 1,
-  //   pageSize: 20,
-  //   total: 1,
-  // };
   const [tabelData, setTabelData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const OnSearch = async (searchData, currentPage) => {
-    // const { error: verror } = await formSearch.validate();
+    // const { error: verror } = await formSearch.current.validate();
     // if (verror) return;
     searchData = Form2.getFieldsValue(searchData);
     const formValues = {
@@ -79,7 +75,7 @@ const ReportsCustomManagement = memo<any>(props => {
     <>
       <Page title="自定义报告管理">
         <Form2
-          ref={node => (formSearch = node)}
+          ref={node => (formSearch.current = node)}
           onResetButtonClick={() => {
             const _search = Form2.createFields({
               reportName: '',
@@ -169,28 +165,19 @@ const ReportsCustomManagement = memo<any>(props => {
           ]}
         />
         <Divider type="horizontal" />
-        <Table
-          size="middle"
+        <SmartTable
           rowKey="uuid"
           dataSource={tabelData}
           columns={TABLE_COL_DEFS()}
-          pagination={false}
           loading={loading}
+          pagination={{
+            onShowSizeChange: handleShowSizeChange,
+            current: pagination.page,
+            pageSize: pagination.pageSize,
+            onChange: handlePaninationChange,
+            total: pagination.total,
+          }}
         />
-        <Row type="flex" justify="end" style={{ marginTop: 15 }}>
-          <Pagination
-            {...{
-              size: 'small',
-              showSizeChanger: true,
-              onShowSizeChange: handleShowSizeChange,
-              showQuickJumper: true,
-              current: pagination.page,
-              pageSize: pagination.pageSize,
-              onChange: handlePaninationChange,
-              total: pagination.total,
-            }}
-          />
-        </Row>
       </Page>
     </>
   );

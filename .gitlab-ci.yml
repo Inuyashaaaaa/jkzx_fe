@@ -29,6 +29,7 @@ Install:
     - /develop.*/
     - /release.*/
     - /hotfix.*/
+    - /doc.*/
 
 Lint:
   stage: test
@@ -93,7 +94,6 @@ Deploy-Doc:
   stage: deploy
   script:
     - yarn run deploy:doc
-  when: manual
   only:
     - /master.*/
     - /develop.*/

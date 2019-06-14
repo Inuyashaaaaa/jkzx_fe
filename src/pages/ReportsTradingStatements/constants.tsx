@@ -1,5 +1,5 @@
 import { ASSET_TYPE_ZHCN_MAP, DIRECTION_ZHCN_MAP } from '@/constants/common';
-import { formatNumber } from '@/tools';
+import { formatNumber, formatMoney } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -53,32 +53,36 @@ export const TABLE_COL_DEFS = [
     title: '名义金额 (¥)',
     dataIndex: 'nominalPrice',
     width: 130,
+    align: 'right',
     render: (value, record, index) => {
-      return formatNumber(value, 4);
+      return formatMoney(value);
     },
   },
   {
     title: '期权费 (¥)',
     dataIndex: 'beginPremium',
     width: 130,
+    align: 'right',
     render: (value, record, index) => {
-      return formatNumber(value, 4);
+      return formatMoney(value);
     },
   },
   {
     title: '市值 (¥)',
     dataIndex: 'endPremium',
     width: 130,
+    align: 'right',
     render: (value, record, index) => {
-      return formatNumber(value, 4);
+      return formatMoney(value);
     },
   },
   {
     title: '总盈亏 (¥)',
     dataIndex: 'totalPremium',
     width: 130,
+    align: 'right',
     render: (value, record, index) => {
-      return formatNumber(value, 4);
+      return formatMoney(value);
     },
   },
   {

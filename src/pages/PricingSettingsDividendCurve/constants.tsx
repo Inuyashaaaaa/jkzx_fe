@@ -42,6 +42,7 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
   },
   {
     title: '利率(%)',
+    align: 'right',
     dataIndex: 'quote',
     editable: record => {
       return true;
@@ -109,7 +110,17 @@ export const INSERT_FORM_CONTROLS: (tableDataSource) => IFormColDef[] = tableDat
     title: '利率(%)',
     dataIndex: 'quote',
     render: (val, record, index, { form }) => {
-      return <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>;
+      return (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+              },
+            ],
+          })(<Input />)}
+        </FormItem>
+      );
     },
   },
 ];

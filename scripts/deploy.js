@@ -6,11 +6,10 @@ const fs = require('fs');
 const TEST_CONTAINER = 'FE-test';
 const PROD_CONTAINER = 'FE-prod';
 const RELEASE_CONTAINER = 'FE-release';
-// const FEATURE_CONTAINER = 'FE-feature';
-const DOC_CONTAINER = 'FE-doc';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
-const FINISH = '前端模块更新完毕';
 const BUNDLE_NAME = 'dist';
+const DOC_BUNDLE_NAME = 'docs';
+const BRANCH_NAME_LATEST = 'latest';
 
 const exists = src => {
   return fs.existsSync(src);
@@ -32,22 +31,37 @@ function cp(from, to) {
   }
 }
 
-function upload(remoteUsername, remoteIp, remoteFolder) {
-  const paths = path.join(remoteFolder, BUNDLE_NAME);
+function upload(config = {}) {
+  const {
+    bundleName = BUNDLE_NAME,
+    remoteBundleName = bundleName,
+    branchName = process.env.CI_BUILD_REF_NAME,
+    notifaction = true,
+  } = config;
+  const remoteUsername = 'root';
+  const remoteIp = '10.1.5.28';
+  const remoteFolder = `/home/share/bct_product/frontend/${branchName}/`;
+  const remotePaths = path.join(remoteFolder, remoteBundleName);
   console.log(
-    `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${BUNDLE_NAME}`
+    `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${bundleName}`
   );
   try {
     shell.exec(
-      `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${paths}`
+      `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${remotePaths}`
     );
     // https://stackoverflow.com/questions/3663895/ssh-the-authenticity-of-host-hostname-cant-be-established
     shell.exec(
-      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${BUNDLE_NAME} ${remoteUsername}@${remoteIp}:${remoteFolder}`
+      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
     );
-    shell.exec(`./scripts/ci/greet.sh ${remoteIp} ${FINISH} ${process.env.CI_COMMIT_SHA}`);
+    if (notifaction) {
+      shell.exec(
+        `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remotePaths} ${`前端打包上传完毕`} ${
+          process.env.CI_COMMIT_SHA
+        }`
+      );
+    }
   } catch (error) {
-    console.log(`上传失败: scp -r ${paths} ${remoteUsername}@${remoteIp}:${remoteFolder}`);
+    console.log(`上传失败: scp -r ${remotePaths} ${remoteUsername}@${remoteIp}:${remoteFolder}`);
   }
 }
 
@@ -65,43 +79,52 @@ function bundle(prodContainerPath, distpath, filename = new Date().toISOString()
 
 function prod() {
   const prodContainerPath = path.join(USER_PATH, PROD_CONTAINER);
-
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
-  upload('tongyu', '10.1.5.24', '/home/tongyu/');
+  upload();
 }
 
 function test() {
   const prodContainerPath = path.join(USER_PATH, TEST_CONTAINER);
-
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
-  upload('tongyu', '10.1.5.16', '/home/tongyu/');
+  upload();
 }
 
 function release() {
   const prodContainerPath = path.join(USER_PATH, RELEASE_CONTAINER);
-
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
-  upload('tongyu', '10.1.5.23', '/home/tongyu/');
+  upload();
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
+  });
 }
 
 function hotfix() {
-  upload('tongyu', '10.1.5.27', '/home/tongyu/');
+  upload();
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
+  });
+}
+
+function feature() {
+  upload();
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
+  });
 }
 
 function doc() {
-  const prodContainerPath = path.join(USER_PATH, DOC_CONTAINER);
-
-  bundle(prodContainerPath, '../docs/*');
+  upload({
+    bundleName: DOC_BUNDLE_NAME,
+  });
 }
 
 console.log('deploy start!');
-
 // 读取环境变量，区分测试和生产环境
 const denv = process.env.DEPLOY_DIST;
 console.log(`发布环境：${denv}`);
@@ -120,6 +143,10 @@ if (denv === 'release') {
 
 if (denv === 'test') {
   test();
+}
+
+if (denv === 'feature') {
+  feature();
 }
 
 if (denv === 'doc') {

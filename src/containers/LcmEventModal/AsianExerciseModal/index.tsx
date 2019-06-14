@@ -85,7 +85,7 @@ class AsianExerciseModal extends PureComponent<
         this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.LOT
           ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
           : this.getDefaultOptionsNumber(),
-      [SUBJECT_MATTER_AVG]: countAvg(convertObservetions(this.data)),
+      [SUBJECT_MATTER_AVG]: countAvg(convertObservetions(this.data), this.data),
       [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.STRIKE],
     };
   };

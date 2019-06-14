@@ -82,8 +82,17 @@ export const COMPUTED_LEG_FIELD_MAP = {
   VEGA: 'VEGA',
   THETA: 'THETA',
   RHO_R: 'RHO_R',
+  CEGA: 'CEGA',
 };
 
 export const COMPUTED_LEG_FIELDS = _.map(COMPUTED_LEG_FIELD_MAP, val => val);
 
 export const TOTAL_FIELD = 'TOTAL_FIELD';
+
+export const NUM_OF_OPTIONS = 'NUM_OF_OPTIONS';
+
+export const NOTIONAL_AMOUNT = 'NOTIONAL_AMOUNT';
+
+export const UNDERLYER_PRICE = 'UNDERLYER_PRICE';
+
+export const SETTLE_AMOUNT = 'SETTLE_AMOUNT';

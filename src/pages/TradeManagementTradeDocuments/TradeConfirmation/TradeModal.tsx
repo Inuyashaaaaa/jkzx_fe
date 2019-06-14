@@ -1,9 +1,9 @@
 import Form from '@/containers/Form';
-import ModalButton from '@/containers/ModalButton';
 import { DOWN_LOAD_TRADE_URL, emlSendSupplementaryAgreementReport } from '@/services/document';
 import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 
 class TradeModal extends PureComponent {
   public $form: Form = null;
@@ -16,6 +16,7 @@ class TradeModal extends PureComponent {
         '自期初观察日(含)至期末观察日(含)期间，交易所对标的资产、构成标的资产的任一股票或股票指数有价格涨跌幅限制的，若其连续[3]个交易日收盘价格达到交易所规定的当日涨跌幅限制时，甲方有权提前终止期权交易。',
     },
     visible: false,
+    loading: false,
   };
 
   public handleChange = params => {
@@ -38,13 +39,15 @@ class TradeModal extends PureComponent {
   };
 
   public onConfirm = async () => {
+    this.setState({ loading: true });
     const { error } = await emlSendSupplementaryAgreementReport({
       tos: this.props.data.tradeEmail,
       tradeId: this.props.data.tradeId,
-      description7: this.state.modalData.marketDisruption,
-      description8: this.state.modalData.tradeOption,
+      marketInterruptionMessage: this.state.modalData.marketDisruption,
+      earlyTerminationMessage: this.state.modalData.tradeOption,
       partyName: this.props.data.partyName,
     });
+    this.setState({ loading: false });
     if (error) {
       message.error('发送失败');
       return;
@@ -54,7 +57,10 @@ class TradeModal extends PureComponent {
   };
 
   public render() {
-    const { data } = this.props;
+    const {
+      data,
+      currentUser: { username },
+    } = this.props;
     return (
       <>
         <a onClick={this.onClick}>生成交易确认书</a>
@@ -62,13 +68,13 @@ class TradeModal extends PureComponent {
           title="生成交易确认书"
           visible={this.state.visible}
           footer={false}
-          width={700}
+          width={1200}
           onCancel={this.onCancel}
         >
           <>
             <Alert
               style={{ marginBottom: 40 }}
-              message="交易确认书使用最新模板和下方输入的内容即时生成，系统不会留存每次生成的文档。"
+              message="交易确认书基于最新的模板即时生成，系统不会留存每次生成的结果。"
               description="请在下载或发送前，确认以下自定义内容。"
               type="info"
               showIcon={true}
@@ -119,9 +125,11 @@ class TradeModal extends PureComponent {
                 <Button type="default">
                   <a
                     href={encodeURI(
-                      `${DOWN_LOAD_TRADE_URL}tradeId=${this.props.data.tradeId}&description7=${
+                      `${DOWN_LOAD_TRADE_URL}tradeId=${
+                        this.props.data.tradeId
+                      }&marketInterruptionMessage=${
                         this.state.modalData.marketDisruption
-                      }&description8=${this.state.modalData.tradeOption}&partyName=${
+                      }&earlyTerminationMessage=${this.state.modalData.tradeOption}&partyName=${
                         this.props.data.partyName
                       }`
                     )}
@@ -132,7 +140,7 @@ class TradeModal extends PureComponent {
                 </Button>
               </Col>
               <Col>
-                <Button type="primary" onClick={this.onConfirm}>
+                <Button type="primary" onClick={this.onConfirm} loading={this.state.loading}>
                   发送至客户邮箱
                 </Button>
               </Col>
@@ -140,12 +148,12 @@ class TradeModal extends PureComponent {
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <p style={{ lineHeight: '40px' }}>
                 {data.docProcessStatus === 'UN_PROCESSED'
-                  ? `${data.partyName}未处理过交易确认书`
+                  ? `${username} 未处理过交易确认书`
                   : data.docProcessStatus === 'DOWNLOADED'
-                  ? `${data.partyName} 于 ${moment(data.updateAt).format(
+                  ? `${username} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm'
                     )}下载过交易确认书`
-                  : `${data.partyName} 于 ${moment(data.updateAt).format(
+                  : `${username} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm'
                     )}发送过交易确认书`}
               </p>
@@ -157,4 +165,6 @@ class TradeModal extends PureComponent {
   }
 }
 
-export default TradeModal;
+export default connect(({ user }) => ({
+  currentUser: user.currentUser,
+}))(TradeModal);

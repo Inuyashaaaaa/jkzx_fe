@@ -1,7 +1,8 @@
-import ImportExcelButton from '@/containers/_ImportExcelButton';
-import SourceTable, { SourceTableState } from '@/containers/_SourceTable';
+import { Form2, Input, InputNumber, Select, SmartTable } from '@/containers';
 // import Table from '@/containers/_Table2';
 import Page from '@/containers/Page';
+import TabHeader from '@/containers/TabHeader';
+import ImportExcelButton from '@/containers/_ImportExcelButton';
 import {
   mktAllInstrumentWhitelistSave,
   mktInstrumentWhitelistDelete,
@@ -10,20 +11,17 @@ import {
   mktInstrumentWhitelistSearch,
 } from '@/services/market-data-service';
 import { tradeReferenceGet } from '@/services/trade-service';
-import { message, Modal, Table, Divider, Row, Button, Popconfirm } from 'antd';
+import { formatMoney } from '@/tools';
+import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS, SEARCH_FORM_CONTROLS } from './constants';
-import { Form2, Select, InputNumber, Input } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
-import { formatMoney } from '@/tools';
-import TabHeader from '@/containers/TabHeader';
+import { PAGE_TABLE_COL_DEFS } from './constants';
+import { PAGE_SIZE } from '@/constants/component';
 
 class SystemSettingsRiskSettings extends PureComponent {
   public $createFrom: Form2 = null;
   public initialFetchTableData = null;
-
-  public $soureTable: SourceTable = null;
 
   public state = {
     formData: {},
@@ -41,7 +39,7 @@ class SystemSettingsRiskSettings extends PureComponent {
     venueCodes: [],
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     },
     createVisible: false,
     createFormData: {},
@@ -170,7 +168,11 @@ class SystemSettingsRiskSettings extends PureComponent {
         visible: false,
       },
       () => {
-        this.handleExcelFile(this.state.excelData);
+        this.handleExcelFile(
+          this.state.excelData.map(item => {
+            return Form2.getFieldsValue(item);
+          })
+        );
       }
     );
   };
@@ -234,6 +236,17 @@ class SystemSettingsRiskSettings extends PureComponent {
     });
   };
 
+  public handleCellValueChanged = params => {
+    this.setState({
+      excelData: this.state.excelData.map(item => {
+        if (item.uuid === params.record.uuid) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
+  };
+
   public render() {
     return (
       <Page
@@ -254,7 +267,7 @@ class SystemSettingsRiskSettings extends PureComponent {
               submitButtonProps={{
                 icon: 'search',
               }}
-              onSubmitButtonClick={this.fetchTable}
+              onSubmitButtonClick={() => this.fetchTable({ current: 1 })}
               onResetButtonClick={this.onReset}
               onFieldsChange={this.onSearchFormChange}
               columns={[
@@ -313,9 +326,12 @@ class SystemSettingsRiskSettings extends PureComponent {
                     visible: true,
                     excelData: _data.slice(1).map(item => {
                       return {
-                        venueCode: item[0],
-                        instrumentId: item[1],
-                        notionalLimit: item[2] ? item[2] : 100000000,
+                        ...Form2.createFields({
+                          venueCode: item[0],
+                          instrumentId: item[1],
+                          notionalLimit: item[2] ? item[2] : 100000000,
+                        }),
+                        uuid: uuidv4(),
                       };
                     }),
                   });
@@ -324,7 +340,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                 导入Excel
               </ImportExcelButton>
             </Row>
-            <Table
+            <SmartTable
               dataSource={this.state.tableDataSource}
               columns={[
                 {
@@ -336,6 +352,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                   dataIndex: 'instrumentId',
                 },
                 {
+                  align: 'right',
                   title: '存续期名义金额上限（￥）',
                   dataIndex: 'notionalLimit',
                   render: (text, record, index) => {
@@ -362,7 +379,6 @@ class SystemSettingsRiskSettings extends PureComponent {
               }}
               loading={this.state.loading}
               rowKey="uuid"
-              size="middle"
               scroll={
                 this.state.tableDataSource && this.state.tableDataSource.length > 0
                   ? { x: '1000px' }
@@ -378,11 +394,11 @@ class SystemSettingsRiskSettings extends PureComponent {
           onCancel={this.handleCancel}
           width={800}
         >
-          <SourceTable
-            rowKey="instrumentId"
-            tableColumnDefs={PAGE_TABLE_COL_DEFS}
+          <SmartTable
+            rowKey="uuid"
+            columns={PAGE_TABLE_COL_DEFS}
             dataSource={this.state.excelData}
-            editable={false}
+            onCellFieldsChange={this.handleCellValueChanged}
           />
         </Modal>
         <Modal
@@ -451,46 +467,6 @@ class SystemSettingsRiskSettings extends PureComponent {
             ]}
           />
         </Modal>
-        {/* <SourceTable
-              rowKey="instrumentId"
-              createText="新建白名单"
-              ref={node => (this.$soureTable = node)}
-              onSearch={this.fetchTable}
-              onRemove={this.onRemove}
-              removeable={true}
-              editable={false}
-              tableColumnDefs={PAGE_TABLE_COL_DEFS}
-              onCreate={this.onCreate}
-              createFormControls={CREATE_FORM_CONTROLS(this.state.venueCodes)}
-              paginationProps={{
-                backend: true,
-              }}
-              searchFormControls={SEARCH_FORM_CONTROLS}
-              extraActions={[
-                <ImportExcelButton
-                  key="import"
-                  type="primary"
-                  onImport={data => {
-                    const _data = data.data[0][Object.keys(data.data[0])[0]];
-                    this.setState({
-                      visible: true,
-                      excelData: _data.slice(1).map(item => {
-                        return {
-                          venueCode: item[0],
-                          instrumentId: item[1],
-                          notionalLimit: item[2] ? item[2] : 100000000,
-                        };
-                      }),
-                    });
-                  }}
-                >
-                  导入Excel
-                </ImportExcelButton>,
-              ]}
-              tableProps={{
-                onCellValueChanged: this.onCellValueChanged,
-              }}
-            /> */}
       </Page>
     );
   }

@@ -16,7 +16,11 @@ export const NotionalAmountType: ILegColDef = {
   title: '名义本金类型',
   dataIndex: LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
   editable: record => {
-    if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.AUTOCALL_ANNUAL) {
+    if (
+      Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
+      Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+      Form2.getFieldValue(record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN)
+    ) {
       return false;
     }
 

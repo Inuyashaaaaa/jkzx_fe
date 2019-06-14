@@ -1,19 +1,17 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
+import { SmartTable } from '@/containers';
 import Form from '@/containers/Form';
-import SourceTable from '@/containers/SourceTable';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
+import { trdTradeListByBook } from '@/services/general-service';
 import {
   addNonGroupResource,
   queryNonGroupResource,
   updateNonGroupResource,
 } from '@/services/tradeBooks';
-import { Button, Modal, message, Row, Table } from 'antd';
+import { Button, message, Modal, Row } from 'antd';
 import React, { PureComponent } from 'react';
-import { CREATE_FORM_CONTROLS, PAGE_TABLE_COL_DEFS } from './constants';
-import { trdTradeListByBook } from '@/services/general-service';
-import { Form2, Select } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
+import { CREATE_FORM_CONTROLS } from './constants';
 import Operation from './Operation';
 
 function findDepartment(departs, departId) {
@@ -39,8 +37,6 @@ function findDepartment(departs, departId) {
 }
 
 class SystemSettingsTradeBooks extends PureComponent {
-  public $table: SourceTable = null;
-
   public initialFetchTableData = null;
 
   public state = {
@@ -148,7 +144,7 @@ class SystemSettingsTradeBooks extends PureComponent {
             新建交易簿
           </Button>
         </Row>
-        <Table
+        <SmartTable
           dataSource={books}
           columns={[
             {
@@ -171,25 +167,8 @@ class SystemSettingsTradeBooks extends PureComponent {
             },
           ]}
           rowKey="resourceName"
-          size="middle"
           loading={loading}
         />
-        {/* <SourceTable
-          loading={loading}
-          rowKey={'id'}
-          dataSource={books}
-          columnDefs={PAGE_TABLE_COL_DEFS(this.fetchTable)}
-          onCellValueChanged={this.handleCellValueChanged}
-          header={
-            <Button
-              type="primary"
-              style={{ marginBottom: VERTICAL_GUTTER }}
-              onClick={this.switchModal}
-            >
-              新建交易簿
-            </Button>
-          }
-        /> */}
         <Modal
           title="新建交易簿"
           onOk={this.onCreateBook}

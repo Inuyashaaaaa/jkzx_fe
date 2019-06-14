@@ -1,6 +1,5 @@
 import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
-import { Form2, Select } from '@/containers';
-import SourceTable from '@/containers/SourceTable';
+import { Form2, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { removeCalendar } from '@/services/calendars';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
@@ -17,8 +16,6 @@ import TabHeader from '@/containers/TabHeader';
 const { RangePicker } = DatePicker;
 
 class TradeManagementNotifications extends PureComponent<any, any> {
-  public $sourceTable: SourceTable = null;
-
   constructor(props) {
     super(props);
     this.state = {
@@ -155,7 +152,6 @@ class TradeManagementNotifications extends PureComponent<any, any> {
         {this.state.activeTabKey === 'list' && (
           <div>
             <Form2
-              ref={node => (this.$sourceTable = node)}
               layout="inline"
               dataSource={this.state.searchFormData}
               submitText={`搜索`}
@@ -202,9 +198,9 @@ class TradeManagementNotifications extends PureComponent<any, any> {
               ]}
             />
             <Divider type="horizontal" />
-            <Table
+            <SmartTable
               scroll={{
-                x: 2300,
+                x: 2000,
               }}
               dataSource={this.state.tableDataSource}
               rowKey="positionId"
@@ -262,6 +258,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 },
                 {
                   title: '当前价格 (¥)',
+                  align: 'right',
                   dataIndex: 'underlyerPrice',
                   width: 200,
                   render: (text, record, index) => {
@@ -270,6 +267,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 },
                 {
                   title: '障碍价 (¥)',
+                  align: 'right',
                   dataIndex: 'barriers',
                   width: 200,
                 },
@@ -280,6 +278,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 },
                 {
                   title: '支付金额 (¥)',
+                  align: 'right',
                   dataIndex: 'payment',
                   width: 200,
                   render: (text, record, index) => {
@@ -287,7 +286,6 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   },
                 },
               ]}
-              pagination={this.state.pagination}
               loading={this.state.loading}
             />
           </div>

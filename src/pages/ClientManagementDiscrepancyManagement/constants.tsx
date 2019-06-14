@@ -14,7 +14,7 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { ITableColDef, IFormColDef } from '@/components/type';
-import { formatNumber } from '@/tools';
+import { formatNumber, formatMoney } from '@/tools';
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import { Select, Input, InputNumber, DatePicker } from '@/containers';
@@ -36,8 +36,9 @@ export const TABLE_COL_DEFS: ITableColDef[] = [
   },
   {
     title: '出入金额 (¥)',
+    align: 'right',
     dataIndex: 'paymentAmount',
-    render: (value, record, index) => formatNumber(value, 4),
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '方向',

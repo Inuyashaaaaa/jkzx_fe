@@ -6,6 +6,7 @@ import {
   RULES_REQUIRED,
   STRIKE_TYPES_MAP,
   REBATETYPE_TYPE_OPTIONS,
+  REBATETYPE_TYPE_MAP,
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/containers';
@@ -29,11 +30,26 @@ export const RebateType: ILegColDef = {
     return false;
   },
   render: (val, record, index, { form, editing, colDef }) => {
+    const SPECIAL_REBATETYPE_TYPE_OPTIONS = _.reject(
+      REBATETYPE_TYPE_OPTIONS,
+      item => item.value === REBATETYPE_TYPE_MAP.PAY_NONE
+    );
+
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<Select defaultOpen={editing} editing={editing} options={REBATETYPE_TYPE_OPTIONS} />)}
+        })(
+          <Select
+            defaultOpen={editing}
+            editing={editing}
+            options={
+              Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DOUBLE_SHARK_FIN
+                ? SPECIAL_REBATETYPE_TYPE_OPTIONS
+                : REBATETYPE_TYPE_OPTIONS
+            }
+          />
+        )}
       </FormItem>
     );
   },

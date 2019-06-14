@@ -1,17 +1,15 @@
-import { Form2, Table2 } from '@/containers';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import PopconfirmButton from '@/containers/PopconfirmButton';
-import SourceTable from '@/containers/SourceTable';
+import { Form2, SmartTable, Table2 } from '@/containers';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
 import { authRolesList } from '@/services/role';
-import { authUserList, createUser, updateUser, updateUserRole } from '@/services/user';
+import { authUserList, createUser, updateUserRole } from '@/services/user';
 import { Button, Col, message, Modal, notification, Row } from 'antd';
+import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
 import { CREATE_FORM_CONTROLS } from './constants';
 import { createPageTableColDefs } from './services';
-import _ from 'lodash';
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -56,8 +54,6 @@ function departmentsTreeData(departments) {
 
 class SystemSettingsUsers extends PureComponent {
   public rowKey = 'id';
-
-  public $sourceTable: Table2 = null;
 
   public $form: Form2 = null;
 
@@ -198,9 +194,8 @@ class SystemSettingsUsers extends PureComponent {
                 </Button>
               </Col>
             </Row>
-            <Table2
+            <SmartTable
               loading={loading}
-              ref={node => (this.$sourceTable = node)}
               rowKey={this.rowKey}
               dataSource={users}
               columns={createPageTableColDefs(
@@ -209,7 +204,6 @@ class SystemSettingsUsers extends PureComponent {
                 departmentsTreeData(this.state.departments),
                 this.fetchData
               )}
-              size={'middle'}
               scroll={{ x: 1800 }}
               onCellFieldsChange={this.handleCellValueChanged}
               onCellEditingChanged={async params => {

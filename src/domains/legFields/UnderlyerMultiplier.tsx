@@ -1,9 +1,41 @@
-import { LEG_FIELD } from '@/constants/common';
+import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { InputNumber } from '@/containers';
 import { getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
+import { InputBase } from '@/components/type';
+import { Tag, Icon } from 'antd';
 import React from 'react';
+import { Import2 } from '@/containers/InstrumentModalInput';
+
+class MultiplierModalInput extends InputBase {
+  public renderEditing() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        {value
+          .map((item, index) => {
+            return item.underlyerMultiplier;
+          })
+          .join(', ')}
+        <Import2 value={value} onChange={onChange} onValueChange={onValueChange} />
+      </>
+    );
+  }
+
+  public renderRendering() {
+    const { editing, value = [], onChange, onValueChange } = this.props;
+    return (
+      <>
+        {value
+          .map((item, index) => {
+            return item.underlyerMultiplier;
+          })
+          .join(', ')}
+      </>
+    );
+  }
+}
 
 export const UnderlyerMultiplier: ILegColDef = {
   title: '合约乘数',
@@ -17,7 +49,14 @@ export const UnderlyerMultiplier: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<InputNumber editing={false} />)}
+        })(
+          record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.SPREAD_EUROPEAN ||
+            record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN ? (
+            <MultiplierModalInput editing={editing} />
+          ) : (
+            <InputNumber editing={false} />
+          )
+        )}
       </FormItem>
     );
   },

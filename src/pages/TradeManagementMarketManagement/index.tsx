@@ -1,5 +1,4 @@
-import { Form2, Select } from '@/containers';
-import SourceTable from '@/containers/_SourceTable';
+import { Form2, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import {
   mktInstrumentSearch,
@@ -13,6 +12,7 @@ import React, { PureComponent } from 'react';
 import { CLOSE_FORM_CONTROLS, columns, INTRADAY_FORM_CONTROLS } from './constants';
 import _ from 'lodash';
 import { getMoment } from '@/tools';
+import { PAGE_SIZE } from '@/constants/component';
 
 const TabPane = Tabs.TabPane;
 
@@ -31,7 +31,7 @@ class TradeManagementMarketManagement extends PureComponent {
     tableDataSource: [],
     pagination: {
       current: 1,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     },
     total: 0,
     loading: false,
@@ -106,7 +106,7 @@ class TradeManagementMarketManagement extends PureComponent {
       {
         pagination: {
           current: 1,
-          pageSize: 10,
+          pageSize: PAGE_SIZE,
         },
       },
       () => {
@@ -121,7 +121,7 @@ class TradeManagementMarketManagement extends PureComponent {
         searchFormData: {},
         pagination: {
           current: 1,
-          pageSize: 10,
+          pageSize: PAGE_SIZE,
         },
       },
       () => {
@@ -250,7 +250,7 @@ class TradeManagementMarketManagement extends PureComponent {
             </Tooltip>
           </span>
         </Row>
-        <Table
+        <SmartTable
           dataSource={this.state.tableDataSource}
           columns={columns}
           pagination={{
@@ -262,7 +262,6 @@ class TradeManagementMarketManagement extends PureComponent {
           }}
           loading={this.state.loading}
           rowKey={'instrumentId'}
-          size="middle"
           scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
         />
         <Modal

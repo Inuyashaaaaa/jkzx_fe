@@ -24,10 +24,12 @@ import { Eagle } from '@/domains/legs/Eagle';
 import { RangeAccruals } from '@/domains/legs/RangeAccruals';
 import { TripleDigital } from '@/domains/legs/TripleDigital';
 import { DoubleDigital } from '@/domains/legs/DoubleDigital';
+import { RatioSpreadEuropean } from '@/domains/legs/RatioSpreadEuropean';
 import { ModelXy } from '@/domains/legs/ModelXy';
 import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
+import { SpreadEuropean } from '@/domains/legs/SpreadEuropean';
 import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
 import { Asia } from '@/domains/legs/Asia';
@@ -266,6 +268,12 @@ export const getLegByProductType = (productType, exerciseType?) => {
   if (productType === PRODUCT_TYPE_MAP.FORWARD) {
     return Forward;
   }
+  if (productType === PRODUCT_TYPE_MAP.SPREAD_EUROPEAN) {
+    return SpreadEuropean;
+  }
+  if (productType === PRODUCT_TYPE_MAP.RATIO_SPREAD_EUROPEAN) {
+    return RatioSpreadEuropean;
+  }
   throw new Error('not match productType!');
 };
 
@@ -308,8 +316,8 @@ export const formatNumber = (
   roundingMode?: BigNumber.RoundingMode,
   config?: BigNumber.Format
 ) => {
-  if (!value) {
-    return value;
+  if (!_.isNumber(value)) {
+    return '';
   }
   return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
 };
@@ -322,7 +330,7 @@ export const formatMoney = (
     decimalPlaces?: number;
   }
 ) => {
-  const { unit = '', space = false, decimalPlaces = 4 } = config;
+  const { unit = '', space = false, decimalPlaces = 4 } = config || {};
   return formatNumber(value, decimalPlaces, null, {
     // the decimal separator
     decimalSeparator: '.',

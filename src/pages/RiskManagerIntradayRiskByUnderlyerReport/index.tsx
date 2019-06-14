@@ -17,7 +17,7 @@ const RiskManagerIntradayRiskByUnderlyerReport = memo<any>(props => {
       defaultDirection={'asc'}
       searchMethod={rptIntradayRiskReportSearchPaged}
       downloadName={'标的风险'}
-      scrollWidth={1900}
+      scrollWidth={2100}
     />
   );
 });

@@ -1,25 +1,19 @@
-import { INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
+import { VERTICAL_GUTTER } from '@/constants/global';
 import { TRNORS_OPTS } from '@/constants/model';
+import { Form2, Table2, SmartTable } from '@/containers';
 import MarketSourceTable from '@/containers/MarketSourceTable';
 import Page from '@/containers/Page';
 import {
-  getCanUsedTranorsOtions,
-  getCanUsedTranorsOtionsNotIncludingSelf,
-} from '@/services/common';
-import {
   queryAllModelName,
   queryModelDividendCurve,
-  queryModelName,
   saveModelDividendCurve,
 } from '@/services/model';
-import { Col, message, notification, Row, Button, Modal, Divider } from 'antd';
+import { Button, Col, Divider, message, Modal, notification, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
-import { TABLE_COL_DEFS, INSERT_FORM_CONTROLS, SEARCH_FORM_CONTROLS } from './constants';
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { Table2, Form2 } from '@/containers';
+import { INSERT_FORM_CONTROLS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
 
 const GROUP_KEY = 'modelName';
 
@@ -211,12 +205,18 @@ class PricingSettingsDividendCurve extends PureComponent {
   };
 
   public onCancel = () => {
-    this.setState({ visible: false });
+    this.setState({
+      visible: false,
+      insertFormData: {},
+    });
   };
 
   public onInsertFormChange = (props, fields, allFields) => {
     this.setState({
-      insertFormData: allFields,
+      insertFormData: {
+        ...this.state.insertFormData,
+        ...fields,
+      },
     });
   };
 
@@ -271,9 +271,8 @@ class PricingSettingsDividendCurve extends PureComponent {
             >
               保存
             </Button>
-            <Table2
+            <SmartTable
               rowKey="id"
-              size="small"
               pagination={false}
               loading={this.state.tableLoading}
               dataSource={this.state.tableDataSource}

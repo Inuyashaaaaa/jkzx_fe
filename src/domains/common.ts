@@ -3,6 +3,8 @@ import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
+  LEG_TYPE_MAP,
+  LEG_TYPE_FIELD,
 } from '@/constants/common';
 import { TRADESCOLDEFS_LEG_FIELD_MAP } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
@@ -15,6 +17,7 @@ import _ from 'lodash';
 import { ILeg } from '@/types/leg';
 import { qlIsHoliday } from '@/services/volatility';
 import { message } from 'antd';
+import { validateExpirationDate } from '@/tools/leg';
 
 const fetchUnderlyerMultiplierAndUnit = _.debounce(
   (
@@ -139,7 +142,7 @@ const computedTradeNumber = (
   );
 };
 
-export const commonLinkage = (
+export const inline = (
   env: string,
   changeFieldsParams: ITableTriggerCellFieldsChangeParams,
   record: ITableData,
@@ -150,31 +153,6 @@ export const commonLinkage = (
   setTableData: (newData: ITableData[]) => void
 ) => {
   const { changedFields } = changeFieldsParams;
-  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
-    fetchUnderlyerMultiplierAndUnit(
-      env,
-      changeFieldsParams,
-      record,
-      tableData,
-      setColLoading,
-      setLoading,
-      setColValue,
-      setTableData
-    );
-  }
-
-  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
-    fetchInitialSpot(
-      env,
-      changeFieldsParams,
-      record,
-      tableData,
-      setColLoading,
-      setLoading,
-      setColValue,
-      setTableData
-    );
-  }
 
   if (
     Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
@@ -235,14 +213,6 @@ export const commonLinkage = (
     );
   }
 
-  if (Form2.fieldValueIsChange(LEG_FIELD.PREMIUM_TYPE, changedFields)) {
-    const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
-    record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
-      permiumType === PREMIUM_TYPE_MAP.PERCENT
-        ? Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.CNY)
-        : Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.LOT);
-  }
-
   if (Form2.fieldValueIsChange(LEG_FIELD.IS_ANNUAL, changedFields)) {
     const isAnnual = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]);
     record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] = Form2.createField(
@@ -262,12 +232,51 @@ export const commonLinkage = (
       }
     }
 
+    if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
+      if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+        const value = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
+        record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+        record[LEG_FIELD.WEIGHT] = Form2.createField(value);
+        record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
+        return;
+      }
+    }
+
     if (Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)) {
+      if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+        const initialSpot = _.reduce(
+          _.get(record, [LEG_FIELD.INITIAL_SPOT, 'value']),
+          (total, value, index) => {
+            return {
+              ...total,
+              [TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE + (index + 1)]: value[
+                LEG_FIELD.INITIAL_SPOT
+              ],
+            };
+          },
+          {}
+        );
+        const value = _.get(record, [LEG_FIELD.INITIAL_SPOT, 'value']);
+        record[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE] = Form2.createField(initialSpot);
+        record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
+        record[LEG_FIELD.WEIGHT] = Form2.createField(value);
+        record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID] = Form2.createField(value);
+        record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+        return;
+      }
       const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
       record[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE] = Form2.createField(initialSpot);
     }
   }
+
   if (Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)) {
+    if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+      const value = _.get(record, [LEG_FIELD.INITIAL_SPOT, 'value']);
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+      record[LEG_FIELD.WEIGHT] = Form2.createField(value);
+      record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID] = Form2.createField(value);
+      return;
+    }
     if (record[LEG_FIELD.NOTIONAL_AMOUNT] && record[LEG_FIELD.UNDERLYER_MULTIPLIER]) {
       computedTradeNumber(
         env,
@@ -281,6 +290,88 @@ export const commonLinkage = (
       );
     }
   }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.WEIGHT, changedFields)) {
+    if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+      const value = _.get(record, [LEG_FIELD.WEIGHT, 'value']);
+      record[LEG_FIELD.INITIAL_SPOT] = Form2.createField(value);
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] = Form2.createField(value);
+      record[LEG_FIELD.UNDERLYER_INSTRUMENT_ID] = Form2.createField(value);
+      return;
+    }
+  }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields)) {
+    if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+      const value = _.get(record, [LEG_FIELD.VOL, 'value']);
+      record[LEG_FIELD.Q] = Form2.createField(value);
+    }
+  }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.Q, changedFields)) {
+    if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
+      const value = _.get(record, [LEG_FIELD.Q, 'value']);
+      record[LEG_FIELD.VOL] = Form2.createField(value);
+    }
+  }
+};
+
+export const commonLinkage = (
+  env: string,
+  changeFieldsParams: ITableTriggerCellFieldsChangeParams,
+  record: ITableData,
+  tableData: ITableData[],
+  setColLoading: (colId: string, loading: boolean) => void,
+  setLoading: (rowId: string, colId: string, loading: boolean) => void,
+  setColValue: (colId: string, newVal: IFormField) => void,
+  setTableData: (newData: ITableData[]) => void
+) => {
+  const { changedFields } = changeFieldsParams;
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
+    fetchUnderlyerMultiplierAndUnit(
+      env,
+      changeFieldsParams,
+      record,
+      tableData,
+      setColLoading,
+      setLoading,
+      setColValue,
+      setTableData
+    );
+  }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.UNDERLYER_INSTRUMENT_ID, changedFields)) {
+    fetchInitialSpot(
+      env,
+      changeFieldsParams,
+      record,
+      tableData,
+      setColLoading,
+      setLoading,
+      setColValue,
+      setTableData
+    );
+  }
+
+  if (Form2.fieldValueIsChange(LEG_FIELD.PREMIUM_TYPE, changedFields)) {
+    const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
+    record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
+      permiumType === PREMIUM_TYPE_MAP.PERCENT
+        ? Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.CNY)
+        : Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.LOT);
+  }
+
+  inline(
+    env,
+    changeFieldsParams,
+    record,
+    tableData,
+    setColLoading,
+    setLoading,
+    setColValue,
+    setTableData
+  );
 };
 
 export const commonGetPosition = (leg: ILeg) => {
@@ -288,23 +379,6 @@ export const commonGetPosition = (leg: ILeg) => {
 };
 
 export const commonGetDefaultData = (leg: ILeg) => {
-  const validate = async date => {
-    if (!date) return;
-    const rootState = window.g_app._store.getState() || {};
-    const { expirationDate = {} } = rootState;
-    const { volatilityCalendars } = expirationDate;
-    if (!volatilityCalendars) return;
-    const formatDate = date.format('YYYY-MM-DD');
-    const { error, data } = await qlIsHoliday({
-      calendars: volatilityCalendars,
-      date: formatDate,
-    });
-    if (error) return;
-    if (data) {
-      message.warning(`${formatDate}属于非交易日`);
-    }
-  };
-
   return {
     ...leg,
     onDataChange: (
@@ -334,17 +408,8 @@ export const commonGetDefaultData = (leg: ILeg) => {
           Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
           Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)
         ) {
-          validate(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]));
+          validateExpirationDate(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]));
         }
-        return result;
-      }
-      return undefined;
-    },
-
-    getDefaultData: env => {
-      if (leg.getDefaultData) {
-        const result = leg.getDefaultData(env);
-        validate(Form2.getFieldValue(result[LEG_FIELD.EXPIRATION_DATE]));
         return result;
       }
       return undefined;

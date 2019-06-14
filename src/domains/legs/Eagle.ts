@@ -18,7 +18,7 @@ import {
 } from '@/constants/global';
 import {
   LEG_ENV,
-  TOTAL_COMPUTED_FIELDS,
+  GENERAL_COMPUTED_FIELDS,
   TOTAL_EDITING_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
@@ -64,7 +64,6 @@ export const Eagle: ILeg = legPipeLine({
   getColumns: env => {
     if (env === LEG_ENV.PRICING) {
       return [
-        IsAnnual,
         Direction,
         NotionalAmountType,
         InitialSpot,
@@ -83,12 +82,11 @@ export const Eagle: ILeg = legPipeLine({
         NotionalAmount,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
-        ...TOTAL_COMPUTED_FIELDS,
+        ...GENERAL_COMPUTED_FIELDS,
       ];
     }
     if (env === LEG_ENV.EDITING) {
       return [
-        IsAnnual,
         Direction,
         DaysInYear,
         UnderlyerMultiplier,
@@ -118,7 +116,6 @@ export const Eagle: ILeg = legPipeLine({
     }
     if (env === LEG_ENV.BOOKING) {
       return [
-        IsAnnual,
         Direction,
         DaysInYear,
         UnderlyerMultiplier,

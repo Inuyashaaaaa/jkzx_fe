@@ -22,7 +22,7 @@ import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   LEG_ENV,
-  TOTAL_COMPUTED_FIELDS,
+  GENERAL_COMPUTED_FIELDS,
   TOTAL_TRADESCOL_FIELDS,
   TOTAL_EDITING_FIELDS,
 } from '@/constants/legs';
@@ -79,7 +79,7 @@ export const DoubleTouch: ILeg = legPipeLine({
         NotionalAmount,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
-        ...TOTAL_COMPUTED_FIELDS,
+        ...GENERAL_COMPUTED_FIELDS,
       ];
     }
     if (env === LEG_ENV.EDITING) {

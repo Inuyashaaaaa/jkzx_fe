@@ -220,3 +220,13 @@ export async function quotePrcPositionDelete(params = {}) {
     },
   });
 }
+
+export async function trdTradeSettleablePaged(params = {}) {
+  return request(`${HOST_TEST}trade-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'trdTradeSettleablePaged',
+      params,
+    },
+  });
+}

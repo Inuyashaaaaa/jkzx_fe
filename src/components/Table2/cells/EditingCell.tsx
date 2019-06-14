@@ -29,17 +29,30 @@ class EditingCell extends PureComponent<ITableCellProps, any> {
     return dataIndex;
   };
 
-  public render() {
-    const { record, rowIndex, children, $$render, colDef, cellApi } = this.props;
+  public getRenderParams = () => {
+    const { record, rowIndex, colDef, cellApi, api, context } = this.props;
     const value = this.props.cellApi.getValue();
+
+    const inject = {
+      form: this.props.form,
+      editing: true,
+      colDef,
+      api,
+      cellApi,
+      context,
+    };
+
+    if ('dataIndex' in colDef) {
+      return [value, record, rowIndex, inject];
+    }
+    return [record, record, rowIndex, inject];
+  };
+
+  public render() {
+    const { children, $$render, cellApi } = this.props;
+
     return $$render
-      ? cellApi.renderElement(
-          $$render(value, record, rowIndex, {
-            form: this.props.form,
-            editing: true,
-            colDef,
-          })
-        )
+      ? cellApi.renderElement($$render.apply(this, this.getRenderParams()))
       : children;
   }
 }
