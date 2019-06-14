@@ -59,7 +59,7 @@ const Operations = memo<any>(props => {
         onOk={handleOk}
         onCancel={handleCancel}
         footer={false}
-        width={700}
+        width={1200}
       >
         <SmartTable
           rowKey="uuid"

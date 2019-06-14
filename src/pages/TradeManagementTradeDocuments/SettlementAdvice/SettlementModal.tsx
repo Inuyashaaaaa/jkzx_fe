@@ -3,6 +3,7 @@ import { DOWN_LOAD_SETTLEMENT_URL, emlSendSettleReport } from '@/services/docume
 import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { connect } from 'dva';
 
 class TradeModal extends PureComponent {
   public state = {
@@ -47,7 +48,11 @@ class TradeModal extends PureComponent {
   };
 
   public render() {
-    const { data } = this.props;
+    const {
+      data,
+      currentUser: { username },
+    } = this.props;
+
     return (
       <>
         <a onClick={this.onClick}>生成结算通知书</a>
@@ -55,7 +60,7 @@ class TradeModal extends PureComponent {
           title="生成结算通知书"
           visible={this.state.visible}
           footer={false}
-          width={700}
+          width={1200}
           onCancel={this.onCancel}
         >
           <Alert
@@ -88,12 +93,12 @@ class TradeModal extends PureComponent {
           <Row type="flex" justify="end" align="middle" gutter={8}>
             <p style={{ lineHeight: '40px' }}>
               {data.docProcessStatus === 'UN_PROCESSED'
-                ? `${data.partyName}未处理过结算通知书`
+                ? `${username} 未处理过结算通知书`
                 : data.docProcessStatus === 'DOWNLOADED'
-                ? `${data.partyName} 于 ${moment(data.updateAt).format(
+                ? `${username} 于 ${moment(data.updateAt).format(
                     'YYYY-MM-DD HH:mm'
                   )}下载过结算通知书`
-                : `${data.partyName} 于 ${moment(data.updateAt).format(
+                : `${username} 于 ${moment(data.updateAt).format(
                     'YYYY-MM-DD HH:mm'
                   )}发送过结算通知书`}
             </p>
@@ -104,4 +109,6 @@ class TradeModal extends PureComponent {
   }
 }
 
-export default TradeModal;
+export default connect(({ user }) => ({
+  currentUser: user.currentUser,
+}))(TradeModal);

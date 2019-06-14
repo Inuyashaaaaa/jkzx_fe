@@ -648,7 +648,7 @@ const TradeManagementPricingManagement = props => {
                 onShowSizeChange: handleShowSizeChange,
                 showQuickJumper: true,
                 current: pagination.current,
-                pageSize: PAGE_SIZE,
+                pageSize: pagination.pageSize,
                 pageSizeOptions: PAGE_SIZE_OPTIONS,
                 onChange: handlePaninationChange,
                 total: pagination.total,

@@ -3,12 +3,15 @@ import { ILeg } from '@/types/leg';
 import { Button, Dropdown, Menu, Icon } from 'antd';
 import React, { PureComponent } from 'react';
 import { getLegByType } from '@/tools';
-import { LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
+import { LEG_TYPE_FIELD, LEG_TYPE_MAP, LEG_FIELD } from '@/constants/common';
 import _ from 'lodash';
+import { Form2 } from '..';
+import { validateExpirationDate } from '@/tools/leg';
 
 export default class MultilLegCreateButton extends PureComponent<{
   handleAddLeg?: (leg: ILeg) => void;
   isPricing?: boolean;
+  env?: string;
 }> {
   public static defaultProps = {
     isPricing: false,
@@ -40,6 +43,16 @@ export default class MultilLegCreateButton extends PureComponent<{
     });
   };
 
+  public handleAddleg = leg => {
+    if (leg.getDefaultData) {
+      const result = leg.getDefaultData(this.props.env);
+      validateExpirationDate(Form2.getFieldValue(result[LEG_FIELD.EXPIRATION_DATE]));
+    }
+    if (this.props.handleAddLeg) {
+      this.props.handleAddLeg(leg);
+    }
+  };
+
   public render() {
     return (
       <Dropdown
@@ -56,7 +69,7 @@ export default class MultilLegCreateButton extends PureComponent<{
             }}
             onClick={event => {
               const leg = getLegByType(event.key);
-              this.props.handleAddLeg(leg);
+              this.handleAddleg(leg);
             }}
           >
             {this.getLegMenuNodes(this.normalLegMenus())}

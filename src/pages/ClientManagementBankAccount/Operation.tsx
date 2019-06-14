@@ -73,7 +73,7 @@ class Operation extends PureComponent<{
         <Modal
           title="编辑银行账户"
           visible={this.state.visible}
-          width={700}
+          width={1200}
           onCancel={this.switchModal}
           onOk={this.handleEdit}
           confirmLoading={this.state.confirmLoading}

@@ -17,6 +17,7 @@ import _ from 'lodash';
 import { ILeg } from '@/types/leg';
 import { qlIsHoliday } from '@/services/volatility';
 import { message } from 'antd';
+import { validateExpirationDate } from '@/tools/leg';
 
 const fetchUnderlyerMultiplierAndUnit = _.debounce(
   (
@@ -378,23 +379,6 @@ export const commonGetPosition = (leg: ILeg) => {
 };
 
 export const commonGetDefaultData = (leg: ILeg) => {
-  const validate = async date => {
-    if (!date) return;
-    const rootState = window.g_app._store.getState() || {};
-    const { expirationDate = {} } = rootState;
-    const { volatilityCalendars } = expirationDate;
-    if (!volatilityCalendars) return;
-    const formatDate = date.format('YYYY-MM-DD');
-    const { error, data } = await qlIsHoliday({
-      calendars: volatilityCalendars,
-      date: formatDate,
-    });
-    if (error) return;
-    if (data) {
-      message.warning(`${formatDate}属于非交易日`);
-    }
-  };
-
   return {
     ...leg,
     onDataChange: (
@@ -424,17 +408,8 @@ export const commonGetDefaultData = (leg: ILeg) => {
           Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
           Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)
         ) {
-          validate(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]));
+          validateExpirationDate(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]));
         }
-        return result;
-      }
-      return undefined;
-    },
-
-    getDefaultData: env => {
-      if (leg.getDefaultData) {
-        const result = leg.getDefaultData(env);
-        validate(Form2.getFieldValue(result[LEG_FIELD.EXPIRATION_DATE]));
         return result;
       }
       return undefined;

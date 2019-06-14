@@ -1,60 +1,58 @@
 import {
-  LEG_FIELD,
-  DIRECTION_MAP,
-  OPTION_TYPE_MAP,
+  BIG_NUMBER_CONFIG,
   DIRECTION_ZHCN_MAP,
+  LCM_EVENT_TYPE_MAP,
+  LEG_FIELD,
+  LEG_TYPE_MAP,
   OPTION_TYPE_ZHCN_MAP,
   PRODUCTTYPE_ZHCH_MAP,
+  SPECIFIED_PRICE_MAP,
   SPECIFIED_PRICE_ZHCN_MAP,
   STRIKE_TYPES_MAP,
-  LCM_EVENT_TYPE_MAP,
-  BIG_NUMBER_CONFIG,
-  LEG_TYPE_MAP,
 } from '@/constants/common';
-import { SmartTable, InputNumber, Loading, Form2, Table, Table2 } from '@/containers';
-import { Modal, Button, Row, Pagination, message, Icon, Col } from 'antd';
-import _, { get } from 'lodash';
-import React, { memo, useState, useEffect, useRef, forwardRef } from 'react';
-import FormItem from 'antd/lib/form/FormItem';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
-import {
-  trdTradeSettleablePaged,
-  trdTradeLCMEventProcess,
-  tradeExercisePreSettle,
-} from '@/services/trade-service';
-import { showTotal } from '@/tools/component';
-import { formatMoney, getRequiredRule, remove } from '@/tools';
-import BigNumber from 'bignumber.js';
-import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS } from '@/constants/global';
-import { connect } from 'dva';
+import { PAGE_SIZE } from '@/constants/component';
+import { Form2, InputNumber, Loading, SmartTable, Table2 } from '@/containers';
+import { mktQuotesListPaged } from '@/services/market-data-service';
 import { cliTasksGenerateByTradeId } from '@/services/reference-data-service';
+import {
+  tradeExercisePreSettle,
+  trdTradeLCMEventProcess,
+  trdTradeSettleablePaged,
+} from '@/services/trade-service';
+import { formatMoney, formatNumber, getRequiredRule } from '@/tools';
 import { getNumOfOptionsByNotionalAmount } from '@/tools/getNumOfOptions';
+import { Button, Col, Icon, message, Modal, Pagination, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import BigNumber from 'bignumber.js';
+import { connect } from 'dva';
+import _, { get } from 'lodash';
 import moment from 'moment';
-import { ITableProps } from '@/components/type';
+import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
 const ALREADY = 'ALREADY';
 
 const SettleInputNumber = memo<any>(
   forwardRef(props => {
-    const { onReload, editing, ...restProps } = props;
+    const { onReload, editing, showReload, ...restProps } = props;
 
     return editing ? (
       <InputNumber {...restProps} editing={editing} />
     ) : (
       <Row type="flex" justify="space-between" align="middle">
         <InputNumber {...restProps} editing={editing} style={{ width: 'auto', flexGrow: 1 }} />
-        <Icon
-          type="reload"
-          onClick={event => {
-            event.preventDefault();
-            event.stopPropagation();
-            if (onReload) {
-              onReload();
-            }
-          }}
-          style={{ paddingLeft: 5, color: '#1890ff' }}
-        />
+        {!!showReload && (
+          <Icon
+            type="reload"
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+              if (onReload) {
+                onReload();
+              }
+            }}
+            style={{ paddingLeft: 5, color: '#1890ff' }}
+          />
+        )}
       </Row>
     );
   })
@@ -72,9 +70,10 @@ const Settlement = props => {
   const [loading, setLoading] = useState(false);
 
   const [settLoading, setSettLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
+  const [setted, setSetted] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const tableEl = useRef<Table2>(null);
+  const [cacheTableDataMapCurrent, setCacheTableDataMapCurrent] = useState({});
 
   const fetch = async (paramsPagination?) => {
     setLoading(true);
@@ -82,12 +81,21 @@ const Settlement = props => {
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
     });
-    setLoading(false);
 
     if (error) return;
     if (_.isEmpty(data)) return;
 
     const { page = [], totalCount } = data;
+
+    const priceBySpecifedType = (type, priceInfo = {}) => {
+      if (type === SPECIFIED_PRICE_MAP.CLOSE) {
+        return priceInfo.close;
+      }
+      if (type === SPECIFIED_PRICE_MAP.TWAP) {
+        return priceInfo.settle;
+      }
+      return undefined;
+    };
 
     const tableDataSource = _.flatten(
       page.map(item => {
@@ -106,13 +114,77 @@ const Settlement = props => {
       })
     );
 
-    setTableData(tableDataSource);
-    setPagination(pre => ({
-      ...pre,
+    const nextPagination = {
+      ...pagination,
       total: totalCount,
       current: (paramsPagination || pagination).current,
       pageSize: (paramsPagination || pagination).pageSize,
-    }));
+    };
+
+    const canSettTableData = tableDataSource.filter(record => canSett(record));
+
+    const instrumentIds = canSettTableData
+      .filter(item => !!_.get(item, `asset.underlyerInstrumentId`))
+      .map(item => _.get(item, `asset.underlyerInstrumentId`));
+    const mktQuotesListPagedRsp = await mktQuotesListPaged({
+      instrumentIds,
+    });
+
+    // 如果标的物价格获取失败，结算金额就停止获取
+    if (mktQuotesListPagedRsp.error) {
+      return setLoading(false);
+    }
+
+    const quotes = _.get(mktQuotesListPagedRsp, 'data.page', []);
+
+    const nextCanSettTableData = canSettTableData.map(item => {
+      const result = quotes.find(
+        quote => _.get(item, `asset.underlyerInstrumentId`) === quote.instrumentId
+      );
+      if (result) {
+        return {
+          ...item,
+          [LEG_FIELD.UNDERLYER_PRICE]: Form2.createField(
+            formatNumber(
+              priceBySpecifedType(_.get(item, `asset.${LEG_FIELD.SPECIFIED_PRICE}`), result),
+              4
+            )
+          ),
+        };
+      }
+      return item;
+    });
+
+    const startTradeExercisePreSettleRsps = await Promise.all(
+      nextCanSettTableData.map(item => startTradeExercisePreSettle(item))
+    ).then(rsps => {
+      return rsps.map((rsp, index) => ({
+        rsp,
+        record: nextCanSettTableData[index],
+      }));
+    });
+
+    setLoading(false);
+
+    const successDtas = startTradeExercisePreSettleRsps.filter(item => !item.rsp.error);
+    const distTableData = nextCanSettTableData.map(item => {
+      const findItem = successDtas.find(meta => meta.record[POSITION_ID] === item[POSITION_ID]);
+      if (findItem) {
+        return {
+          ...item,
+          [LEG_FIELD.SETTLE_AMOUNT]: Form2.createField(
+            new BigNumber(findItem.rsp.data)
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber()
+          ),
+        };
+      }
+      return item;
+    });
+
+    setTableData(distTableData);
+
+    setPagination(nextPagination);
   };
 
   const onPagination = (current, pageSize) => {
@@ -208,7 +280,25 @@ const Settlement = props => {
       );
     });
     setSettLoading(false);
-    setFetched(true);
+    setSetted(true);
+  };
+
+  const startTradeExercisePreSettle = record => {
+    const values = Form2.getFieldsValue(record);
+
+    return tradeExercisePreSettle({
+      positionId: record[POSITION_ID],
+      eventDetail: {
+        underlyerPrice: String(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`)),
+        numOfOptions: getNumOfOptionsByNotionalAmount(
+          get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
+          get(values, `asset.${LEG_FIELD.INITIAL_SPOT}`),
+          get(values, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`)
+        ), // 名义本金(手数)
+        notionalAmount: String(get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`)), // 名义本金
+      },
+      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+    });
   };
 
   const preSettlement = async (record): Promise<boolean> => {
@@ -222,21 +312,7 @@ const Settlement = props => {
       return true;
     }
 
-    const values = Form2.getFieldsValue(record);
-
-    const { error, data } = await tradeExercisePreSettle({
-      positionId: record[POSITION_ID],
-      eventDetail: {
-        underlyerPrice: String(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`)),
-        numOfOptions: getNumOfOptionsByNotionalAmount(
-          get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
-          get(values, `asset.${LEG_FIELD.INITIAL_SPOT}`),
-          get(values, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`)
-        ), // 名义本金(手数)
-        notionalAmount: String(get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`)), // 名义本金
-      },
-      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
-    });
+    const { error, data } = await startTradeExercisePreSettle(record);
 
     if (error) return;
 
@@ -268,7 +344,7 @@ const Settlement = props => {
   useEffect(
     () => {
       if (!modalVisible) {
-        setFetched(false);
+        setSetted(false);
         setSelectedRowKeys([]);
         return;
       }
@@ -306,14 +382,20 @@ const Settlement = props => {
   };
 
   const getFooter = () => {
-    if (fetched) {
+    if (setted) {
       return (
         <Row type="flex" gutter={10} justify="end">
           <Col>
             <Button onClick={() => setModalVisible(false)}>关闭</Button>
           </Col>
           <Col>
-            <Button type="primary" onClick={() => fetch()}>
+            <Button
+              type="primary"
+              onClick={() => {
+                fetch();
+                setSetted(false);
+              }}
+            >
               刷新
             </Button>
           </Col>
@@ -471,16 +553,17 @@ const Settlement = props => {
               editable: record => {
                 return canSett(record);
               },
+              defaultEditing: false,
               dataIndex: LEG_FIELD.UNDERLYER_PRICE,
               render: (val, record, index, { form, editing }) => {
-                if (!canSett(record)) {
+                if (!record[ALREADY] && !canSett(record)) {
                   return null;
                 }
                 return (
                   <FormItem>
                     {form.getFieldDecorator({
                       rules: [getRequiredRule()],
-                    })(<InputNumber autoFocus={true} editing={editing} />)}
+                    })(<InputNumber autoFocus={true} autoSelect={true} editing={editing} />)}
                   </FormItem>
                 );
               },
@@ -493,9 +576,10 @@ const Settlement = props => {
               editable: record => {
                 return canSett(record);
               },
+              defaultEditing: false,
               dataIndex: LEG_FIELD.SETTLE_AMOUNT,
               render: (val, record, index, { form, editing }) => {
-                if (!canSett(record)) {
+                if (!record[ALREADY] && !canSett(record)) {
                   return null;
                 }
                 return (
@@ -504,6 +588,8 @@ const Settlement = props => {
                       rules: [getRequiredRule()],
                     })(
                       <SettleInputNumber
+                        autoSelect={true}
+                        showReload={!record[ALREADY]}
                         editing={editing}
                         onReload={async () => {
                           const error = await preSettlement(record);
@@ -537,15 +623,11 @@ const Settlement = props => {
           <Pagination
             {...{
               size: 'small',
-              showSizeChanger: true,
-              onShowSizeChange,
-              showQuickJumper: true,
-              current: pagination.current,
               pageSize: pagination.pageSize,
+              current: pagination.current,
               onChange,
               total: pagination.total,
-              pageSizeOptions: PAGE_SIZE_OPTIONS,
-              showTotal,
+              simple: true,
             }}
           />
         </Row>

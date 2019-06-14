@@ -36,10 +36,12 @@ const ActionBar = memo<any>(props => {
     setCreateFormData({});
   };
 
-  const transactionHandleOk = () => {
+  const transactionHandleOk = async () => {
     setTransactionModalVisible(false);
-    handelTrdTradeCreate();
-    router.push('/approval-process/process-manangement');
+    const error = await handelTrdTradeCreate();
+    if (!error) {
+      router.push('/approval-process/process-manangement');
+    }
   };
 
   const transactionHandleCancel = () => {
@@ -69,7 +71,7 @@ const ActionBar = memo<any>(props => {
       },
     });
 
-    if (_error) return;
+    if (_error) return true;
     if (_data.processInstanceId) {
       message.success('已进入流程');
     } else {
@@ -86,7 +88,7 @@ const ActionBar = memo<any>(props => {
         attachmentId,
         processInstanceId: _data.processInstanceId,
       });
-      if (aerror) return;
+      if (aerror) return true;
     }
   };
 
@@ -102,83 +104,85 @@ const ActionBar = memo<any>(props => {
           padding: affix ? '20px 0' : 0,
         }}
       >
-        <Button.Group>
-          <MultilLegCreateButton
-            isPricing={false}
-            key="create"
-            handleAddLeg={(leg: ILeg) => {
-              if (!leg) return;
+        <MultilLegCreateButton
+          isPricing={false}
+          env={LEG_ENV.BOOKING}
+          key="create"
+          handleAddLeg={(leg: ILeg) => {
+            if (!leg) return;
 
-              setTableData(pre =>
-                pre.concat({
-                  ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
-                  ...leg.getDefaultData(LEG_ENV.BOOKING),
-                })
-              );
-            }}
-          />
-          <ModalButton
-            key="完成簿记"
-            type="primary"
-            loading={createTradeLoading}
-            onClick={async () => {
-              if (tableData.length === 0) {
-                return message.warn('缺少交易结构');
-              }
+            setTableData(pre =>
+              pre.concat({
+                ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
+                ...leg.getDefaultData(LEG_ENV.BOOKING),
+              })
+            );
+          }}
+        />
 
-              const rsps = await tableEl.current.table.validate();
-              if (rsps.some(item => item.errors)) {
-                return;
-              }
-              setCreateModalVisible(true);
-            }}
-            modalProps={{
-              title: '创建簿记',
-              visible: createModalVisible,
-              onOk: async () => {
-                const res = await currentCreateFormRef.validate();
-                if (res.error) return;
-                const _createFormData = Form2.getFieldsValue(createFormData);
-                Object.keys(_createFormData).forEach(item => {
-                  if (!_.endsWith(item, 'Date')) {
-                    _createFormData[item] = _.trim(_createFormData[item]);
-                  }
-                });
-                const trade = convertTradePageData2ApiData(
-                  tableData.map(item => Form2.getFieldsValue(item)),
-                  _createFormData,
-                  currentUser.username,
-                  LEG_ENV.BOOKING
-                );
-                const { error: _error, data: _data } = await wkValidProcessCanStart({
-                  processName: '交易录入',
-                  data: {
-                    trade,
-                  },
-                });
-                if (_error) return;
-                if (_data.status) {
-                  return setTransactionModalVisible(true);
+        <ModalButton
+          disabled={_.isEmpty(tableData)}
+          key="完成簿记"
+          type="primary"
+          loading={createTradeLoading}
+          onClick={async () => {
+            if (tableData.length === 0) {
+              return message.warn('缺少交易结构');
+            }
+
+            const rsps = await tableEl.current.table.validate();
+            if (rsps.some(item => item.errors)) {
+              return;
+            }
+            setCreateModalVisible(true);
+          }}
+          modalProps={{
+            title: '创建簿记',
+            visible: createModalVisible,
+            onOk: async () => {
+              const res = await currentCreateFormRef.validate();
+              if (res.error) return;
+              const _createFormData = Form2.getFieldsValue(createFormData);
+              Object.keys(_createFormData).forEach(item => {
+                if (!_.endsWith(item, 'Date')) {
+                  _createFormData[item] = _.trim(_createFormData[item]);
                 }
+              });
+              const trade = convertTradePageData2ApiData(
+                tableData.map(item => Form2.getFieldsValue(item)),
+                _createFormData,
+                currentUser.username,
+                LEG_ENV.BOOKING
+              );
+              const { error: _error, data: _data } = await wkValidProcessCanStart({
+                processName: '交易录入',
+                data: {
+                  trade,
+                },
+              });
+              if (_error) return;
+              // 是否可以发起审批
+              if (_data === true) {
+                return setTransactionModalVisible(true);
+              }
 
-                handelTrdTradeCreate();
-              },
-              onCancel: () => setCreateModalVisible(false),
-              children: (
-                <BookingBaseInfoForm
-                  currentCreateFormRef={node => {
-                    currentCreateFormRef = node;
-                  }}
-                  editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
-                  createFormData={createFormData}
-                  setCreateFormData={setCreateFormData}
-                />
-              ),
-            }}
-          >
-            完成簿记
-          </ModalButton>
-        </Button.Group>
+              handelTrdTradeCreate();
+            },
+            onCancel: () => setCreateModalVisible(false),
+            children: (
+              <BookingBaseInfoForm
+                currentCreateFormRef={node => {
+                  currentCreateFormRef = node;
+                }}
+                editableStatus={FORM_EDITABLE_STATUS.EDITING_NO_CONVERT}
+                createFormData={createFormData}
+                setCreateFormData={setCreateFormData}
+              />
+            ),
+          }}
+        >
+          完成簿记
+        </ModalButton>
       </Row>
 
       <CashExportModal
