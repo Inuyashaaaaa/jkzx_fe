@@ -501,7 +501,7 @@ export const LEG_FIELD = {
   ...TRADE_GENERAL_FIELD_MAP,
   ...COMPUTED_LEG_FIELD_MAP,
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
-  SHIFTED: 'SHIFTED',
+  BARRIER_SHIFT: 'barrierShift',
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
   WEIGHT: 'weight',
@@ -981,4 +981,10 @@ export const DOC_MAP = {
   SUPPLEMENTARY_AGREEMENT: '交易确认书',
   VALUATION_REPORT: '估值报告',
   MARGIN_CALL: '追保函',
+};
+
+export const UNIT_MAP = {
+  ZN: '¥',
+  US: '$',
+  PERCENT: '%',
 };

@@ -161,6 +161,7 @@ class ObserveModalInput extends InputBase<{
       return { start, end, freq };
     }
 
+    // 亚式，区间累积
     const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).format(
       'YYYY-MM-DD'
     );
