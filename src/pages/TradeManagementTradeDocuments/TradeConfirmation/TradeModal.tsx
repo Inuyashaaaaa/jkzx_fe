@@ -57,8 +57,10 @@ class TradeModal extends PureComponent {
   };
 
   public render() {
-    const { data } = this.props;
-    const currentUser = this.props.currentUser.username;
+    const {
+      data,
+      currentUser: { username },
+    } = this.props;
     return (
       <>
         <a onClick={this.onClick}>生成交易确认书</a>
@@ -146,12 +148,12 @@ class TradeModal extends PureComponent {
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <p style={{ lineHeight: '40px' }}>
                 {data.docProcessStatus === 'UN_PROCESSED'
-                  ? `${currentUser}未处理过交易确认书`
+                  ? `${username} 未处理过交易确认书`
                   : data.docProcessStatus === 'DOWNLOADED'
-                  ? `${currentUser} 于 ${moment(data.updateAt).format(
+                  ? `${username} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm'
                     )}下载过交易确认书`
-                  : `${currentUser} 于 ${moment(data.updateAt).format(
+                  : `${username} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm'
                     )}发送过交易确认书`}
               </p>
