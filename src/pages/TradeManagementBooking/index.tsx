@@ -98,8 +98,8 @@ const TradeManagementBooking = props => {
           const leg = getLegByRecord(item);
           if (!leg) return item;
           const omits = _.difference(
-            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.BOOKING).map(item => item.dataIndex)
+            leg.getColumns(LEG_ENV.PRICING, item).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.BOOKING, item).map(item => item.dataIndex)
           );
 
           const pricingPermium = getPricingPermium(item);

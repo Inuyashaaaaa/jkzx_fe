@@ -8,6 +8,7 @@ import {
   wkAttachmentList,
   downloadTradeAttachment,
 } from '@/services/approval';
+import { queryCompleteCompanys } from '@/services/sales';
 import moment from 'moment';
 import { Form2, Upload, Input as Input2, InputNumber, SmartTable } from '@/containers';
 import {
@@ -36,6 +37,7 @@ import { getToken } from '@/tools/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
 import _ from 'lodash';
 import styles from '../index.less';
+import { arr2treeOptions, getMoment } from '@/tools';
 import EditModalButton from '../../ClientManagementInfo/EditModelButton';
 
 const { TextArea } = AntdInput;
@@ -62,6 +64,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
       editable: false,
       creditForm: {},
       isCompleted: null,
+      salesCascaderList: [],
     };
   }
   public componentDidMount = async () => {
@@ -93,6 +96,38 @@ class AccountOpeningApproval extends PureComponent<any, any> {
       );
     }
   }
+
+  public fetchBranchSalesList = async () => {
+    const { error, data } = await queryCompleteCompanys();
+    if (error) return;
+    const newData = arr2treeOptions(
+      data,
+      ['subsidiaryId', 'branchId', 'salesId'],
+      ['subsidiaryName', 'branchName', 'salesName']
+    );
+
+    const branchSalesList = newData.map(subsidiary => {
+      return {
+        value: subsidiary.label,
+        label: subsidiary.label,
+        children: subsidiary.children.map(branch => {
+          return {
+            value: branch.label,
+            label: branch.label,
+            children: branch.children.map(salesName => {
+              return {
+                value: salesName.label,
+                label: salesName.label,
+              };
+            }),
+          };
+        }),
+      };
+    });
+    this.setState({
+      salesCascaderList: branchSalesList,
+    });
+  };
 
   public fetchData = async (params, status) => {
     const processInstanceId = params.processInstanceId || params.processInstance.processInstanceId;
@@ -160,6 +195,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
     this.setState({
       attachmentId: _.get(AttachmentListRes, 'data[0].attachmentId'),
     });
+    this.fetchBranchSalesList();
   };
 
   public handleConfirmModify = async e => {
@@ -600,23 +636,28 @@ class AccountOpeningApproval extends PureComponent<any, any> {
               {_data.status === '待审批' || _data.status === '审核完成' || status !== 'pending' ? (
                 <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
                   <EditModalButton
-                    salesCascaderList={[]}
+                    salesCascaderList={this.state.salesCascaderList}
                     name="查看"
+                    modelEditable={false}
                     content={<Button>查看完整信息</Button>}
                     processInstanceId={this.props.formData.processInstanceId}
                     style={{ color: 'rgba(0, 0, 0, 0.85)' }}
+                    status={this.props.status}
+                    formData={this.props.formData}
                   />
                 </Row>
               ) : (
                 <Row style={{ marginBottom: '20px', paddingLeft: '30px' }}>
                   <EditModalButton
-                    salesCascaderList={[]}
+                    salesCascaderList={this.state.salesCascaderList}
                     name="编辑"
                     modelEditable={true}
                     content={<Button>修改客户信息</Button>}
                     style={{ color: 'rgba(0, 0, 0, 0.85)' }}
                     handleApprovalData={this.handleGetData}
                     processInstanceId={this.props.formData.processInstanceId}
+                    status={this.props.status}
+                    formData={this.props.formData}
                   />
                 </Row>
               )}

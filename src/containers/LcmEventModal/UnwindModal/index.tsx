@@ -364,7 +364,7 @@ class UnwindModal extends PureComponent<
                           },
                         },
                         {
-                          message: '平仓金额为必填项',
+                          message: '平仓名义本金为必填项',
                           required: true,
                         },
                         {

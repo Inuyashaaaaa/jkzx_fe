@@ -183,6 +183,12 @@ export const getTradeCreateModalData = (apiData: any = {}) => {
 function miniumlPercent(item) {
   const clone = { ...item };
 
+  if (clone[LEG_FIELD.BARRIER_SHIFT] !== undefined) {
+    clone[LEG_FIELD.BARRIER_SHIFT] = new BigNumber(clone[LEG_FIELD.BARRIER_SHIFT])
+      .multipliedBy(0.01)
+      .toNumber();
+  }
+
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
       clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM]
@@ -409,6 +415,12 @@ function miniumlPercent(item) {
 
 export function backConvertPercent(item) {
   const clone = { ...Form2.getFieldsValue(item) };
+
+  if (clone[LEG_FIELD.BARRIER_SHIFT] !== undefined) {
+    clone[LEG_FIELD.BARRIER_SHIFT] = new BigNumber(clone[LEG_FIELD.BARRIER_SHIFT])
+      .multipliedBy(100)
+      .toNumber();
+  }
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(

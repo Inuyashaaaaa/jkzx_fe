@@ -219,6 +219,7 @@ export const PROCESS_STATUS_TYPE_OPTIONS = convertOptions(
 );
 
 export const LCM_EVENT_TYPE_MAP = {
+  PAYMENT: 'PAYMENT',
   OPEN: 'OPEN',
   UNWIND: 'UNWIND',
   EXPIRATION: 'EXPIRATION',
@@ -235,6 +236,7 @@ export const LCM_EVENT_TYPE_MAP = {
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
+  PAYMENT: '支付',
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
   OPEN: '开仓',
@@ -394,14 +396,14 @@ export const OPTION_TYPE_OPTIONS = Object.keys(OPTION_TYPE_MAP).map(key => ({
 
 export const OBSERVATION_TYPE_ZHCN_MAP = {
   TERMINAL: '到期观察',
-  // DISCRETE: '离散观察',
+  DISCRETE: '离散观察',
   DAILY: '每日观察',
   CONTINUOUS: '连续观察',
 };
 
 export const OBSERVATION_TYPE_MAP = {
   TERMINAL: 'TERMINAL',
-  // DISCRETE: 'DISCRETE',
+  DISCRETE: 'DISCRETE',
   CONTINUOUS: 'CONTINUOUS',
   DAILY: 'DAILY',
 };
@@ -499,6 +501,9 @@ export const LEG_FIELD = {
   ...TRADE_GENERAL_FIELD_MAP,
   ...COMPUTED_LEG_FIELD_MAP,
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
+  BARRIER_SHIFT: 'barrierShift',
+  EARNINGS: 'EARNINGS',
+  EARNINGS_TYPE: 'EARNINGS_TYPE',
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
   WEIGHT: 'weight',
@@ -838,8 +843,9 @@ export const PRODUCTTYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间累积',
   [LEG_TYPE_MAP.STRADDLE]: '跨式',
   [LEG_TYPE_MAP.DIGITAL]: '二元',
-  [LEG_TYPE_MAP.SPREAD_EUROPEAN]: '价差欧式(a-b)',
-  [LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN]: '价差欧式(a/b)',
+  // 暂时去掉下面2个类型
+  // [LEG_TYPE_MAP.SPREAD_EUROPEAN]: '价差欧式(a-b)',
+  // [LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN]: '价差欧式(a/b)',
 };
 
 export const PRODUCTTYPE_MAP = {
@@ -865,8 +871,9 @@ export const PRODUCTTYPE_MAP = {
   // DIGITAL_AMERICAN: 'DIGITAL_AMERICAN',
   // DIGITAL_EUROPEAN: 'DIGITAL_EUROPEAN',
   DIGITAL: 'DIGITAL',
-  SPREAD_EUROPEAN: 'SPREAD_EUROPEAN',
-  RATIO_SPREAD_EUROPEAN: 'RATIO_SPREAD_EUROPEAN',
+  // 暂时去掉下面2个类型
+  // SPREAD_EUROPEAN: 'SPREAD_EUROPEAN',
+  // RATIO_SPREAD_EUROPEAN: 'RATIO_SPREAD_EUROPEAN',
 };
 
 export const PRODUCTTYPE_OPTIONS = convertOptions(PRODUCTTYPE_MAP, PRODUCTTYPE_ZHCH_MAP);
@@ -978,4 +985,10 @@ export const DOC_MAP = {
   SUPPLEMENTARY_AGREEMENT: '交易确认书',
   VALUATION_REPORT: '估值报告',
   MARGIN_CALL: '追保函',
+};
+
+export const UNIT_MAP = {
+  ZN: '¥',
+  US: '$',
+  PERCENT: '%',
 };

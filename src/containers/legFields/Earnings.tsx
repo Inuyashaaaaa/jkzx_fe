@@ -1,21 +1,14 @@
-import {
-  LEG_FIELD,
-  RULES_REQUIRED,
-  STRIKE_TYPES_MAP,
-  LEG_TYPE_FIELD,
-  LEG_ENV_FIELD,
-} from '@/constants/common';
+import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
+import { Form2 } from '@/containers';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
 import React from 'react';
-import { Form2 } from '@/containers';
 
-export const Strike: ILegColDef = {
-  title: '行权价',
-  dataIndex: LEG_FIELD.STRIKE,
+export const Earnings: ILegColDef = {
+  title: '区间收益',
+  dataIndex: LEG_FIELD.EARNINGS,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     if (isEditing) {
@@ -26,13 +19,10 @@ export const Strike: ILegColDef = {
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
+
     const getUnit = () => {
-      const val = Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]);
-      if (val === STRIKE_TYPES_MAP.CNY) {
+      if (Form2.getFieldValue(record[LEG_FIELD.EARNINGS_TYPE]) === STRIKE_TYPES_MAP.CNY) {
         return '¥';
-      }
-      if (val === STRIKE_TYPES_MAP.PERCENT) {
-        return '%';
       }
       return '%';
     };

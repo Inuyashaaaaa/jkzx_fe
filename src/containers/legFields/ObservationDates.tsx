@@ -161,18 +161,15 @@ class ObserveModalInput extends InputBase<{
       return { start, end, freq };
     }
 
-    if (isRangeAccruals(record)) {
-      const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).format(
-        'YYYY-MM-DD'
-      );
-      const end = getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).format(
-        'YYYY-MM-DD'
-      );
-      const freq = Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_STEP]);
-      return { start, end, freq };
-    }
-
-    throw new Error('getAutoGenerateParams: not match!');
+    // 亚式，区间累积
+    const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).format(
+      'YYYY-MM-DD'
+    );
+    const end = getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).format(
+      'YYYY-MM-DD'
+    );
+    const freq = Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_STEP]);
+    return { start, end, freq };
   };
 
   public onGenerate = async () => {

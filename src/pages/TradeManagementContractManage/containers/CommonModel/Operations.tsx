@@ -1,4 +1,4 @@
-import { LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
+import { LCM_EVENT_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_MAP } from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
 import ModalButton from '@/containers/_ModalButton2';
@@ -14,6 +14,8 @@ import router from 'umi/router';
 import uuidv4 from 'uuid';
 import LifeModalTable from '../../LifeModalTable';
 import PortfolioModalTable from '../../PortfolioModalTable';
+import _ from 'lodash';
+
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 
@@ -150,10 +152,11 @@ class Operations extends PureComponent<{
 
   public loadCommon = () => {
     const item = this.props.record;
-    if (!this.state.eventTypes[item.positionId]) return;
-    return this.state.eventTypes[item.positionId].map(node => {
-      return <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>;
-    });
+    return _.get(this.state.eventTypes, item.positionId, [])
+      .filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT)
+      .map(node => {
+        return <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>;
+      });
   };
 
   public render() {

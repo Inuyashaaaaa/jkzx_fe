@@ -281,8 +281,8 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
   const leg = getLegByRecord(record);
   if (!leg) return record;
   const omits = _.difference(
-    leg.getColumns(record[LEG_ENV_FIELD]).map(record => record.dataIndex),
-    leg.getColumns(toEnv).map(record => record.dataIndex)
+    leg.getColumns(record[LEG_ENV_FIELD], record).map(record => record.dataIndex),
+    leg.getColumns(toEnv, record).map(record => record.dataIndex)
   );
   return {
     ...createLegDataSourceItem(leg, toEnv),
@@ -293,6 +293,8 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
 
 export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
   const isAnnualized = position.asset.annualized;
+
+  const pageData = leg.getPageData(env, position);
 
   return {
     ...createLegDataSourceItem(leg, env),
@@ -305,8 +307,8 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
         ),
         [LEG_FIELD.IS_ANNUAL]: isAnnualized,
       }),
-      ...leg.getPageData(env, position),
     }),
+    ...pageData,
   };
 };
 
@@ -316,8 +318,8 @@ export const formatNumber = (
   roundingMode?: BigNumber.RoundingMode,
   config?: BigNumber.Format
 ) => {
-  if (value == null) {
-    return value;
+  if (!_.isNumber(value)) {
+    return '';
   }
   return new BigNumber(value).toFormat(decimalPlaces, roundingMode, config);
 };
