@@ -102,7 +102,6 @@ Deploy-Prod:
   stage: deploy
   script:
     - yarn run deploy:prod
-  when: manual
   only:
     - /master.*/
 
