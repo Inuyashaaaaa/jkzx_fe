@@ -48,7 +48,7 @@ const MultiLegTable = memo<
       setColumns(pre => {
         const multiLegColumns = dataSource.reduce((container, record) => {
           const leg = getLegByRecord(record);
-          return container.concat(leg.getColumns(env));
+          return container.concat(leg.getColumns(env, record));
         }, []);
 
         const nextUnion = getUnionLegColumns(multiLegColumns);
@@ -112,7 +112,7 @@ const MultiLegTable = memo<
       return false;
     }
 
-    if (!(leg && leg.getColumns(env).find(item => item.dataIndex === colDef.dataIndex))) {
+    if (!(leg && leg.getColumns(env, record).find(item => item.dataIndex === colDef.dataIndex))) {
       return true;
     }
 
