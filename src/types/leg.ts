@@ -20,6 +20,7 @@ export interface ILeg {
   name: string;
   type: string;
   assetClass: string;
+  convertEditRecord2PricingData?: (record: any) => any;
   getColumns: (env: string, record: any) => ILegColDef[];
   getDefaultData: (env: string) => ITableData;
   getPosition: (env: string, dataItem: any, baseInfo: any) => any;

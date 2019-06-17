@@ -1,20 +1,18 @@
-import { getMoment } from '@/tools';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   ASSET_CLASS_MAP,
-  EXERCISETYPE_MAP,
+  BIG_NUMBER_CONFIG,
+  KNOCK_DIRECTION_MAP,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
-  UNIT_ENUM_MAP,
-  REBATETYPE_UNIT_MAP,
-  REBATETYPE_TYPE_MAP,
-  KNOCK_DIRECTION_MAP,
-  OPTION_TYPE_MAP,
-  BIG_NUMBER_CONFIG,
   OBSERVATION_TYPE_MAP,
   OB_DAY_FIELD,
-  FREQUENCY_TYPE_NUM_MAP,
   OB_PRICE_FIELD,
+  OPTION_TYPE_MAP,
+  REBATETYPE_TYPE_MAP,
+  REBATETYPE_UNIT_MAP,
+  UNIT_ENUM_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -22,15 +20,21 @@ import {
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/global';
 import {
-  LEG_ENV,
   GENERAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
+  LEG_ENV,
   TOTAL_EDITING_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
+import { ObservationDates } from '@/containers/legFields/ObservationDates';
+import { ObservationStep } from '@/containers/legFields/ObservationStep';
+import { BarrierShift } from '@/containers/legFields/Shifted';
+import { getMoment } from '@/tools';
+import { computedShift } from '@/tools/leg';
 import { ILeg } from '@/types/leg';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+import { evaluate } from 'mathjs';
 import moment from 'moment';
 import {
   LEG_FIELD,
@@ -40,49 +44,37 @@ import {
   STRIKE_TYPES_MAP,
 } from '../../constants/common';
 import { Direction } from '../../containers/legFields';
+import { Barrier } from '../../containers/legFields/Barrier';
+import { BarrierType } from '../../containers/legFields/BarrierType';
 import { DaysInYear } from '../../containers/legFields/DaysInYear';
 import { EffectiveDate } from '../../containers/legFields/EffectiveDate';
 import { ExpirationDate } from '../../containers/legFields/ExpirationDate';
 import { FrontPremium } from '../../containers/legFields/FrontPremium';
-import { AlUnwindNotionalAmount } from '../../containers/legFields/infos/AlUnwindNotionalAmount';
-import { InitialNotionalAmount } from '../../containers/legFields/infos/InitialNotionalAmount';
-import { LcmEventType } from '../../containers/legFields/infos/LcmEventType';
-import { PositionId } from '../../containers/legFields/infos/PositionId';
 import { InitialSpot } from '../../containers/legFields/InitialSpot';
 import { IsAnnual } from '../../containers/legFields/IsAnnual';
+import { KnockDirection } from '../../containers/legFields/KnockDirection';
 import { MinimumPremium } from '../../containers/legFields/MinimumPremium';
 import { NotionalAmount } from '../../containers/legFields/NotionalAmount';
 import { NotionalAmountType } from '../../containers/legFields/NotionalAmountType';
+import { ObservationType } from '../../containers/legFields/ObservationType';
 import { OptionType } from '../../containers/legFields/OptionType';
 import { ParticipationRate } from '../../containers/legFields/ParticipationRate';
 import { Premium } from '../../containers/legFields/Premium';
 import { PremiumType } from '../../containers/legFields/PremiumType';
+import { Rebate } from '../../containers/legFields/Rebate';
+import { RebateType } from '../../containers/legFields/RebateType';
+import { RebateUnit } from '../../containers/legFields/RebateUnit';
 import { SettlementDate } from '../../containers/legFields/SettlementDate';
 import { SpecifiedPrice } from '../../containers/legFields/SpecifiedPrice';
 import { Strike } from '../../containers/legFields/Strike';
 import { StrikeType } from '../../containers/legFields/StrikeType';
 import { Term } from '../../containers/legFields/Term';
+import { TradeNumber } from '../../containers/legFields/TradeNumber';
 import { UnderlyerInstrumentId } from '../../containers/legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../../containers/legFields/UnderlyerMultiplier';
-import { commonLinkage } from '../common';
-import { Rebate } from '../../containers/legFields/Rebate';
-import { ObservationType } from '../../containers/legFields/ObservationType';
-import { KnockDirection } from '../../containers/legFields/KnockDirection';
-import { RebateUnit } from '../../containers/legFields/RebateUnit';
-import { RebateType } from '../../containers/legFields/RebateType';
-import { BarrierType } from '../../containers/legFields/BarrierType';
-import { Barrier } from '../../containers/legFields/Barrier';
-import BigNumber from 'bignumber.js';
 import { Unit } from '../../containers/legFields/Unit';
+import { commonLinkage } from '../common';
 import { legPipeLine } from '../_utils';
-import { TradeNumber } from '../../containers/legFields/TradeNumber';
-import { AlreadyBarrier } from '@/containers/legFields/AlreadyBarrier';
-import { ObservationStep } from '@/containers/legFields/ObservationStep';
-import ObserveModalInput from '@/containers/ObserveModalInput';
-import { ObservationDates } from '@/containers/legFields/ObservationDates';
-import { BarrierShift } from '@/containers/legFields/Shifted';
-import { evaluate } from 'mathjs';
-import { prcTrialPositionsService } from '@/services/pricing';
 
 const asyncLinkageBarrierShift = (
   env,
@@ -96,47 +88,29 @@ const asyncLinkageBarrierShift = (
 ) => {
   const { changedFields } = changeFieldsParams;
 
-  const computedShift = (vol = 0.2) => {
-    console.log(vol);
-    const step = Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_STEP]);
-    const barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
-
-    if (step && barrier == null) {
-    } else if (barrier != null && !step) {
-      record[LEG_FIELD.BARRIER_SHIFT] = Form2.createField(barrier);
-    } else if (barrier != null && step) {
-      const dt = evaluate(`${FREQUENCY_TYPE_NUM_MAP[step]} / 256`);
-      const next = parseFloat(
-        evaluate(`${barrier} * exp(0.5826 * ${vol} * sqrt(${dt}))`).toPrecision(4)
-      );
-      record[LEG_FIELD.BARRIER_SHIFT] = Form2.createField(next);
-    }
-  };
-
-  if (env === LEG_ENV.PRICING) {
+  if (Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_TYPE]) === OBSERVATION_TYPE_MAP.DISCRETE) {
     if (Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields)) {
-      if (
-        Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_TYPE]) === OBSERVATION_TYPE_MAP.DISCRETE
-      ) {
-        const vol = Form2.getFieldValue(record[LEG_FIELD.VOL]);
-        computedShift(evaluate(`${vol} / 100`));
-      }
+      const vol = Form2.getFieldValue(record[LEG_FIELD.VOL]);
+      computedShift(evaluate(record, `${vol} / 100`));
+    }
+
+    if (
+      Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.OBSERVATION_STEP, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.KNOCK_DIRECTION, changedFields)
+    ) {
+      computedShift(record);
     }
   }
 
   // 切换离散
   if (Form2.fieldValueIsChange(LEG_FIELD.OBSERVATION_TYPE, changedFields)) {
     if (Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_TYPE]) === OBSERVATION_TYPE_MAP.DISCRETE) {
-      computedShift();
-    }
-  }
-
-  if (Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_TYPE]) === OBSERVATION_TYPE_MAP.DISCRETE) {
-    if (
-      Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.OBSERVATION_STEP, changedFields)
-    ) {
-      computedShift();
+      computedShift(record);
+    } else {
+      record[LEG_FIELD.OBSERVATION_STEP] = undefined;
+      record[LEG_FIELD.OBSERVATION_DATES] = undefined;
+      record[LEG_FIELD.BARRIER_SHIFT] = undefined;
     }
   }
 };
@@ -150,10 +124,6 @@ export const BarrierLeg: ILeg = legPipeLine({
       const obType = Form2.getFieldValue(record[ObservationType.dataIndex]);
 
       if (obType === OBSERVATION_TYPE_MAP.DISCRETE) {
-        if (env === LEG_ENV.EDITING) {
-          return [ObservationDates, BarrierShift];
-        }
-
         return [ObservationStep, ObservationDates, BarrierShift];
       }
 
@@ -328,8 +298,11 @@ export const BarrierLeg: ILeg = legPipeLine({
           {}
         );
       }
+      if (dataItem[LEG_FIELD.OBSERVATION_STEP]) {
+        nextPosition.asset[LEG_FIELD.UP_OBSERVATION_STEP] = dataItem[LEG_FIELD.OBSERVATION_STEP];
+      }
     } else {
-      delete nextPosition.asset[LEG_FIELD.BARRIER_SHIFT];
+      nextPosition.asset[LEG_FIELD.BARRIER_SHIFT] = null;
     }
 
     nextPosition.asset.effectiveDate =
@@ -351,6 +324,9 @@ export const BarrierLeg: ILeg = legPipeLine({
     const days = Object.keys(position.asset.fixingObservations);
     if (!days.length) return {};
     return Form2.createFields({
+      fixingObservations: undefined,
+      [LEG_FIELD.UP_OBSERVATION_STEP]: undefined,
+      [LEG_FIELD.OBSERVATION_STEP]: position.asset[LEG_FIELD.UP_OBSERVATION_STEP],
       [LEG_FIELD.OBSERVATION_DATES]: days.map(day => {
         return {
           [OB_DAY_FIELD]: day,
@@ -419,10 +395,25 @@ export const BarrierLeg: ILeg = legPipeLine({
             ? Form2.createField(OPTION_TYPE_MAP.CALL)
             : Form2.createField(OPTION_TYPE_MAP.PUT);
 
+        const prevKnockDirection = Form2.getFieldValue(record[LEG_FIELD.KNOCK_DIRECTION]);
         record[LEG_FIELD.KNOCK_DIRECTION] =
           barrier > strike
             ? Form2.createField(KNOCK_DIRECTION_MAP.UP)
             : Form2.createField(KNOCK_DIRECTION_MAP.DOWN);
+
+        // 联动依赖联动
+        if (prevKnockDirection !== Form2.getFieldValue(record[LEG_FIELD.KNOCK_DIRECTION])) {
+          asyncLinkageBarrierShift(
+            env,
+            changeFieldsParams,
+            record,
+            tableData,
+            setColLoading,
+            setLoading,
+            setColValue,
+            setTableData
+          );
+        }
       }
     }
   },
