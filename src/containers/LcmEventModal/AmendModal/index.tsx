@@ -106,7 +106,7 @@ const AmendModal = memo<IAmendModal>(props => {
           Form2.getFieldsValue(store.tableFormData),
           LEG_ENV.BOOKING
         );
-        let _data = Form2.getFieldsValue(cashData);
+        const _data = Form2.getFieldsValue(cashData);
         _data.cashFlowChange = JSON.stringify(_data.cashFlowChange);
         _data.paymentDate = moment(_data.paymentDate).format('YYYY-MM-DD');
         const { error } = await trdTradeLCMEventProcess({
@@ -242,7 +242,7 @@ const AmendModal = memo<IAmendModal>(props => {
       <Alert
         message="现金流金额为正时代表我方收入，金额为负时代表我方支出。"
         type="info"
-        showIcon
+        showIcon={true}
       />
     </Modal>
   );
