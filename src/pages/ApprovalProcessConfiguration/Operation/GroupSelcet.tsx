@@ -3,7 +3,9 @@ import _ from 'lodash';
 import { Select } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useEffect, useState } from 'react';
+import { Divider, Button } from 'antd';
 
+const { Option } = Select;
 const GroupSelcet = memo<{
   value: any;
   record: object;
@@ -58,7 +60,7 @@ const GroupSelcet = memo<{
   }
   return (
     <Select
-      defaultOpen={false}
+      defaultOpen={true}
       autoSelect={true}
       mode="multiple"
       options={options}
@@ -66,6 +68,20 @@ const GroupSelcet = memo<{
       value={value}
       onChange={val => {
         props.onChange(val);
+      }}
+      dropdownRender={menu => {
+        return (
+          <>
+            {menu}
+            <Divider style={{ margin: '4px 0' }} />
+            <div style={{ padding: '8px', cursor: 'pointer' }}>
+              <Button type="primary" style={{ marginRight: '15px' }}>
+                确认
+              </Button>
+              <Button>取消</Button>
+            </div>
+          </>
+        );
       }}
     />
   );
