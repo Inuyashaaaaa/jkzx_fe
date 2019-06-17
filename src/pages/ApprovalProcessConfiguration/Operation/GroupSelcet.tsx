@@ -11,10 +11,8 @@ const GroupSelcet = memo<{
   formData?: any;
 }>(props => {
   const [options, setOptions] = useState(null);
-  const { record, index, formData } = props;
-  const { form } = formData;
-  const [editing, setEditing] = useState(formData.editing);
-  const [value, setValue] = useState([]);
+  const { record, index, form, editing } = props;
+  const { value } = props;
 
   useEffect(
     () => {
@@ -31,7 +29,6 @@ const GroupSelcet = memo<{
       label: item.approveGroupName,
     }));
     setOptions(_.sortBy(optionsData, 'label'));
-    setValue(props.value);
   };
 
   if (!options) {
@@ -47,25 +44,30 @@ const GroupSelcet = memo<{
     );
   }
 
+  if (!_.get(props, 'editing')) {
+    return (
+      <Select
+        defaultOpen={false}
+        autoSelect={true}
+        mode="multiple"
+        options={options}
+        editing={editing}
+        value={value}
+      />
+    );
+  }
   return (
-    <FormItem>
-      {form.getFieldDecorator({
-        rules: [
-          {
-            required: true,
-            message: '至少选择一个审批组',
-          },
-        ],
-      })(
-        <Select
-          defaultOpen={false}
-          autoSelect={true}
-          mode="multiple"
-          options={options}
-          editing={editing}
-        />
-      )}
-    </FormItem>
+    <Select
+      defaultOpen={false}
+      autoSelect={true}
+      mode="multiple"
+      options={options}
+      editing={editing}
+      value={value}
+      onChange={val => {
+        props.onChange(val);
+      }}
+    />
   );
 });
 
