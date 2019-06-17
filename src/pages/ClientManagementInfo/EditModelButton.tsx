@@ -25,34 +25,42 @@ import {
   TRADER_TYPE,
 } from './constants';
 import { getToken } from '@/tools/authority';
-import { wkProcessInstanceFormGet } from '@/services/approval';
+import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 
 const TabPane = Tabs.TabPane;
 
 const useTableData = props => {
-  const { record = {}, modelEditable, processInstanceId } = props;
+  const { record = {}, modelEditable, status } = props;
   const [loading, setLoading] = useState(false);
   const [baseFormData, setBaseFormData] = useState({});
   const [traderList, setTraderList] = useState([]);
 
-  const fetchData = async () => {
+  const fetchData = async (param, processInstanceId) => {
     setLoading(true);
-    // 开户审批
     let result = {};
     let data = {};
-    console.log(props);
     if (processInstanceId) {
-      result = await wkProcessInstanceFormGet({
+      const isCompleted = param.processInstanceStatusEnum
+        ? !_.toLower(param.processInstanceStatusEnum).includes('unfinished') && status !== 'pending'
+        : false;
+      const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
+      const res = await executeMethod({
         processInstanceId,
       });
-      data = _.get(result, 'data.process._business_payload');
+      if (!res || res.error) {
+        this.setState({
+          loading: false,
+        });
+        return;
+      }
+      data = _.get(res, 'data.process._business_payload');
     } else {
       result = await refPartyGetByLegalName({ legalName: record.legalName });
       data = result.data;
     }
-    console.log(data);
     setLoading(false);
     if (result.error) return;
+
     const newData = {};
     const authorizers = data.authorizers;
     if (modelEditable !== false) {
@@ -1485,7 +1493,12 @@ const EditModalButton = memo<any>(props => {
       style={{ ...props.style }}
       onClick={() => {
         setModalVisible(true);
-        fetchData();
+        // 开户审批查看
+        // if (props.processInstanceId) {
+
+        //   return;
+        // }
+        fetchData(props.formData, props.processInstanceId);
       }}
       modalProps={{
         title: name,
