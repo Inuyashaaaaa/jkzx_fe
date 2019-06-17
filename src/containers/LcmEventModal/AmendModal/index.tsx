@@ -16,11 +16,11 @@ import FormItem from 'antd/lib/form/FormItem';
 
 const UN_EDITDIR = [
   LEG_FIELD.UNDERLYER_MULTIPLIER,
-  LEG_FIELD.TERM,
-  LEG_FIELD.EFFECTIVE_DATE,
-  LEG_FIELD.EXPIRATION_DATE,
-  LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
-  LEG_FIELD.NOTIONAL_AMOUNT,
+  // LEG_FIELD.TERM,
+  // LEG_FIELD.EFFECTIVE_DATE,
+  // LEG_FIELD.EXPIRATION_DATE,
+  // LEG_FIELD.NOTIONAL_AMOUNT_TYPE,
+  // LEG_FIELD.NOTIONAL_AMOUNT,
   LEG_FIELD.UNIT,
   LEG_FIELD.ALREADY_BARRIER,
 ];
@@ -54,7 +54,6 @@ const AmendModal = memo<IAmendModal>(props => {
   }>({});
   current({
     show: (record, tableFormData, currentUser, reload) => {
-      console.log(record, tableFormData);
       const newData = _.mapValues(record, (item, key) => {
         if (_.includes(DATE_ARRAY, key)) {
           return {
@@ -180,6 +179,7 @@ const AmendModal = memo<IAmendModal>(props => {
             return {
               ...item,
               editable(record) {
+                // 拦截字段强制不可编辑
                 if (UN_EDITDIR.find(key => key === item.dataIndex)) return false;
 
                 return typeof item.editable === 'function'
