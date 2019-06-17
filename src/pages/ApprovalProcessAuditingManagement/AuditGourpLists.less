@@ -1,6 +1,30 @@
 @import '~antd/lib/style/themes/default.less';
 
-.listItem {
+.lists {
+  :global {
+    .ant-list-item,
+    .ant-list-something-after-last-item
+      .ant-spin-container
+      > .ant-list-items
+      > .ant-list-item:last-child {
+      border: none;
+      padding: 0;
+    }
+    .ant-list-items {
+      padding: '0 15px 15px 15px';
+    }
+    .ant-list-item:hover {
+      // background: #1890ff;
+      background: rgb(130, 187, 236);
+    }
+  }
+}
+.listItem1 {
+  background: #1890ff;
+}
+
+.listItem1,
+.listItem2 {
   .icon {
     visibility: hidden;
     margin-left: 4px;
@@ -13,6 +37,13 @@
 
   &:hover .icon {
     visibility: visible;
+  }
+  .name {
+    width: 150px;
+    margin: 3px 0;
+    display: inline-block;
+    padding: 3px 0;
+    padding-left: 6px;
   }
 
   .value {
