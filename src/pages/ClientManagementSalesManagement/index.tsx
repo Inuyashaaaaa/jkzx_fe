@@ -21,6 +21,7 @@ import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
 import styles from './index.less';
 import Operation from './Operation';
+import _ from 'lodash';
 
 const { TreeNode } = Tree;
 
@@ -260,7 +261,7 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public renderTreeNodes = data => {
-    return data.map(item => {
+    return _.sortBy(data, 'title').map(item => {
       if (item.children) {
         return (
           <TreeNode

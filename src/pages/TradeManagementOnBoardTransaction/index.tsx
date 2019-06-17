@@ -5,6 +5,7 @@ import {
   mktInstrumentInfo,
   mktInstrumentSearch,
   mktInstrumentWhitelistSearch,
+  excListAllInstrumentsInTradeRecords,
   mktQuotesListPaged,
 } from '@/services/market-data-service';
 import {
@@ -484,7 +485,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
                     allowClear: true,
                     placeholder: '请输入内容搜索',
                     options: async value => {
-                      const { data, error } = await mktInstrumentWhitelistSearch({
+                      const { data, error } = await excListAllInstrumentsInTradeRecords({
                         instrumentIdPart: value,
                       });
                       if (error) return [];

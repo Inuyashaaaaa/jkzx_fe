@@ -126,11 +126,11 @@ export default [
               name: 'baseContractManagement',
               component: './PricingSettingsBaseContractManagement/index',
             },
-            {
-              path: '/pricingSettings/pricingEnvironment',
-              name: 'pricingEnvironment',
-              component: './PricingSettingsPricingEnvironment/index',
-            },
+            // {
+            //   path: '/pricingSettings/pricingEnvironment',
+            //   name: 'pricingEnvironment',
+            //   component: './PricingSettingsPricingEnvironment/index',
+            // },
             {
               path: '/pricingSettings/customModel',
               name: 'customModel',
@@ -293,11 +293,6 @@ export default [
               path: '/approval-process/process-configuration',
               name: 'processConfiguration',
               component: './ApprovalProcessConfiguration/index',
-            },
-            {
-              path: '/approval-process/trigger-management',
-              name: 'triggerManagement',
-              component: './ApprocalTriggerManagement/index',
             },
           ],
         },

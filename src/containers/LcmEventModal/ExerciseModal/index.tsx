@@ -176,17 +176,19 @@ class ExerciseModal extends PureComponent<
   public handleSettleAmount = async () => {
     const dataSource = this.state.dataSource;
     if (
-      (_.has(dataSource, 'UNDERLYER_PRICE') && !dataSource[UNDERLYER_PRICE]) ||
-      (!dataSource[UNDERLYER_PRICE1] || !dataSource[UNDERLYER_PRICE2])
+      !(
+        (_.has(dataSource, 'UNDERLYER_PRICE') && dataSource[UNDERLYER_PRICE]) ||
+        (dataSource[UNDERLYER_PRICE1] || dataSource[UNDERLYER_PRICE2])
+      )
     ) {
-      if (
-        (_.has(dataSource, 'UNDERLYER_PRICE') && !(dataSource[UNDERLYER_PRICE] === 0)) ||
-        !(dataSource[UNDERLYER_PRICE1] === 0) ||
-        !(dataSource[UNDERLYER_PRICE2] === 0)
-      ) {
-        message.error('请填标的物价格');
-        return;
-      }
+      // if (
+      //   (_.has(dataSource, 'UNDERLYER_PRICE') && dataSource[UNDERLYER_PRICE]) ||
+      //   !(dataSource[UNDERLYER_PRICE1] === 0) ||
+      //   !(dataSource[UNDERLYER_PRICE2] === 0)
+      // ) {
+      message.error('请填标的物价格');
+      return;
+      // }
     }
     const params = this.state.productType.includes('SPREAD_EUROPEAN')
       ? {
@@ -195,7 +197,7 @@ class ExerciseModal extends PureComponent<
           notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
         }
       : {
-          underlyerPrice1: String(dataSource[UNDERLYER_PRICE]),
+          underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
           numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
           notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
         };
