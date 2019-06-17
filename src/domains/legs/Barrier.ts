@@ -91,7 +91,7 @@ const asyncLinkageBarrierShift = (
   if (Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_TYPE]) === OBSERVATION_TYPE_MAP.DISCRETE) {
     if (Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields)) {
       const vol = Form2.getFieldValue(record[LEG_FIELD.VOL]);
-      computedShift(evaluate(record, `${vol} / 100`));
+      computedShift(record, evaluate(`${vol} / 100`));
     }
 
     if (
