@@ -89,17 +89,18 @@ const asyncLinkageBarrierShift = (
   const { changedFields } = changeFieldsParams;
 
   if (Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_TYPE]) === OBSERVATION_TYPE_MAP.DISCRETE) {
-    if (Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields)) {
-      const vol = Form2.getFieldValue(record[LEG_FIELD.VOL]);
-      computedShift(evaluate(record, `${vol} / 100`));
-    }
-
     if (
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.OBSERVATION_STEP, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.KNOCK_DIRECTION, changedFields)
+      Form2.fieldValueIsChange(LEG_FIELD.KNOCK_DIRECTION, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields)
     ) {
-      computedShift(record);
+      const vol = Form2.getFieldValue(record[LEG_FIELD.VOL]);
+      if (vol != null) {
+        computedShift(record, evaluate(`${vol} / 100`));
+      } else {
+        computedShift(record, 0.2);
+      }
     }
   }
 
