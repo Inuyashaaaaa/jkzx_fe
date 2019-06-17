@@ -79,15 +79,15 @@ const ClientManagementInfo = memo(() => {
 
     const branchSalesList = newData.map(subsidiary => {
       return {
-        value: subsidiary.label,
+        value: subsidiary.value,
         label: subsidiary.label,
         children: subsidiary.children.map(branch => {
           return {
-            value: branch.label,
+            value: branch.value,
             label: branch.label,
             children: branch.children.map(salesName => {
               return {
-                value: salesName.label,
+                value: salesName.value,
                 label: salesName.label,
               };
             }),
