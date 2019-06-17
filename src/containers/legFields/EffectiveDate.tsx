@@ -9,6 +9,7 @@ export const EffectiveDate: ILegColDef = {
   title: '起始日',
   dataIndex: LEG_FIELD.EFFECTIVE_DATE,
   editable: record => {
+    // debugger
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
     if (isBooking || isPricing) {
@@ -16,8 +17,9 @@ export const EffectiveDate: ILegColDef = {
     }
     return false;
   },
-  defaultEditing: false,
+  // defaultEditing: false
   render: (value, record, index, { form, editing, colDef }) => {
+    // debugger
     const isBooking = legEnvIsBooking(record);
     const isPricing = legEnvIsPricing(record);
     return (
@@ -26,8 +28,10 @@ export const EffectiveDate: ILegColDef = {
           rules: [getRequiredRule()],
         })(
           <DatePicker
-            defaultOpen={true}
-            editing={editing}
+            // defaultOpen={true}
+            // editing={editing}
+            defaultOpen={isBooking || isPricing}
+            editing={isBooking || isPricing ? editing : false}
             {...{
               format: 'YYYY-MM-DD',
             }}
