@@ -41,7 +41,7 @@ const AmendModal = memo<IAmendModal>(props => {
   const $form = useRef<Form2>(null);
   const [cashData, setCashData] = useState({
     ...Form2.createFields({
-      date: moment(),
+      paymentDate: moment(),
     }),
   });
   const [createCash, setCreateCash] = useState(false);
@@ -54,6 +54,7 @@ const AmendModal = memo<IAmendModal>(props => {
   }>({});
   current({
     show: (record, tableFormData, currentUser, reload) => {
+      console.log(record, tableFormData);
       const newData = _.mapValues(record, (item, key) => {
         if (_.includes(DATE_ARRAY, key)) {
           return {
@@ -87,7 +88,6 @@ const AmendModal = memo<IAmendModal>(props => {
   const handleChange = e => {
     setCreateCash(e.target.checked);
   };
-
   return (
     <Modal
       okText="保存"
@@ -106,6 +106,9 @@ const AmendModal = memo<IAmendModal>(props => {
           Form2.getFieldsValue(store.tableFormData),
           LEG_ENV.BOOKING
         );
+        let _data = Form2.getFieldsValue(cashData);
+        _data.cashFlowChange = JSON.stringify(_data.cashFlowChange);
+        _data.paymentDate = moment(_data.paymentDate).format('YYYY-MM-DD');
         const { error } = await trdTradeLCMEventProcess({
           positionId: store.record[LEG_ID_FIELD],
           tradeId: store.tableFormData.tradeId,
@@ -114,6 +117,7 @@ const AmendModal = memo<IAmendModal>(props => {
           eventDetail: {
             asset: _.get(position, 'asset'),
             productType: position.productType,
+            ..._data,
           },
         });
         setConfirmLoading(false);
@@ -202,7 +206,7 @@ const AmendModal = memo<IAmendModal>(props => {
         columns={[
           {
             title: '现金流金额',
-            dataIndex: 'cash',
+            dataIndex: 'cashFlowChange',
             render: (value, record, index, { form, editing }) => {
               return (
                 <FormItem>
@@ -215,7 +219,7 @@ const AmendModal = memo<IAmendModal>(props => {
           },
           {
             title: '支付日期',
-            dataIndex: 'date',
+            dataIndex: 'paymentDate',
             render: (value, record, index, { form, editing }) => {
               return (
                 <FormItem>
