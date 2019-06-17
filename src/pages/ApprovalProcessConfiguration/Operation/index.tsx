@@ -476,7 +476,7 @@ const Operation = props => {
               type="info"
               showIcon={true}
             />
-            <Table2
+            <SmartTable
               ref={node => (tableE1 = node)}
               dataSource={reviewTask}
               rowKey="taskId"

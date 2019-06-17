@@ -80,7 +80,7 @@ const EditTable = memo<any>(props => {
 
   return (
     <>
-      <Table2
+      <SmartTable
         dataSource={reviewTask}
         rowKey="taskId"
         pagination={false}
