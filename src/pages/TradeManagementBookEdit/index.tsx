@@ -5,6 +5,7 @@ import {
   BIG_NUMBER_CONFIG,
   LEG_TYPE_MAP,
   LEG_TYPE_FIELD,
+  LCM_EVENT_TYPE_MAP,
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
@@ -162,7 +163,7 @@ const TradeManagementBooking = props => {
         positionId: position.positionId,
       }).then(rsp => {
         if (rsp.error) return;
-        const data = [...rsp.data];
+        const data = [...rsp.data].filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT);
         setEventTypes(pre => ({
           ...pre,
           [position.positionId]: data,
