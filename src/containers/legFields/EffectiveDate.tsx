@@ -18,8 +18,6 @@ export const EffectiveDate: ILegColDef = {
   },
   defaultEditing: false,
   render: (value, record, index, { form, editing, colDef }) => {
-    const isBooking = legEnvIsBooking(record);
-    const isPricing = legEnvIsPricing(record);
     return (
       <FormItem>
         {form.getFieldDecorator({

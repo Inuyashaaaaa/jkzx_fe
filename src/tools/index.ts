@@ -285,8 +285,8 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
     leg.getColumns(toEnv, record).map(record => record.dataIndex)
   );
   return {
-    ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
-    ...leg.getDefaultData(LEG_ENV.BOOKING),
+    ...createLegDataSourceItem(leg, toEnv),
+    ...leg.getDefaultData(toEnv),
     ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
   };
 };
