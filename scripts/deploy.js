@@ -6,6 +6,7 @@ const fs = require('fs');
 const TEST_CONTAINER = 'FE-test';
 const PROD_CONTAINER = 'FE-prod';
 const RELEASE_CONTAINER = 'FE-release';
+const HOTFIX_CONTAINER = 'FE-hotfix';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
@@ -105,6 +106,10 @@ function release() {
 }
 
 function hotfix() {
+  const prodContainerPath = path.join(USER_PATH, HOTFIX_CONTAINER);
+  // 更新 last
+  bundle(prodContainerPath, '../dist/*');
+
   upload();
   upload({
     branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
