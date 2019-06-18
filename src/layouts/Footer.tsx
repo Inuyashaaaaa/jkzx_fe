@@ -29,7 +29,7 @@ const FooterView = () => (
       copyright={
         <Fragment>
           Copyright <Icon type="copyright" /> Tongyu All Rights Reserved 上海同余信息科技有限公司
-          沪ICP备16043748号 version {require('@/defaultSettings').version}
+          沪ICP备16043748号 v{require('@/defaultSettings').version}
         </Fragment>
       }
     />
