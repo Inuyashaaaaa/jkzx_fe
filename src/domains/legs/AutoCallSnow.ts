@@ -60,7 +60,7 @@ import { UpBarrier } from '../../containers/legFields/UpBarrier';
 import { UpBarrierType } from '../../containers/legFields/UpBarrierType';
 import { UpObservationStep } from '../../containers/legFields/UpObservationStep';
 import { commonLinkage } from '../common';
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import { Unit } from '../../containers/legFields/Unit';
 import { legPipeLine } from '../_utils';
 import { TradeNumber } from '../../containers/legFields/TradeNumber';
@@ -170,10 +170,11 @@ export const AutoCallSnow: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [LEG_FIELD.IS_ANNUAL]: true,
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
@@ -182,8 +183,8 @@ export const AutoCallSnow: ILeg = legPipeLine({
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
       [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],
       [LEG_FIELD.STEP]: 0,

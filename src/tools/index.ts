@@ -401,6 +401,12 @@ export const getMoment = (val, clone = false) => {
   return isMoment(val) ? (clone ? val.clone() : val) : !!val ? moment(val) : moment();
 };
 
+export const getCurDateMoment = () => {
+  const m = moment();
+  const s = m.format('YYYY-MM-DD');
+  return moment(s);
+};
+
 export * from './delay';
 export * from '../utils/eventBus';
 export * from '../utils/isShallowEqual';

@@ -19,7 +19,7 @@ import {
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
@@ -157,6 +157,7 @@ export const Asia: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
@@ -165,17 +166,17 @@ export const Asia: ILeg = legPipeLine({
       [Strike.dataIndex]: 100,
       [SpecifiedPrice.dataIndex]: SPECIFIED_PRICE_MAP.CLOSE,
       [Term.dataIndex]: DEFAULT_TERM,
-      [EffectiveDate.dataIndex]: moment(),
-      [ExpirationDate.dataIndex]: moment(),
-      [SettlementDate.dataIndex]: moment().add(DEFAULT_TERM, 'day'),
+      [EffectiveDate.dataIndex]: curDateMoment.clone(),
+      [ExpirationDate.dataIndex]: curDateMoment.clone(),
+      [SettlementDate.dataIndex]: curDateMoment.clone().add(DEFAULT_TERM, 'day'),
       [DaysInYear.dataIndex]: DEFAULT_DAYS_IN_YEAR,
       [PremiumType.dataIndex]: PREMIUM_TYPE_MAP.PERCENT,
       [NotionalAmountType.dataIndex]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
-      [ObserveStartDay.dataIndex]: moment(),
-      [ObserveEndDay.dataIndex]: moment().add(DEFAULT_TERM, 'day'),
+      [ObserveStartDay.dataIndex]: curDateMoment.clone(),
+      [ObserveEndDay.dataIndex]: curDateMoment.clone().add(DEFAULT_TERM, 'day'),
       [ObservationStep.dataIndex]: FREQUENCY_TYPE_MAP['1D'],
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       ...(env === LEG_ENV.PRICING
         ? {
             [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
