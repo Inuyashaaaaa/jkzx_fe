@@ -1,4 +1,4 @@
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -155,11 +155,12 @@ export const Concava: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       [IsAnnual.dataIndex]: true,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,

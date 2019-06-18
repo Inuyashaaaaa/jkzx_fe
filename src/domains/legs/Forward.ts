@@ -1,4 +1,4 @@
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -133,12 +133,13 @@ export const Forward: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [LEG_FIELD.IS_ANNUAL]: false,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,

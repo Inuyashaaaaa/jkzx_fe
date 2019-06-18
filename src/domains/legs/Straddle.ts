@@ -1,4 +1,4 @@
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -155,11 +155,12 @@ export const Straddle: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       [IsAnnual.dataIndex]: true,
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.LOW_PARTICIPATION_RATE]: 100,
       [LEG_FIELD.HIGH_PARTICIPATION_RATE]: 100,

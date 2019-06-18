@@ -29,7 +29,7 @@ import { Form2 } from '@/containers';
 import { ObservationDates } from '@/containers/legFields/ObservationDates';
 import { ObservationStep } from '@/containers/legFields/ObservationStep';
 import { BarrierShift } from '@/containers/legFields/Shifted';
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import { computedShift } from '@/tools/leg';
 import { ILeg } from '@/types/leg';
 import BigNumber from 'bignumber.js';
@@ -233,12 +233,13 @@ export const BarrierLeg: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,

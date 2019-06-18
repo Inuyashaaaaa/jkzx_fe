@@ -20,7 +20,7 @@ import {
   TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -139,12 +139,13 @@ export const RatioSpreadEuropean: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,

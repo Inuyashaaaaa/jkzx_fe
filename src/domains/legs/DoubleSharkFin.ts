@@ -1,4 +1,4 @@
-import { getMoment } from '@/tools';
+import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
   EXERCISETYPE_MAP,
@@ -188,10 +188,11 @@ export const DoubleSharkFin: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.LOW_PARTICIPATION_RATE]: 100,
       [LEG_FIELD.HIGH_PARTICIPATION_RATE]: 100,
@@ -202,7 +203,7 @@ export const DoubleSharkFin: ILeg = legPipeLine({
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       ...(env === LEG_ENV.PRICING
         ? {
             [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
