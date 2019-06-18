@@ -1,21 +1,18 @@
+import { InputBase, ITableColDef } from '@/components/type';
 import {
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
   KNOCK_DIRECTION_MAP,
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
 } from '@/constants/common';
-import { Form2 } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
 import ModalButton from '@/containers/ModalButton';
 import PopconfirmButton from '@/containers/PopconfirmButton';
-import SourceTable from '@/containers/SourceTable';
-import { IColumnDef } from '@/containers/Table/types';
-import { InputBase } from '@/components/type';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { qlDateScheduleCreate } from '@/services/quant-service';
-import { getLegEnvs, getMoment, getRequiredRule, isAsian, isRangeAccruals, remove } from '@/tools';
+import { getLegEnvs, getMoment, getRequiredRule, isAsian, remove } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Button, Col, message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -28,8 +25,6 @@ class ObserveModalInput extends InputBase<{
   direction?: string;
   record: any;
 }> {
-  public $sourceTable: SourceTable = null;
-
   public state = {
     visible: false,
     popconfirmVisible: false,
@@ -49,6 +44,7 @@ class ObserveModalInput extends InputBase<{
         return {
           ...item,
           [OB_DAY_FIELD]: moment(item[OB_DAY_FIELD]),
+          price: Form2.createField(item.price),
         };
       })
     );
@@ -79,20 +75,16 @@ class ObserveModalInput extends InputBase<{
   };
 
   public onOk = async () => {
-    const validateTableRsp: any = await this.$sourceTable.validateTable();
-
-    if (validateTableRsp.error) return;
-
     this.setState(
       {
         visible: !this.state.visible,
       },
       () => {
         const val = this.state.dealDataSource.map(item => {
-          return {
+          return Form2.getFieldsValue({
             ...item,
             [OB_DAY_FIELD]: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
-          };
+          });
         });
         if (this.props.onChange) {
           this.props.onChange(val);
@@ -129,10 +121,10 @@ class ObserveModalInput extends InputBase<{
     });
   };
 
-  public bindRemove = params => () => {
+  public bindRemove = rowIndex => () => {
     this.setState({
       dealDataSource: this.computeDataSource(
-        remove(this.state.dealDataSource, (item, index) => index === params.node.rowIndex)
+        remove(this.state.dealDataSource, (item, index) => index === rowIndex)
       ),
     });
   };
@@ -232,49 +224,56 @@ class ObserveModalInput extends InputBase<{
     return this.props.direction === KNOCK_DIRECTION_MAP.UP;
   };
 
-  public getColumnDefs = (): IColumnDef[] => {
+  public getColumnDefs = (): ITableColDef[] => {
     if (this.isAutoCallSnow() || this.isAutoCallPhoenix()) {
       return [
         {
-          headerName: '观察日',
-          field: OB_DAY_FIELD,
-          input: {
-            type: 'date',
-            ranger: 'day',
+          title: '观察日',
+          dataIndex: OB_DAY_FIELD,
+          render: (text, record, index) => {
+            return record[OB_DAY_FIELD].format('YYYY-MM-DD');
           },
         },
         {
-          headerName: '支付日',
-          field: 'payDay',
-          input: {
-            type: 'date',
-            ranger: 'day',
+          title: '支付日',
+          dataIndex: 'payDay',
+          render: (text, record, index) => {
+            return record.payDay.format('YYYY-MM-DD');
           },
         },
         this.isAutoCallSnow()
           ? {
-              headerName: '障碍价格',
-              field: 'price',
-              input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+              title: '障碍价格',
+              dataIndex: 'price',
             }
           : {
-              headerName: '已观察到价格(可编辑)',
-              field: 'price',
-              editable: true,
-              input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+              title: '已观察到价格(可编辑)',
+              dataIndex: 'price',
+              defaultEditing: false,
+              editable: record => true,
+              render: (val, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <UnitInputNumber autoSelect={true} editing={editing} unit={'¥'} />
+                    )}
+                  </FormItem>
+                );
+              },
             },
         {
-          headerName: '操作',
-          render: params => {
+          title: '操作',
+          dataIndex: 'operation',
+          render: (text, record, index) => {
             return (
               <Row
                 type="flex"
                 align="middle"
-                style={{
-                  height: params.context.rowHeight,
-                }}
+                // style={{
+                //   height: params.context.rowHeight,
+                // }}
               >
-                <Button size="small" type="danger" onClick={this.bindRemove(params)}>
+                <Button size="small" type="danger" onClick={this.bindRemove(index)}>
                   删除
                 </Button>
               </Row>
@@ -286,40 +285,48 @@ class ObserveModalInput extends InputBase<{
 
     return [
       {
-        headerName: '观察日',
-        field: OB_DAY_FIELD,
-        input: {
-          type: 'date',
-          ranger: 'day',
+        title: '观察日',
+        dataIndex: OB_DAY_FIELD,
+        render: (text, record, index) => {
+          return record[OB_DAY_FIELD].format('YYYY-MM-DD');
         },
       },
       ...(this.isAccruals()
         ? []
         : [
             {
-              headerName: '权重',
-              field: 'weight',
-              input: INPUT_NUMBER_DIGITAL_CONFIG,
+              title: '权重',
+              dataIndex: 'weight',
             },
           ]),
       {
-        headerName: '已观察到价格(可编辑)',
-        field: 'price',
-        editable: true,
-        input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+        title: '已观察到价格(可编辑)',
+        dataIndex: 'price',
+        defaultEditing: false,
+        editable: record => true,
+        render: (val, record, index, { form, editing }) => {
+          return (
+            <FormItem>
+              {form.getFieldDecorator({})(
+                <UnitInputNumber autoSelect={true} editing={editing} unit={'¥'} />
+              )}
+            </FormItem>
+          );
+        },
       },
       {
-        headerName: '操作',
-        render: params => {
+        title: '操作',
+        dataIndex: 'operation',
+        render: (text, record, index) => {
           return (
             <Row
               type="flex"
               align="middle"
-              style={{
-                height: params.context.rowHeight,
-              }}
+              // style={{
+              //   height: params.context.rowHeight,
+              // }}
             >
-              <Button size="small" type="danger" onClick={this.bindRemove(params)}>
+              <Button size="small" type="danger" onClick={this.bindRemove(index)}>
                 删除
               </Button>
             </Row>
@@ -347,6 +354,19 @@ class ObserveModalInput extends InputBase<{
     );
   };
 
+  public handleCellValueChanged = params => {
+    this.setState({
+      dealDataSource: this.computeDataSource(
+        this.state.dealDataSource.map((item, index) => {
+          if (index === params.rowIndex) {
+            return params.record;
+          }
+          return item;
+        })
+      ),
+    });
+  };
+
   public renderEditing() {
     return (
       <Row
@@ -370,47 +390,45 @@ class ObserveModalInput extends InputBase<{
           onClick={this.onOpen}
           style={{ width: '100%', display: 'block' }}
           content={
-            <SourceTable
-              dataSource={this.state.dealDataSource}
-              pagination={false}
-              rowKey={OB_DAY_FIELD}
-              ref={node => {
-                this.$sourceTable = node;
-              }}
-              header={
-                <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
-                  <Col>
-                    <Form
-                      onSubmitButtonClick={this.onSubmitButtonClick}
-                      layout="inline"
-                      controls={[
-                        {
-                          field: 'day',
-                          control: {
-                            label: '观察日',
-                          },
-                          input: {
-                            type: 'date',
-                            range: 'day',
-                          },
-                          decorator: {
-                            rules: [
-                              {
-                                required: true,
-                              },
-                            ],
-                          },
+            <>
+              <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
+                <Col>
+                  <Form
+                    onSubmitButtonClick={this.onSubmitButtonClick}
+                    layout="inline"
+                    controls={[
+                      {
+                        field: 'day',
+                        control: {
+                          label: '观察日',
                         },
-                      ]}
-                      submitText={'添加'}
-                      resetable={false}
-                    />
-                  </Col>
-                  <Col>{this.getAutoGenerateButton()}</Col>
-                </Row>
-              }
-              columnDefs={this.getColumnDefs()}
-            />
+                        input: {
+                          type: 'date',
+                          range: 'day',
+                        },
+                        decorator: {
+                          rules: [
+                            {
+                              required: true,
+                            },
+                          ],
+                        },
+                      },
+                    ]}
+                    submitText={'添加'}
+                    resetable={false}
+                  />
+                </Col>
+                <Col>{this.getAutoGenerateButton()}</Col>
+              </Row>
+              <SmartTable
+                dataSource={this.state.dealDataSource}
+                pagination={false}
+                rowKey={OB_DAY_FIELD}
+                onCellFieldsChange={this.handleCellValueChanged}
+                columns={this.getColumnDefs()}
+              />
+            </>
           }
         >
           观察日管理
