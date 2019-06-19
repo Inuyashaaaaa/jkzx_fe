@@ -20,7 +20,7 @@ import { Button, Divider, message, Modal, Radio, Row, Table, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants';
 import TabHeader from '@/containers/TabHeader';
@@ -28,8 +28,6 @@ import { SmartTable } from '@/containers';
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
-
-const reg = /^[+-]?\d+\.?\d*$/;
 
 const TradeManagementOnBoardTansaction = props => {
   const [loading, setLoading] = useState(false);
@@ -53,19 +51,8 @@ const TradeManagementOnBoardTansaction = props => {
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    queryInstrumentId();
     queryFlowData();
   }, []);
-
-  const queryInstrumentId = async () => {
-    const ids = await mktInstrumentSearch({
-      instrumentIdPart: '',
-    });
-    if (ids.error) {
-      return;
-    }
-    const data = (ids && ids.data) || [];
-  };
 
   const queryAndInjectMarketData = async (queryMethod, params) => {
     const list = await queryMethod({ ...params });
@@ -499,4 +486,4 @@ const TradeManagementOnBoardTansaction = props => {
   );
 };
 
-export default TradeManagementOnBoardTansaction;
+export default memo(TradeManagementOnBoardTansaction);
