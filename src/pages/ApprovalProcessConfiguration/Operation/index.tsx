@@ -67,6 +67,19 @@ const Operation = props => {
     });
     setLoading(false);
     let { tasks } = processData;
+    tasks = tasks.map(task => {
+      task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
+        return item.approveGroupId;
+      });
+      if (task.taskType === 'modifyData') {
+        task.sequence = 9999;
+      }
+      if (task.taskType === 'insertData') {
+        task.sequence = -9999;
+      }
+      return task;
+    });
+
     tasks = _.sortBy(tasks, 'sequence');
     setProcess(processData);
     setProcessConfigs(processData.processConfigs);
