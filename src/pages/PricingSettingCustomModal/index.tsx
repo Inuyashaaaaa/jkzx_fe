@@ -301,7 +301,6 @@ const CustomModel = memo(() => {
   };
 
   const handleSelect = async (e, param) => {
-    console.log(param);
     setCurrentTrade(param);
     setTableLoading(true);
     const { data, error } = await mdlModelDataGet({
