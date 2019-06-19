@@ -204,6 +204,26 @@ export const TABLE_COL_DEFS = [
     },
   },
   {
+    title: 'vol(%)',
+    dataIndex: 'vol',
+    width: 130,
+  },
+  {
+    title: 'r(%)',
+    dataIndex: 'r',
+    width: 130,
+  },
+  {
+    title: 'q(%)',
+    dataIndex: 'q',
+    width: 130,
+  },
+  {
+    title: '定价环境',
+    dataIndex: 'pricingEnvironment',
+    width: 130,
+  },
+  {
     title: '错误信息',
     dataIndex: 'message',
   },
