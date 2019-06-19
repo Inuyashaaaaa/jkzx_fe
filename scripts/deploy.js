@@ -6,10 +6,10 @@ const fs = require('fs');
 const TEST_CONTAINER = 'FE-test';
 const PROD_CONTAINER = 'FE-prod';
 const RELEASE_CONTAINER = 'FE-release';
+const DEMO_CONTAINER = 'FE-demo';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
-const DEMO_CONTAINER = 'demo';
 const BRANCH_NAME_LATEST = 'latest';
 
 const exists = src => {
