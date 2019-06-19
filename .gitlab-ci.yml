@@ -98,7 +98,6 @@ Deploy-Demo:
   stage: deploy
   script:
     - yarn run deploy:demo
-  when: manual
   only:
     - /demo.*/
 
