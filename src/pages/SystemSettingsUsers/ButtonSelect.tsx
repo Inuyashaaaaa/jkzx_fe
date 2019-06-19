@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React, { memo, useEffect, useState } from 'react';
 import { Divider, Button, notification, Row } from 'antd';
-import { Form2, Select, Table2 } from '@/containers';
+import { Select, Table2 } from '@/containers';
 
 const GroupSelcet = memo<any>(props => {
   const { cellApi, value: _value } = props;
