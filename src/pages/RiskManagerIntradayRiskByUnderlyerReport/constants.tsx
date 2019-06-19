@@ -1,4 +1,5 @@
 import { formatNumber } from '@/tools';
+import { multiply } from 'mathjs';
 
 export const TABLE_COL_DEFS = [
   {
@@ -26,13 +27,13 @@ export const TABLE_COL_DEFS = [
     align: 'right',
   },
   {
-    title: '标的物价格变化 (%)',
+    title: '标的物价格变化',
     dataIndex: 'underlyerPriceChangePercent',
     width: 150,
-    render: (value, record, index) => {
-      return formatNumber(value, 4) + '%';
-    },
     align: 'right',
+    render: (value, record, index) => {
+      return formatNumber(multiply(value, 100), 4) + '%';
+    },
   },
   {
     title: '标的物持仓 (手)',
