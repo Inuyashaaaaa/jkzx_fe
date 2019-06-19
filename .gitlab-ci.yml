@@ -30,6 +30,7 @@ Install:
     - /release.*/
     - /hotfix.*/
     - /doc.*/
+    - /demo.*/
 
 Lint:
   stage: test
@@ -40,6 +41,7 @@ Lint:
     - /develop.*/
     - /release.*/
     - /hotfix.*/
+    - /demo.*/
 
 Test:
   stage: test
@@ -50,6 +52,7 @@ Test:
     - /develop.*/
     - /release.*/
     - /hotfix.*/
+    - /demo.*/
 
 Build:
   stage: build
@@ -60,6 +63,7 @@ Build:
     - /develop.*/
     - /release.*/
     - /hotfix.*/
+    - /demo.*/
 
 Deploy-Release:
   stage: deploy
@@ -89,6 +93,13 @@ Deploy-Prod:
   when: manual
   only:
     - /master.*/
+
+Deploy-Demo:
+  stage: deploy
+  script:
+    - yarn run deploy:demo
+  only:
+    - /demo.*/
 
 Deploy-Doc:
   stage: deploy

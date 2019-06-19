@@ -7,6 +7,7 @@ const TEST_CONTAINER = 'FE-test';
 const PROD_CONTAINER = 'FE-prod';
 const RELEASE_CONTAINER = 'FE-release';
 const HOTFIX_CONTAINER = 'FE-hotfix';
+const DEMO_CONTAINER = 'FE-demo';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
@@ -86,6 +87,14 @@ function prod() {
   upload();
 }
 
+function demo() {
+  const prodContainerPath = path.join(USER_PATH, DEMO_CONTAINER);
+  // 更新 last
+  bundle(prodContainerPath, '../dist/*');
+
+  upload();
+}
+
 function test() {
   const prodContainerPath = path.join(USER_PATH, TEST_CONTAINER);
   // 更新 last
@@ -156,4 +165,8 @@ if (denv === 'feature') {
 
 if (denv === 'doc') {
   doc();
+}
+
+if (denv === 'demo') {
+  demo();
 }
