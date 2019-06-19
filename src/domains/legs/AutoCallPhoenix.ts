@@ -218,7 +218,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
     const COMPUTED_FIELDS = [
       LEG_FIELD.UP_BARRIER,
       LEG_FIELD.UP_BARRIER_TYPE,
-      AlreadyBarrier.dataIndex,
+      // AlreadyBarrier.dataIndex,
       LEG_FIELD.IS_ANNUAL,
       LEG_FIELD.UNIT,
       LEG_FIELD.TRADE_NUMBER,
@@ -284,7 +284,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
       }),
       [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
       [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
-      [LEG_FIELD.ALREADY_BARRIER]: position.lcmEventType === 'KNOCK_IN' ? true : false,
+      // [LEG_FIELD.ALREADY_BARRIER]: position.lcmEventType === 'KNOCK_IN' ? true : false,
       // [AlreadyBarrier.dataIndex]: !!position.asset[DownBarrierDate.dataIndex],
     });
     return fields;

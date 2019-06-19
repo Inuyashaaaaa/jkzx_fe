@@ -510,7 +510,7 @@ export const LEG_FIELD = {
   IS_ANNUAL: 'annualized', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
   DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
-  ALREADY_BARRIER: 'AlreadyBarrier', // 已经敲入
+  ALREADY_BARRIER: 'knockedIn', // 已经敲入
   COUPON_BARRIER: 'couponBarrier', // coupon障碍
   OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日
   OBSERVATION_STEP: 'observationStep', // 观察频率
