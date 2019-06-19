@@ -478,7 +478,7 @@ class SwitchCell extends PureComponent<
           'rowId',
         ])}
         onClick={this.onCellClick}
-        className={classNames('tongyu-table-cell', {
+        className={classNames('tongyu-table-cell', this.props.className, {
           editable: this.getEditable(),
           editing: this.getEditing(),
           rendering: !this.getEditing(),

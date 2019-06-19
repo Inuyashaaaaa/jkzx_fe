@@ -18,6 +18,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState, forwardRef } from 'react';
 import SmartTable from '../SmartTable';
+import styles from './index.less';
 
 const MultiLegTable = memo<
   {
@@ -145,7 +146,7 @@ const MultiLegTable = memo<
           }
           if (cellIsEmpty(record, colDef)) {
             return {
-              style: { backgroundColor: '#fafafa' },
+              className: styles.empty,
               ...(item.onCell ? item.onCell.apply(this, arguments) : null),
             };
           }
