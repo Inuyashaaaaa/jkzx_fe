@@ -110,13 +110,13 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       throw new Error('not found Leg type');
     }
 
-    const lcmEventType =
-      type === LEG_TYPE_MAP.AUTOCALL_PHOENIX && dataSourceItem[LEG_FIELD.ALREADY_BARRIER]
-        ? 'KNOCK_IN'
-        : 'OPEN';
+    // const lcmEventType =
+    //   type === LEG_TYPE_MAP.AUTOCALL_PHOENIX && dataSourceItem[LEG_FIELD.ALREADY_BARRIER]
+    //     ? 'KNOCK_IN'
+    //     : 'OPEN';
 
     return {
-      lcmEventType,
+      // lcmEventType,
       positionAccountCode: 'empty',
       positionAccountName: 'empty',
       counterPartyAccountCode: 'empty',
