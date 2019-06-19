@@ -14,22 +14,9 @@ import {
 import { TABLE_CELL_FIELDS_CHANGE, TABLE_CELL_VALUES_CHANGE } from '../constants/EVENT';
 // import schema from 'async-validator';
 
-const EditableContext = React.createContext<{ form?: WrappedFormUtils }>({});
+const EditableContext = React.createContext<WrappedFormUtils>(null);
 
 class EditableRow extends React.Component<ITableRowProps> {
-  // public shouldComponentUpdate(nextProps) {
-  //   if (nextProps.getEditing()) {
-  //     nextProps.setEditing(false);
-  //     return true;
-  //   }
-
-  //   if (_.some(nextProps.editings, val => !!val)) {
-  //     return false;
-  //   }
-
-  //   return !isShallowEqual(nextProps, this.props);
-  // }
-
   public componentDidMount = () => {
     const { record, getRowKey } = this.props;
     this.props.api.tableManager.registeRow(record[getRowKey()], this);
@@ -42,31 +29,8 @@ class EditableRow extends React.Component<ITableRowProps> {
 
   public validate = (options: any = {}, colIds = []) => {
     const { silence, scroll = true, ...rest } = options;
-    // const { columns, record } = this.props;
 
     return new Promise<{ errors: any; values: any }>((resolve, reject) => {
-      // if (silence) {
-      //   const fieldsProps = columns
-      //     .map(item => {
-      //       return item.dataIndex;
-      //     })
-      //     .reduce((obj, dataIndex) => {
-      //       obj[dataIndex] = this.props.form.getFieldProps(dataIndex);
-      //       return obj;
-      //     }, {});
-
-      //   const schemaConfig = _.mapValues(fieldsProps, (meta, dataIndex) => {
-      //     return meta['data-__meta'].rules || [];
-      //   });
-
-      //   const validator = new schema(schemaConfig);
-
-      //   const values = this.props.form.getFieldsValue();
-      //   validator.validate(values, errors => {
-      //     resolve({ errors, values });
-      //   });
-      //   return;
-      // }
       return this.props.form[scroll ? 'validateFieldsAndScroll' : 'validateFields'](
         colIds,
         rest,
@@ -119,7 +83,7 @@ class EditableRow extends React.Component<ITableRowProps> {
     );
     const contextMenu = this.getContextMenu();
     return (
-      <EditableContext.Provider value={{ form }}>
+      <EditableContext.Provider value={this.props.form}>
         {contextMenu ? (
           <Dropdown trigger={['contextMenu']} overlay={contextMenu}>
             {child}
