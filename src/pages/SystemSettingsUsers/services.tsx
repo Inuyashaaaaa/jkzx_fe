@@ -8,13 +8,7 @@ import { Divider, Button } from 'antd';
 import Operation from './Operation';
 import ButtonSelect from './ButtonSelect';
 
-export const createPageTableColDefs = (
-  roleOptions,
-  showResources,
-  departments,
-  fetchData,
-  handleValueChanged
-) => [
+export const createPageTableColDefs = (roleOptions, showResources, departments, fetchData) => [
   {
     title: '用户名',
     dataIndex: 'username',
@@ -31,15 +25,14 @@ export const createPageTableColDefs = (
     editable: record => {
       return true;
     },
-    render: (value, record, index, { form, editing }) => {
+    render: (value, record, index, { form, editing, cellApi }) => {
       return (
         <FormItem>
           {form.getFieldDecorator({})(
             <ButtonSelect
               options={roleOptions}
               mode={'multiple'}
-              handleValueChanged={handleValueChanged}
-              {...{ record, index, form, editing }}
+              {...{ record, index, form, editing, cellApi }}
             />
           )}
         </FormItem>
