@@ -1,5 +1,6 @@
 import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
 import { formatNumber } from '@/tools';
+import { multiply } from 'mathjs';
 
 export const TABLE_COL_DEFS = [
   {
@@ -190,19 +191,31 @@ export const TABLE_COL_DEFS = [
     align: 'right',
   },
   {
-    title: 'vol(%)',
+    title: 'vol',
     dataIndex: 'vol',
     width: 130,
+    align: 'right',
+    render: text => {
+      return text === +text ? formatNumber(multiply(text, 100), 4) + '%' : text;
+    },
   },
   {
-    title: 'r(%)',
+    title: 'r',
     dataIndex: 'r',
     width: 130,
+    align: 'right',
+    render: text => {
+      return text === +text ? formatNumber(multiply(text, 100), 4) + '%' : text;
+    },
   },
   {
-    title: 'q(%)',
+    title: 'q',
     dataIndex: 'q',
     width: 130,
+    align: 'right',
+    render: text => {
+      return text === +text ? formatNumber(multiply(text, 100), 4) + '%' : text;
+    },
   },
   {
     title: '定价环境',
