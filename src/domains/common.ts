@@ -218,6 +218,22 @@ export const inline = (
     record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] = Form2.createField(
       isAnnual ? NOTIONAL_AMOUNT_TYPE_MAP.CNY : NOTIONAL_AMOUNT_TYPE_MAP.LOT
     );
+    if (
+      record[LEG_FIELD.INITIAL_SPOT] &&
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] &&
+      record[LEG_FIELD.NOTIONAL_AMOUNT]
+    ) {
+      computedTradeNumber(
+        env,
+        changeFieldsParams,
+        record,
+        tableData,
+        setColLoading,
+        setLoading,
+        setColValue,
+        setTableData
+      );
+    }
   }
 
   if (env === LEG_ENV.PRICING) {
