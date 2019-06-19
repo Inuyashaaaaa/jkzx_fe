@@ -12,8 +12,7 @@ const GroupSelcet = memo<{
 }>(props => {
   const [options, setOptions] = useState(null);
   const { record, index, formData } = props;
-  const { form } = formData;
-  const [editing, setEditing] = useState(formData.editing);
+  const { form, editing } = formData;
   const [value, setValue] = useState([]);
 
   useEffect(
