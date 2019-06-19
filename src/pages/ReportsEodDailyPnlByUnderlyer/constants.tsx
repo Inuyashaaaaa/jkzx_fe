@@ -91,8 +91,14 @@ export const TABLE_COL_DEFS = [
     title: '其他贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionUnexplained',
+    width: 130,
     render: (value, record, index) => {
       return formatMoney(value);
     },
+  },
+  {
+    title: '定价环境',
+    dataIndex: 'pricingEnvironment',
+    width: 130,
   },
 ];

@@ -6,8 +6,15 @@ import FormItem from 'antd/lib/form/FormItem';
 import { Select } from '@/containers';
 import { Divider, Button } from 'antd';
 import Operation from './Operation';
+import ButtonSelect from './ButtonSelect';
 
-export const createPageTableColDefs = (roleOptions, showResources, departments, fetchData) => [
+export const createPageTableColDefs = (
+  roleOptions,
+  showResources,
+  departments,
+  fetchData,
+  handleValueChanged
+) => [
   {
     title: '用户名',
     dataIndex: 'username',
@@ -19,22 +26,20 @@ export const createPageTableColDefs = (roleOptions, showResources, departments, 
     width: 180,
   },
   {
-    title: '拥有角色（可编辑）',
+    title: '拥有角色',
     dataIndex: 'roles',
     editable: record => {
       return true;
     },
-    defaultEditing: false,
     render: (value, record, index, { form, editing }) => {
       return (
         <FormItem>
           {form.getFieldDecorator({})(
-            <Select
-              defaultOpen={true}
-              editing={editing}
-              autoSelect={true}
+            <ButtonSelect
               options={roleOptions}
               mode={'multiple'}
+              handleValueChanged={handleValueChanged}
+              {...{ record, index, form, editing }}
             />
           )}
         </FormItem>

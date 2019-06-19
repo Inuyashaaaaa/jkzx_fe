@@ -18,7 +18,7 @@ const RiskManagerIntradayPositionReport = memo<any>(props => {
       defaultDirection={'desc'}
       searchMethod={rptIntradayTradeReportSearchPaged}
       downloadName={'持仓明细'}
-      scrollWidth={3450}
+      scrollWidth={4050}
       colSwitch={[{ dataIndex: 'productType', options: PRODUCTTYPE_ZHCH_MAP }]}
     />
   );
