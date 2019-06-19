@@ -28,6 +28,7 @@ import {
 import FormItem from 'antd/lib/form/FormItem';
 import { Form2, Select, InputNumber, Table2, Input, SmartTable } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import ActiveTable from './ActiveTable';
 
 class PricingSettingVolSurface extends PureComponent {
   public lastFetchedDataSource = null;
@@ -158,6 +159,7 @@ class PricingSettingVolSurface extends PureComponent {
               title: '期限',
               dataIndex: 'tenor',
               defaultEditing: false,
+              width: 120,
               editable: record => {
                 return true;
               },
@@ -183,6 +185,7 @@ class PricingSettingVolSurface extends PureComponent {
             dataIndex: item.field,
             defaultEditing: false,
             percent: item.percent,
+            width: 150,
             editable: record => {
               return true;
             },
@@ -363,6 +366,7 @@ class PricingSettingVolSurface extends PureComponent {
     const columns = tableColumnDefs.concat({
       title: '操作',
       dataIndex: 'operation',
+      width: 150,
       render: (text, record, index) => {
         return (
           <>
@@ -384,6 +388,7 @@ class PricingSettingVolSurface extends PureComponent {
       const value = o.tenor.value;
       return durationMap[value.substring(value.length - 1)] * Number.parseInt(value, 10) * 7;
     });
+
     return (
       <Page>
         <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
@@ -431,50 +436,13 @@ class PricingSettingVolSurface extends PureComponent {
               columns={SEARCH_FORM(this.state.groups, this.state.searchFormData)}
             />
             <Divider type="horizontal" />
-            <Row>
-              <Button type="primary" onClick={this.handleSaveTable}>
-                保存
-              </Button>
-            </Row>
-            {this.underlyer ? (
-              <>
-                <Divider type="horizontal" />
-                <Form2
-                  layout="inline"
-                  dataSource={Form2.createFields(this.state.tableFormData)}
-                  submitable={false}
-                  resetable={false}
-                  onFieldsChange={this.onTableFormChange}
-                  columns={[
-                    {
-                      dataIndex: 'quote',
-                      title: '标的物价格',
-                      render: (value, record, index, { form, editing }) => {
-                        return (
-                          <FormItem>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                },
-                              ],
-                            })(<InputNumber style={{ width: 200 }} />)}
-                          </FormItem>
-                        );
-                      },
-                    },
-                  ]}
-                />
-              </>
-            ) : null}
-            <SmartTable
+            <ActiveTable
               dataSource={tds}
               columns={columns}
-              onCellFieldsChange={this.handleCellValueChanged}
-              loading={this.state.tableLoading}
-              rowKey="id"
-              pagination={false}
-              style={{ marginTop: 20 }}
+              handleCellValueChanged={this.handleCellValueChanged}
+              underlyer={this.underlyer}
+              onTableFormChange={this.onTableFormChange}
+              tableFormData={this.state.tableFormData}
             />
           </Col>
         </Row>
