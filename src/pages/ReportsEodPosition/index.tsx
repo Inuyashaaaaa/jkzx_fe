@@ -15,7 +15,7 @@ const ReportsEodPosition = memo<any>(props => {
       reportType={'LIVE_POSITION_INFO'}
       searchMethod={rptPositionReportSearchPaged}
       downloadName={'持仓明细'}
-      scrollWidth={4000}
+      scrollWidth={4500}
       colSwitch={[{ dataIndex: 'productType', options: PRODUCTTYPE_ZHCH_MAP }]}
     />
   );

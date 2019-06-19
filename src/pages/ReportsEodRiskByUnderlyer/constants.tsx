@@ -136,4 +136,9 @@ export const TABLE_COL_DEFS = [
     },
     align: 'right',
   },
+  {
+    title: '定价环境',
+    dataIndex: 'pricingEnvironment',
+    width: 130,
+  },
 ];

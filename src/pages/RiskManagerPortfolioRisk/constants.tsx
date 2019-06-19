@@ -41,4 +41,9 @@ export const TABLE_COL_DEFS = [
     align: 'right',
     render: (value, record, index) => formatMoney(value),
   },
+  {
+    title: '定价环境',
+    dataIndex: 'pricingEnvironment',
+    width: 130,
+  },
 ];
