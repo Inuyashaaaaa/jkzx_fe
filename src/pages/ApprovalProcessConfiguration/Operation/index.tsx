@@ -59,8 +59,9 @@ const Operation = props => {
       return setLoading(false);
     }
     const processData = { ...data };
-    // let { tasks } = processData;
-    let tasks = processData.tasks.map(task => {
+    setLoading(false);
+    let { tasks } = processData;
+    tasks = tasks.map(task => {
       task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
         return item.approveGroupId;
       });
@@ -72,7 +73,7 @@ const Operation = props => {
       }
       return task;
     });
-    setLoading(false);
+
     tasks = _.sortBy(tasks, 'sequence');
     setProcess(processData);
     setProcessConfigs(processData.processConfigs);

@@ -6,6 +6,8 @@ const fs = require('fs');
 const TEST_CONTAINER = 'FE-test';
 const PROD_CONTAINER = 'FE-prod';
 const RELEASE_CONTAINER = 'FE-release';
+const HOTFIX_CONTAINER = 'FE-hotfix';
+const DEMO_CONTAINER = 'FE-demo';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
@@ -85,6 +87,14 @@ function prod() {
   upload();
 }
 
+function demo() {
+  const prodContainerPath = path.join(USER_PATH, DEMO_CONTAINER);
+  // 更新 last
+  bundle(prodContainerPath, '../dist/*');
+
+  upload();
+}
+
 function test() {
   const prodContainerPath = path.join(USER_PATH, TEST_CONTAINER);
   // 更新 last
@@ -105,6 +115,10 @@ function release() {
 }
 
 function hotfix() {
+  const prodContainerPath = path.join(USER_PATH, HOTFIX_CONTAINER);
+  // 更新 last
+  bundle(prodContainerPath, '../dist/*');
+
   upload();
   upload({
     branchName: process.env.CI_BUILD_REF_NAME.replace(/(.*\/).*/, `$1${BRANCH_NAME_LATEST}`),
@@ -165,4 +179,8 @@ if (denv === 'doc') {
 
 if (denv === 'cdoc') {
   cdoc();
+}
+
+if (denv === 'demo') {
+  demo();
 }
