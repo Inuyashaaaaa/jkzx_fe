@@ -4,7 +4,6 @@ import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import {
   mktInstrumentInfo,
   mktInstrumentSearch,
-  mktInstrumentWhitelistSearch,
   excListAllInstrumentsInTradeRecords,
   mktQuotesListPaged,
 } from '@/services/market-data-service';
@@ -13,6 +12,7 @@ import {
   exeTradeRecordSave,
   queryDetail,
   querySummary,
+  queryPortfolio,
   queryTradeRecord,
   uploadUrl,
 } from '@/services/onBoardTransaction';
@@ -20,161 +20,114 @@ import { Button, Divider, message, Modal, Radio, Row, Table, Tabs } from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
-import React, { PureComponent } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { CREATE_FORM_CONTROLS, generateColumns } from './constants';
 import TabHeader from '@/containers/TabHeader';
 import { SmartTable } from '@/containers';
 
-const { TabPane } = Tabs;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 
-const reg = /^[+-]?\d+\.?\d*$/;
+const TradeManagementOnBoardTansaction = props => {
+  const [loading, setLoading] = useState(false);
+  const [flowData, setFlowData] = useState([]);
+  const [positionData, setPositionData] = useState([]);
+  const [formItems, setFormItems] = useState([]);
+  const [positionMode, setPositionMode] = useState('detail');
+  const [createFormVisible, setCreateFormVisible] = useState(false);
+  const [createModalDataSource, setCreateModalDataSource] = useState({
+    dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
+  });
+  const [searchFormDataFlow, setSearchFormDataFlow] = useState<any>({
+    date: [moment().subtract(1, 'days'), moment()],
+  });
+  const [searchFormDataPosition, setSearchFormDataPosition] = useState({
+    searchDate: moment().subtract(1, 'days'),
+  });
+  const [activeKey, setActiveKey] = useState('flow');
+  const [modalTitle, setModalTitle] = useState();
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-class TradeManagementOnBoardTansaction extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading: false,
-      flowData: [],
-      positionData: [],
-      formItems: [],
-      instrumentIds: [],
-      positionMode: 'detail',
-      createFormVisible: false,
-      createModalDataSource: {
-        dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
-      },
-      searchFormDataFlow: { date: [moment().subtract(1, 'days'), moment()] },
-      searchFormDataPosition: { searchDate: moment().subtract(1, 'days') },
-      activeKey: 'flow',
-    };
-  }
+  useEffect(() => {
+    queryFlowData();
+  }, []);
 
-  public componentDidMount() {
-    this.queryInstrumentId();
-    this.queryRecords();
-  }
-
-  public queryInstrumentId = async () => {
-    const ids = await mktInstrumentSearch({
-      instrumentIdPart: '',
-    });
-    if (ids.error) {
-      return;
-    }
-    const data = (ids && ids.data) || [];
-    this.setState({
-      instrumentIds: data,
-    });
-  };
-
-  public queryRecords = async () => {
-    const data = { ...this.state.searchFormDataFlow };
-    const params = {
-      instrumentIds: data.instrumentId,
-      startTime: `${data.date[0].format('YYYY-MM-DD')}T00:00:00`,
-      endTime: `${data.date[1].format('YYYY-MM-DD')}T23:59:59`,
-    };
-    this.fetchData(params, 'flow');
-  };
-
-  public queryDetail = async () => {
-    const data = { ...this.state.searchFormDataPosition };
-    const params = {
-      searchDate: data.searchDate.format('YYYY-MM-DD'),
-    };
-    this.fetchData(params, 'position', 'detail');
-  };
-
-  public querySummary = async () => {
-    const data = { ...this.state.searchFormDataPosition };
-    const params = {
-      searchDate: data.searchDate.format('YYYY-MM-DD'),
-    };
-    this.fetchData(params, 'position', 'summary');
-  };
-
-  public fetchData = async (params, type, positionMode) => {
-    const isFlow = type === 'flow';
-
-    this.setState({
-      loading: true,
-    });
-    const executeMethod = isFlow
-      ? queryTradeRecord
-      : positionMode === 'detail'
-      ? queryDetail
-      : querySummary;
-    const list = await executeMethod({
-      ...params,
-    });
+  const queryAndInjectMarketData = async (queryMethod, params) => {
+    const list = await queryMethod({ ...params });
     if (list.error) {
-      this.setState({
-        loading: false,
-      });
+      setLoading(false);
     }
-    let data = (list && list.data) || [];
+    const data = (list && list.data) || [];
+    return injectMarketValue(data);
+  };
 
-    data = await this.injectMarketValue(data);
+  const queryFlowData = async () => {
+    const params = {
+      instrumentIds: searchFormDataFlow.instrumentId,
+      startTime: `${searchFormDataFlow.date[0].format('YYYY-MM-DD')}T00:00:00`,
+      endTime: `${searchFormDataFlow.date[1].format('YYYY-MM-DD')}T23:59:59`,
+    };
+
+    setLoading(true);
+    const data = await queryAndInjectMarketData(queryTradeRecord, params);
 
     const finalData = data.map(d => {
       const obj = { ...d };
-      if (isFlow) {
-        obj.openClose = obj.openClose
-          ? obj.openClose.toLowerCase() === 'open'
-            ? '开'
-            : '平'
-          : '-';
-        obj.direction = obj.direction
-          ? obj.direction.toLowerCase() === 'buyer'
-            ? '买'
-            : '卖'
-          : '-';
-        obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
-      }
+      obj.openClose = obj.openClose ? (obj.openClose.toLowerCase() === 'open' ? '开' : '平') : '-';
+      obj.direction = obj.direction ? (obj.direction.toLowerCase() === 'buyer' ? '买' : '卖') : '-';
+      obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
       return obj;
     });
 
-    if (isFlow) {
-      finalData.sort((a, b) => {
-        const dealTime = moment(a.dealTime).valueOf() - moment(b.dealTime).valueOf();
-        if (dealTime > 0) {
-          return -1;
-        } else if (dealTime < 0) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-    } else if (!isFlow && positionMode === 'summary') {
-      finalData.sort((a, b) => {
-        const aStr = a.instrumentId;
-        const bStr = b.instrumentId;
-        return aStr.localeCompare(bStr);
-      });
-    } else {
-      finalData.sort((a, b) => {
-        const aStr = a.bookId + a.instrumentId;
-        const bStr = b.bookId + b.instrumentId;
-        return aStr.localeCompare(bStr);
-      });
-    }
-
-    const nextState = isFlow ? { flowData: finalData } : { positionData: finalData };
-    if (isFlow) {
-      this.originFlowData = data;
-    } else {
-      this.originPositionData = data;
-    }
-    this.setState({
-      loading: false,
-      ...nextState,
+    finalData.sort((a, b) => {
+      const dealTime = moment(a.dealTime).valueOf() - moment(b.dealTime).valueOf();
+      if (dealTime > 0) {
+        return -1;
+      } else if (dealTime < 0) {
+        return 1;
+      } else {
+        return 0;
+      }
     });
+    setFlowData(finalData);
+    setLoading(false);
   };
 
-  public injectMarketValue = async finalData => {
+  const sortBy = (data, field) => {
+    data.sort((a, b) => {
+      const aStr = a[field] + a.instrumentId;
+      const bStr = b[field] + a.instrumentId;
+      return aStr.localeCompare(bStr);
+    });
+    return data;
+  };
+
+  const queryPositionData = async (mode?) => {
+    const actualMode = mode ? mode : positionMode;
+    const params = {
+      searchDate: searchFormDataPosition.searchDate.format('YYYY-MM-DD'),
+    };
+    setLoading(true);
+
+    let data;
+    if (actualMode === 'summary') {
+      data = await queryAndInjectMarketData(querySummary, params);
+      data = sortBy(data, 'instrumentId');
+    } else if (actualMode === 'detail') {
+      data = await queryAndInjectMarketData(queryDetail, params);
+      data = sortBy(data, 'bookId');
+    } else if (actualMode === 'portfolio') {
+      data = await queryAndInjectMarketData(queryPortfolio, params);
+      data = sortBy(data, 'portfolioName');
+      data = data.filter(v => v.portfolioName);
+    }
+    setPositionData(data);
+    setLoading(false);
+  };
+
+  const injectMarketValue = async finalData => {
     const { data = {}, error } = await mktQuotesListPaged({
       instrumentIds: finalData.map(item => item.instrumentId),
     });
@@ -212,40 +165,7 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     });
   };
 
-  public generateSummary = data => {
-    const obj = {};
-    const plusItems = [
-      'netPosition',
-      'historyBuyAmount',
-      'historySellAmount',
-      'shortPosition',
-      'totalPnl',
-    ];
-    data.forEach(d => {
-      const id = d.instrumentId;
-      const target = obj[id];
-      if (target) {
-        plusItems.forEach(item => {
-          let tValue = target[item];
-          let dValue = d[item];
-          tValue = reg.test(tValue) ? parseFloat(tValue) : 0;
-          dValue = reg.test(dValue) ? parseFloat(dValue) : 0;
-          target[item] = tValue + dValue;
-        });
-      } else {
-        obj[id] = { ...d };
-      }
-    });
-
-    const keys = Object.keys(obj);
-    const finalData = keys.map(key => {
-      const value = obj[key];
-      return value;
-    });
-    return finalData;
-  };
-
-  public formatFormItems = () => {
+  const formatFormItems = () => {
     const uploadAttachData = {
       url: uploadUrl,
       mimeTypes: ['CSV'],
@@ -266,78 +186,56 @@ class TradeManagementOnBoardTansaction extends PureComponent {
     return [documentUp];
   };
 
-  public hideModal = () => {
-    this.editDate = {};
-    this.setState({
-      modalVisible: false,
-      formItems: [],
-      modalLoading: false,
-    });
+  const hideModal = () => {
+    setModalVisible(false);
+    setFormItems([]);
+    setModalLoading(false);
   };
 
-  public showModal = () => {
-    this.setState({
-      modalVisible: true,
-      modalTitle: '导入场内流水',
-      formItems: this.formatFormItems(),
-    });
+  const showModal = () => {
+    setModalVisible(true);
+    setModalTitle('导入场内流水');
+    setFormItems(formatFormItems());
   };
 
-  public changeTab = tab => {
-    this.setState({ activeKey: tab });
-    const { positionMode } = this.state;
+  const changeTab = tab => {
+    setActiveKey(tab);
     if (tab === 'position') {
-      if (positionMode === 'detail') {
-        this.queryDetail();
-      } else {
-        this.querySummary();
-      }
+      setPositionMode('detail');
+      queryPositionData('detail');
     } else {
-      this.queryRecords();
+      queryFlowData();
     }
   };
 
-  public changePosition = e => {
+  const changePosition = e => {
     const { value } = e.target;
-    this.setState({
-      positionMode: value === 'a' ? 'detail' : 'summary',
-    });
-    value === 'a' ? this.queryDetail() : this.querySummary();
+    setPositionMode(value);
+    queryPositionData(value);
   };
 
-  public handleFormData = action => {
+  const handleFormData = action => {
     if (action === 'uploading') {
-      this.setState({
-        modalLoading: true,
-      });
+      setModalLoading(true);
     }
     if (action === 'failed') {
-      this.setState({
-        modalLoading: false,
-      });
+      setModalLoading(false);
     }
     if (action === 'success') {
-      this.hideModal();
+      hideModal();
     }
   };
 
-  public createFormModal = () => {
-    this.setState({
-      createFormVisible: true,
-    });
+  const createFormModal = () => {
+    setCreateFormVisible(true);
   };
 
-  public hideCreateForm = () => {
-    this.setState({
-      createFormVisible: false,
-    });
+  const hideCreateForm = () => {
+    setCreateFormVisible(false);
   };
 
-  public handleCreateForm = async () => {
-    this.setState({
-      createFormVisible: false,
-    });
-    const { createModalDataSource } = this.state;
+  const handleCreateForm = async () => {
+    setCreateFormVisible(false);
     const formatValues = _.mapValues(createModalDataSource, val => {
       if (isMoment(val)) {
         return val.format('YYYY-MM-DDTHH:mm:ss');
@@ -357,7 +255,6 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       return;
     }
     message.success('新建成功');
-    const { flowData } = this.state;
 
     const dataSwitch = _.mapValues(data, (item, key) => {
       if (key === 'direction') {
@@ -374,246 +271,219 @@ class TradeManagementOnBoardTansaction extends PureComponent {
       }
       return item;
     });
-    this.setState({
-      flowData: [...flowData, dataSwitch],
-      createModalDataSource: {
-        dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
-      },
+    setFlowData([...flowData, dataSwitch]);
+    setCreateModalDataSource({
+      dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
     });
   };
 
-  public onValueChange = params => {
-    this.setState({
-      createModalDataSource: params.values,
-    });
+  const onValueChange = params => {
+    setCreateModalDataSource(params.values);
   };
 
-  public downloadFormModal = async () => {
+  const downloadFormModal = async () => {
     window.open(`${downloadUrl}position.csv`);
   };
 
-  public handleFlowChange = value => {
-    this.setState({
-      searchFormDataFlow: value.values,
-    });
+  const handleFlowChange = value => {
+    setSearchFormDataFlow(value.values);
   };
 
-  public onReset = () => {
-    this.setState(
-      {
-        searchFormDataFlow: { date: [moment().subtract(1, 'days'), moment()] },
-      },
-      () => {
-        this.queryRecords();
+  const onReset = () => {
+    setSearchFormDataFlow({ date: [moment().subtract(1, 'days'), moment()] });
+    queryFlowData();
+  };
+
+  const onResetPosition = () => {
+    setSearchFormDataPosition({ searchDate: moment().subtract(1, 'days') });
+    queryPositionData();
+  };
+
+  const handlePositionChange = value => {
+    setSearchFormDataPosition(value.values);
+  };
+
+  const flowColumns = generateColumns('flow');
+  const detailColumns = generateColumns('detail');
+  const summaryColumns = generateColumns('summary');
+  const portfolioColumns = generateColumns('portfolio');
+  return (
+    <Page
+      footer={
+        <TabHeader
+          activeKey={activeKey}
+          onChange={changeTab}
+          tabList={[{ key: 'flow', tab: '场内流水' }, { key: 'position', tab: '场内持仓统计' }]}
+        />
       }
-    );
-  };
-
-  public onResetPosition = () => {
-    this.setState(
-      {
-        searchFormDataPosition: { searchDate: moment().subtract(1, 'days') },
-      },
-      () => {
-        this.state.positionMode === 'detail' ? this.queryDetail() : this.querySummary();
-      }
-    );
-  };
-
-  public handlePositionChange = value => {
-    this.setState({
-      searchFormDataPosition: value.values,
-    });
-  };
-
-  public render() {
-    const {
-      modalTitle,
-      modalVisible,
-      formItems,
-      modalLoading,
-      loading,
-      instrumentIds,
-      positionMode,
-      createFormVisible,
-      createModalDataSource,
-      searchFormDataFlow,
-      searchFormDataPosition,
-      flowData,
-      positionData,
-      activeKey,
-    } = this.state;
-    const flowColumns = generateColumns('flow');
-    const detailColumns = generateColumns('detail');
-    const summaryColumns = generateColumns('summary');
-    return (
-      <Page
-        footer={
-          <TabHeader
-            activeKey={activeKey}
-            onChange={this.changeTab}
-            tabList={[{ key: 'flow', tab: '场内流水' }, { key: 'position', tab: '场内持仓统计' }]}
+    >
+      {activeKey === 'flow' && (
+        <>
+          <Form
+            submitText="查询"
+            dataSource={searchFormDataFlow}
+            onSubmitButtonClick={queryFlowData}
+            onResetButtonClick={onReset}
+            controls={[
+              {
+                field: 'date',
+                control: {
+                  label: '选择日期',
+                },
+                input: {
+                  type: 'date',
+                  range: 'range',
+                },
+              },
+              {
+                field: 'instrumentId',
+                control: {
+                  label: '合约代码',
+                },
+                input: {
+                  type: 'select',
+                  mode: 'multiple',
+                  allowClear: true,
+                  placeholder: '请输入内容搜索',
+                  options: async value => {
+                    const { data, error } = await excListAllInstrumentsInTradeRecords({
+                      instrumentIdPart: value,
+                    });
+                    if (error) return [];
+                    return data.map(item => ({
+                      label: item,
+                      value: item,
+                    }));
+                  },
+                },
+              },
+            ]}
+            onValueChange={handleFlowChange}
+            layout="inline"
           />
-        }
-      >
-        {activeKey === 'flow' && (
-          <>
-            <Form
-              submitText="查询"
-              dataSource={searchFormDataFlow}
-              onSubmitButtonClick={this.queryRecords}
-              onResetButtonClick={this.onReset}
-              controls={[
-                {
-                  field: 'date',
-                  control: {
-                    label: '选择日期',
-                  },
-                  input: {
-                    type: 'date',
-                    range: 'range',
-                  },
-                },
-                {
-                  field: 'instrumentId',
-                  control: {
-                    label: '合约代码',
-                  },
-                  input: {
-                    type: 'select',
-                    mode: 'multiple',
-                    allowClear: true,
-                    placeholder: '请输入内容搜索',
-                    options: async value => {
-                      const { data, error } = await excListAllInstrumentsInTradeRecords({
-                        instrumentIdPart: value,
-                      });
-                      if (error) return [];
-                      return data.map(item => ({
-                        label: item,
-                        value: item,
-                      }));
-                    },
-                  },
-                },
-              ]}
-              onValueChange={this.handleFlowChange}
-              layout="inline"
-            />
-            <Divider type="horizontal" />
-            <div style={{ marginBottom: '20px' }}>
-              <Button onClick={this.showModal} type="primary">
-                导入场内流水
-              </Button>
+          <Divider type="horizontal" />
+          <div style={{ marginBottom: '20px' }}>
+            <Button onClick={showModal} type="primary">
+              导入场内流水
+            </Button>
 
-              <Button onClick={this.createFormModal} type="default">
-                新建
-              </Button>
-            </div>
+            <Button onClick={createFormModal} type="default">
+              新建
+            </Button>
+          </div>
+          <SmartTable
+            dataSource={flowData}
+            columns={flowColumns}
+            loading={loading}
+            rowKey="uuid"
+            scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
+          />
+        </>
+      )}
+      {activeKey === 'position' && (
+        <>
+          <Form
+            submitText="查询"
+            dataSource={searchFormDataPosition}
+            onSubmitButtonClick={() => queryPositionData()}
+            onResetButtonClick={onResetPosition}
+            controls={[
+              {
+                field: 'searchDate',
+                control: {
+                  label: '选择日期',
+                },
+                input: {
+                  type: 'date',
+                  range: 'day',
+                },
+              },
+            ]}
+            onValueChange={handlePositionChange}
+            layout="inline"
+          />
+          <Divider type="horizontal" />
+          <Row type="flex" justify="end">
+            <RadioGroup
+              onChange={changePosition}
+              defaultValue="detail"
+              style={{ marginBottom: '20px' }}
+            >
+              <RadioButton value="detail">按明细统计</RadioButton>
+              <RadioButton value="summary">按合约代码统计</RadioButton>
+              <RadioButton value="portfolio">按投资组合统计</RadioButton>
+            </RadioGroup>
+          </Row>
+          {positionMode === 'detail' && (
             <SmartTable
-              dataSource={flowData}
-              columns={flowColumns}
+              dataSource={positionData}
+              columns={detailColumns}
               loading={loading}
               rowKey="uuid"
-              scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
-            />
-          </>
-        )}
-        {activeKey === 'position' && (
-          <>
-            <Form
-              submitText="查询"
-              dataSource={searchFormDataPosition}
-              onSubmitButtonClick={positionMode === 'detail' ? this.queryDetail : this.querySummary}
-              onResetButtonClick={this.onResetPosition}
-              controls={[
-                {
-                  field: 'searchDate',
-                  control: {
-                    label: '选择日期',
-                  },
-                  input: {
-                    type: 'date',
-                    range: 'day',
-                  },
-                },
-              ]}
-              onValueChange={this.handlePositionChange}
-              layout="inline"
-            />
-            <Divider type="horizontal" />
-            <Row type="flex" justify="end">
-              <RadioGroup
-                onChange={this.changePosition}
-                defaultValue="a"
-                style={{ marginBottom: '20px' }}
-              >
-                <RadioButton value="a">按明细统计</RadioButton>
-                <RadioButton value="b">按合约代码统计</RadioButton>
-              </RadioGroup>
-            </Row>
-            {positionMode === 'detail' && (
-              <SmartTable
-                dataSource={positionData}
-                columns={detailColumns}
-                loading={loading}
-                rowKey="uuid"
-                scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
-              />
-            )}
-            {positionMode === 'summary' && (
-              <SmartTable
-                dataSource={positionData}
-                columns={summaryColumns}
-                loading={loading}
-                scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
-                rowKey="uuid"
-              />
-            )}
-          </>
-        )}
-        <Modal
-          title={modalTitle}
-          visible={modalVisible}
-          onCancel={this.hideModal}
-          onOk={this.hideModal}
-          footer={[
-            <Button key="back" type="primary" onClick={this.hideModal} loading={modalLoading}>
-              {modalLoading ? '上传中' : '取消'}
-            </Button>,
-          ]}
-        >
-          {modalVisible && (
-            <CommonForm
-              data={formItems}
-              handleStatusChange={this.handleFormData}
-              uploadDisabled={modalLoading}
+              scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
             />
           )}
-          <p style={{ marginTop: '20px' }}>操作说明:</p>
-          <p style={{ marginLeft: '20px' }}>1.仅支持导入.csv格式的文件</p>
-          <p style={{ marginLeft: '20px' }}>
-            2.导入模板下载:
-            <a onClick={this.downloadFormModal}>导入场内流水模板.csv</a>
-          </p>
-        </Modal>
-        <Modal
-          visible={createFormVisible}
-          onCancel={this.hideCreateForm}
-          onOk={this.handleCreateForm}
-          title="新建场内流水"
-        >
-          <Form
-            controlNumberOneRow={1}
-            footer={false}
-            dataSource={createModalDataSource}
-            onValueChange={this.onValueChange}
-            controls={CREATE_FORM_CONTROLS}
+          {positionMode === 'summary' && (
+            <SmartTable
+              dataSource={positionData}
+              columns={summaryColumns}
+              loading={loading}
+              scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
+              rowKey="uuid"
+            />
+          )}
+          {positionMode === 'portfolio' && (
+            <SmartTable
+              dataSource={positionData}
+              columns={portfolioColumns}
+              loading={loading}
+              scroll={positionData.length > 0 ? { x: '2000px' } : { x: false }}
+              rowKey="uuid"
+            />
+          )}
+        </>
+      )}
+      <Modal
+        title={modalTitle}
+        visible={modalVisible}
+        onCancel={hideModal}
+        onOk={hideModal}
+        footer={[
+          <Button key="back" type="primary" onClick={hideModal} loading={modalLoading}>
+            {modalLoading ? '上传中' : '取消'}
+          </Button>,
+        ]}
+      >
+        {modalVisible && (
+          <CommonForm
+            data={formItems}
+            handleStatusChange={handleFormData}
+            uploadDisabled={modalLoading}
           />
-        </Modal>
-      </Page>
-    );
-  }
-}
+        )}
+        <p style={{ marginTop: '20px' }}>操作说明:</p>
+        <p style={{ marginLeft: '20px' }}>1.仅支持导入.csv格式的文件</p>
+        <p style={{ marginLeft: '20px' }}>
+          2.导入模板下载:
+          <a onClick={downloadFormModal}>导入场内流水模板.csv</a>
+        </p>
+      </Modal>
+      <Modal
+        visible={createFormVisible}
+        onCancel={hideCreateForm}
+        onOk={handleCreateForm}
+        title="新建场内流水"
+      >
+        <Form
+          controlNumberOneRow={1}
+          footer={false}
+          dataSource={createModalDataSource}
+          onValueChange={onValueChange}
+          controls={CREATE_FORM_CONTROLS}
+        />
+      </Modal>
+    </Page>
+  );
+};
 
-export default TradeManagementOnBoardTansaction;
+export default memo(TradeManagementOnBoardTansaction);

@@ -5,7 +5,10 @@ import {
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-import { trdBookListBySimilarBookName } from '@/services/trade-service';
+import {
+  trdBookListBySimilarBookName,
+  trdPortfolioListBySimilarPortfolioName,
+} from '@/services/trade-service';
 import { formatMoney, formatMoney } from '@/tools';
 
 const bookId = {
@@ -146,10 +149,29 @@ const marketValue = {
   },
 };
 
+const portfolios = {
+  dataIndex: 'portfolioNames',
+  width: 150,
+  title: '投资组合',
+  render: (text, record, index) => {
+    return Array.isArray(text) ? text.join(',') : text;
+  },
+};
+
+const portfolio = {
+  dataIndex: 'portfolioName',
+  width: 150,
+  title: '投资组合',
+  render: (text, record, index) => {
+    return Array.isArray(text) ? text.join(',') : text;
+  },
+};
+
 export function generateColumns(type) {
   if (type === 'flow') {
     return [
       bookId,
+      portfolios,
       instrumentId,
       direction,
       openClose,
@@ -161,36 +183,29 @@ export function generateColumns(type) {
       multiplier,
     ];
   }
+
+  const baseColumns = [
+    instrumentId,
+    netPosition,
+    longPosition,
+    shortPosition,
+    totalBuy,
+    historyBuyAmount,
+    totalSell,
+    historySellAmount,
+    marketValue,
+    totalPnl,
+  ];
+
   if (type === 'detail') {
-    return [
-      bookId,
-      instrumentId,
-      netPosition,
-      longPosition,
-      shortPosition,
-      totalBuy,
-      historyBuyAmount,
-      totalSell,
-      historySellAmount,
-      marketValue,
-      totalPnl,
-    ];
+    return [bookId, ...baseColumns];
   }
 
-  if (type === 'summary') {
-    return [
-      instrumentId,
-      netPosition,
-      longPosition,
-      shortPosition,
-      totalBuy,
-      historyBuyAmount,
-      totalSell,
-      historySellAmount,
-      marketValue,
-      totalPnl,
-    ];
+  if (type === 'portfolio') {
+    return [portfolio, ...baseColumns];
   }
+
+  return baseColumns;
 }
 
 export const CREATE_FORM_CONTROLS: IFormControl[] = [
@@ -245,6 +260,27 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
           required: true,
         },
       ],
+    },
+  },
+  {
+    control: {
+      label: '投资组合',
+    },
+    field: 'portfolioNames',
+    input: {
+      type: 'select',
+      showSearch: true,
+      mode: 'multiple',
+      options: async value => {
+        const { data, error } = await trdPortfolioListBySimilarPortfolioName({
+          similarPortfolioName: value,
+        });
+        if (error) return [];
+        return data.map(item => ({
+          label: item,
+          value: item,
+        }));
+      },
     },
   },
   {
