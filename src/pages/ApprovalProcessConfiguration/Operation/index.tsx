@@ -21,7 +21,7 @@ import {
   Tag,
 } from 'antd';
 import _ from 'lodash';
-import { default as React, default as React, useEffect, useRef, useState } from 'react';
+import { default as React, useEffect, useRef, useState } from 'react';
 import uuidv4 from 'uuid/v4';
 import { COLUMNS, GTE_PROCESS_CONFIGS, TASKTYPE } from '../constants';
 import EditTable from './EditTable';
@@ -93,12 +93,7 @@ const Operation = props => {
     setReviewTask(reviewTaskData);
   };
 
-  const handleReviewOk = async () => {
-    const res = await tableE1.validate();
-    if (_.isArray(res)) {
-      if (res.some(value => value.errors)) return;
-    }
-
+  const reviewSave = async () => {
     let tasks = _.cloneDeep(process.tasks);
     tasks = _.sortBy(tasks, 'sequence');
     const reviewTasklength = (tasks || []).filter(item => item.taskType === 'reviewData').length;
@@ -116,6 +111,15 @@ const Operation = props => {
       return item;
     });
     featchProcessModify(tasks);
+  };
+
+  const handleReviewOk = async () => {
+    const res = await tableE1.validate();
+    if (_.isArray(res)) {
+      if (res.some(value => value.errors)) return;
+    }
+
+    reviewSave();
   };
 
   const getActionClass = (taskType, processName) => {
@@ -303,7 +307,11 @@ const Operation = props => {
     setReviewTask(reviewTaskData);
   };
 
-  const onReviewCellFieldsChange = ({ allFields, changedFields, record, rowIndex }) => {
+  const onReviewCellFieldsChange = async (
+    { allFields, changedFields, record, rowIndex },
+    isSelect
+  ) => {
+    console.log(isSelect);
     setReviewTask(
       reviewTask.map((item, index) => {
         if (index === rowIndex) {
@@ -312,6 +320,36 @@ const Operation = props => {
         return item;
       })
     );
+    if (isSelect) {
+      // 修改单个审批组
+      const task = Form2.getFieldsValue(record);
+      const { processName } = process;
+      const { error, data } = await wkTaskApproveGroupBind({
+        processName,
+        taskList: [
+          {
+            taskId: task.taskId,
+            approveGroupList: task.approveGroupList,
+          },
+        ],
+      });
+      if (error) {
+        return;
+      }
+      const cloneData = { ...data };
+      cloneData.tasks = cloneData.tasks.map(item => {
+        item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
+        return item;
+      });
+
+      setProcess(cloneData);
+      setProcessConfigs(data.processConfigs);
+      handleReviewData(data);
+
+      notification.success({
+        message: `${processName}流程保存成功`,
+      });
+    }
   };
 
   const warningCancel = () => {
@@ -499,6 +537,7 @@ const Operation = props => {
             excelData={excelData}
             processName={process.processName}
             setWarningVisible={setWarningVisible}
+            onReviewCellFieldsChange={onReviewCellFieldsChange}
           />
         </Col>
       </Row>

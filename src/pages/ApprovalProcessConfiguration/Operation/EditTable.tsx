@@ -6,6 +6,7 @@ import GroupSelcet from './GroupSelcet';
 import FormItem from 'antd/lib/form/FormItem';
 import XLSX from 'xlsx';
 import { wkApproveGroupList } from '@/services/auditing';
+import AutoSelect from './AutoSelect';
 
 const EditTable = memo<any>(props => {
   const {
@@ -37,7 +38,8 @@ const EditTable = memo<any>(props => {
   };
 
   const handleReviewCellFieldsChange = ({ allFields, changedFields, record, rowIndex }) => {
-    onReviewCellFieldsChange({ allFields, changedFields, record, rowIndex });
+    // debugger
+    // onReviewCellFieldsChange({ allFields, changedFields, record, rowIndex }, true);
   };
 
   const handleOk = () => {
@@ -87,7 +89,7 @@ const EditTable = memo<any>(props => {
         dataSource={reviewTask}
         rowKey="taskId"
         pagination={false}
-        onCellFieldsChange={handleReviewCellFieldsChange}
+        onCellValueChanged={handleReviewCellFieldsChange}
         columns={[
           {
             title: '节点名称',
@@ -105,6 +107,7 @@ const EditTable = memo<any>(props => {
             editable: record => {
               return true;
             },
+            width: '50%',
             render: (value, record, index, { form, editing }) => {
               return (
                 <FormItem>
@@ -115,7 +118,7 @@ const EditTable = memo<any>(props => {
                         message: '至少选择一个审批组',
                       },
                     ],
-                  })(<GroupSelcet {...{ record, index, form, editing }} />)}
+                  })(<AutoSelect {...{ record, index, form, editing, processName }} />)}
                 </FormItem>
               );
             },
@@ -152,7 +155,9 @@ const EditTable = memo<any>(props => {
               dataIndex: 'approveGroupList',
               width: 450,
               render: (value, record, index, { form, editing }) => {
-                return <GroupSelcet {...{ record, index, form, editing }} />;
+                return (
+                  <GroupSelcet record={record} index={index} formData={{ form, editing: true }} />
+                );
               },
             },
           ]}

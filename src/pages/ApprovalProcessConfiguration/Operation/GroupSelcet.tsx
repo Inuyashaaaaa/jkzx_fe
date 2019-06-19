@@ -3,9 +3,7 @@ import _ from 'lodash';
 import { Select } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useEffect, useState } from 'react';
-import { Divider, Button } from 'antd';
 
-const { Option } = Select;
 const GroupSelcet = memo<{
   value: any;
   record: object;
@@ -13,8 +11,9 @@ const GroupSelcet = memo<{
   formData?: any;
 }>(props => {
   const [options, setOptions] = useState(null);
-  const { record, index, form, editing } = props;
-  const { value } = props;
+  const { record, index, formData } = props;
+  const { form, editing } = formData;
+  const [value, setValue] = useState([]);
 
   useEffect(
     () => {
@@ -31,6 +30,7 @@ const GroupSelcet = memo<{
       label: item.approveGroupName,
     }));
     setOptions(_.sortBy(optionsData, 'label'));
+    setValue(props.value);
   };
 
   if (!options) {
@@ -46,44 +46,25 @@ const GroupSelcet = memo<{
     );
   }
 
-  if (!_.get(props, 'editing')) {
-    return (
-      <Select
-        defaultOpen={false}
-        autoSelect={true}
-        mode="multiple"
-        options={options}
-        editing={editing}
-        value={value}
-      />
-    );
-  }
   return (
-    <Select
-      defaultOpen={true}
-      autoSelect={true}
-      mode="multiple"
-      options={options}
-      editing={editing}
-      value={value}
-      onChange={val => {
-        props.onChange(val);
-      }}
-      dropdownRender={menu => {
-        return (
-          <>
-            {menu}
-            <Divider style={{ margin: '4px 0' }} />
-            <div style={{ padding: '8px', cursor: 'pointer' }}>
-              <Button type="primary" style={{ marginRight: '15px' }}>
-                确认
-              </Button>
-              <Button>取消</Button>
-            </div>
-          </>
-        );
-      }}
-    />
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '至少选择一个审批组',
+          },
+        ],
+      })(
+        <Select
+          defaultOpen={false}
+          autoSelect={true}
+          mode="multiple"
+          options={options}
+          editing={editing}
+        />
+      )}
+    </FormItem>
   );
 });
 
