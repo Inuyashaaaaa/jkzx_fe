@@ -266,7 +266,7 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     control: {
       label: '投资组合',
     },
-    field: 'portfolioName',
+    field: 'portfolioNames',
     input: {
       type: 'select',
       showSearch: true,
