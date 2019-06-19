@@ -37,11 +37,6 @@ const EditTable = memo<any>(props => {
     onOtherCellFieldsChange({ allFields, changedFields, record, rowIndex });
   };
 
-  const handleReviewCellFieldsChange = ({ allFields, changedFields, record, rowIndex }) => {
-    // debugger
-    // onReviewCellFieldsChange({ allFields, changedFields, record, rowIndex }, true);
-  };
-
   const handleOk = () => {
     handleOtherOk();
   };
@@ -89,7 +84,6 @@ const EditTable = memo<any>(props => {
         dataSource={reviewTask}
         rowKey="taskId"
         pagination={false}
-        onCellValueChanged={handleReviewCellFieldsChange}
         columns={[
           {
             title: '节点名称',
@@ -118,7 +112,12 @@ const EditTable = memo<any>(props => {
                         message: '至少选择一个审批组',
                       },
                     ],
-                  })(<AutoSelect {...{ record, index, form, editing, processName }} />)}
+                  })(
+                    <AutoSelect
+                      {...{ record, index, form, editing, processName }}
+                      fetchData={props.fetchData}
+                    />
+                  )}
                 </FormItem>
               );
             },

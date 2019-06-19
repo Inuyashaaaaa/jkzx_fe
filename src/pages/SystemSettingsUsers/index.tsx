@@ -172,6 +172,21 @@ class SystemSettingsUsers extends PureComponent {
     });
   };
 
+  public handleValueChanged = async (record, value) => {
+    const user = this.state.users.find(item => item.id === record.id);
+    if (!user) return;
+
+    const res = await updateUserRole({
+      userId: user.id,
+      roleIds: value,
+    });
+    if (res.error) return;
+    notification.success({
+      message: '更新角色成功',
+    });
+    this.fetchData();
+  };
+
   public render() {
     const {
       displayResources,
@@ -202,25 +217,12 @@ class SystemSettingsUsers extends PureComponent {
                 this.state.roleOptions,
                 this.showResources,
                 departmentsTreeData(this.state.departments),
-                this.fetchData
+                this.fetchData,
+                this.handleValueChanged
               )}
               scroll={{ x: 1800 }}
-              onCellFieldsChange={this.handleCellValueChanged}
-              onCellEditingChanged={async params => {
-                const { record, rowId } = params;
-
-                const user = this.state.users.find(item => item.id === rowId);
-                if (!user) return;
-
-                const res = await updateUserRole({
-                  userId: user.id,
-                  roleIds: Form2.getFieldValue(record.roles),
-                });
-                if (res.error) return;
-                notification.success({
-                  message: '更新角色成功',
-                });
-              }}
+              // onCellFieldsChange={this.handleCellValueChanged}
+              // onCellEditingChanged={this.handleValueChanged}
             />
           </>
         )}

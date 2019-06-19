@@ -22,7 +22,7 @@ const GroupSelcet = memo<{
   editing?: any;
 }>(props => {
   const [options, setOptions] = useState(null);
-  const { record, index, form, editing, processName } = props;
+  const { record, index, form, editing, processName, fetchData } = props;
   const [open, setOpen] = useState(true);
   const [value, setValue] = useState(props.value);
 
@@ -44,7 +44,6 @@ const GroupSelcet = memo<{
   };
 
   const handleOk = async () => {
-    console.log(record, value);
     // 修改单个审批组
     const task = Form2.getFieldsValue(record);
     const { error, data } = await wkTaskApproveGroupBind({
@@ -52,7 +51,7 @@ const GroupSelcet = memo<{
       taskList: [
         {
           taskId: task.taskId,
-          approveGroupList: task.approveGroupList,
+          approveGroupList: value,
         },
       ],
     });
@@ -69,6 +68,9 @@ const GroupSelcet = memo<{
       message: `${processName}流程保存成功`,
     });
     // 页面刷新数据
+    if (fetchData) {
+      fetchData();
+    }
     setOpen(false);
   };
 
@@ -110,10 +112,11 @@ const GroupSelcet = memo<{
       editing={editing}
       value={value}
       onChange={val => {
-        // props.onChange(val);
         setValue(val);
       }}
-      // onFocus={() => setOpen(true)}
+      onFocus={() => {
+        setOpen(true);
+      }}
       dropdownRender={menu => {
         return (
           <>

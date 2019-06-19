@@ -538,6 +538,7 @@ const Operation = props => {
             processName={process.processName}
             setWarningVisible={setWarningVisible}
             onReviewCellFieldsChange={onReviewCellFieldsChange}
+            fetchData={fetchData}
           />
         </Col>
       </Row>
