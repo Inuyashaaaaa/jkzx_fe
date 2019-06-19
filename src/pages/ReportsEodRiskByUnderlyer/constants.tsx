@@ -1,6 +1,7 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { IColumnDef } from '@/containers/Table/types';
 import { formatNumber, formatMoney } from '@/tools';
+import { multiply } from 'mathjs';
 
 export const TABLE_COL_DEFS = [
   {
@@ -28,11 +29,11 @@ export const TABLE_COL_DEFS = [
     align: 'right',
   },
   {
-    title: '标的物价格变化 (%)',
+    title: '标的物价格变化',
     dataIndex: 'underlyerPriceChangePercent',
     width: 150,
     render: (value, record, index) => {
-      return formatNumber(value, 4) + '%';
+      return formatNumber(multiply(value, 100), 4) + '%';
     },
     align: 'right',
   },
