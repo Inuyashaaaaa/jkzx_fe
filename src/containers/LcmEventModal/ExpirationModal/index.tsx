@@ -33,6 +33,7 @@ import {
   SETTLE_AMOUNT,
   UNDERLYER_PRICE,
 } from './constants';
+import { Form2 } from '@/containers';
 
 class ExpirationModal extends PureComponent<
   {
@@ -79,10 +80,12 @@ class ExpirationModal extends PureComponent<
   public computedFormData = () => {
     return {
       [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-      [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: _.chain(this.fixingTableData)
-        .last()
-        .get(OB_PRICE_FIELD)
-        .value(),
+      [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
+        _.chain(this.fixingTableData)
+          .last()
+          .get(OB_PRICE_FIELD)
+          .value()
+      ),
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
       [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
