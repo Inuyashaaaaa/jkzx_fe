@@ -258,11 +258,6 @@ export default [
               component: './RiskManagerIntradayDailyPnlByUnderlyerReport/index',
             },
             {
-              path: '/risk-manager/custom-report',
-              name: 'customReport',
-              component: './RiskManagerCustomReport/index',
-            },
-            {
               path: '/risk-manager/intraday-expiring-position-report',
               name: 'intradayExpiringPositionReport',
               component: './RiskManagerIntradayExpiringPositionReport/index',
