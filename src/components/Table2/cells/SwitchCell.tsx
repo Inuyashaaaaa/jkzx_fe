@@ -323,6 +323,9 @@ class SwitchCell extends PureComponent<
     // 本次事件触发修改了 next cell 的状态，next cell 的事件还没有触发
     setTimeout(() => {
       this.saveCell();
+      setTimeout(() => {
+        this.handleDirectionTableKeyDown(40);
+      });
     });
   };
 
@@ -484,7 +487,7 @@ class SwitchCell extends PureComponent<
         style={this.getTdStyle()}
       >
         <EditableContext.Consumer>
-          {({ form }) => {
+          {form => {
             this.form = form;
             return this.getInlineCell(form);
           }}
