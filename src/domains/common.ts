@@ -126,9 +126,19 @@ const computedTradeNumber = (
   setTableData: (newData: ITableData[]) => void
 ) => {
   const notionalAmountType = Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE]);
-  const notionalAmount = Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT]);
   const multipler = Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]);
   const initialSpotVal = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
+  const annualCoefficient =
+    Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]) &&
+    new BigNumber(Form2.getFieldValue(record[LEG_FIELD.TERM]))
+      .div(Form2.getFieldValue(record[LEG_FIELD.DAYS_IN_YEAR]))
+      .toNumber();
+  const notionalAmount = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL])
+    ? new BigNumber(Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT]))
+        .multipliedBy(annualCoefficient)
+        .toNumber()
+    : Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT]);
+
   const notional =
     notionalAmountType === 'LOT'
       ? notionalAmount
@@ -166,6 +176,28 @@ export const inline = (
       );
       record[LEG_FIELD.SETTLEMENT_DATE] = Form2.createField(
         getMoment(effectiveDate, true).add(term, 'days')
+      );
+    }
+  }
+
+  if (
+    Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
+    Form2.fieldValueIsChange(LEG_FIELD.DAYS_IN_YEAR, changedFields)
+  ) {
+    if (
+      record[LEG_FIELD.INITIAL_SPOT] &&
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] &&
+      record[LEG_FIELD.NOTIONAL_AMOUNT]
+    ) {
+      computedTradeNumber(
+        env,
+        changeFieldsParams,
+        record,
+        tableData,
+        setColLoading,
+        setLoading,
+        setColValue,
+        setTableData
       );
     }
   }
