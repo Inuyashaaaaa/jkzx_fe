@@ -87,6 +87,13 @@ const LcmEventModal = memo<{
     );
   };
 
+  const notKnockIn = data => {
+    if (data[LEG_FIELD.ALREADY_BARRIER]) {
+      return true;
+    }
+    return false;
+  };
+
   const meta: ILcmEventModalEl = {
     show: (event: ILcmEventModalEventParams) => {
       const { eventType, record, createFormData, currentUser, loadData } = event;
@@ -103,6 +110,11 @@ const LcmEventModal = memo<{
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_IN) {
+        if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+          if (notKnockIn(data)) {
+            return message.warn('不能进行敲入操作');
+          }
+        }
         return $barrierIn.current.show(data, tableFormData, currentUser, loadData);
       }
 

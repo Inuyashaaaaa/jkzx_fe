@@ -86,7 +86,7 @@ export const isRangeAccruals = data => {
 };
 
 export const isKnockIn = data => {
-  return data[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.KNOCK_IN;
+  return data[LEG_FIELD.ALREADY_BARRIER];
 };
 
 export const getMinRule = (message: string = '不允许小于0') => {
