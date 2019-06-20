@@ -195,7 +195,7 @@ class PricingSettingVolSurface extends PureComponent {
               return (
                 <FormItem>
                   {form.getFieldDecorator({})(
-                    <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
+                    <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} min={0} />
                   )}
                 </FormItem>
               );
@@ -336,23 +336,25 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public render() {
-    const tableColumnDefs = TABLE_COLUMN(this.state.tableDataSource);
-    const columns = tableColumnDefs.concat({
-      title: '操作',
-      dataIndex: OPERATION,
-      width: 150,
-      render: (text, record, index) => {
-        return (
-          <>
-            <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(index, record)}>
-              <a style={{ color: 'red' }}>删除</a>
-            </Popconfirm>
-            <Divider type="vertical" />
-            <a onClick={() => this.onClick(record, index)}>插入</a>
-          </>
-        );
-      },
-    });
+    const tableColumnDefs = this.state.tableColumnDefs;
+    const columns = tableColumnDefs.length
+      ? tableColumnDefs.concat({
+          title: '操作',
+          dataIndex: OPERATION,
+          width: 150,
+          render: (text, record, index) => {
+            return (
+              <>
+                <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(index, record)}>
+                  <a style={{ color: 'red' }}>删除</a>
+                </Popconfirm>
+                <Divider type="vertical" />
+                <a onClick={() => this.onClick(record, index)}>插入</a>
+              </>
+            );
+          },
+        })
+      : [];
     const tableDataSource = this.state.tableDataSource.map(item => {
       item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
       return item;
@@ -377,6 +379,7 @@ class PricingSettingVolSurface extends PureComponent {
                     {
                       tableDataSource: [],
                       tableFormData: {},
+                      tableColumnDefs: [],
                       searchFormData: {
                         ...searchFormData,
                         ...Form2.createFields({

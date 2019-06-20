@@ -191,7 +191,7 @@ const ActiveTable = memo<any>(props => {
                 {dataSource.length && batch ? (
                   <Row type="flex" justify="end">
                     <Col>
-                      <InputNumber value={number} onChange={val => setNumber(val)} />
+                      <InputNumber value={number} onChange={val => setNumber(val)} min={0} />
                     </Col>
                     <Col>
                       <Button.Group>
