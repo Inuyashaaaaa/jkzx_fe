@@ -285,9 +285,9 @@ class Table2 extends PureComponent<ITableProps> {
     return (
       <div id={this.domId}>
         <Table
+          {...this.props}
           className={this.getClassName()}
           components={components}
-          {...this.props}
           columns={this.getColumnDefs()}
           onRow={this.getOnRow()}
         />
