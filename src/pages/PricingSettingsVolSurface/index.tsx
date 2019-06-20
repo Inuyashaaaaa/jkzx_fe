@@ -24,10 +24,13 @@ import {
   SEARCH_FORM_CONTROLS,
   SEARCH_FORM,
   TABLE_COLUMN,
+  OPERATION,
+  TENOR_KEY,
 } from './constants';
 import FormItem from 'antd/lib/form/FormItem';
 import { Form2, Select, InputNumber, Table2, Input, SmartTable } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import ActiveTable from './ActiveTable';
 
 class PricingSettingVolSurface extends PureComponent {
   public lastFetchedDataSource = null;
@@ -156,8 +159,9 @@ class PricingSettingVolSurface extends PureComponent {
           if (item.field === 'tenor') {
             return {
               title: '期限',
-              dataIndex: 'tenor',
+              dataIndex: TENOR_KEY,
               defaultEditing: false,
+              width: 120,
               editable: record => {
                 return true;
               },
@@ -183,6 +187,7 @@ class PricingSettingVolSurface extends PureComponent {
             dataIndex: item.field,
             defaultEditing: false,
             percent: item.percent,
+            width: 150,
             editable: record => {
               return true;
             },
@@ -205,7 +210,6 @@ class PricingSettingVolSurface extends PureComponent {
       quote: underlyer.quote,
     };
     this.underlyer = underlyer;
-
     this.lastFetchedDataSource = tableDataSource;
     this.setState({
       tableColumnDefs,
@@ -237,23 +241,6 @@ class PricingSettingVolSurface extends PureComponent {
     this.setState({
       insertFormData: allFields,
     });
-  };
-
-  public handleSaveTable = async () => {
-    const { tableDataSource } = this.state;
-    const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
-    const { error } = await saveModelVolSurface({
-      columns: this.state.tableColumnDefs,
-      dataSource: tableDataSource.map(item => Form2.getFieldsValue(item)),
-      underlyer: this.underlyer,
-      newQuote: (this.state.tableFormData as any).quote,
-      modelName: searchFormData[GROUP_KEY],
-      instance: searchFormData[INSTANCE_KEY],
-    });
-
-    if (error) return;
-
-    message.success('保存成功');
   };
 
   public onSetConstantsButtonClick = event => {
@@ -295,16 +282,11 @@ class PricingSettingVolSurface extends PureComponent {
       id: uuidv4(),
     };
     const clone = _.concat(this.state.tableDataSource, data);
-    this.setState(
-      {
-        insertVisible: false,
-        tableDataSource: this.sortDataSource(clone),
-        insertFormData: {},
-      },
-      () => {
-        console.log(this.state.tableDataSource);
-      }
-    );
+    this.setState({
+      insertVisible: false,
+      tableDataSource: this.sortDataSource(clone),
+      insertFormData: {},
+    });
     message.success('插入成功');
   };
 
@@ -343,26 +325,22 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public handleCellValueChanged = params => {
-    this.setState(
-      {
-        tableDataSource: this.state.tableDataSource.map(item => {
-          if (item.id === params.record.id) {
-            return params.record;
-          }
-          return item;
-        }),
-      },
-      () => {
-        console.log(this.state.tableDataSource);
-      }
-    );
+    this.setState({
+      tableDataSource: this.state.tableDataSource.map(item => {
+        if (item.id === params.record.id) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
   };
 
   public render() {
     const tableColumnDefs = TABLE_COLUMN(this.state.tableDataSource);
     const columns = tableColumnDefs.concat({
       title: '操作',
-      dataIndex: 'operation',
+      dataIndex: OPERATION,
+      width: 150,
       render: (text, record, index) => {
         return (
           <>
@@ -384,6 +362,7 @@ class PricingSettingVolSurface extends PureComponent {
       const value = o.tenor.value;
       return durationMap[value.substring(value.length - 1)] * Number.parseInt(value, 10) * 7;
     });
+
     return (
       <Page>
         <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
@@ -431,50 +410,14 @@ class PricingSettingVolSurface extends PureComponent {
               columns={SEARCH_FORM(this.state.groups, this.state.searchFormData)}
             />
             <Divider type="horizontal" />
-            <Row>
-              <Button type="primary" onClick={this.handleSaveTable}>
-                保存
-              </Button>
-            </Row>
-            {this.underlyer ? (
-              <>
-                <Divider type="horizontal" />
-                <Form2
-                  layout="inline"
-                  dataSource={Form2.createFields(this.state.tableFormData)}
-                  submitable={false}
-                  resetable={false}
-                  onFieldsChange={this.onTableFormChange}
-                  columns={[
-                    {
-                      dataIndex: 'quote',
-                      title: '标的物价格',
-                      render: (value, record, index, { form, editing }) => {
-                        return (
-                          <FormItem>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                },
-                              ],
-                            })(<InputNumber style={{ width: 200 }} />)}
-                          </FormItem>
-                        );
-                      },
-                    },
-                  ]}
-                />
-              </>
-            ) : null}
-            <SmartTable
+            <ActiveTable
+              searchFormData={this.state.searchFormData}
               dataSource={tds}
               columns={columns}
-              onCellFieldsChange={this.handleCellValueChanged}
-              loading={this.state.tableLoading}
-              rowKey="id"
-              pagination={false}
-              style={{ marginTop: 20 }}
+              handleCellValueChanged={this.handleCellValueChanged}
+              underlyer={this.underlyer}
+              onTableFormChange={this.onTableFormChange}
+              tableFormData={this.state.tableFormData}
             />
           </Col>
         </Row>
