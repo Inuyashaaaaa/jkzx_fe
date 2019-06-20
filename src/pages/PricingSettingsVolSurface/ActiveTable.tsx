@@ -1,43 +1,107 @@
 import _ from 'lodash';
 import React, { memo, useEffect, useState } from 'react';
-import { Divider, Button, Checkbox, Row } from 'antd';
+import { Divider, Button, Checkbox, Row, Popover, Col, message } from 'antd';
 import { Form2, InputNumber, Table2, SmartTable } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
+import InputButton from '@/containers/_InputButton';
+import { saveModelVolSurface } from '@/services/model';
+import { GROUP_KEY, INSTANCE_KEY, TENOR_KEY, OPERATION } from './constants';
+import styles from './index.less';
 
 const ActiveTable = memo<any>(props => {
-  const { handleCellValueChanged, underlyer, onTableFormChange } = props;
+  const {
+    handleCellValueChanged,
+    tableFormData,
+    searchFormData,
+    underlyer,
+    onTableFormChange,
+    columns,
+  } = props;
   const [loading, setLoading] = useState(false);
+  const [selectedColKeys, setSelectedColKeys] = useState({});
+  const [selectColumns, setSelectColumns] = useState(props.columns);
   const [dataSource, setDataSource] = useState(props.dataSource);
-  const [columns, setColumns] = useState(props.columns);
   const [batch, setBatch] = useState(false);
   const [rowSelection, setRowSelection] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
+  const [number, setNumber] = useState();
+
+  useEffect(
+    () => {
+      setBatch(false);
+    },
+    [searchFormData]
+  );
+
   useEffect(
     () => {
       setDataSource(props.dataSource);
-      setColumns(props.columns);
     },
-    [props]
+    [props.dataSource]
+  );
+
+  useEffect(
+    () => {
+      setSelectColumns(() => {
+        return props.columns.map((item, index) => {
+          if (!batch) return item;
+          if (index === 0 || index === props.columns.length - 1) return item;
+          return {
+            ...item,
+            oldTitle: item.oldTitle || item.title,
+            onCell: () => {
+              return {
+                className: !!selectedColKeys[item.dataIndex] ? 'col-selected' : '',
+              };
+            },
+            title: (
+              <Checkbox
+                checked={!!selectedColKeys[item.dataIndex]}
+                onChange={e => {
+                  setSelectedColKeys((pre: any) => {
+                    return {
+                      ...pre,
+                      [item.dataIndex]: e.target.checked,
+                    };
+                  });
+                }}
+              >
+                {item.oldTitle || item.title}
+              </Checkbox>
+            ),
+          };
+        });
+      });
+    },
+    [selectedColKeys, props.columns, batch]
   );
 
   // 批量选择
   const rowSelectionData = {
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedRow(selectedRowKeys);
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    },
-    onSelect: (record, selected, selectedRows) => {
-      console.log(record, selected, selectedRows);
-    },
-    onSelectAll: (selected, selectedRows, changeRows) => {
-      console.log(selected, selectedRows, changeRows);
     },
   };
 
-  const handleSaveTable = () => {};
+  const handleSaveTable = async () => {
+    const searchFormDataValues = Form2.getFieldsValue(searchFormData);
+    const { error } = await saveModelVolSurface({
+      columns: columns.filter(col => !(col.dataIndex === TENOR_KEY || col.dataIndex === OPERATION)),
+      dataSource: dataSource.map(item => Form2.getFieldsValue(item)),
+      underlyer,
+      newQuote: (tableFormData as any).quote,
+      modelName: searchFormDataValues[GROUP_KEY],
+      instance: searchFormDataValues[INSTANCE_KEY],
+    });
+
+    if (error) return;
+
+    message.success('保存成功');
+  };
 
   const handleBatchCancel = () => {
     setBatch(false);
+    setNumber(null);
     setRowSelection(null);
   };
 
@@ -46,101 +110,118 @@ const ActiveTable = memo<any>(props => {
     setRowSelection(rowSelectionData);
   };
 
-  const handleBatchSave = () => {
-    const selectColumns = _.filter(columns, item => {
-      return item.checked;
-    });
-    console.log(selectColumns);
-    console.log(selectedRow);
-  };
-
-  const columnsSelect = (e, dataIndex) => {
-    setColumns(
-      columns.map(item => {
-        item.checked = e.target.checked;
-        return item;
-      })
-    );
-  };
-
-  const columnsData = columns.map(item => {
-    console.log(item);
-    if (!item.text && item.dataIndex !== 'operation' && batch) {
-      item.text = item.title;
-      item.title = (
-        <Checkbox checked={item.checked} onChange={e => columnsSelect(e, item.dataIndex)}>
-          {item.title}
-        </Checkbox>
-      );
+  const handleBatchSave = event => {
+    if (_.isEmpty(selectedRow) && _.isEmpty(selectedColKeys)) {
+      return message.warn('还未选择行或者列');
     }
-    return item;
-  });
+
+    (_.isEmpty(selectedRow) ? dataSource.map(item => item.id) : selectedRow).forEach(rowKey => {
+      const selectedColIds = _.toPairs(selectedColKeys)
+        .filter(([key, checked]) => checked)
+        .map(([colKey]) => colKey);
+
+      (_.isEmpty(selectedColIds)
+        ? selectColumns.map(item => item.dataIndex)
+        : selectedColIds
+      ).forEach(colKey => {
+        if (colKey === TENOR_KEY || colKey === OPERATION) return;
+        setDataSource(pre => {
+          return pre.map(record => {
+            if (record.id === rowKey) {
+              return {
+                ...record,
+                [colKey]: {
+                  ...record[colKey],
+                  value: number,
+                },
+              };
+            }
+            return record;
+          });
+        });
+      });
+    });
+
+    setBatch(false);
+    setNumber(null);
+    setSelectedColKeys([]);
+    setSelectedRow([]);
+  };
 
   return (
     <>
-      <Row>
+      <Row type="flex" justify="space-between">
         <Button type="primary" onClick={handleSaveTable} style={{ marginRight: '20px' }}>
           保存
         </Button>
-        {dataSource.length ? (
-          <>
-            {dataSource.length && batch ? (
-              <>
-                <Button type="primary" onClick={handleBatchCancel} style={{ marginRight: '20px' }}>
-                  取消
-                </Button>
-                <Button type="primary" onClick={handleBatchSave} style={{ marginRight: '20px' }}>
-                  批量保存
-                </Button>
-              </>
-            ) : (
-              <Button type="primary" onClick={handleBatchSelect} style={{ marginRight: '20px' }}>
-                批量选择
-              </Button>
-            )}
-          </>
-        ) : null}
       </Row>
       {underlyer ? (
         <>
           <Divider type="horizontal" />
-          <Form2
-            layout="inline"
-            dataSource={Form2.createFields(props.tableFormData)}
-            submitable={false}
-            resetable={false}
-            onFieldsChange={onTableFormChange}
-            columns={[
-              {
-                dataIndex: 'quote',
-                title: '标的物价格',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                          },
-                        ],
-                      })(<InputNumber style={{ width: 200 }} />)}
-                    </FormItem>
-                  );
+          <Row type="flex" justify="space-between">
+            <Form2
+              layout="inline"
+              dataSource={Form2.createFields(props.tableFormData)}
+              submitable={false}
+              resetable={false}
+              onFieldsChange={onTableFormChange}
+              columns={[
+                {
+                  dataIndex: 'quote',
+                  title: '标的物价格',
+                  render: (value, record, index, { form, editing }) => {
+                    return (
+                      <FormItem>
+                        {form.getFieldDecorator({
+                          rules: [
+                            {
+                              required: true,
+                            },
+                          ],
+                        })(<InputNumber style={{ width: 200 }} disabled={batch} />)}
+                      </FormItem>
+                    );
+                  },
                 },
-              },
-            ]}
-          />
+              ]}
+            />
+
+            {dataSource.length ? (
+              <>
+                {dataSource.length && batch ? (
+                  <Row type="flex" justify="end">
+                    <Col>
+                      <InputNumber value={number} onChange={val => setNumber(val)} />
+                    </Col>
+                    <Col>
+                      <Button.Group>
+                        <Button type="primary" onClick={handleBatchSave} disabled={number == null}>
+                          确认
+                        </Button>
+                        <Button onClick={handleBatchCancel}>取消</Button>
+                      </Button.Group>
+                    </Col>
+                  </Row>
+                ) : (
+                  <Button type="primary" onClick={handleBatchSelect}>
+                    批量设置
+                  </Button>
+                )}
+              </>
+            ) : null}
+          </Row>
         </>
       ) : null}
       <SmartTable
+        className={styles.scope}
         dataSource={dataSource}
-        columns={columnsData}
+        columns={selectColumns}
         onCellFieldsChange={handleCellValueChanged}
         loading={loading}
         rowKey="id"
         pagination={false}
         style={{ marginTop: 20 }}
-        rowSelection={rowSelection}
+        rowSelection={batch ? rowSelection : null}
         scroll={dataSource.length ? { x: 1250 } : undefined}
       />
     </>

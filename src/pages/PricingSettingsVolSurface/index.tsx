@@ -24,6 +24,8 @@ import {
   SEARCH_FORM_CONTROLS,
   SEARCH_FORM,
   TABLE_COLUMN,
+  OPERATION,
+  TENOR_KEY,
 } from './constants';
 import FormItem from 'antd/lib/form/FormItem';
 import { Form2, Select, InputNumber, Table2, Input, SmartTable } from '@/containers';
@@ -157,7 +159,7 @@ class PricingSettingVolSurface extends PureComponent {
           if (item.field === 'tenor') {
             return {
               title: '期限',
-              dataIndex: 'tenor',
+              dataIndex: TENOR_KEY,
               defaultEditing: false,
               width: 120,
               editable: record => {
@@ -208,7 +210,6 @@ class PricingSettingVolSurface extends PureComponent {
       quote: underlyer.quote,
     };
     this.underlyer = underlyer;
-
     this.lastFetchedDataSource = tableDataSource;
     this.setState({
       tableColumnDefs,
@@ -240,23 +241,6 @@ class PricingSettingVolSurface extends PureComponent {
     this.setState({
       insertFormData: allFields,
     });
-  };
-
-  public handleSaveTable = async () => {
-    const { tableDataSource } = this.state;
-    const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
-    const { error } = await saveModelVolSurface({
-      columns: this.state.tableColumnDefs,
-      dataSource: tableDataSource.map(item => Form2.getFieldsValue(item)),
-      underlyer: this.underlyer,
-      newQuote: (this.state.tableFormData as any).quote,
-      modelName: searchFormData[GROUP_KEY],
-      instance: searchFormData[INSTANCE_KEY],
-    });
-
-    if (error) return;
-
-    message.success('保存成功');
   };
 
   public onSetConstantsButtonClick = event => {
@@ -298,16 +282,11 @@ class PricingSettingVolSurface extends PureComponent {
       id: uuidv4(),
     };
     const clone = _.concat(this.state.tableDataSource, data);
-    this.setState(
-      {
-        insertVisible: false,
-        tableDataSource: this.sortDataSource(clone),
-        insertFormData: {},
-      },
-      () => {
-        console.log(this.state.tableDataSource);
-      }
-    );
+    this.setState({
+      insertVisible: false,
+      tableDataSource: this.sortDataSource(clone),
+      insertFormData: {},
+    });
     message.success('插入成功');
   };
 
@@ -346,26 +325,21 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public handleCellValueChanged = params => {
-    this.setState(
-      {
-        tableDataSource: this.state.tableDataSource.map(item => {
-          if (item.id === params.record.id) {
-            return params.record;
-          }
-          return item;
-        }),
-      },
-      () => {
-        console.log(this.state.tableDataSource);
-      }
-    );
+    this.setState({
+      tableDataSource: this.state.tableDataSource.map(item => {
+        if (item.id === params.record.id) {
+          return params.record;
+        }
+        return item;
+      }),
+    });
   };
 
   public render() {
     const tableColumnDefs = TABLE_COLUMN(this.state.tableDataSource);
     const columns = tableColumnDefs.concat({
       title: '操作',
-      dataIndex: 'operation',
+      dataIndex: OPERATION,
       width: 150,
       render: (text, record, index) => {
         return (
@@ -437,6 +411,7 @@ class PricingSettingVolSurface extends PureComponent {
             />
             <Divider type="horizontal" />
             <ActiveTable
+              searchFormData={this.state.searchFormData}
               dataSource={tds}
               columns={columns}
               handleCellValueChanged={this.handleCellValueChanged}

@@ -338,3 +338,7 @@ export const TABLE_COLUMN = tableDataSource => [
     },
   },
 ];
+
+export const OPERATION = 'operation';
+
+export const TENOR_KEY = 'tenor';
