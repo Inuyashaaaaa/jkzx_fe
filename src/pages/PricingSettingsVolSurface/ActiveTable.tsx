@@ -185,30 +185,25 @@ const ActiveTable = memo<any>(props => {
                 },
               ]}
             />
-
-            {dataSource.length ? (
-              <>
-                {dataSource.length && batch ? (
-                  <Row type="flex" justify="end">
-                    <Col>
-                      <InputNumber value={number} onChange={val => setNumber(val)} />
-                    </Col>
-                    <Col>
-                      <Button.Group>
-                        <Button type="primary" onClick={handleBatchSave} disabled={number == null}>
-                          确认
-                        </Button>
-                        <Button onClick={handleBatchCancel}>取消</Button>
-                      </Button.Group>
-                    </Col>
-                  </Row>
-                ) : (
-                  <Button type="primary" onClick={handleBatchSelect}>
-                    批量设置
-                  </Button>
-                )}
-              </>
-            ) : null}
+            {batch ? (
+              <Row type="flex" justify="end">
+                <Col>
+                  <InputNumber value={number} onChange={val => setNumber(val)} />
+                </Col>
+                <Col>
+                  <Button.Group>
+                    <Button type="primary" onClick={handleBatchSave} disabled={number == null}>
+                      确认
+                    </Button>
+                    <Button onClick={handleBatchCancel}>取消</Button>
+                  </Button.Group>
+                </Col>
+              </Row>
+            ) : (
+              <Button type="primary" onClick={handleBatchSelect} disabled={_.isEmpty(dataSource)}>
+                批量设置
+              </Button>
+            )}
           </Row>
         </>
       ) : null}
