@@ -100,7 +100,7 @@ class Component extends PureComponent<
             ...item,
             assetClass: ASSET_CLASS_ZHCN_MAP[data.assetClass],
             instrumentType: INSTRUMENT_TYPE_ZHCN_MAP[data.instrumentType],
-            multiplier: data.instrumentInfo.multiplier,
+            multiplier: data.instrumentInfo.multiplier ? data.instrumentInfo.multiplier : 1,
           };
         });
       })
