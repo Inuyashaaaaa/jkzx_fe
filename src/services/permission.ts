@@ -29,14 +29,14 @@ function setPagePermissions(user, roles, rolePagesPermission, pagePermissionTree
 
 export const updatePermission = async userInfo => {
   const permissionRsps = await initPagePermissions(userInfo.token);
-
   const allRolePermissions = permissionRsps[0].data;
   const allPagePermissions = permissionRsps[1].data;
   const roles = permissionRsps[2].data;
 
-  userInfo.permissions = userInfo.permissions || {};
+  userInfo.permissions = {
+    ...userInfo.permissions,
+  };
 
   setPagePermissions(userInfo, roles || [], allRolePermissions || [], allPagePermissions);
-
   return userInfo;
 };
