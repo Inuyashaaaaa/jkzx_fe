@@ -1,4 +1,5 @@
 {
   "video": false,
-  "browser": "chrome"
+  "browser": "chrome",
+  "reporter": "mochawesome"
 }

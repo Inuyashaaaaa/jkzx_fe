@@ -13,6 +13,7 @@ const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
 const CDOC_BUNDLE_NAME = 'cdocs';
 const BRANCH_NAME_LATEST = 'latest';
+const E2E_CONTAINER = 'mochawesome-report';
 
 const exists = src => {
   return fs.existsSync(src);
@@ -37,13 +38,14 @@ function cp(from, to) {
 function upload(config = {}) {
   const {
     bundleName = BUNDLE_NAME,
+    remoteBundleName = bundleName,
     branchName = process.env.CI_BUILD_REF_NAME,
     notifaction = true,
   } = config;
   const remoteUsername = 'root';
   const remoteIp = '10.1.5.28';
   const remoteFolder = `/home/share/bct_product/frontend/${branchName}/`;
-  const remotePaths = path.join(remoteFolder, bundleName);
+  const remotePaths = path.join(remoteFolder, remoteBundleName);
   console.log(
     `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${bundleName}`
   );
@@ -51,9 +53,12 @@ function upload(config = {}) {
     shell.exec(
       `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${remotePaths}`
     );
+    shell.exec(
+      `ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${remoteUsername}@${remoteIp} "[ -d ${remotePaths} ] && echo ok || mkdir -p ${remotePaths}"`
+    );
     // https://stackoverflow.com/questions/3663895/ssh-the-authenticity-of-host-hostname-cant-be-established
     shell.exec(
-      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
+      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName}/* ${remoteUsername}@${remoteIp}:${remotePaths}`
     );
     if (notifaction) {
       shell.exec(
@@ -134,7 +139,7 @@ function feature() {
 
 function doc() {
   upload({
-    branchName: `${process.env.CI_BUILD_REF_NAME}/${DOC_BUNDLE_NAME}`,
+    branchName: process.env.CI_BUILD_REF_NAME,
     bundleName: DOC_BUNDLE_NAME,
     notifaction: false,
   });
@@ -142,8 +147,17 @@ function doc() {
 
 function cdoc() {
   upload({
-    branchName: `${process.env.CI_BUILD_REF_NAME}/${CDOC_BUNDLE_NAME}`,
+    branchName: process.env.CI_BUILD_REF_NAME,
     bundleName: CDOC_BUNDLE_NAME,
+    notifaction: false,
+  });
+}
+
+function e2eReports() {
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME,
+    bundleName: E2E_CONTAINER,
+    remoteBundleName: 'e2e-reports',
     notifaction: false,
   });
 }
@@ -183,4 +197,8 @@ if (denv === 'cdoc') {
 
 if (denv === 'demo') {
   demo();
+}
+
+if (denv === 'e2e-reports') {
+  e2eReports();
 }
