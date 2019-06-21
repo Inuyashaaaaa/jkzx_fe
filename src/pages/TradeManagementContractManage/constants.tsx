@@ -7,7 +7,6 @@ import {
   PRODUCTTYPE_ZHCH_MAP,
   LEG_TYPE_MAP,
 } from '@/constants/common';
-import { IColumnDef } from '@/containers/Table/types';
 import { Timeline, Typography } from 'antd';
 import React from 'react';
 import Operations from './containers/CommonModel/Operations';

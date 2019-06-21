@@ -5,7 +5,6 @@ import {
 } from '@/constants/common';
 import CashInsertModal from '@/containers/CashInsertModal';
 import { IFormControl } from '@/containers/Form/types';
-import { IColumnDef } from '@/containers/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import {
   refMasterAgreementSearch,
@@ -100,41 +99,6 @@ export const PROCESSED_FORM_CONTROLS: (tabKey) => IFormControl[] = tabKey => {
     },
   ] as any[]).concat(tabKey === 'processed' ? [] : event);
 };
-
-export const PROCESSED_COL_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
-  {
-    headerName: '交易对手',
-    field: 'legalName',
-  },
-  {
-    headerName: '交易ID',
-    field: 'tradeId',
-  },
-  {
-    headerName: '现金流 (¥)',
-    field: 'cashFlow',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '期权费 (¥)',
-    field: 'premium',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-  {
-    headerName: '生命周期事件',
-    field: 'lcmEventType',
-    input: {
-      type: 'select',
-      options: LCM_EVENT_TYPE_OPTIONS,
-    },
-  },
-  {
-    headerName: '操作',
-    render: params => {
-      return <CashInsertModal record={params.data} fetchTable={fetchTable} />;
-    },
-  },
-];
 
 export const PROCESSED_COLUMN = fetchTable => [
   {

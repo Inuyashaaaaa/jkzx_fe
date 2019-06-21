@@ -1,5 +1,4 @@
 import { IFormControl } from '@/containers/Form/types';
-import { IColumnDef } from '@/containers/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -135,46 +134,6 @@ export const SEARCH_FORM_CONTROLS_SETTLE: (bookIdList, positionIdList) => IFormC
   },
 ];
 
-export const SETTLE_COLUMN_DEFS: (onFetch) => IColumnDef[] = onFetch => [
-  {
-    field: 'positionId',
-    headerName: '持仓ID',
-  },
-  {
-    field: 'tradeId',
-    headerName: '所属交易ID',
-  },
-  {
-    field: 'bookName',
-    headerName: '所属交易簿',
-  },
-  {
-    field: 'partyName',
-    headerName: '交易对手',
-  },
-  {
-    field: 'salesName',
-    headerName: '销售',
-  },
-  {
-    field: 'expirationDate',
-    headerName: '到期日',
-  },
-  {
-    field: 'status',
-    headerName: '结算通知书处理状态',
-  },
-  {
-    headerName: '操作',
-    render: params => {
-      return (
-        <Row type="flex" align="middle" style={{ height: params.node.rowHeight }}>
-          <SettlementModal data={params.data} onFetch={onFetch} />
-        </Row>
-      );
-    },
-  },
-];
 export const columns = [
   {
     dataIndex: 'positionId',

@@ -1,5 +1,4 @@
 import { IFormControl } from '@/containers/Form/types';
-import { IColumnDef } from '@/containers/Table/types';
 import {
   refSimilarAccountNameList,
   refSimilarBankAccountList,
@@ -7,35 +6,6 @@ import {
 } from '@/services/reference-data-service';
 import React from 'react';
 import Operation from './Operation';
-
-export const TABLE_COLUMN_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
-  {
-    headerName: '交易对手',
-    field: 'legalName',
-  },
-  {
-    headerName: '交易对手银行账号',
-    field: 'bankAccount',
-  },
-  {
-    headerName: '交易对手银行账户名',
-    field: 'bankAccountName',
-  },
-  {
-    headerName: '交易对手开户行',
-    field: 'bankName',
-  },
-  {
-    headerName: '交易对手支付系统行号',
-    field: 'paymentSystemCode',
-  },
-  {
-    headerName: '操作',
-    render: params => {
-      return <Operation record={params} fetchTable={fetchTable} />;
-    },
-  },
-];
 
 export const CREATE_FORM_CONTROLS: IFormControl[] = [
   {

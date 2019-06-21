@@ -1,4 +1,3 @@
-import { IColDef } from '@/containers/Table/types';
 import _ from 'lodash';
 
 export const USER_LOCAL_FIELD = 'tongyu_USER_LOCAL_FIELD';
@@ -40,17 +39,6 @@ export const DEFAULT_TERM = 30;
 
 export const DEFAULT_DAYS_IN_YEAR = 365;
 
-export interface ILegType {
-  type: string;
-  name: string;
-  assetClass: string;
-  getColumnDefs: (env?: string) => IColDef[];
-  getPricingColumnDefs?: () => any[];
-  isAnnualized: boolean;
-  getDefault?: any;
-  getPosition?: any;
-  getPageData?: any;
-}
 export const CNY_FORMAT = '¥ 0,0.0000';
 
 export const FORM_EDITABLE_STATUS = {

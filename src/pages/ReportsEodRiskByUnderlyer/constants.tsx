@@ -1,5 +1,4 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/containers/Table/types';
 import { formatNumber, formatMoney } from '@/tools';
 import { multiply } from 'mathjs';
 

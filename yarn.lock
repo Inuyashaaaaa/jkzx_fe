@@ -2769,28 +2769,6 @@ after@0.8.2:
   resolved "https://registry.npm.taobao.org/after/download/after-0.8.2.tgz#fedb394f9f0e02aa9768e702bda23b505fae7e1f"
   integrity sha1-/ts5T58OAqqXaOcCvaI7UF+ufh8=
 
-ag-grid-community@^20.0.0:
-  version "20.2.0"
-  resolved "https://registry.npm.taobao.org/ag-grid-community/download/ag-grid-community-20.2.0.tgz#22f26d53e309b51a156878d180c9ec6f16bc6403"
-  integrity sha1-IvJtU+MJtRoVaHjRgMnsbxa8ZAM=
-
-ag-grid-enterprise@^20.0.0:
-  version "20.2.0"
-  resolved "https://registry.npm.taobao.org/ag-grid-enterprise/download/ag-grid-enterprise-20.2.0.tgz#dbc2c4f6d3c097661911fe40c18dcac775dac04d"
-  integrity sha1-28LE9tPAl2YZEf5AwY3Kx3XawE0=
-
-ag-grid-react@^20.0.0:
-  version "20.2.0"
-  resolved "https://registry.npm.taobao.org/ag-grid-react/download/ag-grid-react-20.2.0.tgz#b2fd24950a31fc491a1c79ce92657b8aa7582c45"
-  integrity sha1-sv0klQox/EkaHHnOkmV7iqdYLEU=
-  dependencies:
-    prop-types "^15.6.2"
-
-ag-grid@^18.1.2:
-  version "18.1.2"
-  resolved "https://registry.npm.taobao.org/ag-grid/download/ag-grid-18.1.2.tgz#d98b3dd824b9cb82d9f638e4bab5a5771513869b"
-  integrity sha1-2Ys92CS5y4LZ9jjkurWldxUThps=
-
 airbnb-prop-types@^2.13.2:
   version "2.13.2"
   resolved "https://registry.npm.taobao.org/airbnb-prop-types/download/airbnb-prop-types-2.13.2.tgz#43147a5062dd2a4a5600e748a47b64004cc5f7fc"
