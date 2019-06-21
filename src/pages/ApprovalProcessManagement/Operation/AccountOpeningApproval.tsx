@@ -70,6 +70,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
   public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
+    this.handleGetInitForm();
   };
 
   public componentWillReceiveProps(nextProps) {
@@ -235,8 +236,27 @@ class AccountOpeningApproval extends PureComponent<any, any> {
       },
       businessProcessData: this.state.accountData,
     };
-    // 提交修改后数据
     this.executeModify(param, 'modify');
+  };
+
+  public handleGetInitForm = async () => {
+    const { processInstanceId } = this.props.formData;
+    const isCompleted = this.props.formData.processInstanceStatusEnum
+      ? !_.toLower(this.props.formData.processInstanceStatusEnum).includes('unfinished') &&
+        status !== 'pending'
+      : false;
+    const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
+    const res = await executeMethod({
+      processInstanceId,
+    });
+    if (!res || res.error) {
+      this.setState({
+        loading: false,
+      });
+      return;
+    }
+    const data = _.get(res, 'data.process._business_payload');
+    this.handleGetData(data);
   };
 
   public handleGetData = param => {
