@@ -12,13 +12,8 @@ import { Col, Modal, notification, Row } from 'antd';
 import produce from 'immer';
 import memo from 'memoize-one';
 import React from 'react';
-import {
-  EXPIRY_KEY,
-  FORM_CONTROLS,
-  INSTRUMENT_KEY,
-  POSITION_KEY,
-  POSITION_SHOW_KEY,
-} from './constants';
+import { EXPIRY_KEY, INSTRUMENT_KEY, POSITION_KEY, POSITION_SHOW_KEY } from './constants';
+import { FORM_CONTROLS } from './tools';
 
 class PricingSettingsBaseContractManagement extends PureStateComponent {
   public state = {

@@ -11,7 +11,7 @@ import { Divider, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
-import { HISTORY_CLOUNMS } from './constants';
+import { HISTORY_CLOUNMS } from './tools';
 
 class History extends PureComponent {
   public state = {

@@ -22,7 +22,8 @@ import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { useState, useEffect, memo } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { CREATE_FORM_CONTROLS, generateColumns } from './constants';
+import { CREATE_FORM_CONTROLS } from './constants';
+import { generateColumns } from './tools';
 import TabHeader from '@/containers/TabHeader';
 import { SmartTable } from '@/containers';
 

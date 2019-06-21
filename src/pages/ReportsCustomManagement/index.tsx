@@ -1,14 +1,14 @@
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, Table2, SmartTable } from '@/containers';
+import { Form2, Select, SmartTable } from '@/containers';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
-import { Pagination, Divider, Row, Table, DatePicker } from 'antd';
+import { Divider, DatePicker } from 'antd';
 import Page from '@/containers/Page';
 import { rptCustomReportNameList, rptCustomReportSearchPaged } from '@/services/report-service';
-import { TABLE_COL_DEFS, REPORT_TYPE } from './constants';
+import { REPORT_TYPE } from './constants';
+import { TABLE_COL_DEFS } from './tools';
 import _ from 'lodash';
-import { async } from 'q';
 import { PAGE_SIZE } from '@/constants/component';
 const { RangePicker } = DatePicker;
 
