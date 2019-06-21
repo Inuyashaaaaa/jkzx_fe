@@ -167,6 +167,14 @@ const portfolio = {
   },
 };
 
+export const resultTableFailureColumns = [
+  tradeId,
+  {
+    dataIndex: 'cause',
+    title: '失败原因',
+  },
+];
+
 export function generateColumns(type) {
   if (type === 'flow') {
     return [
