@@ -163,6 +163,55 @@ export const portfolio = {
   },
 };
 
+export const resultTableFailureColumns = [
+  tradeId,
+  {
+    dataIndex: 'cause',
+    title: '失败原因',
+  },
+];
+
+export function generateColumns(type) {
+  if (type === 'flow') {
+    return [
+      bookId,
+      portfolios,
+      instrumentId,
+      direction,
+      openClose,
+      dealPrice,
+      dealAmount,
+      dealTime,
+      tradeId,
+      tradeAccount,
+      multiplier,
+    ];
+  }
+
+  const baseColumns = [
+    instrumentId,
+    netPosition,
+    longPosition,
+    shortPosition,
+    totalBuy,
+    historyBuyAmount,
+    totalSell,
+    historySellAmount,
+    marketValue,
+    totalPnl,
+  ];
+
+  if (type === 'detail') {
+    return [bookId, ...baseColumns];
+  }
+
+  if (type === 'portfolio') {
+    return [portfolio, ...baseColumns];
+  }
+
+  return baseColumns;
+}
+
 export const CREATE_FORM_CONTROLS: IFormControl[] = [
   {
     control: {

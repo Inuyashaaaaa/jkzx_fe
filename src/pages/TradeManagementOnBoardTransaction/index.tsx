@@ -1,3 +1,4 @@
+import { getToken } from '@/tools/authority';
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import { BIG_NUMBER_CONFIG } from '@/constants/common';
@@ -16,14 +17,25 @@ import {
   queryTradeRecord,
   uploadUrl,
 } from '@/services/onBoardTransaction';
-import { Button, Divider, message, Modal, Radio, Row, Table, Tabs } from 'antd';
+import {
+  Button,
+  Divider,
+  message,
+  Modal,
+  Radio,
+  Row,
+  Table,
+  Tabs,
+  Upload,
+  Icon,
+  notification,
+} from 'antd';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { useState, useEffect, memo } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
-import { CREATE_FORM_CONTROLS } from './constants';
-import { generateColumns } from './tools';
+import { CREATE_FORM_CONTROLS, generateColumns, resultTableFailureColumns } from './constants';
 import TabHeader from '@/containers/TabHeader';
 import { SmartTable } from '@/containers';
 
@@ -34,7 +46,6 @@ const TradeManagementOnBoardTansaction = props => {
   const [loading, setLoading] = useState(false);
   const [flowData, setFlowData] = useState([]);
   const [positionData, setPositionData] = useState([]);
-  const [formItems, setFormItems] = useState([]);
   const [positionMode, setPositionMode] = useState('detail');
   const [createFormVisible, setCreateFormVisible] = useState(false);
   const [createModalDataSource, setCreateModalDataSource] = useState({
@@ -47,9 +58,10 @@ const TradeManagementOnBoardTansaction = props => {
     searchDate: moment().subtract(1, 'days'),
   });
   const [activeKey, setActiveKey] = useState('flow');
-  const [modalTitle, setModalTitle] = useState();
   const [modalLoading, setModalLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [uploadResultTable, setUploadResultTable] = useState({ success: [], failure: [] });
 
   useEffect(() => {
     queryFlowData();
@@ -166,37 +178,23 @@ const TradeManagementOnBoardTansaction = props => {
     });
   };
 
-  const formatFormItems = () => {
-    const uploadAttachData = {
-      url: uploadUrl,
-      mimeTypes: ['CSV'],
-      mimeInfos: ['text/csv', 'application/vnd.ms-excel'],
-      uploadData: {
-        method: 'exeTradeRecordUpload',
-        params: '{}',
-      },
-    };
-    const documentUp = {
-      type: 'upload',
-      label: '文件上传',
-      property: 'document',
-      required: true,
-      marginTop: 30,
-      attachData: uploadAttachData,
-    };
-    return [documentUp];
+  const attachData = {
+    url: uploadUrl,
+    mimeTypes: ['CSV'],
+    mimeInfos: ['text/csv', 'application/vnd.ms-excel'],
+    uploadData: {
+      method: 'exeTradeRecordUpload',
+      params: '{}',
+    },
   };
 
   const hideModal = () => {
     setModalVisible(false);
-    setFormItems([]);
     setModalLoading(false);
   };
 
   const showModal = () => {
     setModalVisible(true);
-    setModalTitle('导入场内流水');
-    setFormItems(formatFormItems());
   };
 
   const changeTab = tab => {
@@ -215,14 +213,50 @@ const TradeManagementOnBoardTansaction = props => {
     queryPositionData(value);
   };
 
-  const handleFormData = action => {
-    if (action === 'uploading') {
+  const checkFileType = (file, data) => {
+    const infos = (data && data.mimeInfos) || [];
+    const types = (data && data.mimeTypes) || [];
+    if (infos.length === 0 || types.length === 0) {
+      return true;
+    }
+    const type = (file && file.type) || '';
+    if (infos.includes(type)) {
       setModalLoading(true);
+      return true;
     }
-    if (action === 'failed') {
+    notification.error({
+      message: `文件上传只支持${types.join(',')}类型`,
+    });
+    return false;
+  };
+
+  const onUploadStatusChanged = info => {
+    if (info.file.status === 'done') {
+      const resp = info.file.response;
+      if (resp) {
+        const failure = resp.diagnostics.map(v => {
+          const fail = v.split('`');
+          return {
+            tradeId: fail[0],
+            cause: fail[1],
+          };
+        });
+        setUploadResultTable({
+          failure,
+          success: resp.result,
+        });
+      }
       setModalLoading(false);
+      notification.success({
+        message: '模板上传成功',
+      });
+      hideModal();
+      setResultModalVisible(true);
     }
-    if (action === 'success') {
+    if (info.file.status === 'error') {
+      notification.error({
+        message: (info.file && info.file.error && info.file.error.message) || '模板上传失败',
+      });
       hideModal();
     }
   };
@@ -445,7 +479,7 @@ const TradeManagementOnBoardTansaction = props => {
         </>
       )}
       <Modal
-        title={modalTitle}
+        title="导入场内流水"
         visible={modalVisible}
         onCancel={hideModal}
         onOk={hideModal}
@@ -456,11 +490,28 @@ const TradeManagementOnBoardTansaction = props => {
         ]}
       >
         {modalVisible && (
-          <CommonForm
-            data={formItems}
-            handleStatusChange={handleFormData}
-            uploadDisabled={modalLoading}
-          />
+          <div style={{ borderWidth: 0, borderColor: '#e8e8e8', borderStyle: 'solid' }}>
+            <div style={{ textAlign: 'center', margin: '30px' }}>
+              <div>
+                <Upload
+                  name="file"
+                  showUploadList={modalLoading}
+                  action={attachData.url}
+                  headers={{
+                    Authorization: `Bearer ${getToken()}`,
+                  }}
+                  data={attachData.uploadData}
+                  beforeUpload={file => checkFileType(file, attachData)}
+                  onChange={info => onUploadStatusChanged(info)}
+                >
+                  <Button disabled={false}>
+                    <Icon type="upload" />
+                    上传文件
+                  </Button>
+                </Upload>
+              </div>
+            </div>
+          </div>
         )}
         <p style={{ marginTop: '20px' }}>操作说明:</p>
         <p style={{ marginLeft: '20px' }}>1.仅支持导入.csv格式的文件</p>
@@ -481,6 +532,29 @@ const TradeManagementOnBoardTansaction = props => {
           dataSource={createModalDataSource}
           onValueChange={onValueChange}
           controls={CREATE_FORM_CONTROLS}
+        />
+      </Modal>
+      <Modal
+        width={1500}
+        visible={resultModalVisible}
+        onCancel={() => {
+          setResultModalVisible(false);
+        }}
+        title="批量导入结果"
+      >
+        <SmartTable
+          dataSource={uploadResultTable.failure}
+          columns={resultTableFailureColumns}
+          loading={loading}
+          rowKey="uuid"
+          scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
+        />
+        <SmartTable
+          dataSource={uploadResultTable.success}
+          columns={flowColumns}
+          loading={loading}
+          rowKey="uuid"
+          scroll={flowData.length > 0 ? { x: '2000px' } : { x: false }}
         />
       </Modal>
     </Page>
