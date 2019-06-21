@@ -106,7 +106,7 @@ const TriggerCard = memo<any>(props => {
     if (!trigger) {
       setColumns(columns1);
       return setTargetData({
-        ...Form2.createFields({ operation: 'all' }),
+        ...Form2.createFields({ operation: 'all', processName }),
       });
     }
     setColumns(columns2);
@@ -124,6 +124,7 @@ const TriggerCard = memo<any>(props => {
       ...Form2.createFields({
         operation: trigger.operation,
         conditions,
+        processName,
       }),
     });
   };
@@ -281,6 +282,8 @@ const TriggerCard = memo<any>(props => {
       ...changedFields,
     });
   };
+
+  console.log(targetData);
 
   return (
     <>
