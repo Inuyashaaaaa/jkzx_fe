@@ -70,7 +70,6 @@ const useTableData = props => {
         data.salesName ? data.salesName : '',
       ];
     }
-
     const requests = Object.keys(data).map(async item => {
       newData[item] = Form2.createField(data[item]);
       if (_.includes(ALL_DATE_FIELD_KEYS, item)) {

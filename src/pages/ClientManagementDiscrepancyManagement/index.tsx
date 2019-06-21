@@ -1,5 +1,5 @@
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Table2, Form2, SmartTable } from '@/containers';
+import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { createApprovalProcess } from '@/services/approval';
 import { cliFundEventSearch, refBankAccountSearch } from '@/services/reference-data-service';
@@ -8,7 +8,8 @@ import produce from 'immer';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
-import { CREATE_FORM_CONTROLS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
+import { SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
+import { CREATE_FORM_CONTROLS } from './tools';
 import router from 'umi/router';
 import SmartForm from '@/containers/SmartForm';
 

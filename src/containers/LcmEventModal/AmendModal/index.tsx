@@ -126,6 +126,7 @@ const AmendModal = memo<IAmendModal>(props => {
         if (store.reload) {
           store.reload();
         }
+        setVisible(false);
       }}
       confirmLoading={confirmLoading}
     >

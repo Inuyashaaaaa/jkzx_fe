@@ -8,7 +8,7 @@ import { Button, Col, message, Modal, notification, Row } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
-import { CREATE_FORM_CONTROLS } from './constants';
+import { CREATE_FORM_CONTROLS } from './tools';
 import { createPageTableColDefs } from './services';
 
 function findDepartment(departs, departId) {

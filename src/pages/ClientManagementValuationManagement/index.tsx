@@ -12,7 +12,7 @@ import { Divider, message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import { VALUATION_COL_DEFS } from './constants';
+import { VALUATION_COL_DEFS } from './tools';
 import { PAGE_SIZE } from '@/constants/component';
 
 class ClientManagementValuationManagement extends PureComponent {

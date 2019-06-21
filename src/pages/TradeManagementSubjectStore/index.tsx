@@ -7,7 +7,7 @@ import { Button, Divider, message, Modal } from 'antd';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { TABLE_COL_DEFS } from './constants';
+import { TABLE_COL_DEFS } from './tools';
 import { createFormControls, searchFormControls } from './services';
 
 const TradeManagementMarketManagement = props => {
