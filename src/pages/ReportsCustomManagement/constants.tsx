@@ -12,8 +12,3 @@ export const REPORT_TYPE = [
     value: 'CUSTOM',
   },
 ];
-
-export const REPORT_TYPE_MAP = {
-  CUSTOM: '自定义报告',
-  REG: '监管报告',
-};
