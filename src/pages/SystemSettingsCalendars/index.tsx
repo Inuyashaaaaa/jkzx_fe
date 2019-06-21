@@ -8,7 +8,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
-import { DEFAULT_CALENDAR, HOLIDAY_FORMAT, TABLE_COLUMN_DEFS } from './constants';
+import { DEFAULT_CALENDAR, HOLIDAY_FORMAT } from './constants';
+import { TABLE_COLUMN_DEFS } from './tools';
 import { createFormControls } from './services';
 const { RangePicker } = DatePicker;
 

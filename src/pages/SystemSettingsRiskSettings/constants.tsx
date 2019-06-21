@@ -1,7 +1,6 @@
 import React from 'react';
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/containers/_Form2';
-import { IColumnDef } from '@/containers/_Table2';
+import { IColumnDef } from '@/containers/Table/types';
 import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 import { Input } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
@@ -26,57 +25,6 @@ export const SEARCH_FORM_CONTROLS: IFormControl[] = [
           value: item,
         }));
       },
-    },
-  },
-];
-
-export const CREATE_FORM_CONTROLS: (venueCodes) => IFormControl[] = venueCodes => [
-  {
-    dataIndex: 'venueCode',
-    control: {
-      label: '交易所',
-    },
-    input: {
-      type: 'select',
-      options: venueCodes,
-    },
-    options: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-  },
-  {
-    dataIndex: 'instrumentId',
-    control: {
-      label: '标的',
-    },
-    input: {
-      type: 'input',
-    },
-    options: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-  },
-  {
-    dataIndex: 'notionalLimit',
-    control: {
-      label: '存续期名义金额',
-    },
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-    options: {
-      rules: [
-        {
-          required: true,
-          message: '金额上限不能为空',
-        },
-      ],
     },
   },
 ];

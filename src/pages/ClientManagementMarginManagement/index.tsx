@@ -12,7 +12,8 @@ import { Button, Divider, Icon, message, Modal, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid';
-import { PAGE_TABLE_COL_DEFS, TABLE_COLUMNS } from './constants';
+import { PAGE_TABLE_COL_DEFS } from './constants';
+import { TABLE_COLUMNS } from './tools';
 import _ from 'lodash';
 class ClientManagementMarginManagement extends PureComponent {
   public state = {

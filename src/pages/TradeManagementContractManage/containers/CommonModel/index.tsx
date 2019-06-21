@@ -17,7 +17,7 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
-import { BOOKING_TABLE_COLUMN_DEFS } from '../../constants';
+import { BOOKING_TABLE_COLUMN_DEFS } from '../../tools';
 import SmartForm from '@/containers/SmartForm';
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
 import { showTotal } from '@/tools/component';

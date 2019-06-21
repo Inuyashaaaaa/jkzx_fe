@@ -12,7 +12,7 @@ import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import styles from './Action.less';
-import { BOOKING_TABLE_COLUMN_DEFS } from './constants';
+import { BOOKING_TABLE_COLUMN_DEFS } from './tools';
 import { PAGE_SIZE } from '@/constants/component';
 
 class Action extends PureComponent<any, any> {

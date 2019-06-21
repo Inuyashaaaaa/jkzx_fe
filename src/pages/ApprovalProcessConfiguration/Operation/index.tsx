@@ -23,7 +23,8 @@ import {
 import _ from 'lodash';
 import { default as React, useEffect, useRef, useState } from 'react';
 import uuidv4 from 'uuid/v4';
-import { COLUMNS, GTE_PROCESS_CONFIGS, TASKTYPE } from '../constants';
+import { TASKTYPE } from '../constants';
+import { GTE_PROCESS_CONFIGS, COLUMNS } from '../tools';
 import EditTable from './EditTable';
 import TriggerCard from './TriggerCard';
 

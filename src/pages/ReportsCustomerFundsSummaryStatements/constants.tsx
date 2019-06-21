@@ -1,4 +1,4 @@
-import { formatNumber, formatMoney } from '@/tools';
+import { formatMoney } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {

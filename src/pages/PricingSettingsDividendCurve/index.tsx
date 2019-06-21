@@ -13,7 +13,7 @@ import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
-import { INSERT_FORM_CONTROLS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
+import { INSERT_FORM_CONTROLS, SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './tools';
 
 const GROUP_KEY = 'modelName';
 
