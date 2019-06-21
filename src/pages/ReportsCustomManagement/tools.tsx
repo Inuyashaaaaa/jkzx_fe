@@ -18,6 +18,9 @@ export const TABLE_COL_DEFS = () => [
     title: '报告类型',
     dataIndex: 'reportType',
     width: 150,
+    render: (text, record, index) => {
+      return REPORT_TYPE_MAP[text] ? REPORT_TYPE_MAP[text] : text;
+    },
   },
   {
     title: '更新日期',

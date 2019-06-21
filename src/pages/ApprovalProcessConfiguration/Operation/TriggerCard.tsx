@@ -124,6 +124,7 @@ const TriggerCard = memo<any>(props => {
       ...Form2.createFields({
         operation: trigger.operation,
         conditions,
+        processName,
       }),
     });
   };
@@ -281,6 +282,8 @@ const TriggerCard = memo<any>(props => {
       ...changedFields,
     });
   };
+
+  console.log(targetData);
 
   return (
     <>
