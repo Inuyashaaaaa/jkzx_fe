@@ -8,7 +8,6 @@ import {
   PROCESS_STATUS_TYPES_ZHCN_MAPS,
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
-import { IColumnDef } from '@/containers/Table/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,

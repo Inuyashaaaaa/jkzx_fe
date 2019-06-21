@@ -1,4 +1,3 @@
-import { IColumnDef } from '@/containers/Table/types';
 import { IFormControl } from '@/containers/_Form2';
 import React from 'react';
 import { ITableColDef } from '@/components/type';

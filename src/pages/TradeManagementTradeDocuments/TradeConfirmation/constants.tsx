@@ -1,5 +1,4 @@
 import { IFormControl } from '@/containers/Form/types';
-import { IColumnDef } from '@/containers/Table/types';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
@@ -114,47 +113,6 @@ export const SEARCH_FORM_CONTROLS_TRADE: (bookIdList) => IFormControl[] = bookId
       },
     },
     field: 'partyName',
-  },
-];
-
-export const TRADE_COLUMN_DEFS: (onFetch) => IColumnDef[] = onFetch => [
-  {
-    field: 'tradeId',
-    headerName: '交易ID',
-  },
-  {
-    field: 'bookName',
-    headerName: '交易簿',
-  },
-  {
-    field: 'partyName',
-    headerName: '交易对手',
-  },
-  {
-    field: 'salesName',
-    headerName: '销售',
-  },
-  {
-    field: 'tradeDate',
-    headerName: '交易日',
-  },
-  {
-    field: 'tradeEmail',
-    headerName: '交易邮箱',
-  },
-  {
-    field: 'status',
-    headerName: '交易确认书处理状态',
-  },
-  {
-    headerName: '操作',
-    render: params => {
-      return (
-        <Row type="flex" align="middle">
-          <TradeModal data={params.data} onFetch={onFetch} />
-        </Row>
-      );
-    },
   },
 ];
 

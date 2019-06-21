@@ -1,4 +1,3 @@
-// import Table from '@/containers/_Table2';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { SmartTable } from '@/containers';
 import Page from '@/containers/Page';

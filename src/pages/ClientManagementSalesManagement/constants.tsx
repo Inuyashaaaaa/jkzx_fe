@@ -1,41 +1,6 @@
 import { IFormControl } from '@/containers/Form/types';
-import { IColumnDef } from '@/containers/Table/types';
-import React from 'react';
-import Operation from './Operation';
 export const ADDRESS_CASCADER = 'ADDRESS_CASCADER';
-import { getMoment } from '@/tools';
 import { CascaderOptionType } from 'antd/lib/cascader';
-
-export const TABLE_COL_DEF: (branchSalesList, fetchTable) => IColumnDef[] = (
-  branchSalesList,
-  fetchTable
-) => [
-  {
-    headerName: '销售',
-    field: 'salesName',
-  },
-  {
-    headerName: '营业部',
-    field: 'branchName',
-  },
-  {
-    headerName: '分公司',
-    field: 'subsidiaryName',
-  },
-  {
-    headerName: '创建时间',
-    field: 'createdAt',
-    render: params => {
-      return getMoment(params.value).format('YYYY-MM-DD HH:mm:ss');
-    },
-  },
-  {
-    headerName: '操作',
-    render: params => {
-      return <Operation record={params.data} fetchTable={fetchTable} />;
-    },
-  },
-];
 
 export const CREATE_FORM_CONTROLS: (
   branchSalesList: CascaderOptionType[]
