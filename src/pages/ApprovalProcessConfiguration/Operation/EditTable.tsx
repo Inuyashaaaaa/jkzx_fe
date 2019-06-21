@@ -5,7 +5,6 @@ import { Button, Icon, Tag, Alert, Modal, message } from 'antd';
 import GroupSelcet from './GroupSelcet';
 import FormItem from 'antd/lib/form/FormItem';
 import XLSX from 'xlsx';
-import { wkApproveGroupList } from '@/services/auditing';
 import AutoSelect from './AutoSelect';
 
 const EditTable = memo<any>(props => {
