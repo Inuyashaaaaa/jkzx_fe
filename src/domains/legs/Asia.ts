@@ -43,8 +43,6 @@ import { NotionalAmount } from '../../containers/legFields/NotionalAmount';
 import { NotionalAmountType } from '../../containers/legFields/NotionalAmountType';
 import { ObservationDates } from '../../containers/legFields/ObservationDates';
 import { ObservationStep } from '../../containers/legFields/ObservationStep';
-import { ObserveEndDay } from '../../containers/legFields/ObserveEndDay';
-import { ObserveStartDay } from '../../containers/legFields/ObserveStartDay';
 import { OptionType } from '../../containers/legFields/OptionType';
 import { ParticipationRate } from '../../containers/legFields/ParticipationRate';
 import { Premium } from '../../containers/legFields/Premium';
@@ -83,8 +81,6 @@ export const Asia: ILeg = legPipeLine({
         NotionalAmountType,
         NotionalAmount,
         ObservationStep,
-        ObserveStartDay,
-        ObserveEndDay,
         ObservationDates,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
@@ -114,8 +110,6 @@ export const Asia: ILeg = legPipeLine({
         FrontPremium,
         NotionalAmountType,
         NotionalAmount,
-        ObserveStartDay,
-        ObserveEndDay,
         ObservationStep,
         ObservationDates,
         Unit,
@@ -146,8 +140,6 @@ export const Asia: ILeg = legPipeLine({
         FrontPremium,
         NotionalAmountType,
         NotionalAmount,
-        ObserveStartDay,
-        ObserveEndDay,
         ObservationStep,
         ObservationDates,
         Unit,
@@ -172,8 +164,6 @@ export const Asia: ILeg = legPipeLine({
       [DaysInYear.dataIndex]: DEFAULT_DAYS_IN_YEAR,
       [PremiumType.dataIndex]: PREMIUM_TYPE_MAP.PERCENT,
       [NotionalAmountType.dataIndex]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
-      [ObserveStartDay.dataIndex]: curDateMoment.clone(),
-      [ObserveEndDay.dataIndex]: curDateMoment.clone().add(DEFAULT_TERM, 'day'),
       [ObservationStep.dataIndex]: FREQUENCY_TYPE_MAP['1D'],
       [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
@@ -189,8 +179,6 @@ export const Asia: ILeg = legPipeLine({
     const nextPosition: any = {};
 
     const DATE_FIELDS = [
-      ObserveEndDay.dataIndex,
-      ObserveEndDay.dataIndex,
       EffectiveDate.dataIndex,
       ExpirationDate.dataIndex,
       SettlementDate.dataIndex,
