@@ -7,6 +7,7 @@ import {
 } from '@/services/reference-data-service';
 import { Modal } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
+import _ from 'lodash';
 
 const TABLE_COL_DEFS = fetchTable => [
   {
@@ -67,7 +68,18 @@ const CashExportModal = memo<{
     [props.visible]
   );
 
+  useEffect(
+    () => {
+      console.log(props.trade);
+      searchData();
+    },
+    [props.trade]
+  );
+
   const searchData = async () => {
+    if (!_.get(props, 'trade.tradeId') || !_.get(props, 'trade.counterPartyCode')) {
+      return;
+    }
     const { error, data } = await cliTasksGenerateByTradeId({
       tradeId: props.trade.tradeId,
       legalName: props.trade.counterPartyCode,
