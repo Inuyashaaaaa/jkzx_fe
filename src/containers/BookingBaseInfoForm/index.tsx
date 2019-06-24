@@ -4,6 +4,7 @@ import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,
   refSimilarLegalNameList,
+  refFuzzyQueryEnabledPartyNames,
 } from '@/services/reference-data-service';
 import { refPartyGetByLegalName, trdBookListBySimilarBookName } from '@/services/trade-service';
 import { getFormEditingMeta } from '@/tools';
@@ -341,7 +342,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                               allowClear: true,
                               placeholder: '请输入内容搜索',
                               options: async (value: string = '') => {
-                                const { data, error } = await refSimilarLegalNameList({
+                                const { data, error } = await refFuzzyQueryEnabledPartyNames({
                                   similarLegalName: value,
                                 });
                                 if (error) return [];

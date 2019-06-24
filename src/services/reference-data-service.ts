@@ -111,6 +111,17 @@ export async function refSimilarLegalNameList(params) {
   });
 }
 
+//  簿记时不允许选择被禁用的交易对手
+export async function refFuzzyQueryEnabledPartyNames(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'refFuzzyQueryEnabledPartyNames',
+      params,
+    },
+  });
+}
+
 export async function refSimilarSalesNameList(params) {
   return request(`${HOST_TEST}reference-data-service/api/rpc`, {
     method: `POST`,
