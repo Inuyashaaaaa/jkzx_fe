@@ -13,6 +13,7 @@ import {
   TABLE_CELL_EDITING_CHANGED,
   TABLE_KEY_DOWN,
   TABLE_STOP_ACTIVE,
+  TABLE_CELL_CLICK,
 } from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
@@ -162,6 +163,7 @@ class SwitchCell extends PureComponent<
     }
 
     event.stopPropagation();
+    this.props.api.eventBus.emit(TABLE_CELL_CLICK, event);
     this.props.tableApi.saveBy((rowId, colId) => {
       if (rowId === this.props.rowId && colId === this.props.colDef.dataIndex) {
         return false;
