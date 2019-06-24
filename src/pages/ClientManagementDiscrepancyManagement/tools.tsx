@@ -4,6 +4,10 @@ import { IFormColDef } from '@/components/type';
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import { Select, InputNumber, DatePicker } from '@/containers';
+import { Row, Col } from 'antd';
+import styles from './index.less';
+
+const { Option } = Select;
 
 export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAccountList => [
   {
@@ -53,7 +57,25 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
                 message: '交易对手银行账号必填',
               },
             ],
-          })(<Select allowClear={true} options={bankAccountList} />)}
+          })(
+            <Select allowClear={true} className={styles.bankAccount}>
+              {bankAccountList.map(item => {
+                return (
+                  <Option value={item.value} title={item.label} key={item.value}>
+                    <Row>{item.label}</Row>
+                    <Row
+                      style={{
+                        color: 'rgba(0, 0, 0, 0.35)',
+                      }}
+                    >
+                      <Col>账户名: {item.bankName ? item.bankName : '-'}</Col>
+                      <Col>开户行: {item.bankAccountName ? item.bankAccountName : '-'}</Col>
+                    </Row>
+                  </Option>
+                );
+              })}
+            </Select>
+          )}
         </FormItem>
       );
     },
