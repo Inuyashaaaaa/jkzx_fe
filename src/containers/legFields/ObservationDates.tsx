@@ -12,7 +12,7 @@ import ModalButton from '@/containers/ModalButton';
 import PopconfirmButton from '@/containers/PopconfirmButton';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { qlDateScheduleCreate } from '@/services/quant-service';
-import { getLegEnvs, getMoment, getRequiredRule, isAsian, remove } from '@/tools';
+import { getLegEnvs, getMoment, getRequiredRule, isAsian, remove, isBarrier } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { Button, Col, message, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -291,7 +291,7 @@ class ObserveModalInput extends InputBase<{
           return record[OB_DAY_FIELD].format('YYYY-MM-DD');
         },
       },
-      ...(this.isAccruals()
+      ...(this.isAccruals() || isBarrier(this.props.record)
         ? []
         : [
             {
@@ -299,21 +299,25 @@ class ObserveModalInput extends InputBase<{
               dataIndex: 'weight',
             },
           ]),
-      {
-        title: '已观察到价格(可编辑)',
-        dataIndex: 'price',
-        defaultEditing: false,
-        editable: record => true,
-        render: (val, record, index, { form, editing }) => {
-          return (
-            <FormItem>
-              {form.getFieldDecorator({})(
-                <UnitInputNumber autoSelect={true} editing={editing} unit={'¥'} />
-              )}
-            </FormItem>
-          );
-        },
-      },
+      ...(isBarrier(this.props.record)
+        ? []
+        : [
+            {
+              title: '已观察到价格(可编辑)',
+              dataIndex: 'price',
+              defaultEditing: false,
+              editable: record => true,
+              render: (val, record, index, { form, editing }) => {
+                return (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <UnitInputNumber autoSelect={true} editing={editing} unit={'¥'} />
+                    )}
+                  </FormItem>
+                );
+              },
+            },
+          ]),
       {
         title: '操作',
         dataIndex: 'operation',

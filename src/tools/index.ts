@@ -77,6 +77,10 @@ export const isAsian = data => {
   );
 };
 
+export const isBarrier = data => {
+  return data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER;
+};
+
 export const isRangeAccruals = data => {
   return (
     data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
