@@ -142,21 +142,11 @@ class ObserveModalInput extends InputBase<{
 
   public getAutoGenerateParams = () => {
     const { record } = this.props;
-    if (isAsian(record)) {
-      const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.OBSERVE_START_DAY])).format(
-        'YYYY-MM-DD'
-      );
-      const end = getMoment(Form2.getFieldValue(record[LEG_FIELD.OBSERVE_END_DAY])).format(
-        'YYYY-MM-DD'
-      );
-      const freq = Form2.getFieldValue(record[LEG_FIELD.OBSERVATION_STEP]);
-      return { start, end, freq };
-    }
-
-    // 亚式，区间累积
-    const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).format(
-      'YYYY-MM-DD'
-    );
+    // 亚式，区间累积,单鲨
+    const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE]))
+      .clone()
+      .add(1, 'days')
+      .format('YYYY-MM-DD');
     const end = getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).format(
       'YYYY-MM-DD'
     );

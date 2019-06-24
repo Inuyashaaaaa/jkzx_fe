@@ -1,15 +1,10 @@
 import {
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
   EQUITY_EXCHANGE_ZHCN_MAP,
   COMMODITY_EXCHANGE_ZHCN_MAP,
-  ASSET_CLASS_ZHCN_MAP,
   INSTRUMENT_TYPE_ZHCN_MAP,
 } from '@/constants/common';
-import { IFormControl } from '@/containers/_Form2';
-import { IColumnDef } from '@/containers/_Table2';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-import { getDate, getUnit } from '@/tools/format';
+import { getDate } from '@/tools/format';
 import { formatNumber, getMoment } from '@/tools';
 import { IFormColDef } from '@/components/type';
 import FormItem from 'antd/lib/form/FormItem';

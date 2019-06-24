@@ -5,7 +5,8 @@ import { authRolesList, createRole, queryAllPagePermissions } from '@/services/r
 import { Button, message, Modal } from 'antd';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
-import { FORM_CONTROL, TABLE_COL_DEF } from './constants';
+import { FORM_CONTROL } from './constants';
+import { TABLE_COL_DEF } from './tools';
 
 class SystemSettingsRoleManagement extends PureComponent {
   public $table: Table2 = null;

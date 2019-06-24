@@ -1,80 +1,76 @@
-import {
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  INPUT_NUMBER_LOT_CONFIG,
-} from '@/constants/common';
+import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_LOT_CONFIG } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
 } from '@/services/trade-service';
-import { formatMoney, formatMoney } from '@/tools';
+import { formatMoney } from '@/tools';
 
-const bookId = {
+export const bookId = {
   dataIndex: 'bookId',
   title: '交易簿',
   width: 150,
 };
 
-const instrumentId = {
+export const instrumentId = {
   dataIndex: 'instrumentId',
   width: 150,
   title: '合约代码',
 };
 
-const direction = {
+export const direction = {
   dataIndex: 'direction',
   width: 150,
   title: '买/卖',
 };
 
-const openClose = {
+export const openClose = {
   dataIndex: 'openClose',
   width: 150,
   title: '开/平',
 };
 
-const dealPrice = {
+export const dealPrice = {
   dataIndex: 'dealPrice',
   width: 150,
   title: '价格',
   align: 'right',
 };
 
-const dealAmount = {
+export const dealAmount = {
   dataIndex: 'dealAmount',
   width: 150,
   title: '手数/股数',
   align: 'right',
 };
 
-const dealTime = {
+export const dealTime = {
   dataIndex: 'dealTime',
   width: 150,
   title: '交易时间',
 };
 
-const tradeId = {
+export const tradeId = {
   dataIndex: 'tradeId',
   width: 150,
   title: '成交ID',
 };
 
-const tradeAccount = {
+export const tradeAccount = {
   dataIndex: 'tradeAccount',
   width: 150,
   title: '交易账号',
 };
 
-const multiplier = {
+export const multiplier = {
   dataIndex: 'multiplier',
   width: 150,
   title: '合约乘数',
   align: 'right',
 };
 
-const historyBuyAmount = {
+export const historyBuyAmount = {
   dataIndex: 'historyBuyAmount',
   width: 150,
   align: 'right',
@@ -84,7 +80,7 @@ const historyBuyAmount = {
   },
 };
 
-const historySellAmount = {
+export const historySellAmount = {
   dataIndex: 'historySellAmount',
   width: 150,
   title: '总卖金额(￥)',
@@ -94,42 +90,42 @@ const historySellAmount = {
   },
 };
 
-const totalBuy = {
+export const totalBuy = {
   width: 150,
   dataIndex: 'totalBuy',
   title: '总买量',
   align: 'right',
 };
 
-const longPosition = {
+export const longPosition = {
   dataIndex: 'longPosition',
   width: 150,
   title: '多头持仓',
   align: 'right',
 };
 
-const shortPosition = {
+export const shortPosition = {
   dataIndex: 'shortPosition',
   width: 150,
   title: '空头持仓',
   align: 'right',
 };
 
-const netPosition = {
+export const netPosition = {
   dataIndex: 'netPosition',
   width: 150,
   title: '持仓数量',
   align: 'right',
 };
 
-const totalSell = {
+export const totalSell = {
   dataIndex: 'totalSell',
   width: 150,
   title: '总卖量',
   align: 'right',
 };
 
-const totalPnl = {
+export const totalPnl = {
   dataIndex: 'totalPnl',
   width: 150,
   title: '总盈亏',
@@ -139,7 +135,7 @@ const totalPnl = {
   },
 };
 
-const marketValue = {
+export const marketValue = {
   dataIndex: 'marketValue',
   width: 150,
   align: 'right',
@@ -149,7 +145,7 @@ const marketValue = {
   },
 };
 
-const portfolios = {
+export const portfolios = {
   dataIndex: 'portfolioNames',
   width: 150,
   title: '投资组合',
@@ -158,7 +154,7 @@ const portfolios = {
   },
 };
 
-const portfolio = {
+export const portfolio = {
   dataIndex: 'portfolioName',
   width: 150,
   title: '投资组合',
@@ -166,6 +162,14 @@ const portfolio = {
     return Array.isArray(text) ? text.join(',') : text;
   },
 };
+
+export const resultTableFailureColumns = [
+  tradeId,
+  {
+    dataIndex: 'cause',
+    title: '失败原因',
+  },
+];
 
 export function generateColumns(type) {
   if (type === 'flow') {

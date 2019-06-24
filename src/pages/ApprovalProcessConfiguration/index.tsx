@@ -3,8 +3,9 @@ import React, { PureComponent } from 'react';
 import TabHeader from '@/containers/TabHeader';
 import { wkProcessList } from '@/services/approvalProcessConfiguration';
 import _ from 'lodash';
-import { GTE_PROCESS_CONFIGS, REVIEW_DATA, TASKTYPE } from './constants';
+import { REVIEW_DATA } from './constants';
 import Operation from './Operation';
+
 class ApprovalProcessManage extends PureComponent {
   public state = {
     processList: [],

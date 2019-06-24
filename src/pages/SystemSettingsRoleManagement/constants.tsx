@@ -1,40 +1,14 @@
-import { IFormColDef, ITableColDef } from '@/components/type';
+import { IFormColDef } from '@/components/type';
 import { getLocaleId, mapTree, remove } from '@/tools';
 import { Input } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 import { formatMessage } from 'umi/locale';
-import Operation from './Operation';
 
 const { TextArea } = Input;
 
 const routerExports = require('../../../config/router.config.js');
 const routeData = routerExports.default || routerExports || [];
-
-export const TABLE_COL_DEF: (fetchTable, showResource) => ITableColDef[] = (
-  fetchTable,
-  showResource
-) => [
-  {
-    dataIndex: 'roleName',
-    title: '角色',
-  },
-  {
-    dataIndex: 'alias',
-    title: '别名',
-  },
-  {
-    dataIndex: 'remark',
-    title: '备注',
-  },
-  {
-    dataIndex: 'operation',
-    title: '操作',
-    render: (val, record, index) => {
-      return <Operation data={record} fetchTable={fetchTable} showResource={showResource} />;
-    },
-  },
-];
 
 export const FORM_CONTROL: IFormColDef[] = [
   {

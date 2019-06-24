@@ -10,25 +10,17 @@ import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
-import { queryAllModelNameVol, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
-// import { queryModelName, queryModelVolSurface, saveModelVolSurface } from '@/services/model';
-import { Col, message, notification, Row, Table, Divider, Button, Modal, Popconfirm } from 'antd';
+import { queryAllModelNameVol, queryModelVolSurface } from '@/services/model';
+import { Col, message, notification, Row, Divider, Modal, Popconfirm } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import uuidv4 from 'uuid/v4';
-import {
-  GROUP_KEY,
-  INSTANCE_KEY,
-  MARKET_KEY,
-  SEARCH_FORM_CONTROLS,
-  SEARCH_FORM,
-  TABLE_COLUMN,
-  OPERATION,
-  TENOR_KEY,
-} from './constants';
+import { GROUP_KEY, INSTANCE_KEY, MARKET_KEY, OPERATION, TENOR_KEY } from './constants';
+import { SEARCH_FORM, TABLE_COLUMN } from './tools';
+
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, InputNumber, Table2, Input, SmartTable } from '@/containers';
+import { Form2, Select } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import ActiveTable from './ActiveTable';
 

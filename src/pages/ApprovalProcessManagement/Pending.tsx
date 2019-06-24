@@ -2,7 +2,7 @@ import { Table2, SmartTable } from '@/containers';
 import { queryProcessToDoList } from '@/services/approval';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { PENDING_COL_DEFS } from './constants';
+import { PENDING_COL_DEFS } from './tools';
 
 class Pending extends PureComponent {
   public state = {
