@@ -13,6 +13,10 @@ export const HISTORY_COL_DEFS: IColumnDef[] = [
     pinned: 'left',
   },
   {
+    title: '主协议编号',
+    dataIndex: 'masterAgreementId',
+  },
+  {
     headerName: '交易ID',
     field: 'tradeId',
   },

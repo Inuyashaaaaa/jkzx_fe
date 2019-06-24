@@ -194,12 +194,12 @@ export const HISTORY_CLOUNMS = fetchTable => [
     fixed: 'left',
   },
   {
-    title: '交易ID',
-    dataIndex: 'tradeId',
+    title: '主协议编号',
+    dataIndex: 'masterAgreementId',
   },
   {
-    title: 'SAC',
-    dataIndex: 'sac',
+    title: '交易ID',
+    dataIndex: 'tradeId',
   },
   {
     title: '操作状态',
