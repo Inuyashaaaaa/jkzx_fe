@@ -26,6 +26,14 @@ export const TABLE_COL_DEFS: ITableColDef[] = [
     dataIndex: 'bankAccount',
   },
   {
+    title: '交易对手银行账户名',
+    dataIndex: 'bankAccountName',
+  },
+  {
+    title: '交易对手开户行',
+    dataIndex: 'bankName',
+  },
+  {
     title: '序列号',
     dataIndex: 'serialNumber',
   },

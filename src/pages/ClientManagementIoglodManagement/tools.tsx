@@ -198,6 +198,10 @@ export const HISTORY_CLOUNMS = fetchTable => [
     dataIndex: 'tradeId',
   },
   {
+    title: 'SAC',
+    dataIndex: 'sac',
+  },
+  {
     title: '操作状态',
     width: 150,
     dataIndex: 'status',

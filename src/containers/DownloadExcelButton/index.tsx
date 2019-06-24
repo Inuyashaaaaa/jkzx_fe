@@ -67,7 +67,15 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     if (!this.checkData(this.props.data)) {
       return;
     }
-    const { searchMethod, cols, name, argument, colSwitch } = this.props.data;
+    const {
+      searchMethod,
+      cols,
+      name,
+      argument,
+      colSwitch,
+      sortBy,
+      handleDataSource,
+    } = this.props.data;
     const { searchFormData, sortField = {} } = argument;
     const { error, data: _data } = await searchMethod({
       ..._.mapValues(Form2.getFieldsValue(searchFormData), (values, key) => {
@@ -87,26 +95,37 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     const title = _.flatten(
       cols.map(item => (item.children ? item.children.map(iitem => iitem.title) : item.title))
     );
-    const newData =
-      name === '定制化报告'
-        ? _data.page.map(item => {
-            return _.mapValues(item.reportData, (value, key) => {
-              const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
-              if (col) {
-                return col.options[value];
-              }
-              return value;
+
+    let newData = [];
+    if (!_data.page && _.isArray(_data)) {
+      newData = handleDataSource ? handleDataSource(_data) : _data;
+    } else {
+      newData =
+        name === '定制化报告'
+          ? (_data.page || []).map(item => {
+              return _.mapValues(item.reportData, (value, key) => {
+                const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
+                if (col) {
+                  return col.options[value];
+                }
+                return value;
+              });
+            })
+          : (_data.page || []).map(item => {
+              return _.mapValues(item, (value, key) => {
+                const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
+                if (col) {
+                  return col.options[value];
+                }
+                return value;
+              });
             });
-          })
-        : _data.page.map(item => {
-            return _.mapValues(item, (value, key) => {
-              const col = colSwitch.find((iitem, keys) => iitem.dataIndex === key);
-              if (col) {
-                return col.options[value];
-              }
-              return value;
-            });
-          });
+    }
+
+    if (sortBy) {
+      newData = _.reverse(_.sortBy(newData, 'sortBy'));
+    }
+
     const dataSource = this.handleData(newData, dataIndex, title);
     if (this.props.tabs) {
       // 多sheet表导出
