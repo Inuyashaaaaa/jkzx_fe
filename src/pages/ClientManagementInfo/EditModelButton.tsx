@@ -62,7 +62,7 @@ const useTableData = props => {
     if (result.error) return;
 
     const newData = {};
-    const authorizers = data.authorizers;
+    const authorizers = data.tradeAuthorizer || data.authorizers;
     if (modelEditable !== false) {
       data.salesName = [
         data.subsidiaryName ? data.subsidiaryName : '',
