@@ -99,6 +99,10 @@ const AmendModal = memo<IAmendModal>(props => {
           const res = await $form.current.validate();
           if (res.error) return;
         }
+        const rsps = await tableEl.current.table.validate();
+        if (rsps.some(item => item.errors)) {
+          return;
+        }
         setConfirmLoading(true);
         const [position = {}] = convertTradePositions(
           tableData.map(item => Form2.getFieldsValue(item)),
