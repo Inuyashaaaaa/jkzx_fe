@@ -133,8 +133,11 @@ const TradeManagementBooking = props => {
   };
 
   const handelSave = async () => {
-    const res = await currentCreateFormRef.validate();
-    if (res.error) return;
+    const [formRsp, tableRsps] = await Promise.all([
+      currentCreateFormRef.validate(),
+      tableEl.current.table.validate(),
+    ]);
+    if (tableRsps.some(item => item.errors) || formRsp.error) return;
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
       Form2.getFieldsValue(createFormData),
