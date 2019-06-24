@@ -182,8 +182,8 @@ class SystemSettingsRoleManagement extends PureComponent {
         message: '该用户已在审批组中',
       });
     }
-    currentGroup.userList = (currentGroup.userList || []).concat(param);
-    const userList = currentGroup.userList.map(item => {
+    // currentGroup.userList = (currentGroup.userList || []).concat(param);
+    const userList = _.concat(currentGroup.userList, param).map(item => {
       return {
         userApproveGroupId: item.userApproveGroupId,
         username: item.username,
