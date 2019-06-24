@@ -22,13 +22,25 @@ export const TABLE_COL_DEFS: ITableColDef[] = [
     dataIndex: 'clientId',
   },
   {
+    title: '主协议编号',
+    dataIndex: 'masterAgreementId',
+  },
+  {
     title: '交易对手银行账号',
     dataIndex: 'bankAccount',
   },
   {
-    title: '序列号',
-    dataIndex: 'serialNumber',
+    title: '银行账户名',
+    dataIndex: 'bankAccountName',
   },
+  {
+    title: '开户行',
+    dataIndex: 'bankName',
+  },
+  // {
+  //   title: '序列号',
+  //   dataIndex: 'serialNumber',
+  // },
   {
     title: '出入金额 (¥)',
     align: 'right',
@@ -50,9 +62,8 @@ export const TABLE_COL_DEFS: ITableColDef[] = [
     dataIndex: 'paymentDate',
   },
   {
-    title: '状态',
-    dataIndex: 'processStatus',
-    render: (value, record, index) => PROCESS_STATUS_TYPES_ZHCN_MAPS[value],
+    title: '录入时间',
+    dataIndex: 'createdAt',
   },
 ];
 

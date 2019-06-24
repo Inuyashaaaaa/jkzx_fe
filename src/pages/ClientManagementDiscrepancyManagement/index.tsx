@@ -3,7 +3,7 @@ import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { createApprovalProcess } from '@/services/approval';
 import { cliFundEventSearch, refBankAccountSearch } from '@/services/reference-data-service';
-import { message, Button, Modal, Divider } from 'antd';
+import { message, Button, Modal, Divider, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
@@ -11,7 +11,14 @@ import React, { PureComponent } from 'react';
 import { SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
 import { CREATE_FORM_CONTROLS } from './tools';
 import router from 'umi/router';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SmartForm from '@/containers/SmartForm';
+import { formatMoney } from '@/tools';
+import {
+  PAYMENT_DIRECTION_TYPE_ZHCN_MAP,
+  ACCOUNT_DIRECTION_TYPE_ZHCN_MAP,
+  PROCESS_STATUS_TYPES_ZHCN_MAPS,
+} from '@/constants/common';
 import styles from './index.less';
 
 class ClientManagementDiscrepancyManagement extends PureComponent {
@@ -38,12 +45,9 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     this.fetchTable();
   };
 
-  public fetchTable = async () => {
-    this.setState({
-      loading: true,
-    });
+  public handleSearchForm = () => {
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
-    const { error, data } = await cliFundEventSearch({
+    return {
       ..._.omit(searchFormData, ['paymentDate', 'processStatus']),
       ...(searchFormData.paymentDate
         ? {
@@ -54,7 +58,14 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       ...(searchFormData.processStatus && searchFormData.processStatus === 'all'
         ? null
         : { processStatus: searchFormData.processStatus }),
+    };
+  };
+
+  public fetchTable = async () => {
+    this.setState({
+      loading: true,
     });
+    const { error, data } = await cliFundEventSearch(this.handleSearchForm());
     this.setState({
       loading: false,
     });
@@ -165,6 +176,18 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     this.setState({ visible: !this.state.visible });
   };
 
+  public handleDataSource = data => {
+    return data.map(item => {
+      item.paymentAmount = formatMoney(item.paymentAmount);
+      item.paymentDirection =
+        PAYMENT_DIRECTION_TYPE_ZHCN_MAP[item.paymentDirection] || item.paymentDirection;
+      item.accountDirection =
+        ACCOUNT_DIRECTION_TYPE_ZHCN_MAP[item.accountDirection] || item.accountDirection;
+      item.processStatus = PROCESS_STATUS_TYPES_ZHCN_MAPS[item.processStatus] || item.processStatus;
+      return item;
+    });
+  };
+
   public render() {
     return (
       <Page>
@@ -180,9 +203,29 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
           onSubmitButtonClick={this.fetchTable}
         />
         <Divider />
-        <Button type="primary" style={{ marginBottom: VERTICAL_GUTTER }} onClick={this.showModal}>
-          出入金录入
-        </Button>
+        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
+          <Button type="primary" style={{ marginBottom: VERTICAL_GUTTER }} onClick={this.showModal}>
+            出入金录入
+          </Button>
+          <DownloadExcelButton
+            style={{ margin: '10px 0' }}
+            key="export"
+            type="primary"
+            data={{
+              searchMethod: cliFundEventSearch,
+              argument: {
+                searchFormData: this.handleSearchForm(),
+              },
+              cols: TABLE_COL_DEFS,
+              name: '财务出入金管理',
+              colSwitch: [],
+              handleDataSource: this.handleDataSource,
+            }}
+          >
+            导出Excel
+          </DownloadExcelButton>
+        </Row>
+
         <SmartTable
           rowKey="uuid"
           columns={TABLE_COL_DEFS}

@@ -11,8 +11,11 @@ import { Divider, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import { HISTORY_CLOUNMS } from './tools';
-
+import { HISTORY_CLOUNMS_STATUS_MAP } from './constants';
+import { formatMoney } from '@/tools';
+import _ from 'lodash';
 class History extends PureComponent {
   public state = {
     dataSource: [],
@@ -54,6 +57,32 @@ class History extends PureComponent {
   public onSearchFormChange = (props, changedFields, allFields) => {
     this.setState({
       searchFormData: allFields,
+    });
+  };
+
+  public handleDataSource = data => {
+    return data.map(item => {
+      item.status = HISTORY_CLOUNMS_STATUS_MAP[item.status];
+      item.event = (
+        IOGLOD_EVENT_TYPE_OPTIONS[
+          _.findIndex(IOGLOD_EVENT_TYPE_OPTIONS, param => {
+            return param.value === item.event;
+          })
+        ] || {}
+      ).label;
+      item.marginChange = formatMoney(item.marginChange);
+      item.cashChange = formatMoney(item.cashChange);
+      item.premiumChange = formatMoney(item.premiumChange);
+      item.creditUsedChange = formatMoney(item.creditUsedChange);
+      item.debtChange = formatMoney(item.debtChange);
+      item.debtChange = formatMoney(item.debtChange);
+      item.netDepositChange = formatMoney(item.netDepositChange);
+      item.realizedPnLChange = formatMoney(item.realizedPnLChange);
+      item.counterPartyCreditChange = formatMoney(item.counterPartyCreditChange);
+      item.counterPartyCreditBalanceChange = formatMoney(item.counterPartyCreditBalanceChange);
+      item.counterPartyFundChange = formatMoney(item.counterPartyFundChange);
+      item.counterPartyMarginChange = formatMoney(item.counterPartyMarginChange);
+      return item;
     });
   };
 
@@ -182,6 +211,24 @@ class History extends PureComponent {
         <Divider type="horizontal" />
         <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
           <CapitalInputModal fetchTable={this.fetchTable} />
+          <DownloadExcelButton
+            style={{ margin: '10px 0' }}
+            key="export"
+            type="primary"
+            data={{
+              searchMethod: clientAccountOpRecordSearch,
+              argument: {
+                searchFormData: this.state.searchFormData,
+              },
+              cols: HISTORY_CLOUNMS(this.fetchTable),
+              name: '台账管理-历史台账',
+              colSwitch: [],
+              sortBy: 'CreateAt',
+              handleDataSource: this.handleDataSource,
+            }}
+          >
+            导出Excel
+          </DownloadExcelButton>
         </Row>
         <SmartTable
           dataSource={this.state.dataSource}
