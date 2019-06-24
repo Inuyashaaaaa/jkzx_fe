@@ -283,8 +283,6 @@ const TriggerCard = memo<any>(props => {
     });
   };
 
-  console.log(targetData);
-
   return (
     <>
       <Card
