@@ -114,7 +114,8 @@ const TriggerCard = memo<any>(props => {
     conditions = conditions.map(item => {
       item.leftIndex = _.get(item, 'leftIndex.indexClass');
       item.rightIndex = _.get(item, 'rightIndex.indexClass');
-      item.rightValue = _.get(item, 'rightValue.number');
+      const number = _.get(item, 'rightValue.number');
+      item.rightValue = number && _.isNumber(number) ? _.get(item, 'rightValue.number') : '';
       return {
         ...Form2.createFields(item),
         conditionId: item.conditionId,
@@ -282,9 +283,7 @@ const TriggerCard = memo<any>(props => {
       ...changedFields,
     });
   };
-
   console.log(targetData);
-
   return (
     <>
       <Card
