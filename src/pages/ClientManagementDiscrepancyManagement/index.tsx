@@ -12,6 +12,7 @@ import { SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
 import { CREATE_FORM_CONTROLS } from './tools';
 import router from 'umi/router';
 import SmartForm from '@/containers/SmartForm';
+import styles from './index.less';
 
 class ClientManagementDiscrepancyManagement extends PureComponent {
   public $searchForm: Form2 = null;
@@ -126,8 +127,9 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       () => {
         message.success(data.processInstanceId ? '已进入流程' : '资金录入成功');
         if (data.processInstanceId) {
-          router.push('/approval-process/process-manangement');
+          return router.push('/approval-process/process-manangement');
         }
+        this.fetchTable();
       }
     );
   };
@@ -144,6 +146,8 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
         return {
           label: _.pick(val, ['bankAccount']).bankAccount,
           value: _.pick(val, ['bankAccount']).bankAccount,
+          bankName: _.pick(val, ['bankName']).bankName,
+          bankAccountName: _.pick(val, ['bankAccountName']).bankAccountName,
         };
       });
       this.setState({
@@ -199,6 +203,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
             columns={CREATE_FORM_CONTROLS(this.state.bankAccountList)}
             footer={false}
             onFieldsChange={this.createFormChange}
+            className={styles.createForm}
           />
         </Modal>
       </Page>
