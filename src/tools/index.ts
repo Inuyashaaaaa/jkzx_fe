@@ -293,7 +293,6 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
 
 export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
   const isAnnualized = position.asset.annualized;
-
   const pageData = leg.getPageData(env, position);
 
   return {
@@ -307,8 +306,8 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
         ),
         [LEG_FIELD.IS_ANNUAL]: isAnnualized,
       }),
+      ...pageData,
     }),
-    ...pageData,
   };
 };
 
