@@ -97,7 +97,17 @@ const Operation = props => {
 
   const reviewSave = async () => {
     let tasks = _.cloneDeep(process.tasks);
+    tasks = tasks.map(task => {
+      if (task.taskType === 'modifyData') {
+        task.sequence = 9999;
+      }
+      if (task.taskType === 'insertData') {
+        task.sequence = -9999;
+      }
+      return task;
+    });
     tasks = _.sortBy(tasks, 'sequence');
+
     const reviewTasklength = (tasks || []).filter(item => item.taskType === 'reviewData').length;
     tasks.splice(
       1,
@@ -108,6 +118,7 @@ const Operation = props => {
         })
       )
     );
+
     tasks = tasks.map((item, index) => {
       item.sequence = index;
       return item;
@@ -289,6 +300,7 @@ const Operation = props => {
         taskAction: recordData.taskAction,
         taskType: recordData.taskType,
         taskName: '',
+        sequence: reviewTaskData.length + 1,
       }),
       taskId: uuidv4(),
     });
@@ -313,7 +325,6 @@ const Operation = props => {
     { allFields, changedFields, record, rowIndex },
     isSelect
   ) => {
-    console.log(isSelect);
     setReviewTask(
       reviewTask.map((item, index) => {
         if (index === rowIndex) {
@@ -387,7 +398,6 @@ const Operation = props => {
 
     let tasks = _.cloneDeep(process.tasks);
     tasks = _.sortBy(tasks, 'sequence');
-    console.log(tasks);
     tasks = tasks.map(item => {
       if (item.taskId === currentTaskId) {
         return Form2.getFieldsValue(otherTask[0]);
