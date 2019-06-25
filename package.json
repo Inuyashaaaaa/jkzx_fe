@@ -34,9 +34,9 @@
   "dependencies": {
     "@antv/data-set": "~0.9.6",
     "@babel/runtime": "~7.1.2",
-    "@umijs/fabric": "~1.0.9",
     "@commitlint/cli": "~8.0.0",
     "@commitlint/config-angular": "~8.0.0",
+    "@umijs/fabric": "~1.0.9",
     "animate.css": "~3.7.0",
     "antd": "~3.19.2",
     "bignumber.js": "~8.1.1",
@@ -122,7 +122,7 @@
     "style-loader": "~0.23.1",
     "stylelint": "~10.1.0",
     "umi": "~2.4.4",
-    "umi-plugin-react": "~1.2.0",
+    "umi-plugin-react": "~1.4.2",
     "webpack-bundle-analyzer": "~2.13.1"
   },
   "husky": {
