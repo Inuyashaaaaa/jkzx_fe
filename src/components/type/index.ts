@@ -64,6 +64,7 @@ export interface IRenderOptions<C = any, A = any> {
   api?: ITableApi;
   cellApi?: A;
   context?: ITableContext;
+  tableApi?: Table2;
 }
 
 export interface IFormColDef<T = any> extends IColDef<T> {

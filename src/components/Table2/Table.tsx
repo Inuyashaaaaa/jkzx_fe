@@ -12,17 +12,24 @@ import {
   TABLE_CELL_FIELDS_CHANGE,
   TABLE_CELL_VALUES_CHANGE,
   TABLE_KEY_DOWN,
+  TABLE_CELL_CLICK,
 } from './constants/EVENT';
 import FormRow from './rows/FormRow';
 import HeaderCell from './cells/HeaderCell';
 
 class Table2 extends PureComponent<ITableProps> {
+  public static activeTableInstance: Table2 = null;
+
   public static defaultProps = {
     columns: [],
     rowKey: 'key',
     vertical: false,
     prefixCls: 'ant-table',
     size: 'default',
+  };
+
+  public static setActiveTableInstance: (instance: Table2) => void = table => {
+    Table2.activeTableInstance = table;
   };
 
   public api: ITableApi;
@@ -59,7 +66,10 @@ class Table2 extends PureComponent<ITableProps> {
   };
 
   public componentDidMount = () => {
+    Table2.setActiveTableInstance(this);
+
     this.$dom = document.getElementById(this.domId);
+
     window.addEventListener('keydown', this.onKeyDown, false);
     window.addEventListener('click', this.onWindowClick, false);
   };
@@ -70,6 +80,7 @@ class Table2 extends PureComponent<ITableProps> {
   };
 
   public onWindowClick = (event: MouseEvent) => {
+    if (Table2.activeTableInstance !== this) return;
     if (
       event.target instanceof HTMLElement &&
       !hasElement(document.getElementById(this.domId), event.target)
@@ -79,19 +90,23 @@ class Table2 extends PureComponent<ITableProps> {
       return;
     }
 
-    if (event.target === this.getTbody()) {
-      this.save();
-      return;
-    }
-
-    if (event.target instanceof HTMLElement && hasElement(this.getThead(), event.target)) {
+    if (
+      event.target === this.getTbody() ||
+      (event.target instanceof HTMLElement && hasElement(this.getThead(), event.target))
+    ) {
       this.save();
       return;
     }
   };
 
   public onKeyDown = (event: Event) => {
+    if (Table2.activeTableInstance !== this) return;
     this.api.eventBus.emit(TABLE_KEY_DOWN, event);
+  };
+
+  public onTableCellClick = params => {
+    // 设置激活状态的 table 为当前，cell click 的后续操作要在此状态更新后处理
+    Table2.setActiveTableInstance(this);
   };
 
   public getFieldNames = () => {
@@ -194,9 +209,6 @@ class Table2 extends PureComponent<ITableProps> {
             getRowKey,
             rowId,
             vertical,
-            // setEditing: this.bindSetEditing(rowId, colDef.dataIndex),
-            // getEditing: this.bindGetEditing(rowId, colDef.dataIndex),
-            // editings: this.editings,
           };
         },
       };
@@ -223,9 +235,6 @@ class Table2 extends PureComponent<ITableProps> {
         context: this.context,
         getRowKey,
         columns: this.props.columns,
-        // setEditing: this.bindSetEditing(rowId),
-        // getEditing: this.bindGetEditing(rowId),
-        // editings: this.editings,
         getContextMenu: this.props.getContextMenu,
       };
     };
@@ -239,22 +248,12 @@ class Table2 extends PureComponent<ITableProps> {
       return this.props.onCellValuesChange && this.props.onCellValuesChange(params);
     }
     if (eventName === TABLE_CELL_FIELDS_CHANGE) {
-      // const { changedFields } = params;
-      // Object.keys(changedFields).forEach(key => {
-      //   _.set(this.editings, [params.rowId, key], true);
-      // });
       return this.props.onCellFieldsChange && this.props.onCellFieldsChange(params);
     }
+    if (eventName === TABLE_CELL_CLICK) {
+      return this.onTableCellClick(params);
+    }
   };
-
-  // public bindSetEditing = (rowId, colId) =>
-  //   _.debounce(editing => {
-  //     _.set(this.editings, [rowId, colId], editing);
-  //   }, 50);
-
-  // public bindGetEditing = (rowId, colId) => () => {
-  //   return _.get(this.editings, [rowId, colId]);
-  // };
 
   public listen = (eventName: string, callback, scope) => {
     this.api.eventBus.listen(eventName, callback, scope);
