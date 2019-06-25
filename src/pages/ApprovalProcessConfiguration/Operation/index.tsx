@@ -1,12 +1,3 @@
-import { Form2, SmartTable, Table2 } from '@/containers';
-import {
-  wkProcessConfigModify,
-  wkProcessGet,
-  wkProcessInstanceListByProcessName,
-  wkProcessModify,
-  wkProcessStatusModify,
-  wkTaskApproveGroupBind,
-} from '@/services/approvalProcessConfiguration';
 import {
   Alert,
   Button,
@@ -23,6 +14,15 @@ import {
 import _ from 'lodash';
 import { default as React, useEffect, useRef, useState } from 'react';
 import uuidv4 from 'uuid/v4';
+import {
+  wkProcessConfigModify,
+  wkProcessGet,
+  wkProcessInstanceListByProcessName,
+  wkProcessModify,
+  wkProcessStatusModify,
+  wkTaskApproveGroupBind,
+} from '@/services/approvalProcessConfiguration';
+import { Form2, SmartTable, Table2 } from '@/containers';
 import { TASKTYPE } from '../constants';
 import { GTE_PROCESS_CONFIGS, COLUMNS } from '../tools';
 import EditTable from './EditTable';
@@ -43,16 +43,13 @@ const Operation = props => {
   let $editTable = useRef<Table2>(null);
   const [isInstanceList, setIsInstanceList] = useState(false);
 
-  useEffect(
-    () => {
-      if (props.processName) {
-        fetchData();
-      }
-    },
-    [props.processName]
-  );
+  useEffect(() => {
+    if (props.processName) {
+      fetchData();
+    }
+  }, [fetchData, props.processName]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const { processName } = props;
     const { data, error } = await wkProcessGet({ processName });
@@ -63,9 +60,7 @@ const Operation = props => {
     setLoading(false);
     let { tasks } = processData;
     tasks = tasks.map(task => {
-      task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
-        return item.approveGroupId;
-      });
+      task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => item.approveGroupId);
       if (task.taskType === 'modifyData') {
         task.sequence = 9999;
       }
@@ -79,35 +74,40 @@ const Operation = props => {
     setProcess(processData);
     setProcessConfigs(processData.processConfigs);
     handleReviewData(processData);
-  };
+  });
 
   const handleReviewData = processData => {
-    const data = processData ? processData : process;
+    const data = processData || process;
     let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
     reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
 
-    reviewTaskData = reviewTaskData.map(item => {
-      return {
-        ...Form2.createFields(item),
-        taskId: item.taskId,
-      };
-    });
+    reviewTaskData = reviewTaskData.map(item => ({
+      ...Form2.createFields(item),
+      taskId: item.taskId,
+    }));
     setReviewTask(reviewTaskData);
   };
 
   const reviewSave = async () => {
     let tasks = _.cloneDeep(process.tasks);
+    tasks = tasks.map(task => {
+      if (task.taskType === 'modifyData') {
+        task.sequence = 9999;
+      }
+      if (task.taskType === 'insertData') {
+        task.sequence = -9999;
+      }
+      return task;
+    });
     tasks = _.sortBy(tasks, 'sequence');
+
     const reviewTasklength = (tasks || []).filter(item => item.taskType === 'reviewData').length;
     tasks.splice(
       1,
       reviewTasklength,
-      ..._.values(
-        reviewTask.map(item => {
-          return Form2.getFieldsValue(item);
-        })
-      )
+      ..._.values(reviewTask.map(item => Form2.getFieldsValue(item))),
     );
+
     tasks = tasks.map((item, index) => {
       item.sequence = index;
       return item;
@@ -128,33 +128,33 @@ const Operation = props => {
     // 资金
     if (processName === '财务出入金') {
       if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
-        return `tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction`;
+        return 'tech.tongyu.bct.workflow.process.func.action.cap.FundReviewTaskAction';
       }
-      return `tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction`;
+      return 'tech.tongyu.bct.workflow.process.func.action.cap.FundInputTaskAction';
     }
 
     // 授信
     if (processName === '授信额度变更') {
       if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
-        return `tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction`;
+        return 'tech.tongyu.bct.workflow.process.func.action.credit.CreditReviewTaskAction';
       }
-      return `tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction`;
+      return 'tech.tongyu.bct.workflow.process.func.action.credit.CreditInputTaskAction';
     }
 
     // 交易
     if (processName === '交易录入') {
       if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
-        return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
+        return 'tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction';
       }
-      return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
+      return 'tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction';
     }
 
     // 交易
     if (processName === '开户' || processName === '开户审批') {
       if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
-        return `tech.tongyu.bct.workflow.process.func.action.account.AccountReviewTaskAction`;
+        return 'tech.tongyu.bct.workflow.process.func.action.account.AccountReviewTaskAction';
       }
-      return `tech.tongyu.bct.workflow.process.func.action.account.AccountInputTaskAction`;
+      return 'tech.tongyu.bct.workflow.process.func.action.account.AccountInputTaskAction';
     }
 
     throw new Error('getActionClass: no match');
@@ -178,14 +178,12 @@ const Operation = props => {
 
     // 修改审批组与发起审批组一致
     tasks[tasks.length - 1].approveGroupList = tasks[0].approveGroupList;
-    const taskList = tasks.map((item, index) => {
-      return {
-        ...item,
-        sequence: index,
-        taskType: TASKTYPE[item.taskType],
-        actionClass: getActionClass(item.taskType, processName),
-      };
-    });
+    const taskList = tasks.map((item, index) => ({
+      ...item,
+      sequence: index,
+      taskType: TASKTYPE[item.taskType],
+      actionClass: getActionClass(item.taskType, processName),
+    }));
 
     const { error, data } = await wkProcessModify({
       processName,
@@ -259,12 +257,10 @@ const Operation = props => {
       return item;
     });
     const { error, data } = await wkProcessConfigModify({
-      configList: processConfigsData.map(item => {
-        return {
-          configId: item.configId,
-          status: item.status,
-        };
-      }),
+      configList: processConfigsData.map(item => ({
+        configId: item.configId,
+        status: item.status,
+      })),
     });
     if (error) return;
     processData.processConfigs = processConfigsData;
@@ -273,7 +269,7 @@ const Operation = props => {
 
     handleReviewData(processData);
     notification.success({
-      message: `修改审批配置成功`,
+      message: '修改审批配置成功',
     });
   };
 
@@ -289,6 +285,7 @@ const Operation = props => {
         taskAction: recordData.taskAction,
         taskType: recordData.taskType,
         taskName: '',
+        sequence: reviewTaskData.length + 1,
       }),
       taskId: uuidv4(),
     });
@@ -311,16 +308,15 @@ const Operation = props => {
 
   const onReviewCellFieldsChange = async (
     { allFields, changedFields, record, rowIndex },
-    isSelect
+    isSelect,
   ) => {
-    console.log(isSelect);
     setReviewTask(
       reviewTask.map((item, index) => {
         if (index === rowIndex) {
           return record;
         }
         return item;
-      })
+      }),
     );
     if (isSelect) {
       // 修改单个审批组
@@ -366,12 +362,10 @@ const Operation = props => {
       item.approveGroupList = (item.approveGroups || []).map(i => i.approveGroupId);
       return item;
     });
-    otherTaskData = otherTaskData.map(item => {
-      return {
-        ...Form2.createFields(item),
-        taskId: item.taskId,
-      };
-    });
+    otherTaskData = otherTaskData.map(item => ({
+      ...Form2.createFields(item),
+      taskId: item.taskId,
+    }));
 
     setOtherTask(otherTaskData);
     setOtherVisible(true);
@@ -387,7 +381,6 @@ const Operation = props => {
 
     let tasks = _.cloneDeep(process.tasks);
     tasks = _.sortBy(tasks, 'sequence');
-    console.log(tasks);
     tasks = tasks.map(item => {
       if (item.taskId === currentTaskId) {
         return Form2.getFieldsValue(otherTask[0]);
@@ -400,12 +393,10 @@ const Operation = props => {
 
     const { error, data } = await wkTaskApproveGroupBind({
       processName,
-      taskList: tasks.map(item => {
-        return {
-          taskId: item.taskId,
-          approveGroupList: item.approveGroupList,
-        };
-      }),
+      taskList: tasks.map(item => ({
+        taskId: item.taskId,
+        approveGroupList: item.approveGroupList,
+      })),
     });
     if (error) {
       const otherTaskData = (process.tasks || []).filter(item => item.taskId === currentTaskId);
@@ -438,13 +429,11 @@ const Operation = props => {
           return record;
         }
         return item;
-      })
+      }),
     );
   };
 
-  const insertData = (_.get(process, 'tasks') || []).filter(item => {
-    return item.taskType === 'insertData';
-  });
+  const insertData = (_.get(process, 'tasks') || []).filter(item => item.taskType === 'insertData');
   const approveGroups = _.get(insertData, '[0].approveGroups') || [];
   const { status } = process;
 
@@ -477,24 +466,20 @@ const Operation = props => {
               bordered={false}
               extra={<a onClick={e => showOtherModel(e, _.get(insertData, '[0].taskId'))}>修改</a>}
             >
-              {approveGroups.map(item => {
-                return (
-                  <Tag style={{ margin: 5 }} key={item.approveGroupId}>
-                    {item.approveGroupName}
-                  </Tag>
-                );
-              })}
+              {approveGroups.map(item => (
+                <Tag style={{ margin: 5 }} key={item.approveGroupId}>
+                  {item.approveGroupName}
+                </Tag>
+              ))}
             </Card>
             <Card title="审批配置" style={{ marginTop: '10px' }} bordered={false}>
-              {(processConfigs || []).map(item => {
-                return (
-                  <p key={item.id}>
-                    <Checkbox onChange={e => configListChange(e, item)} checked={item.status}>
-                      {GTE_PROCESS_CONFIGS(item.configName)}
-                    </Checkbox>
-                  </p>
-                );
-              })}
+              {(processConfigs || []).map(item => (
+                <p key={item.id}>
+                  <Checkbox onChange={e => configListChange(e, item)} checked={item.status}>
+                    {GTE_PROCESS_CONFIGS(item.configName)}
+                  </Checkbox>
+                </p>
+              ))}
             </Card>
           </div>
         </Col>
@@ -514,7 +499,7 @@ const Operation = props => {
             <Alert
               message="如果不需要增删节点、调整节点顺序或修改节点名称，建议通过编辑节点来实现审批组或触发器的修改。"
               type="info"
-              showIcon={true}
+              showIcon
             />
             <SmartTable
               ref={node => (tableE1 = node)}

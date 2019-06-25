@@ -1,3 +1,7 @@
+import { message } from 'antd';
+import React, { memo, useRef } from 'react';
+import _ from 'lodash';
+import BigNumber from 'bignumber.js';
 import {
   LCM_EVENT_TYPE_MAP,
   LCM_EVENT_TYPE_ZHCN_MAP,
@@ -11,8 +15,6 @@ import {
 import { Form2 } from '@/containers';
 import { filterObDays } from '@/pages/TradeManagementBookEdit/utils';
 import { convertObservetions } from '@/services/common';
-import { message } from 'antd';
-import React, { memo, useRef } from 'react';
 import AmendModal, { IAmendModalEl } from './AmendModal';
 import AsianExerciseModal from './AsianExerciseModal';
 import BarrierIn from './BarrierIn';
@@ -24,9 +26,8 @@ import RollModal from './RollModal';
 import SettleModal from './SettleModal';
 import UnwindModal from './UnwindModal';
 import { OB_PRICE_FIELD } from './constants';
-import _ from 'lodash';
-import BigNumber from 'bignumber.js';
 import { getObservertionFieldData } from './tools';
+import { isRangeAccruals } from '@/tools';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -41,7 +42,7 @@ export interface ILcmEventModalEl {
 }
 
 const LcmEventModal = memo<{
-  current: (node: ILcmEventModalEl) => void;
+  current:(node: ILcmEventModalEl) => void;
 }>(props => {
   const $unwindModal = useRef<UnwindModal>(null);
   const $asianExerciseModal = useRef<AsianExerciseModal>(null);
@@ -59,9 +60,7 @@ const LcmEventModal = memo<{
   const notBarrierHappen = data => {
     const direction = data[LEG_FIELD.KNOCK_DIRECTION];
     const fixObservations = data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
-    const last = fixObservations.every(item => {
-      return _.isNumber(item[OB_PRICE_FIELD]);
-    });
+    const last = fixObservations.every(item => _.isNumber(item[OB_PRICE_FIELD]));
     const tableData = getObservertionFieldData(data);
     return (
       last &&
@@ -136,7 +135,7 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
         if (record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
           return message.warn(
-            `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
+            `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`,
           );
         }
         return $unwindModal.current.show(data, tableFormData, currentUser, loadData);
@@ -159,6 +158,12 @@ const LcmEventModal = memo<{
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+        if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+          const convertedData = filterObDays(convertObservetions(data));
+          if (convertedData.some(item => !item.price)) {
+            return message.warn('请先完善观察日价格');
+          }
+        }
         return $settleModal.current.show(data, tableFormData, currentUser, loadData);
       }
     },

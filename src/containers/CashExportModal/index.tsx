@@ -1,3 +1,6 @@
+import { Modal } from 'antd';
+import React, { memo, useEffect, useState } from 'react';
+import _ from 'lodash';
 import { INPUT_NUMBER_DIGITAL_CONFIG, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import CashInsertModal from '@/containers/CashInsertModal';
 import { Table2 } from '@/containers';
@@ -5,8 +8,6 @@ import {
   cliTasksGenerateByTradeId,
   cliUnProcessedTradeTaskListByTradeId,
 } from '@/services/reference-data-service';
-import { Modal } from 'antd';
-import React, { memo, useEffect, useState } from 'react';
 
 const TABLE_COL_DEFS = fetchTable => [
   {
@@ -43,9 +44,7 @@ const TABLE_COL_DEFS = fetchTable => [
   {
     title: '操作',
     dataIndex: 'action',
-    render: (val, record) => {
-      return <CashInsertModal record={record} fetchTable={fetchTable} />;
-    },
+    render: (val, record) => <CashInsertModal record={record} fetchTable={fetchTable} />,
   },
 ];
 
@@ -58,16 +57,21 @@ const CashExportModal = memo<{
   const [dataSource, setDataSource] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(
-    () => {
-      if (props.visible) {
-        searchData();
-      }
-    },
-    [props.visible]
-  );
+  useEffect(() => {
+    if (props.visible) {
+      searchData();
+    }
+  }, [props.visible, searchData]);
 
-  const searchData = async () => {
+  useEffect(() => {
+    console.log(props.trade);
+    searchData();
+  }, [props.trade, searchData]);
+
+  const searchData = useCallback(async () => {
+    if (!_.get(props, 'trade.tradeId') || !_.get(props, 'trade.counterPartyCode')) {
+      return;
+    }
     const { error, data } = await cliTasksGenerateByTradeId({
       tradeId: props.trade.tradeId,
       legalName: props.trade.counterPartyCode,
@@ -75,7 +79,7 @@ const CashExportModal = memo<{
 
     if (error) return false;
     fetchTable();
-  };
+  });
 
   const fetchTable = async () => {
     setLoading(true);

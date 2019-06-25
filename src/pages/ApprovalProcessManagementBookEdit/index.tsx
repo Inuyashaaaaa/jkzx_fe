@@ -1,3 +1,10 @@
+import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
+import { connect } from 'dva';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { memo, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import uuidv4 from 'uuid/v4';
 import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { ILegColDef, LEG_ENV, TOTAL_EDITING_FIELDS } from '@/constants/legs';
@@ -12,13 +19,6 @@ import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 import { convertTradePageData2ApiData } from '@/services/pages';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord, getMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
-import { connect } from 'dva';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { memo, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import uuidv4 from 'uuid/v4';
 import './index.less';
 import BigNumber from 'bignumber.js';
 
@@ -34,8 +34,8 @@ const DATE_ARRAY = [
 const TradeManagementBooking = props => {
   const { currentUser } = props;
   const { tradeManagementBookEditPageData, dispatch, isCompleted } = props;
-  const tableData = _.map(tradeManagementBookEditPageData.tableData, iitem => {
-    return _.mapValues(iitem, (item, key) => {
+  const tableData = _.map(tradeManagementBookEditPageData.tableData, iitem =>
+    _.mapValues(iitem, (item, key) => {
       if (_.includes(DATE_ARRAY, key)) {
         return {
           type: 'field',
@@ -43,8 +43,8 @@ const TradeManagementBooking = props => {
         };
       }
       return item;
-    });
-  });
+    }),
+  );
   const setTableData = payload => {
     dispatch({
       type: 'tradeManagementBookEdit/setTableData',
@@ -89,7 +89,7 @@ const TradeManagementBooking = props => {
       salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
       counterPartyCode: _.get(
         data,
-        'process._business_payload.trade.positions[0].counterPartyCode'
+        'process._business_payload.trade.positions[0].counterPartyCode',
       ),
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
@@ -110,15 +110,13 @@ const TradeManagementBooking = props => {
     };
 
     const positions = _.get(data, 'process._business_payload.trade.positions');
-    const composePositions = (positions || []).map(position => {
-      return {
-        ...position,
-        asset: {
-          ...position.asset,
-          [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
-        },
-      };
-    });
+    const composePositions = (positions || []).map(position => ({
+      ...position,
+      asset: {
+        ...position.asset,
+        [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+      },
+    }));
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
     if (!composePositions) return;
@@ -133,13 +131,16 @@ const TradeManagementBooking = props => {
   };
 
   const handelSave = async () => {
-    const res = await currentCreateFormRef.validate();
-    if (res.error) return;
+    const [formRsp, tableRsps] = await Promise.all([
+      currentCreateFormRef.validate(),
+      tableEl.current.table.validate(),
+    ]);
+    if (tableRsps.some(item => item.errors) || formRsp.error) return;
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
       Form2.getFieldsValue(createFormData),
       currentUser.username,
-      LEG_ENV.BOOKING
+      LEG_ENV.BOOKING,
     );
     props.tbookEditCancel();
     props.confirmModify(trade);
@@ -163,7 +164,7 @@ const TradeManagementBooking = props => {
   return (
     <Page>
       {tableLoading ? (
-        <Skeleton active={true} paragraph={{ rows: 4 }} />
+        <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
@@ -224,10 +225,10 @@ const TradeManagementBooking = props => {
                             };
                           }
                           return item;
-                        })
+                        }),
                       );
                     },
-                    setTableData
+                    setTableData,
                   );
                 }
                 return newData;
@@ -236,9 +237,7 @@ const TradeManagementBooking = props => {
             dataSource={tableData}
             chainColumns={(columns: ILegColDef[]) => {
               const totalFields = TOTAL_EDITING_FIELDS.map(item => item.dataIndex);
-              return columns.filter(item => {
-                return !totalFields.includes(item.dataIndex);
-              });
+              return columns.filter(item => !totalFields.includes(item.dataIndex));
             }}
           />
         </>
@@ -267,5 +266,5 @@ export default memo(
   connect(state => ({
     currentUser: (state.user as any).currentUser,
     tradeManagementBookEditPageData: state.tradeManagementBookEdit,
-  }))(TradeManagementBooking)
+  }))(TradeManagementBooking),
 );

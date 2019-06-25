@@ -45,7 +45,7 @@ export interface IColDef<T> {
     value: any,
     record: T,
     index: number,
-    params: IRenderOptions<IColDef<T>>
+    params: IRenderOptions<IColDef<T>>,
   ) => React.ReactNode;
 }
 
@@ -53,10 +53,10 @@ export interface IRenderOptions<C = any, A = any> {
   form?: Omit<WrappedFormUtils, 'getFieldDecorator'> & {
     getFieldDecorator<T extends object>(
       id: keyof T,
-      options?: GetFieldDecoratorOptions
+      options?: GetFieldDecoratorOptions,
     ): (node: React.ReactNode) => React.ReactNode;
     getFieldDecorator(
-      options?: GetFieldDecoratorOptions
+      options?: GetFieldDecoratorOptions,
     ): (node: React.ReactNode) => React.ReactNode;
   };
   editing?: boolean;
@@ -64,6 +64,7 @@ export interface IRenderOptions<C = any, A = any> {
   api?: ITableApi;
   cellApi?: A;
   context?: ITableContext;
+  tableApi?: Table2;
 }
 
 export interface IFormColDef<T = any> extends IColDef<T> {
@@ -76,7 +77,7 @@ export interface IFormColDef<T = any> extends IColDef<T> {
     value: any,
     record: T,
     index: number,
-    params: IRenderOptions<IFormColDef<T>, FormSwitchCell>
+    params: IRenderOptions<IFormColDef<T>, FormSwitchCell>,
   ) => React.ReactNode;
 }
 
@@ -92,7 +93,7 @@ export interface ITableColDef<T = any>
         index: number,
         params: {
           colDef: ITableColDef<T>;
-        }
+        },
       ) => boolean);
   editing?:
     | boolean
@@ -101,7 +102,7 @@ export interface ITableColDef<T = any>
         index: number,
         params: {
           colDef: ITableColDef<T>;
-        }
+        },
       ) => boolean);
   editable?:
     | boolean
@@ -110,20 +111,20 @@ export interface ITableColDef<T = any>
         index: number,
         params: {
           colDef: ITableColDef<T>;
-        }
+        },
       ) => boolean);
   onCell?: (
     record: T,
     index: number,
     params: {
       colDef: ITableColDef<T>;
-    }
+    },
   ) => any;
   render?: (
     value: any,
     record: T,
     index: number,
-    params: IRenderOptions<ITableColDef<T>, TableSwitchCell>
+    params: IRenderOptions<ITableColDef<T>, TableSwitchCell>,
   ) => React.ReactNode;
 }
 
@@ -174,7 +175,7 @@ export interface ITableRowProps<T = any> extends FormComponentProps {
   getEditing: () => boolean;
   setEditing: (editing: boolean) => void;
   getContextMenu?: (
-    params: ITableContextMenuParams
+    params: ITableContextMenuParams,
   ) => React.ReactNode | (() => React.ReactNode) | boolean;
 }
 
@@ -223,7 +224,7 @@ export interface ITableProps<T = ITableData> extends Omit<TableProps<T>, 'column
   onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
   onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
   getContextMenu?: (
-    params: ITableContextMenuParams
+    params: ITableContextMenuParams,
   ) => React.ReactNode | (() => React.ReactNode) | boolean;
   columns?: ITableColDef[];
   vertical?: boolean;
@@ -273,13 +274,13 @@ export interface IFormProps<T = any> extends IFormBaseProps {
 }
 
 export type IFormEditingChangedHandle<T = any> = (
-  params: IFormTriggerCellEditingChangedParams
+  params: IFormTriggerCellEditingChangedParams,
 ) => void;
 
 export type IFormValuesChangeHandle<T = any> = (
   props: T,
   changedValues: any,
-  allValues: any
+  allValues: any,
 ) => void;
 
 export interface IInputBaseProps {
@@ -295,13 +296,13 @@ export abstract class InputBase<P = any, S = any> extends React.PureComponent<
   S
 > {
   public abstract renderEditing(): any;
+
   public abstract renderRendering(): any;
 
   public render() {
     if (this.props.editing === undefined ? true : this.props.editing) {
       return this.renderEditing();
-    } else {
-      return this.renderRendering();
     }
+    return this.renderRendering();
   }
 }

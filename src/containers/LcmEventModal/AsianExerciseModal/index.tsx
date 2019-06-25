@@ -1,3 +1,7 @@
+import { Alert, Button, Col, message, Modal, Row } from 'antd';
+import BigNumber from 'bignumber.js';
+import moment from 'moment';
+import React, { PureComponent } from 'react';
 import PopconfirmButton from '@/containers/PopconfirmButton';
 import {
   BIG_NUMBER_CONFIG,
@@ -16,10 +20,6 @@ import Form from '@/containers/Form';
 import { convertObservetions } from '@/services/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMoment } from '@/tools';
-import { Alert, Button, Col, message, Modal, Row } from 'antd';
-import BigNumber from 'bignumber.js';
-import moment from 'moment';
-import React, { PureComponent } from 'react';
 import { countAvg } from '../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 import CashExportModal from '@/containers/CashExportModal';
@@ -75,51 +75,45 @@ class AsianExerciseModal extends PureComponent<
     });
   };
 
-  public getDefaultFormData = () => {
-    return {
-      [LEG_FIELD.NOTIONAL_AMOUNT]:
-        this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-          ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
-          : this.getDefaultNotionalAmount(),
-      [OPTIONS_NUMBER]:
-        this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.LOT
-          ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
-          : this.getDefaultOptionsNumber(),
-      [SUBJECT_MATTER_AVG]: countAvg(convertObservetions(this.data), this.data),
-      [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.STRIKE],
-    };
-  };
+  public getDefaultFormData = () => ({
+    [LEG_FIELD.NOTIONAL_AMOUNT]:
+      this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+        ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
+        : this.getDefaultNotionalAmount(),
+    [OPTIONS_NUMBER]:
+      this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTIONAL_AMOUNT_TYPE_MAP.LOT
+        ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
+        : this.getDefaultOptionsNumber(),
+    [SUBJECT_MATTER_AVG]: countAvg(convertObservetions(this.data), this.data),
+    [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.STRIKE],
+  });
 
-  public getDefaultOptionsNumber = () => {
+  public getDefaultOptionsNumber = () =>
     // 名义本金 / 期初价格 / 合约乘数
-    return new BigNumber(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
-      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+    new BigNumber(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
       .toNumber();
-  };
 
-  public getDefaultNotionalAmount = () => {
+  public getDefaultNotionalAmount = () =>
     // 期初价格*护合约手数* 合约乘数
-    return new BigNumber(this.data[LEG_FIELD.INITIAL_SPOT])
+    new BigNumber(this.data[LEG_FIELD.INITIAL_SPOT])
       .multipliedBy(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
       .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
       .toNumber();
-  };
 
-  public computeCnyDataSource = (value, changed = {}) => {
-    return {
-      ...value,
-      [NOTIONAL_AMOUNT]: new BigNumber(value[NUM_OF_OPTIONS])
-        .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .toNumber(),
-      [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
-        ? changed[SETTLE_AMOUNT]
-        : new BigNumber(value[NUM_OF_OPTIONS]).multipliedBy(value[UNDERLYER_PRICE]).toNumber(),
-    };
-  };
+  public computeCnyDataSource = (value, changed = {}) => ({
+    ...value,
+    [NOTIONAL_AMOUNT]: new BigNumber(value[NUM_OF_OPTIONS])
+      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .toNumber(),
+    [SETTLE_AMOUNT]: changed[SETTLE_AMOUNT]
+      ? changed[SETTLE_AMOUNT]
+      : new BigNumber(value[NUM_OF_OPTIONS]).multipliedBy(value[UNDERLYER_PRICE]).toNumber(),
+  });
 
   public switchConfirmLoading = () => {
     this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
@@ -131,11 +125,8 @@ class AsianExerciseModal extends PureComponent<
     });
   };
 
-  public filterObDays = tableData => {
-    return tableData.filter(item => {
-      return getMoment(item).valueOf() <= moment().valueOf();
-    });
-  };
+  public filterObDays = tableData =>
+    tableData.filter(item => getMoment(item).valueOf() <= moment().valueOf());
 
   public getTitle = () => {
     // @todo xxxx
@@ -173,13 +164,10 @@ class AsianExerciseModal extends PureComponent<
     });
   };
 
-  public isRange = () => {
-    return (
-      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
-      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-      this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS
-    );
-  };
+  public isRange = () =>
+    this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
+    this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+    this.state.productType === LEG_TYPE_MAP.RANGE_ACCRUALS;
 
   public convertVisible = () => {
     this.setState({
@@ -217,7 +205,7 @@ class AsianExerciseModal extends PureComponent<
             </Row>
           }
           closable={false}
-          destroyOnClose={true}
+          destroyOnClose
           visible={visible}
           title={this.getTitle()}
         >
