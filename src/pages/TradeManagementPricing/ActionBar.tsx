@@ -256,7 +256,12 @@ const ActionBar = memo<any>(props => {
         }}
         visible={visible}
       >
-        <HistoryPanel visible={visible} setTableData={setTableData} setVisible={setVisible} />
+        <HistoryPanel
+          visible={visible}
+          setTableData={setTableData}
+          setVisible={setVisible}
+          setCurPricingEnv={setCurPricingEnv}
+        />
       </Drawer>
     </Affix>
   );
