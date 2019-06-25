@@ -14,18 +14,22 @@
     "*.js": "javascriptreact",
     "*.ts": "typescriptreact"
   },
-  "workbench.startupEditor": "newUntitledFile",
   "explorer.confirmDragAndDrop": false,
   "explorer.confirmDelete": false,
   "git.autofetch": true,
   "emmet.triggerExpansionOnTab": true,
   "workbench.statusBar.visible": true,
-  "editor.minimap.enabled": false,
-  "autoimport.showNotifications": true,
   "editor.lineNumbers": "interval",
-  "editor.renderLineHighlight": "gutter",
-  "autoimport.filesToScan": "**/*.{ts,tsx}",
   "workbench.colorTheme": "One Dark Pro",
-  "eslint.validate": ["javascript", "javascriptreact"],
-  "javascript.updateImportsOnFileMove.enabled": "always"
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "eslint.enable": true,
+  "eslint.options": {
+    "extensions": [".ts", ".tsx"]
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    { "language": "typescript" },
+    { "language": "typescriptreact" }
+  ]
 }
