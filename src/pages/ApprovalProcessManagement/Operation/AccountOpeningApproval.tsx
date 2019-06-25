@@ -558,10 +558,9 @@ class AccountOpeningApproval extends PureComponent<any, any> {
       _data.status =
         histories[histories.length - 1].operation === '退回'
           ? '待修改'
-          : histories[histories.length - 1].operation === '复核通过' ||
-            histories[histories.length - 1].operation === '废弃'
-          ? '审核完成'
-          : '待审批';
+          : formData.processInstanceStatusEnum === 'processUnfinished'
+          ? '待审批'
+          : '审批完成';
     }
     const formStatus =
       _data.status === '待审批' || _data.status === '审核完成' || status !== 'pending';

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useEffect, useState, useRef } from 'react';
 import { Table2, Select, Form2, Input } from '@/containers';
-import { notification, Card, Tag, Col, Modal, message } from 'antd';
+import { notification, Card, Tag, Modal, message } from 'antd';
 import {
   wkProcessTriggerList,
   wkProcessTriggerBind,
@@ -330,6 +330,9 @@ const TriggerCard = memo<any>(props => {
           onFieldsChange={onFormChange}
           columns={columns}
         />
+        <p style={{ color: 'red', paddingLeft: '90px' }}>
+          注意：触发了审批流程的操作，通过审批后才会生效；未触发流程的操作，会立即生效。
+        </p>
       </Modal>
     </>
   );
