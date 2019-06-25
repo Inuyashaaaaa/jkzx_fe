@@ -1,16 +1,17 @@
+import { Alert, message, Modal } from 'antd';
+import BigNumber from 'bignumber.js';
+import React, { PureComponent } from 'react';
 import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
   LEG_TYPE_MAP,
+  LEG_TYPE_ZHCH_MAP,
   LEG_TYPE_FIELD,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { Alert, message, Modal } from 'antd';
-import BigNumber from 'bignumber.js';
-import React, { PureComponent } from 'react';
 import {
   NOTIONAL_AMOUNT,
   NUM_OF_OPTIONS,
@@ -91,7 +92,8 @@ class ExerciseModal extends PureComponent<
   };
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    const { modalConfirmLoading } = this.state;
+    this.setState({ modalConfirmLoading: !modalConfirmLoading });
   };
 
   public switchModal = () => {
@@ -103,7 +105,7 @@ class ExerciseModal extends PureComponent<
   public onConfirm = async () => {
     const rsp = await this.$settleForm.validate();
     if (rsp.error) return;
-    const dataSource = this.state.dataSource;
+    const { dataSource } = this.state;
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
@@ -140,7 +142,7 @@ class ExerciseModal extends PureComponent<
   };
 
   public handleSettleAmount = async () => {
-    const dataSource = this.state.dataSource;
+    const { dataSource } = this.state;
     if (!dataSource[UNDERLYER_PRICE]) {
       if (!(dataSource[UNDERLYER_PRICE] === 0)) {
         message.error('请填标的物价格');
@@ -179,12 +181,10 @@ class ExerciseModal extends PureComponent<
           closable={false}
           onCancel={this.switchModal}
           onOk={this.onConfirm}
-          destroyOnClose={true}
+          destroyOnClose
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={`结算: (${
-            this.state.productType === LEG_TYPE_MAP.FORWARD ? '远期' : '自定义产品'
-          })`}
+          title={`结算: (${LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP[this.state.productType]]})`}
         >
           <Form
             ref={node => {
@@ -197,7 +197,7 @@ class ExerciseModal extends PureComponent<
             controls={SETTLE_FORM_CONTROLS(
               this.state.notionalType,
               this.state.productType,
-              this.handleSettleAmount
+              this.handleSettleAmount,
             )}
           />
           <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
