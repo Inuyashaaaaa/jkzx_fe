@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Form2, Input, Loading, Select, SmartTable } from '@/containers';
 import {
   DIRECTION_OPTIONS,
@@ -63,7 +65,7 @@ const TradeManagementPricingManagement = props => {
 
   const [pageSizeCurrent, setPageSizeCurrent] = useState(1);
 
-  const onTradeTableSearch = async (params = {}) => {
+  const onTradeTableSearch = useCallback(async (params = {}) => {
     const { paramsPagination, paramsSearchFormData } = params as any;
     const newFormData = Form2.getFieldsValue(paramsSearchFormData || searchFormData);
     const formatValues = _.reduce(
@@ -87,7 +89,7 @@ const TradeManagementPricingManagement = props => {
         }
         return prev;
       },
-      {}
+      {},
     );
 
     setLoading(true);
@@ -104,20 +106,18 @@ const TradeManagementPricingManagement = props => {
     if (_.isEmpty(data)) return;
 
     const tableDataSource = _.flatten(
-      data.page.map(item => {
-        return item.quotePositions.map((node, key) => {
-          return {
-            ...node,
-            ...item,
-            ...(item.quotePositions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
-            ...(item.quotePositions.length <= 1
-              ? null
-              : key === 0
-              ? { timeLineNumber: item.quotePositions.length }
-              : null),
-          };
-        });
-      })
+      data.page.map(item =>
+        item.quotePositions.map((node, key) => ({
+          ...node,
+          ...item,
+          ...(item.quotePositions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
+          ...(item.quotePositions.length <= 1
+            ? null
+            : key === 0
+            ? { timeLineNumber: item.quotePositions.length }
+            : null),
+        })),
+      ),
     );
 
     setTableDataSource(tableDataSource);
@@ -127,7 +127,7 @@ const TradeManagementPricingManagement = props => {
       total: data.totalCount,
     });
     setPageSizeCurrent((paramsPagination || pagination).pageSize);
-  };
+  });
 
   const onPagination = (current, pageSize) => {
     onTradeTableSearch({
@@ -146,14 +146,13 @@ const TradeManagementPricingManagement = props => {
     onPagination(current, pageSize);
   };
 
-  const handleTradescol = params => {
-    return _.mapValues(params, (value, key) => {
+  const handleTradescol = params =>
+    _.mapValues(params, (value, key) => {
       if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
         return value;
       }
       return value ? new BigNumber(value).multipliedBy(100).toNumber() : value;
     });
-  };
 
   const handleTradeNumber = position => {
     const record = position.asset;
@@ -166,25 +165,31 @@ const TradeManagementPricingManagement = props => {
       return null;
     }
     const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
-    const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
     const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+    const annualCoefficient =
+      record[LEG_FIELD.IS_ANNUAL] &&
+      new BigNumber(record[LEG_FIELD.TERM]).div(record[LEG_FIELD.DAYS_IN_YEAR]).toNumber();
+    const notionalAmount = record[LEG_FIELD.IS_ANNUAL]
+      ? new BigNumber(record[LEG_FIELD.NOTIONAL_AMOUNT]).multipliedBy(annualCoefficient).toNumber()
+      : record[LEG_FIELD.NOTIONAL_AMOUNT];
+
     const notional =
       notionalAmountType === 'LOT'
         ? notionalAmount
-        : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+        : new BigNumber(notionalAmount)
+            .div(record[LEG_FIELD.INITIAL_SPOT])
+            .div(multipler)
+            .toNumber();
     return new BigNumber(notional)
       .multipliedBy(multipler)
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
       .toNumber();
   };
 
-  useEffect(
-    () => {
-      if (!visible) return;
-      onTradeTableSearch();
-    },
-    [visible]
-  );
+  useEffect(() => {
+    if (!visible) return;
+    onTradeTableSearch();
+  }, [onTradeTableSearch, visible]);
 
   return (
     <>
@@ -213,141 +218,127 @@ const TradeManagementPricingManagement = props => {
           {
             title: '交易对手',
             dataIndex: 'counterPartyCode',
-            render: (val, record, index, { form }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator()(
-                    <Select
-                      {...{
-                        style: {
-                          width: '180px',
-                        },
-                        editing: true,
-                        fetchOptionsOnSearch: true,
-                        showSearch: true,
-                        allowClear: true,
-                        placeholder: '请输入内容搜索',
-                        options: async (value: string = '') => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        },
-                      }}
-                    />
-                  )}
-                </FormItem>
-              );
-            },
+            render: (val, record, index, { form }) => (
+              <FormItem>
+                {form.getFieldDecorator()(
+                  <Select
+                    {...{
+                      style: {
+                        width: '180px',
+                      },
+                      editing: true,
+                      fetchOptionsOnSearch: true,
+                      showSearch: true,
+                      allowClear: true,
+                      placeholder: '请输入内容搜索',
+                      options: async (value: string = '') => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      },
+                    }}
+                  />,
+                )}
+              </FormItem>
+            ),
           },
           {
             title: '标的物',
             dataIndex: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
-            render: (value, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({})(
-                    <Select
-                      style={{ minWidth: 180 }}
-                      placeholder="请输入内容搜索"
-                      allowClear={true}
-                      showSearch={true}
-                      fetchOptionsOnSearch={true}
-                      options={async (value: string = '') => {
-                        const { data, error } = await mktInstrumentSearch({
-                          instrumentIdPart: value,
-                        });
-                        if (error) return [];
-                        return data.slice(0, 50).map(item => ({
-                          label: item,
-                          value: item,
-                        }));
-                      }}
-                    />
-                  )}
-                </FormItem>
-              );
-            },
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({})(
+                  <Select
+                    style={{ minWidth: 180 }}
+                    placeholder="请输入内容搜索"
+                    allowClear
+                    showSearch
+                    fetchOptionsOnSearch
+                    options={async (value: string = '') => {
+                      const { data, error } = await mktInstrumentSearch({
+                        instrumentIdPart: value,
+                      });
+                      if (error) return [];
+                      return data.slice(0, 50).map(item => ({
+                        label: item,
+                        value: item,
+                      }));
+                    }}
+                  />,
+                )}
+              </FormItem>
+            ),
           },
           {
             title: '期权类型',
             dataIndex: 'productType',
-            render: (value, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({})(
-                    <Select
-                      style={{ minWidth: 180 }}
-                      placeholder="请输入内容搜索"
-                      allowClear={true}
-                      showSearch={true}
-                      fetchOptionsOnSearch={true}
-                      options={PRODUCTTYPE_OPTIONS}
-                    />
-                  )}
-                </FormItem>
-              );
-            },
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({})(
+                  <Select
+                    style={{ minWidth: 180 }}
+                    placeholder="请输入内容搜索"
+                    allowClear
+                    showSearch
+                    fetchOptionsOnSearch
+                    options={PRODUCTTYPE_OPTIONS}
+                  />,
+                )}
+              </FormItem>
+            ),
           },
           {
             title: '到期日范围',
             dataIndex: RANGE_DATE_KEY,
-            render: (value, record, index, { form, editing }) => {
-              return <FormItem>{form.getFieldDecorator({})(<DatePicker.RangePicker />)}</FormItem>;
-            },
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>{form.getFieldDecorator({})(<DatePicker.RangePicker />)}</FormItem>
+            ),
           },
           {
             title: '涨/跌',
             dataIndex: LEG_FIELD.OPTION_TYPE,
-            render: (value, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({})(
-                    <Select
-                      style={{ minWidth: 180 }}
-                      placeholder="请选择"
-                      allowClear={true}
-                      showSearch={true}
-                      options={OPTION_TYPE_OPTIONS}
-                    />
-                  )}
-                </FormItem>
-              );
-            },
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({})(
+                  <Select
+                    style={{ minWidth: 180 }}
+                    placeholder="请选择"
+                    allowClear
+                    showSearch
+                    options={OPTION_TYPE_OPTIONS}
+                  />,
+                )}
+              </FormItem>
+            ),
           },
           {
             title: '买卖方向',
             dataIndex: LEG_FIELD.DIRECTION,
-            render: (value, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({})(
-                    <Select
-                      style={{ minWidth: 180 }}
-                      placeholder="请选择内容"
-                      allowClear={true}
-                      showSearch={true}
-                      options={DIRECTION_OPTIONS}
-                    />
-                  )}
-                </FormItem>
-              );
-            },
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({})(
+                  <Select
+                    style={{ minWidth: 180 }}
+                    placeholder="请选择内容"
+                    allowClear
+                    showSearch
+                    options={DIRECTION_OPTIONS}
+                  />,
+                )}
+              </FormItem>
+            ),
           },
           {
             title: '备注',
             dataIndex: LEG_FIELD.COMMENT,
-            render: (value, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({})(<Input placeholder="请输入内容" />)}
-                </FormItem>
-              );
-            },
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>{form.getFieldDecorator({})(<Input placeholder="请输入内容" />)}</FormItem>
+            ),
           },
         ]}
       />
@@ -356,7 +347,7 @@ const TradeManagementPricingManagement = props => {
         <Loading loading={loading}>
           <SmartTable
             pagination={false}
-            rowKey={'uuid'}
+            rowKey="uuid"
             scroll={{ x: 2700 }}
             dataSource={tableDataSource}
             columns={[
@@ -365,16 +356,12 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: 'productType',
                 width: 150,
                 fixed: 'left',
-                onCell: record => {
-                  return {
-                    style: { paddingLeft: '20px' },
-                  };
-                },
-                onHeaderCell: record => {
-                  return {
-                    style: { paddingLeft: '20px' },
-                  };
-                },
+                onCell: record => ({
+                  style: { paddingLeft: '20px' },
+                }),
+                onHeaderCell: record => ({
+                  style: { paddingLeft: '20px' },
+                }),
                 render: (text, record, index) => {
                   if (record.timeLineNumber) {
                     return (
@@ -384,17 +371,15 @@ const TradeManagementPricingManagement = props => {
                           style={{ position: 'absolute', left: '-15px', top: '5px' }}
                           className={styles.timelines}
                         >
-                          {record.quotePositions.map((item, index) => {
-                            return (
-                              <TimelineItem
-                                style={{
-                                  paddingBottom:
-                                    index === record.quotePositions.length - 1 ? 0 : 30.5,
-                                }}
-                                key={index}
-                              />
-                            );
-                          })}
+                          {record.quotePositions.map((item, index) => (
+                            <TimelineItem
+                              style={{
+                                paddingBottom:
+                                  index === record.quotePositions.length - 1 ? 0 : 30.5,
+                              }}
+                              key={index}
+                            />
+                          ))}
                         </Timeline>
                       </span>
                     );
@@ -411,9 +396,7 @@ const TradeManagementPricingManagement = props => {
                 title: '买/卖',
                 dataIndex: 'direction',
                 width: 150,
-                render: (text, record, index) => {
-                  return DIRECTION_TYPE_ZHCN_MAP[text];
-                },
+                render: (text, record, index) => DIRECTION_TYPE_ZHCN_MAP[text],
               },
               {
                 title: '标的物',
@@ -433,9 +416,7 @@ const TradeManagementPricingManagement = props => {
                 dataIndex: 'asset.optionType',
                 width: 150,
                 // width: 60,
-                render: (text, record, index) => {
-                  return EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[text];
-                },
+                render: (text, record, index) => EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[text],
               },
               {
                 title: '起始日',
@@ -487,27 +468,24 @@ const TradeManagementPricingManagement = props => {
                 align: 'right',
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.VOL,
                 width: 150,
-                render: (val, record) => {
-                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
-                },
+                render: (val, record) =>
+                  _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val,
               },
               {
                 title: 'r（%）',
                 align: 'right',
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.R,
                 width: 150,
-                render: (val, record) => {
-                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
-                },
+                render: (val, record) =>
+                  _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val,
               },
               {
                 title: 'q（%）',
                 align: 'right',
                 dataIndex: TRADESCOLDEFS_LEG_FIELD_MAP.Q,
                 width: 150,
-                render: (val, record) => {
-                  return _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val;
-                },
+                render: (val, record) =>
+                  _.isNumber(val) ? new BigNumber(val).multipliedBy(100).toNumber() : val,
               },
               {
                 title: '定价结果',
@@ -523,7 +501,7 @@ const TradeManagementPricingManagement = props => {
                         });
                       }
                       return `${formatNumber(data.value, 4)}${unit}`;
-                    })
+                    }),
                   );
 
                   const str = groups.map(([key, val]) => `${key}: ${val}`).join(',');
@@ -533,16 +511,14 @@ const TradeManagementPricingManagement = props => {
                       <Popover
                         content={
                           <div style={{ width: 170 }}>
-                            {groups.map(([key, val]) => {
-                              return (
-                                <Row key={key} type="flex" justify="space-between">
-                                  <span>{key}:</span> <span>{val}</span>
-                                </Row>
-                              );
-                            })}
+                            {groups.map(([key, val]) => (
+                              <Row key={key} type="flex" justify="space-between">
+                                <span>{key}:</span> <span>{val}</span>
+                              </Row>
+                            ))}
                           </div>
                         }
-                        title={'计算结果预览'}
+                        title="计算结果预览"
                       >
                         {str.slice(0, 20)}...
                       </Popover>
@@ -555,90 +531,81 @@ const TradeManagementPricingManagement = props => {
               {
                 title: '备注',
                 dataIndex: LEG_FIELD.COMMENT,
-                render: (val, record) => {
-                  return val;
-                },
+                render: (val, record) => val,
               },
               {
                 title: '操作',
                 dataIndex: 'action',
                 width: 150,
                 fixed: 'right',
-                render: (val, record) => {
-                  return (
-                    <div>
-                      <Popconfirm
-                        title="将会覆盖当前试定价数据，是否继续?"
-                        onConfirm={() => {
-                          const { quotePositions } = record as any;
+                render: (val, record) => (
+                  <div>
+                    <Popconfirm
+                      title="将会覆盖当前试定价数据，是否继续?"
+                      onConfirm={() => {
+                        const { quotePositions } = record as any;
 
-                          const next = quotePositions.map(position => {
-                            const { productType, asset } = position;
-                            const leg = getLegByProductType(
-                              productType,
-                              position.asset.exerciseType
-                            );
-                            if (!leg) {
-                              throw new Error(`${productType} is not defiend!`);
-                            }
-                            return {
-                              ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-                              ...backConvertPercent(
-                                Form2.createFields({
-                                  ..._.mapValues(asset, (val, key) => {
-                                    if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
-                                      return moment(val);
-                                    }
-                                    return val;
-                                  }),
-                                  ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
-                                  [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
-                                  [LEG_FIELD.TERM]: asset.annualized
-                                    ? asset[LEG_FIELD.TERM]
-                                    : getMoment(asset[LEG_FIELD.EXPIRATION_DATE]).diff(
-                                        getMoment(asset[LEG_FIELD.EFFECTIVE_DATE]),
-                                        'days'
-                                      ),
-                                })
-                              ),
-                            };
-                          });
-                          setTableData(next);
-                          setVisible(false);
-                        }}
-                        okText="是"
-                        cancelText="否"
-                      >
-                        <a href="javascript:;">复用</a>
-                      </Popconfirm>
-                      <Divider type="vertical" />
-                      <Popconfirm
-                        title="确认删除本条数据吗?"
-                        onConfirm={async () => {
-                          const { error, data } = await quotePrcPositionDelete({
-                            uuid: record.uuid,
-                          });
-                          if (error) return;
-                          notification.success({ message: '删除成功' });
-                          setTimeout(() => {
-                            onTradeTableSearch();
-                          });
-                        }}
-                        okText="是"
-                        cancelText="否"
-                      >
-                        <a href="javascript:;" style={{ color: 'red' }}>
-                          删除
-                        </a>
-                      </Popconfirm>
-                    </div>
-                  );
-                },
+                        const next = quotePositions.map(position => {
+                          const { productType, asset } = position;
+                          const leg = getLegByProductType(productType, position.asset.exerciseType);
+                          if (!leg) {
+                            throw new Error(`${productType} is not defiend!`);
+                          }
+                          return {
+                            ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
+                            ...backConvertPercent(
+                              Form2.createFields({
+                                ..._.mapValues(asset, (val, key) => {
+                                  if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                                    return moment(val);
+                                  }
+                                  return val;
+                                }),
+                                ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
+                                [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+                                [LEG_FIELD.TERM]: asset.annualized
+                                  ? asset[LEG_FIELD.TERM]
+                                  : getMoment(asset[LEG_FIELD.EXPIRATION_DATE]).diff(
+                                      getMoment(asset[LEG_FIELD.EFFECTIVE_DATE]),
+                                      'days',
+                                    ),
+                              }),
+                            ),
+                          };
+                        });
+                        setTableData(next);
+                        setVisible(false);
+                      }}
+                      okText="是"
+                      cancelText="否"
+                    >
+                      <a href="javascript:;">复用</a>
+                    </Popconfirm>
+                    <Divider type="vertical" />
+                    <Popconfirm
+                      title="确认删除本条数据吗?"
+                      onConfirm={async () => {
+                        const { error, data } = await quotePrcPositionDelete({
+                          uuid: record.uuid,
+                        });
+                        if (error) return;
+                        notification.success({ message: '删除成功' });
+                        setTimeout(() => {
+                          onTradeTableSearch();
+                        });
+                      }}
+                      okText="是"
+                      cancelText="否"
+                    >
+                      <a href="javascript:;" style={{ color: 'red' }}>
+                        删除
+                      </a>
+                    </Popconfirm>
+                  </div>
+                ),
               },
             ]}
-            onRow={record => {
-              return record.style ? { style: record.style } : null;
-            }}
+            onRow={record => (record.style ? { style: record.style } : null)}
           />
           <Row type="flex" justify="end" style={{ marginTop: 15 }}>
             <Pagination
