@@ -43,6 +43,7 @@ const ReportCommonTable = memo<any>(props => {
   const [excelFormData, setExcelFormData] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
+    if (!pageSize) return;
     setIsMount(true);
     setPagination({
       current,
