@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { ILegColDef, LEG_ENV, TOTAL_EDITING_FIELDS } from '@/constants/legs';
@@ -34,8 +36,8 @@ const DATE_ARRAY = [
 const TradeManagementBooking = props => {
   const { currentUser } = props;
   const { tradeManagementBookEditPageData, dispatch, isCompleted } = props;
-  const tableData = _.map(tradeManagementBookEditPageData.tableData, iitem => {
-    return _.mapValues(iitem, (item, key) => {
+  const tableData = _.map(tradeManagementBookEditPageData.tableData, iitem =>
+    _.mapValues(iitem, (item, key) => {
       if (_.includes(DATE_ARRAY, key)) {
         return {
           type: 'field',
@@ -43,8 +45,8 @@ const TradeManagementBooking = props => {
         };
       }
       return item;
-    });
-  });
+    }),
+  );
   const setTableData = payload => {
     dispatch({
       type: 'tradeManagementBookEdit/setTableData',
@@ -89,7 +91,7 @@ const TradeManagementBooking = props => {
       salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
       counterPartyCode: _.get(
         data,
-        'process._business_payload.trade.positions[0].counterPartyCode'
+        'process._business_payload.trade.positions[0].counterPartyCode',
       ),
       comment: _.get(data, 'process._business_payload.trade.comment'),
     };
@@ -97,12 +99,23 @@ const TradeManagementBooking = props => {
     const handleTradeNumber = position => {
       const record = position.asset;
       const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
-      const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
       const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+      const annualCoefficient =
+        record[LEG_FIELD.IS_ANNUAL] &&
+        new BigNumber(record[LEG_FIELD.TERM]).div(record[LEG_FIELD.DAYS_IN_YEAR]).toNumber();
+      const notionalAmount = record[LEG_FIELD.IS_ANNUAL]
+        ? new BigNumber(record[LEG_FIELD.NOTIONAL_AMOUNT])
+            .multipliedBy(annualCoefficient)
+            .toNumber()
+        : record[LEG_FIELD.NOTIONAL_AMOUNT];
+
       const notional =
         notionalAmountType === 'LOT'
           ? notionalAmount
-          : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+          : new BigNumber(notionalAmount)
+              .div(record[LEG_FIELD.INITIAL_SPOT])
+              .div(multipler)
+              .toNumber();
       return new BigNumber(notional)
         .multipliedBy(multipler)
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
@@ -110,15 +123,13 @@ const TradeManagementBooking = props => {
     };
 
     const positions = _.get(data, 'process._business_payload.trade.positions');
-    const composePositions = (positions || []).map(position => {
-      return {
-        ...position,
-        asset: {
-          ...position.asset,
-          [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
-        },
-      };
-    });
+    const composePositions = (positions || []).map(position => ({
+      ...position,
+      asset: {
+        ...position.asset,
+        [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+      },
+    }));
     setTableLoading(false);
     setCreateFormData(Form2.createFields(_detailData));
     if (!composePositions) return;
@@ -142,7 +153,7 @@ const TradeManagementBooking = props => {
       tableData.map(item => Form2.getFieldsValue(item)),
       Form2.getFieldsValue(createFormData),
       currentUser.username,
-      LEG_ENV.BOOKING
+      LEG_ENV.BOOKING,
     );
     props.tbookEditCancel();
     props.confirmModify(trade);
@@ -166,7 +177,7 @@ const TradeManagementBooking = props => {
   return (
     <Page>
       {tableLoading ? (
-        <Skeleton active={true} paragraph={{ rows: 4 }} />
+        <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
@@ -227,10 +238,10 @@ const TradeManagementBooking = props => {
                             };
                           }
                           return item;
-                        })
+                        }),
                       );
                     },
-                    setTableData
+                    setTableData,
                   );
                 }
                 return newData;
@@ -239,9 +250,7 @@ const TradeManagementBooking = props => {
             dataSource={tableData}
             chainColumns={(columns: ILegColDef[]) => {
               const totalFields = TOTAL_EDITING_FIELDS.map(item => item.dataIndex);
-              return columns.filter(item => {
-                return !totalFields.includes(item.dataIndex);
-              });
+              return columns.filter(item => !totalFields.includes(item.dataIndex));
             }}
           />
         </>
@@ -270,5 +279,5 @@ export default memo(
   connect(state => ({
     currentUser: (state.user as any).currentUser,
     tradeManagementBookEditPageData: state.tradeManagementBookEdit,
-  }))(TradeManagementBooking)
+  }))(TradeManagementBooking),
 );
