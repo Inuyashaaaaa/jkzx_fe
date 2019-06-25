@@ -93,8 +93,8 @@ class AsianExerciseModal extends PureComponent<
   public getDefaultOptionsNumber = () => {
     // 名义本金 / 期初价格 / 合约乘数
     return new BigNumber(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
-      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
       .toNumber();
   };

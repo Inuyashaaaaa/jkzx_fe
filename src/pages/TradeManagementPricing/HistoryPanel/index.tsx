@@ -51,7 +51,7 @@ const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
 
 const TradeManagementPricingManagement = props => {
   const [searchFormData, setSearchFormData] = useState({});
-  const { setTableData, setVisible, visible, setCurPricingEnv } = props;
+  const { setTableData, setVisible, visible } = props;
   const [tableDataSource, setTableDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -166,13 +166,8 @@ const TradeManagementPricingManagement = props => {
       return null;
     }
     const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
     const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
-    const annualCoefficient =
-      record[LEG_FIELD.IS_ANNUAL] &&
-      new BigNumber(record[LEG_FIELD.TERM]).div(record[LEG_FIELD.DAYS_IN_YEAR]).toNumber();
-    const notionalAmount = record[LEG_FIELD.IS_ANNUAL]
-      ? new BigNumber(record[LEG_FIELD.NOTIONAL_AMOUNT]).multipliedBy(annualCoefficient).toNumber()
-      : record[LEG_FIELD.NOTIONAL_AMOUNT];
     const notional =
       notionalAmountType === 'LOT'
         ? notionalAmount
@@ -575,7 +570,7 @@ const TradeManagementPricingManagement = props => {
                       <Popconfirm
                         title="将会覆盖当前试定价数据，是否继续?"
                         onConfirm={() => {
-                          const { quotePositions, pricingEnvironmentId } = record as any;
+                          const { quotePositions } = record as any;
 
                           const next = quotePositions.map(position => {
                             const { productType, asset } = position;
@@ -609,7 +604,6 @@ const TradeManagementPricingManagement = props => {
                             };
                           });
                           setTableData(next);
-                          setCurPricingEnv(pricingEnvironmentId);
                           setVisible(false);
                         }}
                         okText="是"
