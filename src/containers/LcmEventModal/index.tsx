@@ -27,6 +27,7 @@ import { OB_PRICE_FIELD } from './constants';
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import { getObservertionFieldData } from './tools';
+import { isRangeAccruals } from '@/tools';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -136,7 +137,7 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
         if (record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
           return message.warn(
-            `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
+            `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`,
           );
         }
         return $unwindModal.current.show(data, tableFormData, currentUser, loadData);
@@ -159,6 +160,12 @@ const LcmEventModal = memo<{
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+        if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+          const convertedData = filterObDays(convertObservetions(data));
+          if (convertedData.some(item => !item.price)) {
+            return message.warn('请先完善观察日价格');
+          }
+        }
         return $settleModal.current.show(data, tableFormData, currentUser, loadData);
       }
     },

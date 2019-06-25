@@ -19,18 +19,18 @@
     "analyze": "cross-env ANALYZE=1 umi build",
     "test": "umi test",
     "test:component": "umi test ./src/components",
-    "lint-staged": "lint-staged",
-    "lint:js": "eslint --fix './src/**/*.{ts,tsx,js,jsx}'",
-    "lint:style": "stylelint --syntax less './src/**/*.less'",
-    "prettier": "prettier --write './src/**/*.{js,jsx,ts,tsx,less,css}'",
+    "prettier": "prettier --write './src/**/*'",
+    "lint:js": "eslint --fix './src/**/*.{js,jsx}'",
+    "lint:ts": "tslint --fix './src/**/*.{ts,tsx}'",
+    "lint:less": "stylelint --syntax less './src/**/*.less'",
     "e2e:dev": "cypress open",
     "e2e:build": "cypress run",
     "cdoc:dev": "docz dev",
     "cdoc:build": "docz build",
     "doc:dev": "gulp",
     "doc:build": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md",
-    "lint": "yarn run lint:js && yarn run lint:style",
-    "precommit": "yarn run lint-staged"
+    "lint": "umi-lint --eslint --stylelint --eslint.ext='.ts,tsx' src/",
+    "precommit": "umi-lint --staged --eslint --stylelint --prettier --fix --eslint.ext='.ts,tsx'"
   },
   "dependencies": {
     "@antv/data-set": "^0.9.6",
@@ -90,6 +90,7 @@
     "stompjs": "^2.3.3",
     "tslint-eslint-rules": "^5.4.0",
     "umi-library": "^1.6.0",
+    "umi-lint": "^2.0.2",
     "uuid": "^3.3.2",
     "ws": "^6.2.1",
     "xlsx": "^0.14.1"
@@ -108,7 +109,7 @@
     "css-loader": "^2.1.1",
     "cypress": "^3.3.0",
     "docz-theme-default": "^1.2.0",
-    "eslint": "^5.16.0",
+    "eslint": "^6.0.0",
     "husky": "^1.2.0",
     "jsdoc": "^3.5.5",
     "less-loader": "^5.0.0",
@@ -131,19 +132,6 @@
     "hooks": {
       "pre-commit": "yarn run precommit"
     }
-  },
-  "lint-staged": {
-    "linters": {
-      "**/*.{js,jsx,ts,tsx,less,css}": [
-        "prettier --write",
-        "git add"
-      ],
-      "**/*.{js,jsx,ts,tsx}": "eslint --fix",
-      "**/*.less": "stylelint --syntax less --fix"
-    },
-    "ignore": [
-      "**/*.min.*"
-    ]
   },
   "optionalDependencies": {},
   "lint-staged": {
