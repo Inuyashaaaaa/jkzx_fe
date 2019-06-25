@@ -28,7 +28,8 @@
     "cdoc:build": "docz build",
     "doc:dev": "gulp",
     "doc:build": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md",
-    "lint": "yarn run lint:js && yarn run lint:style"
+    "lint": "yarn run lint:js && yarn run lint:style",
+    "precommit": "yarn run lint-staged"
   },
   "dependencies": {
     "@antv/data-set": "~0.9.6",
@@ -123,6 +124,25 @@
     "umi": "~2.4.4",
     "umi-plugin-react": "~1.2.0",
     "webpack-bundle-analyzer": "~2.13.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run precommit",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "linters": {
+      "**/*.{js,jsx,ts,tsx,less,css}": [
+        "prettier --write",
+        "git add"
+      ],
+      "**/*.{js,jsx,ts,tsx}": "eslint --fix",
+      "**/*.less": "stylelint --syntax less --fix"
+    },
+    "ignore": [
+      "**/*.min.*"
+    ]
   },
   "optionalDependencies": {},
   "browserslist": [
