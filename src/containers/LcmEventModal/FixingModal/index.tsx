@@ -219,6 +219,7 @@ class FixingModal extends PureComponent<
         [LEG_FIELD.OBSERVATION_DATES]: this.data[LEG_FIELD.OBSERVATION_DATES].map(item => {
           if (item[OB_DAY_FIELD] === params.record[OB_DAY_FIELD]) {
             return {
+              ...item,
               [OB_DAY_FIELD]: params.record[OB_DAY_FIELD],
               [OB_PRICE_FIELD]: Form2.getFieldValue(params.record[OB_PRICE_FIELD]),
             };
