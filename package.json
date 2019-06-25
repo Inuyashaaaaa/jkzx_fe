@@ -17,20 +17,20 @@
     "deploy:cdoc": "cross-env DEPLOY_DIST=cdoc node ./scripts/deploy.js",
     "deploy:e2e-reports": "cross-env DEPLOY_DIST=e2e-reports node ./scripts/deploy.js",
     "analyze": "cross-env ANALYZE=1 umi build",
-    "lint-staged": "lint-staged",
     "test": "umi test",
     "test:component": "umi test ./src/components",
-    "prettier": "prettier --write './src/**/*'",
-    "lint:js": "eslint --fix './src/**/*.{js,jsx}'",
-    "lint:ts": "tslint --fix './src/**/*.{ts,tsx}'",
-    "lint:less": "stylelint --syntax less './src/**/*.less'",
-    "lint": "yarn run lint:js && yarn run lint:ts && yarn run lint:less",
+    "lint-staged": "lint-staged",
+    "lint:js": "eslint --fix './src/**/*.{ts,tsx,js,jsx}'",
+    "lint:style": "stylelint --syntax less './src/**/*.less'",
+    "prettier": "prettier --write './src/**/*.{js,jsx,ts,tsx,less,css}'",
     "e2e:dev": "cypress open",
     "e2e:build": "cypress run",
     "cdoc:dev": "docz dev",
     "cdoc:build": "docz build",
     "doc:dev": "gulp",
-    "doc:build": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md"
+    "doc:build": "node_modules/.bin/jsdoc -c jsdoc.json -R README.md",
+    "lint": "yarn run lint:js && yarn run lint:style",
+    "precommit": "yarn run lint-staged"
   },
   "dependencies": {
     "@antv/data-set": "^0.9.6",
@@ -108,15 +108,7 @@
     "css-loader": "^2.1.1",
     "cypress": "^3.3.0",
     "docz-theme-default": "^1.2.0",
-    "eslint": "^5.4.0",
-    "eslint-config-airbnb": "^17.0.0",
-    "eslint-config-prettier": "^3.0.1",
-    "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-compat": "^2.6.2",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.1.2",
-    "eslint-plugin-markdown": "^1.0.0-beta.6",
-    "eslint-plugin-react": "^7.11.1",
+    "eslint": "^5.16.0",
     "husky": "^1.2.0",
     "jsdoc": "^3.5.5",
     "less-loader": "^5.0.0",
@@ -139,6 +131,19 @@
     "hooks": {
       "pre-commit": "yarn run precommit"
     }
+  },
+  "lint-staged": {
+    "linters": {
+      "**/*.{js,jsx,ts,tsx,less,css}": [
+        "prettier --write",
+        "git add"
+      ],
+      "**/*.{js,jsx,ts,tsx}": "eslint --fix",
+      "**/*.less": "stylelint --syntax less --fix"
+    },
+    "ignore": [
+      "**/*.min.*"
+    ]
   },
   "optionalDependencies": {},
   "lint-staged": {
