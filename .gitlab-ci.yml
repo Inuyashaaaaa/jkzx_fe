@@ -1,6 +1,6 @@
 stages:
   - install
-  - test
+  # - test
   - build
   - deploy
 
@@ -34,27 +34,27 @@ Install:
     - /doc.*/
     - /demo.*/
 
-Lint:
-  stage: test
-  script:
-    - echo 'yarn run lint'
-  only:
-    - /master.*/
-    - /develop.*/
-    - /release.*/
-    - /hotfix.*/
-    - /demo.*/
+# Lint:
+#   stage: test
+#   script:
+#     - echo 'yarn run lint'
+#   only:
+#     - /master.*/
+#     - /develop.*/
+#     - /release.*/
+#     - /hotfix.*/
+#     - /demo.*/
 
-Test:
-  stage: test
-  script:
-    - echo 'yarn run test'
-  only:
-    - /master.*/
-    - /develop.*/
-    - /release.*/
-    - /hotfix.*/
-    - /demo.*/
+# Test:
+#   stage: test
+#   script:
+#     - echo 'yarn run test'
+#   only:
+#     - /master.*/
+#     - /develop.*/
+#     - /release.*/
+#     - /hotfix.*/
+#     - /demo.*/
 
 Build:
   stage: build
@@ -67,19 +67,19 @@ Build:
     - /hotfix.*/
     - /demo.*/
 
-Build-Doc:
-  stage: build
-  script:
-    - yarn run doc:build
-  only:
-    - /develop.*/
+# Build-Doc:
+#   stage: build
+#   script:
+#     - yarn run doc:build
+#   only:
+#     - /develop.*/
 
-Build-CDoc:
-  stage: build
-  script:
-    - yarn run cdoc:build
-  only:
-    - /develop.*/
+# Build-CDoc:
+#   stage: build
+#   script:
+#     - yarn run cdoc:build
+#   only:
+#     - /develop.*/
 
 Deploy-Release:
   stage: deploy
@@ -116,16 +116,16 @@ Deploy-Demo:
   only:
     - /demo.*/
 
-Deploy-Doc:
-  stage: deploy
-  script:
-    - yarn run deploy:doc
-  only:
-    - /develop.*/
+# Deploy-Doc:
+#   stage: deploy
+#   script:
+#     - yarn run deploy:doc
+#   only:
+#     - /develop.*/
 
-Deploy-CDoc:
-  stage: deploy
-  script:
-    - yarn run deploy:cdoc
-  only:
-    - /develop.*/
+# Deploy-CDoc:
+#   stage: deploy
+#   script:
+#     - yarn run deploy:cdoc
+#   only:
+#     - /develop.*/
