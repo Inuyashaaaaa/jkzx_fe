@@ -1,4 +1,5 @@
 import fetch from 'dva/fetch';
+import { notification } from 'antd';
 import { HOST_TEST } from '@/constants/global';
 import request from '@/tools/request';
 
@@ -102,31 +103,66 @@ export async function emlSendSettleReport(params) {
   });
 }
 
-export const UPLOAD_URL = `${HOST_TEST}document-service/api/upload/rpc`;
+export const DOWN_LOAD_TRADE_URL = `${HOST_TEST}document-service/bct/download/supplementary_agreement/?`;
 
-export const HREF_UPLOAD_URL = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;
-
-export const COMFIRM_POI_URL = `${HOST_TEST}document-service/bct/download/poi/poi-template?poiTemplateId=`;
-
-export const DOWN_LOAD_FIEL_URL = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;
+export const DOWN_LOAD_SETTLEMENT_URL = `${HOST_TEST}document-service/bct/download/settlement/?`;
 
 export const DOWN_LOAD_VALUATION_URL = `${HOST_TEST}document-service/bct/download/valuationReport?valuationReportId=`;
 
-export const DOWN_LOAD_TRADE_URL = `${HOST_TEST}document-service/bct/download/poi/supplementary_agreement?`;
+export const HREF_UPLOAD_URL = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;
 
-export const DOWN_LOAD_SETTLEMENT_URL = `${HOST_TEST}document-service/bct/download/poi/settlement?`;
+export const UPLOAD_URL = `${HOST_TEST}document-service/api/upload/rpc`;
 
-export async function DOWN_LOAD_TRADE_URL_URL(options) {
-  return fetch(`${DOWN_LOAD_TRADE_URL}${options}`, {
+export const COMFIRM_POI_URL = `${HOST_TEST}document-service/bct/download/poi/poi-template?poiTemplateId=`;
+
+export async function DOWN_LOAD(url, options) {
+  return fetch(`${url}${encodeURI(options)}`, {
     method: 'GET',
     credentials: 'include',
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json; charset=utf-8',
       Authorization: `Bearer ${getToken()}`,
     },
-  }).then(res => {
-    console.log(res);
-    return res.json();
-  });
+  })
+    .then(response => {
+      if (response.status >= 200 && response.status < 300) {
+        return response.blob();
+        // return response.url;
+      }
+      const errortext = '请求失败';
+      const error = new Error(errortext);
+      error.code = response.status;
+      throw error;
+    })
+    .then(blob => {
+      if (window.webkitURL) {
+        return window.webkitURL.createObjectURL(blob);
+      }
+      if (window.URL && window.URL.createObjectURL) {
+        return window.URL.createObjectURL(blob);
+      }
+      return null;
+    })
+    .catch(error => {
+      const { code, message } = error;
+      notification.error({
+        message: '请求失败',
+      });
+      const failAction = { error };
+
+      if (code === 401) {
+        notification.error({
+          message: '3秒后自动跳转登录页',
+        });
+        setTimeout(() => {
+          // eslint-disable-next-line  no-underscore-dangle
+          window.g_app._store.dispatch({
+            type: 'login/logout',
+          });
+        }, 3000);
+
+        return failAction;
+      }
+
+      return failAction;
+    });
 }

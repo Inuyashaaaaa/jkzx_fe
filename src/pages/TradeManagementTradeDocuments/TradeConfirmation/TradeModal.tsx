@@ -8,7 +8,7 @@ import {
   emlSendSupplementaryAgreementReport,
 } from '@/services/document';
 import Form from '@/containers/Form';
-import DownloadButton from '../DownloadButton';
+import DownloadButton from '@/containers/DownloadButton';
 
 class TradeModal extends PureComponent {
   public $form: Form = null;
@@ -125,25 +125,10 @@ class TradeModal extends PureComponent {
             />
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <Col>
-                {/* <Button type="default">
-                  <a
-                    href={encodeURI(
-                      `${DOWN_LOAD_TRADE_URL}tradeId=${
-                        this.props.data.tradeId
-                      }&marketInterruptionMessage=${
-                        this.state.modalData.marketDisruption
-                      }&earlyTerminationMessage=${this.state.modalData.tradeOption}&partyName=${
-                        this.props.data.partyName
-                      }`
-                    )}
-                    download="template.t"
-                  >
-                    下载
-                  </a>
-                </Button> */}
                 <DownloadButton
-                  downMethod={DOWN_LOAD_TRADE_URL_URL}
-                  options={`tradeId=${this.props.data.tradeId}&marketInterruptionMessage=${this.state.modalData.marketDisruption}&earlyTerminationMessage=${this.state.modalData.tradeOption}&partyName=${this.props.data.partyName}`}
+                  name={`${this.props.data.tradeId}交易确认书.doc`}
+                  url={DOWN_LOAD_TRADE_URL}
+                  options={`tradeId=${this.props.data.tradeId}&partyName=${this.props.data.partyName}&description7=${this.state.modalData.marketDisruption}&description8=${this.state.modalData.tradeOption}`}
                 />
               </Col>
               <Col>
@@ -162,15 +147,6 @@ class TradeModal extends PureComponent {
                   : `${username} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm',
                     )}发送过交易确认书`}
-                {/* {data.docProcessStatus === 'UN_PROCESSED'
-                  ? `${username} 未处理过交易确认书`
-                  : data.docProcessStatus === 'DOWNLOADED'
-                  ? `${username} 于 ${moment(data.updateAt).format(
-                      'YYYY-MM-DD HH:mm',
-                    )}下载过交易确认书`
-                  : `${username} 于 ${moment(data.updateAt).format(
-                      'YYYY-MM-DD HH:mm',
-                    )}发送过交易确认书`} */}
               </p>
             </Row>
           </>
