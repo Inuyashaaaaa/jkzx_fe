@@ -101,7 +101,7 @@ class ExpirationModal extends PureComponent<
    * 如果由菜单进入：获得所有观察价格，按照fixing事件中的方法进行计算
    */
   public getCouponPaymentTotal = () => {
-    if (!!this.fixingTableData) {
+    if (this.fixingTableData.length) {
       return this.fixingTableData.reduce((total, next) => total + (next[OB_LIFE_PAYMENT] || 0), 0);
     }
 
