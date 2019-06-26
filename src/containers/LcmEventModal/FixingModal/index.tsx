@@ -151,13 +151,13 @@ class FixingModal extends PureComponent<
     const expirationDate = getMoment(this.data[LEG_FIELD.EXPIRATION_DATE]);
 
     // 今天是最后一个观察日
-    const a = last.isSame(now, 'day');
+    // const a = last.isSame(now, 'day');
     // 所有观察日都已经填写观察到价格
     const b = obdatas.every(item => _.isNumber(item[OB_PRICE_FIELD]));
     // 今天是到期日
-    const c = expirationDate.isSame(now, 'day');
+    const c = expirationDate.isSame(now, 'day') || expirationDate.isBefore(now, 'day');
 
-    if ((a || c) && b) {
+    if (c && b) {
       return true;
     }
     return false;
@@ -362,6 +362,7 @@ class FixingModal extends PureComponent<
     const expirationDate = getMoment(this.data[LEG_FIELD.EXPIRATION_DATE]);
     const now = moment();
     const expiration = expirationDate.isBefore(now, 'day') || expirationDate.isSame(now, 'day');
+
     return (
       last &&
       expiration &&
