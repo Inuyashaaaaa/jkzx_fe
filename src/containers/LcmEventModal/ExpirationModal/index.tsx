@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
@@ -77,22 +78,20 @@ class ExpirationModal extends PureComponent<
     });
   };
 
-  public computedFormData = () => {
-    return {
-      [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-      [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
-        _.chain(this.fixingTableData)
-          .last()
-          .get(OB_PRICE_FIELD)
-          .value()
-      ),
-      [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
-      [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
-      [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
-      [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
-      [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
-    };
-  };
+  public computedFormData = () => ({
+    [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+    [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
+      _.chain(this.fixingTableData)
+        .last()
+        .get(OB_PRICE_FIELD)
+        .value(),
+    ),
+    [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+    [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
+    [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
+    [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
+    [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
+  });
 
   /**
    * coupnon部分：
@@ -100,13 +99,13 @@ class ExpirationModal extends PureComponent<
    * 如果由菜单进入：获得所有观察价格，按照fixing事件中的方法进行计算
    */
   public getCouponPaymentTotal = () => {
-    if (!!this.fixingTableData) {
+    if (this.fixingTableData) {
       return this.fixingTableData.reduce((total, next) => total + (next[OB_LIFE_PAYMENT] || 0), 0);
     }
 
     return getObservertionFieldData(this.data).reduce(
       (total, next) => total + (next[OB_LIFE_PAYMENT] || 0),
-      0
+      0,
     );
   };
 
@@ -145,7 +144,7 @@ class ExpirationModal extends PureComponent<
     const matures = value[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM];
     const countDay = new BigNumber(
       moment(value[LEG_FIELD.EXPIRATION_DATE]).valueOf() -
-        moment(value[LEG_FIELD.EFFECTIVE_DATE]).valueOf()
+        moment(value[LEG_FIELD.EFFECTIVE_DATE]).valueOf(),
     )
       .div(86400000)
       .decimalPlaces(0)
@@ -221,17 +220,15 @@ class ExpirationModal extends PureComponent<
     let rsp;
     if (isAutocallPhoenix(this.data)) {
       rsp = await this.$autocallPhoenix.validate();
+    } else if (
+      isAutocallSnow(this.data) &&
+      this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+    ) {
+      rsp = await this.$expirationFixedModal.validate();
+    } else if (isAutocallSnow(this.data)) {
+      rsp = await this.$expirationCallModal.validate();
     } else {
-      if (
-        isAutocallSnow(this.data) &&
-        this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
-      ) {
-        rsp = await this.$expirationFixedModal.validate();
-      } else if (isAutocallSnow(this.data)) {
-        rsp = await this.$expirationCallModal.validate();
-      } else {
-        rsp = 'expiration';
-      }
+      rsp = 'expiration';
     }
     if (rsp.error) return;
     const usedFormData = this.getUsedFormData();
@@ -344,7 +341,7 @@ class ExpirationModal extends PureComponent<
               field: LEG_FIELD.NOTIONAL_AMOUNT,
               control: {
                 label:
-                  this.state.notionalType === NOTION_ENUM_MAP.CNY
+                  this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTION_ENUM_MAP.CNY
                     ? '名义本金 (￥)'
                     : '名义本金 (手)',
               },
@@ -459,7 +456,7 @@ class ExpirationModal extends PureComponent<
             controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
               this.state.notionalType,
               this.state.premiumType,
-              this.handleSettleAmount
+              this.handleSettleAmount,
             )}
           />
         </>
@@ -482,16 +479,16 @@ class ExpirationModal extends PureComponent<
           closable={false}
           onCancel={this.switchModal}
           onOk={this.onConfirm}
-          destroyOnClose={true}
+          destroyOnClose
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={
-            (isAutocallPhoenix(this.data)
-              ? `到期结算`
+          title={`${
+            isAutocallPhoenix(this.data)
+              ? '到期结算'
               : isAutocallSnow(this.data)
-              ? `到期结算`
-              : `到期`) + ` (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`
-          }
+              ? '到期结算'
+              : '到期'
+          } (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
         >
           {this.getForm()}
           {isAutocallPhoenix(this.data) ? (
