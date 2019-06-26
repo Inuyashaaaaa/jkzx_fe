@@ -1,4 +1,4 @@
-/*eslint-disable */
+/* eslint-disable*/
 import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
@@ -101,7 +101,7 @@ class ExpirationModal extends PureComponent<
    * 如果由菜单进入：获得所有观察价格，按照fixing事件中的方法进行计算
    */
   public getCouponPaymentTotal = () => {
-    if (!!this.fixingTableData) {
+    if (this.fixingTableData) {
       return this.fixingTableData.reduce((total, next) => total + (next[OB_LIFE_PAYMENT] || 0), 0);
     }
 
@@ -222,17 +222,15 @@ class ExpirationModal extends PureComponent<
     let rsp;
     if (isAutocallPhoenix(this.data)) {
       rsp = await this.$autocallPhoenix.validate();
+    } else if (
+      isAutocallSnow(this.data) &&
+      this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+    ) {
+      rsp = await this.$expirationFixedModal.validate();
+    } else if (isAutocallSnow(this.data)) {
+      rsp = await this.$expirationCallModal.validate();
     } else {
-      if (
-        isAutocallSnow(this.data) &&
-        this.state.autoCallPaymentType === EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
-      ) {
-        rsp = await this.$expirationFixedModal.validate();
-      } else if (isAutocallSnow(this.data)) {
-        rsp = await this.$expirationCallModal.validate();
-      } else {
-        rsp = 'expiration';
-      }
+      rsp = 'expiration';
     }
     if (rsp.error) return;
     const usedFormData = this.getUsedFormData();
@@ -345,7 +343,7 @@ class ExpirationModal extends PureComponent<
               field: LEG_FIELD.NOTIONAL_AMOUNT,
               control: {
                 label:
-                  this.state.notionalType === NOTION_ENUM_MAP.CNY
+                  this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTION_ENUM_MAP.CNY
                     ? '名义本金 (￥)'
                     : '名义本金 (手)',
               },
@@ -483,16 +481,16 @@ class ExpirationModal extends PureComponent<
           closable={false}
           onCancel={this.switchModal}
           onOk={this.onConfirm}
-          destroyOnClose={true}
+          destroyOnClose
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
-          title={
-            (isAutocallPhoenix(this.data)
-              ? `到期结算`
+          title={`${
+            isAutocallPhoenix(this.data)
+              ? '到期结算'
               : isAutocallSnow(this.data)
-              ? `到期结算`
-              : `到期`) + ` (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`
-          }
+              ? '到期结算'
+              : '到期'
+          } (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
         >
           {this.getForm()}
           {isAutocallPhoenix(this.data) ? (
