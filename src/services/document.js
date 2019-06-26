@@ -128,7 +128,7 @@ export async function DOWN_LOAD(url, options) {
         return response.blob();
         // return response.url;
       }
-      const errortext = '请求失败';
+      const errortext = response.statusText;
       const error = new Error(errortext);
       error.code = response.status;
       throw error;
@@ -146,6 +146,7 @@ export async function DOWN_LOAD(url, options) {
       const { code, message } = error;
       notification.error({
         message: '请求失败',
+        description: message,
       });
       const failAction = { error };
 
