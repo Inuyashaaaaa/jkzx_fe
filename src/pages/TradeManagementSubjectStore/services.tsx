@@ -6,45 +6,41 @@ import React from 'react';
 const multiplier = {
   title: '合约乘数',
   dataIndex: 'multiplier',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '合约乘数是必填项',
-            },
-          ],
-        })(
-          <InputNumber
-            precision={0}
-            min={1}
-            disabled={Form2.getFieldValue(record.instrumentType) === 'STOCK'}
-          />
-        )}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '合约乘数是必填项',
+          },
+        ],
+      })(
+        <InputNumber
+          precision={0}
+          min={1}
+          disabled={Form2.getFieldValue(record.instrumentType) === 'STOCK'}
+        />,
+      )}
+    </FormItem>
+  ),
 };
 
 const name = {
   title: '合约名称',
   dataIndex: 'name',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '合约名称是必填项',
-            },
-          ],
-        })(<Input />)}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '合约名称是必填项',
+          },
+        ],
+      })(<Input />)}
+    </FormItem>
+  ),
 };
 
 const exchange = {
@@ -85,6 +81,10 @@ const exchange = {
           label: '金交所',
           value: 'SGE',
         },
+        {
+          label: '能源中心',
+          value: 'INE',
+        },
       ];
     };
 
@@ -106,39 +106,35 @@ const exchange = {
 const maturity = {
   title: '期货到期日',
   dataIndex: 'maturity',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '期权到期日是必填项',
-            },
-          ],
-        })(<DatePicker editing={true} format={'YYYY-MM-DD'} />)}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '期权到期日是必填项',
+          },
+        ],
+      })(<DatePicker editing format="YYYY-MM-DD" />)}
+    </FormItem>
+  ),
 };
 
 const indexName = {
   title: '指数名称',
   dataIndex: 'name',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '指数名称是必填项',
-            },
-          ],
-        })(<Input />)}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '指数名称是必填项',
+          },
+        ],
+      })(<Input />)}
+    </FormItem>
+  ),
 };
 
 const instrumentType = {
@@ -255,7 +251,7 @@ const instrumentTypeSearch = {
     return (
       <FormItem>
         {form.getFieldDecorator({})(
-          <Select style={{ minWidth: 180 }} options={getOptions()} disabled={disable()} />
+          <Select style={{ minWidth: 180 }} options={getOptions()} disabled={disable()} />,
         )}
       </FormItem>
     );
@@ -278,7 +274,7 @@ const assetClassSearch = {
           <Select
             style={{ minWidth: 180 }}
             disabled={disable()}
-            allowClear={true}
+            allowClear
             options={[
               {
                 label: '商品',
@@ -289,69 +285,61 @@ const assetClassSearch = {
                 value: 'EQUITY',
               },
             ]}
-          />
+          />,
         )}
       </FormItem>
     );
   },
 };
 
-const assetClass = type => {
-  return {
-    title: '资产类别',
-    dataIndex: 'assetClass',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
-              {
-                required: true,
-                message: '资产类别是必填项',
-              },
-            ],
-          })(
-            <Select
-              style={{ minWidth: 180 }}
-              disabled={type === 'edit' ? true : false}
-              options={[
-                {
-                  label: '商品',
-                  value: 'COMMODITY',
-                },
-                {
-                  label: '权益',
-                  value: 'EQUITY',
-                },
-              ]}
-            />
-          )}
-        </FormItem>
-      );
-    },
-  };
-};
+const assetClass = type => ({
+  title: '资产类别',
+  dataIndex: 'assetClass',
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '资产类别是必填项',
+          },
+        ],
+      })(
+        <Select
+          style={{ minWidth: 180 }}
+          disabled={type === 'edit'}
+          options={[
+            {
+              label: '商品',
+              value: 'COMMODITY',
+            },
+            {
+              label: '权益',
+              value: 'EQUITY',
+            },
+          ]}
+        />,
+      )}
+    </FormItem>
+  ),
+});
 
-const instrumentId = type => {
-  return {
-    title: '合约代码',
-    dataIndex: 'instrumentId',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
-              {
-                required: true,
-                message: '标的物代码是必填项',
-              },
-            ],
-          })(<Input disabled={type === 'edit'} />)}
-        </FormItem>
-      );
-    },
-  };
-};
+const instrumentId = type => ({
+  title: '合约代码',
+  dataIndex: 'instrumentId',
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '标的物代码是必填项',
+          },
+        ],
+      })(<Input disabled={type === 'edit'} />)}
+    </FormItem>
+  ),
+});
 
 const instrumentIds = {
   title: '标的物列表',
@@ -372,14 +360,14 @@ const instrumentIds = {
           <Select
             style={{ minWidth: 180 }}
             placeholder="请输入内容搜索"
-            allowClear={true}
-            showSearch={true}
+            allowClear
+            showSearch
             mode="multiple"
             disabled={disable()}
-            fetchOptionsOnSearch={true}
-            options={async (value: string = '') => {
+            fetchOptionsOnSearch
+            options={async (values: string = '') => {
               const { data = [], error } = await mktInstrumentSearch({
-                instrumentIdPart: value,
+                instrumentIdPart: values,
               });
               if (error) return [];
               return data.slice(0, 50).map(item => ({
@@ -387,7 +375,7 @@ const instrumentIds = {
                 value: item,
               }));
             }}
-          />
+          />,
         )}
       </FormItem>
     );
@@ -397,169 +385,157 @@ const instrumentIds = {
 const exerciseType = {
   title: '行权方式',
   dataIndex: 'exerciseType',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator('exerciseType', {
-          rules: [
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator('exerciseType', {
+        rules: [
+          {
+            required: true,
+            message: '行权方式是必填项',
+          },
+        ],
+      })(
+        <Select
+          style={{ minWidth: 180 }}
+          placeholder="请输入内容搜索"
+          allowClear
+          showSearch
+          fetchOptionsOnSearch
+          options={[
             {
-              required: true,
-              message: '行权方式是必填项',
+              label: '欧式',
+              value: 'EUROPEAN',
             },
-          ],
-        })(
-          <Select
-            style={{ minWidth: 180 }}
-            placeholder="请输入内容搜索"
-            allowClear={true}
-            showSearch={true}
-            fetchOptionsOnSearch={true}
-            options={[
-              {
-                label: '欧式',
-                value: 'EUROPEAN',
-              },
-              {
-                label: '美式',
-                value: 'AMERICAN',
-              },
-            ]}
-          />
-        )}
-      </FormItem>
-    );
-  },
+            {
+              label: '美式',
+              value: 'AMERICAN',
+            },
+          ]}
+        />,
+      )}
+    </FormItem>
+  ),
 };
 
 const optionType = {
   title: '期权类型',
   dataIndex: 'optionType',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator('optionType', {
-          rules: [
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator('optionType', {
+        rules: [
+          {
+            required: true,
+            message: '期权类型是必填项',
+          },
+        ],
+      })(
+        <Select
+          style={{ minWidth: 180 }}
+          placeholder="请输入内容搜索"
+          allowClear
+          showSearch
+          fetchOptionsOnSearch
+          options={[
             {
-              required: true,
-              message: '期权类型是必填项',
+              label: '看涨',
+              value: 'CALL',
             },
-          ],
-        })(
-          <Select
-            style={{ minWidth: 180 }}
-            placeholder="请输入内容搜索"
-            allowClear={true}
-            showSearch={true}
-            fetchOptionsOnSearch={true}
-            options={[
-              {
-                label: '看涨',
-                value: 'CALL',
-              },
-              {
-                label: '看跌',
-                value: 'PUT',
-              },
-            ]}
-          />
-        )}
-      </FormItem>
-    );
-  },
+            {
+              label: '看跌',
+              value: 'PUT',
+            },
+          ]}
+        />,
+      )}
+    </FormItem>
+  ),
 };
 
 const strike = {
   title: '行权价格',
   dataIndex: 'strike',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '行权价格是必填项',
-            },
-          ],
-        })(<InputNumber precision={4} />)}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '行权价格是必填项',
+          },
+        ],
+      })(<InputNumber precision={4} />)}
+    </FormItem>
+  ),
 };
 
 const underlyerInstrumentId = {
   title: '标的代码',
   dataIndex: 'underlyerInstrumentId',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '标的代码是必填项',
-            },
-          ],
-        })(
-          <Select
-            placeholder="请输入内容搜索"
-            allowClear={true}
-            showSearch={true}
-            fetchOptionsOnSearch={true}
-            options={async (value: string = '') => {
-              const { data = [], error } = await mktInstrumentSearch({
-                instrumentIdPart: value,
-                excludeOption: true,
-              });
-              if (error) return [];
-              return data.slice(0, 50).map(item => ({
-                label: item,
-                value: item,
-              }));
-            }}
-          />
-        )}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '标的代码是必填项',
+          },
+        ],
+      })(
+        <Select
+          placeholder="请输入内容搜索"
+          allowClear
+          showSearch
+          fetchOptionsOnSearch
+          options={async (values: string = '') => {
+            const { data = [], error } = await mktInstrumentSearch({
+              instrumentIdPart: values,
+              excludeOption: true,
+            });
+            if (error) return [];
+            return data.slice(0, 50).map(item => ({
+              label: item,
+              value: item,
+            }));
+          }}
+        />,
+      )}
+    </FormItem>
+  ),
 };
 
 const expirationDate = {
   title: '期权到期日',
   dataIndex: 'expirationDate',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '期权到期时间是必填项',
-            },
-          ],
-        })(<DatePicker editing={true} format={'YYYY-MM-DD'} />)}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '期权到期时间是必填项',
+          },
+        ],
+      })(<DatePicker editing format="YYYY-MM-DD" />)}
+    </FormItem>
+  ),
 };
 
 const expirationTime = {
   title: '期权到期时间',
   dataIndex: 'expirationTime',
-  render: (value, record, index, { form, editing }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [
-            {
-              required: true,
-              message: '期权到期时间是必填项',
-            },
-          ],
-        })(<TimePicker />)}
-      </FormItem>
-    );
-  },
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '期权到期时间是必填项',
+          },
+        ],
+      })(<TimePicker />)}
+    </FormItem>
+  ),
 };
 
 export const getInstrumenInfo = event => {
@@ -618,14 +594,10 @@ export const getInstrumenInfo = event => {
   return fieldMap[key] || [];
 };
 
-export const createFormControls = (event = {}, type) => {
-  return [instrumentId(type), assetClass(type), instrumentType].concat(getInstrumenInfo(event));
-};
+export const createFormControls = (event = {}, type) =>
+  [instrumentId(type), assetClass(type), instrumentType].concat(getInstrumenInfo(event));
 
-export const editFormControls = (event = {}, type) => {
-  return [instrumentId(type), assetClass(type), instrumentType].concat(getInstrumenInfo(event));
-};
+export const editFormControls = (event = {}, type) =>
+  [instrumentId(type), assetClass(type), instrumentType].concat(getInstrumenInfo(event));
 
-export const searchFormControls = () => {
-  return [assetClassSearch, instrumentTypeSearch, instrumentIds];
-};
+export const searchFormControls = () => [assetClassSearch, instrumentTypeSearch, instrumentIds];
