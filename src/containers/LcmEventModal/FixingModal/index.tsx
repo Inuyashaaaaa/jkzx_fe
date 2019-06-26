@@ -1,8 +1,6 @@
+import { ITableColDef } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
-  INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  INPUT_NUMBER_PERCENTAGE_CONFIG,
   KNOCK_DIRECTION_MAP,
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
@@ -13,22 +11,23 @@ import {
   UP_BARRIER_TYPE_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
+import { Form2, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
-import SourceTable from '@/containers/SourceTable';
-import { IColumnDef } from '@/containers/Table/types';
-import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
-import { getObservertionFieldData } from '../tools';
-import { countAvg, filterObDays } from '../utils';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { isAutocallPhoenix, isRangeAccruals, getMoment } from '@/tools';
+import { formatMoney, getMoment, isRangeAccruals, isAsian } from '@/tools';
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import AsianExerciseModal from '../AsianExerciseModal';
+import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
 import ExpirationModal from '../ExpirationModal';
 import KnockOutModal from '../KnockOutModal';
+import { getObservertionFieldData } from '../tools';
+import { countAvg, filterObDays } from '../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 class FixingModal extends PureComponent<
@@ -70,7 +69,12 @@ class FixingModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-    const tableData = filterObDays(getObservertionFieldData(data));
+    const tableData = filterObDays(getObservertionFieldData(data)).map(item => {
+      return {
+        ...item,
+        [OB_PRICE_FIELD]: Form2.createField(item[OB_PRICE_FIELD]),
+      };
+    });
     this.setState(
       {
         tableData,
@@ -182,34 +186,54 @@ class FixingModal extends PureComponent<
   };
 
   public countAvg = () => {
-    return countAvg(this.state.tableData, this.data);
+    const tableData = this.state.tableData.map(item => Form2.getFieldsValue(item));
+    return countAvg(tableData, this.data);
   };
 
   public onCellValueChanged = params => {
-    if (
-      params.colDef.field === OB_PRICE_FIELD &&
-      params.newValue &&
-      params.newValue !== params.oldValue
-    ) {
-      this.startOb(params.data);
+    if (params.dataIndex === OB_PRICE_FIELD && params.record[OB_PRICE_FIELD]) {
+      this.startOb(params.record);
     }
+  };
+
+  public onCellFieldsChanged = params => {
     if (this.isAutocallPhoenix()) {
       this.data = {
         ...this.data,
         [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: this.data[
           LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY
         ].map(item => {
-          if (item[OB_DAY_FIELD] === params.data[OB_DAY_FIELD]) {
+          if (item[OB_DAY_FIELD] === params.record[OB_DAY_FIELD]) {
             return {
-              [OB_DAY_FIELD]: params.data[OB_DAY_FIELD],
-              [OB_PRICE_FIELD]: params.data[OB_PRICE_FIELD],
+              [OB_DAY_FIELD]: params.record[OB_DAY_FIELD],
+              [OB_PRICE_FIELD]: Form2.getFieldValue(params.record[OB_PRICE_FIELD]),
             };
           }
           return item;
         }),
       };
     }
-    const tableData = filterObDays(getObservertionFieldData(this.data));
+    if (isRangeAccruals(this.data) || isAsian(this.data)) {
+      this.data = {
+        ...this.data,
+        [LEG_FIELD.OBSERVATION_DATES]: this.data[LEG_FIELD.OBSERVATION_DATES].map(item => {
+          if (item[OB_DAY_FIELD] === params.record[OB_DAY_FIELD]) {
+            return {
+              ...item,
+              [OB_DAY_FIELD]: params.record[OB_DAY_FIELD],
+              [OB_PRICE_FIELD]: Form2.getFieldValue(params.record[OB_PRICE_FIELD]),
+            };
+          }
+          return item;
+        }),
+      };
+    }
+    const tableData = filterObDays(getObservertionFieldData(this.data)).map(item => {
+      return {
+        ...item,
+        [OB_PRICE_FIELD]: Form2.createField(item[OB_PRICE_FIELD]),
+      };
+    });
     this.setState(
       {
         tableData,
@@ -230,7 +254,7 @@ class FixingModal extends PureComponent<
       userLoginId: this.currentUser.username,
       eventDetail: {
         observationDate: data[OB_DAY_FIELD],
-        observationPrice: String(data[OB_PRICE_FIELD]),
+        observationPrice: String(Form2.getFieldValue(data[OB_PRICE_FIELD])),
       },
     });
     if (error) return;
@@ -241,94 +265,108 @@ class FixingModal extends PureComponent<
     return this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX;
   };
 
-  public getColumnDefs = (): IColumnDef[] => {
+  public getColumnDefs = (): ITableColDef[] => {
     if (this.isAutocallPhoenix()) {
       return [
         {
-          headerName: '观察日',
-          field: OB_DAY_FIELD,
-          input: {
-            type: 'date',
+          title: '观察日',
+          dataIndex: OB_DAY_FIELD,
+        },
+        {
+          title: '敲出障碍价',
+          dataIndex: LEG_FIELD.UP_BARRIER,
+          render: (val, record, index) => {
+            return this.state.upBarrierType === UP_BARRIER_TYPE_MAP.CNY
+              ? formatMoney(val, { unit: '¥' })
+              : formatMoney(val) + ' %';
           },
         },
         {
-          headerName: '敲出障碍价',
-          field: LEG_FIELD.UP_BARRIER,
-          input:
-            this.state.upBarrierType === UP_BARRIER_TYPE_MAP.CNY
-              ? INPUT_NUMBER_CURRENCY_CNY_CONFIG
-              : INPUT_NUMBER_PERCENTAGE_CONFIG,
+          title: 'Coupon障碍',
+          dataIndex: LEG_FIELD.COUPON_BARRIER,
+          render: (val, record, index) => {
+            return formatMoney(val) + ' %';
+          },
         },
         {
-          headerName: 'Coupon障碍',
-          field: LEG_FIELD.COUPON_BARRIER,
-          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+          title: '已观察到价格(可编辑)',
+          dataIndex: OB_PRICE_FIELD,
+          defaultEditing: false,
+          editable: record => true,
+          render: (val, record, index, { form, editing }) => {
+            return (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      message: '数值不能低于0',
+                      validator: (rule, value, callback) => {
+                        if (value < 0) {
+                          return callback(true);
+                        }
+                        callback();
+                      },
+                    },
+                  ],
+                })(<UnitInputNumber autoSelect={true} editing={editing} unit={'¥'} />)}
+              </FormItem>
+            );
+          },
         },
         {
-          headerName: '已观察到价格(可编辑)',
-          field: OB_PRICE_FIELD,
-          editable: true,
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-          rules: [
-            {
-              message: '数值不能低于0',
-              validator: (rule, value, callback) => {
-                if (value < 0) {
-                  return callback(true);
-                }
-                callback();
-              },
-            },
-          ],
-        },
-        {
-          headerName: '观察周期收益',
-          field: OB_LIFE_PAYMENT,
-          input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+          title: '观察周期收益',
+          dataIndex: OB_LIFE_PAYMENT,
+          render: (val, record, index) => {
+            return formatMoney(val, { unit: '¥' });
+          },
         },
       ];
     }
 
     return [
       {
-        headerName: '观察日',
-        field: OB_DAY_FIELD,
-        input: {
-          type: 'date',
-        },
+        title: '观察日',
+        dataIndex: OB_DAY_FIELD,
       },
       ...(this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS
         ? []
         : [
             {
-              headerName: '权重',
-              field: 'weight',
-              input: INPUT_NUMBER_DIGITAL_CONFIG,
+              title: '权重',
+              dataIndex: 'weight',
             },
           ]),
       {
-        headerName: '已观察到价格(可编辑)',
-        field: OB_PRICE_FIELD,
-        editable: true,
-        input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        rules: [
-          {
-            message: '数值不能低于0',
-            validator: (rule, value, callback) => {
-              if (value < 0) {
-                return callback(true);
-              }
-              callback();
-            },
-          },
-        ],
+        title: '已观察到价格(可编辑)',
+        dataIndex: OB_PRICE_FIELD,
+        defaultEditing: false,
+        editable: record => true,
+        render: (val, record, index, { form, editing }) => {
+          return (
+            <FormItem>
+              {form.getFieldDecorator({
+                rules: [
+                  {
+                    message: '数值不能低于0',
+                    validator: (rule, value, callback) => {
+                      if (value < 0) {
+                        return callback(true);
+                      }
+                      callback();
+                    },
+                  },
+                ],
+              })(<UnitInputNumber autoSelect={true} editing={editing} unit={'¥'} />)}
+            </FormItem>
+          );
+        },
       },
     ];
   };
 
   public canBarrier = () => {
     return this.state.tableData.some(record => {
-      const alObPrice = record[OB_PRICE_FIELD];
+      const alObPrice = Form2.getFieldValue(record[OB_PRICE_FIELD]);
       const upBarrier = record[LEG_FIELD.UP_BARRIER];
       const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
       const actUpBarrier =
@@ -363,7 +401,7 @@ class FixingModal extends PureComponent<
       last &&
       this.state.tableData.every(record => {
         const upBarrier = record[LEG_FIELD.UP_BARRIER];
-        const alObPrice = record[OB_PRICE_FIELD];
+        const alObPrice = Form2.getFieldValue(record[OB_PRICE_FIELD]);
         const actUpBarrier =
           this.data[LEG_FIELD.UP_BARRIER_TYPE] === UNIT_ENUM_MAP2.PERCENT
             ? new BigNumber(upBarrier)
@@ -446,12 +484,13 @@ class FixingModal extends PureComponent<
           footer={this.getModalFooter()}
           width={900}
         >
-          <SourceTable
+          <SmartTable
             pagination={false}
             dataSource={this.state.tableData}
             rowKey={OB_DAY_FIELD}
-            onCellValueChanged={this.onCellValueChanged}
-            columnDefs={this.getColumnDefs()}
+            onCellFieldsChange={this.onCellFieldsChanged}
+            onCellEditingChanged={this.onCellValueChanged}
+            columns={this.getColumnDefs()}
           />
         </Modal>
       </>

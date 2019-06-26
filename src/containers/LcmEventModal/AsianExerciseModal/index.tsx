@@ -10,6 +10,7 @@ import {
   LEG_TYPE_MAP,
   NOTION_ENUM_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/containers/Form';
@@ -60,6 +61,7 @@ class AsianExerciseModal extends PureComponent<
     productType: 'ASIAN',
     notionalType: null,
     exportVisible: false,
+    strikeType: null,
   };
 
   public show = (data, tableFormData, currentUser, reload) => {
@@ -72,6 +74,7 @@ class AsianExerciseModal extends PureComponent<
       productType: this.data[LEG_TYPE_FIELD],
       notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       formData: this.getDefaultFormData(),
+      strikeType: this.data[LEG_FIELD.STRIKE_TYPE],
     });
   };
 
@@ -93,8 +96,8 @@ class AsianExerciseModal extends PureComponent<
   public getDefaultOptionsNumber = () => {
     // 名义本金 / 期初价格 / 合约乘数
     return new BigNumber(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
-      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
       .toNumber();
   };
@@ -266,7 +269,10 @@ class AsianExerciseModal extends PureComponent<
                     {
                       field: LEG_FIELD.STRIKE,
                       control: {
-                        label: '行权价（¥）',
+                        label:
+                          this.state.strikeType === UNIT_ENUM_MAP.CNY
+                            ? '行权价（¥）'
+                            : '行权价（%）',
                       },
                       input: {
                         ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,

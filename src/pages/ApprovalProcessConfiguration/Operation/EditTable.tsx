@@ -3,7 +3,9 @@ import React, { memo, useEffect, useState, useRef } from 'react';
 import { Table2, Select, Form2, Input, SmartTable } from '@/containers';
 import { Button, Icon, Tag, Alert, Modal, message } from 'antd';
 import GroupSelcet from './GroupSelcet';
+import FormItem from 'antd/lib/form/FormItem';
 import XLSX from 'xlsx';
+import AutoSelect from './AutoSelect';
 
 const EditTable = memo<any>(props => {
   const {
@@ -20,14 +22,11 @@ const EditTable = memo<any>(props => {
     excelData,
     processName,
     setWarningVisible,
+    onReviewCellFieldsChange,
     // downloadFormModal,
   } = props;
 
   const tableE2 = useRef<Table2>(null);
-
-  useEffect(() => {
-    console.log(reviewTask);
-  }, reviewTask);
 
   const showModel = () => {
     showOtherModel();
@@ -80,7 +79,7 @@ const EditTable = memo<any>(props => {
 
   return (
     <>
-      <Table2
+      <SmartTable
         dataSource={reviewTask}
         rowKey="taskId"
         pagination={false}
@@ -88,30 +87,37 @@ const EditTable = memo<any>(props => {
           {
             title: '节点名称',
             dataIndex: 'taskName',
+            editable: record => {
+              return false;
+            },
             render: (value, record, index, { form, editing }) => {
-              return value;
+              return <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>;
             },
           },
-          // {
-          //   title: '节点触发器',
-          //   dataIndex: 'triggers',
-          //   render: (value, record, index, { form, editing }) => {
-          //     return value;
-          //   },
-          // },
           {
             title: '审批组',
-            dataIndex: 'approveGroups',
+            dataIndex: 'approveGroupList',
+            editable: record => {
+              return true;
+            },
+            width: '50%',
             render: (value, record, index, { form, editing }) => {
               return (
-                <>
-                  {value.map(item => {
-                    return <Tag key={item.approveGroupId}>{item.approveGroupName}</Tag>;
-                  })}
-                  <a onClick={e => showOtherModel(e, record.taskId)}>
-                    <Icon type="form" />
-                  </a>
-                </>
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '至少选择一个审批组',
+                      },
+                    ],
+                  })(
+                    <AutoSelect
+                      {...{ record, index, form, editing, processName }}
+                      fetchData={props.fetchData}
+                    />
+                  )}
+                </FormItem>
               );
             },
           },

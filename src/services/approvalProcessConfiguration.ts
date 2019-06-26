@@ -240,3 +240,13 @@ export async function wkProcessTriggerUnbind(params = {}) {
     },
   });
 }
+
+export async function authCan(params = {}) {
+  return request(`${HOST_TEST}auth-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'authCan',
+      params,
+    },
+  });
+}

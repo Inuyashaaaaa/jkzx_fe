@@ -1,19 +1,14 @@
-import { getMoment } from '@/tools';
+import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   ASSET_CLASS_MAP,
-  EXERCISETYPE_MAP,
+  FREQUENCY_TYPE_MAP,
   LEG_INJECT_FIELDS,
   LEG_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
-  UNIT_ENUM_MAP,
-  REBATETYPE_UNIT_MAP,
-  REBATETYPE_TYPE_MAP,
-  KNOCK_DIRECTION_MAP,
-  OPTION_TYPE_MAP,
-  PAYMENT_TYPE_MAP,
-  FREQUENCY_TYPE_MAP,
   OB_DAY_FIELD,
   OB_PRICE_FIELD,
+  PAYMENT_TYPE_MAP,
+  UNIT_ENUM_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -21,13 +16,13 @@ import {
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/global';
 import {
-  LEG_ENV,
   GENERAL_COMPUTED_FIELDS,
-  TOTAL_TRADESCOL_FIELDS,
+  LEG_ENV,
   TOTAL_EDITING_FIELDS,
+  TOTAL_TRADESCOL_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
-import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
+import { getMoment, getCurDateMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
 import _ from 'lodash';
 import moment from 'moment';
@@ -36,50 +31,36 @@ import {
   NOTIONAL_AMOUNT_TYPE_MAP,
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
-  STRIKE_TYPES_MAP,
 } from '../../constants/common';
-import { Direction } from '../legFields';
-import { DaysInYear } from '../legFields/DaysInYear';
-import { EffectiveDate } from '../legFields/EffectiveDate';
-import { ExpirationDate } from '../legFields/ExpirationDate';
-import { FrontPremium } from '../legFields/FrontPremium';
-import { AlUnwindNotionalAmount } from '../legFields/infos/AlUnwindNotionalAmount';
-import { InitialNotionalAmount } from '../legFields/infos/InitialNotionalAmount';
-import { LcmEventType } from '../legFields/infos/LcmEventType';
-import { PositionId } from '../legFields/infos/PositionId';
-import { InitialSpot } from '../legFields/InitialSpot';
-import { IsAnnual } from '../legFields/IsAnnual';
-import { MinimumPremium } from '../legFields/MinimumPremium';
-import { NotionalAmount } from '../legFields/NotionalAmount';
-import { NotionalAmountType } from '../legFields/NotionalAmountType';
-import { OptionType } from '../legFields/OptionType';
-import { ParticipationRate } from '../legFields/ParticipationRate';
-import { Premium } from '../legFields/Premium';
-import { PremiumType } from '../legFields/PremiumType';
-import { SettlementDate } from '../legFields/SettlementDate';
-import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
-import { Strike } from '../legFields/Strike';
-import { StrikeType } from '../legFields/StrikeType';
-import { Term } from '../legFields/Term';
-import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
-import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
+import { Direction } from '../../containers/legFields';
+import { BarrierType } from '../../containers/legFields/BarrierType';
+import { DaysInYear } from '../../containers/legFields/DaysInYear';
+import { Earnings } from '../../containers/legFields/Earnings';
+import { EarningsType } from '../../containers/legFields/EarningsType';
+import { EffectiveDate } from '../../containers/legFields/EffectiveDate';
+import { ExpirationDate } from '../../containers/legFields/ExpirationDate';
+import { FrontPremium } from '../../containers/legFields/FrontPremium';
+import { HighBarrier } from '../../containers/legFields/HighBarrier';
+import { InitialSpot } from '../../containers/legFields/InitialSpot';
+import { IsAnnual } from '../../containers/legFields/IsAnnual';
+import { LowBarrier } from '../../containers/legFields/LowBarrier';
+import { MinimumPremium } from '../../containers/legFields/MinimumPremium';
+import { NotionalAmount } from '../../containers/legFields/NotionalAmount';
+import { NotionalAmountType } from '../../containers/legFields/NotionalAmountType';
+import { ObservationDates } from '../../containers/legFields/ObservationDates';
+import { ObservationStep } from '../../containers/legFields/ObservationStep';
+import { ParticipationRate } from '../../containers/legFields/ParticipationRate';
+import { Premium } from '../../containers/legFields/Premium';
+import { PremiumType } from '../../containers/legFields/PremiumType';
+import { SettlementDate } from '../../containers/legFields/SettlementDate';
+import { SpecifiedPrice } from '../../containers/legFields/SpecifiedPrice';
+import { Term } from '../../containers/legFields/Term';
+import { TradeNumber } from '../../containers/legFields/TradeNumber';
+import { UnderlyerInstrumentId } from '../../containers/legFields/UnderlyerInstrumentId';
+import { UnderlyerMultiplier } from '../../containers/legFields/UnderlyerMultiplier';
+import { Unit } from '../../containers/legFields/Unit';
 import { commonLinkage } from '../common';
-import { Rebate } from '../legFields/Rebate';
-import { ObservationType } from '../legFields/ObservationType';
-import { KnockDirection } from '../legFields/KnockDirection';
-import { RebateUnit } from '../legFields/RebateUnit';
-import { RebateType } from '../legFields/RebateType';
-import { BarrierType } from '../legFields/BarrierType';
-import { Barrier } from '../legFields/Barrier';
-import { PaymentType } from '../legFields/PaymentType';
-import { Payment } from '../legFields/Payment';
-import { HighBarrier } from '../legFields/HighBarrier';
-import { LowBarrier } from '../legFields/LowBarrier';
-import { ObservationDates } from '../legFields/ObservationDates';
-import { ObservationStep } from '../legFields/ObservationStep';
-import { Unit } from '../legFields/Unit';
 import { legPipeLine } from '../_utils';
-import { TradeNumber } from '../legFields/TradeNumber';
 
 export const RangeAccruals: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.RANGE_ACCRUALS],
@@ -100,8 +81,8 @@ export const RangeAccruals: ILeg = legPipeLine({
         NotionalAmountType,
         EffectiveDate,
         ExpirationDate,
-        PaymentType,
-        Payment,
+        EarningsType,
+        Earnings,
         BarrierType,
         HighBarrier,
         LowBarrier,
@@ -128,12 +109,12 @@ export const RangeAccruals: ILeg = legPipeLine({
         NotionalAmountType,
         EffectiveDate,
         ExpirationDate,
-        PaymentType,
+        EarningsType,
         PremiumType,
         Premium,
         FrontPremium,
         MinimumPremium,
-        Payment,
+        Earnings,
         BarrierType,
         HighBarrier,
         LowBarrier,
@@ -160,12 +141,12 @@ export const RangeAccruals: ILeg = legPipeLine({
         NotionalAmountType,
         EffectiveDate,
         ExpirationDate,
-        PaymentType,
+        EarningsType,
         PremiumType,
         Premium,
         FrontPremium,
         MinimumPremium,
-        Payment,
+        Earnings,
         BarrierType,
         HighBarrier,
         LowBarrier,
@@ -178,13 +159,14 @@ export const RangeAccruals: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [IsAnnual.dataIndex]: true,
       // expirationTime: '15:00:00',
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
@@ -247,6 +229,10 @@ export const RangeAccruals: ILeg = legPipeLine({
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset[LEG_FIELD.PAYMENT] = nextPosition.asset[LEG_FIELD.EARNINGS];
+    nextPosition.asset[LEG_FIELD.PAYMENT_TYPE] = nextPosition.asset[LEG_FIELD.EARNINGS_TYPE];
+    delete nextPosition.asset[LEG_FIELD.EARNINGS];
+    delete nextPosition.asset[LEG_FIELD.EARNINGS_TYPE];
 
     return nextPosition;
   },
@@ -254,7 +240,15 @@ export const RangeAccruals: ILeg = legPipeLine({
     if (!position.asset.fixingObservations) return {};
     const days = Object.keys(position.asset.fixingObservations);
     if (!days.length) return {};
+
+    const earnings = position.asset[LEG_FIELD.PAYMENT];
+    const earningsType = position.asset[LEG_FIELD.PAYMENT_TYPE];
+    delete position.asset[LEG_FIELD.PAYMENT];
+    delete position.asset[LEG_FIELD.PAYMENT_TYPE];
+
     return Form2.createFields({
+      [LEG_FIELD.EARNINGS]: earnings,
+      [LEG_FIELD.EARNINGS_TYPE]: earningsType,
       [LEG_FIELD.OBSERVATION_DATES]: days.map(day => {
         return {
           [OB_DAY_FIELD]: day,

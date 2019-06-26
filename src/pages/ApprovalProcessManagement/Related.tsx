@@ -8,7 +8,7 @@ import { Switch } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
-import { RELATED_COL_DEFS } from './constants';
+import { RELATED_COL_DEFS } from './tools';
 
 class Related extends PureComponent {
   public state = {

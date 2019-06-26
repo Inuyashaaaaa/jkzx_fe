@@ -30,7 +30,7 @@ import {
   Alert,
 } from 'antd';
 import React, { PureComponent } from 'react';
-import { generateColumns } from '../constants';
+import { generateColumns } from '../tools';
 import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/tools/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';

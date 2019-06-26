@@ -10,7 +10,7 @@ import { Divider, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
-import { PROCESSED_COLUMN } from './constants';
+import { PROCESSED_COLUMN } from './tools';
 
 class Processed extends PureComponent {
   public state = {

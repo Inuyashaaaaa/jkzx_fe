@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {
   BIG_NUMBER_CONFIG,
   LEG_FIELD,
@@ -28,12 +30,12 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
     const curLegHasUnitField = !!getLegByRecord(record)
-      .getColumns(env)
+      .getColumns(env, record)
       .find(col => col.dataIndex === LEG_FIELD.UNIT);
 
     setColLoading(LEG_FIELD.UNDERLYER_MULTIPLIER, true);
@@ -68,7 +70,7 @@ const fetchUnderlyerMultiplierAndUnit = _.debounce(
         }
       });
   },
-  50
+  50,
 );
 
 const fetchInitialSpot = _.debounce(
@@ -80,7 +82,7 @@ const fetchInitialSpot = _.debounce(
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     const instrumentId = _.get(record, [LEG_FIELD.UNDERLYER_INSTRUMENT_ID, 'value']);
 
@@ -95,7 +97,7 @@ const fetchInitialSpot = _.debounce(
             .get('data.page[0]')
             .omitBy(_.isNull)
             .get('last', 1)
-            .value()
+            .value(),
         )
           .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
           .toNumber();
@@ -112,7 +114,7 @@ const fetchInitialSpot = _.debounce(
         setColLoading(LEG_FIELD.INITIAL_SPOT, false);
       });
   },
-  50
+  50,
 );
 
 const computedTradeNumber = (
@@ -123,22 +125,35 @@ const computedTradeNumber = (
   setColLoading: (colId: string, loading: boolean) => void,
   setLoading: (rowId: string, colId: string, loading: boolean) => void,
   setColValue: (colId: string, newVal: IFormField) => void,
-  setTableData: (newData: ITableData[]) => void
+  setTableData: (newData: ITableData[]) => void,
 ) => {
   const notionalAmountType = Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE]);
-  const notionalAmount = Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT]);
   const multipler = Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]);
   const initialSpotVal = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
+  const annualCoefficient =
+    Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]) &&
+    new BigNumber(Form2.getFieldValue(record[LEG_FIELD.TERM]))
+      .div(Form2.getFieldValue(record[LEG_FIELD.DAYS_IN_YEAR]))
+      .toNumber();
+  const notionalAmount = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL])
+    ? new BigNumber(Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT]))
+        .multipliedBy(annualCoefficient)
+        .toNumber()
+    : Form2.getFieldValue(record[LEG_FIELD.NOTIONAL_AMOUNT]);
+
   const notional =
     notionalAmountType === 'LOT'
       ? notionalAmount
-      : new BigNumber(notionalAmount).div(initialSpotVal).toNumber();
+      : new BigNumber(notionalAmount)
+          .div(initialSpotVal)
+          .div(multipler)
+          .toNumber();
 
   record[LEG_FIELD.TRADE_NUMBER] = Form2.createField(
     new BigNumber(notional)
       .multipliedBy(multipler)
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-      .toNumber()
+      .toNumber(),
   );
 };
 
@@ -150,7 +165,7 @@ export const inline = (
   setColLoading: (colId: string, loading: boolean) => void,
   setLoading: (rowId: string, colId: string, loading: boolean) => void,
   setColValue: (colId: string, newVal: IFormField) => void,
-  setTableData: (newData: ITableData[]) => void
+  setTableData: (newData: ITableData[]) => void,
 ) => {
   const { changedFields } = changeFieldsParams;
 
@@ -162,10 +177,32 @@ export const inline = (
     const effectiveDate = Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE]);
     if (term !== undefined && effectiveDate !== undefined) {
       record[LEG_FIELD.EXPIRATION_DATE] = Form2.createField(
-        getMoment(effectiveDate, true).add(term, 'days')
+        getMoment(effectiveDate, true).add(term, 'days'),
       );
       record[LEG_FIELD.SETTLEMENT_DATE] = Form2.createField(
-        getMoment(effectiveDate, true).add(term, 'days')
+        getMoment(effectiveDate, true).add(term, 'days'),
+      );
+    }
+  }
+
+  if (
+    Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
+    Form2.fieldValueIsChange(LEG_FIELD.DAYS_IN_YEAR, changedFields)
+  ) {
+    if (
+      record[LEG_FIELD.INITIAL_SPOT] &&
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] &&
+      record[LEG_FIELD.NOTIONAL_AMOUNT]
+    ) {
+      computedTradeNumber(
+        env,
+        changeFieldsParams,
+        record,
+        tableData,
+        setColLoading,
+        setLoading,
+        setColValue,
+        setTableData,
       );
     }
   }
@@ -194,7 +231,7 @@ export const inline = (
         setColLoading,
         setLoading,
         setColValue,
-        setTableData
+        setTableData,
       );
     }
   }
@@ -209,15 +246,31 @@ export const inline = (
       new BigNumber(miniumPermium)
         .plus(permium)
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber()
+        .toNumber(),
     );
   }
 
   if (Form2.fieldValueIsChange(LEG_FIELD.IS_ANNUAL, changedFields)) {
     const isAnnual = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]);
     record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] = Form2.createField(
-      isAnnual ? NOTIONAL_AMOUNT_TYPE_MAP.CNY : NOTIONAL_AMOUNT_TYPE_MAP.LOT
+      isAnnual ? NOTIONAL_AMOUNT_TYPE_MAP.CNY : NOTIONAL_AMOUNT_TYPE_MAP.LOT,
     );
+    if (
+      record[LEG_FIELD.INITIAL_SPOT] &&
+      record[LEG_FIELD.UNDERLYER_MULTIPLIER] &&
+      record[LEG_FIELD.NOTIONAL_AMOUNT]
+    ) {
+      computedTradeNumber(
+        env,
+        changeFieldsParams,
+        record,
+        tableData,
+        setColLoading,
+        setLoading,
+        setColValue,
+        setTableData,
+      );
+    }
   }
 
   if (env === LEG_ENV.PRICING) {
@@ -226,8 +279,8 @@ export const inline = (
         record[LEG_FIELD.TERM] = Form2.createField(
           getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).diff(
             getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])),
-            'days'
-          )
+            'days',
+          ),
         );
       }
     }
@@ -246,15 +299,13 @@ export const inline = (
       if (record[LEG_TYPE_FIELD].includes('SPREAD_EUROPEAN')) {
         const initialSpot = _.reduce(
           _.get(record, [LEG_FIELD.INITIAL_SPOT, 'value']),
-          (total, value, index) => {
-            return {
-              ...total,
-              [TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE + (index + 1)]: value[
-                LEG_FIELD.INITIAL_SPOT
-              ],
-            };
-          },
-          {}
+          (total, value, index) => ({
+            ...total,
+            [TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE + (index + 1)]: value[
+              LEG_FIELD.INITIAL_SPOT
+            ],
+          }),
+          {},
         );
         const value = _.get(record, [LEG_FIELD.INITIAL_SPOT, 'value']);
         record[TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE] = Form2.createField(initialSpot);
@@ -286,7 +337,7 @@ export const inline = (
         setColLoading,
         setLoading,
         setColValue,
-        setTableData
+        setTableData,
       );
     }
   }
@@ -324,7 +375,7 @@ export const commonLinkage = (
   setColLoading: (colId: string, loading: boolean) => void,
   setLoading: (rowId: string, colId: string, loading: boolean) => void,
   setColValue: (colId: string, newVal: IFormField) => void,
-  setTableData: (newData: ITableData[]) => void
+  setTableData: (newData: ITableData[]) => void,
 ) => {
   const { changedFields } = changeFieldsParams;
 
@@ -337,7 +388,7 @@ export const commonLinkage = (
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   }
 
@@ -350,7 +401,7 @@ export const commonLinkage = (
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   }
 
@@ -370,49 +421,45 @@ export const commonLinkage = (
     setColLoading,
     setLoading,
     setColValue,
-    setTableData
+    setTableData,
   );
 };
 
-export const commonGetPosition = (leg: ILeg) => {
-  return leg;
-};
+export const commonGetPosition = (leg: ILeg) => leg;
 
-export const commonGetDefaultData = (leg: ILeg) => {
-  return {
-    ...leg,
-    onDataChange: (
-      env,
-      changeFieldsParams,
-      record,
-      tableData,
-      setColLoading,
-      setLoading,
-      setColValue,
-      setTableData
-    ) => {
-      if (leg.onDataChange) {
-        const result = leg.onDataChange(
-          env,
-          changeFieldsParams,
-          record,
-          tableData,
-          setColLoading,
-          setLoading,
-          setColValue,
-          setTableData
-        );
-        const { changedFields } = changeFieldsParams;
-        if (
-          Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields) ||
-          Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
-          Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)
-        ) {
-          validateExpirationDate(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]));
-        }
-        return result;
+export const commonGetDefaultData = (leg: ILeg) => ({
+  ...leg,
+  onDataChange: (
+    env,
+    changeFieldsParams,
+    record,
+    tableData,
+    setColLoading,
+    setLoading,
+    setColValue,
+    setTableData,
+  ) => {
+    if (leg.onDataChange) {
+      const result = leg.onDataChange(
+        env,
+        changeFieldsParams,
+        record,
+        tableData,
+        setColLoading,
+        setLoading,
+        setColValue,
+        setTableData,
+      );
+      const { changedFields } = changeFieldsParams;
+      if (
+        Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields) ||
+        Form2.fieldValueIsChange(LEG_FIELD.TERM, changedFields) ||
+        Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)
+      ) {
+        validateExpirationDate(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE]));
       }
-      return undefined;
-    },
-  };
-};
+      return result;
+    }
+    return undefined;
+  },
+});

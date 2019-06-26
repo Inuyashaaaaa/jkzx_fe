@@ -3,7 +3,7 @@ import {
   wkApproveGroupDelete,
   wkApproveGroupModify,
 } from '@/services/auditing';
-import { Button, Icon, Input, Modal, notification, Popconfirm } from 'antd';
+import { Button, Icon, Input, Modal, notification, Popconfirm, List } from 'antd';
 import React, { PureComponent } from 'react';
 import styles from './AuditGourpLists.less';
 import _ from 'lodash';
@@ -211,46 +211,58 @@ class AuditLists extends PureComponent {
 
   public render() {
     return (
-      <div style={{ height: '100%', position: 'relative' }}>
+      <div style={{ height: '100%', position: 'relative' }} className={styles.lists}>
         {this.state.approveGroupList && this.state.approveGroupList.length ? (
-          <ul style={{ padding: '0 15px 15px 15px' }}>
-            {this.state.approveGroupList.map((item, index) => {
-              return (
-                <li key={index} className={styles.listItem}>
-                  <a
+          <>
+            <List
+              pagination={{
+                pageSize: 10,
+                simple: true,
+              }}
+              dataSource={this.state.approveGroupList}
+              renderItem={(item, index) => {
+                return (
+                  <List.Item
+                    key={item.approveGroupId}
                     className={
                       item.approveGroupId === this.state.indexGroupId
-                        ? styles.background
-                        : styles.value
+                        ? styles.listItem1
+                        : styles.listItem2
                     }
-                    onClick={() => this.handleMenber(item)}
                   >
-                    {item.approveGroupName}
-                  </a>
-                  <span className={styles.icon}>
-                    <Icon type="edit" onClick={() => this.showModal(item)} />
-                    <Popconfirm
-                      title="确认删除此审批组"
-                      onConfirm={this.confirm(item)}
-                      okText="确认"
-                      cancelText="取消"
-                    >
-                      <Icon type="minus-circle" />
-                    </Popconfirm>
-                  </span>
-                </li>
-              );
-            })}
-            <li className={styles.listItem}>
-              <Button
-                type="dashed"
-                style={{ width: '100%', border: '1px dashed #ccc' }}
-                onClick={this.showModal}
-              >
-                新建审批组
-              </Button>
-            </li>
-          </ul>
+                    <List.Item.Meta
+                      title={
+                        <>
+                          <a className={styles.name} onClick={() => this.handleMenber(item)}>
+                            {item.approveGroupName}
+                          </a>
+                          <span className={styles.icon}>
+                            <Icon type="edit" onClick={() => this.showModal(item)} />
+                            <Popconfirm
+                              title="确认删除此审批组"
+                              onConfirm={this.confirm(item)}
+                              okText="确认"
+                              cancelText="取消"
+                            >
+                              <Icon type="minus-circle" />
+                            </Popconfirm>
+                          </span>
+                        </>
+                      }
+                    />
+                  </List.Item>
+                );
+              }}
+            />
+            <Button
+              type="dashed"
+              style={{ width: '100%', margin: '20px 0' }}
+              onClick={this.showModal}
+              size="large"
+            >
+              新建审批组
+            </Button>
+          </>
         ) : (
           <Button className={styles.center} type="primary" onClick={this.showModal}>
             新建审批组

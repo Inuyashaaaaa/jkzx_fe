@@ -1,6 +1,6 @@
 stages:
   - install
-  - test
+  # - test
   - build
   - deploy
 
@@ -9,6 +9,8 @@ cache:
   paths:
     - node_modules/
     - dist/
+    - docs/
+    - cdocs/
 
 before_script:
   - source ~/.bashrc
@@ -30,26 +32,29 @@ Install:
     - /release.*/
     - /hotfix.*/
     - /doc.*/
+    - /demo.*/
 
-Lint:
-  stage: test
-  script:
-    - echo 'yarn run lint'
-  only:
-    - /master.*/
-    - /develop.*/
-    - /release.*/
-    - /hotfix.*/
+# Lint:
+#   stage: test
+#   script:
+#     - echo 'yarn run lint'
+#   only:
+#     - /master.*/
+#     - /develop.*/
+#     - /release.*/
+#     - /hotfix.*/
+#     - /demo.*/
 
-Test:
-  stage: test
-  script:
-    - echo 'yarn run test'
-  only:
-    - /master.*/
-    - /develop.*/
-    - /release.*/
-    - /hotfix.*/
+# Test:
+#   stage: test
+#   script:
+#     - echo 'yarn run test'
+#   only:
+#     - /master.*/
+#     - /develop.*/
+#     - /release.*/
+#     - /hotfix.*/
+#     - /demo.*/
 
 Build:
   stage: build
@@ -60,6 +65,21 @@ Build:
     - /develop.*/
     - /release.*/
     - /hotfix.*/
+    - /demo.*/
+
+# Build-Doc:
+#   stage: build
+#   script:
+#     - yarn run doc:build
+#   only:
+#     - /develop.*/
+
+# Build-CDoc:
+#   stage: build
+#   script:
+#     - yarn run cdoc:build
+#   only:
+#     - /develop.*/
 
 Deploy-Release:
   stage: deploy
@@ -86,14 +106,26 @@ Deploy-Prod:
   stage: deploy
   script:
     - yarn run deploy:prod
-  when: manual
   only:
     - /master.*/
 
-Deploy-Doc:
+Deploy-Demo:
   stage: deploy
   script:
-    - yarn run deploy:doc
+    - yarn run deploy:demo
   only:
-    - /master.*/
-    - /develop.*/
+    - /demo.*/
+
+# Deploy-Doc:
+#   stage: deploy
+#   script:
+#     - yarn run deploy:doc
+#   only:
+#     - /develop.*/
+
+# Deploy-CDoc:
+#   stage: deploy
+#   script:
+#     - yarn run deploy:cdoc
+#   only:
+#     - /develop.*/

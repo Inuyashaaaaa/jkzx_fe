@@ -31,39 +31,39 @@ import {
   PREMIUM_TYPE_MAP,
   SPECIFIED_PRICE_MAP,
 } from '../../constants/common';
-import { Direction } from '../legFields';
-import { AutoCallStrike } from '../legFields/AutoCallStrike';
-import { AutoCallStrikeUnit } from '../legFields/AutoCallStrikeUnit';
-import { CouponEarnings } from '../legFields/CouponEarnings';
-import { DaysInYear } from '../legFields/DaysInYear';
-import { EffectiveDate } from '../legFields/EffectiveDate';
-import { ExpirationDate } from '../legFields/ExpirationDate';
-import { ExpireNoBarrierObserveDay } from '../legFields/ExpireNoBarrierObserveDay';
-import { ExpireNoBarrierPremium } from '../legFields/ExpireNoBarrierPremium';
-import { ExpireNoBarrierPremiumType } from '../legFields/ExpireNoBarrierPremiumType';
-import { FrontPremium } from '../legFields/FrontPremium';
-import { InitialSpot } from '../legFields/InitialSpot';
-import { KnockDirection } from '../legFields/KnockDirection';
-import { MinimumPremium } from '../legFields/MinimumPremium';
-import { NotionalAmount } from '../legFields/NotionalAmount';
-import { NotionalAmountType } from '../legFields/NotionalAmountType';
-import { ParticipationRate } from '../legFields/ParticipationRate';
-import { Premium } from '../legFields/Premium';
-import { PremiumType } from '../legFields/PremiumType';
-import { SettlementDate } from '../legFields/SettlementDate';
-import { SpecifiedPrice } from '../legFields/SpecifiedPrice';
-import { Step } from '../legFields/Step';
-import { Term } from '../legFields/Term';
-import { UnderlyerInstrumentId } from '../legFields/UnderlyerInstrumentId';
-import { UnderlyerMultiplier } from '../legFields/UnderlyerMultiplier';
-import { UpBarrier } from '../legFields/UpBarrier';
-import { UpBarrierType } from '../legFields/UpBarrierType';
-import { UpObservationStep } from '../legFields/UpObservationStep';
+import { Direction } from '../../containers/legFields';
+import { AutoCallStrike } from '../../containers/legFields/AutoCallStrike';
+import { AutoCallStrikeUnit } from '../../containers/legFields/AutoCallStrikeUnit';
+import { CouponEarnings } from '../../containers/legFields/CouponEarnings';
+import { DaysInYear } from '../../containers/legFields/DaysInYear';
+import { EffectiveDate } from '../../containers/legFields/EffectiveDate';
+import { ExpirationDate } from '../../containers/legFields/ExpirationDate';
+import { ExpireNoBarrierObserveDay } from '../../containers/legFields/ExpireNoBarrierObserveDay';
+import { ExpireNoBarrierPremium } from '../../containers/legFields/ExpireNoBarrierPremium';
+import { ExpireNoBarrierPremiumType } from '../../containers/legFields/ExpireNoBarrierPremiumType';
+import { FrontPremium } from '../../containers/legFields/FrontPremium';
+import { InitialSpot } from '../../containers/legFields/InitialSpot';
+import { KnockDirection } from '../../containers/legFields/KnockDirection';
+import { MinimumPremium } from '../../containers/legFields/MinimumPremium';
+import { NotionalAmount } from '../../containers/legFields/NotionalAmount';
+import { NotionalAmountType } from '../../containers/legFields/NotionalAmountType';
+import { ParticipationRate } from '../../containers/legFields/ParticipationRate';
+import { Premium } from '../../containers/legFields/Premium';
+import { PremiumType } from '../../containers/legFields/PremiumType';
+import { SettlementDate } from '../../containers/legFields/SettlementDate';
+import { SpecifiedPrice } from '../../containers/legFields/SpecifiedPrice';
+import { Step } from '../../containers/legFields/Step';
+import { Term } from '../../containers/legFields/Term';
+import { UnderlyerInstrumentId } from '../../containers/legFields/UnderlyerInstrumentId';
+import { UnderlyerMultiplier } from '../../containers/legFields/UnderlyerMultiplier';
+import { UpBarrier } from '../../containers/legFields/UpBarrier';
+import { UpBarrierType } from '../../containers/legFields/UpBarrierType';
+import { UpObservationStep } from '../../containers/legFields/UpObservationStep';
 import { commonLinkage } from '../common';
-import { getMoment } from '@/tools';
-import { Unit } from '../legFields/Unit';
+import { getMoment, getCurDateMoment } from '@/tools';
+import { Unit } from '../../containers/legFields/Unit';
 import { legPipeLine } from '../_utils';
-import { TradeNumber } from '../legFields/TradeNumber';
+import { TradeNumber } from '../../containers/legFields/TradeNumber';
 
 export const AutoCallSnow: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.AUTOCALL],
@@ -170,10 +170,11 @@ export const AutoCallSnow: ILeg = legPipeLine({
     throw new Error('getColumns get unknow leg env!');
   },
   getDefaultData: env => {
+    const curDateMoment = getCurDateMoment();
     return Form2.createFields({
       // expirationTime: '15:00:00',
       [LEG_FIELD.IS_ANNUAL]: true,
-      [LEG_FIELD.EFFECTIVE_DATE]: moment(),
+      [LEG_FIELD.EFFECTIVE_DATE]: curDateMoment.clone(),
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
@@ -182,8 +183,8 @@ export const AutoCallSnow: ILeg = legPipeLine({
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.UP_BARRIER_TYPE]: UP_BARRIER_TYPE_MAP.PERCENT,
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED,
-      [LEG_FIELD.EXPIRATION_DATE]: moment().add(DEFAULT_TERM, 'days'),
-      [LEG_FIELD.SETTLEMENT_DATE]: moment().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
+      [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
       [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],
       [LEG_FIELD.STEP]: 0,

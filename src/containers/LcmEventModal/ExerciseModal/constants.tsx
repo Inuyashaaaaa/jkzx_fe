@@ -13,6 +13,17 @@ export const EXERCISE_FORM_CONTROLS: (
   handleSettleAmount,
   productType
 ) => IFormControl[] = (notionalType, handleSettleAmount, productType) => {
+  const noExerciseArray = [
+    'STRADDLE',
+    'EAGLE',
+    'CONCAVA',
+    'CONVEX',
+    'TRIPLE_DIGITAL',
+    'DOUBLE_TOUCH',
+    'DOUBLE_NO_TOUCH',
+    'DOUBLE_DIGITAL',
+    'DOUBLE_SHARK_FIN',
+  ];
   if (productType.includes('SPREAD_EUROPEAN')) {
     return [
       // {
@@ -152,11 +163,15 @@ export const EXERCISE_FORM_CONTROLS: (
       },
       input: {
         ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-        after: (
-          <Button key="upload" type="primary" onClick={handleSettleAmount}>
-            结算
-          </Button>
-        ),
+        ...(noExerciseArray.includes(productType)
+          ? {}
+          : {
+              after: (
+                <Button key="upload" type="primary" onClick={handleSettleAmount}>
+                  结算
+                </Button>
+              ),
+            }),
       },
       decorator: {
         rules: [

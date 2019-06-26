@@ -219,6 +219,7 @@ export const PROCESS_STATUS_TYPE_OPTIONS = convertOptions(
 );
 
 export const LCM_EVENT_TYPE_MAP = {
+  PAYMENT: 'PAYMENT',
   OPEN: 'OPEN',
   UNWIND: 'UNWIND',
   EXPIRATION: 'EXPIRATION',
@@ -235,6 +236,7 @@ export const LCM_EVENT_TYPE_MAP = {
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
+  PAYMENT: '支付',
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
   OPEN: '开仓',
@@ -394,14 +396,14 @@ export const OPTION_TYPE_OPTIONS = Object.keys(OPTION_TYPE_MAP).map(key => ({
 
 export const OBSERVATION_TYPE_ZHCN_MAP = {
   TERMINAL: '到期观察',
-  // DISCRETE: '离散观察',
+  DISCRETE: '离散观察',
   DAILY: '每日观察',
   CONTINUOUS: '连续观察',
 };
 
 export const OBSERVATION_TYPE_MAP = {
   TERMINAL: 'TERMINAL',
-  // DISCRETE: 'DISCRETE',
+  DISCRETE: 'DISCRETE',
   CONTINUOUS: 'CONTINUOUS',
   DAILY: 'DAILY',
 };
@@ -499,13 +501,16 @@ export const LEG_FIELD = {
   ...TRADE_GENERAL_FIELD_MAP,
   ...COMPUTED_LEG_FIELD_MAP,
   ...TRADESCOLDEFS_LEG_FIELD_MAP,
+  BARRIER_SHIFT: 'barrierShift',
+  EARNINGS: 'EARNINGS',
+  EARNINGS_TYPE: 'EARNINGS_TYPE',
   POSITION_ID: 'POSITION_ID',
   LEG_META: 'LEG_META',
   WEIGHT: 'weight',
   IS_ANNUAL: 'annualized', // 是否年化
   IN_EXPIRE_NO_BARRIEROBSERVE_DAY: 'knockInObservationDates', // 敲入观察日
   DOWN_BARRIER_DATE: 'knockInDate', // 敲入日期
-  ALREADY_BARRIER: 'AlreadyBarrier', // 已经敲入
+  ALREADY_BARRIER: 'knockedIn', // 已经敲入
   COUPON_BARRIER: 'couponBarrier', // coupon障碍
   OBSERVATION_DATES: 'OBSERVATION_DATES', // 观察日
   OBSERVATION_STEP: 'observationStep', // 观察频率
@@ -980,4 +985,10 @@ export const DOC_MAP = {
   SUPPLEMENTARY_AGREEMENT: '交易确认书',
   VALUATION_REPORT: '估值报告',
   MARGIN_CALL: '追保函',
+};
+
+export const UNIT_MAP = {
+  ZN: '¥',
+  US: '$',
+  PERCENT: '%',
 };

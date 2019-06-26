@@ -7,79 +7,246 @@ import {
   wkProcessTriggerList,
   wkProcessTriggerBind,
   wkProcessTriggerUnbind,
+  wkIndexList,
+  wkProcessTriggerBusinessCreate,
+  wkProcessTriggerBusinessModify,
+  authCan,
 } from '@/services/approvalProcessConfiguration';
 import uuidv4 from 'uuid/v4';
-import { TRIGGERTYPE, OPERATION_MAP } from '../constants';
+import { TRIGGERTYPE, OPERATION_MAP, operation, SYMBOL_MAP } from '../constants';
+import GroupList from './GroupList';
 import PopconfirmCard from '../../ApprocalTriggerManagement/PopconfirmCard';
 
 const TriggerCard = memo<any>(props => {
-  const { processName, fetchData, triggers } = props;
-  let $form = useRef<Form2>(null);
+  const { processName, fetchData, trigger } = props;
+  const isCreate = !trigger;
 
-  const [targetVisible, setTargetVisible] = useState(false);
-  const [targetData, setTargetData] = useState({});
-  const [columns, setColumns] = useState([
+  const $formModel = useRef<Form2>(null);
+  const $form = useRef<Form2>(null);
+
+  const columns1 = [
     {
-      title: '触发方式',
-      dataIndex: 'byTrigger',
+      title: '当前流程',
+      dataIndex: 'processName',
       render: (value, record, index, { form, editing }) => {
         return (
           <FormItem>
-            {form.getFieldDecorator({
-              rules: [{ required: true, message: '触发方式为必填项' }],
-            })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
+            {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
           </FormItem>
         );
       },
     },
-  ]);
-
-  const showTargetModel = () => {
-    setTargetData({});
-    setColumns([
-      {
-        title: '触发方式',
-        dataIndex: 'byTrigger',
-        render: (value, record, index, { form, editing }) => {
-          return (
-            <FormItem>
-              {form.getFieldDecorator({
-                rules: [{ required: true, message: '触发方式为必填项' }],
-              })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-            </FormItem>
-          );
-        },
+    {
+      title: '组合方式',
+      dataIndex: 'operation',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({
+              rules: [{ required: true, message: '组合方式为必填项' }],
+            })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
+          </FormItem>
+        );
       },
-    ]);
+    },
+  ];
+
+  const columns2 = [
+    {
+      title: '当前流程',
+      dataIndex: 'processName',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
+          </FormItem>
+        );
+      },
+    },
+    {
+      title: '组合方式',
+      dataIndex: 'operation',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({
+              rules: [{ required: true, message: '组合方式为必填项' }],
+            })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
+          </FormItem>
+        );
+      },
+    },
+    {
+      title: '条件列表',
+      dataIndex: 'conditions',
+      render: (value, record, index, { form, editing }) => {
+        return (
+          <FormItem>
+            {form.getFieldDecorator({
+              rules: [{ required: true, message: '条件列表为必填项' }],
+            })(
+              <GroupList
+                getCurrent={node => ($formModel.current = node)}
+                {...{ record, index, form, editing }}
+              />
+            )}
+          </FormItem>
+        );
+      },
+    },
+  ];
+
+  const [targetVisible, setTargetVisible] = useState(false);
+  const [targetData, setTargetData] = useState({
+    ...Form2.createFields({ processName }),
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleData = () => {
+    if (!trigger) {
+      setColumns(columns1);
+      return setTargetData({
+        ...Form2.createFields({ operation: 'all', processName }),
+      });
+    }
+    setColumns(columns2);
+    let conditions = _.cloneDeep(trigger.conditions);
+    conditions = conditions.map(item => {
+      item.leftIndex = _.get(item, 'leftIndex.indexClass');
+      item.rightIndex = _.get(item, 'rightIndex.indexClass');
+      const number = _.get(item, 'rightValue.number');
+      item.rightValue = number && _.isNumber(number) ? _.get(item, 'rightValue.number') : '';
+      return {
+        ...Form2.createFields(item),
+        conditionId: item.conditionId,
+      };
+    });
+    setTargetData({
+      ...Form2.createFields({
+        operation: trigger.operation,
+        conditions,
+        processName,
+      }),
+    });
+  };
+
+  useEffect(
+    () => {
+      handleData();
+    },
+    [trigger]
+  );
+
+  const [columns, setColumns] = useState(columns1);
+
+  const findName = (data, filed, item) => {
+    const Index = _.findIndex(data, p => {
+      return p[filed] === item;
+    });
+    if (Index >= 0) {
+      return data[Index].indexName;
+    }
+    return item;
+  };
+
+  const showTargetModel = async () => {
+    // 是否有修改触发器权限
+    const { error, data } = await authCan({
+      resourceType: 'PROCESS_DEFINITION_INFO',
+      resourceName: ['交易录入'],
+      resourcePermissionType: 'BIND_PROCESS_TRIGGER',
+    });
+    if (error) return;
+    if (!data[0]) {
+      return notification.info({
+        message: '没有修改流程触发的权限',
+      });
+    }
+    handleData();
     setTargetVisible(true);
   };
 
   const handleTargetOk = async () => {
-    const res = await $form.validate();
+    const res = await $form.current.validate();
     if (res.error) return;
 
     const formData = Form2.getFieldsValue(targetData);
-    if (formData.byTrigger === true) {
-      const { data, error } = await wkProcessTriggerBind({
+    if (formData.operation === 'all') {
+      setColumns(columns1);
+      // 解除触发器绑定
+      setLoading(true);
+      const { error } = await wkProcessTriggerUnbind({
         processName,
-        triggerId: formData.triggerName,
       });
+      setLoading(false);
       if (error) return;
-      fetchData();
+      setTargetVisible(false);
       notification.success({
-        message: `${processName}流程触发器修改成功`,
+        message: `${processName}流程触发修改成功`,
       });
-      return setTargetVisible(false);
+      return fetchData();
     }
-    const { error } = await wkProcessTriggerUnbind({
-      processName,
+    // 修改触发器||创建绑定触发器
+    let conditionsData = [...formData.conditions];
+    const cerror = await $formModel.current.validate();
+    const errLen = cerror.filter(item => item && item.error).length;
+    if (errLen > 0) return;
+    conditionsData = conditionsData
+      .filter(item => !!item)
+      .map(item => {
+        return Form2.getFieldsValue(item);
+      });
+
+    if (conditionsData.length <= 0) {
+      return message.info('至少添加一个条件');
+    }
+
+    conditionsData = conditionsData.map(item => {
+      item.rightValue = item.rightValue ? { number: item.rightValue } : {};
+      return item;
     });
-    if (error) return;
-    fetchData();
-    notification.success({
-      message: `${processName}流程触发器修改成功`,
+    const { data: _data, error: _error } = await wkIndexList({});
+    const strArr = conditionsData.map(item => {
+      return `${findName(_data, 'indexClass', item.leftIndex)}${SYMBOL_MAP[item.symbol]}${
+        item.rightIndex === 'returnNumberIndexImpl'
+          ? _.get(item, 'rightValue.number')
+          : findName(_data, 'indexClass', item.rightIndex)
+      }`;
     });
+    if (isCreate) {
+      const triggerName = processName;
+      setLoading(true);
+      const { error, data } = await wkProcessTriggerBusinessCreate({
+        triggerName,
+        operation: formData.operation,
+        description: strArr.join(','),
+        conditions: conditionsData,
+        processName,
+      });
+      setLoading(false);
+      if (error) return;
+      setTargetVisible(false);
+      notification.success({
+        message: `${processName}流程触发修改成功`,
+      });
+      return fetchData();
+    }
+    setLoading(true);
+    const { error: merror, data } = await wkProcessTriggerBusinessModify({
+      triggerId: trigger.triggerId,
+      triggerName: trigger.triggerName,
+      operation: formData.operation,
+      description: strArr.join(','),
+      conditions: conditionsData,
+    });
+    setLoading(false);
+
+    if (merror) return;
     setTargetVisible(false);
+    notification.success({
+      message: `${processName}流程触发修改成功`,
+    });
+    fetchData();
   };
 
   const handleTargetCancel = () => {
@@ -88,101 +255,14 @@ const TriggerCard = memo<any>(props => {
 
   const onFormChange = async (props, changedFields, allFields, rowIndex) => {
     const changedData = Form2.getFieldsValue(changedFields);
-    if (changedData.byTrigger === true) {
-      setColumns([
-        {
-          title: '触发方式',
-          dataIndex: 'byTrigger',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true, message: '触发方式为必填项' }],
-                })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-              </FormItem>
-            );
-          },
-        },
-        {
-          title: '选择触发器',
-          dataIndex: 'triggerName',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true, message: '选择触发器为必填项' }],
-                })(
-                  <Select
-                    style={{ width: 250 }}
-                    options={async () => {
-                      const { error, data } = await wkProcessTriggerList({});
-                      if (error) return [];
-                      return data.map(item => {
-                        return {
-                          label: item.triggerName,
-                          value: item.triggerId,
-                        };
-                      });
-                    }}
-                  />
-                )}
-              </FormItem>
-            );
-          },
-        },
-        {
-          title: '组合方式',
-          dataIndex: 'operation',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true, message: '组合方式为必填项' }],
-                })(<Input style={{ width: 250 }} editing={false} />)}
-              </FormItem>
-            );
-          },
-        },
-        {
-          title: '条件列表',
-          dataIndex: 'description',
-          render: (value, record, index, { form, editing }) => {
-            value = (value || '').split(',') || [];
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true, message: '条件列表为必填项' }],
-                })(
-                  // <Input style={{ width: 250 }} editing={false}/>
-                  <>
-                    {value.map(item => (
-                      <Input key={item} value={item} style={{ width: 250 }} editing={false} />
-                    ))}
-                  </>
-                )}
-              </FormItem>
-            );
-          },
-        },
-      ]);
+    if (changedData.operation === 'all') {
+      setColumns(columns1);
+      return setTargetData({
+        ...targetData,
+        ...changedFields,
+      });
     }
-    if (changedData.byTrigger === false) {
-      setColumns([
-        {
-          title: '触发方式',
-          dataIndex: 'byTrigger',
-          render: (value, record, index, { form, editing }) => {
-            return (
-              <FormItem>
-                {form.getFieldDecorator({
-                  rules: [{ required: true, message: '触发方式为必填项' }],
-                })(<Select style={{ width: 250 }} options={TRIGGERTYPE} />)}
-              </FormItem>
-            );
-          },
-        },
-      ]);
-    }
+    setColumns(columns2);
     if (changedData.triggerName) {
       const { error, data } = await wkProcessTriggerList({});
       if (error) return;
@@ -203,7 +283,7 @@ const TriggerCard = memo<any>(props => {
       ...changedFields,
     });
   };
-
+  console.log(targetData);
   return (
     <>
       <Card
@@ -212,33 +292,41 @@ const TriggerCard = memo<any>(props => {
         bordered={false}
         extra={<a onClick={showTargetModel}>修改</a>}
       >
-        {(triggers || []).map(item => {
-          return (
-            <p key={item.triggerId}>
-              触发器：
-              <Tag style={{ margin: 5 }} key={item.approveGroupId}>
-                {item.triggerName}
+        {trigger ? (
+          <>
+            <p>
+              触发方式：
+              <Tag style={{ margin: 5 }} key={trigger.approveGroupId}>
+                {OPERATION_MAP[trigger.operation]}
               </Tag>
-              <PopconfirmCard data={item} key={item.triggerId} />
             </p>
-          );
-        })}
-        {!triggers || triggers.length <= 0 ? '全部触发' : null}
+            <p>
+              条件列表：
+              <Tag style={{ margin: 5 }} key={trigger.approveGroupId}>
+                {trigger.conditions.length}个条件
+              </Tag>
+              <PopconfirmCard data={trigger} key={trigger.triggerId} />
+            </p>
+          </>
+        ) : (
+          '触发方式：全部触发'
+        )}
       </Card>
       <Modal
         visible={targetVisible}
-        width={1200}
-        title="选择触发器"
+        width={1000}
+        title="配置流程触发"
         onOk={handleTargetOk}
         onCancel={handleTargetCancel}
+        confirmLoading={loading}
       >
         <Form2
-          ref={node => ($form = node)}
+          ref={node => ($form.current = node)}
           layout="horizontal"
           footer={false}
           dataSource={targetData}
-          wrapperCol={{ span: 16 }}
-          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 20 }}
+          labelCol={{ span: 4 }}
           onFieldsChange={onFormChange}
           columns={columns}
         />

@@ -1,5 +1,4 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
-import { IColumnDef } from '@/containers/Table/types';
 import { formatNumber, formatMoney } from '@/tools';
 import { multiply } from 'mathjs';
 
@@ -135,5 +134,10 @@ export const TABLE_COL_DEFS = [
       return formatNumber(value, 4);
     },
     align: 'right',
+  },
+  {
+    title: '定价环境',
+    dataIndex: 'pricingEnvironment',
+    width: 130,
   },
 ];

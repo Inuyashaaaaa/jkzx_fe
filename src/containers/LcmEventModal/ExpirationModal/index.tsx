@@ -1,3 +1,4 @@
+/*eslint-disable */
 import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
@@ -33,6 +34,7 @@ import {
   SETTLE_AMOUNT,
   UNDERLYER_PRICE,
 } from './constants';
+import { Form2 } from '@/containers';
 
 class ExpirationModal extends PureComponent<
   {
@@ -79,10 +81,12 @@ class ExpirationModal extends PureComponent<
   public computedFormData = () => {
     return {
       [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-      [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: _.chain(this.fixingTableData)
-        .last()
-        .get(OB_PRICE_FIELD)
-        .value(),
+      [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
+        _.chain(this.fixingTableData)
+          .last()
+          .get(OB_PRICE_FIELD)
+          .value(),
+      ),
       [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
       [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
       [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
@@ -103,7 +107,7 @@ class ExpirationModal extends PureComponent<
 
     return getObservertionFieldData(this.data).reduce(
       (total, next) => total + (next[OB_LIFE_PAYMENT] || 0),
-      0
+      0,
     );
   };
 
@@ -142,7 +146,7 @@ class ExpirationModal extends PureComponent<
     const matures = value[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM];
     const countDay = new BigNumber(
       moment(value[LEG_FIELD.EXPIRATION_DATE]).valueOf() -
-        moment(value[LEG_FIELD.EFFECTIVE_DATE]).valueOf()
+        moment(value[LEG_FIELD.EFFECTIVE_DATE]).valueOf(),
     )
       .div(86400000)
       .decimalPlaces(0)
@@ -237,9 +241,9 @@ class ExpirationModal extends PureComponent<
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: isAutocallPhoenix(this.data)
-        ? LCM_EVENT_TYPE_MAP.EXPIRATION
+        ? LCM_EVENT_TYPE_MAP.SETTLE
         : isAutocallSnow(this.data)
-        ? LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE
+        ? LCM_EVENT_TYPE_MAP.SETTLE
         : LCM_EVENT_TYPE_MAP.EXPIRATION,
       userLoginId: this.currentUser.username,
       eventDetail: this.getEventDetail(usedFormData),
@@ -286,7 +290,7 @@ class ExpirationModal extends PureComponent<
         underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
         notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
-      eventType: LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
+      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
     });
     if (error) return;
     this.setState({
@@ -314,7 +318,7 @@ class ExpirationModal extends PureComponent<
             underlyerPrice: String(dataSource[LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]),
           }
         : { underlyerPrice: null },
-      eventType: LCM_EVENT_TYPE_MAP.EXPIRATION,
+      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
     });
     if (error) return;
     this.setState({
@@ -456,7 +460,7 @@ class ExpirationModal extends PureComponent<
             controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
               this.state.notionalType,
               this.state.premiumType,
-              this.handleSettleAmount
+              this.handleSettleAmount,
             )}
           />
         </>

@@ -22,7 +22,7 @@ import { Form2, Select } from '@/containers';
 import BigNumber from 'bignumber.js';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import FormItem from 'antd/lib/form/FormItem';
-import TradeManagementPricingManagement from './TradeManagementPricingManagement';
+import HistoryPanel from './HistoryPanel';
 
 const ActionBar = memo<any>(props => {
   const {
@@ -34,6 +34,7 @@ const ActionBar = memo<any>(props => {
     fetchDefaultPricingEnvData,
     testPricing,
     pricingLoading,
+    tableEl,
   } = props;
 
   const onPricingEnvSelectChange = val => {
@@ -158,6 +159,17 @@ const ActionBar = memo<any>(props => {
             LEG_ENV.PRICING
           );
 
+          const computedFieldsMapFieldType = values => {
+            const allMuliLegColums = _.get(tableEl.current, 'columns', []);
+            return _.mapValues(values, (val, fieldName) => {
+              const findCol = allMuliLegColums.find(col => col.dataIndex === fieldName);
+              return {
+                value: val,
+                unit: findCol.getUnit ? findCol.getUnit() : undefined,
+              };
+            });
+          };
+
           setSaveLoading(true);
           const { error, data } = await quotePrcCreate({
             quotePrc: {
@@ -175,6 +187,9 @@ const ActionBar = memo<any>(props => {
                       }
                       return val ? new BigNumber(val).multipliedBy(0.01).toNumber() : val;
                     }
+                  ),
+                  prcResult: computedFieldsMapFieldType(
+                    Form2.getFieldsValue(_.pick(tableData[index], COMPUTED_LEG_FIELDS))
                   ),
                 };
               }),
@@ -241,7 +256,7 @@ const ActionBar = memo<any>(props => {
         }}
         visible={visible}
       >
-        <TradeManagementPricingManagement setTableData={setTableData} setVisible={setVisible} />
+        <HistoryPanel visible={visible} setTableData={setTableData} setVisible={setVisible} />
       </Drawer>
     </Affix>
   );

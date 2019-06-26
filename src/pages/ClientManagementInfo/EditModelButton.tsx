@@ -25,29 +25,51 @@ import {
   TRADER_TYPE,
 } from './constants';
 import { getToken } from '@/tools/authority';
+import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 
 const TabPane = Tabs.TabPane;
 
 const useTableData = props => {
-  const { record, name } = props;
+  const { record = {}, modelEditable, status } = props;
   const [loading, setLoading] = useState(false);
   const [baseFormData, setBaseFormData] = useState({});
   const [traderList, setTraderList] = useState([]);
-  const fetchData = async () => {
+
+  const fetchData = async (param, processInstanceId) => {
     setLoading(true);
-    const { error, data } = await refPartyGetByLegalName({ legalName: record.legalName });
+    let result = {};
+    let data = {};
+    if (processInstanceId) {
+      const isCompleted = param.processInstanceStatusEnum
+        ? !_.toLower(param.processInstanceStatusEnum).includes('unfinished') && status !== 'pending'
+        : false;
+      const executeMethod = isCompleted ? queryProcessHistoryForm : queryProcessForm;
+      const res = await executeMethod({
+        processInstanceId,
+      });
+      if (!res || res.error) {
+        this.setState({
+          loading: false,
+        });
+        return;
+      }
+      data = _.get(res, 'data.process._business_payload');
+    } else {
+      result = await refPartyGetByLegalName({ legalName: record.legalName });
+      data = result.data;
+    }
     setLoading(false);
-    if (error) return;
+    if (result.error) return;
+
     const newData = {};
-    const authorizers = data.authorizers;
-    if (name !== '查看') {
+    const authorizers = data.tradeAuthorizer || data.authorizers;
+    if (modelEditable !== false) {
       data.salesName = [
         data.subsidiaryName ? data.subsidiaryName : '',
         data.branchName ? data.branchName : '',
         data.salesName ? data.salesName : '',
       ];
     }
-
     const requests = Object.keys(data).map(async item => {
       newData[item] = Form2.createField(data[item]);
       if (_.includes(ALL_DATE_FIELD_KEYS, item)) {
@@ -212,7 +234,7 @@ const EditModalButton = memo<any>(props => {
     },
   ];
 
-  const { salesCascaderList, name, fetchTable, formData } = props;
+  const { salesCascaderList = [], name, fetchTable, formData, modelEditable, content } = props;
   const formRef = useRef<Form2>(null);
   const initialFormDatas: any = {};
   const {
@@ -229,7 +251,8 @@ const EditModalButton = memo<any>(props => {
   let disabled = false;
   let editable = true;
   const [modalVisible, setModalVisible] = useState(false);
-  if (name === '查看') {
+
+  if (modelEditable === false) {
     disabled = true;
     editable = false;
   }
@@ -1466,9 +1489,15 @@ const EditModalButton = memo<any>(props => {
           </>
         </Spin>
       }
+      style={{ ...props.style }}
       onClick={() => {
         setModalVisible(true);
-        fetchData();
+        // 开户审批查看
+        // if (props.processInstanceId) {
+
+        //   return;
+        // }
+        fetchData(props.formData, props.processInstanceId);
       }}
       modalProps={{
         title: name,
@@ -1527,12 +1556,19 @@ const EditModalButton = memo<any>(props => {
                   baseData.salesName = salesName;
                 }
                 baseData.tradeAuthorizer = tradeAuthorizer;
+                // 开户审批提交修改
+                if (props.handleApprovalData) {
+                  props.handleApprovalData(baseData);
+                  return setModalVisible(false);
+                }
                 setLoading(true);
                 const { data, error } = await createRefParty(baseData);
                 setLoading(false);
                 if (error) return;
                 setModalVisible(false);
-                fetchTable();
+                if (fetchTable) {
+                  fetchTable();
+                }
                 notification.success({
                   message: '保存成功',
                 });
@@ -1544,7 +1580,8 @@ const EditModalButton = memo<any>(props => {
         ),
       }}
     >
-      {name}
+      {/* {name} */}
+      {content}
     </ModalButton>
   );
 });

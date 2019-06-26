@@ -3,7 +3,7 @@ import { Select, message, Drawer, List, Switch, Divider, Icon, Button, Alert, To
 import { formatMessage } from 'umi/locale';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'dva';
-import omit from 'omit.js';
+import { omit } from 'lodash';
 import styles from './index.less';
 import BlockChecbox from './BlockChecbox';
 

@@ -14,7 +14,7 @@ import { remove } from './utils';
  * @param {*} array
  * @param {*} item
  * @param {*} [defaultItem=item]
- * @returns
+ * @return array
  */
 export function toggleItem(array, item, predicate?: (item: any, index: number) => boolean) {
   predicate = predicate || (it => it === item);

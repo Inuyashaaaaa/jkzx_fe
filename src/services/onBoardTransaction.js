@@ -6,7 +6,7 @@ export async function queryTradeRecord(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     method: `POST`,
     body: {
-      method: 'exeTradeRecordSearch',
+      method: 'excTradeRecordSearch',
       params,
     },
   });
@@ -29,6 +29,16 @@ export async function querySummary(params = {}) {
     method: `POST`,
     body: {
       method: 'excPositionRecordSearchGroupByInstrumentId',
+      params,
+    },
+  });
+}
+
+export async function queryPortfolio(params = {}) {
+  return request(`${HOST_TEST}exchange-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'excGroupedPositionRecordSearch',
       params,
     },
   });

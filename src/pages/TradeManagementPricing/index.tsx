@@ -6,6 +6,8 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   DATE_ARRAY,
+  OBSERVATION_TYPE_MAP,
+  FREQUENCY_TYPE_NUM_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -53,6 +55,8 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ActionBar from './ActionBar';
 import './index.less';
+import { evaluate } from 'mathjs';
+import { computedShift } from '@/tools/leg';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
@@ -99,15 +103,20 @@ const TradeManagementPricing = props => {
           const leg = getLegByRecord(record);
           if (!leg) return record;
           const omits = _.difference(
-            leg.getColumns(LEG_ENV.EDITING).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex)
+            leg.getColumns(LEG_ENV.EDITING, record).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex)
           );
-          return {
+
+          const result = {
             ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
             ...leg.getDefaultData(LEG_ENV.PRICING),
             ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
             [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
           };
+
+          return leg.convertEditRecord2PricingData
+            ? leg.convertEditRecord2PricingData(result)
+            : result;
         });
       setTableData(next);
     }
@@ -136,7 +145,7 @@ const TradeManagementPricing = props => {
     }
 
     const leftColumns = _.reject(
-      leg.getColumns(LEG_ENV.PRICING),
+      leg.getColumns(LEG_ENV.PRICING, record),
       item =>
         !![...TOTAL_TRADESCOL_FIELDS, ...TOTAL_COMPUTED_FIELDS].find(
           iitem => iitem.dataIndex === item.dataIndex
@@ -162,7 +171,7 @@ const TradeManagementPricing = props => {
   const getSelfTradesColDataIndexs = record => {
     const leg = getLegByRecord(record);
     const selfTradesColDataIndexs = _.intersection(
-      leg.getColumns(LEG_ENV.PRICING).map(item => item.dataIndex),
+      leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
       TRADESCOL_FIELDS
     );
     return selfTradesColDataIndexs;
@@ -231,9 +240,10 @@ const TradeManagementPricing = props => {
 
     setTableData(pre => {
       return pre.map(item => {
+        let nextRecord = item;
         if (item[LEG_ID_FIELD] === rowId) {
           const selfTradesColDataIndexs = getSelfTradesColDataIndexs(item);
-          return {
+          nextRecord = {
             ...item,
             ...Form2.createFields(
               _.mapValues(
@@ -258,7 +268,16 @@ const TradeManagementPricing = props => {
             ),
           };
         }
-        return item;
+
+        if (
+          Form2.getFieldValue(nextRecord[LEG_FIELD.OBSERVATION_TYPE]) ===
+          OBSERVATION_TYPE_MAP.DISCRETE
+        ) {
+          const vol = Form2.getFieldValue(nextRecord[LEG_FIELD.VOL]);
+          computedShift(nextRecord, evaluate(`${vol} / 100`));
+        }
+
+        return nextRecord;
       });
     });
   };
@@ -344,7 +363,7 @@ const TradeManagementPricing = props => {
           if (isError || rspIsEmpty(next)) {
             if (isError) {
               notification.error({
-                message: _.get(next.raw.diagnostics, '[0].message', []),
+                message: _.get(next.raw, 'diagnostics.[0].message', []),
               });
             }
             return pre.concat(null);
@@ -525,6 +544,7 @@ const TradeManagementPricing = props => {
         fetchDefaultPricingEnvData={fetchDefaultPricingEnvData}
         testPricing={testPricing}
         pricingLoading={pricingLoading}
+        tableEl={tableEl}
       />
       <Divider />
       <MultiLegTable

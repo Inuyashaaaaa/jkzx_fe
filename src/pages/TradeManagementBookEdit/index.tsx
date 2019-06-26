@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {
   LCM_EVENT_TYPE_ZHCN_MAP,
   LEG_FIELD,
@@ -5,6 +7,7 @@ import {
   BIG_NUMBER_CONFIG,
   LEG_TYPE_MAP,
   LEG_TYPE_FIELD,
+  LCM_EVENT_TYPE_MAP,
 } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
@@ -105,11 +108,11 @@ const TradeManagementBooking = props => {
             },
           };
         });
-      })
+      }),
     );
     const composePositions = await Promise.all(
-      unitPositions.map(position => {
-        return trdTradeLCMUnwindAmountGet({
+      unitPositions.map(position =>
+        trdTradeLCMUnwindAmountGet({
           tradeId: tableFormData.tradeId,
           positionId: position.positionId,
         }).then(rsp => {
@@ -124,8 +127,8 @@ const TradeManagementBooking = props => {
               [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
             },
           };
-        });
-      })
+        }),
+      ),
     );
 
     setTableLoading(false);
@@ -137,12 +140,21 @@ const TradeManagementBooking = props => {
   const handleTradeNumber = position => {
     const record = position.asset;
     const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
-    const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
     const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+    const annualCoefficient =
+      record[LEG_FIELD.IS_ANNUAL] &&
+      new BigNumber(record[LEG_FIELD.TERM]).div(record[LEG_FIELD.DAYS_IN_YEAR]).toNumber();
+    const notionalAmount = record[LEG_FIELD.IS_ANNUAL]
+      ? new BigNumber(record[LEG_FIELD.NOTIONAL_AMOUNT]).multipliedBy(annualCoefficient).toNumber()
+      : record[LEG_FIELD.NOTIONAL_AMOUNT];
+
     const notional =
       notionalAmountType === 'LOT'
         ? notionalAmount
-        : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+        : new BigNumber(notionalAmount)
+            .div(record[LEG_FIELD.INITIAL_SPOT])
+            .div(multipler)
+            .toNumber();
     return new BigNumber(notional)
       .multipliedBy(multipler)
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
@@ -162,7 +174,7 @@ const TradeManagementBooking = props => {
         positionId: position.positionId,
       }).then(rsp => {
         if (rsp.error) return;
-        const data = [...rsp.data];
+        const data = [...rsp.data].filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT);
         setEventTypes(pre => ({
           ...pre,
           [position.positionId]: data,
@@ -174,15 +186,16 @@ const TradeManagementBooking = props => {
   const getContextMenu = params => {
     const menuItem =
       eventTypes[params.record.id] &&
-      eventTypes[params.record.id].map(eventType => {
-        return { key: eventType, value: LCM_EVENT_TYPE_ZHCN_MAP[eventType] };
-      });
+      eventTypes[params.record.id].map(eventType => ({
+        key: eventType,
+        value: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
+      }));
     if (!menuItem) return;
     return (
       <Menu onClick={({ key }) => handleEventAction(key, params)}>
-        {menuItem.map(item => {
-          return <Menu.Item key={item.key}>{item.value}</Menu.Item>;
-        })}
+        {menuItem.map(item => (
+          <Menu.Item key={item.key}>{item.value}</Menu.Item>
+        ))}
       </Menu>
     );
   };
@@ -204,16 +217,16 @@ const TradeManagementBooking = props => {
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
-    <Page back={true} title={'交易详情'}>
+    <Page back title="交易详情">
       {tableLoading ? (
-        <Skeleton active={true} paragraph={{ rows: 4 }} />
+        <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
         <>
           <Typography.Title level={4}>基本信息</Typography.Title>
           <Divider />
           <div className={styles.bookingBaseInfoFormWrapper}>
             <BookingBaseInfoForm
-              hideRequiredMark={true}
+              hideRequiredMark
               columnNumberOneRow={2}
               editableStatus={FORM_EDITABLE_STATUS.SHOW}
               createFormData={createFormData}
@@ -262,10 +275,10 @@ const TradeManagementBooking = props => {
                             };
                           }
                           return item;
-                        })
+                        }),
                       );
                     },
-                    setTableData
+                    setTableData,
                   );
                 }
                 return newData;
@@ -286,5 +299,5 @@ export default memo(
   connect(state => ({
     currentUser: (state.user as any).currentUser,
     tradeManagementBookEditPageData: state.tradeManagementBookEdit,
-  }))(TradeManagementBooking)
+  }))(TradeManagementBooking),
 );

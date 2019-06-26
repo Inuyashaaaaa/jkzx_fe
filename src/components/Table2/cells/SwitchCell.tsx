@@ -1,20 +1,19 @@
-import { isShallowEqual } from '../../../utils';
 import { FormItemProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import FormItem from 'antd/lib/form/FormItem';
 import classNames from 'classnames';
-import _, { omit, get } from 'lodash';
-import React, { KeyboardEvent, PureComponent, CSSProperties } from 'react';
+import _, { get, omit } from 'lodash';
+import React, { CSSProperties, KeyboardEvent, PureComponent } from 'react';
 import { EMPTY_VALUE } from '../../../containers/constants';
 import Form2 from '../../Form2';
 import { ITableCellProps } from '../../type';
 import { wrapFormGetDecorator } from '../../_utils';
 import {
+  TABLE_ARROW_KEY_CODE_MAP,
   TABLE_CELL_EDITING_CHANGED,
   TABLE_KEY_DOWN,
   TABLE_STOP_ACTIVE,
-  TABLE_ARROW_KEY_CODE_OPTIONS,
-  TABLE_ARROW_KEY_CODE_MAP,
+  TABLE_CELL_CLICK,
 } from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
@@ -164,6 +163,7 @@ class SwitchCell extends PureComponent<
     }
 
     event.stopPropagation();
+    this.props.api.eventBus.emit(TABLE_CELL_CLICK, event);
     this.props.tableApi.saveBy((rowId, colId) => {
       if (rowId === this.props.rowId && colId === this.props.colDef.dataIndex) {
         return false;
@@ -325,6 +325,9 @@ class SwitchCell extends PureComponent<
     // 本次事件触发修改了 next cell 的状态，next cell 的事件还没有触发
     setTimeout(() => {
       this.saveCell();
+      setTimeout(() => {
+        this.handleDirectionTableKeyDown(40);
+      });
     });
   };
 
@@ -477,7 +480,7 @@ class SwitchCell extends PureComponent<
           'rowId',
         ])}
         onClick={this.onCellClick}
-        className={classNames('tongyu-cell', 'tongyu-table-cell', {
+        className={classNames('tongyu-table-cell', this.props.className, {
           editable: this.getEditable(),
           editing: this.getEditing(),
           rendering: !this.getEditing(),
@@ -486,7 +489,7 @@ class SwitchCell extends PureComponent<
         style={this.getTdStyle()}
       >
         <EditableContext.Consumer>
-          {({ form }) => {
+          {form => {
             this.form = form;
             return this.getInlineCell(form);
           }}
