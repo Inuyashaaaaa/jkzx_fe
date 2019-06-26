@@ -137,7 +137,7 @@
         "prettier --write",
         "git add"
       ],
-      "**/*.{js,jsx,ts,tsx}": "eslint --fix",
+      "**/*.{js,jsx,ts,tsx}": "eslint --quiet --fix",
       "**/*.less": "stylelint --syntax less --fix"
     },
     "ignore": [
