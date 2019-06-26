@@ -28,7 +28,8 @@ import { OB_PRICE_FIELD } from './constants';
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import { getObservertionFieldData } from './tools';
-import { isRangeAccruals } from '@/tools';
+import { isRangeAccruals, getMoment } from '@/tools';
+import moment from 'moment';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -63,8 +64,12 @@ const LcmEventModal = memo<{
     const fixObservations = data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
     const last = fixObservations.every(item => _.isNumber(item[OB_PRICE_FIELD]));
     const tableData = getObservertionFieldData(data);
+    const expirationDate = getMoment(data[LEG_FIELD.EXPIRATION_DATE]);
+    const now = moment();
+    const expiration = expirationDate.isBefore(now, 'day') || expirationDate.isSame(now, 'day');
     return (
       last &&
+      expiration &&
       tableData.every(record => {
         const upBarrier = record[LEG_FIELD.UP_BARRIER];
         const alObPrice = record[OB_PRICE_FIELD];
