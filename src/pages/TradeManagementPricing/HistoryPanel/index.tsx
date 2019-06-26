@@ -189,7 +189,7 @@ const TradeManagementPricingManagement = props => {
   useEffect(() => {
     if (!visible) return;
     onTradeTableSearch();
-  }, [onTradeTableSearch, visible]);
+  }, [visible]);
 
   return (
     <>

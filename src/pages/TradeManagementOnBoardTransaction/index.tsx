@@ -146,7 +146,7 @@ const TradeManagementOnBoardTansaction = props => {
 
   useEffect(() => {
     queryFlowData();
-  }, [queryFlowData]);
+  }, []);
 
   const sortBy = (data, field) => {
     data.sort((a, b) => {
@@ -540,6 +540,7 @@ const TradeManagementOnBoardTansaction = props => {
         width={1500}
         visible={resultModalVisible}
         onOk={() => {
+          queryFlowData();
           setResultModalVisible(false);
         }}
         onCancel={() => {
