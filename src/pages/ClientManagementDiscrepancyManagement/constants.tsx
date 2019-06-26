@@ -14,13 +14,11 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { ITableColDef, IFormColDef } from '@/components/type';
-import { formatNumber, formatMoney, parseMoney } from '@/tools';
+import { formatNumber, formatMoney } from '@/tools';
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import { Select, Input, InputNumber, DatePicker } from '@/containers';
 import { DatePicker as AntdDatePicker } from 'antd';
-import { NumberInput } from './NumberInput';
-import BigNumber from 'bignumber.js';
 const { RangePicker } = AntdDatePicker;
 
 export const TABLE_COL_DEFS: ITableColDef[] = [
@@ -129,20 +127,7 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
                 message: '出入金金额必填',
               },
             ],
-          })(
-            <InputNumber
-              formatter={v => {
-                if (v) {
-                  const dot = (v + '').endsWith('.') ? '.' : '';
-                  return formatMoney(+v, { decimalPlaces: null }) + dot;
-                }
-                return '';
-              }}
-              parser={value => {
-                return typeof value === 'string' ? value.replace(/,/g, '') : '';
-              }}
-            />
-          )}
+          })(<InputNumber />)}
         </FormItem>
       );
     },
