@@ -106,11 +106,6 @@ const LcmEventModal = memo<{
       const data = Form2.getFieldsValue(record);
       const tableFormData = Form2.getFieldsValue(createFormData);
       if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
-        if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
-          if (!notBarrierHappen(data)) {
-            return message.warn('不能进行到期结算操作');
-          }
-        }
         return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
       }
 
@@ -171,6 +166,11 @@ const LcmEventModal = memo<{
           }
         }
         if (legType === LEG_TYPE_MAP.AUTOCALL || legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+          if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+            if (!notBarrierHappen(data)) {
+              return message.warn('不能进行到期结算操作');
+            }
+          }
           return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
         }
         return $settleModal.current.show(data, tableFormData, currentUser, loadData);
