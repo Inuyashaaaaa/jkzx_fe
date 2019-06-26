@@ -78,20 +78,22 @@ class ExpirationModal extends PureComponent<
     });
   };
 
-  public computedFormData = () => ({
-    [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-    [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
-      _.chain(this.fixingTableData)
-        .last()
-        .get(OB_PRICE_FIELD)
-        .value(),
-    ),
-    [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
-    [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
-    [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
-    [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
-    [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
-  });
+  public computedFormData = () => {
+    return {
+      [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+      [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
+        _.chain(this.fixingTableData)
+          .last()
+          .get(OB_PRICE_FIELD)
+          .value(),
+      ),
+      [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+      [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
+      [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
+      [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
+      [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
+    };
+  };
 
   /**
    * coupnon部分：
@@ -237,9 +239,9 @@ class ExpirationModal extends PureComponent<
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
       eventType: isAutocallPhoenix(this.data)
-        ? LCM_EVENT_TYPE_MAP.EXPIRATION
+        ? LCM_EVENT_TYPE_MAP.SETTLE
         : isAutocallSnow(this.data)
-        ? LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE
+        ? LCM_EVENT_TYPE_MAP.SETTLE
         : LCM_EVENT_TYPE_MAP.EXPIRATION,
       userLoginId: this.currentUser.username,
       eventDetail: this.getEventDetail(usedFormData),
@@ -286,7 +288,7 @@ class ExpirationModal extends PureComponent<
         underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
         notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
       },
-      eventType: LCM_EVENT_TYPE_MAP.SNOW_BALL_EXERCISE,
+      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
     });
     if (error) return;
     this.setState({
@@ -314,7 +316,7 @@ class ExpirationModal extends PureComponent<
             underlyerPrice: String(dataSource[LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]),
           }
         : { underlyerPrice: null },
-      eventType: LCM_EVENT_TYPE_MAP.EXPIRATION,
+      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
     });
     if (error) return;
     this.setState({

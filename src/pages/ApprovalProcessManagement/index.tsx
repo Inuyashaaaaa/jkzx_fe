@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import Page from '@/containers/Page';
 import React, { PureComponent } from 'react';
 import Pending from './Pending';
