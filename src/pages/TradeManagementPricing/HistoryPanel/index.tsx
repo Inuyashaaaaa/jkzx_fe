@@ -65,7 +65,7 @@ const TradeManagementPricingManagement = props => {
 
   const [pageSizeCurrent, setPageSizeCurrent] = useState(1);
 
-  const onTradeTableSearch = useCallback(async (params = {}) => {
+  const onTradeTableSearch = async (params = {}) => {
     const { paramsPagination, paramsSearchFormData } = params as any;
     const newFormData = Form2.getFieldsValue(paramsSearchFormData || searchFormData);
     const formatValues = _.reduce(
@@ -127,7 +127,7 @@ const TradeManagementPricingManagement = props => {
       total: data.totalCount,
     });
     setPageSizeCurrent((paramsPagination || pagination).pageSize);
-  });
+  };
 
   const onPagination = (current, pageSize) => {
     onTradeTableSearch({

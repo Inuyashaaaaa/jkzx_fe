@@ -1,3 +1,20 @@
+import {
+  Button,
+  Divider,
+  message,
+  Modal,
+  Radio,
+  Row,
+  Table,
+  Tabs,
+  Upload,
+  Icon,
+  notification,
+} from 'antd';
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import moment, { isMoment } from 'moment';
+import React, { useState, useEffect, memo } from 'react';
 import { getToken } from '@/tools/authority';
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
@@ -17,23 +34,6 @@ import {
   queryTradeRecord,
   uploadUrl,
 } from '@/services/onBoardTransaction';
-import {
-  Button,
-  Divider,
-  message,
-  Modal,
-  Radio,
-  Row,
-  Table,
-  Tabs,
-  Upload,
-  Icon,
-  notification,
-} from 'antd';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
-import moment, { isMoment } from 'moment';
-import React, { useState, useEffect, memo } from 'react';
 import CommonForm from '../SystemSettingDepartment/components/CommonForm';
 import { CREATE_FORM_CONTROLS, generateColumns, resultTableFailureColumns } from './constants';
 import TabHeader from '@/containers/TabHeader';
@@ -62,83 +62,6 @@ const TradeManagementOnBoardTansaction = props => {
   const [modalVisible, setModalVisible] = useState(false);
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [uploadResultTable, setUploadResultTable] = useState({ success: [], failure: [] });
-
-  useEffect(() => {
-    queryFlowData();
-  }, []);
-
-  const queryAndInjectMarketData = async (queryMethod, params) => {
-    const list = await queryMethod({ ...params });
-    if (list.error) {
-      setLoading(false);
-    }
-    const data = (list && list.data) || [];
-    return injectMarketValue(data);
-  };
-
-  const queryFlowData = async () => {
-    const params = {
-      instrumentIds: searchFormDataFlow.instrumentId,
-      startTime: `${searchFormDataFlow.date[0].format('YYYY-MM-DD')}T00:00:00`,
-      endTime: `${searchFormDataFlow.date[1].format('YYYY-MM-DD')}T23:59:59`,
-    };
-
-    setLoading(true);
-    const data = await queryAndInjectMarketData(queryTradeRecord, params);
-
-    const finalData = data.map(d => {
-      const obj = { ...d };
-      obj.openClose = obj.openClose ? (obj.openClose.toLowerCase() === 'open' ? '开' : '平') : '-';
-      obj.direction = obj.direction ? (obj.direction.toLowerCase() === 'buyer' ? '买' : '卖') : '-';
-      obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
-      return obj;
-    });
-
-    finalData.sort((a, b) => {
-      const dealTime = moment(a.dealTime).valueOf() - moment(b.dealTime).valueOf();
-      if (dealTime > 0) {
-        return -1;
-      } else if (dealTime < 0) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    setFlowData(finalData);
-    setLoading(false);
-  };
-
-  const sortBy = (data, field) => {
-    data.sort((a, b) => {
-      const aStr = a[field] + a.instrumentId;
-      const bStr = b[field] + a.instrumentId;
-      return aStr.localeCompare(bStr);
-    });
-    return data;
-  };
-
-  const queryPositionData = async (mode?) => {
-    const actualMode = mode ? mode : positionMode;
-    const params = {
-      searchDate: searchFormDataPosition.searchDate.format('YYYY-MM-DD'),
-    };
-    setLoading(true);
-
-    let data;
-    if (actualMode === 'summary') {
-      data = await queryAndInjectMarketData(querySummary, params);
-      data = sortBy(data, 'instrumentId');
-    } else if (actualMode === 'detail') {
-      data = await queryAndInjectMarketData(queryDetail, params);
-      data = sortBy(data, 'bookId');
-    } else if (actualMode === 'portfolio') {
-      data = await queryAndInjectMarketData(queryPortfolio, params);
-      data = sortBy(data, 'portfolioName');
-      data = data.filter(v => v.portfolioName);
-    }
-    setPositionData(data);
-    setLoading(false);
-  };
 
   const injectMarketValue = async finalData => {
     const { data = {}, error } = await mktQuotesListPaged({
@@ -176,6 +99,85 @@ const TradeManagementOnBoardTansaction = props => {
       }
       return item;
     });
+  };
+
+  const queryAndInjectMarketData = async (queryMethod, params) => {
+    const list = await queryMethod({ ...params });
+    if (list.error) {
+      setLoading(false);
+    }
+    const data = (list && list.data) || [];
+    return injectMarketValue(data);
+  };
+
+  const queryFlowData = async () => {
+    const params = {
+      instrumentIds: searchFormDataFlow.instrumentId,
+      startTime: `${searchFormDataFlow.date[0].format('YYYY-MM-DD')}T00:00:00`,
+      endTime: `${searchFormDataFlow.date[1].format('YYYY-MM-DD')}T23:59:59`,
+    };
+
+    setLoading(true);
+    const data = await queryAndInjectMarketData(queryTradeRecord, params);
+
+    const finalData = data.map(d => {
+      const obj = { ...d };
+      // eslint-disable-next-line no-nested-ternary
+      obj.openClose = obj.openClose ? (obj.openClose.toLowerCase() === 'open' ? '开' : '平') : '-';
+      // eslint-disable-next-line no-nested-ternary
+      obj.direction = obj.direction ? (obj.direction.toLowerCase() === 'buyer' ? '买' : '卖') : '-';
+      obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
+      return obj;
+    });
+
+    finalData.sort((a, b) => {
+      const dealTime = moment(a.dealTime).valueOf() - moment(b.dealTime).valueOf();
+      if (dealTime > 0) {
+        return -1;
+      }
+      if (dealTime < 0) {
+        return 1;
+      }
+      return 0;
+    });
+    setFlowData(finalData);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    queryFlowData();
+  }, [queryFlowData]);
+
+  const sortBy = (data, field) => {
+    data.sort((a, b) => {
+      const aStr = a[field] + a.instrumentId;
+      const bStr = b[field] + a.instrumentId;
+      return aStr.localeCompare(bStr);
+    });
+    return data;
+  };
+
+  const queryPositionData = async mode => {
+    const actualMode = mode || positionMode;
+    const params = {
+      searchDate: searchFormDataPosition.searchDate.format('YYYY-MM-DD'),
+    };
+    setLoading(true);
+
+    let data;
+    if (actualMode === 'summary') {
+      data = await queryAndInjectMarketData(querySummary, params);
+      data = sortBy(data, 'instrumentId');
+    } else if (actualMode === 'detail') {
+      data = await queryAndInjectMarketData(queryDetail, params);
+      data = sortBy(data, 'bookId');
+    } else if (actualMode === 'portfolio') {
+      data = await queryAndInjectMarketData(queryPortfolio, params);
+      data = sortBy(data, 'portfolioName');
+      data = data.filter(v => v.portfolioName);
+    }
+    setPositionData(data);
+    setLoading(false);
   };
 
   const attachData = {
@@ -537,6 +539,9 @@ const TradeManagementOnBoardTansaction = props => {
       <Modal
         width={1500}
         visible={resultModalVisible}
+        onOk={() => {
+          setResultModalVisible(false);
+        }}
         onCancel={() => {
           setResultModalVisible(false);
         }}
