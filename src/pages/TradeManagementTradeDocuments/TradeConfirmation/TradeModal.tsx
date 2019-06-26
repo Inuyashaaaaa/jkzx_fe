@@ -1,9 +1,14 @@
-import Form from '@/containers/Form';
-import { DOWN_LOAD_TRADE_URL, emlSendSupplementaryAgreementReport } from '@/services/document';
 import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
+import {
+  DOWN_LOAD_TRADE_URL,
+  DOWN_LOAD_TRADE_URL_URL,
+  emlSendSupplementaryAgreementReport,
+} from '@/services/document';
+import Form from '@/containers/Form';
+import DownloadButton from '@/containers/DownloadButton';
 
 class TradeModal extends PureComponent {
   public $form: Form = null;
@@ -53,7 +58,6 @@ class TradeModal extends PureComponent {
       return;
     }
     message.success('发送成功');
-    return;
   };
 
   public render() {
@@ -77,14 +81,13 @@ class TradeModal extends PureComponent {
               message="交易确认书基于最新的模板即时生成，系统不会留存每次生成的结果。"
               description="请在下载或发送前，确认以下自定义内容。"
               type="info"
-              showIcon={true}
+              showIcon
             />
             <Form
               wrappedComponentRef={element => {
                 if (element) {
                   this.$form = element.props.form;
                 }
-                return;
               }}
               controls={[
                 {
@@ -122,22 +125,11 @@ class TradeModal extends PureComponent {
             />
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <Col>
-                <Button type="default">
-                  <a
-                    href={encodeURI(
-                      `${DOWN_LOAD_TRADE_URL}tradeId=${
-                        this.props.data.tradeId
-                      }&marketInterruptionMessage=${
-                        this.state.modalData.marketDisruption
-                      }&earlyTerminationMessage=${this.state.modalData.tradeOption}&partyName=${
-                        this.props.data.partyName
-                      }`
-                    )}
-                    download="template.t"
-                  >
-                    下载
-                  </a>
-                </Button>
+                <DownloadButton
+                  name={`${this.props.data.tradeId}交易确认书.doc`}
+                  url={DOWN_LOAD_TRADE_URL}
+                  options={`tradeId=${this.props.data.tradeId}&partyName=${this.props.data.partyName}&description7=${this.state.modalData.marketDisruption}&description8=${this.state.modalData.tradeOption}`}
+                />
               </Col>
               <Col>
                 <Button type="primary" onClick={this.onConfirm} loading={this.state.loading}>
@@ -147,14 +139,13 @@ class TradeModal extends PureComponent {
             </Row>
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <p style={{ lineHeight: '40px' }}>
-                {data.docProcessStatus === 'UN_PROCESSED'
-                  ? `${username} 未处理过交易确认书`
-                  : data.docProcessStatus === 'DOWNLOADED'
+                {data.docProcessStatus === 'UN_PROCESSED' ? `${username} 未处理过交易确认书` : null}
+                {data.docProcessStatus === 'DOWNLOADED'
                   ? `${username} 于 ${moment(data.updateAt).format(
-                      'YYYY-MM-DD HH:mm'
+                      'YYYY-MM-DD HH:mm',
                     )}下载过交易确认书`
                   : `${username} 于 ${moment(data.updateAt).format(
-                      'YYYY-MM-DD HH:mm'
+                      'YYYY-MM-DD HH:mm',
                     )}发送过交易确认书`}
               </p>
             </Row>
