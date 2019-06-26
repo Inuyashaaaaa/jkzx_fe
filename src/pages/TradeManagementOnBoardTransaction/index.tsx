@@ -14,7 +14,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
-import React, { memo, useEffect, useState, useCallback } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import { Select, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
@@ -316,7 +316,7 @@ const TradeManagementOnBoardTansaction = props => {
   const summaryColumns = generateColumns('summary');
   const portfolioColumns = generateColumns('portfolio');
 
-  const queryFlowData = useCallback(async () => {
+  const queryFlowData = async () => {
     const params = {
       instrumentIds: searchFormDataFlow.instrumentId,
       startTime: `${searchFormDataFlow.date[0].format('YYYY-MM-DD')}T00:00:00`,
@@ -357,7 +357,7 @@ const TradeManagementOnBoardTansaction = props => {
     });
     setFlowData(finalData);
     setLoading(false);
-  });
+  };
 
   const onReset = () => {
     setSearchFormDataFlow({ date: [moment().subtract(1, 'days'), moment()] });
