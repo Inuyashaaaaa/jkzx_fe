@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
@@ -43,6 +44,7 @@ const ReportCommonTable = memo<any>(props => {
   const [excelFormData, setExcelFormData] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
+    if (!pageSize) return;
     setIsMount(true);
     setPagination({
       current,
@@ -121,7 +123,7 @@ const ReportCommonTable = memo<any>(props => {
   const handleData = (dataSource, cols, headers) => {
     const data = [];
     data.push(headers);
-    const length = data.length;
+    const { length } = data;
     dataSource.forEach((ds, index) => {
       const _data = [];
       Object.keys(ds).forEach(key => {
@@ -155,26 +157,20 @@ const ReportCommonTable = memo<any>(props => {
     fetchTable(_searchFormData);
   });
 
-  useEffect(
-    () => {
-      if (!isMount) return;
-      fetchTable();
-    },
-    [sortField, pagination]
-  );
+  useEffect(() => {
+    if (!isMount) return;
+    fetchTable();
+  }, [sortField, pagination]);
 
-  useEffect(
-    () => {
-      setData(
-        handleData(
-          dataSource,
-          tableColDefs.map(item => item.dataIndex),
-          tableColDefs.map(item => item.title)
-        )
-      );
-    },
-    [dataSource]
-  );
+  useEffect(() => {
+    setData(
+      handleData(
+        dataSource,
+        tableColDefs.map(item => item.dataIndex),
+        tableColDefs.map(item => item.title),
+      ),
+    );
+  }, [dataSource]);
 
   return (
     <Page>
@@ -184,7 +180,7 @@ const ReportCommonTable = memo<any>(props => {
         columns={searchFormControls(markets)}
         layout="inline"
         style={{ marginBottom: VERTICAL_GUTTER }}
-        submitText={'查询'}
+        submitText="查询"
         onFieldsChange={onSearchFormChange}
         onSubmitButtonClick={() => {
           setIsMount(false);
