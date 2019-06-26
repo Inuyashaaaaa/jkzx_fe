@@ -1,3 +1,4 @@
+/*eslint-disable */
 import React, { useRef, useState, memo } from 'react';
 import { Popconfirm, Divider, Modal, message } from 'antd';
 import { Form2 } from '@/containers';
@@ -96,9 +97,10 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     return;
   };
 
-  const filterFormData = (allFields, fields) => {
+  const filterFormData = (allFields, fields, columns) => {
     const changed = Form2.getFieldsValue(fields);
-    const formData = Form2.getFieldsValue(allFields);
+    const column = columns.map(item => item.dataIndex);
+    const formData = _.pick(Form2.getFieldsValue(allFields), column);
     if (Object.keys(changed)[0] === 'assetClass') {
       return {
         ..._.pick(props.record, ['instrumentId']),
@@ -117,7 +119,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
   const onEditFormChange = (props, fields, allFields) => {
     const columns = editFormControls(Form2.getFieldsValue(allFields), 'edit');
     setEditformControlsState(columns);
-    setEditFormData(Form2.createFields(filterFormData(allFields, fields)));
+    setEditFormData(Form2.createFields(filterFormData(allFields, fields, columns)));
   };
 
   return (
