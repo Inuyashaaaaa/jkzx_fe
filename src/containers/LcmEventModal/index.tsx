@@ -130,7 +130,7 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
         if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
           const convertedData = filterObDays(convertObservetions(data));
-          if (convertedData.some(item => !item.price)) {
+          if (!convertedData.every(item => _.isNumber(item[OB_PRICE_FIELD]))) {
             return message.warn('请先完善观察日价格');
           }
           return $asianExerciseModal.current.show(data, tableFormData, currentUser, loadData);
@@ -166,7 +166,7 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
         if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
           const convertedData = filterObDays(convertObservetions(data));
-          if (convertedData.some(item => !item.price)) {
+          if (!convertedData.every(item => _.isNumber(item[OB_PRICE_FIELD]))) {
             return message.warn('请先完善观察日价格');
           }
         }
