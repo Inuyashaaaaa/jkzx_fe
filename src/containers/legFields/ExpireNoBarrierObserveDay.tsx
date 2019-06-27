@@ -41,11 +41,13 @@ class ObserveModalInput extends InputBase<{
     super(props);
     this.legType = props.record[LEG_TYPE_FIELD];
     this.state.dealDataSource = this.computeDataSource(
-      (props.value || []).map((item, index) => ({
-        ...item,
-        [OB_DAY_FIELD]: moment(item[OB_DAY_FIELD]),
-        price: Form2.createField(item.price),
-      })),
+      _.toPairs(props.value)
+        .map(item => _.fromPairs([item]))
+        .map((item, index) => ({
+          ...item,
+          [OB_DAY_FIELD]: moment(item[OB_DAY_FIELD]),
+          price: Form2.createField(item.price),
+        })),
     );
   }
 
