@@ -53,7 +53,7 @@ const RANGE_DATE_KEY = 'RANGE_DATE_KEY';
 
 const TradeManagementPricingManagement = props => {
   const [searchFormData, setSearchFormData] = useState({});
-  const { setTableData, setVisible, visible } = props;
+  const { setTableData, setVisible, visible, setCurPricingEnv } = props;
   const [tableDataSource, setTableDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -543,7 +543,7 @@ const TradeManagementPricingManagement = props => {
                     <Popconfirm
                       title="将会覆盖当前试定价数据，是否继续?"
                       onConfirm={() => {
-                        const { quotePositions } = record as any;
+                        const { quotePositions, pricingEnvironmentId } = record as any;
 
                         const next = quotePositions.map(position => {
                           const { productType, asset } = position;
@@ -574,6 +574,7 @@ const TradeManagementPricingManagement = props => {
                           };
                         });
                         setTableData(next);
+                        setCurPricingEnv(pricingEnvironmentId);
                         setVisible(false);
                       }}
                       okText="是"

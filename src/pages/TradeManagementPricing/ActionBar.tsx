@@ -50,7 +50,7 @@ const ActionBar = memo<any>(props => {
   const [visible, setVisible] = useState(false);
 
   return (
-    <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
+    <Affix offsetTop={0} onChange={affixs => setAffix(affixs)}>
       <Row
         type="flex"
         justify="space-between"
@@ -63,7 +63,7 @@ const ActionBar = memo<any>(props => {
         <Row type="flex" align="middle">
           <Col>
             <MultilLegCreateButton
-              isPricing={true}
+              isPricing
               env={LEG_ENV.PRICING}
               key="create"
               handleAddLeg={(leg: ILeg) => {
@@ -73,27 +73,25 @@ const ActionBar = memo<any>(props => {
                   pre.concat({
                     ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
                     ...leg.getDefaultData(LEG_ENV.PRICING),
-                  })
+                  }),
                 );
               }}
             />
           </Col>
           <Col style={{ marginLeft: 15 }}>定价环境:</Col>
           <Col style={{ marginLeft: 10, width: 400 }}>
-            <Input.Group compact={true}>
+            <Input.Group compact>
               <Select
                 loading={curPricingEnv === null}
                 onChange={onPricingEnvSelectChange}
                 value={curPricingEnv}
                 style={{ width: 200 }}
               >
-                {pricingEnvironmentsList.map(item => {
-                  return (
-                    <Select.Option key={item} value={item}>
-                      {item}
-                    </Select.Option>
-                  );
-                })}
+                {pricingEnvironmentsList.map(item => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
               </Select>
               <Button loading={pricingLoading} key="试定价" type="primary" onClick={testPricing}>
                 试定价
@@ -154,9 +152,9 @@ const ActionBar = memo<any>(props => {
 
           const positions = convertPricingHistoryTradePositions(
             tableData.map(item =>
-              Form2.getFieldsValue(_.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))
+              Form2.getFieldsValue(_.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])),
             ),
-            LEG_ENV.PRICING
+            LEG_ENV.PRICING,
           );
 
           const computedFieldsMapFieldType = values => {
@@ -176,23 +174,21 @@ const ActionBar = memo<any>(props => {
               pricingEnvironmentId: curPricingEnv,
               comment,
               counterPartyCode,
-              quotePositions: positions.map((position, index) => {
-                return {
-                  ...position,
-                  ..._.mapValues(
-                    Form2.getFieldsValue(_.pick(tableData[index], TRADESCOL_FIELDS)),
-                    (val, key) => {
-                      if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
-                        return val;
-                      }
-                      return val ? new BigNumber(val).multipliedBy(0.01).toNumber() : val;
+              quotePositions: positions.map((position, index) => ({
+                ...position,
+                ..._.mapValues(
+                  Form2.getFieldsValue(_.pick(tableData[index], TRADESCOL_FIELDS)),
+                  (val, key) => {
+                    if (key === TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE) {
+                      return val;
                     }
-                  ),
-                  prcResult: computedFieldsMapFieldType(
-                    Form2.getFieldsValue(_.pick(tableData[index], COMPUTED_LEG_FIELDS))
-                  ),
-                };
-              }),
+                    return val ? new BigNumber(val).multipliedBy(0.01).toNumber() : val;
+                  },
+                ),
+                prcResult: computedFieldsMapFieldType(
+                  Form2.getFieldsValue(_.pick(tableData[index], COMPUTED_LEG_FIELDS)),
+                ),
+              })),
             },
           });
           setSaveLoading(false);
@@ -208,11 +204,7 @@ const ActionBar = memo<any>(props => {
           });
         }}
       >
-        <Alert
-          showIcon={true}
-          message="保存当前的试定价要素以便快速复用"
-          style={{ marginBottom: 20 }}
-        />
+        <Alert showIcon message="保存当前的试定价要素以便快速复用" style={{ marginBottom: 20 }} />
         <FormItem label="交易对手" wrapperCol={{ span: 16 }} labelCol={{ span: 8 }}>
           <Select
             onChange={val => {
@@ -220,10 +212,10 @@ const ActionBar = memo<any>(props => {
             }}
             value={counterPartyCode}
             style={{ minWidth: 180 }}
-            fetchOptionsOnSearch={true}
+            fetchOptionsOnSearch
             placeholder="请输入内容搜索"
-            allowClear={true}
-            showSearch={true}
+            allowClear
+            showSearch
             options={async (value: string = '') => {
               const { data, error } = await refSimilarLegalNameList({
                 similarLegalName: value,
@@ -250,13 +242,18 @@ const ActionBar = memo<any>(props => {
       <Drawer
         width={1200}
         title="历史定价管理"
-        placement={'right'}
+        placement="right"
         onClose={() => {
           setVisible(false);
         }}
         visible={visible}
       >
-        <HistoryPanel visible={visible} setTableData={setTableData} setVisible={setVisible} />
+        <HistoryPanel
+          visible={visible}
+          setTableData={setTableData}
+          setVisible={setVisible}
+          setCurPricingEnv={setCurPricingEnv}
+        />
       </Drawer>
     </Affix>
   );
