@@ -124,6 +124,7 @@ export async function DOWN_LOAD(url, options) {
     },
   })
     .then(response => {
+      console.log(response);
       if (response.status >= 200 && response.status < 300) {
         return response.blob();
         // return response.url;

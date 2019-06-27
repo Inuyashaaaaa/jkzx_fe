@@ -1,0 +1,40 @@
+---
+name: DownloadButton
+route: /DownloadButton
+menu: Components
+---
+
+import DownloadButton from '../index';
+import { Divider, Tag, Button } from 'antd';
+import { Playground, Props } from 'docz';
+import { DOWN_LOAD_SETTLEMENT_URL } from '@/services/document';
+
+# Table
+
+`data-display`
+
+extends https://ant.design/components/button-cn/#API
+
+## 使用场景
+
+下载文档；
+
+## 功能交互设计
+
+## UI设计
+
+## Basic usage
+
+<Playground>
+  <DownloadButton
+    url={`url`}
+    name={`dome结算通知书.doc`}
+    options={`tradeId=1&positionId=2&partyName=3`}
+  />
+</Playground>
+
+
+## API
+
+<Props of={DownloadButton} />
+
