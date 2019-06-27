@@ -1,19 +1,21 @@
+import { Modal, message, Alert, InputNumber, Checkbox } from 'antd';
+import _ from 'lodash';
+import React, { memo, useState, useRef } from 'react';
+import moment from 'moment';
+import FormItem from 'antd/lib/form/FormItem';
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD, DATE_ARRAY } from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { convertLegDataByEnv, getLegByRecord } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { Modal, message, Alert, InputNumber, Checkbox } from 'antd';
-import _ from 'lodash';
-import React, { memo, useState, useRef } from 'react';
 import { convertTradePositions } from '@/services/pages';
 import { Form2, DatePicker } from '@/containers';
 import { ITableData } from '@/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
-import moment from 'moment';
-import FormItem from 'antd/lib/form/FormItem';
 import CashExportModal from '@/containers/CashExportModal';
+
+/* eslint-disable */
 
 const UN_EDITDIR = [
   LEG_FIELD.UNDERLYER_MULTIPLIER,
@@ -119,11 +121,11 @@ const AmendModal = memo<IAmendModal>(props => {
           const [position = {}] = convertTradePositions(
             tableData.map(item => Form2.getFieldsValue(item)),
             Form2.getFieldsValue(store.tableFormData),
-            LEG_ENV.BOOKING
+            LEG_ENV.BOOKING,
           );
-          const _data = Form2.getFieldsValue(cashData);
-          _data.cashFlowChange = JSON.stringify(_data.cashFlowChange);
-          _data.paymentDate = moment(_data.paymentDate).format('YYYY-MM-DD');
+          const newData = Form2.getFieldsValue(cashData);
+          newData.cashFlowChange = JSON.stringify(newData.cashFlowChange);
+          newData.paymentDate = moment(newData.paymentDate).format('YYYY-MM-DD');
           const { error, data } = await trdTradeLCMEventProcess({
             positionId: store.record[LEG_ID_FIELD],
             tradeId: store.tableFormData.tradeId,
@@ -132,16 +134,13 @@ const AmendModal = memo<IAmendModal>(props => {
             eventDetail: {
               asset: _.get(position, 'asset'),
               productType: position.productType,
-              ..._data,
+              ...newData,
             },
           });
           setConfirmLoading(false);
           if (error) return;
 
           message.success('修改交易要素成功');
-          // if (store.reload) {
-          //   store.reload();
-          // }
 
           if (createCash) {
             setTradeData({
@@ -149,6 +148,10 @@ const AmendModal = memo<IAmendModal>(props => {
               counterPartyCode: store.tableFormData.counterPartyCode,
             });
             setCashModalVisible(true);
+            return setVisible(false);
+          }
+          if (store.reload) {
+            store.reload();
           }
           setVisible(false);
         }}
@@ -181,8 +184,8 @@ const AmendModal = memo<IAmendModal>(props => {
                   },
                   tableEl.current.setLoadingsByRow,
                   (colId: string, newVal: ITableData) => {
-                    setTableData(pre =>
-                      pre.map(item => {
+                    setTableData(preData =>
+                      preData.map(item => {
                         if (item[LEG_ID_FIELD] === params.rowId) {
                           return {
                             ...item,
@@ -190,30 +193,28 @@ const AmendModal = memo<IAmendModal>(props => {
                           };
                         }
                         return item;
-                      })
+                      }),
                     );
                   },
-                  setTableData
+                  setTableData,
                 );
               }
               return newData;
             });
           }}
-          chainColumns={(columns: ILegColDef[]) => {
-            return columns.map(item => {
-              return {
-                ...item,
-                editable(record) {
-                  // 拦截字段强制不可编辑
-                  if (UN_EDITDIR.find(key => key === item.dataIndex)) return false;
+          chainColumns={(columns: ILegColDef[]) =>
+            columns.map(item => ({
+              ...item,
+              editable(record) {
+                // 拦截字段强制不可编辑
+                if (UN_EDITDIR.find(key => key === item.dataIndex)) return false;
 
-                  return typeof item.editable === 'function'
-                    ? item.editable.apply(this, arguments)
-                    : item.editable;
-                },
-              };
-            });
-          }}
+                return typeof item.editable === 'function'
+                  ? item.editable.apply(this, arguments)
+                  : item.editable;
+              },
+            }))
+          }
         />
         <Checkbox checked={createCash} onChange={handleChange} style={{ margin: '20px 0' }}>
           产生现金流
@@ -232,44 +233,38 @@ const AmendModal = memo<IAmendModal>(props => {
             {
               title: '现金流金额',
               dataIndex: 'cashFlowChange',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true, message: '现金流金额为必填项' }],
-                    })(
-                      <InputNumber style={{ width: 200 }} editing={false} disabled={!createCash} />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '现金流金额为必填项' }],
+                  })(<InputNumber style={{ width: 200 }} editing={false} disabled={!createCash} />)}
+                </FormItem>
+              ),
             },
             {
               title: '支付日期',
               dataIndex: 'paymentDate',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true, message: '支付日期为必填项' }],
-                    })(
-                      <DatePicker
-                        style={{ width: 200 }}
-                        editing={true}
-                        format="YYYY-MM-DD"
-                        disabled={!createCash}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '支付日期为必填项' }],
+                  })(
+                    <DatePicker
+                      style={{ width: 200 }}
+                      editing
+                      format="YYYY-MM-DD"
+                      disabled={!createCash}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
         <Alert
           message="现金流金额为正时代表我方收入，金额为负时代表我方支出。"
           type="info"
-          showIcon={true}
+          showIcon
         />
       </Modal>
     </>
