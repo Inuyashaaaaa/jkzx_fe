@@ -9,7 +9,7 @@ import moment, { isMoment } from 'moment';
 import { getMoment } from '@/tools';
 
 const Operation = memo<{ record: any; fetchTable: any }>(props => {
-  let $form: Form2 = useRef(null);
+  let $form = useRef<Form2>(null);
 
   const [editVisible, setEditVisible] = useState(false);
   const [editFormControlsState, setEditformControlsState] = useState({});
@@ -52,7 +52,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
       ? getMoment(modalFormData.expirationTime).format('HH:mm:ss')
       : undefined;
     modalFormData.maturity = modalFormData.maturity
-      ? getMoment(newEditFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
+      ? getMoment(modalFormData.maturity).format('YYYY-MM-DD')
       : undefined;
     const instrumentInfoFields = [
       'multiplier',
