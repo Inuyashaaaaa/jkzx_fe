@@ -6,6 +6,7 @@ import { editFormControls } from './services';
 import { mktInstrumentCreate, mktInstrumentDelete } from '@/services/market-data-service';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
+import { getMoment } from '@/tools';
 
 const Operation = memo<{ record: any; fetchTable: any }>(props => {
   let $form: Form2 = useRef(null);
@@ -29,6 +30,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
 
   const switchModal = () => {
     const data = _.mapValues(props.record, (value, key) => {
+      if (value === null || value === undefined) return value;
       if ('expirationTime' === key) {
         return moment(value, 'HH:mm:ss');
       }
@@ -44,10 +46,13 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
 
   const composeInstrumentInfo = modalFormData => {
     modalFormData.expirationDate = modalFormData.expirationDate
-      ? moment(modalFormData.expirationDate).format('YYYY-MM-DD')
+      ? getMoment(modalFormData.expirationDate).format('YYYY-MM-DD')
       : undefined;
     modalFormData.expirationTime = modalFormData.expirationTime
-      ? moment(modalFormData.expirationTime).format('HH:mm:ss')
+      ? getMoment(modalFormData.expirationTime).format('HH:mm:ss')
+      : undefined;
+    modalFormData.maturity = modalFormData.maturity
+      ? getMoment(newEditFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
       : undefined;
     const instrumentInfoFields = [
       'multiplier',
@@ -79,11 +84,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     const rsp = await $form.validate();
     if (rsp.error) return;
     setEditing(false);
-    let newEditFormData = Form2.getFieldsValue(editFormData);
-    newEditFormData = composeInstrumentInfo(newEditFormData);
-    newEditFormData.instrumentInfo.maturity = isMoment(newEditFormData.instrumentInfo.maturity)
-      ? moment(newEditFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
-      : newEditFormData.instrumentInfo.maturity;
+    const newEditFormData = composeInstrumentInfo(Form2.getFieldsValue(editFormData));
     const { error, data } = await mktInstrumentCreate(newEditFormData);
     setEditing(false);
 
