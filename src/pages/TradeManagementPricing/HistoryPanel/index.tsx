@@ -544,17 +544,19 @@ const TradeManagementPricingManagement = props => {
                       title="将会覆盖当前试定价数据，是否继续?"
                       onConfirm={() => {
                         const { quotePositions, pricingEnvironmentId } = record as any;
-
                         const next = quotePositions.map(position => {
                           const { productType, asset } = position;
                           const leg = getLegByProductType(productType, position.asset.exerciseType);
                           if (!leg) {
                             throw new Error(`${productType} is not defiend!`);
                           }
+
+                          const pageData = leg.getPageData(LEG_ENV.PRICING, position);
+
                           return {
                             ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-                            ...backConvertPercent(
-                              Form2.createFields({
+                            ...backConvertPercent({
+                              ...Form2.createFields({
                                 ..._.mapValues(asset, (val, key) => {
                                   if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
                                     return moment(val);
@@ -570,9 +572,11 @@ const TradeManagementPricingManagement = props => {
                                       'days',
                                     ),
                               }),
-                            ),
+                              ...pageData,
+                            }),
                           };
                         });
+                        console.log(next);
                         setTableData(next);
                         setCurPricingEnv(pricingEnvironmentId);
                         setVisible(false);
