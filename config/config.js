@@ -96,5 +96,5 @@ export default {
   },
   chainWebpack: webpackPlugin,
   // extraBabelPlugins: ['lodash'],
-  history: 'browser',
+  history: 'hash',
 };
