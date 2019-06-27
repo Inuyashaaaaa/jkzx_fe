@@ -1,3 +1,7 @@
+/* eslint-disable */
+import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
+import _ from 'lodash';
+import React, { PureComponent } from 'react';
 import Page from '@/containers/Page';
 import {
   wkApproveGroupList,
@@ -5,9 +9,6 @@ import {
   wkApproveGroupUserListModify,
 } from '@/services/auditing';
 import { queryAuthDepartmentList } from '@/services/department';
-import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
-import _ from 'lodash';
-import React, { PureComponent } from 'react';
 import AuditGourpLists from './AuditGourpLists';
 import styles from './AuditGourpLists.less';
 import DrawerContarner from './DrawerContarner';
@@ -82,19 +83,19 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { message } = error;
     if (error) {
       return;
-    } else {
-      notification.success({
-        message: `移出成功`,
-        description: message,
-      });
-      if (this.$drawer) {
-        this.$drawer.fetchTable();
-      }
-
-      this.setState({
-        visible: false,
-      });
     }
+    notification.success({
+      message: '移出成功',
+      description: message,
+    });
+    if (this.$drawer) {
+      this.$drawer.fetchTable();
+    }
+
+    this.setState({
+      visible: false,
+    });
+
     this.setState({ userList });
   };
 
@@ -175,7 +176,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     const { currentGroup } = this.state;
     const _d = _.intersection(
       param.map(p => p.username),
-      (this.state.currentGroup.userList || []).map(p => p.username)
+      (this.state.currentGroup.userList || []).map(p => p.username),
     );
     if (_d.length > 0) {
       return notification.success({
@@ -183,14 +184,12 @@ class SystemSettingsRoleManagement extends PureComponent {
       });
     }
     // currentGroup.userList = (currentGroup.userList || []).concat(param);
-    const userList = _.concat(currentGroup.userList, param).map(item => {
-      return {
-        userApproveGroupId: item.userApproveGroupId,
-        username: item.username,
-        departmentId: item.departmentId,
-        nickName: item.nickName,
-      };
-    });
+    const userList = _.concat(currentGroup.userList, param).map(item => ({
+      userApproveGroupId: item.userApproveGroupId,
+      username: item.username,
+      departmentId: item.departmentId,
+      nickName: item.nickName,
+    }));
     const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
       approveGroupName: currentGroup.approveGroupName,
@@ -198,19 +197,15 @@ class SystemSettingsRoleManagement extends PureComponent {
     });
     if (error) {
       return;
-    } else {
-      notification.success({
-        message: batchBool
-          ? `${param.length}个用户成功加入审批组,${currentGroup.userList.length}个用户已在审批组中`
-          : '成功加入审批组',
-      });
     }
+    notification.success({
+      message: batchBool
+        ? `${param.length}个用户成功加入审批组,${currentGroup.userList.length}个用户已在审批组中`
+        : '成功加入审批组',
+    });
+
     currentGroup.userList =
-      data[
-        _.findIndex(data, item => {
-          return item.approveGroupId === currentGroup.approveGroupId;
-        })
-      ].userList;
+      data[_.findIndex(data, item => item.approveGroupId === currentGroup.approveGroupId)].userList;
     const approveGroupList = _.sortBy(data, ['approveGroupName']);
     this.setState(
       {
@@ -220,9 +215,9 @@ class SystemSettingsRoleManagement extends PureComponent {
       },
       () => {
         if (this.$drawer) {
-          this.$drawer.filterData((data.userList || []).map(item => item.username));
+          this.$drawer.filterData((currentGroup.userList || []).map(item => item.username));
         }
-      }
+      },
     );
   };
 
@@ -237,9 +232,7 @@ class SystemSettingsRoleManagement extends PureComponent {
   public render() {
     let { userList } = this.state;
     const { department } = this.state;
-    userList = (userList || []).sort((a, b) => {
-      return a.username.localeCompare(b.username);
-    });
+    userList = (userList || []).sort((a, b) => a.username.localeCompare(b.username));
     userList.map(param => {
       const dp = department.find(obj => obj.id === param.departmentId) || {};
       param.departmentName = dp.departmentName;
