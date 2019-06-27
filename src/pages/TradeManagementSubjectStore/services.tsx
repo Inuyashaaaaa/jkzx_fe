@@ -323,7 +323,7 @@ const instrumentIds = {
     const disable = () =>
       _.get(record, 'record.assetClass.value') ||
       _.get(record, 'instrumentType.value') ||
-      _.get(record, 'subAsset.value');
+      _.get(record, 'assetSubClass.value');
     return (
       <FormItem>
         {form.getFieldDecorator({})(
@@ -508,19 +508,20 @@ const expirationTime = {
   ),
 };
 
-const subAssetMap = {
-  BL: '黑色',
-  ME: '有色金属',
-  PMetal: '贵金属',
-  EC: '农产品',
-  EQ: '个股',
-  IN: '指数',
-  Q: '其它',
+export const ASSET_SUB_CLASS_MAP = {
+  BLACK: '黑色',
+  METAL: '有色金属',
+  RESOURCE: '能化',
+  PRECIOUS_METAL: '贵金属',
+  AGRICULTURE: '农产品',
+  EQUITY: '个股',
+  INDEX: '指数',
+  OTHERS: '其它',
 };
 
 const subAssetSearch = {
   title: '资产子类别',
-  dataIndex: 'subAsset',
+  dataIndex: 'assetSubClass',
   render: (value, record, index, { form, editing }) => {
     const disable = () => !!_.get(record, 'instrumentIds.value.length');
     return (
@@ -530,7 +531,10 @@ const subAssetSearch = {
             disabled={disable()}
             style={{ minWidth: 180 }}
             allowClear
-            options={Object.keys(subAssetMap).map(v => ({ label: subAssetMap[v], value: v }))}
+            options={Object.keys(ASSET_SUB_CLASS_MAP).map(v => ({
+              label: ASSET_SUB_CLASS_MAP[v] || v,
+              value: v,
+            }))}
           />,
         )}
       </FormItem>
@@ -540,7 +544,7 @@ const subAssetSearch = {
 
 const subAsset = {
   title: '资产子类别',
-  dataIndex: 'subAsset',
+  dataIndex: 'assetSubClass',
   render: (value, record, index, { form, editing }) => {
     const disable = () => !!_.get(record, 'instrumentIds.value.length');
     return (
@@ -557,7 +561,10 @@ const subAsset = {
             disabled={disable()}
             style={{ minWidth: 180 }}
             allowClear
-            options={Object.keys(subAssetMap).map(v => ({ label: subAssetMap[v], value: v }))}
+            options={Object.keys(ASSET_SUB_CLASS_MAP).map(v => ({
+              label: ASSET_SUB_CLASS_MAP[v] || v,
+              value: v,
+            }))}
           />,
         )}
       </FormItem>

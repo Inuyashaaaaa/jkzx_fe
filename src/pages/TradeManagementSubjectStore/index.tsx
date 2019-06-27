@@ -108,6 +108,9 @@ const TradeManagementMarketManagement = props => {
       'strike',
       'multiplier',
       'underlyerInstrumentId',
+      'tradeCategory',
+      'tradeUnit',
+      'unit',
     ];
     let instrumentInfoSomeFields = instrumentInfoFields;
     if (modalFormData.instrumentType === 'INDEX') {
@@ -231,4 +234,4 @@ const TradeManagementMarketManagement = props => {
     </Page>
   );
 };
-export default memo<any>(TradeManagementMarketManagement);
+export default memo(TradeManagementMarketManagement);
