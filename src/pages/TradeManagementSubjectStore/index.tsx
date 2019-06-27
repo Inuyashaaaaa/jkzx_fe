@@ -1,12 +1,12 @@
+import { Button, Divider, message, Modal } from 'antd';
+import _ from 'lodash';
+import moment, { isMoment } from 'moment';
+import React, { memo, useEffect, useRef, useState, useCallback } from 'react';
 import { PAGE_SIZE } from '@/constants/component';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { mktInstrumentCreate, mktInstrumentsListPaged } from '@/services/market-data-service';
-import { Button, Divider, message, Modal } from 'antd';
-import _ from 'lodash';
-import moment, { isMoment } from 'moment';
-import React, { memo, useEffect, useRef, useState } from 'react';
 import { TABLE_COL_DEFS } from './tools';
 import { createFormControls, searchFormControls } from './services';
 
@@ -29,18 +29,7 @@ const TradeManagementMarketManagement = props => {
   const [creating, setCreating] = useState(false);
   const [noData, setNoData] = useState(true);
 
-  useEffect(() => {
-    fetchTable(null, {});
-    setCreateFormControlsState(createFormControls({}, 'create'));
-  }, []);
-
-  const onReset = () => {
-    setPagination(defaultPagination);
-    setSearchFormData({});
-    fetchTable();
-  };
-
-  const fetchTable = async (paramsPagination?, searchForm?) => {
+  const fetchTable = useCallback(async (paramsPagination?, searchForm?) => {
     const actualPagination = paramsPagination || pagination;
     setLoading(true);
     const newSearchFormData = _.mapValues(
@@ -50,7 +39,7 @@ const TradeManagementMarketManagement = props => {
           return undefined;
         }
         return value;
-      }
+      },
     );
 
     const { error, data } = await mktInstrumentsListPaged({
@@ -63,7 +52,7 @@ const TradeManagementMarketManagement = props => {
     setTableDataSource(data.page);
     setTotal(data.totalCount);
     setNoData(data.page.length === 0);
-  };
+  });
 
   const filterFormData = (allFields, fields) => {
     if (fields.assetClass) {
@@ -85,7 +74,7 @@ const TradeManagementMarketManagement = props => {
 
   const optionInstrumentType = ['FUTURES_OPTION', 'STOCK_OPTION', 'INDEX_OPTION'];
 
-  const onCreateFormChange = (props, fields, allFields) => {
+  const onCreateFormChange = (p, fields, allFields) => {
     const nextAllFields = {
       ...createFormData,
       ...fields,
@@ -99,7 +88,10 @@ const TradeManagementMarketManagement = props => {
     setCreateFormData(filterFormData(nextAllFields, fields));
   };
 
-  const composeInstrumentInfo = modalFormData => {
+  const omitNull = obj => _.omitBy(obj, val => val === null);
+
+  const composeInstrumentInfo = formData => {
+    const modalFormData = formData;
     if (optionInstrumentType.indexOf(modalFormData.instrumentType) !== -1) {
       modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
       modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
@@ -116,6 +108,9 @@ const TradeManagementMarketManagement = props => {
       'strike',
       'multiplier',
       'underlyerInstrumentId',
+      'tradeCategory',
+      'tradeUnit',
+      'unit',
     ];
     let instrumentInfoSomeFields = instrumentInfoFields;
     if (modalFormData.instrumentType === 'INDEX') {
@@ -127,8 +122,6 @@ const TradeManagementMarketManagement = props => {
     };
     return omitNull(params);
   };
-
-  const omitNull = obj => _.omitBy(obj, val => val === null);
 
   const onCreate = async () => {
     const rsp = await $form.validate();
@@ -155,17 +148,10 @@ const TradeManagementMarketManagement = props => {
     fetchTable(defaultPagination);
   };
 
-  const onSearchFormChange = (props, fields, allFields) => {
-    const instrumentTypeMap = {
-      EQUITY: 'STOCK',
-      COMMODITY: 'SPOT',
-    };
-    const assetClass = fields.assetClass;
+  const onSearchFormChange = (p, fields, allFields) => {
     const formData = Form2.getFieldsValue(allFields);
-    if (assetClass) {
-      formData.instrumentType = assetClass.value ? instrumentTypeMap[assetClass.value] : undefined;
-    }
-    setSearchFormData(Form2.createFields(formData));
+    const createData = Form2.createFields(formData);
+    setSearchFormData(createData);
   };
 
   const onPaginationChange = (current, pageSize) => {
@@ -188,20 +174,31 @@ const TradeManagementMarketManagement = props => {
     fetchTable(defaultPagination);
   };
 
+  const onReset = () => {
+    setPagination(defaultPagination);
+    setSearchFormData({});
+    fetchTable();
+  };
+
+  useEffect(() => {
+    fetchTable(null, {});
+    setCreateFormControlsState(createFormControls({}, 'create'));
+  }, []);
+
   return (
     <Page>
       <Form2
         columns={searchFormControls()}
         dataSource={searchFormData}
-        layout={'inline'}
+        layout="inline"
         onSubmitButtonClick={onSearch}
         onResetButtonClick={onReset}
         onFieldsChange={onSearchFormChange}
-        submitText={'查询'}
+        submitText="查询"
       />
       <Divider />
       <Button style={{ marginBottom: VERTICAL_GUTTER }} type="primary" onClick={switchModal}>
-        新建标的物
+        新建标准合约
       </Button>
       <SmartTable
         rowKey="instrumentId"
@@ -221,11 +218,13 @@ const TradeManagementMarketManagement = props => {
         visible={createVisible}
         onOk={onCreate}
         onCancel={switchModal}
-        title={'新建标的物'}
+        title="新建标的物"
         okButtonProps={{ loading: creating }}
       >
         <Form2
-          ref={node => ($form = node)}
+          ref={node => {
+            $form = node;
+          }}
           columns={createFormControlsState}
           dataSource={createFormData}
           onFieldsChange={onCreateFormChange}
@@ -235,4 +234,4 @@ const TradeManagementMarketManagement = props => {
     </Page>
   );
 };
-export default memo<any>(TradeManagementMarketManagement);
+export default memo(TradeManagementMarketManagement);
