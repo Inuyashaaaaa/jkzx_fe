@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-param-reassign */
 import {
   Alert,
   Button,
@@ -12,7 +14,7 @@ import {
   Tag,
 } from 'antd';
 import _ from 'lodash';
-import { default as React, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import uuidv4 from 'uuid/v4';
 import {
   wkProcessConfigModify,
@@ -43,13 +45,19 @@ const Operation = props => {
   let $editTable = useRef<Table2>(null);
   const [isInstanceList, setIsInstanceList] = useState(false);
 
-  useEffect(() => {
-    if (props.processName) {
-      fetchData();
-    }
-  }, [fetchData, props.processName]);
+  const handleReviewData = processData => {
+    const data = processData || process;
+    let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
+    reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
 
-  const fetchData = useCallback(async () => {
+    reviewTaskData = reviewTaskData.map(item => ({
+      ...Form2.createFields(item),
+      taskId: item.taskId,
+    }));
+    setReviewTask(reviewTaskData);
+  };
+
+  const fetchData = async () => {
     setLoading(true);
     const { processName } = props;
     const { data, error } = await wkProcessGet({ processName });
@@ -74,55 +82,13 @@ const Operation = props => {
     setProcess(processData);
     setProcessConfigs(processData.processConfigs);
     handleReviewData(processData);
-  });
-
-  const handleReviewData = processData => {
-    const data = processData || process;
-    let reviewTaskData = (data.tasks || []).filter(item => item.taskType === 'reviewData');
-    reviewTaskData = _.sortBy(reviewTaskData, 'sequence');
-
-    reviewTaskData = reviewTaskData.map(item => ({
-      ...Form2.createFields(item),
-      taskId: item.taskId,
-    }));
-    setReviewTask(reviewTaskData);
   };
 
-  const reviewSave = async () => {
-    let tasks = _.cloneDeep(process.tasks);
-    tasks = tasks.map(task => {
-      if (task.taskType === 'modifyData') {
-        task.sequence = 9999;
-      }
-      if (task.taskType === 'insertData') {
-        task.sequence = -9999;
-      }
-      return task;
-    });
-    tasks = _.sortBy(tasks, 'sequence');
-
-    const reviewTasklength = (tasks || []).filter(item => item.taskType === 'reviewData').length;
-    tasks.splice(
-      1,
-      reviewTasklength,
-      ..._.values(reviewTask.map(item => Form2.getFieldsValue(item))),
-    );
-
-    tasks = tasks.map((item, index) => {
-      item.sequence = index;
-      return item;
-    });
-    featchProcessModify(tasks);
-  };
-
-  const handleReviewOk = async () => {
-    const res = await tableE1.validate();
-    if (_.isArray(res)) {
-      if (res.some(value => value.errors)) return;
+  useEffect(() => {
+    if (props.processName) {
+      fetchData();
     }
-
-    reviewSave();
-  };
+  }, [props.processName]);
 
   const getActionClass = (taskType, processName) => {
     // 资金
@@ -167,7 +133,10 @@ const Operation = props => {
       const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
         processName,
       });
-      if (_error) return (modify = false);
+      if (_error) {
+        modify = false;
+        return;
+      }
       if (_data.length > 0) {
         setExcelData(_data);
         return setWarningVisible(true);
@@ -211,6 +180,42 @@ const Operation = props => {
     setReviewVisible(false);
   };
 
+  const reviewSave = async () => {
+    let tasks = _.cloneDeep(process.tasks);
+    tasks = tasks.map(task => {
+      if (task.taskType === 'modifyData') {
+        task.sequence = 9999;
+      }
+      if (task.taskType === 'insertData') {
+        task.sequence = -9999;
+      }
+      return task;
+    });
+    tasks = _.sortBy(tasks, 'sequence');
+
+    const reviewTasklength = (tasks || []).filter(item => item.taskType === 'reviewData').length;
+    tasks.splice(
+      1,
+      reviewTasklength,
+      ..._.values(reviewTask.map(item => Form2.getFieldsValue(item))),
+    );
+
+    tasks = tasks.map((item, index) => {
+      item.sequence = index;
+      return item;
+    });
+    featchProcessModify(tasks);
+  };
+
+  const handleReviewOk = async () => {
+    const res = await tableE1.validate();
+    if (_.isArray(res)) {
+      if (res.some(value => value.errors)) return;
+    }
+
+    reviewSave();
+  };
+
   const handleReviewCancel = () => {
     handleReviewData(null);
     setReviewVisible(false);
@@ -223,7 +228,10 @@ const Operation = props => {
     const { error: _error, data: _data } = await wkProcessInstanceListByProcessName({
       processName,
     });
-    if (_error) return (modify = false);
+    if (_error) {
+      modify = false;
+      return;
+    }
     if (_data.length > 0) {
       setExcelData(_data);
       return setWarningVisible(true);
@@ -502,7 +510,9 @@ const Operation = props => {
               showIcon
             />
             <SmartTable
-              ref={node => (tableE1 = node)}
+              ref={node => {
+                tableE1 = node;
+              }}
               dataSource={reviewTask}
               rowKey="taskId"
               pagination={false}
@@ -518,7 +528,9 @@ const Operation = props => {
             handleOtherCancel={handleOtherCancel}
             otherTask={otherTask}
             onOtherCellFieldsChange={onOtherCellFieldsChange}
-            getRef={node => ($editTable = node)}
+            getRef={node => {
+              $editTable = node;
+            }}
             warningVisible={warningVisible}
             warningCancel={warningCancel}
             excelData={excelData}
@@ -532,5 +544,8 @@ const Operation = props => {
     </>
   );
 };
+
+/* eslint-enable consistent-return */
+/* eslint-enable no-param-reassign */
 
 export default Operation;

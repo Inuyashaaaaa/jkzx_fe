@@ -653,7 +653,9 @@ export const createFormControls = (event = {}, type) =>
   );
 
 export const editFormControls = (event = {}, type) =>
-  [instrumentId(type), assetClass(type), instrumentType].concat(getInstrumenInfo(event));
+  [instrumentId(type), name, assetClass(type), instrumentType, exchange].concat(
+    getInstrumenInfo(event),
+  );
 
 export const searchFormControls = () => [
   assetClassSearch,

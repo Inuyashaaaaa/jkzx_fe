@@ -57,30 +57,6 @@ const CashExportModal = memo<{
   const [dataSource, setDataSource] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (props.visible) {
-      searchData();
-    }
-  }, [props.visible, searchData]);
-
-  useEffect(() => {
-    console.log(props.trade);
-    searchData();
-  }, [props.trade, searchData]);
-
-  const searchData = useCallback(async () => {
-    if (!_.get(props, 'trade.tradeId') || !_.get(props, 'trade.counterPartyCode')) {
-      return;
-    }
-    const { error, data } = await cliTasksGenerateByTradeId({
-      tradeId: props.trade.tradeId,
-      legalName: props.trade.counterPartyCode,
-    });
-
-    if (error) return false;
-    fetchTable();
-  });
-
   const fetchTable = async () => {
     setLoading(true);
     const { error, data } = await cliUnProcessedTradeTaskListByTradeId({
@@ -90,6 +66,30 @@ const CashExportModal = memo<{
     if (error) return;
     setDataSource(data);
   };
+
+  const searchData = async () => {
+    if (!_.get(props, 'trade.tradeId') || !_.get(props, 'trade.counterPartyCode')) {
+      return;
+    }
+    const { error, data } = await cliTasksGenerateByTradeId({
+      tradeId: props.trade.tradeId,
+      legalName: props.trade.counterPartyCode,
+    });
+    if (error) {
+      return;
+    }
+    fetchTable();
+  };
+
+  useEffect(() => {
+    if (props.visible) {
+      searchData();
+    }
+  }, [props.visible]);
+
+  useEffect(() => {
+    searchData();
+  }, [props.trade]);
 
   return (
     <>

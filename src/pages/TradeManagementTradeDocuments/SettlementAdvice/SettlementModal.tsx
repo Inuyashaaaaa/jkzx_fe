@@ -1,19 +1,14 @@
-import ModalButton from '@/containers/ModalButton';
-import { DOWN_LOAD_SETTLEMENT_URL, emlSendSettleReport } from '@/services/document';
 import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
+import { DOWN_LOAD_SETTLEMENT_URL, emlSendSettleReport } from '@/services/document';
+import ModalButton from '@/containers/ModalButton';
+import DownloadButton from '@/containers/DownloadButton';
 
 class TradeModal extends PureComponent {
   public state = {
     visible: false,
-  };
-
-  public handleChange = params => {
-    this.setState({
-      modalData: params.values,
-    });
   };
 
   public onClick = () => {
@@ -44,7 +39,6 @@ class TradeModal extends PureComponent {
       return;
     }
     message.success('发送成功');
-    return;
   };
 
   public render() {
@@ -67,22 +61,15 @@ class TradeModal extends PureComponent {
             style={{ marginBottom: 40 }}
             message="结算通知书基于最新的模板即时生成，系统不会留存每次生成的结果。"
             type="info"
-            showIcon={true}
+            showIcon
           />
           <Row type="flex" justify="end" align="middle" gutter={8}>
             <Col>
-              <Button type="default">
-                <a
-                  href={encodeURI(
-                    `${DOWN_LOAD_SETTLEMENT_URL}tradeId=${this.props.data.tradeId}&positionId=${
-                      this.props.data.positionId
-                    }&partyName=${this.props.data.partyName}`
-                  )}
-                  download="template.t"
-                >
-                  下载
-                </a>
-              </Button>
+              <DownloadButton
+                url={DOWN_LOAD_SETTLEMENT_URL}
+                name={`${this.props.data.tradeId}结算通知书.doc`}
+                options={`tradeId=${this.props.data.tradeId}&positionId=${this.props.data.positionId}&partyName=${this.props.data.partyName}`}
+              />
             </Col>
             <Col>
               <Button type="primary" onClick={this.onConfirm} loading={this.state.loading}>
@@ -92,14 +79,13 @@ class TradeModal extends PureComponent {
           </Row>
           <Row type="flex" justify="end" align="middle" gutter={8}>
             <p style={{ lineHeight: '40px' }}>
-              {data.docProcessStatus === 'UN_PROCESSED'
-                ? `${username} 未处理过结算通知书`
-                : data.docProcessStatus === 'DOWNLOADED'
+              {data.docProcessStatus === 'UN_PROCESSED' ? `${username} 未处理过结算通知书` : null}
+              {data.docProcessStatus === 'DOWNLOADED'
                 ? `${username} 于 ${moment(data.updateAt).format(
-                    'YYYY-MM-DD HH:mm'
+                    'YYYY-MM-DD HH:mm',
                   )}下载过结算通知书`
                 : `${username} 于 ${moment(data.updateAt).format(
-                    'YYYY-MM-DD HH:mm'
+                    'YYYY-MM-DD HH:mm',
                   )}发送过结算通知书`}
             </p>
           </Row>

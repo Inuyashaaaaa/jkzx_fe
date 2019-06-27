@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import _ from 'lodash';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useEffect, useState, useRef } from 'react';
@@ -77,7 +78,9 @@ const TriggerCard = memo<any>(props => {
             rules: [{ required: true, message: '条件列表为必填项' }],
           })(
             <GroupList
-              getCurrent={node => ($formModel.current = node)}
+              getCurrent={node => {
+                $formModel.current = node;
+              }}
               {...{ record, index, form, editing }}
             />,
           )}
@@ -91,8 +94,9 @@ const TriggerCard = memo<any>(props => {
     ...Form2.createFields({ processName }),
   });
   const [loading, setLoading] = useState(false);
+  const [columns, setColumns] = useState(columns1);
 
-  const handleData = useCallback(() => {
+  const handleData = () => {
     if (!trigger) {
       setColumns(columns1);
       return setTargetData({
@@ -102,29 +106,29 @@ const TriggerCard = memo<any>(props => {
     setColumns(columns2);
     let conditions = _.cloneDeep(trigger.conditions);
     conditions = conditions.map(item => {
-      item.leftIndex = _.get(item, 'leftIndex.indexClass');
-      item.rightIndex = _.get(item, 'rightIndex.indexClass');
       const number = _.get(item, 'rightValue.number');
-      item.rightValue = number && _.isNumber(number) ? _.get(item, 'rightValue.number') : '';
       return {
-        ...Form2.createFields(item),
+        ...Form2.createFields({
+          ...item,
+          leftIndex: _.get(item, 'leftIndex.indexClass'),
+          rightIndex: _.get(item, 'rightIndex.indexClass'),
+          rightValue: number && _.isNumber(number) ? _.get(item, 'rightValue.number') : '',
+        }),
         conditionId: item.conditionId,
       };
     });
-    setTargetData({
+    return setTargetData({
       ...Form2.createFields({
         operation: trigger.operation,
         conditions,
         processName,
       }),
     });
-  });
+  };
 
   useEffect(() => {
     handleData();
-  }, [handleData, trigger]);
-
-  const [columns, setColumns] = useState(columns1);
+  }, [trigger]);
 
   const findName = (data, filed, item) => {
     const Index = _.findIndex(data, p => p[filed] === item);
@@ -182,10 +186,10 @@ const TriggerCard = memo<any>(props => {
       return message.info('至少添加一个条件');
     }
 
-    conditionsData = conditionsData.map(item => {
-      item.rightValue = item.rightValue ? { number: item.rightValue } : {};
-      return item;
-    });
+    conditionsData = conditionsData.map(item => ({
+      ...item,
+      rightValue: item.rightValue ? { number: item.rightValue } : {},
+    }));
     const { data: _data, error: _error } = await wkIndexList({});
     const strArr = conditionsData.map(
       item =>
@@ -235,7 +239,7 @@ const TriggerCard = memo<any>(props => {
     setTargetVisible(false);
   };
 
-  const onFormChange = async (props, changedFields, allFields, rowIndex) => {
+  const onFormChange = async (data, changedFields, allFields, rowIndex) => {
     const changedData = Form2.getFieldsValue(changedFields);
     if (changedData.operation === 'all') {
       setColumns(columns1);
@@ -246,16 +250,16 @@ const TriggerCard = memo<any>(props => {
     }
     setColumns(columns2);
     if (changedData.triggerName) {
-      const { error, data } = await wkProcessTriggerList({});
+      const { error, data: param } = await wkProcessTriggerList({});
       if (error) return;
-      const _data =
-        _.get(data.filter(item => item.triggerId === changedData.triggerName), '[0]') || {};
+      const newData =
+        _.get(param.filter(item => item.triggerId === changedData.triggerName), '[0]') || {};
       return setTargetData({
         ...targetData,
         ...changedFields,
         ...Form2.createFields({
-          operation: OPERATION_MAP[_data.operation],
-          description: _data.description,
+          operation: OPERATION_MAP[newData.operation],
+          description: newData.description,
         }),
       });
     }
@@ -265,7 +269,6 @@ const TriggerCard = memo<any>(props => {
       ...changedFields,
     });
   };
-  console.log(targetData);
   return (
     <>
       <Card
@@ -303,7 +306,9 @@ const TriggerCard = memo<any>(props => {
         confirmLoading={loading}
       >
         <Form2
-          ref={node => ($form.current = node)}
+          ref={node => {
+            $form.current = node;
+          }}
           layout="horizontal"
           footer={false}
           dataSource={targetData}
@@ -316,5 +321,5 @@ const TriggerCard = memo<any>(props => {
     </>
   );
 });
-
+/* eslint-enable consistent-return */
 export default TriggerCard;

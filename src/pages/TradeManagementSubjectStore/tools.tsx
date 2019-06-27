@@ -1,3 +1,4 @@
+import React from 'react';
 import { formatNumber } from '@/tools';
 import {
   EXERCISETYPE_MAP_CN,
@@ -7,7 +8,6 @@ import {
   INSTRUMENT_TYPE_ZHCN_MAP,
   OPTION_TYPE_ZHCN_MAP,
 } from '@/constants/common';
-import React from 'react';
 import Operation from './Operation';
 import { ASSET_SUB_CLASS_MAP } from './services';
 
