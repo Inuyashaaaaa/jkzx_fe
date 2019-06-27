@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Select, Table2, SmartTable } from '@/containers';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
@@ -120,7 +121,7 @@ class Action extends PureComponent<any, any> {
           tradeId: item,
           portfolioNames: [this.state.portfolio.portfolioName],
         });
-      })
+      }),
     );
     const errors = results.filter(item => item.error);
     message.success(`${count - errors.length}笔加入投资组成功`);
@@ -150,7 +151,7 @@ class Action extends PureComponent<any, any> {
       },
       () => {
         this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
-      }
+      },
     );
   };
 
@@ -166,7 +167,7 @@ class Action extends PureComponent<any, any> {
     });
   };
 
-  public onTradeTableSearch = async (paramsPagination?) => {
+  public onTradeTableSearch = async paramsPagination => {
     this.setState({
       loading: true,
     });
@@ -200,29 +201,17 @@ class Action extends PureComponent<any, any> {
         }),
       ];
     });
+
     const tableDataSource = _.reduce(
       dataSource,
       (result, next) => {
         return result.concat(next);
       },
-      []
-    );
-
-    const tradeIds = await trdTradeListBySimilarTradeId({
-      similarTradeId: '',
-    });
-    if (tradeIds.error) return [];
-    const tableDataTrade = tradeIds.data.map(item => ({
-      label: item,
-      value: item,
-    }));
-    const tradeIdsData = tableDataTrade.filter(
-      item => !tableDataSource.map(t => t.tradeId).includes(item.value)
+      [],
     );
 
     this.setState({
       tableDataSource,
-      tradeIdsData,
       pagination: {
         ...pagination,
         ...paramsPagination,
@@ -230,6 +219,21 @@ class Action extends PureComponent<any, any> {
       },
       pageSizeCurrent: tableDataSource.length,
     });
+  };
+
+  public fetchTradeGroupByTradeId = async (similarTradeId = '') => {
+    const tradeIds = await trdTradeListBySimilarTradeId({
+      similarTradeId,
+    });
+    if (tradeIds.error) return [];
+    const tableDataTrade = tradeIds.data.map(item => ({
+      label: item,
+      value: item,
+    }));
+    const tradeIdsData = tableDataTrade.filter(
+      item => !this.state.tableDataSource.map(t => t.tradeId).includes(item.value),
+    );
+    return tradeIdsData;
   };
 
   public handlePortfolioName = e => {
@@ -279,7 +283,7 @@ class Action extends PureComponent<any, any> {
           pageSize,
           portfolioNames: [this.state.portfolio.portfolioName],
         });
-      }
+      },
     );
   };
 
@@ -339,9 +343,9 @@ class Action extends PureComponent<any, any> {
                         <Select
                           style={{ minWidth: 180 }}
                           placeholder="请输入交易ID查询"
-                          allowClear={true}
-                          showSearch={true}
-                          fetchOptionsOnSearch={true}
+                          allowClear
+                          showSearch
+                          fetchOptionsOnSearch
                           style={{ minWidth: '200px' }}
                           mode="multiple"
                           options={
@@ -352,9 +356,12 @@ class Action extends PureComponent<any, any> {
                                     value: item,
                                   };
                                 })
-                              : this.state.tradeIdsData
+                              : async (value: string = '') => {
+                                  const data = await this.fetchTradeGroupByTradeId(value);
+                                  return data.slice(0, 100);
+                                }
                           }
-                        />
+                        />,
                       )}
                     </FormItem>
                   );
