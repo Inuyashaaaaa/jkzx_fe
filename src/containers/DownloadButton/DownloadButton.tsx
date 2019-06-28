@@ -1,11 +1,18 @@
 import React, { memo, useState, useRef } from 'react';
 import { Button, notification } from 'antd';
 import uuidv4 from 'uuid/v4';
+import { ButtonProps } from 'antd/lib/button';
 import { DOWN_LOAD } from '@/services/document';
 
-const DownloadButton = memo<any>(props => {
+export interface BtnProps extends ButtonProps {
+  url?: string; // 下载地址
+  options?: string; // 接口参数
+  name?: string; // 下载文件名称
+}
+
+const DownloadButton: React.SFC<BtnProps> = memo<BtnProps>(props => {
   const btn = useRef<any>(null);
-  const { url, options, name } = props;
+  const { url, options, name, content, ...rest } = props;
   const [loading, setLoading] = useState(false);
   const onClick = async () => {
     setLoading(true);
@@ -28,14 +35,14 @@ const DownloadButton = memo<any>(props => {
 
   return (
     <Button
-      type="default"
+      {...(rest || {})}
       loading={loading}
       onClick={onClick}
       ref={node => {
         btn.current = node;
       }}
     >
-      下载
+      {content}
     </Button>
   );
 });

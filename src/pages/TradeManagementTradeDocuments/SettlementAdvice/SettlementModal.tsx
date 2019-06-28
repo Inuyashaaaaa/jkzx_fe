@@ -66,6 +66,7 @@ class TradeModal extends PureComponent {
           <Row type="flex" justify="end" align="middle" gutter={8}>
             <Col>
               <DownloadButton
+                content="下载"
                 url={DOWN_LOAD_SETTLEMENT_URL}
                 name={`${this.props.data.tradeId}结算通知书.doc`}
                 options={`tradeId=${this.props.data.tradeId}&positionId=${this.props.data.positionId}&partyName=${this.props.data.partyName}`}
