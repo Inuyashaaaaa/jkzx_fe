@@ -241,7 +241,7 @@ const TradeManagementOnBoardTansaction = props => {
     if (mktInstrumentInfoRef.error) return;
     const { error, data } = await exeTradeRecordSave({
       ...formatValues,
-      multiplier: mktInstrumentInfoRef.data.instrumentInfo.multiplier,
+      multiplier: mktInstrumentInfoRef.data.instrumentInfo.multiplier || 1,
     });
     if (error) {
       message.error('新建失败');
