@@ -1,7 +1,5 @@
-/* eslint-disable */
-
-import Page from '@/containers/Page';
 import React, { PureComponent } from 'react';
+import Page from '@/containers/Page';
 import Pending from './Pending';
 import Related from './Related';
 import TabHeader from '@/containers/TabHeader';
