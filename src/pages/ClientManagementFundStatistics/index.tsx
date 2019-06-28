@@ -7,8 +7,8 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { sortByCreateAt } from '@/services/sort';
-import { formatMoney, formatNumber } from '@/tools';
-import { Divider, Table } from 'antd';
+import { formatNumber } from '@/tools';
+import { Divider } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';

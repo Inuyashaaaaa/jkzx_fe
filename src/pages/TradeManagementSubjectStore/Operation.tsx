@@ -1,3 +1,4 @@
+/*eslint-disable */
 import React, { useRef, useState, memo } from 'react';
 import { Popconfirm, Divider, Modal, message } from 'antd';
 import { Form2 } from '@/containers';
@@ -5,9 +6,10 @@ import { editFormControls } from './services';
 import { mktInstrumentCreate, mktInstrumentDelete } from '@/services/market-data-service';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
+import { getMoment } from '@/tools';
 
 const Operation = memo<{ record: any; fetchTable: any }>(props => {
-  let $form: Form2 = useRef(null);
+  let $form = useRef<Form2>(null);
 
   const [editVisible, setEditVisible] = useState(false);
   const [editFormControlsState, setEditformControlsState] = useState({});
@@ -28,6 +30,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
 
   const switchModal = () => {
     const data = _.mapValues(props.record, (value, key) => {
+      if (value === null || value === undefined) return value;
       if ('expirationTime' === key) {
         return moment(value, 'HH:mm:ss');
       }
@@ -43,10 +46,13 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
 
   const composeInstrumentInfo = modalFormData => {
     modalFormData.expirationDate = modalFormData.expirationDate
-      ? moment(modalFormData.expirationDate).format('YYYY-MM-DD')
+      ? getMoment(modalFormData.expirationDate).format('YYYY-MM-DD')
       : undefined;
     modalFormData.expirationTime = modalFormData.expirationTime
-      ? moment(modalFormData.expirationTime).format('HH:mm:ss')
+      ? getMoment(modalFormData.expirationTime).format('HH:mm:ss')
+      : undefined;
+    modalFormData.maturity = modalFormData.maturity
+      ? getMoment(modalFormData.maturity).format('YYYY-MM-DD')
       : undefined;
     const instrumentInfoFields = [
       'multiplier',
@@ -78,11 +84,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     const rsp = await $form.validate();
     if (rsp.error) return;
     setEditing(false);
-    let newEditFormData = Form2.getFieldsValue(editFormData);
-    newEditFormData = composeInstrumentInfo(newEditFormData);
-    newEditFormData.instrumentInfo.maturity = isMoment(newEditFormData.instrumentInfo.maturity)
-      ? moment(newEditFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
-      : newEditFormData.instrumentInfo.maturity;
+    const newEditFormData = composeInstrumentInfo(Form2.getFieldsValue(editFormData));
     const { error, data } = await mktInstrumentCreate(newEditFormData);
     setEditing(false);
 
@@ -96,9 +98,10 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     return;
   };
 
-  const filterFormData = (allFields, fields) => {
+  const filterFormData = (allFields, fields, columns) => {
     const changed = Form2.getFieldsValue(fields);
-    const formData = Form2.getFieldsValue(allFields);
+    const column = columns.map(item => item.dataIndex);
+    const formData = _.pick(Form2.getFieldsValue(allFields), column);
     if (Object.keys(changed)[0] === 'assetClass') {
       return {
         ..._.pick(props.record, ['instrumentId']),
@@ -117,7 +120,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
   const onEditFormChange = (props, fields, allFields) => {
     const columns = editFormControls(Form2.getFieldsValue(allFields), 'edit');
     setEditformControlsState(columns);
-    setEditFormData(Form2.createFields(filterFormData(allFields, fields)));
+    setEditFormData(Form2.createFields(filterFormData(allFields, fields, columns)));
   };
 
   return (

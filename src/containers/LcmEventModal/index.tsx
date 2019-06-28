@@ -1,3 +1,4 @@
+/*eslint-disable */
 import {
   LCM_EVENT_TYPE_MAP,
   LCM_EVENT_TYPE_ZHCN_MAP,
@@ -27,6 +28,8 @@ import { OB_PRICE_FIELD } from './constants';
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import { getObservertionFieldData } from './tools';
+import { isRangeAccruals, getMoment } from '@/tools';
+import moment from 'moment';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -59,12 +62,14 @@ const LcmEventModal = memo<{
   const notBarrierHappen = data => {
     const direction = data[LEG_FIELD.KNOCK_DIRECTION];
     const fixObservations = data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
-    const last = fixObservations.every(item => {
-      return _.isNumber(item[OB_PRICE_FIELD]);
-    });
+    const last = fixObservations.every(item => _.isNumber(item[OB_PRICE_FIELD]));
     const tableData = getObservertionFieldData(data);
+    const expirationDate = getMoment(data[LEG_FIELD.EXPIRATION_DATE]);
+    const now = moment();
+    const expiration = expirationDate.isBefore(now, 'day') || expirationDate.isSame(now, 'day');
     return (
       last &&
+      expiration &&
       tableData.every(record => {
         const upBarrier = record[LEG_FIELD.UP_BARRIER];
         const alObPrice = record[OB_PRICE_FIELD];
@@ -87,6 +92,13 @@ const LcmEventModal = memo<{
     );
   };
 
+  const notKnockIn = data => {
+    if (data[LEG_FIELD.ALREADY_BARRIER]) {
+      return true;
+    }
+    return false;
+  };
+
   const meta: ILcmEventModalEl = {
     show: (event: ILcmEventModalEventParams) => {
       const { eventType, record, createFormData, currentUser, loadData } = event;
@@ -94,15 +106,15 @@ const LcmEventModal = memo<{
       const data = Form2.getFieldsValue(record);
       const tableFormData = Form2.getFieldsValue(createFormData);
       if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
-        if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
-          if (!notBarrierHappen(data)) {
-            return message.warn('不能进行到期结算操作');
-          }
-        }
         return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_IN) {
+        if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+          if (notKnockIn(data)) {
+            return message.warn('不能进行敲入操作');
+          }
+        }
         return $barrierIn.current.show(data, tableFormData, currentUser, loadData);
       }
 
@@ -113,7 +125,7 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
         if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
           const convertedData = filterObDays(convertObservetions(data));
-          if (convertedData.some(item => !item.price)) {
+          if (!convertedData.every(item => _.isNumber(item[OB_PRICE_FIELD]))) {
             return message.warn('请先完善观察日价格');
           }
           return $asianExerciseModal.current.show(data, tableFormData, currentUser, loadData);
@@ -124,7 +136,7 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.UNWIND) {
         if (record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND) {
           return message.warn(
-            `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`
+            `${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}状态下无法继续${LCM_EVENT_TYPE_ZHCN_MAP.UNWIND}`,
           );
         }
         return $unwindModal.current.show(data, tableFormData, currentUser, loadData);
@@ -147,6 +159,20 @@ const LcmEventModal = memo<{
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
+        if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+          const convertedData = filterObDays(convertObservetions(data));
+          if (!convertedData.every(item => _.isNumber(item[OB_PRICE_FIELD]))) {
+            return message.warn('请先完善观察日价格');
+          }
+        }
+        if (legType === LEG_TYPE_MAP.AUTOCALL || legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+          if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+            if (!notBarrierHappen(data)) {
+              return message.warn('不能进行到期结算操作');
+            }
+          }
+          return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
+        }
         return $settleModal.current.show(data, tableFormData, currentUser, loadData);
       }
     },
@@ -156,14 +182,26 @@ const LcmEventModal = memo<{
 
   return (
     <>
-      <UnwindModal ref={node => ($unwindModal.current = node)} />
+      <UnwindModal
+        ref={node => {
+          $unwindModal.current = node;
+        }}
+      />
       <ExerciseModal
         ref={node => {
           $exerciseModal.current = node;
         }}
       />
-      <ExpirationModal ref={node => ($expirationModal.current = node)} />
-      <KnockOutModal ref={node => ($knockOutModal.current = node)} />
+      <ExpirationModal
+        ref={node => {
+          $expirationModal.current = node;
+        }}
+      />
+      <KnockOutModal
+        ref={node => {
+          $knockOutModal.current = node;
+        }}
+      />
       <FixingModal
         ref={node => {
           $fixingModal.current = node;

@@ -1,6 +1,6 @@
 import Form from '@/containers/Form';
 import React, { PureComponent } from 'react';
-import { CREATE_FORM_CONTROLS } from './constants';
+import { CREATE_FORM_CONTROLS } from './tools';
 
 class CreateFormModal extends PureComponent {
   public onValueChange = params => {

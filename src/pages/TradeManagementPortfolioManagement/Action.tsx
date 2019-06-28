@@ -1,23 +1,35 @@
+/* eslint-disable */
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2, SmartTable } from '@/containers';
+import { Form2, Select, Table2, SmartTable, Loading } from '@/containers';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import {
   trdPortfolioDelete,
   trdPortfolioUpdate,
   trdTradePortfolioCreateBatch,
 } from '@/services/trade-service';
-import { Button, Icon, Input, message, Modal, Popconfirm, Row, Table, Divider } from 'antd';
+import {
+  Button,
+  Icon,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Row,
+  Table,
+  Divider,
+  Pagination,
+} from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import styles from './Action.less';
-import { BOOKING_TABLE_COLUMN_DEFS } from './constants';
-import { PAGE_SIZE } from '@/constants/component';
+import { BOOKING_TABLE_COLUMN_DEFS } from './tools';
+import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
+import { showTotal } from '@/tools/component';
 
 class Action extends PureComponent<any, any> {
   public $table2: Table2 = null;
-  public status: any;
 
   constructor(props) {
     super(props);
@@ -33,8 +45,6 @@ class Action extends PureComponent<any, any> {
         pageSize: PAGE_SIZE,
         total: 0,
       },
-      pageSizeCurrent: 0,
-      bookList: [],
       tableDataSource: [],
       portfolioName: props.params.data.portfolioName,
       tradeIdsData: [],
@@ -115,12 +125,12 @@ class Action extends PureComponent<any, any> {
     });
     const count = formatValues.tradeId.length;
     const results = await Promise.all(
-      formatValues.tradeId.map(item => {
-        return trdTradePortfolioCreateBatch({
+      formatValues.tradeId.map(item =>
+        trdTradePortfolioCreateBatch({
           tradeId: item,
           portfolioNames: [this.state.portfolio.portfolioName],
-        });
-      })
+        }),
+      ),
     );
     const errors = results.filter(item => item.error);
     message.success(`${count - errors.length}笔加入投资组成功`);
@@ -150,7 +160,7 @@ class Action extends PureComponent<any, any> {
       },
       () => {
         this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
-      }
+      },
     );
   };
 
@@ -160,13 +170,9 @@ class Action extends PureComponent<any, any> {
     });
   };
 
-  public getFormData = () => {
-    return _.mapValues(this.state.searchFormData, item => {
-      return _.get(item, 'value');
-    });
-  };
+  public getFormData = () => _.mapValues(this.state.searchFormData, item => _.get(item, 'value'));
 
-  public onTradeTableSearch = async (paramsPagination?) => {
+  public onTradeTableSearch = async paramsPagination => {
     this.setState({
       loading: true,
     });
@@ -200,16 +206,28 @@ class Action extends PureComponent<any, any> {
         }),
       ];
     });
+
     const tableDataSource = _.reduce(
       dataSource,
       (result, next) => {
         return result.concat(next);
       },
-      []
+      [],
     );
 
+    this.setState({
+      tableDataSource,
+      pagination: {
+        ...pagination,
+        ...paramsPagination,
+        total: data.totalCount,
+      },
+    });
+  };
+
+  public fetchTradeGroupByTradeId = async (similarTradeId = '') => {
     const tradeIds = await trdTradeListBySimilarTradeId({
-      similarTradeId: '',
+      similarTradeId,
     });
     if (tradeIds.error) return [];
     const tableDataTrade = tradeIds.data.map(item => ({
@@ -217,19 +235,9 @@ class Action extends PureComponent<any, any> {
       value: item,
     }));
     const tradeIdsData = tableDataTrade.filter(
-      item => !tableDataSource.map(t => t.tradeId).includes(item.value)
+      item => !this.state.tableDataSource.map(t => t.tradeId).includes(item.value),
     );
-
-    this.setState({
-      tableDataSource,
-      tradeIdsData,
-      pagination: {
-        ...pagination,
-        ...paramsPagination,
-        total: data.totalCount,
-      },
-      pageSizeCurrent: tableDataSource.length,
-    });
+    return tradeIdsData;
   };
 
   public handlePortfolioName = e => {
@@ -279,9 +287,11 @@ class Action extends PureComponent<any, any> {
           pageSize,
           portfolioNames: [this.state.portfolio.portfolioName],
         });
-      }
+      },
     );
   };
+
+  public status: any;
 
   public render() {
     const { params } = this.props;
@@ -339,9 +349,9 @@ class Action extends PureComponent<any, any> {
                         <Select
                           style={{ minWidth: 180 }}
                           placeholder="请输入交易ID查询"
-                          allowClear={true}
-                          showSearch={true}
-                          fetchOptionsOnSearch={true}
+                          allowClear
+                          showSearch
+                          fetchOptionsOnSearch
                           style={{ minWidth: '200px' }}
                           mode="multiple"
                           options={
@@ -352,9 +362,12 @@ class Action extends PureComponent<any, any> {
                                     value: item,
                                   };
                                 })
-                              : this.state.tradeIdsData
+                              : async (value: string = '') => {
+                                  const data = await this.fetchTradeGroupByTradeId(value);
+                                  return data.slice(0, 100);
+                                }
                           }
-                        />
+                        />,
                       )}
                     </FormItem>
                   );
@@ -363,26 +376,32 @@ class Action extends PureComponent<any, any> {
             ]}
           />
           <div style={{ marginTop: VERTICAL_GUTTER }}>
-            <SmartTable
-              pagination={{
-                position: 'bottom',
-                showQuickJumper: true,
-                current: this.state.pagination.current,
-                // pageSize: this.state.pageSizeCurrent,
-                pageSize: this.state.pagination.pageSize,
-                onChange: this.onPaginationChange,
-                total: this.state.pagination.total,
-                onShowSizeChange: this.handleShowSizeChange,
-              }}
-              rowKey={'positionId'}
-              scroll={{ x: 2300 }}
-              loading={this.state.loading}
-              dataSource={this.state.tableDataSource}
-              columns={BOOKING_TABLE_COLUMN_DEFS(this.state.portfolio.portfolioName, this.search)}
-              onRow={record => {
-                return record.style ? { style: record.style } : null;
-              }}
-            />
+            <Loading loading={this.state.loading}>
+              <SmartTable
+                pagination={false}
+                rowKey="positionId"
+                scroll={{ x: 2300 }}
+                dataSource={this.state.tableDataSource}
+                columns={BOOKING_TABLE_COLUMN_DEFS(this.state.portfolio.portfolioName, this.search)}
+                onRow={record => (record.style ? { style: record.style } : null)}
+              />
+              <Row type="flex" justify="end" style={{ marginTop: 15 }}>
+                <Pagination
+                  {...{
+                    size: 'small',
+                    showSizeChanger: true,
+                    onShowSizeChange: this.handleShowSizeChange,
+                    showQuickJumper: true,
+                    current: this.state.pagination.current,
+                    pageSize: this.state.pagination.pageSize,
+                    onChange: this.onPaginationChange,
+                    total: this.state.pagination.total,
+                    pageSizeOptions: PAGE_SIZE_OPTIONS,
+                    showTotal,
+                  }}
+                />
+              </Row>
+            </Loading>
           </div>
         </Modal>
       </Row>

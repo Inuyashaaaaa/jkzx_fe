@@ -10,7 +10,6 @@ const PopconfirmCard = props => {
 
   const content = (
     <div>
-      <p>{OPERATION_MAP[data.operation]}</p>
       <ul className={styles.desList}>
         {data.description &&
           data.description.split(',').length > 0 &&
@@ -23,7 +22,7 @@ const PopconfirmCard = props => {
 
   return (
     <>
-      <Popover placement="bottomLeft" content={content} title={data.triggerName} trigger="click">
+      <Popover placement="right" content={content}>
         <Icon type="info-circle" style={{ margin: '0 5px' }} />
       </Popover>
     </>

@@ -258,11 +258,6 @@ export default [
               component: './RiskManagerIntradayDailyPnlByUnderlyerReport/index',
             },
             {
-              path: '/risk-manager/custom-report',
-              name: 'customReport',
-              component: './RiskManagerCustomReport/index',
-            },
-            {
               path: '/risk-manager/intraday-expiring-position-report',
               name: 'intradayExpiringPositionReport',
               component: './RiskManagerIntradayExpiringPositionReport/index',
@@ -293,11 +288,6 @@ export default [
               path: '/approval-process/process-configuration',
               name: 'processConfiguration',
               component: './ApprovalProcessConfiguration/index',
-            },
-            {
-              path: '/approval-process/trigger-management',
-              name: 'triggerManagement',
-              component: './ApprocalTriggerManagement/index',
             },
           ],
         },

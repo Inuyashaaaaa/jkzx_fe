@@ -1,5 +1,4 @@
 import { Form2, Input, InputNumber, Select, SmartTable } from '@/containers';
-// import Table from '@/containers/_Table2';
 import Page from '@/containers/Page';
 import TabHeader from '@/containers/TabHeader';
 import ImportExcelButton from '@/containers/_ImportExcelButton';

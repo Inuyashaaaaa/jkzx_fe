@@ -21,10 +21,11 @@ export default {
           antd: true,
           enable: true, // default false
           default: 'zh-CN', // default zh-CN
-          baseNavigator: false, // default true, when it is true, will use `navigator.language` overwrite default
+          // default true, when it is true, will use `navigator.language` overwrite default
+          baseNavigator: false,
         },
         dynamicImport: {
-          loadingComponent: '/containers/_Loading',
+          loadingComponent: '/containers/ProgressLine',
         },
         ...(!process.env.TEST && os.platform() === 'darwin'
           ? {

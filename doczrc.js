@@ -1,7 +1,7 @@
 import path from 'path';
 
 export default {
-  title: 'components',
+  title: 'termites-design',
   src: './src',
   files: '**/*.mdx',
   dest: './cdocs',
@@ -48,5 +48,12 @@ export default {
       });
 
     return config;
+  },
+  filterComponents: files => files.filter(filepath => /w*.(js|jsx|ts|tsx)$/.test(filepath)),
+  menu: ['Home', 'Components', 'Containers'],
+  themeConfig: {
+    colors: {
+      primary: '#000',
+    },
   },
 };

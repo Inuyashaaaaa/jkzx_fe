@@ -1,4 +1,4 @@
-import { BookName, LegalName, InstrumentId, ProductType } from '@/domains/SearchForm';
+import { BookName, LegalName, InstrumentId, ProductType } from '@/containers/searchForm';
 
 export const searchFormControls = () => {
   return [BookName, LegalName, InstrumentId, ProductType];

@@ -1,16 +1,4 @@
-import {
-  completeTaskProcess,
-  queryProcessForm,
-  queryProcessHistoryForm,
-  wkProcessInstanceFormGet,
-  UPLOAD_URL,
-  wkAttachmentProcessInstanceModify,
-  wkAttachmentList,
-  downloadTradeAttachment,
-} from '@/services/approval';
 import moment from 'moment';
-import { Form2, Upload, SmartTable } from '@/containers';
-import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
 import {
   Button,
   Icon,
@@ -26,15 +14,28 @@ import {
   Alert,
 } from 'antd';
 import React, { PureComponent } from 'react';
-import { generateColumns } from '../constants';
 import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import {
+  completeTaskProcess,
+  queryProcessForm,
+  queryProcessHistoryForm,
+  wkProcessInstanceFormGet,
+  UPLOAD_URL,
+  wkAttachmentProcessInstanceModify,
+  wkAttachmentList,
+  downloadTradeAttachment,
+} from '@/services/approval';
+import { Form2, Upload, SmartTable } from '@/containers';
+import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
+import { generateColumns } from '../tools';
 import { getToken } from '@/tools/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
-import _ from 'lodash';
 import styles from '../index.less';
 
 const { TextArea } = Input;
 const { Title } = Typography;
+/* eslint-disable */
 class ApprovalForm extends PureComponent<any, any> {
   constructor(props) {
     super(props);
@@ -60,6 +61,7 @@ class ApprovalForm extends PureComponent<any, any> {
       tableData: {},
     };
   }
+
   public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
@@ -85,7 +87,7 @@ class ApprovalForm extends PureComponent<any, any> {
         },
         () => {
           this.fetchData(formData, status);
-        }
+        },
       );
     }
   }
@@ -118,19 +120,19 @@ class ApprovalForm extends PureComponent<any, any> {
       instance.initiatorName = (instance.initiator && instance.initiator.userName) || '';
       instance.operatorName = (instance.operator && instance.operator.userName) || '';
     }
-    const _detailData = {
+    const newDetailData = {
       tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
       bookName: _.get(data, 'process._business_payload.trade.bookName'),
       tradeDate: _.get(data, 'process._business_payload.trade.tradeDate'),
       salesName: _.get(data, 'process._business_payload.trade.salesName'),
       counterPartyName: _.get(
         data,
-        'process._business_payload.trade.positions[0].counterPartyName'
+        'process._business_payload.trade.positions[0].counterPartyName',
       ),
       trader: _.get(data, 'process._business_payload.trade.trader'),
     };
     this.setState({
-      detailData: _detailData,
+      detailData: newDetailData,
       currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
       tableData: _.get(data, 'process._business_payload'),
@@ -162,7 +164,7 @@ class ApprovalForm extends PureComponent<any, any> {
       },
       () => {
         this.setFinalData(data, status);
-      }
+      },
     );
   };
 
@@ -180,8 +182,8 @@ class ApprovalForm extends PureComponent<any, any> {
     const { formData } = this.props;
     const { data } = this.state;
     console.log(formData);
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
+    // const isCheckBtn =
+    //   formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
     const formItems = this.formatFormItems(data, isCheckBtn);
     this.setState({
       formItems,
@@ -442,24 +444,23 @@ class ApprovalForm extends PureComponent<any, any> {
     const isCheckBtn = currentNodeDTO !== 'modifyData' && status === 'pending';
     const approvalColumns = generateColumns(
       'approval',
-      data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
+      data.processInstance && data.processInstance.operator ? 'operator' : 'initiator',
     );
     const processColumns = generateColumns('process');
     const processData = data.processInstance ? [data.processInstance] : [];
     let histories = data.taskHistory ? data.taskHistory : [];
-    const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin={true} />;
+    const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
     const _data = data.processInstance ? data.processInstance : {};
-    histories = histories.sort((item1, item2) => {
-      return moment(item1.operateTime).valueOf() - moment(item2.operateTime).valueOf();
-    });
+    histories = histories.sort(
+      (item1, item2) => moment(item1.operateTime).valueOf() - moment(item2.operateTime).valueOf(),
+    );
     if (histories.length > 0) {
       _data.status =
         histories[histories.length - 1].operation === '退回'
           ? '待修改'
-          : histories[histories.length - 1].operation === '复核通过' ||
-            histories[histories.length - 1].operation === '废弃'
-          ? '审核完成'
-          : '待审批';
+          : formData.processInstanceStatusEnum === 'processUnfinished'
+          ? '待审批'
+          : '审批完成';
     }
     return (
       <div className={styles.fromContainer}>
@@ -477,38 +478,28 @@ class ApprovalForm extends PureComponent<any, any> {
                 {
                   title: '审批单号',
                   dataIndex: 'processSequenceNum',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '审批类型',
                   dataIndex: 'processName',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
 
                 {
                   title: '状态',
                   dataIndex: 'status',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '发起人',
-                  dataIndex: `${!!_data.initiatorName ? 'initiatorName' : 'operatorName'}`,
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  dataIndex: `${_data.initiatorName ? 'initiatorName' : 'operatorName'}`,
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '标题',
                   dataIndex: 'subject',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
               ]}
             />
@@ -526,48 +517,36 @@ class ApprovalForm extends PureComponent<any, any> {
                 {
                   title: '交易编号',
                   dataIndex: 'tradeId',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '交易簿',
                   dataIndex: 'bookName',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '交易日',
                   dataIndex: 'tradeDate',
-                  render: (value, record, index, { form, editing }) => {
-                    return (
-                      <FormItem>
-                        {value && value.indexOf('T') >= 0 ? value.split('T')[0] : value}
-                      </FormItem>
-                    );
-                  },
+                  render: (value, record, index, { form, editing }) => (
+                    <FormItem>
+                      {value && value.indexOf('T') >= 0 ? value.split('T')[0] : value}
+                    </FormItem>
+                  ),
                 },
                 {
                   title: '交易对手',
                   dataIndex: 'counterPartyName',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '关联销售',
                   dataIndex: 'salesName',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '交易创建人',
                   dataIndex: 'trader',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
               ]}
             />
@@ -613,9 +592,9 @@ class ApprovalForm extends PureComponent<any, any> {
                           },
                           () => {
                             this.transactionHandleOk(
-                              _.get(fileList, '[0].response.result.attachmentName')
+                              _.get(fileList, '[0].response.result.attachmentName'),
                             );
-                          }
+                          },
                         );
                       }
                     }}
@@ -663,7 +642,7 @@ class ApprovalForm extends PureComponent<any, any> {
                           <TextArea
                             onChange={this.setPassComment}
                             value={passComment}
-                            placeholder={'请输入审核意见（可选）'}
+                            placeholder="请输入审核意见（可选）"
                           />
                         </div>
                       }

@@ -1,24 +1,21 @@
 import {
-  ACCOUNT_DIRECTION_TYPE_OPTIONS,
-  INPUT_NUMBER_DIGITAL_CONFIG,
-  PAYMENT_DIRECTION_TYPE_OPTIONS,
   PROCESS_STATUS_TYPES_OPTIONS,
   PAYMENT_DIRECTION_TYPE_ZHCN_MAP,
   ACCOUNT_DIRECTION_TYPE_ZHCN_MAP,
   PROCESS_STATUS_TYPES_ZHCN_MAPS,
 } from '@/constants/common';
-import { IFormControl } from '@/containers/Form/types';
-import { IColumnDef } from '@/containers/Table/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { ITableColDef, IFormColDef } from '@/components/type';
-import { formatNumber, formatMoney } from '@/tools';
+import { formatNumber, formatMoney, parseMoney } from '@/tools';
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
-import { Select, Input, InputNumber, DatePicker } from '@/containers';
+import { Select, Input } from '@/containers';
 import { DatePicker as AntdDatePicker } from 'antd';
+import { NumberInput } from './NumberInput';
+import BigNumber from 'bignumber.js';
 const { RangePicker } = AntdDatePicker;
 
 export const TABLE_COL_DEFS: ITableColDef[] = [
@@ -127,7 +124,20 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
                 message: '出入金金额必填',
               },
             ],
-          })(<InputNumber />)}
+          })(
+            <InputNumber
+              formatter={v => {
+                if (v) {
+                  const dot = (v + '').endsWith('.') ? '.' : '';
+                  return formatMoney(+v, { decimalPlaces: null }) + dot;
+                }
+                return '';
+              }}
+              parser={value => {
+                return typeof value === 'string' ? value.replace(/,/g, '') : '';
+              }}
+            />
+          )}
         </FormItem>
       );
     },

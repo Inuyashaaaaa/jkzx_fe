@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   BIG_NUMBER_CONFIG,
   DIRECTION_ZHCN_MAP,
@@ -55,7 +56,7 @@ const SettleInputNumber = memo<any>(
         )}
       </Row>
     );
-  })
+  }),
 );
 
 const Settlement = props => {
@@ -111,7 +112,7 @@ const Settlement = props => {
               : null),
           };
         });
-      })
+      }),
     );
 
     const nextPagination = {
@@ -139,7 +140,7 @@ const Settlement = props => {
 
     const nextCanSettTableData = canSettTableData.map(item => {
       const result = quotes.find(
-        quote => _.get(item, `asset.underlyerInstrumentId`) === quote.instrumentId
+        quote => _.get(item, `asset.underlyerInstrumentId`) === quote.instrumentId,
       );
       if (result) {
         return {
@@ -147,8 +148,8 @@ const Settlement = props => {
           [LEG_FIELD.UNDERLYER_PRICE]: Form2.createField(
             formatNumber(
               priceBySpecifedType(_.get(item, `asset.${LEG_FIELD.SPECIFIED_PRICE}`), result),
-              4
-            )
+              4,
+            ),
           ),
         };
       }
@@ -156,7 +157,7 @@ const Settlement = props => {
     });
 
     const startTradeExercisePreSettleRsps = await Promise.all(
-      nextCanSettTableData.map(item => startTradeExercisePreSettle(item))
+      nextCanSettTableData.map(item => startTradeExercisePreSettle(item)),
     ).then(rsps => {
       return rsps.map((rsp, index) => ({
         rsp,
@@ -175,7 +176,7 @@ const Settlement = props => {
           [LEG_FIELD.SETTLE_AMOUNT]: Form2.createField(
             new BigNumber(findItem.rsp.data)
               .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-              .toNumber()
+              .toNumber(),
           ),
         };
       }
@@ -210,11 +211,13 @@ const Settlement = props => {
     }
 
     if (_.isEmpty(selectedRowKeys)) {
-      return message.warn('请先选择结算对象');
+      message.warn('请先选择结算对象');
+      return;
     }
 
     if (!currentUser.username) {
-      return message.error('用户名未成功获取，无法结算');
+      message.error('用户名未成功获取，无法结算');
+      return;
     }
 
     setSettLoading(true);
@@ -223,23 +226,28 @@ const Settlement = props => {
       fetchDatas.map(record => {
         const values = Form2.getFieldsValue(record);
 
+        const settleAmount = parseFloat(get(values, `${LEG_FIELD.SETTLE_AMOUNT}`));
+        const underlyerPrice = parseFloat(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`));
+
         return trdTradeLCMEventProcess({
           positionId: record[POSITION_ID],
           tradeId: record.tradeId,
           eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
           userLoginId: currentUser.username,
           eventDetail: {
-            underlyerPrice: String(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`)),
-            settleAmount: String(get(values, `${LEG_FIELD.SETTLE_AMOUNT}`)),
-            numOfOptions: getNumOfOptionsByNotionalAmount(
-              get(record, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
-              get(record, `asset.${LEG_FIELD.INITIAL_SPOT}`),
-              get(record, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`)
+            underlyerPrice: Number.isNaN(underlyerPrice) ? '' : String(underlyerPrice),
+            settleAmount: Number.isNaN(settleAmount) ? '' : String(settleAmount),
+            numOfOptions: String(
+              getNumOfOptionsByNotionalAmount(
+                get(record, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
+                get(record, `asset.${LEG_FIELD.INITIAL_SPOT}`),
+                get(record, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`),
+              ),
             ), // 名义本金(手数)
             notionalAmount: String(get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`)), // 名义本金
           },
         });
-      })
+      }),
     );
 
     const successRsps = rsps.filter(item => {
@@ -250,7 +258,7 @@ const Settlement = props => {
       message.success(
         `批量结算成功：${successRsps
           .reduce((container, rsp) => container.concat((rsp.data || {}).positionIds || []), [])
-          .join(',')}`
+          .join(',')}`,
       );
     }
 
@@ -276,7 +284,7 @@ const Settlement = props => {
 
     setSelectedRowKeys(pre => {
       return _.reject(pre, key =>
-        successRsps.some(rsp => ((rsp.data || {}).positionIds || []).indexOf(key) !== -1)
+        successRsps.some(rsp => ((rsp.data || {}).positionIds || []).indexOf(key) !== -1),
       );
     });
     setSettLoading(false);
@@ -286,14 +294,18 @@ const Settlement = props => {
   const startTradeExercisePreSettle = record => {
     const values = Form2.getFieldsValue(record);
 
+    const underlyerPrice = parseFloat(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`));
+
     return tradeExercisePreSettle({
       positionId: record[POSITION_ID],
       eventDetail: {
-        underlyerPrice: String(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`)),
-        numOfOptions: getNumOfOptionsByNotionalAmount(
-          get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
-          get(values, `asset.${LEG_FIELD.INITIAL_SPOT}`),
-          get(values, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`)
+        underlyerPrice: Number.isNaN(underlyerPrice) ? '' : String(underlyerPrice),
+        numOfOptions: String(
+          getNumOfOptionsByNotionalAmount(
+            get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
+            get(values, `asset.${LEG_FIELD.INITIAL_SPOT}`),
+            get(values, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`),
+          ),
         ), // 名义本金(手数)
         notionalAmount: String(get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`)), // 名义本金
       },
@@ -305,7 +317,7 @@ const Settlement = props => {
     const validates = await tableEl.current.validate(
       {},
       [record[POSITION_ID]],
-      [LEG_FIELD.UNDERLYER_PRICE]
+      [LEG_FIELD.UNDERLYER_PRICE],
     );
 
     if (validates.some(item => !_.isEmpty(item.errors))) {
@@ -322,7 +334,7 @@ const Settlement = props => {
           return {
             ...item,
             [LEG_FIELD.SETTLE_AMOUNT]: Form2.createField(
-              new BigNumber(data).decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES).toNumber()
+              new BigNumber(data).decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES).toNumber(),
             ),
           };
         }
@@ -341,17 +353,14 @@ const Settlement = props => {
     });
   };
 
-  useEffect(
-    () => {
-      if (!modalVisible) {
-        setSetted(false);
-        setSelectedRowKeys([]);
-        return;
-      }
-      fetch();
-    },
-    [modalVisible]
-  );
+  useEffect(() => {
+    if (!modalVisible) {
+      setSetted(false);
+      setSelectedRowKeys([]);
+      return;
+    }
+    fetch();
+  }, [modalVisible]);
 
   const canSett = record => {
     if (record[ALREADY]) {
@@ -596,7 +605,7 @@ const Settlement = props => {
                           if (error) return;
                           message.success('刷新试结算成功');
                         }}
-                      />
+                      />,
                     )}
                   </FormItem>
                 );
@@ -641,5 +650,5 @@ export default memo<any>(
     return {
       currentUser: state.user.currentUser,
     };
-  })(Settlement)
+  })(Settlement),
 );

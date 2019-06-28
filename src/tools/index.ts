@@ -77,6 +77,10 @@ export const isAsian = data => {
   );
 };
 
+export const isBarrier = data => {
+  return data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER;
+};
+
 export const isRangeAccruals = data => {
   return (
     data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
@@ -86,7 +90,7 @@ export const isRangeAccruals = data => {
 };
 
 export const isKnockIn = data => {
-  return data[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.KNOCK_IN;
+  return data[LEG_FIELD.ALREADY_BARRIER];
 };
 
 export const getMinRule = (message: string = '不允许小于0') => {
@@ -281,18 +285,19 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
   const leg = getLegByRecord(record);
   if (!leg) return record;
   const omits = _.difference(
-    leg.getColumns(record[LEG_ENV_FIELD]).map(record => record.dataIndex),
-    leg.getColumns(toEnv).map(record => record.dataIndex)
+    leg.getColumns(record[LEG_ENV_FIELD], record).map(record => record.dataIndex),
+    leg.getColumns(toEnv, record).map(record => record.dataIndex)
   );
   return {
-    ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
-    ...leg.getDefaultData(LEG_ENV.BOOKING),
+    ...createLegDataSourceItem(leg, toEnv),
+    ...leg.getDefaultData(toEnv),
     ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
   };
 };
 
 export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
   const isAnnualized = position.asset.annualized;
+  const pageData = leg.getPageData(env, position);
 
   return {
     ...createLegDataSourceItem(leg, env),
@@ -305,7 +310,7 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
         ),
         [LEG_FIELD.IS_ANNUAL]: isAnnualized,
       }),
-      ...leg.getPageData(env, position),
+      ...pageData,
     }),
   };
 };
@@ -397,6 +402,12 @@ export const convertOptions = (maps, zhcn) => {
 // NOTE: 如果 val 是空，则返回当前时间
 export const getMoment = (val, clone = false) => {
   return isMoment(val) ? (clone ? val.clone() : val) : !!val ? moment(val) : moment();
+};
+
+export const getCurDateMoment = () => {
+  const m = moment();
+  const s = m.format('YYYY-MM-DD');
+  return moment(s);
 };
 
 export * from './delay';

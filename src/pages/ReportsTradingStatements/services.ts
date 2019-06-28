@@ -5,7 +5,7 @@ import {
   AssetType,
   ReportName,
   ValuationDate,
-} from '@/domains/SearchForm';
+} from '@/containers/searchForm';
 
 export const searchFormControls = markets => {
   return [

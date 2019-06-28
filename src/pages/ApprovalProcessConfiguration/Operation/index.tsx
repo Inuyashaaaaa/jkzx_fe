@@ -21,9 +21,10 @@ import {
   Tag,
 } from 'antd';
 import _ from 'lodash';
-import { default as React, default as React, useEffect, useRef, useState } from 'react';
+import { default as React, useEffect, useRef, useState } from 'react';
 import uuidv4 from 'uuid/v4';
-import { COLUMNS, GTE_PROCESS_CONFIGS, TASKTYPE } from '../constants';
+import { TASKTYPE } from '../constants';
+import { GTE_PROCESS_CONFIGS, COLUMNS } from '../tools';
 import EditTable from './EditTable';
 import TriggerCard from './TriggerCard';
 
@@ -59,12 +60,6 @@ const Operation = props => {
       return setLoading(false);
     }
     const processData = { ...data };
-    processData.tasks.map(task => {
-      task.approveGroupList = (_.get(task, 'approveGroups') || []).map(item => {
-        return item.approveGroupId;
-      });
-      return task;
-    });
     setLoading(false);
     let { tasks } = processData;
     tasks = tasks.map(task => {
@@ -100,14 +95,19 @@ const Operation = props => {
     setReviewTask(reviewTaskData);
   };
 
-  const handleReviewOk = async () => {
-    const res = await tableE1.validate();
-    if (_.isArray(res)) {
-      if (res.some(value => value.errors)) return;
-    }
-
+  const reviewSave = async () => {
     let tasks = _.cloneDeep(process.tasks);
+    tasks = tasks.map(task => {
+      if (task.taskType === 'modifyData') {
+        task.sequence = 9999;
+      }
+      if (task.taskType === 'insertData') {
+        task.sequence = -9999;
+      }
+      return task;
+    });
     tasks = _.sortBy(tasks, 'sequence');
+
     const reviewTasklength = (tasks || []).filter(item => item.taskType === 'reviewData').length;
     tasks.splice(
       1,
@@ -118,11 +118,21 @@ const Operation = props => {
         })
       )
     );
+
     tasks = tasks.map((item, index) => {
       item.sequence = index;
       return item;
     });
     featchProcessModify(tasks);
+  };
+
+  const handleReviewOk = async () => {
+    const res = await tableE1.validate();
+    if (_.isArray(res)) {
+      if (res.some(value => value.errors)) return;
+    }
+
+    reviewSave();
   };
 
   const getActionClass = (taskType, processName) => {
@@ -148,6 +158,14 @@ const Operation = props => {
         return `tech.tongyu.bct.workflow.process.func.action.trade.TradeReviewTaskAction`;
       }
       return `tech.tongyu.bct.workflow.process.func.action.trade.TradeInputTaskAction`;
+    }
+
+    // 交易
+    if (processName === '开户' || processName === '开户审批') {
+      if (taskType === 'REVIEW_DATA' || taskType === 'reviewData') {
+        return `tech.tongyu.bct.workflow.process.func.action.account.AccountReviewTaskAction`;
+      }
+      return `tech.tongyu.bct.workflow.process.func.action.account.AccountInputTaskAction`;
     }
 
     throw new Error('getActionClass: no match');
@@ -282,6 +300,7 @@ const Operation = props => {
         taskAction: recordData.taskAction,
         taskType: recordData.taskType,
         taskName: '',
+        sequence: reviewTaskData.length + 1,
       }),
       taskId: uuidv4(),
     });
@@ -302,7 +321,10 @@ const Operation = props => {
     setReviewTask(reviewTaskData);
   };
 
-  const onReviewCellFieldsChange = ({ allFields, changedFields, record, rowIndex }) => {
+  const onReviewCellFieldsChange = async (
+    { allFields, changedFields, record, rowIndex },
+    isSelect
+  ) => {
     setReviewTask(
       reviewTask.map((item, index) => {
         if (index === rowIndex) {
@@ -311,6 +333,36 @@ const Operation = props => {
         return item;
       })
     );
+    if (isSelect) {
+      // 修改单个审批组
+      const task = Form2.getFieldsValue(record);
+      const { processName } = process;
+      const { error, data } = await wkTaskApproveGroupBind({
+        processName,
+        taskList: [
+          {
+            taskId: task.taskId,
+            approveGroupList: task.approveGroupList,
+          },
+        ],
+      });
+      if (error) {
+        return;
+      }
+      const cloneData = { ...data };
+      cloneData.tasks = cloneData.tasks.map(item => {
+        item.approveGroupList = item.approveGroups.map(i => i.approveGroupId);
+        return item;
+      });
+
+      setProcess(cloneData);
+      setProcessConfigs(data.processConfigs);
+      handleReviewData(data);
+
+      notification.success({
+        message: `${processName}流程保存成功`,
+      });
+    }
   };
 
   const warningCancel = () => {
@@ -424,7 +476,7 @@ const Operation = props => {
             </Card>
             {process.processName === '交易录入' ? (
               <TriggerCard
-                triggers={process.triggers}
+                trigger={process.triggers[0]}
                 processName={process.processName}
                 fetchData={fetchData}
               />
@@ -474,7 +526,7 @@ const Operation = props => {
               type="info"
               showIcon={true}
             />
-            <Table2
+            <SmartTable
               ref={node => (tableE1 = node)}
               dataSource={reviewTask}
               rowKey="taskId"
@@ -497,6 +549,8 @@ const Operation = props => {
             excelData={excelData}
             processName={process.processName}
             setWarningVisible={setWarningVisible}
+            onReviewCellFieldsChange={onReviewCellFieldsChange}
+            fetchData={fetchData}
           />
         </Col>
       </Row>

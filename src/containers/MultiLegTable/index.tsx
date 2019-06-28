@@ -18,6 +18,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState, forwardRef } from 'react';
 import SmartTable from '../SmartTable';
+import styles from './index.less';
 
 const MultiLegTable = memo<
   {
@@ -29,7 +30,9 @@ const MultiLegTable = memo<
   } & ITableProps
 >(props => {
   const {
-    tableEl = useRef<Table2>(null),
+    tableEl = useRef<{
+      table: Table2;
+    }>(null),
     dataSource,
     env,
     chainColumns,
@@ -46,7 +49,7 @@ const MultiLegTable = memo<
       setColumns(pre => {
         const multiLegColumns = dataSource.reduce((container, record) => {
           const leg = getLegByRecord(record);
-          return container.concat(leg.getColumns(env));
+          return container.concat(leg.getColumns(env, record));
         }, []);
 
         const nextUnion = getUnionLegColumns(multiLegColumns);
@@ -110,7 +113,7 @@ const MultiLegTable = memo<
       return false;
     }
 
-    if (!(leg && leg.getColumns(env).find(item => item.dataIndex === colDef.dataIndex))) {
+    if (!(leg && leg.getColumns(env, record).find(item => item.dataIndex === colDef.dataIndex))) {
       return true;
     }
 
@@ -143,7 +146,7 @@ const MultiLegTable = memo<
           }
           if (cellIsEmpty(record, colDef)) {
             return {
-              style: { backgroundColor: '#fafafa' },
+              className: styles.empty,
               ...(item.onCell ? item.onCell.apply(this, arguments) : null),
             };
           }
@@ -260,6 +263,7 @@ const MultiLegTable = memo<
           table: node,
           setLoadings,
           setLoadingsByRow,
+          columns,
         };
       }}
       onCellFieldsChange={(...args) => {

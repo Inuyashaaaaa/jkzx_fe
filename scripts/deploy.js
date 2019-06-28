@@ -7,10 +7,13 @@ const TEST_CONTAINER = 'FE-test';
 const PROD_CONTAINER = 'FE-prod';
 const RELEASE_CONTAINER = 'FE-release';
 const HOTFIX_CONTAINER = 'FE-hotfix';
+const DEMO_CONTAINER = 'FE-demo';
 const USER_PATH = shell.exec('cd ~ && pwd').stdout.trim();
 const BUNDLE_NAME = 'dist';
 const DOC_BUNDLE_NAME = 'docs';
+const CDOC_BUNDLE_NAME = 'cdocs';
 const BRANCH_NAME_LATEST = 'latest';
+const E2E_CONTAINER = 'mochawesome-report';
 
 const exists = src => {
   return fs.existsSync(src);
@@ -50,9 +53,12 @@ function upload(config = {}) {
     shell.exec(
       `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${remotePaths}`
     );
+    shell.exec(
+      `ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${remoteUsername}@${remoteIp} "[ -d ${remotePaths} ] && echo ok || mkdir -p ${remotePaths}"`
+    );
     // https://stackoverflow.com/questions/3663895/ssh-the-authenticity-of-host-hostname-cant-be-established
     shell.exec(
-      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName} ${remoteUsername}@${remoteIp}:${remoteFolder}`
+      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName}/* ${remoteUsername}@${remoteIp}:${remotePaths}`
     );
     if (notifaction) {
       shell.exec(
@@ -80,6 +86,14 @@ function bundle(prodContainerPath, distpath, filename = new Date().toISOString()
 
 function prod() {
   const prodContainerPath = path.join(USER_PATH, PROD_CONTAINER);
+  // 更新 last
+  bundle(prodContainerPath, '../dist/*');
+
+  upload();
+}
+
+function demo() {
+  const prodContainerPath = path.join(USER_PATH, DEMO_CONTAINER);
   // 更新 last
   bundle(prodContainerPath, '../dist/*');
 
@@ -125,7 +139,26 @@ function feature() {
 
 function doc() {
   upload({
+    branchName: process.env.CI_BUILD_REF_NAME,
     bundleName: DOC_BUNDLE_NAME,
+    notifaction: false,
+  });
+}
+
+function cdoc() {
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME,
+    bundleName: CDOC_BUNDLE_NAME,
+    notifaction: false,
+  });
+}
+
+function e2eReports() {
+  upload({
+    branchName: process.env.CI_BUILD_REF_NAME,
+    bundleName: E2E_CONTAINER,
+    remoteBundleName: 'e2e-reports',
+    notifaction: false,
   });
 }
 
@@ -156,4 +189,16 @@ if (denv === 'feature') {
 
 if (denv === 'doc') {
   doc();
+}
+
+if (denv === 'cdoc') {
+  cdoc();
+}
+
+if (denv === 'demo') {
+  demo();
+}
+
+if (denv === 'e2e-reports') {
+  e2eReports();
 }

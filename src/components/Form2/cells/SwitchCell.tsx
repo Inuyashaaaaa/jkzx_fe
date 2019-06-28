@@ -9,7 +9,6 @@ import { wrapFormGetDecorator } from '../../_utils';
 import { FORM_CELL_EDITING_CHANGED } from '../constants';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
-import './SwitchCell.less';
 
 class SwitchCell extends PureComponent<
   IFormCellProps,
@@ -272,7 +271,7 @@ class SwitchCell extends PureComponent<
         ])}
         onClick={this.onCellClick}
         onKeyDown={this.onKeyDown}
-        className={classNames(`${this.props.prefix}-cell`, `${this.props.prefix}-form-cell`, {
+        className={classNames(`${this.props.prefix}-form-cell`, {
           editable: this.getEditable(),
           editing: this.getEditing(),
           rendering: !this.getEditing(),

@@ -13,13 +13,15 @@ export interface ILegColDef extends ITableColDef {
   onCellEditingChanged?: (params: ITableTriggerCellEditingChangedParams) => void;
   onCellValuesChange?: (params: ITableTriggerCellValueChangeParams) => void;
   onCellFieldsChange?: (params: ITableTriggerCellFieldsChangeParams) => void;
+  getUnit?: () => string;
 }
 
 export interface ILeg {
   name: string;
   type: string;
   assetClass: string;
-  getColumns: (env: string) => ILegColDef[];
+  convertEditRecord2PricingData?: (record: any) => any;
+  getColumns: (env: string, record: any) => ILegColDef[];
   getDefaultData: (env: string) => ITableData;
   getPosition: (env: string, dataItem: any, baseInfo: any) => any;
   getPageData: (env: string, position: any) => any;

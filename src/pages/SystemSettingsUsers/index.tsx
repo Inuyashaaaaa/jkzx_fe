@@ -8,7 +8,7 @@ import { Button, Col, message, Modal, notification, Row } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import ResourceManagement from '../SystemSettingResource/ResourceManage';
-import { CREATE_FORM_CONTROLS } from './constants';
+import { CREATE_FORM_CONTROLS } from './tools';
 import { createPageTableColDefs } from './services';
 
 function findDepartment(departs, departId) {
@@ -172,6 +172,22 @@ class SystemSettingsUsers extends PureComponent {
     });
   };
 
+  public handleValueChanged = async params => {
+    const { record, rowId } = params;
+
+    const user = this.state.users.find(item => item.id === rowId);
+    if (!user) return;
+
+    const res = await updateUserRole({
+      userId: user.id,
+      roleIds: Form2.getFieldValue(record.roles),
+    });
+    if (res.error) return;
+    notification.success({
+      message: '更新角色成功',
+    });
+  };
+
   public render() {
     const {
       displayResources,
@@ -206,21 +222,7 @@ class SystemSettingsUsers extends PureComponent {
               )}
               scroll={{ x: 1800 }}
               onCellFieldsChange={this.handleCellValueChanged}
-              onCellEditingChanged={async params => {
-                const { record, rowId } = params;
-
-                const user = this.state.users.find(item => item.id === rowId);
-                if (!user) return;
-
-                const res = await updateUserRole({
-                  userId: user.id,
-                  roleIds: Form2.getFieldValue(record.roles),
-                });
-                if (res.error) return;
-                notification.success({
-                  message: '更新角色成功',
-                });
-              }}
+              onCellEditingChanged={this.handleValueChanged}
             />
           </>
         )}

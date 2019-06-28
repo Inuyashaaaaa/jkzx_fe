@@ -9,7 +9,7 @@ import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/refere
 import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonForm from '@/pages/SystemSettingDepartment/components/CommonForm';
-import { generateColumns } from '../constants';
+import { generateColumns } from '../tools';
 import _ from 'lodash';
 const { TextArea } = Input;
 import { SmartTable } from '@/containers';

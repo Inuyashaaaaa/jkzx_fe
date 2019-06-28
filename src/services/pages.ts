@@ -110,13 +110,13 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       throw new Error('not found Leg type');
     }
 
-    const lcmEventType =
-      type === LEG_TYPE_MAP.AUTOCALL_PHOENIX && dataSourceItem[LEG_FIELD.ALREADY_BARRIER]
-        ? 'KNOCK_IN'
-        : 'OPEN';
+    // const lcmEventType =
+    //   type === LEG_TYPE_MAP.AUTOCALL_PHOENIX && dataSourceItem[LEG_FIELD.ALREADY_BARRIER]
+    //     ? 'KNOCK_IN'
+    //     : 'OPEN';
 
     return {
-      lcmEventType,
+      // lcmEventType,
       positionAccountCode: 'empty',
       positionAccountName: 'empty',
       counterPartyAccountCode: 'empty',
@@ -182,6 +182,12 @@ export const getTradeCreateModalData = (apiData: any = {}) => {
 
 function miniumlPercent(item) {
   const clone = { ...item };
+
+  if (clone[LEG_FIELD.BARRIER_SHIFT] !== undefined) {
+    clone[LEG_FIELD.BARRIER_SHIFT] = new BigNumber(clone[LEG_FIELD.BARRIER_SHIFT])
+      .multipliedBy(0.01)
+      .toNumber();
+  }
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
@@ -409,6 +415,12 @@ function miniumlPercent(item) {
 
 export function backConvertPercent(item) {
   const clone = { ...Form2.getFieldsValue(item) };
+
+  if (clone[LEG_FIELD.BARRIER_SHIFT] !== undefined) {
+    clone[LEG_FIELD.BARRIER_SHIFT] = new BigNumber(clone[LEG_FIELD.BARRIER_SHIFT])
+      .multipliedBy(100)
+      .toNumber();
+  }
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
