@@ -108,40 +108,6 @@ const TradeManagementOnBoardTansaction = props => {
     return injectMarketValue(data);
   };
 
-  const queryFlowData = async () => {
-    const params = {
-      instrumentIds: searchFormDataFlow.instrumentId,
-      startTime: `${searchFormDataFlow.date[0].format('YYYY-MM-DD')}T00:00:00`,
-      endTime: `${searchFormDataFlow.date[1].format('YYYY-MM-DD')}T23:59:59`,
-    };
-
-    setLoading(true);
-    const data = await queryAndInjectMarketData(queryTradeRecord, params);
-
-    const finalData = data.map(d => {
-      const obj = { ...d };
-      // eslint-disable-next-line no-nested-ternary
-      obj.openClose = obj.openClose ? (obj.openClose.toLowerCase() === 'open' ? '开' : '平') : '-';
-      // eslint-disable-next-line no-nested-ternary
-      obj.direction = obj.direction ? (obj.direction.toLowerCase() === 'buyer' ? '买' : '卖') : '-';
-      obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
-      return obj;
-    });
-
-    finalData.sort((a, b) => {
-      const dealTime = moment(a.dealTime).valueOf() - moment(b.dealTime).valueOf();
-      if (dealTime > 0) {
-        return -1;
-      }
-      if (dealTime < 0) {
-        return 1;
-      }
-      return 0;
-    });
-    setFlowData(finalData);
-    setLoading(false);
-  };
-
   useEffect(() => {
     queryFlowData();
   }, []);
@@ -153,29 +119,6 @@ const TradeManagementOnBoardTansaction = props => {
       return aStr.localeCompare(bStr);
     });
     return data;
-  };
-
-  const queryPositionData = async mode => {
-    const actualMode = mode || positionMode;
-    const params = {
-      searchDate: searchFormDataPosition.searchDate.format('YYYY-MM-DD'),
-    };
-    setLoading(true);
-
-    let data;
-    if (actualMode === 'summary') {
-      data = await queryAndInjectMarketData(querySummary, params);
-      data = sortBy(data, 'instrumentId');
-    } else if (actualMode === 'detail') {
-      data = await queryAndInjectMarketData(queryDetail, params);
-      data = sortBy(data, 'bookId');
-    } else if (actualMode === 'portfolio') {
-      data = await queryAndInjectMarketData(queryPortfolio, params);
-      data = sortBy(data, 'portfolioName');
-      data = data.filter(v => v.portfolioName);
-    }
-    setPositionData(data);
-    setLoading(false);
   };
 
   const attachData = {
