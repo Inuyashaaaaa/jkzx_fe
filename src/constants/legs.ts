@@ -39,6 +39,7 @@ import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { Forward } from '@/domains/legs/Forward';
 import { SpreadEuropean } from '@/domains/legs/SpreadEuropean';
 import { RatioSpreadEuropean } from '@/domains/legs/RatioSpreadEuropean';
+import { CashFlow } from '@/domains/legs/CashFlow';
 import { Cega } from '@/containers/legFields/computed/Cega';
 
 export const TOTAL_LEGS = [
@@ -63,6 +64,7 @@ export const TOTAL_LEGS = [
   Asia,
   Straddle,
   Forward,
+  CashFlow,
   // 2019年06月11日 暂时移除
   // SpreadEuropean,
   // RatioSpreadEuropean,
@@ -84,6 +86,8 @@ export const GENERAL_COMPUTED_FIELDS = [
 ];
 
 export const TOTAL_COMPUTED_FIELDS = [...GENERAL_COMPUTED_FIELDS, Cega];
+
+export const CASH_TOTAL_EDITING_FIELDS = [PositionId, LcmEventType];
 
 export const TOTAL_EDITING_FIELDS = [
   PositionId,

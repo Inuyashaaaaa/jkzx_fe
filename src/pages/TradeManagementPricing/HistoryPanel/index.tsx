@@ -12,6 +12,7 @@ import {
   PRODUCTTYPE_ZHCH_MAP,
   STRIKE_TYPES_MAP,
   BIG_NUMBER_CONFIG,
+  DATE_ARRAY,
 } from '@/constants/common';
 import {
   TRADESCOLDEFS_LEG_FIELD_MAP,
@@ -558,7 +559,7 @@ const TradeManagementPricingManagement = props => {
                             ...backConvertPercent({
                               ...Form2.createFields({
                                 ..._.mapValues(asset, (val, key) => {
-                                  if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                                  if (val && DATE_ARRAY.indexOf(key) !== -1) {
                                     return moment(val);
                                   }
                                   return val;

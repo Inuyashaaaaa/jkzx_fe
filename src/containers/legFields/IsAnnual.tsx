@@ -1,9 +1,11 @@
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
 import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { Checkbox, Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
-import React from 'react';
+
+const unAnnualArray = [LEG_TYPE_MAP.FORWARD, LEG_TYPE_MAP.CASH_FLOW];
 
 export const IsAnnual: ILegColDef = {
   title: '是否年化',
@@ -11,7 +13,7 @@ export const IsAnnual: ILegColDef = {
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
 
-    if (Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.FORWARD) {
+    if (unAnnualArray.includes(Form2.getFieldValue(record[LEG_TYPE_FIELD]))) {
       return false;
     }
 
@@ -21,17 +23,15 @@ export const IsAnnual: ILegColDef = {
     return true;
   },
   defaultEditing: false,
-  render: (val, record, index, { form, editing, colDef }) => {
-    return (
-      <FormItem>
-        {form.getFieldDecorator({
-          rules: [getRequiredRule()],
-        })(
-          <Checkbox editing={editing} renderingLabels={['年化', '非年化']}>
-            {val ? '年化' : '非年化'}
-          </Checkbox>
-        )}
-      </FormItem>
-    );
-  },
+  render: (val, record, index, { form, editing, colDef }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [getRequiredRule()],
+      })(
+        <Checkbox editing={editing} renderingLabels={['年化', '非年化']}>
+          {val ? '年化' : '非年化'}
+        </Checkbox>,
+      )}
+    </FormItem>
+  ),
 };
