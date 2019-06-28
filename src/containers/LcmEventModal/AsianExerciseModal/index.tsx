@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { Alert, Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
@@ -14,6 +15,7 @@ import {
   LEG_TYPE_MAP,
   NOTION_ENUM_MAP,
   NOTIONAL_AMOUNT_TYPE_MAP,
+  UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/containers/Form';
@@ -60,6 +62,7 @@ class AsianExerciseModal extends PureComponent<
     productType: 'ASIAN',
     notionalType: null,
     exportVisible: false,
+    strikeType: null,
   };
 
   public show = (data, tableFormData, currentUser, reload) => {
@@ -72,6 +75,7 @@ class AsianExerciseModal extends PureComponent<
       productType: this.data[LEG_TYPE_FIELD],
       notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       formData: this.getDefaultFormData(),
+      strikeType: this.data[LEG_FIELD.STRIKE_TYPE],
     });
   };
 
@@ -228,10 +232,7 @@ class AsianExerciseModal extends PureComponent<
               {
                 field: LEG_FIELD.NOTIONAL_AMOUNT,
                 control: {
-                  label:
-                    this.state.notionalType === NOTION_ENUM_MAP.CNY
-                      ? '名义金额 (￥)'
-                      : '名义金额 (手)',
+                  label: '名义金额 (￥)',
                 },
                 input: {
                   ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -254,7 +255,10 @@ class AsianExerciseModal extends PureComponent<
                     {
                       field: LEG_FIELD.STRIKE,
                       control: {
-                        label: '行权价（¥）',
+                        label:
+                          this.state.strikeType === UNIT_ENUM_MAP.CNY
+                            ? '行权价（¥）'
+                            : '行权价（%）',
                       },
                       input: {
                         ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,

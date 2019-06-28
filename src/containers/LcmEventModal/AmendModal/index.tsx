@@ -15,6 +15,8 @@ import { ITableData } from '@/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import CashExportModal from '@/containers/CashExportModal';
 
+/* eslint-disable */
+
 const UN_EDITDIR = [
   LEG_FIELD.UNDERLYER_MULTIPLIER,
   // LEG_FIELD.TERM,
@@ -121,9 +123,9 @@ const AmendModal = memo<IAmendModal>(props => {
             Form2.getFieldsValue(store.tableFormData),
             LEG_ENV.BOOKING,
           );
-          const _data = Form2.getFieldsValue(cashData);
-          _data.cashFlowChange = JSON.stringify(_data.cashFlowChange);
-          _data.paymentDate = moment(_data.paymentDate).format('YYYY-MM-DD');
+          const newData = Form2.getFieldsValue(cashData);
+          newData.cashFlowChange = JSON.stringify(newData.cashFlowChange);
+          newData.paymentDate = moment(newData.paymentDate).format('YYYY-MM-DD');
           const { error, data } = await trdTradeLCMEventProcess({
             positionId: store.record[LEG_ID_FIELD],
             tradeId: store.tableFormData.tradeId,
@@ -132,16 +134,13 @@ const AmendModal = memo<IAmendModal>(props => {
             eventDetail: {
               asset: _.get(position, 'asset'),
               productType: position.productType,
-              ..._data,
+              ...newData,
             },
           });
           setConfirmLoading(false);
           if (error) return;
 
           message.success('修改交易要素成功');
-          // if (store.reload) {
-          //   store.reload();
-          // }
 
           if (createCash) {
             setTradeData({
@@ -149,6 +148,10 @@ const AmendModal = memo<IAmendModal>(props => {
               counterPartyCode: store.tableFormData.counterPartyCode,
             });
             setCashModalVisible(true);
+            return setVisible(false);
+          }
+          if (store.reload) {
+            store.reload();
           }
           setVisible(false);
         }}
@@ -181,8 +184,8 @@ const AmendModal = memo<IAmendModal>(props => {
                   },
                   tableEl.current.setLoadingsByRow,
                   (colId: string, newVal: ITableData) => {
-                    setTableData(pre =>
-                      pre.map(item => {
+                    setTableData(preData =>
+                      preData.map(item => {
                         if (item[LEG_ID_FIELD] === params.rowId) {
                           return {
                             ...item,

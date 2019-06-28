@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { message } from 'antd';
 import React, { memo, useRef } from 'react';
 import _ from 'lodash';
@@ -27,7 +28,8 @@ import SettleModal from './SettleModal';
 import UnwindModal from './UnwindModal';
 import { OB_PRICE_FIELD } from './constants';
 import { getObservertionFieldData } from './tools';
-import { isRangeAccruals } from '@/tools';
+import { isRangeAccruals, getMoment } from '@/tools';
+import moment from 'moment';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -42,7 +44,7 @@ export interface ILcmEventModalEl {
 }
 
 const LcmEventModal = memo<{
-  current:(node: ILcmEventModalEl) => void;
+  current: (node: ILcmEventModalEl) => void;
 }>(props => {
   const $unwindModal = useRef<UnwindModal>(null);
   const $asianExerciseModal = useRef<AsianExerciseModal>(null);
@@ -62,8 +64,12 @@ const LcmEventModal = memo<{
     const fixObservations = data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
     const last = fixObservations.every(item => _.isNumber(item[OB_PRICE_FIELD]));
     const tableData = getObservertionFieldData(data);
+    const expirationDate = getMoment(data[LEG_FIELD.EXPIRATION_DATE]);
+    const now = moment();
+    const expiration = expirationDate.isBefore(now, 'day') || expirationDate.isSame(now, 'day');
     return (
       last &&
+      expiration &&
       tableData.every(record => {
         const upBarrier = record[LEG_FIELD.UP_BARRIER];
         const alObPrice = record[OB_PRICE_FIELD];
@@ -100,11 +106,6 @@ const LcmEventModal = memo<{
       const data = Form2.getFieldsValue(record);
       const tableFormData = Form2.getFieldsValue(createFormData);
       if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
-        if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
-          if (!notBarrierHappen(data)) {
-            return message.warn('不能进行到期结算操作');
-          }
-        }
         return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
       }
 
@@ -124,7 +125,7 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.EXERCISE) {
         if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
           const convertedData = filterObDays(convertObservetions(data));
-          if (convertedData.some(item => !item.price)) {
+          if (!convertedData.every(item => _.isNumber(item[OB_PRICE_FIELD]))) {
             return message.warn('请先完善观察日价格');
           }
           return $asianExerciseModal.current.show(data, tableFormData, currentUser, loadData);
@@ -160,9 +161,17 @@ const LcmEventModal = memo<{
       if (eventType === LCM_EVENT_TYPE_MAP.SETTLE) {
         if (legType === LEG_TYPE_MAP.ASIAN || legType === LEG_TYPE_MAP.RANGE_ACCRUALS) {
           const convertedData = filterObDays(convertObservetions(data));
-          if (convertedData.some(item => !item.price)) {
+          if (!convertedData.every(item => _.isNumber(item[OB_PRICE_FIELD]))) {
             return message.warn('请先完善观察日价格');
           }
+        }
+        if (legType === LEG_TYPE_MAP.AUTOCALL || legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+          if (legType === LEG_TYPE_MAP.AUTOCALL_PHOENIX) {
+            if (!notBarrierHappen(data)) {
+              return message.warn('不能进行到期结算操作');
+            }
+          }
+          return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
         }
         return $settleModal.current.show(data, tableFormData, currentUser, loadData);
       }
@@ -173,14 +182,26 @@ const LcmEventModal = memo<{
 
   return (
     <>
-      <UnwindModal ref={node => ($unwindModal.current = node)} />
+      <UnwindModal
+        ref={node => {
+          $unwindModal.current = node;
+        }}
+      />
       <ExerciseModal
         ref={node => {
           $exerciseModal.current = node;
         }}
       />
-      <ExpirationModal ref={node => ($expirationModal.current = node)} />
-      <KnockOutModal ref={node => ($knockOutModal.current = node)} />
+      <ExpirationModal
+        ref={node => {
+          $expirationModal.current = node;
+        }}
+      />
+      <KnockOutModal
+        ref={node => {
+          $knockOutModal.current = node;
+        }}
+      />
       <FixingModal
         ref={node => {
           $fixingModal.current = node;

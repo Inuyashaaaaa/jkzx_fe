@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -38,14 +39,14 @@ class SystemSettingsRoleManagement extends PureComponent {
         key: 'operation',
         dataIndex: 'operation',
         render: (text, record) =>
-          (this.state.userList.length >= 1 ? (
+          this.state.userList.length >= 1 ? (
             <Popconfirm
               title="确认移出?"
               onConfirm={() => this.handleDelete(record.userApproveGroupId)}
             >
               <a style={{ color: 'red' }}>移出</a>
             </Popconfirm>
-          ) : null),
+          ) : null,
       },
     ],
     userList: null,
@@ -214,7 +215,7 @@ class SystemSettingsRoleManagement extends PureComponent {
       },
       () => {
         if (this.$drawer) {
-          this.$drawer.filterData((data.userList || []).map(item => item.username));
+          this.$drawer.filterData((currentGroup.userList || []).map(item => item.username));
         }
       },
     );

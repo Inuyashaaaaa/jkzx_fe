@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -97,12 +98,23 @@ const TradeManagementBooking = props => {
     const handleTradeNumber = position => {
       const record = position.asset;
       const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
-      const notionalAmount = record[LEG_FIELD.NOTIONAL_AMOUNT];
       const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+      const annualCoefficient =
+        record[LEG_FIELD.IS_ANNUAL] &&
+        new BigNumber(record[LEG_FIELD.TERM]).div(record[LEG_FIELD.DAYS_IN_YEAR]).toNumber();
+      const notionalAmount = record[LEG_FIELD.IS_ANNUAL]
+        ? new BigNumber(record[LEG_FIELD.NOTIONAL_AMOUNT])
+            .multipliedBy(annualCoefficient)
+            .toNumber()
+        : record[LEG_FIELD.NOTIONAL_AMOUNT];
+
       const notional =
         notionalAmountType === 'LOT'
           ? notionalAmount
-          : new BigNumber(notionalAmount).div(record[LEG_FIELD.INITIAL_SPOT]).toNumber();
+          : new BigNumber(notionalAmount)
+              .div(record[LEG_FIELD.INITIAL_SPOT])
+              .div(multipler)
+              .toNumber();
       return new BigNumber(notional)
         .multipliedBy(multipler)
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)

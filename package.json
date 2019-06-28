@@ -34,9 +34,9 @@
   "dependencies": {
     "@antv/data-set": "~0.9.6",
     "@babel/runtime": "~7.1.2",
-    "@umijs/fabric": "~1.0.9",
     "@commitlint/cli": "~8.0.0",
     "@commitlint/config-angular": "~8.0.0",
+    "@umijs/fabric": "~1.0.9",
     "animate.css": "~3.7.0",
     "antd": "~3.19.2",
     "bignumber.js": "~8.1.1",

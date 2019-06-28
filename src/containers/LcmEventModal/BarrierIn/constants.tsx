@@ -1,3 +1,5 @@
+import { Button } from 'antd';
+import React from 'react';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
@@ -5,8 +7,6 @@ import {
   UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
-import { Button } from 'antd';
-import React from 'react';
 
 export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
   {
@@ -73,7 +73,7 @@ export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
 
 export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
   premiumType,
-  handleSettleAmount
+  handleSettleAmount,
 ) => IFormControl[] = (premiumType, handleSettleAmount) => [
   {
     field: 'EXPIRE_NO_BARRIER_PREMIUM_TYPE',
@@ -152,7 +152,7 @@ export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
       rules: [
         {
           required: true,
-          message: '期权数量 (手)为必填项',
+          message: '结算金额为必填项',
         },
       ],
     },

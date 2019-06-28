@@ -1,13 +1,15 @@
-import React, { useRef, useState, memo } from 'react';
-import { Popconfirm, Divider, Modal, message } from 'antd';
-import _ from 'lodash';
-import moment, { isMoment } from 'moment';
+/*eslint-disable */
 import { Form2 } from '@/containers';
-import { editFormControls } from './services';
 import { mktInstrumentCreate, mktInstrumentDelete } from '@/services/market-data-service';
+import { getMoment } from '@/tools';
+import { Divider, message, Modal, Popconfirm } from 'antd';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { memo, useRef, useState } from 'react';
+import { editFormControls } from './services';
 
 const Operation = memo<{ record: any; fetchTable: any }>(props => {
-  let $form: Form2 = useRef(null);
+  let $form = useRef<Form2>(null);
 
   const [editVisible, setEditVisible] = useState(false);
   const [editFormControlsState, setEditformControlsState] = useState({});
@@ -28,7 +30,8 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
 
   const switchModal = () => {
     const data = _.mapValues(props.record, (value, key) => {
-      if (key === 'expirationTime') {
+      if (value === null || value === undefined) return value;
+      if ('expirationTime' === key) {
         return moment(value, 'HH:mm:ss');
       }
       if (['maturity', 'expirationDate'].indexOf(key) !== -1) {
@@ -43,10 +46,16 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
 
   const omitNull = obj => _.omitBy(obj, val => val === null);
 
-  const composeInstrumentInfo = formData => {
-    const modalFormData = formData;
-    modalFormData.expirationDate = moment(modalFormData.expirationDate).format('YYYY-MM-DD');
-    modalFormData.expirationTime = moment(modalFormData.expirationTime).format('HH:mm:ss');
+  const composeInstrumentInfo = modalFormData => {
+    modalFormData.expirationDate = modalFormData.expirationDate
+      ? getMoment(modalFormData.expirationDate).format('YYYY-MM-DD')
+      : undefined;
+    modalFormData.expirationTime = modalFormData.expirationTime
+      ? getMoment(modalFormData.expirationTime).format('HH:mm:ss')
+      : undefined;
+    modalFormData.maturity = modalFormData.maturity
+      ? getMoment(modalFormData.maturity).format('YYYY-MM-DD')
+      : undefined;
     const instrumentInfoFields = [
       'multiplier',
       'name',
@@ -78,11 +87,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     const rsp = await $form.validate();
     if (rsp.error) return;
     setEditing(false);
-    let newEditFormData = Form2.getFieldsValue(editFormData);
-    newEditFormData = composeInstrumentInfo(newEditFormData);
-    newEditFormData.instrumentInfo.maturity = isMoment(newEditFormData.instrumentInfo.maturity)
-      ? moment(newEditFormData.instrumentInfo.maturity).format('YYYY-MM-DD')
-      : newEditFormData.instrumentInfo.maturity;
+    const newEditFormData = composeInstrumentInfo(Form2.getFieldsValue(editFormData));
     const { error, data } = await mktInstrumentCreate(newEditFormData);
     setEditing(false);
 
@@ -95,9 +100,10 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     props.fetchTable();
   };
 
-  const filterFormData = (allFields, fields) => {
+  const filterFormData = (allFields, fields, columns) => {
     const changed = Form2.getFieldsValue(fields);
-    const formData = Form2.getFieldsValue(allFields);
+    const column = columns.map(item => item.dataIndex);
+    const formData = _.pick(Form2.getFieldsValue(allFields), column);
     if (Object.keys(changed)[0] === 'assetClass') {
       return {
         ..._.pick(props.record, ['instrumentId']),
@@ -116,7 +122,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
   const onEditFormChange = (p, fields, allFields) => {
     const columns = editFormControls(Form2.getFieldsValue(allFields), 'edit');
     setEditformControlsState(columns);
-    setEditFormData(Form2.createFields(filterFormData(allFields, fields)));
+    setEditFormData(Form2.createFields(filterFormData(allFields, fields, columns)));
   };
 
   return (

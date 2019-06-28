@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
@@ -37,28 +38,15 @@ class FixingModal extends PureComponent<
   },
   any
 > {
-  public $asianExerciseModal: AsianExerciseModal;
-
-  public $expirationModal: ExpirationModal;
-
-  public $knockOutModal: KnockOutModal;
-
-  public $exerciseForm: Form;
-
   public data: any = {};
 
   public tableFormData: any = {};
 
   public currentUser: any = {};
 
-  public reload: any;
-
   public state = {
     visible: false,
-    direction: 'BUYER',
     modalConfirmLoading: false,
-    dataSource: {},
-    exportVisible: false,
     tableData: [],
     avg: 0,
     upBarrierType: '',
@@ -152,12 +140,6 @@ class FixingModal extends PureComponent<
     );
   };
 
-  public convertVisible = () => {
-    this.setState({
-      exportVisible: false,
-    });
-  };
-
   public isCanExercise = () => {
     if (_.isEmpty(this.data)) return false;
 
@@ -169,13 +151,13 @@ class FixingModal extends PureComponent<
     const expirationDate = getMoment(this.data[LEG_FIELD.EXPIRATION_DATE]);
 
     // 今天是最后一个观察日
-    const a = last.isSame(now, 'day');
+    // const a = last.isSame(now, 'day');
     // 所有观察日都已经填写观察到价格
     const b = obdatas.every(item => _.isNumber(item[OB_PRICE_FIELD]));
     // 今天是到期日
-    const c = expirationDate.isSame(now, 'day');
+    const c = expirationDate.isSame(now, 'day') || expirationDate.isBefore(now, 'day');
 
-    if ((a || c) && b) {
+    if (c && b) {
       return true;
     }
     return false;
@@ -268,9 +250,9 @@ class FixingModal extends PureComponent<
           title: '敲出障碍价',
           dataIndex: LEG_FIELD.UP_BARRIER,
           render: (val, record, index) =>
-            (this.state.upBarrierType === UP_BARRIER_TYPE_MAP.CNY
+            this.state.upBarrierType === UP_BARRIER_TYPE_MAP.CNY
               ? formatMoney(val, { unit: '¥' })
-              : `${formatMoney(val)} %`),
+              : `${formatMoney(val)} %`,
         },
         {
           title: 'Coupon障碍',
@@ -292,7 +274,7 @@ class FixingModal extends PureComponent<
                       if (value < 0) {
                         return callback(true);
                       }
-                      callback();
+                      return callback();
                     },
                   },
                 ],
@@ -336,7 +318,7 @@ class FixingModal extends PureComponent<
                     if (value < 0) {
                       return callback(true);
                     }
-                    callback();
+                    return callback();
                   },
                 },
               ],
@@ -377,8 +359,13 @@ class FixingModal extends PureComponent<
     const direction = this.data[LEG_FIELD.KNOCK_DIRECTION];
     const fixObservations = this.data[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY];
     const last = fixObservations.every(item => _.isNumber(item[OB_PRICE_FIELD]));
+    const expirationDate = getMoment(this.data[LEG_FIELD.EXPIRATION_DATE]);
+    const now = moment();
+    const expiration = expirationDate.isBefore(now, 'day') || expirationDate.isSame(now, 'day');
+
     return (
       last &&
+      expiration &&
       this.state.tableData.every(record => {
         const upBarrier = record[LEG_FIELD.UP_BARRIER];
         const alObPrice = Form2.getFieldValue(record[OB_PRICE_FIELD]);
@@ -422,7 +409,7 @@ class FixingModal extends PureComponent<
               onClick={this.onConfirm}
               loading={this.state.modalConfirmLoading}
             >
-              到期
+              结算
             </Button>
           </Col>
         </Row>
@@ -449,13 +436,35 @@ class FixingModal extends PureComponent<
     );
   };
 
+  public $asianExerciseModal: AsianExerciseModal;
+
+  public $expirationModal: ExpirationModal;
+
+  public $knockOutModal: KnockOutModal;
+
+  public $exerciseForm: Form;
+
+  public reload: any;
+
   public render() {
     const { visible } = this.state;
     return (
       <>
-        <ExpirationModal ref={node => (this.$expirationModal = node)} />
-        <KnockOutModal ref={node => (this.$knockOutModal = node)} />
-        <AsianExerciseModal ref={node => (this.$asianExerciseModal = node)} />
+        <ExpirationModal
+          ref={node => {
+            this.$expirationModal = node;
+          }}
+        />
+        <KnockOutModal
+          ref={node => {
+            this.$knockOutModal = node;
+          }}
+        />
+        <AsianExerciseModal
+          ref={node => {
+            this.$asianExerciseModal = node;
+          }}
+        />
         <Modal
           onCancel={this.switchModal}
           destroyOnClose

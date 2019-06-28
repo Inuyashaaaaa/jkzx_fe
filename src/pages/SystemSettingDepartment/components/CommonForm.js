@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import {
   Input,
@@ -30,9 +31,7 @@ function sortResource(data, sortPropoerty) {
   }
   const { children } = data;
   if (children && children.length > 0) {
-    children.sort((a, b) => {
-      return a[sortPropoerty].localeCompare(b[sortPropoerty]);
-    });
+    children.sort((a, b) => a[sortPropoerty].localeCompare(b[sortPropoerty]));
     children.forEach(c => sortResource(c, sortPropoerty));
   }
 }
@@ -122,7 +121,7 @@ export default class CommonForm extends Component {
         }
       }
       if (target.required) {
-        if (value === '') {
+        if (!value) {
           nextState[key] = `${target.label}不能为空`;
           passed = false;
         }

@@ -1,3 +1,5 @@
+import { Button } from 'antd';
+import React from 'react';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
@@ -5,13 +7,11 @@ import {
   LEG_TYPE_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
-import { Button } from 'antd';
-import React from 'react';
 
 export const EXERCISE_FORM_CONTROLS: (
   notionalType,
   handleSettleAmount,
-  productType
+  productType,
 ) => IFormControl[] = (notionalType, handleSettleAmount, productType) => {
   const noExerciseArray = [
     'STRADDLE',
@@ -44,7 +44,7 @@ export const EXERCISE_FORM_CONTROLS: (
       {
         field: 'NOTIONAL_AMOUNT',
         control: {
-          label: notionalType === NOTION_ENUM_MAP.CNY ? '名义本金 (￥)' : '名义本金 (手)',
+          label: '名义本金 (￥)',
         },
         input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
         decorator: {
@@ -129,7 +129,7 @@ export const EXERCISE_FORM_CONTROLS: (
     {
       field: 'NOTIONAL_AMOUNT',
       control: {
-        label: notionalType === NOTION_ENUM_MAP.CNY ? '名义本金 (￥)' : '名义本金 (手)',
+        label: '名义本金 (￥)',
       },
       input: { ...INPUT_NUMBER_DIGITAL_CONFIG, disabled: true },
       decorator: {

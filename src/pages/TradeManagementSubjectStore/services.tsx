@@ -82,6 +82,10 @@ const exchange = {
           label: '金交所',
           value: 'SGE',
         },
+        {
+          label: '能源中心',
+          value: 'INE',
+        },
       ];
     };
 
@@ -113,6 +117,23 @@ const maturity = {
           },
         ],
       })(<DatePicker editing format="YYYY-MM-DD" />)}
+    </FormItem>
+  ),
+};
+
+const indexName = {
+  title: '指数名称',
+  dataIndex: 'name',
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>
+      {form.getFieldDecorator({
+        rules: [
+          {
+            required: true,
+            message: '指数名称是必填项',
+          },
+        ],
+      })(<Input />)}
     </FormItem>
   ),
 };
@@ -335,9 +356,9 @@ const instrumentIds = {
             mode="multiple"
             disabled={disable()}
             fetchOptionsOnSearch
-            options={async (v: string = '') => {
+            options={async (values: string = '') => {
               const { data = [], error } = await mktInstrumentSearch({
-                instrumentIdPart: v,
+                instrumentIdPart: values,
               });
               if (error) return [];
               return data.slice(0, 50).map(item => ({
@@ -457,9 +478,9 @@ const underlyerInstrumentId = {
           allowClear
           showSearch
           fetchOptionsOnSearch
-          options={async (v: string = '') => {
+          options={async (values: string = '') => {
             const { data = [], error } = await mktInstrumentSearch({
-              instrumentIdPart: v,
+              instrumentIdPart: values,
               excludeOption: true,
             });
             if (error) return [];

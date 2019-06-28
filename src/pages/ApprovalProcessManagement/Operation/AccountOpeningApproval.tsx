@@ -1,21 +1,4 @@
-import {
-  completeTaskProcess,
-  queryProcessForm,
-  queryProcessHistoryForm,
-  wkProcessInstanceFormGet,
-  UPLOAD_URL,
-  wkAttachmentProcessInstanceModify,
-  wkAttachmentList,
-  downloadTradeAttachment,
-} from '@/services/approval';
-import { queryCompleteCompanys } from '@/services/sales';
 import moment from 'moment';
-import { Form2, Upload, Input as Input2, InputNumber, SmartTable } from '@/containers';
-import {
-  refBankAccountSearch,
-  refSimilarLegalNameList,
-  wkAttachmentProcessInstanceBind,
-} from '@/services/reference-data-service';
 import {
   Button,
   Icon,
@@ -31,17 +14,35 @@ import {
   Alert,
 } from 'antd';
 import React, { PureComponent } from 'react';
-import { generateColumns } from '../tools';
 import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import {
+  completeTaskProcess,
+  queryProcessForm,
+  queryProcessHistoryForm,
+  wkProcessInstanceFormGet,
+  UPLOAD_URL,
+  wkAttachmentProcessInstanceModify,
+  wkAttachmentList,
+  downloadTradeAttachment,
+} from '@/services/approval';
+import { queryCompleteCompanys } from '@/services/sales';
+import { Form2, Upload, Input as Input2, InputNumber, SmartTable } from '@/containers';
+import {
+  refBankAccountSearch,
+  refSimilarLegalNameList,
+  wkAttachmentProcessInstanceBind,
+} from '@/services/reference-data-service';
+import { generateColumns } from '../tools';
 import { getToken } from '@/tools/authority';
 import ApprovalProcessManagementBookEdit from '@/pages/ApprovalProcessManagementBookEdit';
-import _ from 'lodash';
 import styles from '../index.less';
 import { arr2treeOptions, getMoment } from '@/tools';
 import EditModalButton from '../../ClientManagementInfo/EditModelButton';
 
 const { TextArea } = AntdInput;
 const { Title } = Typography;
+/* eslint-disable */
 class AccountOpeningApproval extends PureComponent<any, any> {
   constructor(props) {
     super(props);
@@ -67,6 +68,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
       salesCascaderList: [],
     };
   }
+
   public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
@@ -93,7 +95,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
         },
         () => {
           this.fetchData(formData, status);
-        }
+        },
       );
     }
   }
@@ -104,27 +106,21 @@ class AccountOpeningApproval extends PureComponent<any, any> {
     const newData = arr2treeOptions(
       data,
       ['subsidiaryId', 'branchId', 'salesId'],
-      ['subsidiaryName', 'branchName', 'salesName']
+      ['subsidiaryName', 'branchName', 'salesName'],
     );
 
-    const branchSalesList = newData.map(subsidiary => {
-      return {
-        value: subsidiary.label,
-        label: subsidiary.label,
-        children: subsidiary.children.map(branch => {
-          return {
-            value: branch.label,
-            label: branch.label,
-            children: branch.children.map(salesName => {
-              return {
-                value: salesName.label,
-                label: salesName.label,
-              };
-            }),
-          };
-        }),
-      };
-    });
+    const branchSalesList = newData.map(subsidiary => ({
+      value: subsidiary.label,
+      label: subsidiary.label,
+      children: subsidiary.children.map(branch => ({
+        value: branch.label,
+        label: branch.label,
+        children: branch.children.map(salesName => ({
+          value: salesName.label,
+          label: salesName.label,
+        })),
+      })),
+    }));
     this.setState({
       salesCascaderList: branchSalesList,
     });
@@ -278,7 +274,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
       },
       () => {
         this.setFinalData(data, status);
-      }
+      },
     );
   };
 
@@ -544,24 +540,23 @@ class AccountOpeningApproval extends PureComponent<any, any> {
 
     const approvalColumns = generateColumns(
       'approval',
-      data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
+      data.processInstance && data.processInstance.operator ? 'operator' : 'initiator',
     );
     const processColumns = generateColumns('process');
     const processData = data.processInstance ? [data.processInstance] : [];
     let histories = data.taskHistory ? data.taskHistory : [];
-    const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin={true} />;
+    const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
     const _data = data.processInstance ? data.processInstance : {};
-    histories = histories.sort((item1, item2) => {
-      return moment(item1.operateTime).valueOf() - moment(item2.operateTime).valueOf();
-    });
+    histories = histories.sort(
+      (item1, item2) => moment(item1.operateTime).valueOf() - moment(item2.operateTime).valueOf(),
+    );
     if (histories.length > 0) {
       _data.status =
         histories[histories.length - 1].operation === '退回'
           ? '待修改'
-          : histories[histories.length - 1].operation === '复核通过' ||
-            histories[histories.length - 1].operation === '废弃'
-          ? '审核完成'
-          : '待审批';
+          : formData.processInstanceStatusEnum === 'processUnfinished'
+          ? '待审批'
+          : '审批完成';
     }
     const formStatus =
       _data.status === '待审批' || _data.status === '审核完成' || status !== 'pending';
@@ -581,38 +576,28 @@ class AccountOpeningApproval extends PureComponent<any, any> {
                 {
                   title: '审批单号',
                   dataIndex: 'processSequenceNum',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '审批类型',
                   dataIndex: 'processName',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
 
                 {
                   title: '状态',
                   dataIndex: 'status',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '发起人',
-                  dataIndex: `${!!_data.initiatorName ? 'initiatorName' : 'operatorName'}`,
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  dataIndex: `${_data.initiatorName ? 'initiatorName' : 'operatorName'}`,
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '标题',
                   dataIndex: 'subject',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
               ]}
             />
@@ -630,25 +615,21 @@ class AccountOpeningApproval extends PureComponent<any, any> {
                 {
                   title: '交易对手',
                   dataIndex: 'legalName',
-                  render: (value, record, index, { form, editing }) => {
-                    return (
-                      <FormItem>{form.getFieldDecorator({})(<Input2 editing={false} />)}</FormItem>
-                    );
-                  },
+                  render: (value, record, index, { form, editing }) => (
+                    <FormItem>{form.getFieldDecorator({})(<Input2 editing={false} />)}</FormItem>
+                  ),
                 },
                 {
                   title: '关联销售',
                   dataIndex: 'salesName',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => <FormItem>{value}</FormItem>,
                 },
                 {
                   title: '类型',
                   dataIndex: 'clientType',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{value === 'PRODUCT' ? '产品户' : '机构户'}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => (
+                    <FormItem>{value === 'PRODUCT' ? '产品户' : '机构户'}</FormItem>
+                  ),
                 },
               ]}
             />
@@ -671,7 +652,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
                   <EditModalButton
                     salesCascaderList={this.state.salesCascaderList}
                     name="编辑"
-                    modelEditable={true}
+                    modelEditable
                     content={<Button>修改客户信息</Button>}
                     style={{ color: 'rgba(0, 0, 0, 0.85)' }}
                     handleApprovalData={this.handleGetData}
@@ -716,7 +697,7 @@ class AccountOpeningApproval extends PureComponent<any, any> {
                           <TextArea
                             onChange={this.setPassComment}
                             value={passComment}
-                            placeholder={'请输入审核意见（可选）'}
+                            placeholder="请输入审核意见（可选）"
                           />
                         </div>
                       }
