@@ -1,22 +1,22 @@
-/* eslint-disable */
 import {
+  Alert,
   Button,
   Divider,
+  Icon,
   message,
   Modal,
+  notification,
   Radio,
   Row,
-  Table,
-  Tabs,
   Upload,
-  Icon,
-  notification,
 } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
-import React, { useState, useEffect, memo } from 'react';
-import { getToken } from '@/tools/authority';
+import React, { memo, useEffect, useState, useCallback } from 'react';
+import { BIG_NUMBER_CONFIG } from '@/constants/common';
+import { Select, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import TabHeader from '@/containers/TabHeader';
@@ -34,7 +34,11 @@ import {
   queryTradeRecord,
   uploadUrl,
 } from '@/services/onBoardTransaction';
-import CommonForm from '../SystemSettingDepartment/components/CommonForm';
+import {
+  trdPortfolioListBySimilarPortfolioName,
+  trdPortfolioRefresh,
+} from '@/services/trade-service';
+import { getToken } from '@/tools/authority';
 import { CREATE_FORM_CONTROLS, generateColumns, resultTableFailureColumns } from './constants';
 
 const RadioButton = Radio.Button;
@@ -59,7 +63,19 @@ const TradeManagementOnBoardTansaction = props => {
   const [modalLoading, setModalLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [resultModalVisible, setResultModalVisible] = useState(false);
-  const [uploadResultTable, setUploadResultTable] = useState({ success: [], failure: [] });
+  const [uploadResultTable, setUploadResultTable] = useState([]);
+  const [updatePortfolioModalVisible, setUpdatePortfolioModalVisible] = useState(false);
+  const [portfolioSelected, setPortfolioSelected] = useState([]);
+  const [tradeIdToUpdate, setTradeIdToUpdate] = useState([]);
+
+  const sortBy = (data, field) => {
+    data.sort((a, b) => {
+      const aStr = a[field] + a.instrumentId;
+      const bStr = b[field] + a.instrumentId;
+      return aStr.localeCompare(bStr);
+    });
+    return data;
+  };
 
   const injectMarketValue = async finalData => {
     const { data = {}, error } = await mktQuotesListPaged({
@@ -106,19 +122,6 @@ const TradeManagementOnBoardTansaction = props => {
     }
     const data = (list && list.data) || [];
     return injectMarketValue(data);
-  };
-
-  useEffect(() => {
-    queryFlowData();
-  }, []);
-
-  const sortBy = (data, field) => {
-    data.sort((a, b) => {
-      const aStr = a[field] + a.instrumentId;
-      const bStr = b[field] + a.instrumentId;
-      return aStr.localeCompare(bStr);
-    });
-    return data;
   };
 
   const attachData = {
@@ -238,7 +241,7 @@ const TradeManagementOnBoardTansaction = props => {
     if (mktInstrumentInfoRef.error) return;
     const { error, data } = await exeTradeRecordSave({
       ...formatValues,
-      multiplier: mktInstrumentInfoRef.data.instrumentInfo.multiplier || 1,
+      multiplier: mktInstrumentInfoRef.data.instrumentInfo.multiplier,
     });
     if (error) {
       message.error('新建失败');
@@ -313,7 +316,7 @@ const TradeManagementOnBoardTansaction = props => {
   const summaryColumns = generateColumns('summary');
   const portfolioColumns = generateColumns('portfolio');
 
-  const queryFlowData = async () => {
+  const queryFlowData = useCallback(async () => {
     const params = {
       instrumentIds: searchFormDataFlow.instrumentId,
       startTime: `${searchFormDataFlow.date[0].format('YYYY-MM-DD')}T00:00:00`,
@@ -336,9 +339,11 @@ const TradeManagementOnBoardTansaction = props => {
         seller: '卖',
       };
 
-      obj.openClose = openCloseMap[obj.openClose] || '-';
-      obj.direction = directionMap[obj.direction] || '-';
-      obj.dealTime = obj.dealTime ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss') : '-';
+      obj.openClose = openCloseMap[_.toLower(obj.openClose)] || obj.openClose;
+      obj.direction = directionMap[_.toLower(obj.direction)] || obj.direction;
+      obj.dealTime = obj.dealTime
+        ? moment(obj.dealTime).format('YYYY-MM-DD HH:mm:ss')
+        : obj.dealTime;
       return obj;
     });
 
@@ -354,7 +359,7 @@ const TradeManagementOnBoardTansaction = props => {
     });
     setFlowData(finalData);
     setLoading(false);
-  };
+  });
 
   const onReset = () => {
     setSearchFormDataFlow({ date: [moment().subtract(1, 'days'), moment()] });
@@ -382,7 +387,7 @@ const TradeManagementOnBoardTansaction = props => {
 
   useEffect(() => {
     queryFlowData();
-  }, [queryFlowData]);
+  }, []);
 
   return (
     <Page
@@ -584,10 +589,6 @@ const TradeManagementOnBoardTansaction = props => {
         title="批量导入结果"
         width={800}
         visible={resultModalVisible}
-        onOk={() => {
-          queryFlowData();
-          setResultModalVisible(false);
-        }}
         onCancel={() => {
           setResultModalVisible(false);
         }}
