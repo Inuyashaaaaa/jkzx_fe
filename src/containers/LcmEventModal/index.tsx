@@ -26,10 +26,12 @@ import KnockOutModal from './KnockOutModal';
 import RollModal from './RollModal';
 import SettleModal from './SettleModal';
 import UnwindModal from './UnwindModal';
+import BarrierKnockOutModal from './BarrierKnockOutModal';
 import { OB_PRICE_FIELD } from './constants';
 import { getObservertionFieldData } from './tools';
 import { isRangeAccruals, getMoment } from '@/tools';
 import moment from 'moment';
+import BarrierExerciseModal from './BarrierExerciseModal';
 
 export interface ILcmEventModalEventParams {
   eventType: string;
@@ -56,6 +58,8 @@ const LcmEventModal = memo<{
   const $rollModal = useRef<RollModal>(null);
   const $amend = useRef<IAmendModalEl>(null);
   const $settleModal = useRef<SettleModal>(null);
+  const $barrierKnockOutModal = useRef<BarrierKnockOutModal>(null);
+  const $barrierExerciseModal = useRef<BarrierExerciseModal>(null);
 
   const { current } = props;
 
@@ -130,6 +134,9 @@ const LcmEventModal = memo<{
           }
           return $asianExerciseModal.current.show(data, tableFormData, currentUser, loadData);
         }
+        if (legType === LEG_TYPE_MAP.BARRIER) {
+          return $barrierExerciseModal.current.show(data, tableFormData, currentUser, loadData);
+        }
         return $exerciseModal.current.show(data, tableFormData, currentUser, loadData);
       }
 
@@ -143,6 +150,9 @@ const LcmEventModal = memo<{
       }
 
       if (eventType === LCM_EVENT_TYPE_MAP.KNOCK_OUT) {
+        if (legType === LEG_TYPE_MAP.BARRIER) {
+          return $barrierKnockOutModal.current.show(data, tableFormData, currentUser, loadData);
+        }
         return $knockOutModal.current.show(data, tableFormData, currentUser, loadData);
       }
 
@@ -230,6 +240,16 @@ const LcmEventModal = memo<{
       <AmendModal
         current={node => {
           $amend.current = node;
+        }}
+      />
+      <BarrierKnockOutModal
+        ref={node => {
+          $barrierKnockOutModal.current = node;
+        }}
+      />
+      <BarrierExerciseModal
+        ref={node => {
+          $barrierExerciseModal.current = node;
         }}
       />
     </>
