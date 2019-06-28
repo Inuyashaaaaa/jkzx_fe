@@ -10,7 +10,7 @@ export interface BtnProps extends ButtonProps {
   name?: string;
 }
 
-const DownloadButton = memo<BtnProps>(props => {
+const DownloadButton: React.SFC<BtnProps> = memo<BtnProps>(props => {
   const btn = useRef<any>(null);
   const { url, options, name, content, ...rest } = props;
   const [loading, setLoading] = useState(false);
