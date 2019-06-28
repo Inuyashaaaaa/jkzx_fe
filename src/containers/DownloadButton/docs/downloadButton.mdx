@@ -15,10 +15,10 @@ import { Playground, Props } from 'docz';
 extends https://ant.design/components/button-cn/#API
 
 ## 使用场景
-
-下载文档；
+  调接口下载后台文档
 
 ## 功能交互设计
+  -支持自定义Button显示内容
 
 ## UI设计
 
@@ -28,9 +28,10 @@ extends https://ant.design/components/button-cn/#API
 
 <Playground>
   <DownloadButton
-    url={`url`}
+    url={`/api/document-service/bct/download/settlement/?`}
     name={`dome结算通知书.doc`}
     options={`tradeId=1&positionId=2&partyName=3`}
+    content='download'
   />
 </Playground>
 

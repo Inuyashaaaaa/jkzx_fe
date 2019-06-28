@@ -5,9 +5,9 @@ import { ButtonProps } from 'antd/lib/button';
 import { DOWN_LOAD } from '@/services/document';
 
 export interface BtnProps extends ButtonProps {
-  url?: string;
-  options?: string;
-  name?: string;
+  url?: string; // 下载地址
+  options?: string; // 接口参数
+  name?: string; // 下载文件名称
 }
 
 const DownloadButton: React.SFC<BtnProps> = memo<BtnProps>(props => {
