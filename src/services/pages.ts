@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
 import {
   LEG_ENV_FIELD,
   LEG_FIELD,
@@ -16,8 +18,6 @@ import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import { getLegByType, getMoment, uuid } from '@/tools';
 import { ILeg } from '@/types/leg';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
 
 export const createLegDataSourceItem = (leg: ILeg, env: string) => {
   return {
@@ -102,8 +102,8 @@ export const bookingTableFormControls: () => IFormControl[] = () => [
 
 export const convertTradePositions = (tableDataSource, tableFormData, env) => {
   const positions: any[] = tableDataSource.map(dataSourceItem => {
-    dataSourceItem = miniumlPercent(dataSourceItem);
-    const type = dataSourceItem[LEG_TYPE_FIELD];
+    const dataSourceItems = miniumlPercent(dataSourceItem);
+    const type = dataSourceItems[LEG_TYPE_FIELD];
     const leg = getLegByType(type);
 
     if (!leg) {
@@ -123,7 +123,7 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
       counterPartyAccountName: 'empty',
       counterPartyCode: tableFormData.counterPartyCode,
       counterPartyName: tableFormData.counterPartyCode,
-      ...leg.getPosition(env, dataSourceItem, tableDataSource),
+      ...leg.getPosition(env, dataSourceItems, tableDataSource),
     };
   });
 
@@ -132,15 +132,15 @@ export const convertTradePositions = (tableDataSource, tableFormData, env) => {
 
 export const convertPricingHistoryTradePositions = (tableDataSource, env) => {
   const positions: any[] = tableDataSource.map(dataSourceItem => {
-    dataSourceItem = miniumlPercent(dataSourceItem);
-    const type = dataSourceItem[LEG_TYPE_FIELD];
+    const dataSourceItems = miniumlPercent(dataSourceItem);
+    const type = dataSourceItems[LEG_TYPE_FIELD];
     const leg = getLegByType(type);
 
     if (!leg) {
       throw new Error('not found Leg type');
     }
 
-    return leg.getPosition(env, dataSourceItem, tableDataSource);
+    return leg.getPosition(env, dataSourceItems, tableDataSource);
   });
 
   return positions;
@@ -191,7 +191,7 @@ function miniumlPercent(item) {
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
-      clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM]
+      clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM],
     )
       .multipliedBy(0.01)
       .toNumber();
@@ -216,7 +216,7 @@ function miniumlPercent(item) {
   if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
       clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
-        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE]
+        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
       )
         .multipliedBy(0.01)
         .toNumber();
@@ -305,10 +305,18 @@ function miniumlPercent(item) {
 
   if (clone[LEG_FIELD.HIGH_PARTICIPATION_RATE] !== undefined) {
     clone[LEG_FIELD.HIGH_PARTICIPATION_RATE] = new BigNumber(
-      clone[LEG_FIELD.HIGH_PARTICIPATION_RATE]
+      clone[LEG_FIELD.HIGH_PARTICIPATION_RATE],
     )
       .multipliedBy(0.01)
       .toNumber();
+  }
+
+  if (clone[LEG_FIELD.EARNINGS_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.EARNINGS] !== undefined) {
+      clone[LEG_FIELD.EARNINGS] = new BigNumber(clone[LEG_FIELD.EARNINGS])
+        .multipliedBy(0.01)
+        .toNumber();
+    }
   }
 
   if (clone[LEG_FIELD.LOW_PARTICIPATION_RATE] !== undefined) {
@@ -403,7 +411,7 @@ function miniumlPercent(item) {
   if (clone[LEG_FIELD.DOWN_BARRIER] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
       clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
-        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE]
+        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
       )
         .multipliedBy(0.01)
         .toNumber();
@@ -424,7 +432,7 @@ export function backConvertPercent(item) {
 
   if (clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] !== undefined) {
     clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = new BigNumber(
-      clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM]
+      clone[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM],
     )
       .multipliedBy(100)
       .toNumber();
@@ -441,8 +449,16 @@ export function backConvertPercent(item) {
   if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
       clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
-        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE]
+        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
       )
+        .multipliedBy(100)
+        .toNumber();
+    }
+  }
+
+  if (clone[LEG_FIELD.EARNINGS_TYPE] === UNIT_ENUM_MAP.PERCENT) {
+    if (clone[LEG_FIELD.EARNINGS] !== undefined) {
+      clone[LEG_FIELD.EARNINGS] = new BigNumber(clone[LEG_FIELD.EARNINGS])
         .multipliedBy(100)
         .toNumber();
     }
@@ -465,7 +481,7 @@ export function backConvertPercent(item) {
   if (clone[LEG_FIELD.DOWN_BARRIER] === UNIT_ENUM_MAP.PERCENT) {
     if (clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] !== undefined) {
       clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE] = new BigNumber(
-        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE]
+        clone[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
       )
         .multipliedBy(100)
         .toNumber();
@@ -537,7 +553,7 @@ export function backConvertPercent(item) {
 
   if (clone[LEG_FIELD.HIGH_PARTICIPATION_RATE] !== undefined) {
     clone[LEG_FIELD.HIGH_PARTICIPATION_RATE] = new BigNumber(
-      clone[LEG_FIELD.HIGH_PARTICIPATION_RATE]
+      clone[LEG_FIELD.HIGH_PARTICIPATION_RATE],
     )
       .multipliedBy(100)
       .toNumber();
