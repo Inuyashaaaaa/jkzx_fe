@@ -122,8 +122,6 @@ class ClientManagementBankAccount extends PureComponent {
   public handleCreate = async () => {
     this.setState({
       confirmLoading: true,
-      visible: false,
-      createFormData: {},
     });
     const { error, data } = await refBankAccountSave({
       ...this.state.createFormData,
@@ -135,6 +133,7 @@ class ClientManagementBankAccount extends PureComponent {
       message.error('创建失败');
       return;
     }
+    this.setState({ visible: false, createFormData: {} });
     message.success('创建成功');
     this.fetchTable();
   };
