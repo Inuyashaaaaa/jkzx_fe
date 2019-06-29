@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   ASSET_CLASS_MAP,
@@ -84,7 +85,7 @@ const asyncLinkageBarrierShift = (
   setColLoading,
   setLoading,
   setColValue,
-  setTableData
+  setTableData,
 ) => {
   const { changedFields } = changeFieldsParams;
 
@@ -297,7 +298,7 @@ export const BarrierLeg: ILeg = legPipeLine({
             result[item[OB_DAY_FIELD]] = item.price || null;
             return result;
           },
-          {}
+          {},
         );
       }
       if (dataItem[LEG_FIELD.OBSERVATION_STEP]) {
@@ -347,7 +348,7 @@ export const BarrierLeg: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -357,7 +358,7 @@ export const BarrierLeg: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
 
     const { changedFields } = changeFieldsParams;
@@ -370,7 +371,7 @@ export const BarrierLeg: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
 
     if (
@@ -381,15 +382,18 @@ export const BarrierLeg: ILeg = legPipeLine({
     ) {
       let barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
       let strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
+      const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
       if (barrier != null && strike != null) {
         if (Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
           barrier = new BigNumber(barrier)
             .multipliedBy(0.01)
+            .multipliedBy(initialSpot)
             .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
         }
         if (Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
           strike = new BigNumber(strike)
             .multipliedBy(0.01)
+            .multipliedBy(initialSpot)
             .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
         }
         record[LEG_FIELD.OPTION_TYPE] =
@@ -413,7 +417,7 @@ export const BarrierLeg: ILeg = legPipeLine({
             setColLoading,
             setLoading,
             setColValue,
-            setTableData
+            setTableData,
           );
         }
       }

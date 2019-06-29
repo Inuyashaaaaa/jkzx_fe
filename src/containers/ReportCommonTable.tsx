@@ -215,7 +215,7 @@ const ReportCommonTable = memo<any>(props => {
           antd={antd}
           rowKey="uuid"
           loading={loading}
-          dataSource={dataSource}
+          dataSource={dataSource.map(item => _.omitBy(item, val => val == null))}
           pagination={{
             ...pagination,
             total,

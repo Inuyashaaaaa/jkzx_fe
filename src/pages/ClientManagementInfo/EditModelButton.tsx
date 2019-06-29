@@ -1,3 +1,9 @@
+/* eslint-disable */
+import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { memo, useRef, useState } from 'react';
 import EmailInput from '@/containers/EmailInput';
 import Upload from '@/containers/Upload';
 import {
@@ -13,11 +19,6 @@ import {
 import { remove, uuid, getMoment } from '@/tools';
 import { getPartyDoc, HREF_UPLOAD_URL, UPLOAD_URL } from '@/services/document';
 import { createRefParty, refPartyGetByLegalName } from '@/services/reference-data-service';
-import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { memo, useRef, useState } from 'react';
 import {
   ALL_DATE_FIELD_KEYS,
   BASE_FORM_FIELDS,
@@ -27,7 +28,7 @@ import {
 import { getToken } from '@/tools/authority';
 import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
 
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 
 const useTableData = props => {
   const { record = {}, modelEditable, status } = props;
@@ -80,9 +81,7 @@ const useTableData = props => {
         if (data[item]) {
           return getPartyDoc({ uuid: data[item] });
         }
-        return;
       }
-      return;
     });
     setLoading(true);
     const [...res] = await Promise.all(requests);
@@ -149,88 +148,78 @@ const EditModalButton = memo<any>(props => {
     {
       title: '姓名',
       dataIndex: 'name',
-      render: (val, record, index, { form, editing }) => {
-        return (
-          <FormItem hasFeedback={!disabled ? true : false}>
-            {form.getFieldDecorator({
-              rules: [
-                {
-                  required: false,
-                },
-              ],
-            })(<Input disabled={disabled} editing={editable} />)}
-          </FormItem>
-        );
-      },
+      render: (val, record, index, { form, editing }) => (
+        <FormItem hasFeedback={!disabled}>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: false,
+              },
+            ],
+          })(<Input disabled={disabled} editing={editable} />)}
+        </FormItem>
+      ),
     },
     {
       title: '身份证号',
       dataIndex: 'IDNumber',
-      render: (val, record, index, { form, editing }) => {
-        return (
-          <FormItem hasFeedback={!disabled ? true : false}>
-            {form.getFieldDecorator({
-              rules: [
-                {
-                  required: false,
-                },
-              ],
-            })(<Input disabled={disabled} editing={editable} />)}
-          </FormItem>
-        );
-      },
+      render: (val, record, index, { form, editing }) => (
+        <FormItem hasFeedback={!disabled}>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: false,
+              },
+            ],
+          })(<Input disabled={disabled} editing={editable} />)}
+        </FormItem>
+      ),
     },
     {
       title: '证件有效期',
       dataIndex: 'periodValidity',
-      render: (val, record, index, { form, editing }) => {
-        return (
-          <FormItem hasFeedback={!disabled ? true : false}>
-            {form.getFieldDecorator({
-              rules: [
-                {
-                  required: false,
-                },
-              ],
-            })(<DatePicker disabled={disabled} editing={editable} />)}
-          </FormItem>
-        );
-      },
+      render: (val, record, index, { form, editing }) => (
+        <FormItem hasFeedback={!disabled}>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: false,
+              },
+            ],
+          })(<DatePicker disabled={disabled} editing={editable} format={'YYYY-MM-DD'} />)}
+        </FormItem>
+      ),
     },
     {
       title: '联系电话',
       dataIndex: 'phoneNumber',
-      render: (val, record, index, { form, editing }) => {
-        return (
-          <FormItem hasFeedback={!disabled ? true : false}>
-            {form.getFieldDecorator({
-              rules: [
-                {
-                  required: false,
-                },
-              ],
-            })(<Input disabled={disabled} editing={editable} />)}
-          </FormItem>
-        );
-      },
+      render: (val, record, index, { form, editing }) => (
+        <FormItem hasFeedback={!disabled}>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: false,
+              },
+            ],
+          })(<Input disabled={disabled} editing={editable} />)}
+        </FormItem>
+      ),
     },
     {
       title: '操作',
       dataIndex: 'action',
-      render: (val, record, index, { form, editing }) => {
-        return (
-          <a
-            href="javascript:;"
-            style={{ color: 'red' }}
-            onClick={() => {
-              const next = remove(traderList, (item, iindex) => iindex === index);
-              setTraderList(next);
-            }}
-          >
-            删除
-          </a>
-        );
-      },
+      render: (val, record, index, { form, editing }) => (
+        <a
+          href="javascript:;"
+          style={{ color: 'red' }}
+          onClick={() => {
+            const next = remove(traderList, (item, iindex) => iindex === index);
+            setTraderList(next);
+          }}
+        >
+          删除
+        </a>
+      ),
     },
   ];
 
@@ -271,6 +260,10 @@ const EditModalButton = memo<any>(props => {
           item.url = `${HREF_UPLOAD_URL}${_.get(result, 'uuid')}&partyDoc=true`;
           return item;
         }
+        const error = _.get(val, '[0].response.error');
+        if (error) {
+          item.status = 'error';
+        }
         item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
         return item;
       });
@@ -284,12 +277,13 @@ const EditModalButton = memo<any>(props => {
         },
       ];
     }
+
     return val;
   };
 
   return (
     <ModalButton
-      text={true}
+      text
       content={
         <Spin spinning={loading}>
           <>
@@ -319,460 +313,429 @@ const EditModalButton = memo<any>(props => {
                         </span>
                       ),
                       dataIndex: BASE_FORM_FIELDS.LEGALNAME,
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false} help="创建后不允许修改">
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={true} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled} help="创建后不允许修改">
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '交易对手类型',
                       dataIndex: BASE_FORM_FIELDS.TRADER_TYPE,
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem
-                            hasFeedback={!disabled ? true : false}
-                            extra={'产品户 需要在下一步补充产品信息内容'}
-                          >
-                            {form.getFieldDecorator({
-                              rules: [
+                      render: (val, record, index, { form }) => (
+                        <FormItem
+                          hasFeedback={!disabled}
+                          extra="产品户 需要在下一步补充产品信息内容"
+                        >
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(
+                            <Select
+                              style={{ width: '100%' }}
+                              disabled={disabled}
+                              editing={editable}
+                              options={[
                                 {
-                                  required: true,
-                                  message: '必填',
+                                  label: '产品户',
+                                  value: TRADER_TYPE.PRODUCT,
                                 },
-                              ],
-                            })(
-                              <Select
-                                style={{ width: '100%' }}
-                                disabled={disabled}
-                                editing={editable}
-                                options={[
-                                  {
-                                    label: '产品户',
-                                    value: TRADER_TYPE.PRODUCT,
-                                  },
-                                  {
-                                    label: '机构户',
-                                    value: TRADER_TYPE.ENTERPRISE,
-                                  },
-                                ]}
-                              />
-                            )}
-                          </FormItem>
-                        );
-                      },
+                                {
+                                  label: '机构户',
+                                  value: TRADER_TYPE.ENTERPRISE,
+                                },
+                              ]}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '机构类型',
                       dataIndex: 'investorType',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(
+                            <Select
+                              disabled={disabled}
+                              editing={editable}
+                              options={[
                                 {
-                                  required: true,
-                                  message: '必填',
+                                  label: ' 一般机构普通投资者',
+                                  value: 'NON_PROFESSINAL_INVESTOR',
                                 },
-                              ],
-                            })(
-                              <Select
-                                disabled={disabled}
-                                editing={editable}
-                                options={[
-                                  {
-                                    label: ' 一般机构普通投资者',
-                                    value: 'NON_PROFESSINAL_INVESTOR',
-                                  },
-                                  {
-                                    label: '一般机构专业投资者',
-                                    value: 'PROFESSIONAL_INVESTOR',
-                                  },
-                                  {
-                                    label: '金融机构专业投资者',
-                                    value: 'FINANCIAL_INSTITUTIONAL_INVESTOR',
-                                  },
-                                  {
-                                    label: '金融产品',
-                                    value: 'FINANCIAL_PRODUCT',
-                                  },
-                                ]}
-                              />
-                            )}
-                          </FormItem>
-                        );
-                      },
+                                {
+                                  label: '一般机构专业投资者',
+                                  value: 'PROFESSIONAL_INVESTOR',
+                                },
+                                {
+                                  label: '金融机构专业投资者',
+                                  value: 'FINANCIAL_INSTITUTIONAL_INVESTOR',
+                                },
+                                {
+                                  label: '金融产品',
+                                  value: 'FINANCIAL_PRODUCT',
+                                },
+                              ]}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '开户法人',
                       dataIndex: 'legalRepresentative',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '注册地址',
                       dataIndex: 'address',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '开户销售',
                       dataIndex: 'salesName',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {!disabled ? (
-                              form.getFieldDecorator({
-                                rules: [
-                                  {
-                                    required: true,
-                                    message: '必填',
-                                  },
-                                ],
-                              })(
-                                <Cascader
-                                  placeholder="请输入内容"
-                                  style={{ width: '100%' }}
-                                  options={salesCascaderList}
-                                  disabled={disabled}
-                                  showSearch={{
-                                    filter: (inputValue, path) => {
-                                      return path.some(
-                                        option =>
-                                          option.label
-                                            .toLowerCase()
-                                            .indexOf(inputValue.toLowerCase()) > -1
-                                      );
-                                    },
-                                  }}
-                                />
-                              )
-                            ) : (
-                              <Input editing={editable} value={val} />
-                            )}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {!disabled ? (
+                            form.getFieldDecorator({
+                              rules: [
+                                {
+                                  required: true,
+                                  message: '必填',
+                                },
+                              ],
+                            })(
+                              <Cascader
+                                placeholder="请输入内容"
+                                style={{ width: '100%' }}
+                                options={salesCascaderList}
+                                disabled={disabled}
+                                showSearch={{
+                                  filter: (inputValue, path) =>
+                                    path.some(
+                                      option =>
+                                        option.label
+                                          .toLowerCase()
+                                          .indexOf(inputValue.toLowerCase()) > -1,
+                                    ),
+                                }}
+                              />,
+                            )
+                          ) : (
+                            <Input editing={editable} value={val} />
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '担保人',
                       dataIndex: 'warrantor',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '担保人地址',
                       dataIndex: 'warrantorAddress',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '联系人',
                       dataIndex: 'contact',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '交易电话',
                       dataIndex: 'tradePhone',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '交易指定邮箱',
                       dataIndex: 'tradeEmail',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '主协议编号',
                       dataIndex: 'masterAgreementId',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: true,
-                                  message: '必填',
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: true,
+                                message: '必填',
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '托管邮箱',
                       dataIndex: 'trustorEmail',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<EmailInput style={{ width: '100%' }} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '补充协议编号',
                       dataIndex: 'supplementalAgreementId',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '授权到期日',
                       dataIndex: 'authorizeExpiryDate',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<DatePicker disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '协议签署授权人姓名',
                       dataIndex: 'signAuthorizerName',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '协议签署授权人身份证号',
                       dataIndex: 'signAuthorizerIdNumber',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '协议签署授权人证件有效期',
                       dataIndex: 'signAuthorizerIdExpiryDate',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<DatePicker disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '主协议编号版本',
                       dataIndex: 'masterAgreementNoVersion',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <Select
+                              editing={editable}
+                              options={[
                                 {
-                                  required: false,
+                                  label: ' SAC2014',
+                                  value: 'SAC2014',
                                 },
-                              ],
-                            })(
-                              <Select
-                                editing={editable}
-                                options={[
-                                  {
-                                    label: ' SAC2014',
-                                    value: 'SAC2014',
-                                  },
-                                  {
-                                    label: 'SAC2015',
-                                    value: 'SAC2015',
-                                  },
-                                  {
-                                    label: 'ISDA',
-                                    value: 'ISDA',
-                                  },
-                                  {
-                                    label: 'OTHER',
-                                    value: 'OTHER',
-                                  },
-                                  {
-                                    label: 'NAFMII',
-                                    value: 'NAFMII',
-                                  },
-                                ]}
-                              />
-                            )}
-                          </FormItem>
-                        );
-                      },
+                                {
+                                  label: 'SAC2015',
+                                  value: 'SAC2015',
+                                },
+                                {
+                                  label: 'ISDA',
+                                  value: 'ISDA',
+                                },
+                                {
+                                  label: 'OTHER',
+                                  value: 'OTHER',
+                                },
+                                {
+                                  label: 'NAFMII',
+                                  value: 'NAFMII',
+                                },
+                              ]}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '主协议签证日期',
                       dataIndex: 'masterAgreementSignDate',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<DatePicker editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '营业执照',
                       dataIndex: 'businessLicense',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                   ]}
                 />
@@ -797,121 +760,119 @@ const EditModalButton = memo<any>(props => {
                     {
                       title: '产品名称',
                       dataIndex: BASE_FORM_FIELDS.PRODUCTNAME,
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '产品代码',
                       dataIndex: 'productCode',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '产品类型',
                       dataIndex: 'productType',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '备案编号',
                       dataIndex: 'recordNumber',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '产品成立日',
                       dataIndex: 'productFoundDate',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<DatePicker disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '产品到期日',
                       dataIndex: 'productExpiringDate',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<DatePicker disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '基金经理',
                       dataIndex: 'fundManager',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                   ]}
                 />
@@ -936,123 +897,115 @@ const EditModalButton = memo<any>(props => {
                     {
                       title: '交易方向',
                       dataIndex: 'tradingDirection',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <Select
+                              disabled={disabled}
+                              editing={editable}
+                              options={[
                                 {
-                                  required: false,
+                                  label: '买',
+                                  value: 'BUY',
                                 },
-                              ],
-                            })(
-                              <Select
-                                disabled={disabled}
-                                editing={editable}
-                                options={[
-                                  {
-                                    label: '买',
-                                    value: 'BUY',
-                                  },
-                                  {
-                                    label: '卖',
-                                    value: 'SELL',
-                                  },
-                                  {
-                                    label: '买卖',
-                                    value: 'BUY_SELL',
-                                  },
-                                ]}
-                              />
-                            )}
-                          </FormItem>
-                        );
-                      },
+                                {
+                                  label: '卖',
+                                  value: 'SELL',
+                                },
+                                {
+                                  label: '买卖',
+                                  value: 'BUY_SELL',
+                                },
+                              ]}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '交易权限',
                       dataIndex: 'tradingPermission',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <Select
+                              disabled={disabled}
+                              editing={editable}
+                              options={[
                                 {
-                                  required: false,
+                                  label: '交易',
+                                  value: 'FULL',
                                 },
-                              ],
-                            })(
-                              <Select
-                                disabled={disabled}
-                                editing={editable}
-                                options={[
-                                  {
-                                    label: '交易',
-                                    value: 'FULL',
-                                  },
-                                  {
-                                    label: '限制交易',
-                                    value: 'LIMITED',
-                                  },
-                                  {
-                                    label: '交易标的',
-                                    value: 'BY_UNDERLYER',
-                                  },
-                                ]}
-                              />
-                            )}
-                          </FormItem>
-                        );
-                      },
+                                {
+                                  label: '限制交易',
+                                  value: 'LIMITED',
+                                },
+                                {
+                                  label: '交易标的',
+                                  value: 'BY_UNDERLYER',
+                                },
+                              ]}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '交易权限备注',
                       dataIndex: 'tradingPermissionNote',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<Input disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<Input disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: '交易标的',
                       dataIndex: 'tradingUnderlyers',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(
+                            <Select
+                              options={[
                                 {
-                                  required: false,
+                                  label: '个股商品',
+                                  value: 'EQUITY_COMMODITY',
                                 },
-                              ],
-                            })(
-                              <Select
-                                options={[
-                                  {
-                                    label: '个股商品',
-                                    value: 'EQUITY_COMMODITY',
-                                  },
-                                  {
-                                    label: '商品',
-                                    value: 'COMMODITY',
-                                  },
-                                ]}
-                                disabled={disabled}
-                                editing={editable}
-                              />
-                            )}
-                          </FormItem>
-                        );
-                      },
+                                {
+                                  label: '商品',
+                                  value: 'COMMODITY',
+                                },
+                              ]}
+                              disabled={disabled}
+                              editing={editable}
+                            />,
+                          )}
+                        </FormItem>
+                      ),
                     },
                     {
                       title: (
@@ -1061,19 +1014,17 @@ const EditModalButton = memo<any>(props => {
                         </span>
                       ),
                       dataIndex: 'marginDiscountRate',
-                      render: (val, record, index, { form }) => {
-                        return (
-                          <FormItem hasFeedback={!disabled ? true : false}>
-                            {form.getFieldDecorator({
-                              rules: [
-                                {
-                                  required: false,
-                                },
-                              ],
-                            })(<InputNumber disabled={disabled} editing={editable} />)}
-                          </FormItem>
-                        );
-                      },
+                      render: (val, record, index, { form }) => (
+                        <FormItem hasFeedback={!disabled}>
+                          {form.getFieldDecorator({
+                            rules: [
+                              {
+                                required: false,
+                              },
+                            ],
+                          })(<InputNumber disabled={disabled} editing={editable} />)}
+                        </FormItem>
+                      ),
                     },
                   ]}
                 />
@@ -1081,7 +1032,7 @@ const EditModalButton = memo<any>(props => {
               <TabPane tab="交易授权人" key="4">
                 <SmartTable
                   size="small"
-                  rowKey={'uuid'}
+                  rowKey="uuid"
                   pagination={false}
                   dataSource={traderList}
                   ref={node => (tableEl.current = node)}
@@ -1095,7 +1046,7 @@ const EditModalButton = memo<any>(props => {
                           };
                         }
                         return item;
-                      })
+                      }),
                     );
                   }}
                   columns={columns}
@@ -1106,7 +1057,7 @@ const EditModalButton = memo<any>(props => {
                     onClick={() => {
                       setTraderList(traderList.concat({ uuid: uuid() }));
                     }}
-                    block={true}
+                    block
                     type="dashed"
                   >
                     添加
@@ -1136,7 +1087,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1156,7 +1116,7 @@ const EditModalButton = memo<any>(props => {
                                 fileList={val}
                                 disabled={disabled}
                                 editing={editable}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1168,7 +1128,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1188,7 +1157,7 @@ const EditModalButton = memo<any>(props => {
                                 fileList={val}
                                 editing={editable}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1200,7 +1169,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1220,7 +1198,7 @@ const EditModalButton = memo<any>(props => {
                                 fileList={val}
                                 editing={editable}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1232,7 +1210,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1252,7 +1239,7 @@ const EditModalButton = memo<any>(props => {
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 editing={editable}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1264,7 +1251,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1284,7 +1280,7 @@ const EditModalButton = memo<any>(props => {
                                 editing={editable}
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1296,7 +1292,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1316,7 +1321,7 @@ const EditModalButton = memo<any>(props => {
                                 editing={editable}
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1328,7 +1333,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1348,7 +1362,7 @@ const EditModalButton = memo<any>(props => {
                                 editing={editable}
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1360,7 +1374,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1380,7 +1403,7 @@ const EditModalButton = memo<any>(props => {
                                 editing={editable}
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1392,7 +1415,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1412,7 +1444,7 @@ const EditModalButton = memo<any>(props => {
                                 editing={editable}
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1424,7 +1456,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1444,7 +1485,7 @@ const EditModalButton = memo<any>(props => {
                                 editing={editable}
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1456,7 +1497,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!disabled && val && val.length > 0 ? true : false}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1476,7 +1526,7 @@ const EditModalButton = memo<any>(props => {
                                 editing={editable}
                                 headers={{ Authorization: `Bearer ${getToken()}` }}
                                 disabled={disabled}
-                              />
+                              />,
                             )}
                           </FormItem>
                         );
@@ -1528,6 +1578,9 @@ const EditModalButton = memo<any>(props => {
                   if (item.endsWith('Doc') || item === 'creditAgreement') {
                     baseData[item] = baseFormData[item].value
                       .map(param => {
+                        if (param.status === 'error') {
+                          return null;
+                        }
                         if (param.id) {
                           return param.id;
                         }
@@ -1539,16 +1592,14 @@ const EditModalButton = memo<any>(props => {
                       .join('');
                   }
                 });
-                const tradeAuthorizer = traderList.map(item => {
-                  return {
-                    tradeAuthorizerName: item.name.value,
-                    tradeAuthorizerIdNumber: item.IDNumber.value,
-                    tradeAuthorizerIdExpiryDate: getMoment(item.periodValidity.value).format(
-                      'YYYY-MM-DD'
-                    ),
-                    tradeAuthorizerPhone: item.phoneNumber.value,
-                  };
-                });
+                const tradeAuthorizer = traderList.map(item => ({
+                  tradeAuthorizerName: item.name.value,
+                  tradeAuthorizerIdNumber: item.IDNumber.value,
+                  tradeAuthorizerIdExpiryDate: getMoment(item.periodValidity.value).format(
+                    'YYYY-MM-DD',
+                  ),
+                  tradeAuthorizerPhone: item.phoneNumber.value,
+                }));
                 if (Array.isArray(baseData.salesName)) {
                   const [subsidiaryName, branchName, salesName] = baseData.salesName;
                   baseData.subsidiaryName = subsidiaryName;

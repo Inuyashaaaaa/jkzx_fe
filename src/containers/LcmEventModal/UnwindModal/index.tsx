@@ -1,3 +1,4 @@
+/*eslint-disable */
 import {
   BIG_NUMBER_CONFIG,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -73,7 +74,7 @@ class UnwindModal extends PureComponent<
               this.computeCnyFormData({
                 [CAN_UNWIND_PRICE]: data[LEG_FIELD.NOTIONAL_AMOUNT],
               }),
-              _.isNull
+              _.isNull,
             ),
           }
         : {
@@ -81,7 +82,7 @@ class UnwindModal extends PureComponent<
               this.computeLotFormData({
                 [CAN_UNWIND_NUM]: data[LEG_FIELD.NOTIONAL_AMOUNT],
               }),
-              _.isNull
+              _.isNull,
             ),
           }),
     });
@@ -104,8 +105,10 @@ class UnwindModal extends PureComponent<
         .minus(values[UNWIND_PRICE])
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
         .toNumber(),
-      [LEFT_NUM]: new BigNumber(values[CAN_UNWIND_NUM])
-        .minus(values[UNWIND_NUM])
+      [LEFT_NUM]: new BigNumber(values[CAN_UNWIND_PRICE])
+        .minus(values[UNWIND_PRICE])
+        .div(this.data[LEG_FIELD.INITIAL_SPOT])
+        .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
         .toNumber(),
       [UNWIND_PER]: new BigNumber(values[UNWIND_TOTAL])
@@ -135,8 +138,10 @@ class UnwindModal extends PureComponent<
         .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
         .toNumber(),
-      [LEFT_PRICE]: new BigNumber(values[CAN_UNWIND_PRICE])
-        .minus(values[UNWIND_PRICE])
+      [LEFT_PRICE]: new BigNumber(values[CAN_UNWIND_NUM])
+        .minus(values[UNWIND_NUM])
+        .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
         .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
         .toNumber(),
       [LEFT_NUM]: new BigNumber(values[CAN_UNWIND_NUM])
@@ -207,7 +212,7 @@ class UnwindModal extends PureComponent<
           // setTimeout(() => {
           //   this.reload();
           // }, 0);
-        }
+        },
       );
     });
   };

@@ -1,6 +1,6 @@
+import { multiply } from 'mathjs';
 import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
 import { formatNumber } from '@/tools';
-import { multiply } from 'mathjs';
 
 export const TABLE_COL_DEFS = [
   {
@@ -28,9 +28,7 @@ export const TABLE_COL_DEFS = [
     title: '期权类型',
     dataIndex: 'productType',
     width: 150,
-    render: (value, record, index) => {
-      return PRODUCTTYPE_ZHCH_MAP[value];
-    },
+    render: (value, record, index) => PRODUCTTYPE_ZHCH_MAP[value],
   },
   {
     title: '交易日',
@@ -50,144 +48,112 @@ export const TABLE_COL_DEFS = [
     title: '期初数量 (手)',
     dataIndex: 'initialNumber',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: '平仓数量 (手)',
     dataIndex: 'unwindNumber',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: '持仓数量 (手)',
     dataIndex: 'number',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: '期权费 (¥)',
     dataIndex: 'premium',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: '平仓金额 (¥)',
     dataIndex: 'unwindAmount',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: '市值 (¥)',
     dataIndex: 'marketValue',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: '盈亏 (¥)',
     dataIndex: 'pnl',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Delta (手)',
     dataIndex: 'delta',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Delta Cash (￥)',
     dataIndex: 'deltaCash',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Delta Decay (手)',
     dataIndex: 'deltaDecay',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: '预期Delta (手)',
     dataIndex: 'deltaWithDecay',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Gamma (手)',
     dataIndex: 'gamma',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Gamma金额 (¥)',
     dataIndex: 'gammaCash',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Vega/1% (¥)',
     dataIndex: 'vega',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Theta/1天 (¥)',
     dataIndex: 'theta',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
     title: 'Rho/1% (¥)',
     dataIndex: 'rho',
     width: 130,
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
@@ -196,7 +162,8 @@ export const TABLE_COL_DEFS = [
     width: 130,
     align: 'right',
     render: text => {
-      return text === +text ? formatNumber(multiply(text, 100), 4) + '%' : text;
+      if (text == null) return text;
+      return text === +text ? `${formatNumber(multiply(text, 100), 4)}%` : text;
     },
   },
   {
@@ -205,7 +172,8 @@ export const TABLE_COL_DEFS = [
     width: 130,
     align: 'right',
     render: text => {
-      return text === +text ? formatNumber(multiply(text, 100), 4) + '%' : text;
+      if (text == null) return text;
+      return text === +text ? `${formatNumber(multiply(text, 100), 4)}%` : text;
     },
   },
   {
@@ -214,7 +182,8 @@ export const TABLE_COL_DEFS = [
     width: 130,
     align: 'right',
     render: text => {
-      return text === +text ? formatNumber(multiply(text, 100), 4) + '%' : text;
+      if (text == null) return text;
+      return text === +text ? `${formatNumber(multiply(text, 100), 4)}%` : text;
     },
   },
   {

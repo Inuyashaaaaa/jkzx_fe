@@ -1,8 +1,10 @@
+/* eslint-disable */
 import _ from 'lodash';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useEffect, useState, useRef } from 'react';
-import { Table2, Select, Form2, Input } from '@/containers';
 import { notification, Card, Tag, Col, Modal, message } from 'antd';
+import uuidv4 from 'uuid/v4';
+import { Table2, Select, Form2, Input } from '@/containers';
 import {
   wkProcessTriggerList,
   wkProcessTriggerBind,
@@ -12,7 +14,6 @@ import {
   wkProcessTriggerBusinessModify,
   authCan,
 } from '@/services/approvalProcessConfiguration';
-import uuidv4 from 'uuid/v4';
 import { TRIGGERTYPE, OPERATION_MAP, operation, SYMBOL_MAP } from '../constants';
 import GroupList from './GroupList';
 import PopconfirmCard from '../../ApprocalTriggerManagement/PopconfirmCard';
@@ -28,26 +29,22 @@ const TriggerCard = memo<any>(props => {
     {
       title: '当前流程',
       dataIndex: 'processName',
-      render: (value, record, index, { form, editing }) => {
-        return (
-          <FormItem>
-            {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
-          </FormItem>
-        );
-      },
+      render: (value, record, index, { form, editing }) => (
+        <FormItem>
+          {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
+        </FormItem>
+      ),
     },
     {
       title: '组合方式',
       dataIndex: 'operation',
-      render: (value, record, index, { form, editing }) => {
-        return (
-          <FormItem>
-            {form.getFieldDecorator({
-              rules: [{ required: true, message: '组合方式为必填项' }],
-            })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
-          </FormItem>
-        );
-      },
+      render: (value, record, index, { form, editing }) => (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [{ required: true, message: '组合方式为必填项' }],
+          })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
+        </FormItem>
+      ),
     },
   ];
 
@@ -55,44 +52,38 @@ const TriggerCard = memo<any>(props => {
     {
       title: '当前流程',
       dataIndex: 'processName',
-      render: (value, record, index, { form, editing }) => {
-        return (
-          <FormItem>
-            {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
-          </FormItem>
-        );
-      },
+      render: (value, record, index, { form, editing }) => (
+        <FormItem>
+          {form.getFieldDecorator({})(<Input style={{ width: 250 }} editing={false} />)}
+        </FormItem>
+      ),
     },
     {
       title: '组合方式',
       dataIndex: 'operation',
-      render: (value, record, index, { form, editing }) => {
-        return (
-          <FormItem>
-            {form.getFieldDecorator({
-              rules: [{ required: true, message: '组合方式为必填项' }],
-            })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
-          </FormItem>
-        );
-      },
+      render: (value, record, index, { form, editing }) => (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [{ required: true, message: '组合方式为必填项' }],
+          })(<Select style={{ width: 250 }} options={_.concat(TRIGGERTYPE, operation)} />)}
+        </FormItem>
+      ),
     },
     {
       title: '条件列表',
       dataIndex: 'conditions',
-      render: (value, record, index, { form, editing }) => {
-        return (
-          <FormItem>
-            {form.getFieldDecorator({
-              rules: [{ required: true, message: '条件列表为必填项' }],
-            })(
-              <GroupList
-                getCurrent={node => ($formModel.current = node)}
-                {...{ record, index, form, editing }}
-              />
-            )}
-          </FormItem>
-        );
-      },
+      render: (value, record, index, { form, editing }) => (
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [{ required: true, message: '条件列表为必填项' }],
+          })(
+            <GroupList
+              getCurrent={node => ($formModel.current = node)}
+              {...{ record, index, form, editing }}
+            />,
+          )}
+        </FormItem>
+      ),
     },
   ];
 
@@ -130,19 +121,14 @@ const TriggerCard = memo<any>(props => {
     });
   };
 
-  useEffect(
-    () => {
-      handleData();
-    },
-    [trigger]
-  );
+  useEffect(() => {
+    handleData();
+  }, [trigger]);
 
   const [columns, setColumns] = useState(columns1);
 
   const findName = (data, filed, item) => {
-    const Index = _.findIndex(data, p => {
-      return p[filed] === item;
-    });
+    const Index = _.findIndex(data, p => p[filed] === item);
     if (Index >= 0) {
       return data[Index].indexName;
     }
@@ -191,11 +177,7 @@ const TriggerCard = memo<any>(props => {
     const cerror = await $formModel.current.validate();
     const errLen = cerror.filter(item => item && item.error).length;
     if (errLen > 0) return;
-    conditionsData = conditionsData
-      .filter(item => !!item)
-      .map(item => {
-        return Form2.getFieldsValue(item);
-      });
+    conditionsData = conditionsData.filter(item => !!item).map(item => Form2.getFieldsValue(item));
 
     if (conditionsData.length <= 0) {
       return message.info('至少添加一个条件');
@@ -206,13 +188,14 @@ const TriggerCard = memo<any>(props => {
       return item;
     });
     const { data: _data, error: _error } = await wkIndexList({});
-    const strArr = conditionsData.map(item => {
-      return `${findName(_data, 'indexClass', item.leftIndex)}${SYMBOL_MAP[item.symbol]}${
-        item.rightIndex === 'returnNumberIndexImpl'
-          ? _.get(item, 'rightValue.number')
-          : findName(_data, 'indexClass', item.rightIndex)
-      }`;
-    });
+    const strArr = conditionsData.map(
+      item =>
+        `${findName(_data, 'indexClass', item.leftIndex)}${SYMBOL_MAP[item.symbol]}${
+          item.rightIndex === 'returnNumberIndexImpl'
+            ? _.get(item, 'rightValue.number')
+            : findName(_data, 'indexClass', item.rightIndex)
+        }`,
+    );
     if (isCreate) {
       const triggerName = processName;
       setLoading(true);
@@ -319,6 +302,7 @@ const TriggerCard = memo<any>(props => {
         onOk={handleTargetOk}
         onCancel={handleTargetCancel}
         confirmLoading={loading}
+        maskClosable={false}
       >
         <Form2
           ref={node => ($form.current = node)}

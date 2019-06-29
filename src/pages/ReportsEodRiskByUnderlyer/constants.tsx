@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { formatNumber, formatMoney } from '@/tools';
 import { multiply } from 'mathjs';
@@ -32,6 +33,7 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'underlyerPriceChangePercent',
     width: 150,
     render: (value, record, index) => {
+      if (value == null) return value;
       return formatNumber(multiply(value, 100), 4) + '%';
     },
     align: 'right',
