@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { PAGE_SIZE } from '@/constants/component';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Input, Select, SmartTable } from '@/containers';
@@ -66,7 +67,7 @@ class ClientManagementSalesManagement extends PureComponent {
     const newData = arr2treeOptions(
       data,
       ['subsidiaryId', 'branchId'],
-      ['subsidiaryName', 'branchName']
+      ['subsidiaryName', 'branchName'],
     );
     const branchSalesList = newData.map(subsidiaryName => {
       return {
@@ -133,7 +134,6 @@ class ClientManagementSalesManagement extends PureComponent {
     if (res.error) return;
     this.setState({
       confirmLoading: true,
-      visible: false,
     });
     if (this.state.createFormData.cascSubBranch.length === 1) {
       message.error('必须存在营业部');
@@ -143,11 +143,18 @@ class ClientManagementSalesManagement extends PureComponent {
       salesName: this.state.createFormData.salesName,
       branchId: this.state.createFormData.cascSubBranch[1],
     });
+    this.setState({
+      confirmLoading: false,
+    });
     if (error) {
       message.error('创建失败');
       return;
     }
     message.success('创建成功');
+    this.setState({
+      visible: false,
+      createFormData: {},
+    });
     this.handleTreeNode();
     this.fetchTable();
   };
@@ -176,7 +183,7 @@ class ClientManagementSalesManagement extends PureComponent {
           this.setState({
             subModalVisible: true,
           });
-        }
+        },
       );
     }
     return this.setState(
@@ -198,7 +205,7 @@ class ClientManagementSalesManagement extends PureComponent {
         this.setState({
           branchModalVisible: true,
         });
-      }
+      },
     );
   };
 
@@ -242,7 +249,7 @@ class ClientManagementSalesManagement extends PureComponent {
         this.setState({
           subModalVisible: true,
         });
-      }
+      },
     );
   };
 
@@ -256,7 +263,7 @@ class ClientManagementSalesManagement extends PureComponent {
         this.setState({
           branchModalVisible: true,
         });
-      }
+      },
     );
   };
 
@@ -622,7 +629,7 @@ class ClientManagementSalesManagement extends PureComponent {
                         <Select
                           options={this.state.subList}
                           disabled={this.state.editBranch ? true : false}
-                        />
+                        />,
                       )}
                     </FormItem>
                   );
