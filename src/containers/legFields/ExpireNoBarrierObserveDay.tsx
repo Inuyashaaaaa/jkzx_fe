@@ -59,7 +59,6 @@ class ObserveModalInput extends InputBase<{
     const upBarrierType = Form2.getFieldValue(record[LEG_FIELD.UP_BARRIER_TYPE]);
     const step = Form2.getFieldValue(record[LEG_FIELD.STEP]);
     const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
-
     const barrierVal =
       upBarrierType === UP_BARRIER_TYPE_MAP.PERCENT
         ? new BigNumber(initialSpot).multipliedBy(new BigNumber(upBarrier).div(100)).toNumber()
@@ -73,11 +72,7 @@ class ObserveModalInput extends InputBase<{
               _.isNaN(barrierVal)
                 ? 0
                 : new BigNumber(barrierVal)
-                    .plus(
-                      new BigNumber(index + 1)
-                        .multipliedBy(new BigNumber(step).div(100))
-                        .multipliedBy(initialSpot),
-                    )
+                    .plus(new BigNumber(index).multipliedBy(new BigNumber(step).div(100)))
                     .decimalPlaces(4)
                     .toNumber(),
             ),
