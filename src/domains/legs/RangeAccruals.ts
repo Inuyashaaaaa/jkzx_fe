@@ -1,3 +1,6 @@
+/*eslint-disable */
+import _ from 'lodash';
+import moment from 'moment';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   ASSET_CLASS_MAP,
@@ -24,8 +27,6 @@ import {
 import { Form2 } from '@/containers';
 import { getMoment, getCurDateMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -121,7 +122,7 @@ export const RangeAccruals: ILeg = legPipeLine({
         ObservationDates,
         Unit,
         TradeNumber,
-        // ObservationStep,
+        ObservationStep,
         ...TOTAL_EDITING_FIELDS,
       ];
     }
@@ -186,12 +187,7 @@ export const RangeAccruals: ILeg = legPipeLine({
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
     const nextPosition: any = {};
-    const COMPUTED_FIELDS = [
-      ObservationStep.dataIndex,
-      LEG_FIELD.OBSERVATION_DATES,
-      LEG_FIELD.UNIT,
-      LEG_FIELD.TRADE_NUMBER,
-    ];
+    const COMPUTED_FIELDS = [LEG_FIELD.OBSERVATION_DATES, LEG_FIELD.UNIT, LEG_FIELD.TRADE_NUMBER];
 
     nextPosition.productType = LEG_TYPE_MAP.RANGE_ACCRUALS;
     nextPosition.asset = _.omit(dataItem, [
@@ -214,7 +210,7 @@ export const RangeAccruals: ILeg = legPipeLine({
           result[item[OB_DAY_FIELD]] = item.price || null;
           return result;
         },
-        {}
+        {},
       );
     }
 
@@ -228,7 +224,7 @@ export const RangeAccruals: ILeg = legPipeLine({
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
     nextPosition.asset[LEG_FIELD.PAYMENT] = nextPosition.asset[LEG_FIELD.EARNINGS];
     nextPosition.asset[LEG_FIELD.PAYMENT_TYPE] = nextPosition.asset[LEG_FIELD.EARNINGS_TYPE];
     delete nextPosition.asset[LEG_FIELD.EARNINGS];
@@ -249,14 +245,12 @@ export const RangeAccruals: ILeg = legPipeLine({
     return Form2.createFields({
       [LEG_FIELD.EARNINGS]: earnings,
       [LEG_FIELD.EARNINGS_TYPE]: earningsType,
-      [LEG_FIELD.OBSERVATION_DATES]: days.map(day => {
-        return {
-          [OB_DAY_FIELD]: day,
-          weight: position.asset.fixingWeights && position.asset.fixingWeights[day],
-          [OB_PRICE_FIELD]:
-            position.asset.fixingObservations && position.asset.fixingObservations[day],
-        };
-      }),
+      [LEG_FIELD.OBSERVATION_DATES]: days.map(day => ({
+        [OB_DAY_FIELD]: day,
+        weight: position.asset.fixingWeights && position.asset.fixingWeights[day],
+        [OB_PRICE_FIELD]:
+          position.asset.fixingObservations && position.asset.fixingObservations[day],
+      })),
     });
   },
   onDataChange: (
@@ -267,7 +261,7 @@ export const RangeAccruals: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -277,7 +271,7 @@ export const RangeAccruals: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });
