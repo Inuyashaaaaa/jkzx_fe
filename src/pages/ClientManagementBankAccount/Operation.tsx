@@ -1,9 +1,8 @@
-import PopconfirmButton from '@/containers/PopconfirmButton';
-import ModalButton from '@/containers/ModalButton';
-import { refBankAccountDel, refBankAccountSave } from '@/services/reference-data-service';
-import { Col, message, Row, Modal, Popconfirm, Divider } from 'antd';
+/*eslint-disable */
+import { Divider, message, Modal, Popconfirm, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonModalForm from './CommonModalForm';
+import { refBankAccountDel, refBankAccountSave } from '@/services/reference-data-service';
 
 class Operation extends PureComponent<{
   record: any;
@@ -22,9 +21,7 @@ class Operation extends PureComponent<{
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: !this.state.visible,
-    });
+    this.setState(state => ({ visible: !state.visible }));
   };
 
   public handleEdit = async () => {
@@ -37,7 +34,7 @@ class Operation extends PureComponent<{
     });
     if (error) {
       message.error('更新失败');
-      return false;
+      return;
     }
     message.success('更新成功');
     this.props.fetchTable();
@@ -59,7 +56,6 @@ class Operation extends PureComponent<{
     }
     message.success('删除成功');
     this.props.fetchTable();
-    return;
   };
 
   public render() {
@@ -73,7 +69,6 @@ class Operation extends PureComponent<{
         <Modal
           title="编辑银行账户"
           visible={this.state.visible}
-          width={1200}
           onCancel={this.switchModal}
           onOk={this.handleEdit}
           confirmLoading={this.state.confirmLoading}
