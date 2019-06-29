@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
 import { Form2, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
@@ -98,7 +99,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     this.setState(
       produce((state: any) => {
         state.tableDataSource.splice(rowIndex, 1);
-      })
+      }),
     );
   };
 
@@ -124,7 +125,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
       },
       () => {
         this.onFetch();
-      }
+      },
     );
   };
 
@@ -189,7 +190,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                               },
                               ...EVENT_TYPE_OPTIONS,
                             ]}
-                          />
+                          />,
                         )}
                       </FormItem>
                     );
@@ -203,7 +204,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 x: 2000,
               }}
               dataSource={this.state.tableDataSource}
-              rowKey="positionId"
+              rowKey="notificationUUID"
               columns={[
                 {
                   title: () => (
