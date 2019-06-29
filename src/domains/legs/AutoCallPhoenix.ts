@@ -260,12 +260,13 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
 
     nextPosition.asset.fixingObservations =
       dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
-      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce((result, item) => {
-        return {
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
+        (result, item) => ({
           ...result,
           [item[OB_DAY_FIELD]]: item.price !== undefined ? item.price : null,
-        };
-      }, {});
+        }),
+        {},
+      );
 
     nextPosition.asset.annualized = true;
 
