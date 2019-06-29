@@ -19,14 +19,12 @@ import { trdBookListBySimilarBookName } from '@/services/trade-service';
 import { getLegByType, getMoment, uuid } from '@/tools';
 import { ILeg } from '@/types/leg';
 
-export const createLegDataSourceItem = (leg: ILeg, env: string) => {
-  return {
-    [LEG_ID_FIELD]: uuid(),
-    [LEG_TYPE_FIELD]: leg.type,
-    [LEG_NAME_FIELD]: leg.name,
-    [LEG_ENV_FIELD]: env,
-  };
-};
+export const createLegDataSourceItem = (leg: ILeg, env: string) => ({
+  [LEG_ID_FIELD]: uuid(),
+  [LEG_TYPE_FIELD]: leg.type,
+  [LEG_NAME_FIELD]: leg.name,
+  [LEG_ENV_FIELD]: env,
+});
 
 export const bookingTableFormControls: () => IFormControl[] = () => [
   {
