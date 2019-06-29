@@ -224,60 +224,67 @@ class ObserveModalInput extends InputBase<{
 
   public isUp = () => this.props.direction === KNOCK_DIRECTION_MAP.UP;
 
-  public getColumnDefs = (): ITableColDef[] => [
-    {
-      title: '观察日',
-      dataIndex: OB_DAY_FIELD,
-      render: (text, record, index) => record[OB_DAY_FIELD].format('YYYY-MM-DD'),
-    },
-    {
-      title: '支付日',
-      dataIndex: 'payDay',
-      render: (text, record, index) => record.payDay.format('YYYY-MM-DD'),
-    },
-    this.isAutoCallSnow()
-      ? {
-          title: '障碍价格',
-          dataIndex: 'price',
-          defaultEditing: false,
-          editable: record => false,
-          render: (val, record, index, { form, editing }) => (
-            <FormItem>
-              {form.getFieldDecorator({})(<UnitInputNumber editing={false} unit="¥" />)}
-            </FormItem>
-          ),
-        }
-      : {
-          title: '已观察到价格(可编辑)',
-          dataIndex: 'price',
-          defaultEditing: false,
-          editable: record => true,
-          render: (val, record, index, { form, editing }) => (
-            <FormItem>
-              {form.getFieldDecorator({})(
-                <UnitInputNumber autoSelect editing={editing} unit="¥" />,
-              )}
-            </FormItem>
-          ),
-        },
-    {
-      title: '操作',
-      dataIndex: 'operation',
-      render: (text, record, index) => (
-        <Row
-          type="flex"
-          align="middle"
-          // style={{
-          //   height: params.context.rowHeight,
-          // }}
-        >
-          <Button size="small" type="danger" onClick={this.bindRemove(index)}>
-            删除
-          </Button>
-        </Row>
-      ),
-    },
-  ];
+  public getColumnDefs = (): ITableColDef[] => {
+    const { editing: editable } = this.props;
+    return [
+      {
+        title: '观察日',
+        dataIndex: OB_DAY_FIELD,
+        render: (text, record, index) => record[OB_DAY_FIELD].format('YYYY-MM-DD'),
+      },
+      {
+        title: '支付日',
+        dataIndex: 'payDay',
+        render: (text, record, index) => record.payDay.format('YYYY-MM-DD'),
+      },
+      this.isAutoCallSnow()
+        ? {
+            title: '障碍价格',
+            dataIndex: 'price',
+            defaultEditing: false,
+            editable: record => false,
+            render: (val, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({})(<UnitInputNumber editing={false} unit="¥" />)}
+              </FormItem>
+            ),
+          }
+        : {
+            title: '已观察到价格',
+            dataIndex: 'price',
+            defaultEditing: false,
+            editable,
+            render: (val, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({})(
+                  <UnitInputNumber autoSelect editing={editing} unit="¥" />,
+                )}
+              </FormItem>
+            ),
+          },
+      ...(editable
+        ? [
+            {
+              title: '操作',
+              dataIndex: 'operation',
+              render: (text, record, index) => (
+                <Row
+                  type="flex"
+                  align="middle"
+                  // style={{
+                  //   height: params.context.rowHeight,
+                  // }}
+                >
+                  <Button size="small" type="danger" onClick={this.bindRemove(index)}>
+                    删除
+                  </Button>
+                </Row>
+              ),
+            },
+          ]
+        : []),
+    ];
+  };
 
   public getAutoGenerateButton = () => (
     <PopconfirmButton
@@ -308,7 +315,8 @@ class ObserveModalInput extends InputBase<{
     }));
   };
 
-  public renderEditing() {
+  public renderResult = () => {
+    const { editing: editable } = this.props;
     return (
       <Row
         type="flex"
@@ -320,10 +328,24 @@ class ObserveModalInput extends InputBase<{
       >
         <ModalButton
           type="primary"
+          size="small"
           modalProps={{
-            title: '观察日编辑',
-            onOk: this.onOk,
-            onCancel: this.onCancel,
+            closable: false,
+            footer: editable
+              ? [
+                  <Button key="cancel" onClick={this.onCancel}>
+                    取消
+                  </Button>,
+                  <Button key="submit" type="primary" onClick={this.onOk}>
+                    确认
+                  </Button>,
+                ]
+              : [
+                  <Button key="cancel" onClick={this.onCancel}>
+                    取消
+                  </Button>,
+                ],
+            title: `观察日${editable ? '编辑' : '查看'}`,
             destroyOnClose: true,
             width: 700,
             visible: this.state.visible,
@@ -332,36 +354,38 @@ class ObserveModalInput extends InputBase<{
           style={{ width: '100%', display: 'block' }}
           content={
             <>
-              <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
-                <Col>
-                  <Form
-                    onSubmitButtonClick={this.onSubmitButtonClick}
-                    layout="inline"
-                    controls={[
-                      {
-                        field: 'day',
-                        control: {
-                          label: '观察日',
+              {editable && (
+                <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
+                  <Col>
+                    <Form
+                      onSubmitButtonClick={this.onSubmitButtonClick}
+                      layout="inline"
+                      controls={[
+                        {
+                          field: 'day',
+                          control: {
+                            label: '观察日',
+                          },
+                          input: {
+                            type: 'date',
+                            range: 'day',
+                          },
+                          decorator: {
+                            rules: [
+                              {
+                                required: true,
+                              },
+                            ],
+                          },
                         },
-                        input: {
-                          type: 'date',
-                          range: 'day',
-                        },
-                        decorator: {
-                          rules: [
-                            {
-                              required: true,
-                            },
-                          ],
-                        },
-                      },
-                    ]}
-                    submitText="添加"
-                    resetable={false}
-                  />
-                </Col>
-                <Col>{this.getAutoGenerateButton()}</Col>
-              </Row>
+                      ]}
+                      submitText="添加"
+                      resetable={false}
+                    />
+                  </Col>
+                  <Col>{this.getAutoGenerateButton()}</Col>
+                </Row>
+              )}
               <SmartTable
                 dataSource={this.state.dealDataSource}
                 pagination={false}
@@ -372,35 +396,32 @@ class ObserveModalInput extends InputBase<{
             </>
           }
         >
-          观察日管理
+          观察日{editable ? '管理' : '查看'}
         </ModalButton>
       </Row>
     );
+  };
+
+  public renderEditing() {
+    return this.renderResult();
   }
 
   public renderRendering() {
-    const { value } = this.props;
-    if (this.isAutoCallPhoenix() && this.isAutoCallSnow()) {
-      return value && value.length ? [value[0], value[value.length - 1]].join(' ~ ') : '';
-    }
-
-    return value && value.length
-      ? [value[0][OB_DAY_FIELD], value[value.length - 1][OB_DAY_FIELD]].join(' ~ ')
-      : '';
+    return this.renderResult();
   }
 }
 
 export const ExpireNoBarrierObserveDay: ILegColDef = {
   title: '敲出/coupon观察日',
   dataIndex: LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY,
-  editable: record => {
-    const { isEditing } = getLegEnvs(record);
-    if (isEditing) {
-      return false;
+  editable: record => false,
+  defaultEditing: record => {
+    const { isEditing, isBooking, isPricing } = getLegEnvs(record);
+    if (isBooking || isPricing) {
+      return true;
     }
-    return true;
+    return false;
   },
-  defaultEditing: false,
   render: (val, record, index, { form, editing }) => (
     <FormItem>
       {form.getFieldDecorator({
