@@ -450,7 +450,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} />)}
+                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
                     </FormItem>
                   ),
                 },
@@ -495,7 +495,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} />)}
+                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
                     </FormItem>
                   ),
                 },
@@ -551,7 +551,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} />)}
+                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
                     </FormItem>
                   ),
                 },
@@ -661,7 +661,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} />)}
+                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
                     </FormItem>
                   ),
                 },
@@ -676,7 +676,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} />)}
+                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
                     </FormItem>
                   ),
                 },
@@ -913,7 +913,7 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(<DatePicker editing={editable} />)}
+                        })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
                       </FormItem>
                     ),
                   },
