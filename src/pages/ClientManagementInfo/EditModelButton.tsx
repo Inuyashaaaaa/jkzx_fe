@@ -186,7 +186,7 @@ const EditModalButton = memo<any>(props => {
                 required: false,
               },
             ],
-          })(<DatePicker disabled={disabled} editing={editable} />)}
+          })(<DatePicker disabled={disabled} editing={editable} format={'YYYY-MM-DD'} />)}
         </FormItem>
       ),
     },
@@ -605,7 +605,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
@@ -650,7 +656,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
@@ -706,7 +718,7 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker editing={editable} />)}
+                          })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
                         </FormItem>
                       ),
                     },
@@ -816,7 +828,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
@@ -831,7 +849,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format={'YYYY-MM-DD'}
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
