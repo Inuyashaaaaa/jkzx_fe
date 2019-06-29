@@ -1,3 +1,7 @@
+/*eslint-disable */
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import moment from 'moment';
 import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
@@ -25,9 +29,6 @@ import {
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
-import moment from 'moment';
 import { Direction } from '../../containers/legFields';
 import { DaysInYear } from '../../containers/legFields/DaysInYear';
 import { EffectiveDate } from '../../containers/legFields/EffectiveDate';
@@ -81,6 +82,7 @@ export const Eagle: ILeg = legPipeLine({
         ExpirationDate,
         NotionalAmount,
         TradeNumber,
+        Term,
         ...TOTAL_TRADESCOL_FIELDS,
         ...GENERAL_COMPUTED_FIELDS,
       ];
@@ -110,6 +112,7 @@ export const Eagle: ILeg = legPipeLine({
         FrontPremium,
         MinimumPremium,
         Unit,
+        Term,
         TradeNumber,
         ...TOTAL_EDITING_FIELDS,
       ];
@@ -139,6 +142,7 @@ export const Eagle: ILeg = legPipeLine({
         FrontPremium,
         MinimumPremium,
         Unit,
+        Term,
         TradeNumber,
       ];
     }
@@ -207,7 +211,7 @@ export const Eagle: ILeg = legPipeLine({
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
 
     return nextPosition;
   },
@@ -220,7 +224,7 @@ export const Eagle: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -230,7 +234,7 @@ export const Eagle: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
 
     const { changedFields } = changeFieldsParams;
@@ -255,7 +259,7 @@ export const Eagle: ILeg = legPipeLine({
             .multipliedBy(new BigNumber(strike2).minus(strike1))
             .plus(strike3)
             .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-            .toNumber()
+            .toNumber(),
         );
       }
     }
