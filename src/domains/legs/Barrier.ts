@@ -382,7 +382,7 @@ export const BarrierLeg: ILeg = legPipeLine({
     ) {
       let barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
       let strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
-      const initialSpot = Form2.getFieldsValue(record[LEG_FIELD.INITIAL_SPOT]);
+      const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
       if (barrier != null && strike != null) {
         if (Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
           barrier = new BigNumber(barrier)
