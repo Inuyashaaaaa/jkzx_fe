@@ -11,6 +11,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
+  LEG_ENV_FIELD,
 } from '@/constants/common';
 import { Form2, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
@@ -20,6 +21,7 @@ import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { qlDateScheduleCreate } from '@/services/quant-service';
 import { getLegEnvs, getMoment, getRequiredRule, isAsian, remove, isBarrier } from '@/tools';
 import { ILegColDef } from '@/types/leg';
+import { LEG_ENV } from '@/constants/legs';
 
 class ObserveModalInput extends InputBase<
   {
@@ -206,6 +208,8 @@ class ObserveModalInput extends InputBase<
   public isUp = () => this.props.direction === KNOCK_DIRECTION_MAP.UP;
 
   public getColumnDefs = (): ITableColDef[] => {
+    const { editing: editable } = this.props;
+
     if (this.isAutoCallSnow() || this.isAutoCallPhoenix()) {
       return [
         {
@@ -224,10 +228,10 @@ class ObserveModalInput extends InputBase<
               dataIndex: 'price',
             }
           : {
-              title: '已观察到价格(可编辑)',
+              title: '已观察到价格',
               dataIndex: 'price',
               defaultEditing: false,
-              editable: record => true,
+              editable,
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({})(
@@ -236,23 +240,27 @@ class ObserveModalInput extends InputBase<
                 </FormItem>
               ),
             },
-        {
-          title: '操作',
-          dataIndex: 'operation',
-          render: (text, record, index) => (
-            <Row
-              type="flex"
-              align="middle"
-              // style={{
-              //   height: params.context.rowHeight,
-              // }}
-            >
-              <Button size="small" type="danger" onClick={this.bindRemove(index)}>
-                删除
-              </Button>
-            </Row>
-          ),
-        },
+        ...(editable
+          ? [
+              {
+                title: '操作',
+                dataIndex: 'operation',
+                render: (text, record, index) => (
+                  <Row
+                    type="flex"
+                    align="middle"
+                    // style={{
+                    //   height: params.context.rowHeight,
+                    // }}
+                  >
+                    <Button size="small" type="danger" onClick={this.bindRemove(index)}>
+                      删除
+                    </Button>
+                  </Row>
+                ),
+              },
+            ]
+          : []),
       ];
     }
 
@@ -274,10 +282,10 @@ class ObserveModalInput extends InputBase<
         ? []
         : [
             {
-              title: '已观察到价格(可编辑)',
+              title: '已观察到价格',
               dataIndex: 'price',
               defaultEditing: false,
-              editable: record => true,
+              editable,
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({})(
@@ -287,23 +295,27 @@ class ObserveModalInput extends InputBase<
               ),
             },
           ]),
-      {
-        title: '操作',
-        dataIndex: 'operation',
-        render: (text, record, index) => (
-          <Row
-            type="flex"
-            align="middle"
-            // style={{
-            //   height: params.context.rowHeight,
-            // }}
-          >
-            <Button size="small" type="danger" onClick={this.bindRemove(index)}>
-              删除
-            </Button>
-          </Row>
-        ),
-      },
+      ...(editable
+        ? [
+            {
+              title: '操作',
+              dataIndex: 'operation',
+              render: (text, record, index) => (
+                <Row
+                  type="flex"
+                  align="middle"
+                  // style={{
+                  //   height: params.context.rowHeight,
+                  // }}
+                >
+                  <Button size="small" type="danger" onClick={this.bindRemove(index)}>
+                    删除
+                  </Button>
+                </Row>
+              ),
+            },
+          ]
+        : []),
     ];
   };
 
@@ -336,7 +348,8 @@ class ObserveModalInput extends InputBase<
     }));
   };
 
-  public renderEditing() {
+  public renderResult() {
+    const { editing: editable } = this.props;
     return (
       <Row
         type="flex"
@@ -349,7 +362,7 @@ class ObserveModalInput extends InputBase<
         <ModalButton
           type="primary"
           modalProps={{
-            title: '观察日编辑',
+            title: `观察日${editable ? '编辑' : '查看'}`,
             onOk: this.onOk,
             onCancel: this.onCancel,
             destroyOnClose: true,
@@ -360,36 +373,38 @@ class ObserveModalInput extends InputBase<
           style={{ width: '100%', display: 'block' }}
           content={
             <>
-              <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
-                <Col>
-                  <Form
-                    onSubmitButtonClick={this.onSubmitButtonClick}
-                    layout="inline"
-                    controls={[
-                      {
-                        field: 'day',
-                        control: {
-                          label: '观察日',
+              {editable && (
+                <Row style={{ marginBottom: 10 }} type="flex" justify="space-between">
+                  <Col>
+                    <Form
+                      onSubmitButtonClick={this.onSubmitButtonClick}
+                      layout="inline"
+                      controls={[
+                        {
+                          field: 'day',
+                          control: {
+                            label: '观察日',
+                          },
+                          input: {
+                            type: 'date',
+                            range: 'day',
+                          },
+                          decorator: {
+                            rules: [
+                              {
+                                required: true,
+                              },
+                            ],
+                          },
                         },
-                        input: {
-                          type: 'date',
-                          range: 'day',
-                        },
-                        decorator: {
-                          rules: [
-                            {
-                              required: true,
-                            },
-                          ],
-                        },
-                      },
-                    ]}
-                    submitText="添加"
-                    resetable={false}
-                  />
-                </Col>
-                <Col>{this.getAutoGenerateButton()}</Col>
-              </Row>
+                      ]}
+                      submitText="添加"
+                      resetable={false}
+                    />
+                  </Col>
+                  <Col>{this.getAutoGenerateButton()}</Col>
+                </Row>
+              )}
               <SmartTable
                 dataSource={this.state.dealDataSource}
                 pagination={false}
@@ -400,35 +415,32 @@ class ObserveModalInput extends InputBase<
             </>
           }
         >
-          观察日管理
+          观察日{editable ? '管理' : '查看'}
         </ModalButton>
       </Row>
     );
   }
 
-  public renderRendering() {
-    const { value } = this.props;
-    if (this.isAutoCallPhoenix() && this.isAutoCallSnow()) {
-      return value && value.length ? [value[0], value[value.length - 1]].join(' ~ ') : '';
-    }
+  public renderEditing() {
+    return this.renderResult();
+  }
 
-    return value && value.length
-      ? [value[0][OB_DAY_FIELD], value[value.length - 1][OB_DAY_FIELD]].join(' ~ ')
-      : '';
+  public renderRendering() {
+    return this.renderResult();
   }
 }
 
 export const ObservationDates: ILegColDef = {
   title: '观察日',
   dataIndex: LEG_FIELD.OBSERVATION_DATES,
-  editable: record => {
-    const { isEditing } = getLegEnvs(record);
-    if (isEditing) {
-      return false;
+  editable: record => false,
+  defaultEditing: record => {
+    const { isEditing, isBooking, isPricing } = getLegEnvs(record);
+    if (isBooking || isPricing) {
+      return true;
     }
-    return true;
+    return false;
   },
-  defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => (
     <FormItem>
       {form.getFieldDecorator({
