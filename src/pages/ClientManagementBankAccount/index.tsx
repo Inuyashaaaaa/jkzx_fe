@@ -1,9 +1,9 @@
-import ModalButton from '@/containers/ModalButton';
-import Page from '@/containers/Page';
-import { Form2, Select, SmartTable } from '@/containers';
 import { message, Divider, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
+import { Form2, Select, SmartTable } from '@/containers';
+import ModalButton from '@/containers/ModalButton';
+import Page from '@/containers/Page';
 import CommonModalForm from './CommonModalForm';
 import {
   refSimilarAccountNameList,
@@ -20,7 +20,6 @@ class ClientManagementBankAccount extends PureComponent {
     searchFormData: {},
     loading: false,
     markets: null,
-    legalNameList: [],
     visible: false,
     confirmLoading: false,
     createFormData: {},
@@ -40,7 +39,7 @@ class ClientManagementBankAccount extends PureComponent {
     this.setState({
       loading: false,
     });
-    if (error) return false;
+    if (error) return;
     this.setState({
       dataSource: data,
     });
@@ -53,7 +52,7 @@ class ClientManagementBankAccount extends PureComponent {
       },
       () => {
         this.fetchTable();
-      }
+      },
     );
   };
 
@@ -65,12 +64,12 @@ class ClientManagementBankAccount extends PureComponent {
       });
     }
 
-    const { error, data } = await refBankAccountSearch({
+    const { error: _error, data: _data } = await refBankAccountSearch({
       legalName: allFields.legalName.value,
     });
-    if (error) return false;
+    if (_error) return false;
 
-    const markets = data.map(item => ({
+    const markets = _data.map(item => ({
       label: item.bankAccount,
       value: item.bankAccount,
     }));
@@ -100,11 +99,12 @@ class ClientManagementBankAccount extends PureComponent {
     this.setState({
       markets,
       searchFormData: Form2.createFields({
-        legalName: legalNameValue ? legalNameValue : (allFields.legalName || {}).value,
+        legalName: legalNameValue || (allFields.legalName || {}).value,
         bankAccount: bankAccountValue,
         bankAccountName: bankAccountNameValue,
       }),
     });
+    return true;
   };
 
   public switchModal = () => {
@@ -123,6 +123,7 @@ class ClientManagementBankAccount extends PureComponent {
     this.setState({
       confirmLoading: true,
       visible: false,
+      createFormData: {},
     });
     const { error, data } = await refBankAccountSave({
       ...this.state.createFormData,
@@ -150,7 +151,7 @@ class ClientManagementBankAccount extends PureComponent {
         <Form2
           layout="inline"
           dataSource={this.state.searchFormData}
-          submitText={'搜索'}
+          submitText="搜索"
           submitButtonProps={{
             icon: 'search',
           }}
@@ -161,93 +162,87 @@ class ClientManagementBankAccount extends PureComponent {
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (values: string = '') => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: values,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '交易账号',
               dataIndex: 'bankAccount',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={
-                          this.state.markets
-                            ? this.state.markets
-                            : async (value: string = '') => {
-                                const { data, error } = await refSimilarBankAccountList({
-                                  similarBankAccount: value,
-                                });
-                                if (error) return [];
-                                return data.map(item => ({
-                                  label: item,
-                                  value: item,
-                                }));
-                              }
-                        }
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={
+                        this.state.markets
+                          ? this.state.markets
+                          : async (values: string = '') => {
+                              const { data, error } = await refSimilarBankAccountList({
+                                similarBankAccount: values,
+                              });
+                              if (error) return [];
+                              return data.map(item => ({
+                                label: item,
+                                value: item,
+                              }));
+                            }
+                      }
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '交易对手账户名',
               dataIndex: 'bankAccountName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refSimilarAccountNameList({
-                            similarAccountName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (values: string = '') => {
+                        const { data, error } = await refSimilarAccountNameList({
+                          similarAccountName: values,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
@@ -298,9 +293,9 @@ class ClientManagementBankAccount extends PureComponent {
             },
             {
               title: '操作',
-              render: (text, record, index) => {
-                return <Operation record={text} fetchTable={this.fetchTable} />;
-              },
+              render: (text, record, index) => (
+                <Operation record={text} fetchTable={this.fetchTable} />
+              ),
             },
           ]}
           pagination={{
