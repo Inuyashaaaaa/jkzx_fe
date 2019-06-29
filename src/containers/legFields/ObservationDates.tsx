@@ -361,10 +361,24 @@ class ObserveModalInput extends InputBase<
       >
         <ModalButton
           type="primary"
+          size="small"
           modalProps={{
+            closable: false,
+            footer: editable
+              ? [
+                  <Button key="cancel" onClick={this.onCancel}>
+                    取消
+                  </Button>,
+                  <Button key="submit" type="primary" onClick={this.onOk}>
+                    确认
+                  </Button>,
+                ]
+              : [
+                  <Button key="cancel" onClick={this.onCancel}>
+                    取消
+                  </Button>,
+                ],
             title: `观察日${editable ? '编辑' : '查看'}`,
-            onOk: this.onOk,
-            onCancel: this.onCancel,
             destroyOnClose: true,
             width: 700,
             visible: this.state.visible,
