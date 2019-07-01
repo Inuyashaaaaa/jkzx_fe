@@ -72,13 +72,9 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
       'tradeCategory',
       'unit',
     ];
-    let instrumentInfoSomeFields = instrumentInfoFields;
-    if (modalFormData.instrumentType === 'INDEX') {
-      instrumentInfoSomeFields = ['name', 'exchange'];
-    }
     const params = {
       ..._.omit(modalFormData, instrumentInfoFields),
-      instrumentInfo: omitNull(_.pick(modalFormData, instrumentInfoSomeFields)),
+      instrumentInfo: omitNull(_.pick(modalFormData, instrumentInfoFields)),
     };
     return omitNull(params);
   };
@@ -87,6 +83,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     const rsp = await $form.validate();
     if (rsp.error) return;
     setEditing(false);
+
     const newEditFormData = composeInstrumentInfo(Form2.getFieldsValue(editFormData));
     const { error, data } = await mktInstrumentCreate(newEditFormData);
     setEditing(false);
