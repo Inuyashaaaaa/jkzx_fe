@@ -29,6 +29,7 @@ class CommonModel extends PureComponent<any> {
     loading: false,
     searchFormData: {},
     bookIdList: [],
+    searchForm: {},
   };
 
   public componentDidMount = () => {
@@ -48,6 +49,10 @@ class CommonModel extends PureComponent<any> {
 
   public onSearch = ({ domEvent }) => {
     domEvent.preventDefault();
+    const { searchFormData } = this.state;
+    this.setState({
+      searchForm: searchFormData,
+    });
     this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
   };
 
@@ -55,13 +60,13 @@ class CommonModel extends PureComponent<any> {
     this.onTradeTableSearch();
   };
 
-  public getFormData = () => _.mapValues(this.state.searchFormData, item => _.get(item, 'value'));
+  public getFormData = data => _.mapValues(data, item => _.get(item, 'value'));
 
-  public onTradeTableSearch = async (paramsPagination = undefined) => {
+  public onTradeTableSearch = async (paramsPagination = undefined, searchForm) => {
     const { searchFormData } = this.state;
     const { activeTabKey } = this.props;
     const { pagination } = this.props[activeTabKey];
-    const newFormData = this.getFormData();
+    const newFormData = this.getFormData(searchForm || searchFormData);
     const formatValues = _.mapValues(newFormData, (val, key) => {
       if (isMoment(val)) {
         return val.format('YYYY-MM-DD');
@@ -128,10 +133,13 @@ class CommonModel extends PureComponent<any> {
   };
 
   public onPagination = (current, pageSize) => {
-    this.onTradeTableSearch({
-      current,
-      pageSize,
-    });
+    this.onTradeTableSearch(
+      {
+        current,
+        pageSize,
+      },
+      this.state.searchForm,
+    );
   };
 
   public onReset = event => {
