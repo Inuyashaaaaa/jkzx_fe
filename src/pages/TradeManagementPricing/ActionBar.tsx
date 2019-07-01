@@ -1,4 +1,9 @@
-/* eslint-disable */
+import { Affix, Alert, Button, Col, Drawer, Input, Modal, notification, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import React, { memo, useState } from 'react';
+import router from 'umi/router';
 import {
   COMPUTED_LEG_FIELDS,
   TRADESCOLDEFS_LEG_FIELD_MAP,
@@ -12,12 +17,6 @@ import { convertPricingHistoryTradePositions, createLegDataSourceItem } from '@/
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcCreate } from '@/services/trade-service';
 import { ILeg } from '@/types/leg';
-import { Affix, Alert, Button, Col, Drawer, Input, Modal, notification, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
-import React, { memo, useState } from 'react';
-import router from 'umi/router';
 import HistoryPanel from './HistoryPanel';
 import './index.less';
 

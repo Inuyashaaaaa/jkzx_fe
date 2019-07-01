@@ -1,4 +1,4 @@
-/* eslint-disable */
+/*eslint-disable */
 import { Modal, Button, Cascader, Divider, Icon, notification, Row, Steps, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -16,14 +16,9 @@ import {
   SmartTable,
 } from '@/containers';
 import { remove, uuid } from '@/tools';
-import { UPLOAD_URL } from '@/services/document';
+import { UPLOAD_URL, HREF_UPLOAD_URL } from '@/services/document';
 import { createRefParty } from '@/services/reference-data-service';
-import {
-  BASE_FORM_FIELDS,
-  HREF_UPLOAD_URL,
-  PARTY_DOC_CREATE_OR_UPDATE,
-  TRADER_TYPE,
-} from './constants';
+import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 import EmailInput from '@/containers/EmailInput';
 import { getToken } from '@/tools/authority';
 import { wkValidProcessCanStart, wkProcessInstanceCreate } from '@/services/approval';
@@ -450,7 +445,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -495,7 +490,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -551,7 +546,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -661,7 +656,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -676,7 +671,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -913,7 +908,7 @@ const CreateModalButton = memo<any>(props => {
                               message: '必填',
                             },
                           ],
-                        })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                        })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                       </FormItem>
                     ),
                   },

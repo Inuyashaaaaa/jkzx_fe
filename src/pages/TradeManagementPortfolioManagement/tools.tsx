@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 import { message, Popconfirm, Timeline } from 'antd';
 import React from 'react';
 import {
@@ -17,7 +16,10 @@ const onDelete = async (record, portfolioName, onSearch) => {
     portfolioName,
     tradeId: record.tradeId,
   });
-  if (error) return message.error('移出失败');
+  if (error) {
+    message.error('移出失败');
+    return;
+  }
   message.success('移出成功');
   onSearch();
 };

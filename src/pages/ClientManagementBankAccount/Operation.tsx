@@ -1,4 +1,3 @@
-/*eslint-disable */
 import { Divider, message, Modal, Popconfirm, Row } from 'antd';
 import React, { PureComponent } from 'react';
 import CommonModalForm from './CommonModalForm';

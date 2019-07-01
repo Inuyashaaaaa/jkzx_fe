@@ -1,4 +1,5 @@
-/*eslint-disable */
+import { Button, Card, Col, message, Modal, Row } from 'antd';
+import React, { memo, useRef, useState } from 'react';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, SmartTable } from '@/containers';
 import {
@@ -6,8 +7,6 @@ import {
   clientSaveAccountOpRecord,
   trdTradeIdListByCounterPartyName,
 } from '@/services/reference-data-service';
-import { Button, Card, Col, message, Modal, Row } from 'antd';
-import React, { memo, useRef, useState } from 'react';
 import {
   COUNTER_PARTY_FORM_CONTROLS,
   LEGAL_FORM_CONTROLS,
@@ -31,15 +30,28 @@ const ClientManagementInsert = memo<any>(props => {
   const [counterPartyFormData, setCounterPartyFormData] = useState({});
   const [tradeIds, setTradeIds] = useState([]);
 
-  const handleConfirm = async () => {
-    const rsp = await Promise.all([
-      formEl.current.validate(),
-      formTrade.current.validate(),
-      partyForm.current.validate(),
-      counterPartyForm.current.validate(),
-    ]);
-    if (rsp.some(item => item.error)) return;
-    handlePageData2apiData();
+  const handleFundChange = (accountId, fundType, partyData, counterPartyData) => {
+    let event;
+    if (fundType.includes('CHANGE_PREMIUM')) {
+      event = 'CHANGE_PREMIUM';
+    } else if (fundType.includes('UNWIND_TRADE')) {
+      event = 'UNWIND_TRADE';
+    } else if (fundType.includes('SETTLE_TRADE')) {
+      event = 'SETTLE_TRADE';
+    } else {
+      event = 'TRADE_CASH_FLOW';
+    }
+
+    return {
+      accountOpRecord: {
+        event,
+        accountId,
+        tradeId: Form2.getFieldsValue(tradeFormData).tradeId,
+        legalName: Form2.getFieldsValue(legalFormData).legalName,
+        ...Form2.getFieldsValue(partyData),
+        ...Form2.getFieldsValue(counterPartyData),
+      },
+    };
   };
 
   const handlePageData2apiData = async () => {
@@ -66,28 +78,15 @@ const ClientManagementInsert = memo<any>(props => {
     props.fetchTable();
   };
 
-  const handleFundChange = (accountId, fundType, partyData, counterPartyData) => {
-    let event;
-    if (fundType.includes('CHANGE_PREMIUM')) {
-      event = 'CHANGE_PREMIUM';
-    } else if (fundType.includes('UNWIND_TRADE')) {
-      event = 'UNWIND_TRADE';
-    } else if (fundType.includes('SETTLE_TRADE')) {
-      event = 'SETTLE_TRADE';
-    } else {
-      event = 'TRADE_CASH_FLOW';
-    }
-
-    return {
-      accountOpRecord: {
-        event,
-        accountId,
-        tradeId: Form2.getFieldsValue(tradeFormData).tradeId,
-        legalName: Form2.getFieldsValue(legalFormData).legalName,
-        ...Form2.getFieldsValue(partyData),
-        ...Form2.getFieldsValue(counterPartyData),
-      },
-    };
+  const handleConfirm = async () => {
+    const rsp = await Promise.all([
+      formEl.current.validate(),
+      formTrade.current.validate(),
+      partyForm.current.validate(),
+      counterPartyForm.current.validate(),
+    ]);
+    if (rsp.some(item => item.error)) return;
+    handlePageData2apiData();
   };
 
   const handleCancel = () => {
@@ -127,23 +126,23 @@ const ClientManagementInsert = memo<any>(props => {
     setVisible(true);
   };
 
-  const partyFormChange = (props, changedFields, allFields) => {
+  const partyFormChange = (record, changedFields, allFields) => {
     setPartyFormData(allFields);
   };
 
-  const counterPartyFormChange = (props, changedFields, allFields) => {
+  const counterPartyFormChange = (record, changedFields, allFields) => {
     setCounterPartyFormData(allFields);
   };
 
-  const tableFormChange = (props, changedFields, allFields) => {
+  const tableFormChange = (record, changedFields, allFields) => {
     setTradeFormData(allFields);
   };
 
-  const legalFormChange = async (props, changedFields, allFields) => {
+  const legalFormChange = async (record, changedFields, allFields) => {
     setLegalFormData(allFields);
   };
 
-  const legalFormValueChange = async (props, changedValues, allValues) => {
+  const legalFormValueChange = async (record, changedValues, allValues) => {
     if (changedValues.legalName) {
       setTradeIds([]);
     }
@@ -158,13 +157,11 @@ const ClientManagementInsert = memo<any>(props => {
       ]);
     const [{ error, data }, { error: _error, data: _data }] = await requests();
     if (error || _error) return;
-    const tradeIds = data.map(item => {
-      return {
-        label: item,
-        value: item,
-      };
-    });
-    setTradeIds(tradeIds);
+    const tempTradeId = data.map(item => ({
+      label: item,
+      value: item,
+    }));
+    setTradeIds(tempTradeId);
     setTableDataSource([_data]);
     setLegalFormData(
       Form2.createFields({
@@ -184,10 +181,12 @@ const ClientManagementInsert = memo<any>(props => {
         visible={visible}
         width={1000}
         confirmLoading={confirmLoading}
-        destroyOnClose={true}
+        destroyOnClose
       >
         <Form2
-          ref={node => (formEl.current = node)}
+          ref={node => {
+            formEl.current = node;
+          }}
           columnNumberOneRow={3}
           footer={false}
           dataSource={legalFormData}
@@ -203,7 +202,9 @@ const ClientManagementInsert = memo<any>(props => {
           style={{ marginBottom: VERTICAL_GUTTER }}
         />
         <Form2
-          ref={node => (formTrade.current = node)}
+          ref={node => {
+            formTrade.current = node;
+          }}
           footer={false}
           columnNumberOneRow={3}
           dataSource={tradeFormData}
@@ -219,7 +220,9 @@ const ClientManagementInsert = memo<any>(props => {
             >
               <Form2
                 columns={PARTY_FORM_CONTROLS}
-                ref={node => (partyForm.current = node)}
+                ref={node => {
+                  partyForm.current = node;
+                }}
                 footer={false}
                 dataSource={partyFormData}
                 onFieldsChange={partyFormChange}
@@ -234,7 +237,9 @@ const ClientManagementInsert = memo<any>(props => {
             >
               <Form2
                 columns={COUNTER_PARTY_FORM_CONTROLS}
-                ref={node => (counterPartyForm.current = node)}
+                ref={node => {
+                  counterPartyForm.current = node;
+                }}
                 footer={false}
                 dataSource={counterPartyFormData}
                 onFieldsChange={counterPartyFormChange}

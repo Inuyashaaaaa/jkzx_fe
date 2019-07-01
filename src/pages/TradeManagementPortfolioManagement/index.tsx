@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 import { Divider, message, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -33,7 +32,7 @@ export const RESOURCE_FORM_CONTROLS: IFormColDef[] = [
                 if (value && (value.startsWith(' ') || value.endsWith(' '))) {
                   return callback(true);
                 }
-                callback();
+                return callback();
               },
               message: '前后不可以有空格',
             },
