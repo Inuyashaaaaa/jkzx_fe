@@ -69,6 +69,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     this.props.fetchTable();
   };
 
+  // eslint-disable-next-line  consistent-return
   public handleCreate = async () => {
     const params = _.mapValues(this.state.formData, item => _.get(item, 'value'));
     const { error, data } = await wkProcessInstanceCreate({
@@ -85,7 +86,6 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       message.success('已进入流程');
     }
 
-    this.props.fetchTable();
     this.setState({
       visible: false,
     });
