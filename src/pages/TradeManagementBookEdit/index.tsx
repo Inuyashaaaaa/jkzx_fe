@@ -1,5 +1,12 @@
-/* eslint-disable */
-
+/*eslint-disable */
+import { Divider, Menu, message, Skeleton, Typography } from 'antd';
+import { connect } from 'dva';
+import React, { memo, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import ActionBar from './ActionBar';
+import styles from './index.less';
 import {
   LCM_EVENT_TYPE_ZHCN_MAP,
   LEG_FIELD,
@@ -24,19 +31,13 @@ import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Divider, Menu, message, Skeleton, Typography } from 'antd';
-import { connect } from 'dva';
-import React, { memo, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import ActionBar from './ActionBar';
-import styles from './index.less';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
 
 const TradeManagementBooking = props => {
   const { currentUser } = props;
   const { tradeManagementBookEditPageData, dispatch } = props;
   const { tableData } = tradeManagementBookEditPageData;
+  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
+
   const setTableData = payload => {
     dispatch({
       type: 'tradeManagementBookEdit/setTableData',
@@ -61,80 +62,11 @@ const TradeManagementBooking = props => {
     });
   };
 
-  const loadTableData = async () => {
-    setTableData([]);
-    setCreateFormData([]);
-
-    if (!props.location.query.id) {
-      return message.warn('查看 id 不存在');
-    }
-
-    setTableLoading(true);
-
-    const { error, data } = await trdTradeGet({
-      tradeId: props.location.query.id,
+  const mockAddLegItem = async (composePositions, tableFormData) => {
+    composePositions.forEach(position => {
+      const leg = getLegByProductType(position.productType, position.asset.exerciseType);
+      addLeg(leg, position);
     });
-
-    if (error) return;
-
-    const tableFormData = getTradeCreateModalData(data);
-
-    const { positions } = data;
-    const unitPositions = await Promise.all(
-      positions.map(position => {
-        if (position.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
-          return Promise.resolve(position);
-        }
-        return mktInstrumentInfo({
-          instrumentId: position.productType.includes('SPREAD_EUROPEAN')
-            ? _.get(position.asset, 'underlyerInstrumentId1')
-            : position.asset[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
-        }).then(rsp => {
-          const { error, data } = rsp;
-          if (error || data.instrumentInfo.unit === undefined) {
-            return {
-              ...position,
-              asset: {
-                ...position.asset,
-                [LEG_FIELD.UNIT]: '-',
-              },
-            };
-          }
-          return {
-            ...position,
-            asset: {
-              ...position.asset,
-              [LEG_FIELD.UNIT]: data.instrumentInfo.unit,
-            },
-          };
-        });
-      }),
-    );
-    const composePositions = await Promise.all(
-      unitPositions.map(position =>
-        trdTradeLCMUnwindAmountGet({
-          tradeId: tableFormData.tradeId,
-          positionId: position.positionId,
-        }).then(rsp => {
-          const { error, data } = rsp;
-          if (error) return position;
-          return {
-            ...position,
-            asset: {
-              ...position.asset,
-              [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
-              [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: data.initialValue,
-              [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: data.historyValue,
-            },
-          };
-        }),
-      ),
-    );
-
-    setTableLoading(false);
-    setCreateFormData(Form2.createFields(tableFormData));
-    mockAddLegItem(composePositions, tableFormData);
-    fetchEventType(composePositions);
   };
 
   const handleTradeNumber = position => {
@@ -161,13 +93,6 @@ const TradeManagementBooking = props => {
       .toNumber();
   };
 
-  const mockAddLegItem = async (composePositions, tableFormData) => {
-    composePositions.forEach(position => {
-      const leg = getLegByProductType(position.productType, position.asset.exerciseType);
-      addLeg(leg, position);
-    });
-  };
-
   const fetchEventType = composePositions => {
     composePositions.forEach(position => {
       trdPositionLCMEventTypes({
@@ -181,6 +106,83 @@ const TradeManagementBooking = props => {
         }));
       });
     });
+  };
+
+  const loadTableData = async () => {
+    setTableData([]);
+    setCreateFormData([]);
+
+    if (!props.location.query.id) {
+      message.warn('查看 id 不存在');
+      return;
+    }
+
+    setTableLoading(true);
+
+    const { error, data } = await trdTradeGet({
+      tradeId: props.location.query.id,
+    });
+
+    if (error) return;
+
+    const tableFormData = getTradeCreateModalData(data);
+
+    const { positions } = data;
+    const unitPositions = await Promise.all(
+      positions.map(position => {
+        if (position.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
+          return Promise.resolve(position);
+        }
+        return mktInstrumentInfo({
+          instrumentId: position.productType.includes('SPREAD_EUROPEAN')
+            ? _.get(position.asset, 'underlyerInstrumentId1')
+            : position.asset[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
+        }).then(rsp => {
+          const { error: _error, data: _data } = rsp;
+          if (_error || _data.instrumentInfo.unit === undefined) {
+            return {
+              ...position,
+              asset: {
+                ...position.asset,
+                [LEG_FIELD.UNIT]: '-',
+              },
+            };
+          }
+          return {
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.UNIT]: _data.instrumentInfo.unit,
+            },
+          };
+        });
+      }),
+    );
+    const composePositions = await Promise.all(
+      unitPositions.map(position =>
+        trdTradeLCMUnwindAmountGet({
+          tradeId: tableFormData.tradeId,
+          positionId: position.positionId,
+        }).then(rsp => {
+          const { error: _error, data: _data } = rsp;
+          if (_error) return position;
+          return {
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+              [LEG_FIELD.INITIAL_NOTIONAL_AMOUNT]: _data.initialValue,
+              [LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT]: _data.historyValue,
+            },
+          };
+        }),
+      ),
+    );
+
+    setTableLoading(false);
+    setCreateFormData(Form2.createFields(tableFormData));
+    mockAddLegItem(composePositions, tableFormData);
+    fetchEventType(composePositions);
   };
 
   const getContextMenu = params => {
@@ -213,8 +215,6 @@ const TradeManagementBooking = props => {
   useLifecycles(() => {
     loadTableData();
   });
-
-  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
 
   return (
     <Page back title="交易详情">
@@ -266,8 +266,8 @@ const TradeManagementBooking = props => {
                     },
                     tableEl.current.setLoadingsByRow,
                     (colId: string, newVal: ITableData) => {
-                      setTableData(pre =>
-                        pre.map(item => {
+                      setTableData(prev =>
+                        prev.map(item => {
                           if (item[LEG_ID_FIELD] === params.rowId) {
                             return {
                               ...item,
@@ -287,7 +287,11 @@ const TradeManagementBooking = props => {
             dataSource={tableData}
             getContextMenu={getContextMenu}
           />
-          <LcmEventModal current={node => (lcmEventModalEl.current = node)} />
+          <LcmEventModal
+            current={node => {
+              lcmEventModalEl.current = node;
+            }}
+          />
         </>
       )}
       <ActionBar tableData={tableData} />
