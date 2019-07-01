@@ -1,4 +1,3 @@
-/*eslint-disable */
 import { Button, Col, message, Modal, Row, Tag } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
@@ -87,7 +86,7 @@ class FixingModal extends PureComponent<
   });
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    this.setState(state => ({ modalConfirmLoading: !state.modalConfirmLoading }));
   };
 
   public switchModal = () => {
