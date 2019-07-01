@@ -1,4 +1,8 @@
-/* eslint-disable*/
+import { Alert, Button, message, Modal } from 'antd';
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { PureComponent } from 'react';
 import {
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
@@ -17,11 +21,6 @@ import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMinRule, getRequiredRule, isAutocallPhoenix, isAutocallSnow, isKnockIn } from '@/tools';
-import { Alert, Button, message, Modal } from 'antd';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { PureComponent } from 'react';
 import { OB_LIFE_PAYMENT } from '../constants';
 import { getObservertionFieldData } from '../tools';
 import {
@@ -43,19 +42,7 @@ class ExpirationModal extends PureComponent<
   },
   any
 > {
-  public $expirationFixedModal: Form;
-
-  public $expirationCallModal: Form;
-
-  public $autocallPhoenix: Form;
-
   public data: any = {};
-
-  public tableFormData: any;
-
-  public currentUser: any;
-
-  public reload: any;
 
   public fixingTableData: any = [];
 
@@ -78,22 +65,20 @@ class ExpirationModal extends PureComponent<
     });
   };
 
-  public computedFormData = () => {
-    return {
-      [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-      [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
-        _.chain(this.fixingTableData)
-          .last()
-          .get(OB_PRICE_FIELD)
-          .value(),
-      ),
-      [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
-      [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
-      [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
-      [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
-      [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
-    };
-  };
+  public computedFormData = () => ({
+    [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+    [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
+      _.chain(this.fixingTableData)
+        .last()
+        .get(OB_PRICE_FIELD)
+        .value(),
+    ),
+    [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
+    [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
+    [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
+    [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
+    [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
+  });
 
   /**
    * coupnon部分：
@@ -101,7 +86,7 @@ class ExpirationModal extends PureComponent<
    * 如果由菜单进入：获得所有观察价格，按照fixing事件中的方法进行计算
    */
   public getCouponPaymentTotal = () => {
-    if (!!this.fixingTableData.length) {
+    if (this.fixingTableData.length) {
       return this.fixingTableData.reduce((total, next) => total + (next[OB_LIFE_PAYMENT] || 0), 0);
     }
 
@@ -125,7 +110,7 @@ class ExpirationModal extends PureComponent<
     const premiumType = this.data[LEG_FIELD.AUTO_CALL_STRIKE_UNIT];
     const autoCallPaymentType = this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE];
 
-    this.setState({
+    return this.setState({
       visible: true,
       autoCallPaymentType,
       premiumType,
@@ -177,7 +162,7 @@ class ExpirationModal extends PureComponent<
   };
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    this.setState(state => ({ modalConfirmLoading: !state.modalConfirmLoading }));
   };
 
   public switchModal = () => {
@@ -238,11 +223,10 @@ class ExpirationModal extends PureComponent<
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
       tradeId: this.tableFormData.tradeId,
-      eventType: isAutocallPhoenix(this.data)
-        ? LCM_EVENT_TYPE_MAP.SETTLE
-        : isAutocallSnow(this.data)
-        ? LCM_EVENT_TYPE_MAP.SETTLE
-        : LCM_EVENT_TYPE_MAP.EXPIRATION,
+      eventType:
+        isAutocallPhoenix(this.data) || isAutocallSnow(this.data)
+          ? LCM_EVENT_TYPE_MAP.SETTLE
+          : LCM_EVENT_TYPE_MAP.EXPIRATION,
       userLoginId: this.currentUser.username,
       eventDetail: this.getEventDetail(usedFormData),
     });
@@ -467,6 +451,18 @@ class ExpirationModal extends PureComponent<
     return '确认到期操作？';
   };
 
+  public $expirationFixedModal: Form;
+
+  public $expirationCallModal: Form;
+
+  public $autocallPhoenix: Form;
+
+  public tableFormData: any;
+
+  public currentUser: any;
+
+  public reload: any;
+
   public render() {
     const { visible } = this.state;
     return (
@@ -485,17 +481,11 @@ class ExpirationModal extends PureComponent<
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
           title={`${
-            isAutocallPhoenix(this.data)
-              ? '到期结算'
-              : isAutocallSnow(this.data)
-              ? '到期结算'
-              : '到期'
+            isAutocallPhoenix(this.data) || isAutocallSnow(this.data) ? '到期结算' : '到期'
           } (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
         >
           {this.getForm()}
-          {isAutocallPhoenix(this.data) ? (
-            <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
-          ) : isAutocallSnow(this.data) ? (
+          {isAutocallPhoenix(this.data) || isAutocallSnow(this.data) ? (
             <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
           ) : null}
         </Modal>

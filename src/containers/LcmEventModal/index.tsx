@@ -1,8 +1,8 @@
-/*eslint-disable */
 import { message } from 'antd';
 import React, { memo, useRef } from 'react';
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
+import moment from 'moment';
 import {
   LCM_EVENT_TYPE_MAP,
   LCM_EVENT_TYPE_ZHCN_MAP,
@@ -29,9 +29,8 @@ import UnwindModal from './UnwindModal';
 import { OB_PRICE_FIELD } from './constants';
 import { getObservertionFieldData } from './tools';
 import { isRangeAccruals, getMoment } from '@/tools';
-import moment from 'moment';
 
-export interface ILcmEventModalEventParams {
+export interface LcmEventModalEventParams {
   eventType: string;
   record: any;
   createFormData: any;
@@ -39,12 +38,12 @@ export interface ILcmEventModalEventParams {
   loadData: () => void;
 }
 
-export interface ILcmEventModalEl {
-  show: (event: ILcmEventModalEventParams) => void;
+export interface LcmEventModalEl {
+  show: (event: LcmEventModalEventParams) => void;
 }
 
 const LcmEventModal = memo<{
-  current: (node: ILcmEventModalEl) => void;
+  current: (node: LcmEventModalEl) => void;
 }>(props => {
   const $unwindModal = useRef<UnwindModal>(null);
   const $asianExerciseModal = useRef<AsianExerciseModal>(null);
@@ -99,8 +98,8 @@ const LcmEventModal = memo<{
     return false;
   };
 
-  const meta: ILcmEventModalEl = {
-    show: (event: ILcmEventModalEventParams) => {
+  const meta: LcmEventModalEl = {
+    show: (event: LcmEventModalEventParams) => {
       const { eventType, record, createFormData, currentUser, loadData } = event;
       const legType = record[LEG_TYPE_FIELD];
       const data = Form2.getFieldsValue(record);
@@ -175,6 +174,7 @@ const LcmEventModal = memo<{
         }
         return $settleModal.current.show(data, tableFormData, currentUser, loadData);
       }
+      return message.error('不支持该生命周期操作');
     },
   };
 

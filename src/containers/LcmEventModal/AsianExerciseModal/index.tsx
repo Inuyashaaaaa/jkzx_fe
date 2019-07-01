@@ -1,4 +1,3 @@
-/*eslint-disable */
 import { Alert, Button, Col, message, Modal, Row } from 'antd';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
@@ -39,28 +38,17 @@ class AsianExerciseModal extends PureComponent<
   },
   any
 > {
-  public $exerciseForm: Form;
-
   public data: any = {};
 
   public tableFormData: any = {};
 
   public currentUser: any = {};
 
-  public reload: any;
-
-  public subjectMatterAvg: any;
-
-  public $form: Form;
-
   public state = {
     visible: false,
-    direction: 'BUYER',
     modalConfirmLoading: false,
-    dataSource: {},
     formData: {},
     productType: 'ASIAN',
-    notionalType: null,
     exportVisible: false,
     strikeType: null,
   };
@@ -73,7 +61,6 @@ class AsianExerciseModal extends PureComponent<
     this.setState({
       visible: true,
       productType: this.data[LEG_TYPE_FIELD],
-      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       formData: this.getDefaultFormData(),
       strikeType: this.data[LEG_FIELD.STRIKE_TYPE],
     });
@@ -120,7 +107,7 @@ class AsianExerciseModal extends PureComponent<
   });
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    this.setState(state => ({ modalConfirmLoading: !state.modalConfirmLoading }));
   };
 
   public switchModal = () => {
@@ -179,6 +166,14 @@ class AsianExerciseModal extends PureComponent<
     });
   };
 
+  public $exerciseForm: Form;
+
+  public reload: any;
+
+  public subjectMatterAvg: any;
+
+  public $form: Form;
+
   public render() {
     const { visible } = this.state;
     return (
@@ -214,7 +209,9 @@ class AsianExerciseModal extends PureComponent<
           title={this.getTitle()}
         >
           <Form
-            ref={node => (this.$form = node)}
+            ref={node => {
+              this.$form = node;
+            }}
             footer={false}
             dataSource={this.state.formData}
             onValueChange={this.onValueChange}
