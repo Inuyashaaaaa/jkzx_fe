@@ -1,15 +1,15 @@
-import { Form2, InputNumber, Upload } from '@/containers';
-import { UPLOAD_URL, wkProcessGet, wkProcessInstanceCreate } from '@/services/approval';
-import {
-  clientUpdateCredit,
-  wkAttachmentProcessInstanceBind,
-} from '@/services/reference-data-service';
-import { getToken } from '@/tools/authority';
 import { Alert, Button, Icon, message, Modal } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
+import { getToken } from '@/tools/authority';
+import {
+  clientUpdateCredit,
+  wkAttachmentProcessInstanceBind,
+} from '@/services/reference-data-service';
+import { UPLOAD_URL, wkProcessGet, wkProcessInstanceCreate } from '@/services/approval';
+import { Form2, InputNumber, Upload } from '@/containers';
 
 class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public $form: Form2 = null;
@@ -32,8 +32,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   };
 
   public switchModal = () => {
+    const { visible } = this.state;
     this.setState({
-      visible: !this.state.visible,
+      visible: !visible,
     });
   };
 
@@ -45,9 +46,10 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     });
     if (perror) return;
     if (pdata.status) {
-      return this.setState({
+      this.setState({
         modalVisible: true,
       });
+      return;
     }
 
     const params = _.mapValues(this.state.formData, item => _.get(item, 'value'));
@@ -67,6 +69,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     this.props.fetchTable();
   };
 
+  // eslint-disable-next-line  consistent-return
   public handleCreate = async () => {
     const params = _.mapValues(this.state.formData, item => _.get(item, 'value'));
     const { error, data } = await wkProcessInstanceCreate({
@@ -83,7 +86,6 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       message.success('已进入流程');
     }
 
-    this.props.fetchTable();
     this.setState({
       visible: false,
     });
@@ -128,7 +130,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
           title="调整授信额度"
         >
           <Form2
-            ref={node => (this.$form = node)}
+            ref={node => {
+              this.$form = node;
+            }}
             dataSource={this.state.formData}
             onFieldsChange={this.onFieldsChange}
             submitable={false}
@@ -138,38 +142,34 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
               {
                 title: '客户授信总额',
                 dataIndex: 'credit',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '客户授信额度是必填项',
-                          },
-                        ],
-                      })(<InputNumber min={0} precision={4} />)}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form, editing }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '客户授信额度是必填项',
+                        },
+                      ],
+                    })(<InputNumber min={0} precision={4} />)}
+                  </FormItem>
+                ),
               },
               {
                 title: '我方授信总额',
                 dataIndex: 'counterPartyCredit',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '我方授信额度是必填项',
-                          },
-                        ],
-                      })(<InputNumber min={0} precision={4} />)}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form, editing }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '我方授信额度是必填项',
+                        },
+                      ],
+                    })(<InputNumber min={0} precision={4} />)}
+                  </FormItem>
+                ),
               },
             ]}
           />
@@ -183,11 +183,9 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
         >
           <div style={{ margin: '20px' }}>
             <Alert
-              showIcon={true}
+              showIcon
               type="info"
-              message={
-                '您提交的授信额度变更需要通过审批才能完成生效。请上传授信协议等证明文件后发起审批。'
-              }
+              message="您提交的授信额度变更需要通过审批才能完成生效。请上传授信协议等证明文件后发起审批。"
             />
             <p style={{ margin: '20px', textAlign: 'center' }}>
               <Upload
@@ -223,7 +221,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
                 </Button>
               </Upload>
             </p>
-            <Alert message={'请在“审批管理”模块中查看审批进展。'} />
+            <Alert message="请在“审批管理”模块中查看审批进展。" />
           </div>
         </Modal>
       </>
