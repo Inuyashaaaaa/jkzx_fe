@@ -1,4 +1,6 @@
-/*eslint-disable */
+/* eslint-disable consistent-return */
+import { message, Popconfirm, Timeline } from 'antd';
+import React from 'react';
 import {
   DIRECTION_TYPE_ZHCN_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP,
@@ -6,8 +8,6 @@ import {
   PRODUCTTYPE_ZHCH_MAP,
 } from '@/constants/common';
 import { trdTradePortfolioDelete } from '@/services/trade-service';
-import { message, Popconfirm, Timeline } from 'antd';
-import React from 'react';
 import styles from './Action.less';
 
 const TimelineItem = Timeline.Item;
@@ -34,7 +34,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = (portfolioName, onSearch) => [
     onHeaderCell: record => ({
       style: { paddingLeft: '20px' },
     }),
-    render: (text, record, index) => {
+    render: (text, record, i) => {
       if (record.timeLineNumber) {
         return (
           <span style={{ position: 'relative' }}>
@@ -46,7 +46,7 @@ export const BOOKING_TABLE_COLUMN_DEFS = (portfolioName, onSearch) => [
               {record.positions.map((item, index) => (
                 <TimelineItem
                   style={{ paddingBottom: index === record.positions.length - 1 ? 0 : 30.5 }}
-                  key={index}
+                  key={`${item.positionId}`}
                 />
               ))}
             </Timeline>
