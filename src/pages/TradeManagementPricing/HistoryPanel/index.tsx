@@ -1,5 +1,24 @@
-/* eslint-disable */
-
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-nested-ternary */
+import {
+  DatePicker,
+  Divider,
+  notification,
+  Pagination,
+  Popconfirm,
+  Row,
+  Table,
+  Timeline,
+  Tooltip,
+  Popover,
+} from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import TimelineItem from 'antd/lib/timeline/TimelineItem';
+import _ from 'lodash';
+import moment, { isMoment } from 'moment';
+import React, { memo, useState, useEffect } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import BigNumber from 'bignumber.js';
 import { Form2, Input, Loading, Select, SmartTable } from '@/containers';
 import {
   DIRECTION_OPTIONS,
@@ -27,25 +46,6 @@ import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { quotePrcPositionDelete, quotePrcSearchPaged } from '@/services/trade-service';
 import styles from '@/styles/index.less';
 import { formatMoney, getLegByProductType, formatNumber, getMoment } from '@/tools';
-import {
-  DatePicker,
-  Divider,
-  notification,
-  Pagination,
-  Popconfirm,
-  Row,
-  Table,
-  Timeline,
-  Tooltip,
-  Popover,
-} from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import TimelineItem from 'antd/lib/timeline/TimelineItem';
-import _ from 'lodash';
-import moment, { isMoment } from 'moment';
-import React, { memo, useState, useEffect } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import BigNumber from 'bignumber.js';
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
 import SmartForm from '@/containers/SmartForm';
 
@@ -105,7 +105,7 @@ const TradeManagementPricingManagement = props => {
     if (error) return;
     if (_.isEmpty(data)) return;
 
-    const tableDataSource = _.flatten(
+    const tableSource = _.flatten(
       data.page.map(item =>
         item.quotePositions.map((node, key) => ({
           ...node,
@@ -120,7 +120,7 @@ const TradeManagementPricingManagement = props => {
       ),
     );
 
-    setTableDataSource(tableDataSource);
+    setTableDataSource(tableSource);
     setPagination({
       ...pagination,
       ...paramsPagination,
@@ -206,7 +206,7 @@ const TradeManagementPricingManagement = props => {
             paramsPagination: { current: 1, pageSize: PAGE_SIZE },
           });
         }}
-        onFieldsChange={(props, changedFields, allFields) => {
+        onFieldsChange={(propsData, changedFields, allFields) => {
           setSearchFormData({
             ...searchFormData,
             ...changedFields,
@@ -250,7 +250,7 @@ const TradeManagementPricingManagement = props => {
           {
             title: '标的物',
             dataIndex: LEG_FIELD.UNDERLYER_INSTRUMENT_ID,
-            render: (value, record, index, { form, editing }) => (
+            render: (val, record, index, { form, editing }) => (
               <FormItem>
                 {form.getFieldDecorator({})(
                   <Select
@@ -362,7 +362,7 @@ const TradeManagementPricingManagement = props => {
                 onHeaderCell: record => ({
                   style: { paddingLeft: '20px' },
                 }),
-                render: (text, record, index) => {
+                render: (text, record, i) => {
                   if (record.timeLineNumber) {
                     return (
                       <span style={{ position: 'relative' }}>
@@ -377,7 +377,7 @@ const TradeManagementPricingManagement = props => {
                                 paddingBottom:
                                   index === record.quotePositions.length - 1 ? 0 : 30.5,
                               }}
-                              key={index}
+                              key={`${item.positionId}`}
                             />
                           ))}
                         </Timeline>
@@ -504,16 +504,16 @@ const TradeManagementPricingManagement = props => {
                     }),
                   );
 
-                  const str = groups.map(([key, val]) => `${key}: ${val}`).join(',');
+                  const str = groups.map(([key, v]) => `${key}: ${v}`).join(',');
 
                   if (str.length > 20) {
                     return (
                       <Popover
                         content={
                           <div style={{ width: 170 }}>
-                            {groups.map(([key, val]) => (
+                            {groups.map(([key, v]) => (
                               <Row key={key} type="flex" justify="space-between">
-                                <span>{key}:</span> <span>{val}</span>
+                                <span>{key}:</span> <span>{v}</span>
                               </Row>
                             ))}
                           </div>
@@ -557,11 +557,11 @@ const TradeManagementPricingManagement = props => {
                             ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
                             ...backConvertPercent({
                               ...Form2.createFields({
-                                ..._.mapValues(asset, (val, key) => {
-                                  if (val && DATE_LEG_FIELDS.indexOf(key) !== -1) {
-                                    return moment(val);
+                                ..._.mapValues(asset, (v, key) => {
+                                  if (v && DATE_LEG_FIELDS.indexOf(key) !== -1) {
+                                    return moment(v);
                                   }
-                                  return val;
+                                  return v;
                                 }),
                                 ...handleTradescol(_.pick(position, TRADESCOL_FIELDS)),
                                 [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
@@ -584,7 +584,7 @@ const TradeManagementPricingManagement = props => {
                       okText="是"
                       cancelText="否"
                     >
-                      <a href="javascript:;">复用</a>
+                      <a>复用</a>
                     </Popconfirm>
                     <Divider type="vertical" />
                     <Popconfirm
@@ -602,9 +602,7 @@ const TradeManagementPricingManagement = props => {
                       okText="是"
                       cancelText="否"
                     >
-                      <a href="javascript:;" style={{ color: 'red' }}>
-                        删除
-                      </a>
+                      <a style={{ color: 'red' }}>删除</a>
                     </Popconfirm>
                   </div>
                 ),
