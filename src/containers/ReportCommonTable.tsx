@@ -1,4 +1,8 @@
-/*eslint-disable */
+import { ConfigProvider, Divider, message, Table } from 'antd';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
@@ -6,11 +10,6 @@ import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { rptReportNameList } from '@/services/report-service';
 import { getMoment } from '@/tools';
-import { ConfigProvider, Divider, message, Table } from 'antd';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
 import { PAGE_SIZE } from '@/constants/component';
 
 const ReportCommonTable = memo<any>(props => {
@@ -64,7 +63,7 @@ const ReportCommonTable = memo<any>(props => {
       return;
     }
     setLoading(true);
-    const { error, data } = await searchMethod({
+    const { error, data: fetchData } = await searchMethod({
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
       ..._.mapValues(Form2.getFieldsValue(usedFormData), (values, key) => {
@@ -80,15 +79,15 @@ const ReportCommonTable = memo<any>(props => {
       setDataSource([]);
       return;
     }
-    if (!data.page.length) {
+    if (!fetchData.page.length) {
       message.warning('查询日期内暂无数据');
-      setDataSource(data.page);
+      setDataSource(fetchData.page);
       setInfo(false);
-      setTotal(data.totalCount);
+      setTotal(fetchData.totalCount);
       return;
     }
-    setDataSource(data.page);
-    setTotal(data.totalCount);
+    setDataSource(fetchData.page);
+    setTotal(fetchData.totalCount);
   };
 
   const onChange = (paramsPagination, filters, sorter) => {
@@ -114,47 +113,47 @@ const ReportCommonTable = memo<any>(props => {
         order: sortField.order,
       });
     }
-    setSortField({
+    return setSortField({
       orderBy: sorter.columnKey,
       order: sorter.order === 'ascend' ? 'asc' : 'desc',
     });
   };
 
-  const handleData = (dataSource, cols, headers) => {
-    const data = [];
-    data.push(headers);
-    const { length } = data;
-    dataSource.forEach((ds, index) => {
-      const _data = [];
+  const handleData = (inlineDataSource, cols, headers) => {
+    const tempData = [];
+    tempData.push(headers);
+    const { length } = tempData;
+    inlineDataSource.forEach((ds, index) => {
+      const newData = [];
       Object.keys(ds).forEach(key => {
         const dsIndex = _.findIndex(cols, k => k === key);
         if (dsIndex >= 0) {
-          _data[dsIndex] = ds[key];
+          newData[dsIndex] = ds[key];
         }
       });
-      data.push(_data);
+      tempData.push(newData);
     });
-    return data;
+    return tempData;
   };
 
   useLifecycles(async () => {
     setIsMount(true);
-    const { error, data } = await rptReportNameList({
+    const { error, data: reportListData } = await rptReportNameList({
       reportType,
     });
     if (error) return;
-    const _markets = data.map(item => ({
+    const newMarkets = reportListData.map(item => ({
       label: item,
       value: item,
     }));
 
-    setMarkets(_markets);
-    const _searchFormData = {
-      ...(_markets.length ? { reportName: Form2.createField(_markets[0].value) } : null),
+    setMarkets(newMarkets);
+    const formData = {
+      ...(newMarkets.length ? { reportName: Form2.createField(newMarkets[0].value) } : null),
       valuationDate: Form2.createField(moment().subtract(1, 'days')),
     };
-    setSearchFormData(_searchFormData);
-    fetchTable(_searchFormData);
+    setSearchFormData(formData);
+    fetchTable(formData);
   });
 
   useEffect(() => {
@@ -175,7 +174,9 @@ const ReportCommonTable = memo<any>(props => {
   return (
     <Page>
       <Form2
-        ref={node => (form.current = node)}
+        ref={node => {
+          form.current = node;
+        }}
         dataSource={searchFormData}
         columns={searchFormControls(markets)}
         layout="inline"
