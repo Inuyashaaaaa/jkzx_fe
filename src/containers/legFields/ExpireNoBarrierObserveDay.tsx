@@ -383,7 +383,6 @@ class ObserveModalInput extends InputBase<{
               )}
               <SmartTable
                 dataSource={this.state.dealDataSource}
-                pagination={false}
                 rowKey={record => record[OB_DAY_FIELD].format('YYYY-MM-DD')}
                 onCellFieldsChange={this.handleCellValueChanged}
                 columns={this.getColumnDefs()}

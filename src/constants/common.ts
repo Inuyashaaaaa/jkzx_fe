@@ -471,8 +471,8 @@ export const REBATETYPE_TYPE_MAP = {
 };
 
 export const REBATETYPE_TYPE_ZHCN_MAP = {
-  PAY_NONE: '不支付',
-  PAY_WHEN_HIT: '立即支付',
+  PAY_NONE: '无敲出补偿',
+  PAY_WHEN_HIT: '敲出即付',
   PAY_AT_EXPIRY: '到期支付',
 };
 
