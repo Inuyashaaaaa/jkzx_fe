@@ -1,6 +1,7 @@
 import { message, Divider, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
+import _ from 'lodash';
 import { Form2, Select, SmartTable } from '@/containers';
 import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
@@ -15,11 +16,14 @@ import {
 import Operation from './Operation';
 
 class ClientManagementBankAccount extends PureComponent {
+  public $select = {};
+
   public state = {
     dataSource: [],
     searchFormData: {},
     loading: false,
     markets: null,
+    bankAccountNames: null,
     visible: false,
     confirmLoading: false,
     createFormData: {},
@@ -60,13 +64,24 @@ class ClientManagementBankAccount extends PureComponent {
     if (Object.keys(changedFields)[0] === 'legalName' && !changedFields.legalName.value) {
       return this.setState({
         markets: null,
+        bankAccountNames: null,
         searchFormData: {},
       });
     }
-
-    const { error: _error, data: _data } = await refBankAccountSearch({
-      legalName: allFields.legalName.value,
-    });
+    const BankAccountSearch = {};
+    if (_.get(Form2.getFieldsValue(allFields), 'legalName')) {
+      BankAccountSearch.legalName = _.get(Form2.getFieldsValue(allFields), 'legalName');
+    }
+    if (
+      _.get(Form2.getFieldsValue(allFields), 'bankAccount') &&
+      _.get(Form2.getFieldsValue(changedFields), 'bankAccountName')
+    ) {
+      BankAccountSearch.bankAccount = _.get(Form2.getFieldsValue(allFields), 'bankAccount');
+    }
+    if (_.get(Form2.getFieldsValue(allFields), 'bankAccountName')) {
+      BankAccountSearch.bankAccountName = _.get(Form2.getFieldsValue(allFields), 'bankAccountName');
+    }
+    const { error: _error, data: _data } = await refBankAccountSearch(BankAccountSearch);
     if (_error) return false;
 
     const markets = _data.map(item => ({
@@ -74,23 +89,24 @@ class ClientManagementBankAccount extends PureComponent {
       value: item.bankAccount,
     }));
 
+    const bankAccountNames = _data.map(item => ({
+      label: item.bankAccountName,
+      value: item.bankAccountName,
+    }));
+
     let bankAccountNameValue;
     let legalNameValue;
     let bankAccountValue;
 
     if (changedFields.bankAccount && changedFields.bankAccount.value) {
-      const { error, data } = await refBankAccountSearch({
-        bankAccount: changedFields.bankAccount.value,
-      });
+      const { error, data } = await refBankAccountSearch(BankAccountSearch);
       bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
       legalNameValue = data[0].legalName;
       bankAccountValue = data[0].bankAccount;
     }
 
     if (changedFields.bankAccountName && changedFields.bankAccountName.value) {
-      const { error, data } = await refBankAccountSearch({
-        bankAccountName: changedFields.bankAccountName.value,
-      });
+      const { error, data } = await refBankAccountSearch(BankAccountSearch);
       bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
       legalNameValue = data[0].legalName;
       bankAccountValue = data[0].bankAccount;
@@ -98,6 +114,7 @@ class ClientManagementBankAccount extends PureComponent {
 
     this.setState({
       markets,
+      bankAccountNames,
       searchFormData: Form2.createFields({
         legalName: legalNameValue || (allFields.legalName || {}).value,
         bankAccount: bankAccountValue,
@@ -145,6 +162,7 @@ class ClientManagementBankAccount extends PureComponent {
   };
 
   public render() {
+    const searchForm = Form2.getFieldsValue(this.state.searchFormData);
     return (
       <Page>
         <Form2
@@ -170,6 +188,14 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
+                      ref={node => {
+                        this.$select.legalName = node;
+                      }}
+                      onDropdownVisibleChange={open => {
+                        if (open) {
+                          this.$select.legalName.onSearch(value);
+                        }
+                      }}
                       options={async (values: string = '') => {
                         const { data, error } = await refSimilarLegalNameList({
                           similarLegalName: values,
@@ -197,11 +223,21 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
+                      filterOption
+                      ref={node => {
+                        this.$select.bankAccount = node;
+                      }}
+                      onDropdownVisibleChange={open => {
+                        if (open) {
+                          this.$select.bankAccount.onSearch(value);
+                        }
+                      }}
                       options={
                         this.state.markets
                           ? this.state.markets
                           : async (values: string = '') => {
                               const { data, error } = await refSimilarBankAccountList({
+                                similarLegalName: searchForm.legalName,
                                 similarBankAccount: values,
                               });
                               if (error) return [];
@@ -228,16 +264,30 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      options={async (values: string = '') => {
-                        const { data, error } = await refSimilarAccountNameList({
-                          similarAccountName: values,
-                        });
-                        if (error) return [];
-                        return data.map(item => ({
-                          label: item,
-                          value: item,
-                        }));
+                      ref={node => {
+                        this.$select.bankAccountName = node;
                       }}
+                      onDropdownVisibleChange={open => {
+                        if (open) {
+                          this.$select.bankAccountName.onSearch(value);
+                        }
+                      }}
+                      options={
+                        this.state.bankAccountNames
+                          ? this.state.bankAccountNames
+                          : async (values: string = '') => {
+                              const { data, error } = await refSimilarAccountNameList({
+                                similarLegalName: searchForm.legalName,
+                                similarBankAccount: searchForm.bankAccount,
+                                similarAccountName: values,
+                              });
+                              if (error) return [];
+                              return data.map(item => ({
+                                label: item,
+                                value: item,
+                              }));
+                            }
+                      }
                     />,
                   )}
                 </FormItem>
