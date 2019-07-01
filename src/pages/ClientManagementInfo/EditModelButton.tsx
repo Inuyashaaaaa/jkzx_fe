@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Button, Cascader, notification, Row, Spin, Tabs } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -185,7 +186,7 @@ const EditModalButton = memo<any>(props => {
                 required: false,
               },
             ],
-          })(<DatePicker disabled={disabled} editing={editable} />)}
+          })(<DatePicker disabled={disabled} editing={editable} format="YYYY-MM-DD" />)}
         </FormItem>
       ),
     },
@@ -259,6 +260,10 @@ const EditModalButton = memo<any>(props => {
           item.url = `${HREF_UPLOAD_URL}${_.get(result, 'uuid')}&partyDoc=true`;
           return item;
         }
+        const error = _.get(val, '[0].response.error');
+        if (error) {
+          item.status = 'error';
+        }
         item.url = `${HREF_UPLOAD_URL}${item.uid}&partyDoc=true`;
         return item;
       });
@@ -272,6 +277,7 @@ const EditModalButton = memo<any>(props => {
         },
       ];
     }
+
     return val;
   };
 
@@ -599,7 +605,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format="YYYY-MM-DD"
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
@@ -644,7 +656,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format="YYYY-MM-DD"
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
@@ -700,7 +718,7 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker editing={editable} />)}
+                          })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                         </FormItem>
                       ),
                     },
@@ -810,7 +828,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format="YYYY-MM-DD"
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
@@ -825,7 +849,13 @@ const EditModalButton = memo<any>(props => {
                                 required: false,
                               },
                             ],
-                          })(<DatePicker disabled={disabled} editing={editable} />)}
+                          })(
+                            <DatePicker
+                              disabled={disabled}
+                              editing={editable}
+                              format="YYYY-MM-DD"
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
@@ -1057,7 +1087,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1089,7 +1128,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1121,7 +1169,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1153,7 +1210,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1185,7 +1251,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1217,7 +1292,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1249,7 +1333,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1281,7 +1374,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1313,7 +1415,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1345,7 +1456,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1377,7 +1497,16 @@ const EditModalButton = memo<any>(props => {
                       render: (val, record, index, { form }) => {
                         val = handleValue(val);
                         return (
-                          <FormItem hasFeedback={!!(!disabled && val && val.length > 0)}>
+                          <FormItem
+                            hasFeedback={
+                              !!(
+                                !disabled &&
+                                val &&
+                                val.length > 0 &&
+                                _.get(val, '[0]status') !== 'error'
+                              )
+                            }
+                          >
                             {form.getFieldDecorator({
                               rules: [
                                 {
@@ -1449,6 +1578,9 @@ const EditModalButton = memo<any>(props => {
                   if (item.endsWith('Doc') || item === 'creditAgreement') {
                     baseData[item] = baseFormData[item].value
                       .map(param => {
+                        if (param.status === 'error') {
+                          return null;
+                        }
                         if (param.id) {
                           return param.id;
                         }

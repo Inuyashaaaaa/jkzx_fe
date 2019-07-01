@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
   FREQUENCY_TYPE_MAP,
@@ -23,8 +25,6 @@ import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
 import { getMoment, getCurDateMoment } from '@/tools';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -250,7 +250,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE] = getMoment(
-      nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE]
+      nextPosition.asset[LEG_FIELD.DOWN_BARRIER_DATE],
     ).format('YYYY-MM-DD');
 
     nextPosition.asset.settlementDate =
@@ -260,10 +260,13 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
 
     nextPosition.asset.fixingObservations =
       dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
-      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce((result, item) => {
-        result[item[OB_DAY_FIELD]] = item.price !== undefined ? item.price : null;
-        return result;
-      }, {});
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
+        (result, item) => ({
+          ...result,
+          [item[OB_DAY_FIELD]]: item.price !== undefined ? item.price : null,
+        }),
+        {},
+      );
 
     nextPosition.asset.annualized = true;
 
@@ -277,11 +280,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
         [OB_DAY_FIELD]: key,
         price: data[key],
       })),
-      [LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY]: data2.map(key => {
-        return {
-          [OB_DAY_FIELD]: key,
-        };
-      }),
+      [LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY]: data2,
       [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
       [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
       // [LEG_FIELD.ALREADY_BARRIER]: position.lcmEventType === 'KNOCK_IN' ? true : false,
@@ -297,7 +296,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -307,7 +306,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });

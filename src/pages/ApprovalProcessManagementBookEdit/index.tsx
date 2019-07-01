@@ -174,7 +174,7 @@ const TradeManagementBooking = props => {
 
   const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
   return (
-    <Page>
+    <>
       {tableLoading ? (
         <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
@@ -270,7 +270,7 @@ const TradeManagementBooking = props => {
           </Button>
         </Row>
       ) : null}
-    </Page>
+    </>
   );
 };
 

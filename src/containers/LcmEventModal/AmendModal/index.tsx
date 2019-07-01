@@ -1,6 +1,6 @@
 import { Modal, message, Alert, InputNumber, Checkbox } from 'antd';
 import _ from 'lodash';
-import React, { memo, useState, useRef } from 'react';
+import React, { memo, useState, useRef, useEffect } from 'react';
 import moment from 'moment';
 import FormItem from 'antd/lib/form/FormItem';
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD, DATE_ARRAY } from '@/constants/common';
@@ -87,6 +87,19 @@ const AmendModal = memo<IAmendModal>(props => {
       ...changedFields,
     });
   };
+
+  useEffect(() => {
+    if ($form.current && !createCash) {
+      const { cashFlowChange } = cashData;
+      setCashData({
+        ...cashData,
+        cashFlowChange: {
+          ...cashFlowChange,
+          errors: undefined,
+        },
+      });
+    }
+  }, [createCash]);
 
   const handleChange = e => {
     setCreateCash(e.target.checked);
@@ -238,7 +251,7 @@ const AmendModal = memo<IAmendModal>(props => {
               render: (value, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({
-                    rules: [{ required: true, message: '现金流金额为必填项' }],
+                    rules: [{ required: createCash, message: '现金流金额为必填项' }],
                   })(<InputNumber style={{ width: 200 }} editing={false} disabled={!createCash} />)}
                 </FormItem>
               ),
@@ -249,7 +262,7 @@ const AmendModal = memo<IAmendModal>(props => {
               render: (value, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({
-                    rules: [{ required: true, message: '支付日期为必填项' }],
+                    rules: [{ required: createCash, message: '支付日期为必填项' }],
                   })(
                     <DatePicker
                       style={{ width: 200 }}

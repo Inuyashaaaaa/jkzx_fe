@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, SmartTable } from '@/containers';
 import {
@@ -55,12 +56,12 @@ const ClientManagementInsert = memo<any>(props => {
 
     const params = handleFundChange(_data.accountId, fundType, partyData, counterPartyData);
     const { error, data } = await clientSaveAccountOpRecord(params);
-    setVisible(false);
 
     if (error) {
       message.error('录入失败');
       return;
     }
+    setVisible(false);
     message.success('录入成功');
     props.fetchTable();
   };
@@ -112,7 +113,7 @@ const ClientManagementInsert = memo<any>(props => {
         counterPartyFundChange: 0,
         counterPartyCreditBalanceChange: 0,
         counterPartyMarginChange: 0,
-      })
+      }),
     );
     setPartyFormData(
       Form2.createFields({
@@ -121,7 +122,7 @@ const ClientManagementInsert = memo<any>(props => {
         debtChange: 0,
         premiumChange: 0,
         marginChange: 0,
-      })
+      }),
     );
     setVisible(true);
   };
@@ -169,7 +170,7 @@ const ClientManagementInsert = memo<any>(props => {
       Form2.createFields({
         legalName: allValues.legalName,
         normalStatus: _data.normalStatus ? '正常' : '异常',
-      })
+      }),
     );
   };
 

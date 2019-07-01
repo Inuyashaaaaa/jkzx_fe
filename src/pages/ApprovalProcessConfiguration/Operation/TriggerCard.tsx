@@ -304,6 +304,7 @@ const TriggerCard = memo<any>(props => {
         onOk={handleTargetOk}
         onCancel={handleTargetCancel}
         confirmLoading={loading}
+        maskClosable={false}
       >
         <Form2
           ref={node => {
