@@ -3,38 +3,38 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import router from 'umi/router';
-import { getToken } from '@/tools/authority';
+import { Form2, InputNumber, Upload } from '@/containers';
+import { UPLOAD_URL, wkProcessGet, wkProcessInstanceCreate } from '@/services/approval';
 import {
   clientUpdateCredit,
   wkAttachmentProcessInstanceBind,
 } from '@/services/reference-data-service';
-import { UPLOAD_URL, wkProcessGet, wkProcessInstanceCreate } from '@/services/approval';
-import { Form2, InputNumber, Upload } from '@/containers';
+import { getToken } from '@/tools/authority';
 
 class Operation extends PureComponent<{ record: any; fetchTable: any }> {
   public $form: Form2 = null;
 
   public state = {
     visible: false,
-    formData: {
-      counterPartyCredit: {
-        type: 'field',
-        value: this.props.record.counterPartyCredit,
-      },
-      credit: {
-        type: 'field',
-        value: this.props.record.credit,
-      },
-    },
+    formData: {},
     modalVisible: false,
     fileList: [],
     attachmentId: null,
   };
 
   public switchModal = () => {
-    const { visible } = this.state;
     this.setState({
-      visible: !visible,
+      visible: true,
+      formData: Form2.createFields({
+        counterPartyCredit: this.props.record.counterPartyCredit,
+        credit: this.props.record.credit,
+      }),
+    });
+  };
+
+  public hideModal = () => {
+    this.setState({
+      visible: false,
     });
   };
 
@@ -96,6 +96,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       });
       if (aerror) return true;
     }
+    return true;
   };
 
   public onFieldsChange = (props, changedFields, allFields) => {
@@ -126,7 +127,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
         <Modal
           visible={this.state.visible}
           onOk={this.onConfirm}
-          onCancel={this.switchModal}
+          onCancel={this.hideModal}
           title="调整授信额度"
         >
           <Form2
