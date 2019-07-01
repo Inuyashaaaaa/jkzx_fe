@@ -1,12 +1,5 @@
-/* eslint-disable */
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { Form2, Select, Table2, SmartTable, Loading } from '@/containers';
-import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
-import {
-  trdPortfolioDelete,
-  trdPortfolioUpdate,
-  trdTradePortfolioCreateBatch,
-} from '@/services/trade-service';
+/* eslint-disable consistent-return */
+/* eslint-disable no-nested-ternary */
 import {
   Button,
   Icon,
@@ -23,6 +16,14 @@ import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
+import {
+  trdPortfolioDelete,
+  trdPortfolioUpdate,
+  trdTradePortfolioCreateBatch,
+} from '@/services/trade-service';
+import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
+import { Form2, Select, Table2, SmartTable, Loading } from '@/containers';
+import { VERTICAL_GUTTER } from '@/constants/global';
 import styles from './Action.less';
 import { BOOKING_TABLE_COLUMN_DEFS } from './tools';
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '@/constants/component';
@@ -47,7 +48,6 @@ class Action extends PureComponent<any, any> {
       },
       tableDataSource: [],
       portfolioName: props.params.data.portfolioName,
-      tradeIdsData: [],
     };
   }
 
@@ -189,31 +189,21 @@ class Action extends PureComponent<any, any> {
     if (error) return;
     if (_.isEmpty(data)) return;
 
-    const dataSource = data.page.map(item => {
-      return [
-        ...item.positions.map((node, key) => {
-          return {
-            ...item,
-            ..._.omit(node, ['bookName']),
-            ...node.asset,
-            ...(item.positions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
-            ...(item.positions.length <= 1
-              ? null
-              : key === 0
-              ? { timeLineNumber: item.positions.length }
-              : null),
-          };
-        }),
-      ];
-    });
+    const dataSource = data.page.map(item => [
+      ...item.positions.map((node, key) => ({
+        ...item,
+        ..._.omit(node, ['bookName']),
+        ...node.asset,
+        ...(item.positions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
+        ...(item.positions.length <= 1
+          ? null
+          : key === 0
+          ? { timeLineNumber: item.positions.length }
+          : null),
+      })),
+    ]);
 
-    const tableDataSource = _.reduce(
-      dataSource,
-      (result, next) => {
-        return result.concat(next);
-      },
-      [],
-    );
+    const tableDataSource = _.reduce(dataSource, (result, next) => result.concat(next), []);
 
     this.setState({
       tableDataSource,
@@ -322,7 +312,9 @@ class Action extends PureComponent<any, any> {
             </p>
           )}
           <Form2
-            ref={node => (this.$table2 = node)}
+            ref={node => {
+              this.$table2 = node;
+            }}
             layout="inline"
             dataSource={this.state.searchFormData}
             submitText="加入投资组合"
@@ -332,36 +324,31 @@ class Action extends PureComponent<any, any> {
             columns={[
               {
                 dataIndex: 'tradeId',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({})(
-                        <Select
-                          style={{ minWidth: 180 }}
-                          placeholder="请输入交易ID查询"
-                          allowClear
-                          showSearch
-                          fetchOptionsOnSearch
-                          style={{ minWidth: '200px' }}
-                          mode="multiple"
-                          options={
-                            this.state.bookIdList.length
-                              ? this.state.bookIdList.map(item => {
-                                  return {
-                                    label: item,
-                                    value: item,
-                                  };
-                                })
-                              : async (value: string = '') => {
-                                  const data = await this.fetchTradeGroupByTradeId(value);
-                                  return data.slice(0, 100);
-                                }
-                          }
-                        />,
-                      )}
-                    </FormItem>
-                  );
-                },
+                render: (val, record, index, { form, editing }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({})(
+                      <Select
+                        style={{ minWidth: 200 }}
+                        placeholder="请输入交易ID查询"
+                        allowClear
+                        showSearch
+                        fetchOptionsOnSearch
+                        mode="multiple"
+                        options={
+                          this.state.bookIdList.length
+                            ? this.state.bookIdList.map(item => ({
+                                label: item,
+                                value: item,
+                              }))
+                            : async (value: string = '') => {
+                                const data = await this.fetchTradeGroupByTradeId(value);
+                                return data.slice(0, 100);
+                              }
+                        }
+                      />,
+                    )}
+                  </FormItem>
+                ),
               },
             ]}
           />
