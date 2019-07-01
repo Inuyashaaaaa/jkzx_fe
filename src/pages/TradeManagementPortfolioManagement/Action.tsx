@@ -181,7 +181,7 @@ class Action extends PureComponent<any, any> {
     this.setState({ loading: true });
     const { error, data } = await trdTradeSearchIndexPaged({
       page: (paramsPagination || pagination).current - 1,
-      pageSize: PAGE_SIZE,
+      pageSize: (paramsPagination || pagination).pageSize,
       portfolioNames: paramsPagination ? paramsPagination.portfolioNames : null,
     });
     this.setState({ loading: false });
@@ -274,21 +274,11 @@ class Action extends PureComponent<any, any> {
   };
 
   public onPagination = (current, pageSize) => {
-    this.setState(
-      {
-        pagination: {
-          current,
-          pageSize,
-        },
-      },
-      () => {
-        this.onTradeTableSearch({
-          current,
-          pageSize,
-          portfolioNames: [this.state.portfolio.portfolioName],
-        });
-      },
-    );
+    this.onTradeTableSearch({
+      current,
+      pageSize,
+      portfolioNames: [this.state.portfolio.portfolioName],
+    });
   };
 
   public status: any;
