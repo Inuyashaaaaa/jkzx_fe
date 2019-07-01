@@ -306,7 +306,7 @@ const TRIGGER_INFO = common.concat([
   },
   {
     value: 'DELETE_TRIGGER',
-    zh: '删除触发器"',
+    zh: '删除触发器',
   },
 ]);
 
