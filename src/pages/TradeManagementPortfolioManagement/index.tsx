@@ -1,4 +1,4 @@
-import { Divider, message, Row, Table } from 'antd';
+import { Divider, message, Row, Modal, Button } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
@@ -45,11 +45,11 @@ export const RESOURCE_FORM_CONTROLS: IFormColDef[] = [
 
 class TradeManagementPortfolioManagement extends PureComponent<any, any> {
   public state = {
-    visible: false,
     dataSource: [],
     loading: false,
     searchFormData: {},
     createFormData: {},
+    createVisible: false,
   };
 
   public $createForm: Form = null;
@@ -79,25 +79,12 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
     });
   };
 
-  public switchModal = callback => {
-    const { visible } = this.state;
-    this.setState(
-      {
-        visible: !visible,
-      },
-      callback,
-    );
-  };
-
-  public onModalClick = () => {
-    this.switchModal();
-  };
-
   public onCreate = async () => {
     try {
       if (!this.$createForm) return;
 
       const result = await this.$createForm.validate();
+      console.log(result);
       if (result.error) return;
 
       const { error } = await trdPortfolioCreate(Form2.getFieldsValue(this.state.createFormData));
@@ -105,14 +92,26 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
         message.error('新建失败');
         return;
       }
+      this.setState(
+        {
+          createVisible: false,
+        },
+        () => {
+          this.setState({
+            createFormData: {},
+          });
+          message.success('新建成功');
+          this.search();
+        },
+      );
 
-      this.switchModal(() => {
-        this.setState({
-          createFormData: {},
-        });
-        message.success('新建成功');
-        this.search();
-      });
+      // this.switchModal(() => {
+      //   this.setState({
+      //     createFormData: {},
+      //   });
+      //   message.success('新建成功');
+      //   this.search();
+      // });
     } catch (err) {
       console.log(err);
     }
@@ -145,6 +144,18 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
   public onFieldsChange = (props, changedFields, allFields) => {
     this.setState({
       searchFormData: allFields,
+    });
+  };
+
+  public showModal = () => {
+    this.setState({
+      createVisible: true,
+    });
+  };
+
+  public onCancel = () => {
+    this.setState({
+      createVisible: false,
     });
   };
 
@@ -198,26 +209,9 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
         />
         <Divider type="horizontal" />
         <Row style={{ marginBottom: VERTICAL_GUTTER }} type="flex" justify="start">
-          <ModalButton
-            type="primary"
-            content={
-              <Form2
-                ref={node => {
-                  this.$createForm = node;
-                }}
-                footer={false}
-                columns={RESOURCE_FORM_CONTROLS}
-                dataSource={this.state.createFormData}
-                onFieldsChange={this.onCreateFormDataChange}
-              />
-            }
-            modalProps={{
-              title: '新建投资组合名称',
-              onOk: this.onCreate,
-            }}
-          >
+          <Button type="primary" onClick={this.showModal}>
             新建
-          </ModalButton>
+          </Button>
         </Row>
         <SmartTable
           rowKey="uuid"
@@ -238,6 +232,22 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
           ]}
           loading={this.state.loading}
         />
+        <Modal
+          title="新建投资组合"
+          onOk={this.onCreate}
+          visible={this.state.createVisible}
+          onCancel={this.onCancel}
+        >
+          <Form2
+            ref={node => {
+              this.$createForm = node;
+            }}
+            footer={false}
+            columns={RESOURCE_FORM_CONTROLS}
+            dataSource={this.state.createFormData}
+            onFieldsChange={this.onCreateFormDataChange}
+          />
+        </Modal>
       </Page>
     );
   }
