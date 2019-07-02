@@ -1,5 +1,8 @@
+import { Button, message, Modal, Row, TreeSelect } from 'antd';
+import React, { PureComponent } from 'react';
+import FormItem from 'antd/lib/form/FormItem';
 import { VERTICAL_GUTTER } from '@/constants/global';
-import { SmartTable } from '@/containers';
+import { SmartTable, Form2, Input } from '@/containers';
 import Form from '@/containers/Form';
 import Page from '@/containers/Page';
 import { queryAuthDepartmentList } from '@/services/department';
@@ -9,10 +12,27 @@ import {
   queryNonGroupResource,
   updateNonGroupResource,
 } from '@/services/tradeBooks';
-import { Button, message, Modal, Row } from 'antd';
-import React, { PureComponent } from 'react';
 import { CREATE_FORM_CONTROLS } from './constants';
 import Operation from './Operation';
+
+function departmentsTreeData(departments) {
+  function getChild(params) {
+    if (params.children) {
+      return {
+        title: params.departmentName,
+        value: params.id,
+        key: params.id,
+        children: params.children.map(item => getChild(item)),
+      };
+    }
+    return {
+      title: params.departmentName,
+      value: params.id,
+      key: params.id,
+    };
+  }
+  return departments && getChild(departments);
+}
 
 function findDepartment(departs, departId) {
   let hint = {};
@@ -21,15 +41,14 @@ function findDepartment(departs, departId) {
       hint = d;
       return;
     }
-    const children = d.children;
+    const { children } = d;
     if (children && children.length > 0) {
       const target = children.find(c => c.id === departId);
       if (target) {
         hint = target;
         return;
-      } else {
-        children.forEach(c => inner(c));
       }
+      children.forEach(c => inner(c));
     }
   }
   inner(departs);
@@ -39,13 +58,15 @@ function findDepartment(departs, departId) {
 class SystemSettingsTradeBooks extends PureComponent {
   public initialFetchTableData = null;
 
+  public $form: Form2 = null;
+
   public state = {
-    rowData: [],
     loading: false,
     books: [],
     visible: false,
     createFormData: {},
     confirmLoading: false,
+    departments: [],
   };
 
   public componentDidMount() {
@@ -67,20 +88,24 @@ class SystemSettingsTradeBooks extends PureComponent {
     const books = tradeBooks.data || [];
     const currentBooks = books.map(book => {
       const result = findDepartment(departments.data, book.departmentId);
-      book.departmentName = result.departmentName;
-      return { departmentName: result.departmentName, ...book };
+      // book.departmentName = result.departmentName;
+      return { ...book, departmentName: result.departmentName };
     });
-    this.setState({
-      books: currentBooks.sort((a, b) => {
-        return a.resourceName.localeCompare(b.resourceName);
-      }),
+    return this.setState({
+      books: currentBooks.sort((a, b) => a.resourceName.localeCompare(b.resourceName)),
       loading: false,
+      departments: departments.data || [],
     });
   };
 
   public onCreateBook = async () => {
+    const res = await this.$form.validate();
+    if (res.error) {
+      return;
+    }
+
     this.setState({ confirmLoading: true });
-    const createFormData = this.state.createFormData;
+    const createFormData = Form2.getFieldsValue(this.state.createFormData);
     const params = { resourceType: 'BOOK', ...createFormData };
     const { error, data } = await addNonGroupResource(params);
     this.setState({ confirmLoading: false });
@@ -119,15 +144,26 @@ class SystemSettingsTradeBooks extends PureComponent {
   };
 
   public switchModal = () => {
+    const { visible } = this.state;
     this.setState({
-      visible: !this.state.visible,
+      visible: !visible,
       createFormData: {},
     });
   };
 
-  public onValueChange = params => {
+  // public onValueChange = params => {
+  //   this.setState({
+  //     createFormData: params.values,
+  //   });
+  // };
+
+  public onValueChange = (props, fields, allFields) => {
+    const { createFormData } = this.state;
     this.setState({
-      createFormData: params.values,
+      createFormData: {
+        ...createFormData,
+        ...fields,
+      },
     });
   };
 
@@ -161,9 +197,9 @@ class SystemSettingsTradeBooks extends PureComponent {
             },
             {
               title: '操作',
-              render: (text, record, index) => {
-                return <Operation record={text} fetchTable={this.fetchTable} />;
-              },
+              render: (text, record, index) => (
+                <Operation record={text} fetchTable={this.fetchTable} />
+              ),
             },
           ]}
           rowKey="resourceName"
@@ -176,12 +212,59 @@ class SystemSettingsTradeBooks extends PureComponent {
           visible={this.state.visible}
           confirmLoading={this.state.confirmLoading}
         >
-          <Form
+          {/* <Form
             footer={false}
             controlNumberOneRow={1}
             dataSource={this.state.createFormData}
             controls={CREATE_FORM_CONTROLS}
             onValueChange={this.onValueChange}
+          /> */}
+          <Form2
+            ref={node => {
+              this.$form = node;
+            }}
+            dataSource={this.state.createFormData}
+            onFieldsChange={this.onValueChange}
+            footer={false}
+            columns={[
+              {
+                title: '交易簿名称',
+                dataIndex: 'resourceName',
+                render: (val, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '交易簿名称为必填项',
+                        },
+                      ],
+                    })(<Input />)}
+                  </FormItem>
+                ),
+              },
+              {
+                title: '部门',
+                dataIndex: 'departmentId',
+                render: (val, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '部门为必填项',
+                        },
+                      ],
+                    })(
+                      <TreeSelect
+                        treeData={departmentsTreeData(this.state.departments)}
+                        treeDefaultExpandAll
+                      />,
+                    )}
+                  </FormItem>
+                ),
+              },
+            ]}
           />
         </Modal>
       </Page>
