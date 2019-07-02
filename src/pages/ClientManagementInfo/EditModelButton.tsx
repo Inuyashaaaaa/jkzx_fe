@@ -322,7 +322,12 @@ const EditModalButton = memo<any>(props => {
                                 message: '必填',
                               },
                             ],
-                          })(<Input disabled editing={editable} />)}
+                          })(
+                            <Input
+                              disabled={props.processInstanceId ? false : true}
+                              editing={editable}
+                            />,
+                          )}
                         </FormItem>
                       ),
                     },
