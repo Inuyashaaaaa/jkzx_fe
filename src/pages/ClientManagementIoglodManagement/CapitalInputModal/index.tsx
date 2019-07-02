@@ -1,3 +1,5 @@
+import { Button, Card, Col, message, Modal, Row } from 'antd';
+import React, { memo, useRef, useState } from 'react';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, SmartTable } from '@/containers';
 import {
@@ -5,8 +7,6 @@ import {
   clientSaveAccountOpRecord,
   trdTradeIdListByCounterPartyName,
 } from '@/services/reference-data-service';
-import { Button, Card, Col, message, Modal, Row } from 'antd';
-import React, { memo, useRef, useState } from 'react';
 import {
   COUNTER_PARTY_FORM_CONTROLS,
   LEGAL_FORM_CONTROLS,
@@ -29,41 +29,6 @@ const ClientManagementInsert = memo<any>(props => {
   const [partyFormData, setPartyFormData] = useState({});
   const [counterPartyFormData, setCounterPartyFormData] = useState({});
   const [tradeIds, setTradeIds] = useState([]);
-
-  const handleConfirm = async () => {
-    const rsp = await Promise.all([
-      formEl.current.validate(),
-      formTrade.current.validate(),
-      partyForm.current.validate(),
-      counterPartyForm.current.validate(),
-    ]);
-    if (rsp.some(item => item.error)) return;
-    handlePageData2apiData();
-  };
-
-  const handlePageData2apiData = async () => {
-    setConfirmLoading(true);
-    const fundType = Form2.getFieldsValue(tradeFormData).event;
-    const partyData = Form2.getFieldsValue(partyFormData);
-    const counterPartyData = Form2.getFieldsValue(counterPartyFormData);
-    const { error: _error, data: _data } = await clientAccountGetByLegalName({
-      legalName: Form2.getFieldsValue(legalFormData).legalName,
-    });
-
-    setConfirmLoading(false);
-    if (_error) return;
-
-    const params = handleFundChange(_data.accountId, fundType, partyData, counterPartyData);
-    const { error, data } = await clientSaveAccountOpRecord(params);
-    setVisible(false);
-
-    if (error) {
-      message.error('录入失败');
-      return;
-    }
-    message.success('录入成功');
-    props.fetchTable();
-  };
 
   const handleFundChange = (accountId, fundType, partyData, counterPartyData) => {
     let event;
@@ -89,6 +54,41 @@ const ClientManagementInsert = memo<any>(props => {
     };
   };
 
+  const handlePageData2apiData = async () => {
+    setConfirmLoading(true);
+    const fundType = Form2.getFieldsValue(tradeFormData).event;
+    const partyData = Form2.getFieldsValue(partyFormData);
+    const counterPartyData = Form2.getFieldsValue(counterPartyFormData);
+    const { error: _error, data: _data } = await clientAccountGetByLegalName({
+      legalName: Form2.getFieldsValue(legalFormData).legalName,
+    });
+
+    setConfirmLoading(false);
+    if (_error) return;
+
+    const params = handleFundChange(_data.accountId, fundType, partyData, counterPartyData);
+    const { error, data } = await clientSaveAccountOpRecord(params);
+
+    if (error) {
+      message.error('录入失败');
+      return;
+    }
+    setVisible(false);
+    message.success('录入成功');
+    props.fetchTable();
+  };
+
+  const handleConfirm = async () => {
+    const rsp = await Promise.all([
+      formEl.current.validate(),
+      formTrade.current.validate(),
+      partyForm.current.validate(),
+      counterPartyForm.current.validate(),
+    ]);
+    if (rsp.some(item => item.error)) return;
+    handlePageData2apiData();
+  };
+
   const handleCancel = () => {
     setVisible(false);
   };
@@ -112,7 +112,7 @@ const ClientManagementInsert = memo<any>(props => {
         counterPartyFundChange: 0,
         counterPartyCreditBalanceChange: 0,
         counterPartyMarginChange: 0,
-      })
+      }),
     );
     setPartyFormData(
       Form2.createFields({
@@ -121,28 +121,28 @@ const ClientManagementInsert = memo<any>(props => {
         debtChange: 0,
         premiumChange: 0,
         marginChange: 0,
-      })
+      }),
     );
     setVisible(true);
   };
 
-  const partyFormChange = (props, changedFields, allFields) => {
+  const partyFormChange = (record, changedFields, allFields) => {
     setPartyFormData(allFields);
   };
 
-  const counterPartyFormChange = (props, changedFields, allFields) => {
+  const counterPartyFormChange = (record, changedFields, allFields) => {
     setCounterPartyFormData(allFields);
   };
 
-  const tableFormChange = (props, changedFields, allFields) => {
+  const tableFormChange = (record, changedFields, allFields) => {
     setTradeFormData(allFields);
   };
 
-  const legalFormChange = async (props, changedFields, allFields) => {
+  const legalFormChange = async (record, changedFields, allFields) => {
     setLegalFormData(allFields);
   };
 
-  const legalFormValueChange = async (props, changedValues, allValues) => {
+  const legalFormValueChange = async (record, changedValues, allValues) => {
     if (changedValues.legalName) {
       setTradeIds([]);
     }
@@ -157,19 +157,17 @@ const ClientManagementInsert = memo<any>(props => {
       ]);
     const [{ error, data }, { error: _error, data: _data }] = await requests();
     if (error || _error) return;
-    const tradeIds = data.map(item => {
-      return {
-        label: item,
-        value: item,
-      };
-    });
-    setTradeIds(tradeIds);
+    const tempTradeId = data.map(item => ({
+      label: item,
+      value: item,
+    }));
+    setTradeIds(tempTradeId);
     setTableDataSource([_data]);
     setLegalFormData(
       Form2.createFields({
         legalName: allValues.legalName,
         normalStatus: _data.normalStatus ? '正常' : '异常',
-      })
+      }),
     );
   };
 
@@ -183,10 +181,12 @@ const ClientManagementInsert = memo<any>(props => {
         visible={visible}
         width={1000}
         confirmLoading={confirmLoading}
-        destroyOnClose={true}
+        destroyOnClose
       >
         <Form2
-          ref={node => (formEl.current = node)}
+          ref={node => {
+            formEl.current = node;
+          }}
           columnNumberOneRow={3}
           footer={false}
           dataSource={legalFormData}
@@ -202,7 +202,9 @@ const ClientManagementInsert = memo<any>(props => {
           style={{ marginBottom: VERTICAL_GUTTER }}
         />
         <Form2
-          ref={node => (formTrade.current = node)}
+          ref={node => {
+            formTrade.current = node;
+          }}
           footer={false}
           columnNumberOneRow={3}
           dataSource={tradeFormData}
@@ -218,7 +220,9 @@ const ClientManagementInsert = memo<any>(props => {
             >
               <Form2
                 columns={PARTY_FORM_CONTROLS}
-                ref={node => (partyForm.current = node)}
+                ref={node => {
+                  partyForm.current = node;
+                }}
                 footer={false}
                 dataSource={partyFormData}
                 onFieldsChange={partyFormChange}
@@ -233,7 +237,9 @@ const ClientManagementInsert = memo<any>(props => {
             >
               <Form2
                 columns={COUNTER_PARTY_FORM_CONTROLS}
-                ref={node => (counterPartyForm.current = node)}
+                ref={node => {
+                  counterPartyForm.current = node;
+                }}
                 footer={false}
                 dataSource={counterPartyFormData}
                 onFieldsChange={counterPartyFormChange}

@@ -435,18 +435,4 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
       ],
     },
   },
-  // {
-  //   control: {
-  //     label: '合约乘数',
-  //   },
-  //   field: 'multiplier',
-  //   input: INPUT_NUMBER_DIGITAL_CONFIG,
-  //   decorator: {
-  //     rules: [
-  //       {
-  //         required: true,
-  //       },
-  //     ],
-  //   },
-  // },
 ];

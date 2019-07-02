@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   wkApproveGroupCreate,
   wkApproveGroupDelete,
@@ -38,7 +39,7 @@ class AuditLists extends PureComponent {
     } else {
       const newList = [];
       const approveGroupList = this.state.approveGroupList.filter(
-        item => item.approveGroupId !== param.approveGroupId
+        item => item.approveGroupId !== param.approveGroupId,
       );
 
       this.state.approveGroupList.forEach(item => {
@@ -71,7 +72,7 @@ class AuditLists extends PureComponent {
       },
       () => {
         this.changeGroupList();
-      }
+      },
     );
   };
 
@@ -100,7 +101,7 @@ class AuditLists extends PureComponent {
       },
       () => {
         this.changeGroupList();
-      }
+      },
     );
   };
 
@@ -148,7 +149,7 @@ class AuditLists extends PureComponent {
         },
         () => {
           this.changeGroupList();
-        }
+        },
       );
       return;
     }
@@ -174,7 +175,7 @@ class AuditLists extends PureComponent {
         },
         () => {
           this.changeGroupList();
-        }
+        },
       );
     }
   };
@@ -233,9 +234,9 @@ class AuditLists extends PureComponent {
                     <List.Item.Meta
                       title={
                         <>
-                          <a className={styles.name} onClick={() => this.handleMenber(item)}>
+                          <span className={styles.name} onClick={() => this.handleMenber(item)}>
                             {item.approveGroupName}
-                          </a>
+                          </span>
                           <span className={styles.icon}>
                             <Icon type="edit" onClick={() => this.showModal(item)} />
                             <Popconfirm

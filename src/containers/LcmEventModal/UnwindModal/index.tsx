@@ -1,3 +1,8 @@
+/*eslint-disable */
+import { Alert, message, Modal } from 'antd';
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import React, { PureComponent } from 'react';
 import {
   BIG_NUMBER_CONFIG,
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -10,10 +15,6 @@ import {
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { Alert, message, Modal } from 'antd';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
-import React, { PureComponent } from 'react';
 import {
   CAN_UNWIND_NUM,
   CAN_UNWIND_PRICE,
@@ -32,18 +33,6 @@ class UnwindModal extends PureComponent<
   },
   any
 > {
-  public data: any;
-
-  public tableFormData: any;
-
-  public currentUser: any;
-
-  public reload: any;
-
-  public $cnyForm: Form;
-
-  public $lotForm: Form;
-
   public state = {
     cnyFormData: {},
     visible: false,
@@ -73,7 +62,7 @@ class UnwindModal extends PureComponent<
               this.computeCnyFormData({
                 [CAN_UNWIND_PRICE]: data[LEG_FIELD.NOTIONAL_AMOUNT],
               }),
-              _.isNull
+              _.isNull,
             ),
           }
         : {
@@ -81,40 +70,40 @@ class UnwindModal extends PureComponent<
               this.computeLotFormData({
                 [CAN_UNWIND_NUM]: data[LEG_FIELD.NOTIONAL_AMOUNT],
               }),
-              _.isNull
+              _.isNull,
             ),
           }),
     });
   };
 
-  public computeCnyFormData = (values, changed = {}) => {
-    return {
-      ...values,
-      [CAN_UNWIND_NUM]: new BigNumber(values[CAN_UNWIND_PRICE])
-        .div(this.data[LEG_FIELD.INITIAL_SPOT])
-        .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [UNWIND_NUM]: new BigNumber(values[UNWIND_PRICE])
-        .div(this.data[LEG_FIELD.INITIAL_SPOT])
-        .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [LEFT_PRICE]: new BigNumber(values[CAN_UNWIND_PRICE])
-        .minus(values[UNWIND_PRICE])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [LEFT_NUM]: new BigNumber(values[CAN_UNWIND_NUM])
-        .minus(values[UNWIND_NUM])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [UNWIND_PER]: new BigNumber(values[UNWIND_TOTAL])
-        .div(values[UNWIND_NUM])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      ...changed,
-    };
-  };
+  public computeCnyFormData = (values, changed = {}) => ({
+    ...values,
+    [CAN_UNWIND_NUM]: new BigNumber(values[CAN_UNWIND_PRICE])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [UNWIND_NUM]: new BigNumber(values[UNWIND_PRICE])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [LEFT_PRICE]: new BigNumber(values[CAN_UNWIND_PRICE])
+      .minus(values[UNWIND_PRICE])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [LEFT_NUM]: new BigNumber(values[CAN_UNWIND_PRICE])
+      .minus(values[UNWIND_PRICE])
+      .div(this.data[LEG_FIELD.INITIAL_SPOT])
+      .div(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [UNWIND_PER]: new BigNumber(values[UNWIND_TOTAL])
+      .div(values[UNWIND_NUM])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    ...changed,
+  });
 
   public onCnyFormDataChange = params => {
     this.setState({
@@ -122,34 +111,34 @@ class UnwindModal extends PureComponent<
     });
   };
 
-  public computeLotFormData = (values, changed = {}) => {
-    return {
-      ...values,
-      [CAN_UNWIND_PRICE]: new BigNumber(values[CAN_UNWIND_NUM])
-        .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [UNWIND_PRICE]: new BigNumber(values[UNWIND_NUM])
-        .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-        .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [LEFT_PRICE]: new BigNumber(values[CAN_UNWIND_PRICE])
-        .minus(values[UNWIND_PRICE])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [LEFT_NUM]: new BigNumber(values[CAN_UNWIND_NUM])
-        .minus(values[UNWIND_NUM])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      [UNWIND_TOTAL]: new BigNumber(values[UNWIND_PER])
-        .multipliedBy(values[UNWIND_NUM])
-        .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-        .toNumber(),
-      ...changed,
-    };
-  };
+  public computeLotFormData = (values, changed = {}) => ({
+    ...values,
+    [CAN_UNWIND_PRICE]: new BigNumber(values[CAN_UNWIND_NUM])
+      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [UNWIND_PRICE]: new BigNumber(values[UNWIND_NUM])
+      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [LEFT_PRICE]: new BigNumber(values[CAN_UNWIND_NUM])
+      .minus(values[UNWIND_NUM])
+      .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+      .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [LEFT_NUM]: new BigNumber(values[CAN_UNWIND_NUM])
+      .minus(values[UNWIND_NUM])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    [UNWIND_TOTAL]: new BigNumber(values[UNWIND_PER])
+      .multipliedBy(values[UNWIND_NUM])
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber(),
+    ...changed,
+  });
 
   public onLotFormDataChange = params => {
     this.setState({
@@ -158,13 +147,13 @@ class UnwindModal extends PureComponent<
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: !this.state.visible,
-    });
+    this.setState(state => ({
+      visible: !state.visible,
+    }));
   };
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    this.setState(state => ({ modalConfirmLoading: !state.modalConfirmLoading }));
   };
 
   public onConfirm = async () => {
@@ -207,7 +196,7 @@ class UnwindModal extends PureComponent<
           // setTimeout(() => {
           //   this.reload();
           // }, 0);
-        }
+        },
       );
     });
   };
@@ -217,6 +206,18 @@ class UnwindModal extends PureComponent<
       exportVisible: false,
     });
   };
+
+  public data: any;
+
+  public tableFormData: any;
+
+  public currentUser: any;
+
+  public reload: any;
+
+  public $cnyForm: Form;
+
+  public $lotForm: Form;
 
   public render() {
     const { cnyFormData, visible } = this.state;
@@ -233,7 +234,7 @@ class UnwindModal extends PureComponent<
           closable={false}
           onCancel={this.switchModal}
           onOk={this.onConfirm}
-          destroyOnClose={true}
+          destroyOnClose
           width={this.state.productType.includes('SPREAD_EUROPEAN') ? 500 : 900}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}

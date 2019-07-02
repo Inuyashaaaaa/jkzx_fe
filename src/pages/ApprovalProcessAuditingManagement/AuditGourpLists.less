@@ -7,27 +7,36 @@
       .ant-spin-container
       > .ant-list-items
       > .ant-list-item:last-child {
-      border: none;
       padding: 0;
+      border: none;
     }
     .ant-list-items {
       padding: '0 15px 15px 15px';
     }
     .ant-list-item:hover {
-      // background: #1890ff;
-      background: rgb(130, 187, 236);
+      background: @primary-1;
     }
   }
 }
+
 .listItem1 {
-  background: #1890ff;
+  background: @primary-color;
+  .name {
+    color: #fff;
+  }
+  :hover {
+    background: @primary-color;
+    .name {
+      color: #fff;
+    }
+  }
 }
 
 .listItem1,
 .listItem2 {
   .icon {
-    visibility: hidden;
     margin-left: 4px;
+    visibility: hidden;
 
     i {
       padding: 9px;
@@ -38,36 +47,38 @@
   &:hover .icon {
     visibility: visible;
   }
+
   .name {
+    display: inline-block;
     width: 150px;
     margin: 3px 0;
-    display: inline-block;
     padding: 3px 0;
     padding-left: 6px;
+    cursor: pointer;
   }
 
   .value {
+    display: inline-block;
     width: 150px;
     margin: 3px 0;
-    display: inline-block;
-    color: rgba(0, 0, 0, 0.65);
     padding: 3px 0;
     padding-left: 6px;
+    color: rgba(0, 0, 0, 0.65);
   }
 
   .background {
+    display: inline-block;
     width: 150px;
     margin: 3px 0;
-    display: inline-block;
-    color: rgba(0, 0, 0, 0.65);
     padding: 3px 0;
     padding-left: 6px;
+    color: rgba(0, 0, 0, 0.65);
     background: #cce7f2;
   }
 
   button {
-    border: none;
     padding: 3px !important;
+    border: none;
   }
 }
 
@@ -80,8 +91,8 @@
 }
 
 .menberTable {
-  width: 100%;
   float: left;
+  width: 100%;
 }
 
 .auditingWrapper {
@@ -97,8 +108,8 @@
 
 .center {
   position: absolute;
-  left: 50%;
   top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
 }
 

@@ -1,5 +1,5 @@
-/* eslint-disable */
-import { Button, Drawer, notification, Popconfirm, Row, Table } from 'antd';
+/* eslint-disable consistent-return */
+import { Button, Drawer, notification, Popconfirm, Row, Spin } from 'antd';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import Page from '@/containers/Page';
@@ -17,52 +17,47 @@ import { SmartTable } from '@/containers';
 class SystemSettingsRoleManagement extends PureComponent {
   public $drawer: DrawerContarner = null;
 
-  public state = {
-    columns: [
-      {
-        title: '用户名',
-        dataIndex: 'username',
-        key: 'username',
-      },
-      {
-        title: '昵称',
-        dataIndex: 'nickName',
-        key: 'nickName',
-      },
-      {
-        title: '部门',
-        dataIndex: 'departmentName',
-        key: 'departmentName',
-      },
-      {
-        title: '操作',
-        key: 'operation',
-        dataIndex: 'operation',
-        render: (text, record) =>
-          this.state.userList.length >= 1 ? (
-            <Popconfirm
-              title="确认移出?"
-              onConfirm={() => this.handleDelete(record.userApproveGroupId)}
-            >
-              <a style={{ color: 'red' }}>移出</a>
-            </Popconfirm>
-          ) : null,
-      },
-    ],
-    userList: null,
-    loading: false,
-    visible: false,
-    formData: {},
-    displayResources: false,
-    choosedRole: {},
-    approveGroupList: [],
-    hover: false,
-    currentGroup: null,
-    department: [],
-  };
-
-  constructor(props) {
+  public constructor(props) {
     super(props);
+    this.state = {
+      columns: [
+        {
+          title: '用户名',
+          dataIndex: 'username',
+          key: 'username',
+        },
+        {
+          title: '昵称',
+          dataIndex: 'nickName',
+          key: 'nickName',
+        },
+        {
+          title: '部门',
+          dataIndex: 'departmentName',
+          key: 'departmentName',
+        },
+        {
+          title: '操作',
+          key: 'operation',
+          dataIndex: 'operation',
+          render: (text, record) =>
+            this.state.userList.length >= 1 ? (
+              <Popconfirm
+                title="确认移出?"
+                onConfirm={() => this.handleDelete(record.userApproveGroupId)}
+              >
+                <a style={{ color: 'red' }}>移出</a>
+              </Popconfirm>
+            ) : null,
+        },
+      ],
+      userList: null,
+      loading: false,
+      visible: false,
+      approveGroupList: [],
+      currentGroup: null,
+      department: [],
+    };
   }
 
   public componentDidMount = () => {
@@ -70,15 +65,15 @@ class SystemSettingsRoleManagement extends PureComponent {
   };
 
   public handleDelete = async key => {
-    const { currentGroup } = this.state;
-    let userList = [...this.state.userList];
-    userList = userList.filter(item => item.userApproveGroupId !== key);
+    const { currentGroup, userList } = this.state;
+    let userListData = [...userList];
+    userListData = userListData.filter(item => item.userApproveGroupId !== key);
 
-    currentGroup.userList = userList;
+    currentGroup.userList = userListData;
     const { data, error } = await wkApproveGroupUserListModify({
       approveGroupId: currentGroup.approveGroupId,
       approveGroupName: currentGroup.approveGroupName,
-      userList: userList.map(item => item.username),
+      userList: userListData.map(item => item.username),
     });
     const { message } = error;
     if (error) {
@@ -96,7 +91,7 @@ class SystemSettingsRoleManagement extends PureComponent {
       visible: false,
     });
 
-    this.setState({ userList });
+    this.setState({ userList: userListData });
   };
 
   public fetchList = async () => {
@@ -117,7 +112,6 @@ class SystemSettingsRoleManagement extends PureComponent {
 
     const cloneDepartments = JSON.parse(JSON.stringify(department.data || {}));
     const array = this.toArray(cloneDepartments);
-
     if (this.$gourpLists) {
       this.$gourpLists.handleMenber(data[0]);
     }
@@ -131,9 +125,8 @@ class SystemSettingsRoleManagement extends PureComponent {
 
   public toArray = data => {
     let array = [];
-    const children = data.children || [];
-    delete data.children;
-    array.push(data);
+    const { children, ...rest } = data;
+    array.push(rest);
 
     array = array.concat(children);
     if (!children) return;
@@ -174,11 +167,11 @@ class SystemSettingsRoleManagement extends PureComponent {
 
   public onBatchAdd = async (param, batchBool) => {
     const { currentGroup } = this.state;
-    const _d = _.intersection(
+    const newData = _.intersection(
       param.map(p => p.username),
       (this.state.currentGroup.userList || []).map(p => p.username),
     );
-    if (_d.length > 0) {
+    if (newData.length > 0) {
       return notification.success({
         message: '该用户已在审批组中',
       });
@@ -200,7 +193,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     }
     notification.success({
       message: batchBool
-        ? `${param.length}个用户成功加入审批组,${currentGroup.userList.length}个用户已在审批组中`
+        ? `${param.length}个用户成功加入审批组,${userList.length}个用户已在审批组中`
         : '成功加入审批组',
     });
 
@@ -235,17 +228,21 @@ class SystemSettingsRoleManagement extends PureComponent {
     userList = (userList || []).sort((a, b) => a.username.localeCompare(b.username));
     userList.map(param => {
       const dp = department.find(obj => obj.id === param.departmentId) || {};
-      param.departmentName = dp.departmentName;
-      return param;
+      return {
+        ...param,
+        departmentName: dp.departmentName,
+      };
     });
     return (
-      <>
+      <Spin size="large" spinning={this.state.loading}>
         <div className={styles.auditingWrapper}>
           <Page>
             <div style={{ width: '400px', background: '#FFF', padding: '30px' }}>
               <p>审批组列表</p>
               <AuditGourpLists
-                ref={node => (this.$gourpLists = node)}
+                ref={node => {
+                  this.$gourpLists = node;
+                }}
                 approveGroupList={this.state.approveGroupList}
                 handleEdit={param => this.onEdit(param)}
                 handleMenber={this.handleMenber}
@@ -292,14 +289,16 @@ class SystemSettingsRoleManagement extends PureComponent {
               }
             >
               <DrawerContarner
-                ref={node => (this.$drawer = node)}
+                ref={node => {
+                  this.$drawer = node;
+                }}
                 onBatchAdd={(param, bool) => this.onBatchAdd(param, bool)}
                 currentGroup={this.state.currentGroup}
               />
             </Drawer>
           </Page>
         </div>
-      </>
+      </Spin>
     );
   }
 }

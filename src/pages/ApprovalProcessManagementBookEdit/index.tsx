@@ -1,4 +1,6 @@
-/* eslint-disable */
+/* eslint-disable import/order */
+/* eslint-disable consistent-return */
+/* eslint-disable no-underscore-dangle */
 import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -83,7 +85,7 @@ const TradeManagementBooking = props => {
       processInstanceId: props.id,
     });
     if (error) return;
-    const _detailData = {
+    const approvalData = {
       tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
       bookName: _.get(data, 'process._business_payload.trade.bookName'),
       tradeDate: moment(_.get(data, 'process._business_payload.trade.tradeDate')),
@@ -93,6 +95,13 @@ const TradeManagementBooking = props => {
         'process._business_payload.trade.positions[0].counterPartyCode',
       ),
       comment: _.get(data, 'process._business_payload.trade.comment'),
+    };
+
+    const mockAddLegItem = async (composePositions, tableFormData) => {
+      composePositions.forEach(position => {
+        const leg = getLegByProductType(position.productType, position.asset.exerciseType);
+        addLeg(leg, position);
+      });
     };
 
     const handleTradeNumber = position => {
@@ -130,16 +139,9 @@ const TradeManagementBooking = props => {
       },
     }));
     setTableLoading(false);
-    setCreateFormData(Form2.createFields(_detailData));
+    setCreateFormData(Form2.createFields(approvalData));
     if (!composePositions) return;
-    mockAddLegItem(composePositions, _detailData);
-  };
-
-  const mockAddLegItem = async (composePositions, tableFormData) => {
-    composePositions.forEach(position => {
-      const leg = getLegByProductType(position.productType, position.asset.exerciseType);
-      addLeg(leg, position);
-    });
+    mockAddLegItem(composePositions, approvalData);
   };
 
   const handelSave = async () => {
@@ -158,6 +160,8 @@ const TradeManagementBooking = props => {
     props.confirmModify(trade);
   };
 
+  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
+
   const handleEventAction = (eventType, params) => {
     lcmEventModalEl.current.show({
       eventType,
@@ -172,9 +176,8 @@ const TradeManagementBooking = props => {
     loadTableData();
   });
 
-  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
   return (
-    <Page>
+    <>
       {tableLoading ? (
         <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
@@ -228,8 +231,8 @@ const TradeManagementBooking = props => {
                     },
                     tableEl.current.setLoadingsByRow,
                     (colId: string, newVal: ITableData) => {
-                      setTableData(pre =>
-                        pre.map(item => {
+                      setTableData(p =>
+                        p.map(item => {
                           if (item[LEG_ID_FIELD] === params.rowId) {
                             return {
                               ...item,
@@ -270,7 +273,7 @@ const TradeManagementBooking = props => {
           </Button>
         </Row>
       ) : null}
-    </Page>
+    </>
   );
 };
 

@@ -1,3 +1,8 @@
+import { Button, Divider, Icon, message, Modal, Row, notification } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import React, { PureComponent } from 'react';
+import uuidv4 from 'uuid';
+import _ from 'lodash';
 import { Form2, Select, SmartTable, Table2 } from '@/containers';
 import Page from '@/containers/Page';
 import ImportExcelButton from '@/containers/_ImportExcelButton';
@@ -8,13 +13,9 @@ import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
-import { Button, Divider, Icon, message, Modal, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import React, { PureComponent } from 'react';
-import uuidv4 from 'uuid';
 import { PAGE_TABLE_COL_DEFS } from './constants';
 import { TABLE_COLUMNS } from './tools';
-import _ from 'lodash';
+
 class ClientManagementMarginManagement extends PureComponent {
   public state = {
     dataSource: [],
@@ -36,7 +37,7 @@ class ClientManagementMarginManagement extends PureComponent {
       },
       () => {
         this.fetchTable();
-      }
+      },
     );
   };
 
@@ -56,10 +57,18 @@ class ClientManagementMarginManagement extends PureComponent {
     this.setState({
       loading: false,
     });
-    if (error) return;
+    if (error) {
+      this.setState({
+        searchFormData: {},
+      });
+      return notification.error({
+        message: `${error.message ? error.message : ''}请重新查询`,
+      });
+    }
     this.setState({
       dataSource: data,
     });
+    return null;
   };
 
   public handleConfirmExcel = () => {
@@ -68,12 +77,8 @@ class ClientManagementMarginManagement extends PureComponent {
         excelVisible: false,
       },
       () => {
-        this.handleExcelFile(
-          this.state.excelData.map(item => {
-            return Form2.getFieldsValue(item);
-          })
-        );
-      }
+        this.handleExcelFile(this.state.excelData.map(item => Form2.getFieldsValue(item)));
+      },
     );
   };
 
@@ -100,7 +105,6 @@ class ClientManagementMarginManagement extends PureComponent {
     this.editDate = {};
     this.setState({
       modalVisible: false,
-      formItems: [],
       modalLoading: false,
     });
   };
@@ -110,8 +114,9 @@ class ClientManagementMarginManagement extends PureComponent {
   };
 
   public handleCellValueChanged = params => {
+    const { excelData } = this.state;
     this.setState({
-      excelData: this.state.excelData.map(item => {
+      excelData: excelData.map(item => {
         if (item.uuid === params.record.uuid) {
           return params.record;
         }
@@ -126,7 +131,7 @@ class ClientManagementMarginManagement extends PureComponent {
         <Form2
           layout="inline"
           dataSource={this.state.searchFormData}
-          submitText={'查询'}
+          submitText="查询"
           submitButtonProps={{
             icon: 'search',
           }}
@@ -137,60 +142,56 @@ class ClientManagementMarginManagement extends PureComponent {
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (value: string = '') => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '主协议编号',
               dataIndex: 'masterAgreementId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refMasterAgreementSearch({
-                            masterAgreementId: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (value: string = '') => {
+                        const { data, error } = await refMasterAgreementSearch({
+                          masterAgreementId: value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
@@ -254,18 +255,16 @@ class ClientManagementMarginManagement extends PureComponent {
                 marginBottom: '20px',
               }}
               onImport={data => {
-                const _data = data.data[0][Object.keys(data.data[0])[0]];
+                const importData = data.data[0][Object.keys(data.data[0])[0]];
                 this.setState({
                   excelVisible: true,
-                  excelData: _data.map(item => {
-                    return {
-                      ...Form2.createFields({
-                        legalName: item[0],
-                        maintenanceMargin: _.isNumber(item[1]) ? item[1] : 0,
-                      }),
-                      uuid: uuidv4(),
-                    };
-                  }),
+                  excelData: importData.map(item => ({
+                    ...Form2.createFields({
+                      legalName: item[0],
+                      maintenanceMargin: _.isNumber(item[1]) ? item[1] : 0,
+                    }),
+                    uuid: uuidv4(),
+                  })),
                 });
               }}
             >

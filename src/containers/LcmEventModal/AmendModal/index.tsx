@@ -1,6 +1,6 @@
 import { Modal, message, Alert, InputNumber, Checkbox } from 'antd';
 import _ from 'lodash';
-import React, { memo, useState, useRef } from 'react';
+import React, { memo, useState, useRef, useEffect } from 'react';
 import moment from 'moment';
 import FormItem from 'antd/lib/form/FormItem';
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD, DATE_ARRAY } from '@/constants/common';
@@ -15,8 +15,8 @@ import { ITableData } from '@/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import CashExportModal from '@/containers/CashExportModal';
 
-/* eslint-disable */
-
+/* eslint-disable @typescript-eslint/interface-name-prefix */
+/* eslint-disable prefer-rest-params */
 const UN_EDITDIR = [
   LEG_FIELD.UNDERLYER_MULTIPLIER,
   // LEG_FIELD.TERM,
@@ -81,12 +81,25 @@ const AmendModal = memo<IAmendModal>(props => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const tableEl = useRef<IMultiLegTableEl>(null);
 
-  const onFormChange = async (props, changedFields, allFields) => {
+  const onFormChange = async (propsData, changedFields, allFields) => {
     setCashData({
       ...cashData,
       ...changedFields,
     });
   };
+
+  useEffect(() => {
+    if ($form.current && !createCash) {
+      const { cashFlowChange } = cashData;
+      setCashData({
+        ...cashData,
+        cashFlowChange: {
+          ...cashFlowChange,
+          errors: undefined,
+        },
+      });
+    }
+  }, [createCash]);
 
   const handleChange = e => {
     setCreateCash(e.target.checked);
@@ -148,7 +161,8 @@ const AmendModal = memo<IAmendModal>(props => {
               counterPartyCode: store.tableFormData.counterPartyCode,
             });
             setCashModalVisible(true);
-            return setVisible(false);
+            setVisible(false);
+            return;
           }
           if (store.reload) {
             store.reload();
@@ -208,7 +222,6 @@ const AmendModal = memo<IAmendModal>(props => {
               editable(record) {
                 // 拦截字段强制不可编辑
                 if (UN_EDITDIR.find(key => key === item.dataIndex)) return false;
-
                 return typeof item.editable === 'function'
                   ? item.editable.apply(this, arguments)
                   : item.editable;
@@ -220,7 +233,9 @@ const AmendModal = memo<IAmendModal>(props => {
           产生现金流
         </Checkbox>
         <Form2
-          ref={node => ($form.current = node)}
+          ref={node => {
+            $form.current = node;
+          }}
           layout="inline"
           footer={false}
           dataSource={cashData}
@@ -236,7 +251,7 @@ const AmendModal = memo<IAmendModal>(props => {
               render: (value, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({
-                    rules: [{ required: true, message: '现金流金额为必填项' }],
+                    rules: [{ required: createCash, message: '现金流金额为必填项' }],
                   })(<InputNumber style={{ width: 200 }} editing={false} disabled={!createCash} />)}
                 </FormItem>
               ),
@@ -247,7 +262,7 @@ const AmendModal = memo<IAmendModal>(props => {
               render: (value, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({
-                    rules: [{ required: true, message: '支付日期为必填项' }],
+                    rules: [{ required: createCash, message: '支付日期为必填项' }],
                   })(
                     <DatePicker
                       style={{ width: 200 }}

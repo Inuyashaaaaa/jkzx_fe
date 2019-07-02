@@ -1,20 +1,16 @@
+import React from 'react';
+import _ from 'lodash';
+import FormItem from 'antd/lib/form/FormItem';
 import {
   LEG_FIELD,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  PREMIUM_TYPE_MAP,
-  RULES_REQUIRED,
-  STRIKE_TYPES_MAP,
-  REBATETYPE_TYPE_OPTIONS,
   REBATETYPE_TYPE_MAP,
+  REBATETYPE_TYPE_OPTIONS,
 } from '@/constants/common';
-import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/containers';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
+import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React from 'react';
 
 export const RebateType: ILegColDef = {
   title: '补偿支付方式',
@@ -26,30 +22,29 @@ export const RebateType: ILegColDef = {
     }
     return true;
   },
-  defaultEditing: record => {
-    return false;
-  },
+  defaultEditing: record => false,
   render: (val, record, index, { form, editing, colDef }) => {
     const SPECIAL_REBATETYPE_TYPE_OPTIONS = _.reject(
       REBATETYPE_TYPE_OPTIONS,
-      item => item.value === REBATETYPE_TYPE_MAP.PAY_NONE
+      item => item.value === REBATETYPE_TYPE_MAP.PAY_NONE,
     );
+
+    const getSelectOptions = () => {
+      if (
+        Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DOUBLE_SHARK_FIN ||
+        Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DIGITAL_AMERICAN
+      ) {
+        return SPECIAL_REBATETYPE_TYPE_OPTIONS;
+      }
+
+      return REBATETYPE_TYPE_OPTIONS;
+    };
 
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(
-          <Select
-            defaultOpen={editing}
-            editing={editing}
-            options={
-              Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DOUBLE_SHARK_FIN
-                ? SPECIAL_REBATETYPE_TYPE_OPTIONS
-                : REBATETYPE_TYPE_OPTIONS
-            }
-          />
-        )}
+        })(<Select defaultOpen={editing} editing={editing} options={getSelectOptions()} />)}
       </FormItem>
     );
   },
