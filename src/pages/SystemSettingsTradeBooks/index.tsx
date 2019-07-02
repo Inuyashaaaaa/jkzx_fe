@@ -1,4 +1,4 @@
-import { Button, message, Modal, Row, TreeSelect } from 'antd';
+import { Button, message, Modal, Row, TreeSelect, notification } from 'antd';
 import React, { PureComponent } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import { VERTICAL_GUTTER } from '@/constants/global';
@@ -114,6 +114,7 @@ class SystemSettingsTradeBooks extends PureComponent {
       visible: false,
       createFormData: {},
     });
+    message.success('创建成功');
     this.fetchTable();
   };
 
