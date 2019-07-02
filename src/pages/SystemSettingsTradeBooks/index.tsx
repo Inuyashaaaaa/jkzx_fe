@@ -152,12 +152,6 @@ class SystemSettingsTradeBooks extends PureComponent {
     });
   };
 
-  // public onValueChange = params => {
-  //   this.setState({
-  //     createFormData: params.values,
-  //   });
-  // };
-
   public onValueChange = (props, fields, allFields) => {
     const { createFormData } = this.state;
     this.setState({
@@ -213,13 +207,6 @@ class SystemSettingsTradeBooks extends PureComponent {
           visible={this.state.visible}
           confirmLoading={this.state.confirmLoading}
         >
-          {/* <Form
-            footer={false}
-            controlNumberOneRow={1}
-            dataSource={this.state.createFormData}
-            controls={CREATE_FORM_CONTROLS}
-            onValueChange={this.onValueChange}
-          /> */}
           <Form2
             ref={node => {
               this.$form = node;
