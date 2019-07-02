@@ -193,7 +193,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     }
     notification.success({
       message: batchBool
-        ? `${param.length}个用户成功加入审批组,${currentGroup.userList.length}个用户已在审批组中`
+        ? `${param.length}个用户成功加入审批组,${userList.length}个用户已在审批组中`
         : '成功加入审批组',
     });
 
