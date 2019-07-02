@@ -1,13 +1,21 @@
+/* eslint-disable */
+import { Divider, Menu, message, notification } from 'antd';
+import BigNumber from 'bignumber.js';
+import { connect } from 'dva';
+import _ from 'lodash';
+import { evaluate } from 'mathjs';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import { IFormField } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
+  DATE_ARRAY,
+  LEG_ENV_FIELD,
   LEG_FIELD,
   LEG_ID_FIELD,
-  LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  DATE_ARRAY,
   OBSERVATION_TYPE_MAP,
-  FREQUENCY_TYPE_NUM_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -22,7 +30,6 @@ import { Form2 } from '@/containers';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
-import { IFormField } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,
@@ -31,38 +38,25 @@ import {
   countPrice,
   countPricePer,
   countRhoR,
+  countSpreadDelta,
   countStdDelta,
   countTheta,
   countVega,
-  countSpreadStdDelta,
-  countSpreadDelta,
-  countSpreadDeltaCash,
-  countSpreadGamma,
-  countSpreadGammaCash,
-  countSpreadVega,
-  countSpreadCega,
 } from '@/services/cash';
-import { convertTradePositions, createLegDataSourceItem } from '@/services/pages';
+import { convertTradePositions } from '@/services/pages';
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
 import { getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
-import { Divider, Menu, message, notification } from 'antd';
-import BigNumber from 'bignumber.js';
-import { connect } from 'dva';
-import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
+import { computedShift } from '@/tools/leg';
 import ActionBar from './ActionBar';
 import './index.less';
-import { evaluate } from 'mathjs';
-import { computedShift } from '@/tools/leg';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
 const TradeManagementPricing = props => {
-  const tableData = _.map(props.pricingData.tableData, iitem => {
-    return _.mapValues(iitem, (item, key) => {
+  const tableData = _.map(props.pricingData.tableData, iitem =>
+    _.mapValues(iitem, (item, key) => {
       if (_.includes(DATE_ARRAY, key)) {
         return {
           type: 'field',
@@ -70,8 +64,8 @@ const TradeManagementPricing = props => {
         };
       }
       return item;
-    });
-  });
+    }),
+  );
   const { location, tradeManagementBookEditPageData, tradeManagementPricingManagement } = props;
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [curPricingEnv, setCurPricingEnv] = useState(null);
@@ -89,9 +83,9 @@ const TradeManagementPricing = props => {
   useLifecycles(() => {
     if (from === PRICING_FROM_EDITING) {
       const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
-      const recordTypeIsModelXY = record => {
-        return Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
-      };
+
+      const recordTypeIsModelXY = record =>
+        Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
 
       if (editingTableData.some(recordTypeIsModelXY)) {
         message.info('暂不支持自定义产品试定价');
@@ -104,13 +98,13 @@ const TradeManagementPricing = props => {
           if (!leg) return record;
           const omits = _.difference(
             leg.getColumns(LEG_ENV.EDITING, record).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex)
+            leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
           );
 
           const result = {
-            ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
             ...leg.getDefaultData(LEG_ENV.PRICING),
-            ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
+            ..._.omit(record, omits),
+            [LEG_ENV_FIELD]: LEG_ENV.PRICING,
             [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
           };
 
@@ -118,24 +112,22 @@ const TradeManagementPricing = props => {
             ? leg.convertEditRecord2PricingData(result)
             : result;
         });
+
       setTableData(next);
     }
   });
 
   const [fetched, setFetched] = useState(false);
 
-  useEffect(
-    () => {
-      if (from === PRICING_FROM_EDITING) {
-        if (fetched) return;
-        if (!curPricingEnv || !curPricingEnv.length) return;
-        if (_.isEmpty(tableData)) return;
-        tableData.forEach(record => fetchDefaultPricingEnvData(record));
-        setFetched(true);
-      }
-    },
-    [tableData, curPricingEnv]
-  );
+  useEffect(() => {
+    if (from === PRICING_FROM_EDITING) {
+      if (fetched) return;
+      if (!curPricingEnv || !curPricingEnv.length) return;
+      if (_.isEmpty(tableData)) return;
+      tableData.forEach(record => fetchDefaultPricingEnvData(record));
+      setFetched(true);
+    }
+  }, [tableData, curPricingEnv]);
 
   const judgeLegColumnsHasError = record => {
     const leg = getLegByRecord(record);
@@ -148,8 +140,8 @@ const TradeManagementPricing = props => {
       leg.getColumns(LEG_ENV.PRICING, record),
       item =>
         !![...TOTAL_TRADESCOL_FIELDS, ...TOTAL_COMPUTED_FIELDS].find(
-          iitem => iitem.dataIndex === item.dataIndex
-        )
+          iitem => iitem.dataIndex === item.dataIndex,
+        ),
     );
 
     const leftKeys = leftColumns.map(item => item.dataIndex);
@@ -172,7 +164,7 @@ const TradeManagementPricing = props => {
     const leg = getLegByRecord(record);
     const selfTradesColDataIndexs = _.intersection(
       leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
-      TRADESCOL_FIELDS
+      TRADESCOL_FIELDS,
     );
     return selfTradesColDataIndexs;
   };
@@ -196,7 +188,7 @@ const TradeManagementPricing = props => {
     const requiredTradeOptions = getSelfTradesColDataIndexs(record).filter(
       item =>
         item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE &&
-        item !== TRADESCOLDEFS_LEG_FIELD_MAP.Q
+        item !== TRADESCOLDEFS_LEG_FIELD_MAP.Q,
     );
 
     // val，q 等都为空，视为默认
@@ -216,7 +208,7 @@ const TradeManagementPricing = props => {
     const [position] = convertTradePositions(
       [Form2.getFieldsValue(_.omit(record, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))],
       {},
-      LEG_ENV.PRICING
+      LEG_ENV.PRICING,
     );
 
     const { error, data = [], raw } = await prcTrialPositionsService({
@@ -238,8 +230,8 @@ const TradeManagementPricing = props => {
 
     const rowId = record[LEG_ID_FIELD];
 
-    setTableData(pre => {
-      return pre.map(item => {
+    setTableData(pre =>
+      pre.map(item => {
         let nextRecord = item;
         if (item[LEG_ID_FIELD] === rowId) {
           const selfTradesColDataIndexs = getSelfTradesColDataIndexs(item);
@@ -252,8 +244,8 @@ const TradeManagementPricing = props => {
                 }>(
                   _.first(data),
                   selfTradesColDataIndexs.filter(
-                    item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE
-                  )
+                    item => item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE,
+                  ),
                 ),
                 val => {
                   if (val) {
@@ -263,8 +255,8 @@ const TradeManagementPricing = props => {
                       .toNumber();
                   }
                   return val;
-                }
-              )
+                },
+              ),
             ),
           };
         }
@@ -278,8 +270,8 @@ const TradeManagementPricing = props => {
         }
 
         return nextRecord;
-      });
-    });
+      }),
+    );
   };
 
   const [pricingEnvironmentsList, setPricingEnvironmentsList] = useState([]);
@@ -311,15 +303,15 @@ const TradeManagementPricing = props => {
 
     const positions = convertTradePositions(
       tableData.map(item =>
-        Form2.getFieldsValue(_.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS]))
+        Form2.getFieldsValue(_.omit(item, [...TRADESCOL_FIELDS, ...COMPUTED_LEG_FIELDS])),
       ),
       {},
-      LEG_ENV.PRICING
+      LEG_ENV.PRICING,
     );
 
     const rsps = await Promise.all(
-      positions.map((item, index) => {
-        return prcTrialPositionsService({
+      positions.map((item, index) =>
+        prcTrialPositionsService({
           // 需要计算的值，可选price, delta, gamma, vega, theta, rhoR和rhoQ。若为空数组或null，则计算所有值
           // requests,
           // pricingEnvironmentId,
@@ -333,13 +325,13 @@ const TradeManagementPricing = props => {
                 return val;
               }
               return val ? new BigNumber(val).multipliedBy(0.01).toNumber() : val;
-            }
+            },
           ),
           ...(item.productType === LEG_TYPE_MAP.FORWARD ? { vol: 1 } : undefined),
           pricingEnvironmentId: curPricingEnv,
           valuationDateTime: _.get(item, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
-        });
-      })
+        }),
+      ),
     );
 
     setPricingLoading(false);
@@ -352,12 +344,10 @@ const TradeManagementPricing = props => {
       return false;
     };
 
-    const rspIsEmpty = rsp => {
-      return _.isEmpty(rsp.data);
-    };
+    const rspIsEmpty = rsp => _.isEmpty(rsp.data);
 
-    setTableData(pre => {
-      return rsps
+    setTableData(pre =>
+      rsps
         .reduce((pre, next) => {
           const isError = rspIsError(next);
           if (isError || rspIsEmpty(next)) {
@@ -399,7 +389,7 @@ const TradeManagementPricing = props => {
                 [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
                 [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
                   item.price,
-                  getActualNotionAmountBigNumber(Form2.getFieldsValue(record))
+                  getActualNotionAmountBigNumber(Form2.getFieldsValue(record)),
                 ),
                 // [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countSpreadStdDelta(
                 //   item.delta,
@@ -409,16 +399,16 @@ const TradeManagementPricing = props => {
                 [COMPUTED_LEG_FIELD_MAP.DELTA]: countSpreadDelta(
                   item.delta,
                   item.delta,
-                  Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER])
+                  Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]),
                 ),
                 [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(
                   item.delta,
-                  item.underlyerPrice
+                  item.underlyerPrice,
                 ),
                 [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
                   item.gamma,
                   Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]),
-                  item.underlyerPrice
+                  item.underlyerPrice,
                 ),
                 [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),
                 [COMPUTED_LEG_FIELD_MAP.VEGA]: countVega(item.vega),
@@ -467,18 +457,18 @@ const TradeManagementPricing = props => {
               [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
               [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
                 item.price,
-                getActualNotionAmountBigNumber(Form2.getFieldsValue(record))
+                getActualNotionAmountBigNumber(Form2.getFieldsValue(record)),
               ),
               [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
               [COMPUTED_LEG_FIELD_MAP.DELTA]: countDelta(
                 item.delta,
-                Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER])
+                Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]),
               ),
               [COMPUTED_LEG_FIELD_MAP.DELTA_CASH]: countDeltaCash(item.delta, item.underlyerPrice),
               [COMPUTED_LEG_FIELD_MAP.GAMMA]: countGamma(
                 item.gamma,
                 Form2.getFieldValue(record[LEG_FIELD.UNDERLYER_MULTIPLIER]),
-                item.underlyerPrice
+                item.underlyerPrice,
               ),
               [COMPUTED_LEG_FIELD_MAP.GAMMA_CASH]: countGamaCash(item.gamma, item.underlyerPrice),
               [COMPUTED_LEG_FIELD_MAP.VEGA]: countVega(item.vega),
@@ -490,8 +480,8 @@ const TradeManagementPricing = props => {
               // .toNumber(),
             }),
           };
-        });
-    });
+        }),
+    );
   };
 
   const onCellFieldsChange = params => {
@@ -526,7 +516,7 @@ const TradeManagementPricing = props => {
               },
             });
           },
-          setTableData
+          setTableData,
         );
       }
       return newData;
@@ -549,7 +539,7 @@ const TradeManagementPricing = props => {
       <Divider />
       <MultiLegTable
         totalColumnIds={COMPUTED_LEG_FIELDS}
-        totalable={true}
+        totalable
         env={LEG_ENV.PRICING}
         tableEl={tableEl}
         onCellFieldsChange={onCellFieldsChange}
@@ -599,5 +589,5 @@ export default memo(
     pricingData: state.pricingData,
     tradeManagementBookEditPageData: state.tradeManagementBookEdit,
     tradeManagementPricingManagement: state.tradeManagementPricingManagement,
-  }))(TradeManagementPricing)
+  }))(TradeManagementPricing),
 );
