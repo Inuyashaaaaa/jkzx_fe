@@ -1,3 +1,5 @@
+import { Button } from 'antd';
+import React from 'react';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DATE_CONFIG,
@@ -5,12 +7,10 @@ import {
   NOTION_ENUM_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
-import { Button } from 'antd';
-import React from 'react';
 
 export const KNOCKOUT_FORM_CONTROLS: (notionalType, handleSettleAmount) => IFormControl[] = (
   notionalType,
-  handleSettleAmount
+  handleSettleAmount,
 ) => [
   {
     field: 'NOTIONAL_AMOUNT',
@@ -71,7 +71,7 @@ export const KNOCKOUT_FORM_CONTROLS: (notionalType, handleSettleAmount) => IForm
       ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       after: (
         <Button key="upload" type="primary" onClick={handleSettleAmount}>
-          结算
+          试结算
         </Button>
       ),
     },

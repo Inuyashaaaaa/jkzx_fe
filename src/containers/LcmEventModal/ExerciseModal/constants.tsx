@@ -95,7 +95,7 @@ export const EXERCISE_FORM_CONTROLS: (
           ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
           after: (
             <Button key="upload" type="primary" onClick={handleSettleAmount}>
-              结算
+              试结算
             </Button>
           ),
         },
@@ -168,7 +168,7 @@ export const EXERCISE_FORM_CONTROLS: (
           : {
               after: (
                 <Button key="upload" type="primary" onClick={handleSettleAmount}>
-                  结算
+                  试结算
                 </Button>
               ),
             }),
