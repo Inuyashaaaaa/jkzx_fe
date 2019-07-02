@@ -36,10 +36,10 @@ class TradeManagementNotifications extends PureComponent<any, any> {
   };
 
   public getNotificationEventType = type => {
-    if (type.value === 'all') {
+    if (type === 'all') {
       return '';
     }
-    return type.value;
+    return type;
   };
 
   public onFetch = async () => {
@@ -48,10 +48,23 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     });
 
     const { searchFormData } = this.state;
+    const date = Form2.getFieldsValue(searchFormData).date.length
+      ? Form2.getFieldsValue(searchFormData).date
+      : [moment(), moment().add(7, 'day')];
+    const notificationEventType =
+      Form2.getFieldsValue(searchFormData).notificationEventType || 'all';
+    if (!Form2.getFieldsValue(searchFormData).date.length) {
+      this.setState({
+        searchFormData: {
+          date: Form2.createField(date),
+          notificationEventType: Form2.createField(notificationEventType),
+        },
+      });
+    }
     const { error, data } = await traTradeLCMNotificationSearch({
-      after: _.get(searchFormData, 'date.value[0]').format('YYYY-MM-DD'),
-      before: _.get(searchFormData, 'date.value[1]').format('YYYY-MM-DD'),
-      notificationEventType: this.getNotificationEventType(searchFormData.notificationEventType),
+      after: date[0].format('YYYY-MM-DD'),
+      before: date[1].format('YYYY-MM-DD'),
+      notificationEventType: this.getNotificationEventType(notificationEventType),
     });
 
     this.setState({
@@ -124,6 +137,13 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     );
   };
 
+  public disabledDate = current =>
+    current &&
+    current <
+      moment()
+        .subtract(1, 'day')
+        .endOf('day');
+
   public render() {
     return (
       <Page
@@ -162,7 +182,9 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   title: '选择日期',
                   dataIndex: 'date',
                   render: (value, record, index, { form, editing }) => (
-                    <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>
+                    <FormItem>
+                      {form.getFieldDecorator({})(<RangePicker disabledDate={this.disabledDate} />)}
+                    </FormItem>
                   ),
                 },
                 {
