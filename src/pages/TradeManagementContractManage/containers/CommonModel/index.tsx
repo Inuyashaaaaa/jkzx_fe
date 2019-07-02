@@ -402,7 +402,9 @@ class CommonModel extends PureComponent<any> {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      options={LCM_EVENT_TYPE_OPTIONS}
+                      options={LCM_EVENT_TYPE_OPTIONS.sort((a, b) =>
+                        b.value.localeCompare(a.value),
+                      )}
                     />,
                   )}
                 </FormItem>
