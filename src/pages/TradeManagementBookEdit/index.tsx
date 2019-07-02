@@ -188,10 +188,12 @@ const TradeManagementBooking = props => {
   const getContextMenu = params => {
     const menuItem =
       eventTypes[params.record.id] &&
-      eventTypes[params.record.id].map(eventType => ({
-        key: eventType,
-        value: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
-      }));
+      eventTypes[params.record.id]
+        .map(eventType => ({
+          key: eventType,
+          value: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
+        }))
+        .sort((a, b) => b.value.localeCompare(a.value));
     if (!menuItem) return;
     return (
       <Menu onClick={({ key }) => handleEventAction(key, params)}>
