@@ -222,7 +222,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
 
     return nextPosition;
   },
