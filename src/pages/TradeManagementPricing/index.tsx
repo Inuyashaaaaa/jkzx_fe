@@ -417,10 +417,14 @@ const TradeManagementPricing = props => {
                   : val;
               }),
               [COMPUTED_LEG_FIELD_MAP.PRICE]: countPrice(item.price),
-              [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
-                item.price,
-                getActualNotionAmountBigNumber(Form2.getFieldsValue(record)),
-              ),
+              ...(Form2.getFieldsValue(record)[LEG_TYPE_FIELD] === LEG_TYPE_MAP.CASH_FLOW
+                ? {}
+                : {
+                    [COMPUTED_LEG_FIELD_MAP.PRICE_PER]: countPricePer(
+                      item.price,
+                      getActualNotionAmountBigNumber(Form2.getFieldsValue(record)),
+                    ),
+                  }),
               [COMPUTED_LEG_FIELD_MAP.STD_DELTA]: countStdDelta(item.delta, item.quantity),
               [COMPUTED_LEG_FIELD_MAP.DELTA]: countDelta(
                 item.delta,

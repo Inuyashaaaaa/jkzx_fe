@@ -85,6 +85,18 @@ export const GENERAL_COMPUTED_FIELDS = [
   Vega,
 ];
 
+export const CASH_FLOW_COMPUTED_FIELDS = [
+  Delta,
+  DeltaCash,
+  Gamma,
+  GammaCash,
+  Price,
+  RhoR,
+  StdDelta,
+  Theta,
+  Vega,
+];
+
 export const TOTAL_COMPUTED_FIELDS = [...GENERAL_COMPUTED_FIELDS, Cega];
 
 export const CASH_TOTAL_EDITING_FIELDS = [PositionId, LcmEventType];

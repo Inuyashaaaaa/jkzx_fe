@@ -14,6 +14,7 @@ import {
   LEG_ENV,
   TOTAL_EDITING_FIELDS,
   CASH_TOTAL_EDITING_FIELDS,
+  CASH_FLOW_COMPUTED_FIELDS,
 } from '@/constants/legs';
 import { Form2 } from '@/containers';
 import { getMoment } from '@/tools';
@@ -41,7 +42,7 @@ export const CashFlow: ILeg = legPipeLine({
         PaymentDirection,
         PaymentState,
         Currency,
-        ...GENERAL_COMPUTED_FIELDS,
+        ...CASH_FLOW_COMPUTED_FIELDS,
       ];
     }
     if (env === LEG_ENV.EDITING) {
@@ -74,6 +75,8 @@ export const CashFlow: ILeg = legPipeLine({
       LEG_FIELD.TRADE_NUMBER,
       LEG_FIELD.TERM,
       LEG_FIELD.PREMIUM,
+      LEG_FIELD.INITIAL_NOTIONAL_AMOUNT,
+      LEG_FIELD.ALUNWIND_NOTIONAL_AMOUNT,
     ];
     nextPosition.productType = LEG_TYPE_MAP.CASH_FLOW;
     nextPosition.asset = _.omit(dataItem, [
