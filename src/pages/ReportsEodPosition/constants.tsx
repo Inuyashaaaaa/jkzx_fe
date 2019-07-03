@@ -4,19 +4,19 @@ import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
+    title: '持仓编号',
+    dataIndex: 'positionId',
+    fixed: 'left',
+    width: 150,
+  },
+  {
     title: '交易簿',
     dataIndex: 'bookName',
-    fixed: 'left',
     width: 150,
   },
   {
     title: '交易对手',
     dataIndex: 'partyName',
-    width: 150,
-  },
-  {
-    title: '持仓编号',
-    dataIndex: 'positionId',
     width: 150,
   },
   {
