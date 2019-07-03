@@ -14,6 +14,7 @@ import {
   REBATETYPE_TYPE_MAP,
   REBATETYPE_UNIT_MAP,
   UNIT_ENUM_MAP,
+  FREQUENCY_TYPE_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -252,6 +253,7 @@ export const BarrierLeg: ILeg = legPipeLine({
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
+      [LEG_FIELD.OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1D'],
       ...(env === LEG_ENV.PRICING
         ? {
             [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
