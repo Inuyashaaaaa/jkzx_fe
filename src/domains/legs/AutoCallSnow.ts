@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
   EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
@@ -23,8 +25,6 @@ import {
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -188,6 +188,7 @@ export const AutoCallSnow: ILeg = legPipeLine({
       [LEG_FIELD.AUTO_CALL_STRIKE_UNIT]: PAYMENT_TYPE_MAP.PERCENT,
       [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],
       [LEG_FIELD.STEP]: 0,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       ...(env === LEG_ENV.PRICING
         ? {
             [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
@@ -251,15 +252,14 @@ export const AutoCallSnow: ILeg = legPipeLine({
 
     return nextPosition;
   },
-  getPageData: (env: string, position: any) => {
-    return Form2.createFields({
+  getPageData: (env: string, position: any) =>
+    Form2.createFields({
       [ExpireNoBarrierObserveDay.dataIndex]: (position.asset.observationDates || []).map(item => ({
         [OB_DAY_FIELD]: item,
       })),
       [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
       [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
-    });
-  },
+    }),
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
@@ -268,7 +268,7 @@ export const AutoCallSnow: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -278,7 +278,7 @@ export const AutoCallSnow: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });

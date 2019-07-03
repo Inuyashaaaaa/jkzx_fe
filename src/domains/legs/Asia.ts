@@ -1,3 +1,6 @@
+/*eslint-disable */
+import _ from 'lodash';
+import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
   FREQUENCY_TYPE_MAP,
@@ -22,8 +25,6 @@ import { Form2 } from '@/containers';
 import { getMoment, getCurDateMoment } from '@/tools';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -158,6 +159,7 @@ export const Asia: ILeg = legPipeLine({
       [Strike.dataIndex]: 100,
       [SpecifiedPrice.dataIndex]: SPECIFIED_PRICE_MAP.CLOSE,
       [Term.dataIndex]: DEFAULT_TERM,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [EffectiveDate.dataIndex]: curDateMoment.clone(),
       [ExpirationDate.dataIndex]: curDateMoment.clone(),
       [SettlementDate.dataIndex]: curDateMoment.clone().add(DEFAULT_TERM, 'day'),
@@ -217,7 +219,7 @@ export const Asia: ILeg = legPipeLine({
           result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
           return result;
         },
-        {}
+        {},
       );
     }
 
@@ -227,7 +229,7 @@ export const Asia: ILeg = legPipeLine({
           result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
           return result;
         },
-        {}
+        {},
       );
     }
 
@@ -236,7 +238,7 @@ export const Asia: ILeg = legPipeLine({
         ? nextPosition.asset.expirationDate
         : nextPosition.asset.settlementDate;
 
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
 
     return nextPosition;
   },
@@ -251,14 +253,12 @@ export const Asia: ILeg = legPipeLine({
       [LEG_FIELD.OBSERVE_END_DAY]: moment(days[days.length - 1]),
       [LEG_FIELD.OBSERVATION_DATES]: !odays.length
         ? []
-        : days.map(day => {
-            return {
-              [OB_DAY_FIELD]: day,
-              weight: position.asset.fixingWeights && position.asset.fixingWeights[day],
-              [OB_PRICE_FIELD]:
-                position.asset.fixingObservations && position.asset.fixingObservations[day],
-            };
-          }),
+        : days.map(day => ({
+            [OB_DAY_FIELD]: day,
+            weight: position.asset.fixingWeights && position.asset.fixingWeights[day],
+            [OB_PRICE_FIELD]:
+              position.asset.fixingObservations && position.asset.fixingObservations[day],
+          })),
     });
   },
   onDataChange: (
@@ -269,7 +269,7 @@ export const Asia: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -279,18 +279,18 @@ export const Asia: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
     const { changedFields } = changeFieldsParams;
     if (Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields)) {
       record[LEG_FIELD.OBSERVE_END_DAY] = Form2.createField(
-        getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).clone()
+        getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).clone(),
       );
     }
 
     if (Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)) {
       record[LEG_FIELD.OBSERVE_START_DAY] = Form2.createField(
-        getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).clone()
+        getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).clone(),
       );
     }
   },

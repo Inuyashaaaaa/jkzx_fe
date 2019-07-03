@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
@@ -23,8 +25,6 @@ import {
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -156,6 +156,7 @@ export const ModelXy: ILeg = legPipeLine({
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       ...(env === LEG_ENV.PRICING
@@ -205,7 +206,7 @@ export const ModelXy: ILeg = legPipeLine({
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
 
     return nextPosition;
   },
@@ -218,7 +219,7 @@ export const ModelXy: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -228,7 +229,7 @@ export const ModelXy: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });

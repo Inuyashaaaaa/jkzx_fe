@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
@@ -16,8 +18,6 @@ import {
   DEFAULT_TERM,
   TRADESCOLDEFS_LEG_FIELD_MAP,
 } from '@/constants/global';
-import _ from 'lodash';
-import moment from 'moment';
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
@@ -158,6 +158,7 @@ export const DoubleTouch: ILeg = legPipeLine({
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.BARRIER_TYPE]: UNIT_ENUM_MAP.PERCENT,
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       ...(env === LEG_ENV.PRICING
@@ -188,7 +189,6 @@ export const DoubleTouch: ILeg = legPipeLine({
             FrontPremium.dataIndex,
           ]),
     ]);
-    // nextPosition.asset = _.omit(dataSourceItem, [...LEG_INJECT_FIELDS, LEG_FIELD.IS_ANNUAL, ...COMPUTED_FIELDS]);
     nextPosition.asset.effectiveDate =
       nextPosition.asset.effectiveDate &&
       getMoment(nextPosition.asset.effectiveDate).format('YYYY-MM-DD');
@@ -199,7 +199,7 @@ export const DoubleTouch: ILeg = legPipeLine({
       nextPosition.asset.settlementDate &&
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
     nextPosition.asset.touched = true;
     return nextPosition;
   },
@@ -212,7 +212,7 @@ export const DoubleTouch: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -222,7 +222,7 @@ export const DoubleTouch: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });
