@@ -67,17 +67,11 @@ class ExpirationModal extends PureComponent<
 
   public computedFormData = () => ({
     [LEG_FIELD.NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-    [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: Form2.getFieldValue(
-      _.chain(this.fixingTableData)
-        .last()
-        .get(OB_PRICE_FIELD)
-        .value(),
-    ),
+    [LEG_FIELD.UNDERLYER_INSTRUMENT_PRICE]: this.getUnderlyerPrice(),
     [LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]: this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE],
     [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE],
     [LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE]: this.data[LEG_FIELD.DOWN_BARRIER_OPTIONS_TYPE],
     [LEG_FIELD.COUPON_PAYMENT]: this.getCouponPaymentTotal(),
-    [LEG_FIELD.SPECIFIED_PRICE2]: this.getCouponPaymentTotal(),
   });
 
   /**
@@ -85,6 +79,24 @@ class ExpirationModal extends PureComponent<
    * 如果由fixing中进入到期，则coupon部分收益=观察事件表格中观察周期收益的总和
    * 如果由菜单进入：获得所有观察价格，按照fixing事件中的方法进行计算
    */
+
+  public getUnderlyerPrice = () => {
+    if (this.fixingTableData.length) {
+      return Form2.getFieldValue(
+        _.chain(this.fixingTableData)
+          .last()
+          .get(OB_PRICE_FIELD)
+          .value(),
+      );
+    }
+    return Form2.getFieldValue(
+      _.chain(getObservertionFieldData(this.data))
+        .last()
+        .get(OB_PRICE_FIELD)
+        .value(),
+    );
+  };
+
   public getCouponPaymentTotal = () => {
     if (this.fixingTableData.length) {
       return this.fixingTableData.reduce((total, next) => total + (next[OB_LIFE_PAYMENT] || 0), 0);
