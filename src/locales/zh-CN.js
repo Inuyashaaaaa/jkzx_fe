@@ -61,7 +61,7 @@ export default {
   'menu.tradeManagement.contractManagement': '合约管理',
   'menu.tradeManagement.pricing': '交易定价',
   'menu.tradeManagement.notifications': '事件提醒',
-  'menu.tradeManagement.bookEdit': '交易编辑',
+  'menu.tradeManagement.bookEdit': '合约详情',
   'menu.tradeManagement.marketManagement': '行情管理',
   'menu.tradeManagement.subjectStore': '标的物管理',
   'menu.tradeManagement.onBoardTransaction': '场内交易管理',

@@ -219,7 +219,7 @@ const TradeManagementBooking = props => {
   });
 
   return (
-    <Page back title="交易详情">
+    <Page back title="交易详情" footer={<ActionBar tableData={tableData} />}>
       {tableLoading ? (
         <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
@@ -229,7 +229,7 @@ const TradeManagementBooking = props => {
           <div className={styles.bookingBaseInfoFormWrapper}>
             <BookingBaseInfoForm
               hideRequiredMark
-              columnNumberOneRow={2}
+              columnNumberOneRow={3}
               editableStatus={FORM_EDITABLE_STATUS.SHOW}
               createFormData={createFormData}
               setCreateFormData={setCreateFormData}
@@ -296,7 +296,7 @@ const TradeManagementBooking = props => {
           />
         </>
       )}
-      <ActionBar tableData={tableData} />
+      {/* <ActionBar tableData={tableData} /> */}
     </Page>
   );
 };
