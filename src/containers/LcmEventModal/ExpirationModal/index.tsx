@@ -417,7 +417,7 @@ class ExpirationModal extends PureComponent<
                     type="primary"
                     onClick={this.countAutocalPhoenixSettleAmount}
                   >
-                    结算
+                    试结算
                   </Button>
                 ),
               },
