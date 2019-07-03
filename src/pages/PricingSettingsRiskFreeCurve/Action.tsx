@@ -4,14 +4,14 @@ import React, { memo, useRef } from 'react';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import { getCanUsedTranorsOtionsNotIncludingSelf } from '@/services/common';
-import { Form2, Input, Select } from '@/containers';
+import { Form2, Input, Select, InputNumber } from '@/containers';
 
 const Action = memo<any>(props => {
   const formEl = useRef<Form2>(null);
 
   const { onRemove, index, value, record } = props;
 
-  const onConfirm = async (rowIndex, param, recorddata) => {
+  const onConfirm = async (rowIndex, param, recordData) => {
     const { error } = await formEl.current.validate();
     if (error) return;
 
@@ -23,7 +23,7 @@ const Action = memo<any>(props => {
       use: Form2.createField(true),
     };
     const clone = _.concat(props.tableDataSource, data).map(item => {
-      if (item.id === recorddata.id) {
+      if (item.id === recordData.id) {
         return {
           ...item,
           visible: false,
@@ -37,11 +37,11 @@ const Action = memo<any>(props => {
 
   return (
     <>
+      <a onClick={() => props.onClick(record)}>插入</a>
+      <Divider type="vertical" />
       <Popconfirm title="确认要删除吗？" onConfirm={() => onRemove(index)}>
         <a style={{ color: 'red' }}>删除</a>
       </Popconfirm>
-      <Divider type="vertical" />
-      <a onClick={() => props.onClick(record)}>插入</a>
       <Modal
         visible={props.tableDataSource.find(item => item.id === record.id).visible}
         onOk={e => onConfirm(index, value, record)}
@@ -83,7 +83,7 @@ const Action = memo<any>(props => {
               title: '利率(%)',
               dataIndex: 'quote',
               render: (val, recordData, i, { form }) => (
-                <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>
+                <FormItem>{form.getFieldDecorator({})(<InputNumber />)}</FormItem>
               ),
             },
           ]}
