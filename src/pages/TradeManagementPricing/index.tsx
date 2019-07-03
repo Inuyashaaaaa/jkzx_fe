@@ -152,7 +152,6 @@ const TradeManagementPricing = props => {
     }, {});
 
     const leftValues = Form2.getFieldsValue(_.pick(fills, leftKeys));
-
     if (_.some(leftValues, val => val == null)) {
       return true;
     }
@@ -485,6 +484,9 @@ const TradeManagementPricing = props => {
   };
 
   const onCellFieldsChange = params => {
+    if (params.changedFields.OBSERVATION_DATES) {
+      fetchDefaultPricingEnvData(params.record);
+    }
     const { record } = params;
     const leg = getLegByRecord(record);
 
