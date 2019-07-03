@@ -24,33 +24,20 @@ const ActionBar = memo<{
     return result;
   };
   return (
-    <Affix onChange={status => setAffixed(status)}>
-      <div
-        style={{
-          background: '#fff',
-          margin: affixed ? '0 10px' : ' 0',
-          paddingBottom: affixed ? 0 : 20,
-        }}
-      >
-        <Row justify="end" type="flex">
-          <Button
-            disabled={getDisabled()}
-            type="primary"
-            onClick={() => {
-              router.push({
-                pathname: '/trade-management/pricing',
-                query: {
-                  from: PRICING_FROM_EDITING,
-                },
-              });
-            }}
-          >
-            转换定价
-          </Button>
-        </Row>
-        {affixed ? <Divider /> : null}
-      </div>
-    </Affix>
+    <Button
+      disabled={getDisabled()}
+      type="primary"
+      onClick={() => {
+        router.push({
+          pathname: '/trade-management/pricing',
+          query: {
+            from: PRICING_FROM_EDITING,
+          },
+        });
+      }}
+    >
+      转换定价
+    </Button>
   );
 });
 

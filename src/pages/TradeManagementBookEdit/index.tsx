@@ -1,5 +1,5 @@
 /*eslint-disable */
-import { Divider, Menu, message, Skeleton, Typography } from 'antd';
+import { Divider, Menu, message, Skeleton, Typography, Button } from 'antd';
 import { connect } from 'dva';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
@@ -31,7 +31,9 @@ import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
+import BackBtn from '@/containers/BackBtn';
 
+const ButtonGroup = Button.Group;
 const TradeManagementBooking = props => {
   const { currentUser } = props;
   const { tradeManagementBookEditPageData, dispatch } = props;
@@ -219,7 +221,16 @@ const TradeManagementBooking = props => {
   });
 
   return (
-    <Page back title="交易详情" footer={<ActionBar tableData={tableData} />}>
+    <Page
+      back
+      title="交易详情"
+      extra={
+        <ButtonGroup>
+          <BackBtn />
+          <ActionBar tableData={tableData} />
+        </ButtonGroup>
+      }
+    >
       {tableLoading ? (
         <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
