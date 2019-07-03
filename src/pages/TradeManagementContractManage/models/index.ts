@@ -52,6 +52,7 @@ export default {
         total: 0,
       },
     },
+    modify: false,
   },
   reducers: {
     onTabChange(state, action) {
@@ -99,6 +100,13 @@ export default {
       return {
         ...state,
         entryTabKey: action.payload,
+      };
+    },
+
+    modify(state, action) {
+      return {
+        ...state,
+        modify: action.payload,
       };
     },
   },

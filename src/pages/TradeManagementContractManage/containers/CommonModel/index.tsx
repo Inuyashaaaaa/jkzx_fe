@@ -33,12 +33,21 @@ class CommonModel extends PureComponent<any> {
   };
 
   public componentDidMount = () => {
-    const { preLocation } = this.props;
+    const { preLocation, modify } = this.props;
     if (
       preLocation &&
       preLocation.pathname === '/trade-management/book-edit' &&
       this.props.entryTabKey === this.props.name
     ) {
+      if (modify) {
+        const { activeTabKey } = this.props;
+        const { pagination } = this.props[activeTabKey];
+        this.onTradeTableSearch(pagination);
+        return this.props.dispatch({
+          type: 'tradeManagementContractManage/modify',
+          payload: false,
+        });
+      }
       return this.props.dispatch({
         type: 'tradeManagementContractManage/setEntryTabKey',
         payload: null,
@@ -455,4 +464,5 @@ export default connect(({ preRouting, tradeManagementContractManage }) => ({
   preLocation: preRouting.location,
   activeTabKey: tradeManagementContractManage.activeTabKey,
   entryTabKey: tradeManagementContractManage.entryTabKey,
+  modify: tradeManagementContractManage.modify,
 }))(CommonModel);
