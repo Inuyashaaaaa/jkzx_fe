@@ -61,7 +61,6 @@ import { commonLinkage } from '../common';
 import { PaymentType } from '../../containers/legFields/PaymentType';
 import { Payment } from '../../containers/legFields/Payment';
 import { RebateType } from '../../containers/legFields/RebateType';
-import { ObservationType } from '../../containers/legFields/ObservationType';
 import { Unit } from '../../containers/legFields/Unit';
 import { legPipeLine } from '../_utils';
 import { TradeNumber } from '../../containers/legFields/TradeNumber';
@@ -88,7 +87,6 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         Payment,
         ParticipationRate,
         NotionalAmount,
-        ObservationType,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...GENERAL_COMPUTED_FIELDS,
@@ -120,7 +118,6 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         ExpirationDate,
         // ExpirationTime,
         EffectiveDate,
-        ObservationType,
         RebateType,
         Unit,
         TradeNumber,
@@ -152,7 +149,6 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         MinimumPremium,
         ExpirationDate,
         EffectiveDate,
-        ObservationType,
         RebateType,
         Unit,
         TradeNumber,
@@ -185,7 +181,6 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
           }
         : null),
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
-      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.TERMINAL,
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
