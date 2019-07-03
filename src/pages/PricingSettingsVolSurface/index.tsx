@@ -1,3 +1,13 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable array-callback-return */
+/* eslint-disable consistent-return */
+/* eslint-disable react/no-access-state-in-setstate */
+import { Col, message, notification, Row, Divider, Modal, Popconfirm } from 'antd';
+import produce from 'immer';
+import _ from 'lodash';
+import React, { PureComponent } from 'react';
+import uuidv4 from 'uuid/v4';
+import FormItem from 'antd/lib/form/FormItem';
 import { INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
 import { TRNORS_OPTS } from '@/constants/model';
 import MarketSourceTable from '@/containers/MarketSourceTable';
@@ -11,15 +21,9 @@ import {
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
 import { queryAllModelNameVol, queryModelVolSurface } from '@/services/model';
-import { Col, message, notification, Row, Divider, Modal, Popconfirm } from 'antd';
-import produce from 'immer';
-import _ from 'lodash';
-import React, { PureComponent } from 'react';
-import uuidv4 from 'uuid/v4';
 import { GROUP_KEY, INSTANCE_KEY, MARKET_KEY, OPERATION, TENOR_KEY } from './constants';
 import { SEARCH_FORM, TABLE_COLUMN } from './tools';
 
-import FormItem from 'antd/lib/form/FormItem';
 import { Form2, Select } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import ActiveTable from './ActiveTable';
@@ -37,35 +41,29 @@ class PricingSettingVolSurface extends PureComponent {
 
   public selectedColumns = [];
 
-  public state = {
-    tableFormData: {},
-    searchFormData: {
-      ...Form2.createFields({ [INSTANCE_KEY]: 'INTRADAY' }),
-    },
-    tableLoading: false,
-    tableDataSource: [],
-    tableColumnDefs: [],
-    groups: [],
-    groupLoading: false,
-    insertVisible: false,
-    insertFormData: {},
-    quoteData: {},
-    record: {},
-    rowIndex: 0,
-  };
-
   constructor(props) {
     super(props);
+    this.state = {
+      tableFormData: {},
+      searchFormData: {
+        ...Form2.createFields({ [INSTANCE_KEY]: 'INTRADAY' }),
+      },
+      tableDataSource: [],
+      tableColumnDefs: [],
+      groups: [],
+      insertVisible: false,
+      insertFormData: {},
+      record: {},
+      rowIndex: 0,
+    };
   }
 
   public fetchGroup = async underlyer => {
     const { error, data } = await queryAllModelNameVol();
     if (error) return;
-    const dataGroup = data.map(item => {
-      return {
-        modelName: item,
-      };
-    });
+    const dataGroup = data.map(item => ({
+      modelName: item,
+    }));
     this.setState(
       produce((state: any) => {
         state.searchFormData[GROUP_KEY].value = undefined;
@@ -76,12 +74,12 @@ class PricingSettingVolSurface extends PureComponent {
             value: modelName,
           };
         });
-      })
+      }),
     );
   };
 
-  public sortDataSource = dataSource => {
-    return dataSource
+  public sortDataSource = dataSource =>
+    dataSource
       .map(record => {
         const day = TRNORS_OPTS.find(item => item.name === record.tenor.value) || {};
         return {
@@ -91,26 +89,22 @@ class PricingSettingVolSurface extends PureComponent {
       })
       .sort((a, b) => a.days - b.days)
       .map(item => item.record);
-  };
 
   public fetchTableData = async () => {
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
-    this.setState({ tableLoading: true });
     const rsp = await queryModelVolSurface(
       {
         underlyer: searchFormData[MARKET_KEY],
         modelName: searchFormData[GROUP_KEY],
         instance: searchFormData[INSTANCE_KEY],
       },
-      true
+      true,
     );
     const { error } = rsp;
     let { data } = rsp;
-    this.setState({ tableLoading: false });
 
     if (error) {
-      const { message } = error;
-      if (message.includes('failed to find model data for ')) {
+      if (error.message.includes('failed to find model data for ')) {
         const dataSource = [
           {
             tenor: '1D',
@@ -138,7 +132,7 @@ class PricingSettingVolSurface extends PureComponent {
       } else {
         notification.error({
           message: '请求失败',
-          description: message,
+          description: error.message,
         });
         return;
       }
@@ -154,24 +148,20 @@ class PricingSettingVolSurface extends PureComponent {
               dataIndex: TENOR_KEY,
               defaultEditing: false,
               width: 120,
-              editable: record => {
-                return true;
-              },
-              render: (val, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        editing={editing}
-                        autoSelect={true}
-                        defaultOpen={true}
-                        options={getCanUsedTranorsOtions(dataSource, Form2.getFieldsValue(record))}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              editable: record => true,
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      editing={editing}
+                      autoSelect
+                      defaultOpen
+                      options={getCanUsedTranorsOtions(dataSource, Form2.getFieldsValue(record))}
+                    />,
+                  )}
+                </FormItem>
+              ),
             };
           }
           return {
@@ -180,24 +170,18 @@ class PricingSettingVolSurface extends PureComponent {
             defaultEditing: false,
             percent: item.percent,
             width: 150,
-            editable: record => {
-              return true;
-            },
-            render: (val, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({})(
-                    <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} min={0} />
-                  )}
-                </FormItem>
-              );
-            },
+            editable: record => true,
+            render: (val, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({})(
+                  <UnitInputNumber autoSelect editing={editing} unit="%" min={0} />,
+                )}
+              </FormItem>
+            ),
           };
         });
     let tableDataSource = this.sortDataSource(dataSource);
-    tableDataSource = tableDataSource.map(item => {
-      return Form2.createFields(item);
-    });
+    tableDataSource = tableDataSource.map(item => Form2.createFields(item));
     const tableSelfFormData = {
       quote: underlyer.quote,
     };
@@ -217,7 +201,7 @@ class PricingSettingVolSurface extends PureComponent {
       },
       () => {
         this.fetchTableData();
-      }
+      },
     );
   };
 
@@ -249,7 +233,7 @@ class PricingSettingVolSurface extends PureComponent {
         (this.$sourceForm.$baseSourceTable.$table.$baseTable.gridApi as any).valueService.setValue(
           rowNode,
           column.getColId(),
-          value
+          value,
         );
       });
     });
@@ -328,32 +312,30 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public render() {
-    const tableColumnDefs = this.state.tableColumnDefs;
+    const { tableColumnDefs } = this.state;
     const columns = tableColumnDefs.length
       ? tableColumnDefs.concat({
           title: '操作',
           dataIndex: OPERATION,
           width: 150,
-          render: (text, record, index) => {
-            return (
-              <>
-                <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(index, record)}>
-                  <a style={{ color: 'red' }}>删除</a>
-                </Popconfirm>
-                <Divider type="vertical" />
-                <a onClick={() => this.onClick(record, index)}>插入</a>
-              </>
-            );
-          },
+          render: (text, record, index) => (
+            <>
+              <a onClick={() => this.onClick(record, index)}>插入</a>
+              <Divider type="vertical" />
+              <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(index, record)}>
+                <a style={{ color: 'red' }}>删除</a>
+              </Popconfirm>
+            </>
+          ),
         })
       : [];
-    const tableDataSource = this.state.tableDataSource.map(item => {
-      item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
-      return item;
-    });
+    const tableDataSource = this.state.tableDataSource.map(item => ({
+      ...item,
+      id: _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id,
+    }));
     const durationMap = { W: 7, D: 1, M: 30, Y: 365 };
     const tds = _.sortBy(tableDataSource, o => {
-      const value = o.tenor.value;
+      const { value } = o.tenor;
       return durationMap[value.substring(value.length - 1)] * Number.parseInt(value, 10) * 7;
     });
 
@@ -362,7 +344,7 @@ class PricingSettingVolSurface extends PureComponent {
         <Row type="flex" justify="space-between" align="top" gutter={16 + 8}>
           <Col xs={24} sm={4}>
             <MarketSourceTable
-              marketType={'volInstrumnent'}
+              marketType="volInstrumnent"
               {...{
                 onSelect: market => {
                   this.lastFetchedDataSource = null;
@@ -384,7 +366,7 @@ class PricingSettingVolSurface extends PureComponent {
                       if (market) {
                         this.fetchGroup(market);
                       }
-                    }
+                    },
                   );
                 },
               }}
@@ -392,10 +374,12 @@ class PricingSettingVolSurface extends PureComponent {
           </Col>
           <Col xs={24} sm={20}>
             <Form2
-              ref={node => (this.$sourceForm = node)}
+              ref={node => {
+                this.$sourceForm = node;
+              }}
               layout="inline"
               dataSource={this.state.searchFormData}
-              submitText={'搜索'}
+              submitText="搜索"
               submitButtonProps={{
                 icon: 'search',
               }}
@@ -426,7 +410,9 @@ class PricingSettingVolSurface extends PureComponent {
           maskClosable={false}
         >
           <Form2
-            ref={node => (this.$insertForm = node)}
+            ref={node => {
+              this.$insertForm = node;
+            }}
             dataSource={this.state.insertFormData}
             footer={false}
             onFieldsChange={this.onInsertFormChange}
@@ -434,27 +420,25 @@ class PricingSettingVolSurface extends PureComponent {
               {
                 title: '期限',
                 dataIndex: 'tenor',
-                render: (val, record, index, { form }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '期限必填',
-                          },
-                        ],
-                      })(
-                        <Select
-                          style={{ minWidth: 180 }}
-                          options={getCanUsedTranorsOtionsNotIncludingSelf(
-                            this.state.tableDataSource.map(item => Form2.getFieldsValue(item))
-                          )}
-                        />
-                      )}
-                    </FormItem>
-                  );
-                },
+                render: (val, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '期限必填',
+                        },
+                      ],
+                    })(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        options={getCanUsedTranorsOtionsNotIncludingSelf(
+                          this.state.tableDataSource.map(item => Form2.getFieldsValue(item)),
+                        )}
+                      />,
+                    )}
+                  </FormItem>
+                ),
               },
             ]}
           />
