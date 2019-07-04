@@ -4,6 +4,12 @@ import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
+    title: '持仓ID',
+    dataIndex: 'tradeId',
+    fixed: 'left',
+    width: 150,
+  },
+  {
     title: '交易簿',
     dataIndex: 'bookName',
     fixed: 'left',
