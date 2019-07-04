@@ -16,6 +16,7 @@ import {
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
   OBSERVATION_TYPE_MAP,
+  LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -348,12 +349,16 @@ const TradeManagementPricing = props => {
 
     setTableData(pre =>
       rsps
-        .reduce((pre, next) => {
+        .reduce((pre, next, index) => {
           const isError = rspIsError(next);
           if (isError || rspIsEmpty(next)) {
             if (isError) {
+              const position = positions[index];
               notification.error({
-                message: _.get(next.raw, 'diagnostics.[0].message', []),
+                message: `第${index + 1}条结构(${
+                  LEG_TYPE_ZHCH_MAP[position.productType]
+                })定价产生错误`,
+                description: `xxxxx${_.get(next.raw, 'diagnostics.[0].message', [])}`,
               });
             }
             return pre.concat(null);
