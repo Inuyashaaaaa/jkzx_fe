@@ -229,6 +229,9 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
     nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
+    nextPosition.asset.rebate = nextPosition.asset.payment;
+    nextPosition.asset.rebateType = nextPosition.asset.paymentType;
+    nextPosition.asset = _.omit(nextPosition.asset, ['payment', 'paymentType']);
 
     return nextPosition;
   },
