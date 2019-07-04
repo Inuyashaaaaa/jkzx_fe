@@ -170,13 +170,14 @@ class ObserveModalInput extends InputBase<
       holidays: ['DEFAULT_CALENDAR'],
     });
     this.setState({ generateLoading: false });
-
     if (error) return;
     this.setState({
       dealDataSource: this.computeDataSource(
-        data.map(item => ({
-          [OB_DAY_FIELD]: moment(item),
-        })),
+        data
+          .filter(item => moment(item) > moment(start))
+          .map(item => ({
+            [OB_DAY_FIELD]: moment(item),
+          })),
       ),
     });
   };
