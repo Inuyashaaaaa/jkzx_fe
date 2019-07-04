@@ -68,7 +68,7 @@ export async function reloadAirflowTrigger(id) {
       method: `POST`,
       body: {},
     },
-    true
+    true,
   );
 }
 
@@ -116,6 +116,16 @@ export async function rptPnlReportNameList(params = {}) {
     method: `POST`,
     body: {
       method: 'rptPnlReportNameList',
+      params,
+    },
+  });
+}
+
+export async function rptPnlReportPagedByNameAndDate(params) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptPnlReportPagedByNameAndDate',
       params,
     },
   });
