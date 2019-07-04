@@ -57,7 +57,7 @@ const TradeManagementOnBoardTansaction = props => {
     date: [moment().subtract(1, 'days'), moment()],
   });
   const [searchFormDataPosition, setSearchFormDataPosition] = useState({
-    searchDate: moment().subtract(1, 'days'),
+    searchDate: moment(),
   });
   const [activeKey, setActiveKey] = useState('flow');
   const [modalLoading, setModalLoading] = useState(false);
