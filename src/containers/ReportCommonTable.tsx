@@ -153,7 +153,7 @@ const ReportCommonTable = memo<any>(props => {
       valuationDate: Form2.createField(moment().subtract(1, 'days')),
     };
     setSearchFormData(formData);
-    if (newMarkets.length > 0) {
+    if (_.get(newMarkets.length) && _.get(newMarkets.length) > 0) {
       fetchTable(formData);
     }
   });
