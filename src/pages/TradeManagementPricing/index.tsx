@@ -155,8 +155,7 @@ const TradeManagementPricing = props => {
     }, {});
 
     const leftValues = Form2.getFieldsValue(_.pick(fills, leftKeys));
-
-    if (_.some(leftValues, val => val == null)) {
+    if (_.some(leftValues, val => val == null || _.get(val, 'length') === 0)) {
       return true;
     }
 
@@ -530,6 +529,12 @@ const TradeManagementPricing = props => {
     });
   };
 
+  const onCellValuesChange = params => {
+    if (_.get(params, 'changedValues.OBSERVATION_DATES')) {
+      fetchDefaultPricingEnvData(params.record);
+    }
+  };
+
   return (
     <Page>
       <ActionBar
@@ -555,6 +560,7 @@ const TradeManagementPricing = props => {
         onCellEditingChanged={params => {
           fetchDefaultPricingEnvData(params.record);
         }}
+        onCellValuesChange={onCellValuesChange}
         dataSource={tableData}
         getContextMenu={params => {
           const { record } = params;
