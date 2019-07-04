@@ -8,6 +8,7 @@ import {
   getCanUsedTranorsOtions,
   getCanUsedTranorsOtionsNotIncludingSelf,
 } from '@/services/common';
+import { MARKET_KEY, GROUP_KEY, INSTANCE_KEY } from './constants';
 
 export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableColDef[] = (
   tableDataSource,
@@ -126,6 +127,76 @@ export const SEARCH_FORM_CONTROLS: (groups) => IFormColDef[] = groups => [
       <FormItem>
         {form.getFieldDecorator({ rules: [{ required: true, message: '标的必填' }] })(
           <Select options={groups} style={{ minWidth: 180 }} />,
+        )}
+      </FormItem>
+    ),
+  },
+];
+
+export const SEARCH_FORM = (groups, formData) => [
+  {
+    title: '标的',
+    dataIndex: MARKET_KEY,
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(<Select style={{ minWidth: 180 }} placeholder="请选择左侧标的物" disabled />)}
+      </FormItem>
+    ),
+  },
+  {
+    title: '分组',
+    dataIndex: 'modelName',
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="选择标的物后，继续选择分组项"
+            options={groups}
+          />,
+        )}
+      </FormItem>
+    ),
+  },
+  {
+    title: '定价环境',
+    dataIndex: INSTANCE_KEY,
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="选择定价环境"
+            disabled={!formData.modelName}
+            options={[
+              {
+                label: '日内',
+                value: 'INTRADAY',
+              },
+              {
+                label: '收盘',
+                value: 'CLOSE',
+              },
+            ]}
+          />,
         )}
       </FormItem>
     ),

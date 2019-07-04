@@ -1,10 +1,10 @@
+import { BigNumber } from 'bignumber.js';
+import lodash from 'lodash';
+import uuidv4 from 'uuid/v4';
 import { BIG_NUMBER_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
 import { HOST_TEST } from '@/constants/global';
 import { TRNORS_OPTS } from '@/constants/model';
 import { request } from '@/tools';
-import { BigNumber } from 'bignumber.js';
-import lodash from 'lodash';
-import uuidv4 from 'uuid/v4';
 
 /**
  * 获取插值（行权价）无风险利率
@@ -36,16 +36,14 @@ export function queryModelRiskFreeCurve(params) {
     return {
       error,
       data: {
-        dataSource: instruments.map(item => {
-          return {
-            ...item,
-            id: uuidv4(),
-            quote: new BigNumber(item.quote)
-              .multipliedBy(100)
-              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-              .toNumber(),
-          };
-        }),
+        dataSource: instruments.map(item => ({
+          ...item,
+          id: uuidv4(),
+          quote: new BigNumber(item.quote)
+            .multipliedBy(100)
+            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+            .toNumber(),
+        })),
       },
     };
   });
@@ -76,7 +74,7 @@ export function queryModelDividendCurve(params, passError) {
         },
       },
     },
-    passError
+    passError,
   ).then(result => {
     const { error, data } = result;
     if (error) return result;
@@ -88,16 +86,14 @@ export function queryModelDividendCurve(params, passError) {
     return {
       error,
       data: {
-        dataSource: instruments.map(item => {
-          return {
-            ...item,
-            id: uuidv4(),
-            quote: new BigNumber(item.quote)
-              .multipliedBy(100)
-              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-              .toNumber(),
-          };
-        }),
+        dataSource: instruments.map(item => ({
+          ...item,
+          id: uuidv4(),
+          quote: new BigNumber(item.quote)
+            .multipliedBy(100)
+            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+            .toNumber(),
+        })),
       },
     };
   });
@@ -113,16 +109,14 @@ export function saveModelRiskFreeCurve(params) {
       params: {
         save: true,
         instance: 'intraday',
-        instruments: dataSource.map(item => {
-          return {
-            ...item,
-            quote: new BigNumber(item.quote)
-              .dividedBy(100)
-              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-              .toNumber(),
-            id: undefined,
-          };
-        }),
+        instruments: dataSource.map(item => ({
+          ...item,
+          quote: new BigNumber(item.quote)
+            .dividedBy(100)
+            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+            .toNumber(),
+          id: undefined,
+        })),
         modelName,
       },
     },
@@ -130,7 +124,7 @@ export function saveModelRiskFreeCurve(params) {
 }
 
 export function saveModelDividendCurve(params) {
-  const { dataSource, modelName, underlyer } = params;
+  const { dataSource, modelName, underlyer, instance } = params;
 
   return request(`${HOST_TEST}model-service/api/rpc`, {
     method: 'POST',
@@ -138,17 +132,15 @@ export function saveModelDividendCurve(params) {
       method: 'mdlCurveDividendCreate',
       params: {
         save: true,
-        instance: 'intraday',
-        instruments: dataSource.map(item => {
-          return {
-            ...item,
-            quote: new BigNumber(item.quote)
-              .div(100)
-              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-              .toNumber(),
-            id: undefined,
-          };
-        }),
+        instance,
+        instruments: dataSource.map(item => ({
+          ...item,
+          quote: new BigNumber(item.quote)
+            .div(100)
+            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+            .toNumber(),
+          id: undefined,
+        })),
         modelName,
         underlyer,
       },
@@ -181,7 +173,7 @@ export async function queryModelVolSurface(params, passError) {
         },
       },
     },
-    passError
+    passError,
   ).then(result => {
     const { error, data } = result;
 
@@ -198,30 +190,21 @@ export async function queryModelVolSurface(params, passError) {
         editable: true,
         input: {
           type: 'select',
-          options: TRNORS_OPTS.map(item => {
-            return {
-              label: item.name,
-              value: item.name,
-            };
-          }),
+          options: TRNORS_OPTS.map(item => ({
+            label: item.name,
+            value: item.name,
+          })),
         },
       },
       ...lodash
-        .unionBy(
-          volGrid.reduce((allVols, vg) => {
-            return allVols.concat(vg.vols);
-          }, []),
-          item => item.label
-        )
-        .map(vol => {
-          return {
-            percent: vol.percent,
-            headerName: vol.label,
-            field: vol.label,
-            editable: true,
-            input: INPUT_NUMBER_PERCENTAGE_CONFIG,
-          };
-        }),
+        .unionBy(volGrid.reduce((allVols, vg) => allVols.concat(vg.vols), []), item => item.label)
+        .map(vol => ({
+          percent: vol.percent,
+          headerName: vol.label,
+          field: vol.label,
+          editable: true,
+          input: INPUT_NUMBER_PERCENTAGE_CONFIG,
+        })),
     ];
 
     const dataSource = volGrid.map(item => {
@@ -232,11 +215,13 @@ export async function queryModelVolSurface(params, passError) {
         tenor: item.tenor,
         ...vols.reduce((obj, next) => {
           const { label, quote } = next;
-          obj[label] = new BigNumber(quote)
-            .multipliedBy(100)
-            .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-            .toNumber();
-          return obj;
+          return {
+            ...obj,
+            [label]: new BigNumber(quote)
+              .multipliedBy(100)
+              .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+              .toNumber(),
+          };
         }, {}),
       };
     });
@@ -268,25 +253,23 @@ export async function saveModelVolSurface(params) {
           ...underlyer,
           quote: newQuote,
         },
-        instruments: dataSource.map(record => {
-          return {
-            tenor: record.tenor,
-            vols: columns
-              .filter(col => col.dataIndex !== 'tenor')
-              .map(col => {
-                const { percent, title: label } = col;
-                return {
-                  label,
-                  quote: new BigNumber(record[label])
-                    .dividedBy(100)
-                    .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
-                    .toNumber(),
-                  // strike: new BigNumber(newQuote).multipliedBy(percent).toNumber(),
-                  percent,
-                };
-              }),
-          };
-        }),
+        instruments: dataSource.map(record => ({
+          tenor: record.tenor,
+          vols: columns
+            .filter(col => col.dataIndex !== 'tenor')
+            .map(col => {
+              const { percent, title: label } = col;
+              return {
+                label,
+                quote: new BigNumber(record[label])
+                  .dividedBy(100)
+                  .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+                  .toNumber(),
+                // strike: new BigNumber(newQuote).multipliedBy(percent).toNumber(),
+                percent,
+              };
+            }),
+        })),
       },
     },
   });
@@ -364,7 +347,7 @@ export async function mdlModelDataGet(params = {}) {
         },
       },
     },
-    true
+    true,
   );
 }
 
