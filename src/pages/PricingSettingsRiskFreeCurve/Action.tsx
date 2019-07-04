@@ -4,7 +4,7 @@ import React, { memo, useRef } from 'react';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import { getCanUsedTranorsOtionsNotIncludingSelf } from '@/services/common';
-import { Form2, Input, Select, InputNumber } from '@/containers';
+import { Form2, Select, InputNumber } from '@/containers';
 
 const Action = memo<any>(props => {
   const formEl = useRef<Form2>(null);
