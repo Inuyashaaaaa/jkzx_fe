@@ -174,7 +174,9 @@ class ObserveModalInput extends InputBase<
     this.setState({
       dealDataSource: this.computeDataSource(
         data
-          .filter(item => moment(item) > moment(start))
+          .filter(item => {
+            return moment(item).isAfter(start);
+          })
           .map(item => ({
             [OB_DAY_FIELD]: moment(item),
           })),
