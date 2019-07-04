@@ -52,6 +52,7 @@ import { getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
 import { computedShift } from '@/tools/leg';
 import ActionBar from './ActionBar';
 import './index.less';
+import moment from 'moment';
 
 const DATE_ARRAY = [LEG_FIELD.SETTLEMENT_DATE, LEG_FIELD.EFFECTIVE_DATE, LEG_FIELD.EXPIRATION_DATE];
 
@@ -70,6 +71,7 @@ const TradeManagementPricing = props => {
   const { location, tradeManagementBookEditPageData, tradeManagementPricingManagement } = props;
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [curPricingEnv, setCurPricingEnv] = useState(null);
+  const [validateDateTime, setValidateDateTime] = useState(moment());
 
   const setTableData = payload => {
     props.dispatch({
@@ -215,7 +217,7 @@ const TradeManagementPricing = props => {
     const { error, data = [], raw } = await prcTrialPositionsService({
       positions: [position],
       pricingEnvironmentId: curPricingEnv,
-      valuationDateTime: _.get(position, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
+      valuationDateTime: validateDateTime.format('YYYY-MM-DD'),
     });
 
     inlineSetLoadings(false);
@@ -290,7 +292,7 @@ const TradeManagementPricing = props => {
 
   const [pricingLoading, setPricingLoading] = useState(false);
 
-  const testPricing = async params => {
+  const testPricing = async () => {
     if (_.isEmpty(tableData)) {
       message.warn('请添加期权结构');
       return;
@@ -330,7 +332,7 @@ const TradeManagementPricing = props => {
           ),
           ...(item.productType === LEG_TYPE_MAP.FORWARD ? { vol: 1 } : undefined),
           pricingEnvironmentId: curPricingEnv,
-          valuationDateTime: _.get(item, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
+          valuationDateTime: validateDateTime.format('YYYY-MM-DD'),
         }),
       ),
     );
@@ -531,6 +533,8 @@ const TradeManagementPricing = props => {
   return (
     <Page>
       <ActionBar
+        setValidateDateTime={setValidateDateTime}
+        validateDateTime={validateDateTime}
         setTableData={setTableData}
         curPricingEnv={curPricingEnv}
         setCurPricingEnv={setCurPricingEnv}
