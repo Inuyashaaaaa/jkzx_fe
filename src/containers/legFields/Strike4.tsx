@@ -1,10 +1,10 @@
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
 import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
-import React from 'react';
 
 const getProps = record => {
   const val = Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]);
@@ -25,22 +25,22 @@ export const Strike4: ILegColDef = {
   dataIndex: LEG_FIELD.STRIKE4,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-    if (isEditing) {
+    if (isEditing || isBooking) {
       return false;
     }
     return true;
   },
-  render: (val, record, index, { form, editing, colDef }) => {
+  render: (v, record, index, { form, editing, colDef }) => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     const getUnit = () => {
-      const val = Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]);
-      if (val === STRIKE_TYPES_MAP.CNY) {
+      const value = Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]);
+      if (value === STRIKE_TYPES_MAP.CNY) {
         return '¥';
       }
-      if (val === STRIKE_TYPES_MAP.USD) {
+      if (value === STRIKE_TYPES_MAP.USD) {
         return '$';
       }
-      if (val === STRIKE_TYPES_MAP.PERCENT) {
+      if (value === STRIKE_TYPES_MAP.PERCENT) {
         return '%';
       }
       return '%';
@@ -50,7 +50,7 @@ export const Strike4: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<UnitInputNumber autoSelect={true} editing={false} unit={getUnit()} />)}
+        })(<UnitInputNumber autoSelect editing={false} unit={getUnit()} />)}
       </FormItem>
     );
   },

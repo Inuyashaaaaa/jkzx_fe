@@ -1,4 +1,3 @@
-/*eslint-disable */
 import { Divider, Popconfirm } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
@@ -57,14 +56,10 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
     width: 100,
     render: (val, record, index) => (
       <>
-        <a href="javascript:;" onClick={showModal}>
-          插入
-        </a>
+        <a onClick={showModal}>插入</a>
         <Divider type="vertical" />
         <Popconfirm title="确认要删除吗？" onConfirm={() => onRemove(record)}>
-          <a href="javascript:;" style={{ color: 'red' }}>
-            删除
-          </a>
+          <a style={{ color: 'red' }}>删除</a>
         </Popconfirm>
       </>
     ),
