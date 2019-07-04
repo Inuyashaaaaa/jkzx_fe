@@ -1,6 +1,6 @@
 import SiderMenu from '@/containers/SiderMenu';
 import ErrorBoundary from '@/containers/ErrorBoundary';
-import { Layout } from 'antd';
+import { Layout, BackTop } from 'antd';
 import classNames from 'classnames';
 import { connect } from 'dva';
 import memoizeOne from 'memoize-one';
@@ -193,6 +193,7 @@ class BasicLayout extends React.PureComponent {
             <Content style={this.getContentStyle()}>{children}</Content>
           </ErrorBoundary>
           <Footer />
+          <BackTop style={{ right: '10px', bottom: '10px' }} />
         </Layout>
       </Layout>
     );
