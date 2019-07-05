@@ -41,6 +41,7 @@ const ReportCommonTable = memo<any>(props => {
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
   const [excelFormData, setExcelFormData] = useState({});
+  const [searchForm, setSearchForm] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
     if (!pageSize) return;
@@ -56,7 +57,7 @@ const ReportCommonTable = memo<any>(props => {
   };
 
   const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
-    const usedFormData = paramsSearchFormData || searchFormData;
+    const usedFormData = paramsSearchFormData || searchForm;
     setExcelFormData(usedFormData);
     const formValidateRsp = await form.current.validate();
     if (formValidateRsp.error) {
@@ -153,6 +154,7 @@ const ReportCommonTable = memo<any>(props => {
       valuationDate: Form2.createField(moment().subtract(1, 'days')),
     };
     setSearchFormData(formData);
+    setSearchForm(formData);
     if (_.get(newMarkets.length) && _.get(newMarkets.length) > 0) {
       fetchTable(formData);
     }
@@ -192,6 +194,7 @@ const ReportCommonTable = memo<any>(props => {
             pageSize: PAGE_SIZE,
           });
           fetchTable(searchFormData, { current: 1, pageSize: PAGE_SIZE });
+          setSearchForm(searchFormData);
         }}
         resetable={false}
       />
