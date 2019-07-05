@@ -57,7 +57,7 @@ const TradeManagementOnBoardTansaction = props => {
     date: [moment().subtract(1, 'days'), moment()],
   });
   const [searchFormDataPosition, setSearchFormDataPosition] = useState({
-    searchDate: moment().subtract(1, 'days'),
+    searchDate: moment(),
   });
   const [activeKey, setActiveKey] = useState('flow');
   const [modalLoading, setModalLoading] = useState(false);
@@ -495,9 +495,9 @@ const TradeManagementOnBoardTansaction = props => {
               defaultValue="detail"
               style={{ marginBottom: '20px' }}
             >
-              <RadioButton value="detail">按明细统计</RadioButton>
-              <RadioButton value="summary">按合约代码统计</RadioButton>
-              <RadioButton value="portfolio">按投资组合统计</RadioButton>
+              <RadioButton value="detail">分交易簿统计</RadioButton>
+              <RadioButton value="portfolio">分投资组合统计</RadioButton>
+              <RadioButton value="summary">按合约代码汇总</RadioButton>
             </RadioGroup>
           </Row>
           {positionMode === 'detail' && (

@@ -202,6 +202,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
       [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.ALREADY_BARRIER]: false,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [LEG_FIELD.DOWN_BARRIER_OPTIONS_STRIKE_TYPE]: UNIT_ENUM_MAP2.PERCENT,
       [DownBarrierType.dataIndex]: UNIT_ENUM_MAP2.PERCENT,
       [LEG_FIELD.UP_OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1W'],

@@ -144,7 +144,7 @@ export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
       ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       after: (
         <Button key="upload" type="primary" onClick={handleSettleAmount}>
-          结算
+          试结算
         </Button>
       ),
     },

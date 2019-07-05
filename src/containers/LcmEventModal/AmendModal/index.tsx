@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React, { memo, useState, useRef, useEffect } from 'react';
 import moment from 'moment';
 import FormItem from 'antd/lib/form/FormItem';
+import { connect } from 'dva';
 import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD, DATE_ARRAY } from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import MultiLegTable from '@/containers/MultiLegTable';
@@ -36,7 +37,7 @@ export interface IAmendModal {
   current: (node: IAmendModalEl) => void;
 }
 
-const AmendModal = memo<IAmendModal>(props => {
+const AmendModal = props => {
   const { current } = props;
 
   const [visible, setVisible] = useState(false);
@@ -164,6 +165,11 @@ const AmendModal = memo<IAmendModal>(props => {
             setVisible(false);
             return;
           }
+          // 刷新合约管理列表
+          props.dispatch({
+            type: 'tradeManagementContractManage/modify',
+            payload: true,
+          });
           if (store.reload) {
             store.reload();
           }
@@ -284,6 +290,10 @@ const AmendModal = memo<IAmendModal>(props => {
       </Modal>
     </>
   );
-});
+};
 
-export default AmendModal;
+export default memo<IAmendModal>(
+  connect(state => ({
+    tradeManagementContractManage: state.tradeManagementContractManage,
+  }))(AmendModal),
+);

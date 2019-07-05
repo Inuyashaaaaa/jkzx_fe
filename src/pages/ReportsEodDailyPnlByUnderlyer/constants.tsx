@@ -43,6 +43,16 @@ export const TABLE_COL_DEFS = [
     },
   },
   {
+    title: '当日新交易',
+    dataIndex: 'pnlContributionNew',
+    width: 130,
+  },
+  {
+    title: '当日结算贡献',
+    dataIndex: 'pnlContributionSettled',
+    width: 130,
+  },
+  {
     title: 'Delta贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionDelta',

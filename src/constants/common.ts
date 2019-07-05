@@ -219,7 +219,7 @@ export const PROCESS_STATUS_TYPE_OPTIONS = convertOptions(
 );
 
 export const LCM_EVENT_TYPE_MAP = {
-  PAYMENT: 'PAYMENT',
+  // PAYMENT: 'PAYMENT',
   OPEN: 'OPEN',
   UNWIND: 'UNWIND',
   EXPIRATION: 'EXPIRATION',
@@ -229,14 +229,12 @@ export const LCM_EVENT_TYPE_MAP = {
   ROLL: 'ROLL',
   UNWIND_PARTIAL: 'UNWIND_PARTIAL',
   OBSERVE: 'OBSERVE',
-  SNOW_BALL_EXERCISE: 'SNOW_BALL_EXERCISE',
-  PHOENIX_EXERCISE: 'PHOENIX_EXERCISE',
   AMEND: 'AMEND',
   SETTLE: 'SETTLE',
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
-  PAYMENT: '支付',
+  // PAYMENT: '支付',
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
   OPEN: '开仓',
@@ -246,8 +244,6 @@ export const LCM_EVENT_TYPE_ZHCN_MAP = {
   ROLL: '展期',
   UNWIND_PARTIAL: '部分平仓',
   OBSERVE: '观察',
-  SNOW_BALL_EXERCISE: '雪球式到期结算',
-  PHOENIX_EXERCISE: '凤凰式到期结算',
   AMEND: '修改交易要素',
   SETTLE: '结算',
 };

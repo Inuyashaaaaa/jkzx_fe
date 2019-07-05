@@ -2,19 +2,21 @@ import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
 import { evaluate } from 'mathjs';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import moment from 'moment';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import { IFormField } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
+  DATE_ARRAY,
+  LEG_ENV_FIELD,
   LEG_FIELD,
   LEG_ID_FIELD,
-  LEG_INJECT_FIELDS,
   LEG_TYPE_FIELD,
   LEG_TYPE_MAP,
-  DATE_ARRAY,
   OBSERVATION_TYPE_MAP,
-  FREQUENCY_TYPE_NUM_MAP,
+  LEG_TYPE_ZHCH_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -29,7 +31,6 @@ import { Form2 } from '@/containers';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
-import { IFormField } from '@/components/type';
 import {
   countDelta,
   countDeltaCash,
@@ -38,25 +39,19 @@ import {
   countPrice,
   countPricePer,
   countRhoR,
+  countSpreadDelta,
   countStdDelta,
   countTheta,
   countVega,
-  countSpreadStdDelta,
-  countSpreadDelta,
-  countSpreadDeltaCash,
-  countSpreadGamma,
-  countSpreadGammaCash,
-  countSpreadVega,
-  countSpreadCega,
 } from '@/services/cash';
-import { convertTradePositions, createLegDataSourceItem } from '@/services/pages';
+import { convertTradePositions } from '@/services/pages';
 import { prcTrialPositionsService } from '@/services/pricing';
 import { prcPricingEnvironmentsList } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
 import { getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
+import { computedShift } from '@/tools/leg';
 import ActionBar from './ActionBar';
 import './index.less';
-import { computedShift } from '@/tools/leg';
 
 const TradeManagementPricing = props => {
   const tableData = _.map(props.pricingData.tableData, iitem =>
@@ -73,6 +68,7 @@ const TradeManagementPricing = props => {
   const { location, tradeManagementBookEditPageData, tradeManagementPricingManagement } = props;
   const tableEl = useRef<IMultiLegTableEl>(null);
   const [curPricingEnv, setCurPricingEnv] = useState(null);
+  const [validateDateTime, setValidateDateTime] = useState(moment());
 
   const setTableData = payload => {
     props.dispatch({
@@ -83,6 +79,15 @@ const TradeManagementPricing = props => {
 
   const { query } = location;
   const { from, id } = query;
+
+  const getSelfTradesColDataIndexs = record => {
+    const leg = getLegByRecord(record);
+    const selfTradesColDataIndexs = _.intersection(
+      leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
+      TRADESCOL_FIELDS,
+    );
+    return selfTradesColDataIndexs;
+  };
 
   const judgeLegColumnsHasError = record => {
     const leg = getLegByRecord(record);
@@ -110,21 +115,11 @@ const TradeManagementPricing = props => {
     );
 
     const leftValues = Form2.getFieldsValue(_.pick(fills, leftKeys));
-
-    if (_.some(leftValues, val => val == null)) {
+    if (_.some(leftValues, val => val == null || _.get(val, 'length') === 0)) {
       return true;
     }
 
     return false;
-  };
-
-  const getSelfTradesColDataIndexs = record => {
-    const leg = getLegByRecord(record);
-    const selfTradesColDataIndexs = _.intersection(
-      leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
-      TRADESCOL_FIELDS,
-    );
-    return selfTradesColDataIndexs;
   };
 
   const fetchDefaultPricingEnvData = async (record, reload = false) => {
@@ -173,7 +168,7 @@ const TradeManagementPricing = props => {
     const { error, data = [], raw } = await prcTrialPositionsService({
       positions: [position],
       pricingEnvironmentId: curPricingEnv,
-      valuationDateTime: _.get(position, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
+      valuationDateTime: validateDateTime.format('YYYY-MM-DD'),
     });
 
     inlineSetLoadings(false);
@@ -234,6 +229,55 @@ const TradeManagementPricing = props => {
     );
   };
 
+  useLifecycles(() => {
+    if (from === PRICING_FROM_EDITING) {
+      const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
+
+      const recordTypeIsModelXY = record =>
+        Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
+
+      if (editingTableData.some(recordTypeIsModelXY)) {
+        message.info('暂不支持自定义产品试定价');
+      }
+
+      const next = editingTableData
+        .filter(record => !recordTypeIsModelXY(record))
+        .map(record => {
+          const leg = getLegByRecord(record);
+          if (!leg) return record;
+          const omits = _.difference(
+            leg.getColumns(LEG_ENV.EDITING, record).map(item => item.dataIndex),
+            leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
+          );
+
+          const result = {
+            ...leg.getDefaultData(LEG_ENV.PRICING),
+            ..._.omit(record, omits),
+            [LEG_ENV_FIELD]: LEG_ENV.PRICING,
+            [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
+          };
+
+          return leg.convertEditRecord2PricingData
+            ? leg.convertEditRecord2PricingData(result)
+            : result;
+        });
+
+      setTableData(next);
+    }
+  });
+
+  const [fetched, setFetched] = useState(false);
+
+  useEffect(() => {
+    if (from === PRICING_FROM_EDITING) {
+      if (fetched) return;
+      if (!curPricingEnv || !curPricingEnv.length) return;
+      if (_.isEmpty(tableData)) return;
+      tableData.forEach(record => fetchDefaultPricingEnvData(record));
+      setFetched(true);
+    }
+  }, [tableData, curPricingEnv]);
+
   const [pricingEnvironmentsList, setPricingEnvironmentsList] = useState([]);
 
   const loadPricingEnv = async () => {
@@ -249,7 +293,7 @@ const TradeManagementPricing = props => {
 
   const [pricingLoading, setPricingLoading] = useState(false);
 
-  const testPricing = async params => {
+  const testPricing = async () => {
     if (_.isEmpty(tableData)) {
       message.warn('请添加期权结构');
       return;
@@ -289,7 +333,7 @@ const TradeManagementPricing = props => {
           ),
           ...(item.productType === LEG_TYPE_MAP.FORWARD ? { vol: 1 } : undefined),
           pricingEnvironmentId: curPricingEnv,
-          valuationDateTime: _.get(item, `asset.${LEG_FIELD.EFFECTIVE_DATE}`),
+          valuationDateTime: validateDateTime.format('YYYY-MM-DD'),
         }),
       ),
     );
@@ -308,12 +352,16 @@ const TradeManagementPricing = props => {
 
     setTableData(pre =>
       rsps
-        .reduce((prev, next) => {
+        .reduce((prev, next, index) => {
           const isError = rspIsError(next);
           if (isError || rspIsEmpty(next)) {
             if (isError) {
+              const position = positions[index];
               notification.error({
-                message: _.get(next.raw, 'diagnostics.[0].message', []),
+                message: `第${index + 1}条结构(${
+                  LEG_TYPE_ZHCH_MAP[position.productType]
+                })定价产生错误`,
+                description: `xxxxx${_.get(next.raw, 'diagnostics.[0].message', [])}`,
               });
             }
             return prev.concat(null);
@@ -489,56 +537,17 @@ const TradeManagementPricing = props => {
     });
   };
 
-  useLifecycles(() => {
-    if (from === PRICING_FROM_EDITING) {
-      const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
-      const recordTypeIsModelXY = record =>
-        Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
-
-      if (editingTableData.some(recordTypeIsModelXY)) {
-        message.info('暂不支持自定义产品试定价');
-      }
-
-      const next = editingTableData
-        .filter(record => !recordTypeIsModelXY(record))
-        .map(record => {
-          const leg = getLegByRecord(record);
-          if (!leg) return record;
-          const omits = _.difference(
-            leg.getColumns(LEG_ENV.EDITING, record).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
-          );
-
-          const result = {
-            ...createLegDataSourceItem(leg, LEG_ENV.PRICING),
-            ...leg.getDefaultData(LEG_ENV.PRICING),
-            ..._.omit(record, [...omits, ...LEG_INJECT_FIELDS]),
-            [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
-          };
-
-          return leg.convertEditRecord2PricingData
-            ? leg.convertEditRecord2PricingData(result)
-            : result;
-        });
-      setTableData(next);
+  const onCellValuesChange = params => {
+    if (_.get(params, 'changedValues.OBSERVATION_DATES')) {
+      fetchDefaultPricingEnvData(params.record);
     }
-  });
-
-  const [fetched, setFetched] = useState(false);
-
-  useEffect(() => {
-    if (from === PRICING_FROM_EDITING) {
-      if (fetched) return;
-      if (!curPricingEnv || !curPricingEnv.length) return;
-      if (_.isEmpty(tableData)) return;
-      tableData.forEach(record => fetchDefaultPricingEnvData(record));
-      setFetched(true);
-    }
-  }, [tableData, curPricingEnv]);
+  };
 
   return (
     <Page>
       <ActionBar
+        setValidateDateTime={setValidateDateTime}
+        validateDateTime={validateDateTime}
         setTableData={setTableData}
         curPricingEnv={curPricingEnv}
         setCurPricingEnv={setCurPricingEnv}
@@ -559,6 +568,7 @@ const TradeManagementPricing = props => {
         onCellEditingChanged={params => {
           fetchDefaultPricingEnvData(params.record);
         }}
+        onCellValuesChange={onCellValuesChange}
         dataSource={tableData}
         getContextMenu={params => {
           const { record } = params;

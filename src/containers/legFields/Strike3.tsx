@@ -1,7 +1,7 @@
 import { ValidationRule } from 'antd/lib/form';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
-import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
+import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP, LEG_TYPE_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
@@ -29,8 +29,27 @@ export const Strike3: ILegColDef = {
       return '%';
     };
 
-    const getRules = () =>
-      ([
+    const getRules = () => {
+      if (LEG_TYPE_MAP.TRIPLE_DIGITAL === record.$legType) {
+        return ([
+          {
+            message: '必须满足条件(行权价1 < 行权价2 < 行权价3)',
+            validator(rule, value, callback) {
+              if (
+                !(
+                  Form2.getFieldValue(record[LEG_FIELD.STRIKE1]) <
+                    Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) &&
+                  Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) < value
+                )
+              ) {
+                return callback(true);
+              }
+              return callback();
+            },
+          },
+        ] as ValidationRule[]).concat(RULES_REQUIRED);
+      }
+      return ([
         {
           message: '必须满足条件(行权价1 < 行权价2 <= 行权价3)',
           validator(rule, value, callback) {
@@ -47,6 +66,7 @@ export const Strike3: ILegColDef = {
           },
         },
       ] as ValidationRule[]).concat(RULES_REQUIRED);
+    };
 
     return (
       <FormItem>

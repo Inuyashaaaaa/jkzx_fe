@@ -1,3 +1,6 @@
+/*eslint-disable */
+import _ from 'lodash';
+import moment from 'moment';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import {
   ASSET_CLASS_MAP,
@@ -22,8 +25,6 @@ import {
 import { Form2 } from '@/containers';
 import { getMoment, getCurDateMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -148,6 +149,7 @@ export const SpreadEuropean: ILeg = legPipeLine({
       [LEG_FIELD.STRIKE_TYPE]: STRIKE_TYPES_MAP.PERCENT,
       [LEG_FIELD.PARTICIPATION_RATE]: 100,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [LEG_FIELD.NOTIONAL_AMOUNT_TYPE]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
       [LEG_FIELD.PREMIUM_TYPE]: PREMIUM_TYPE_MAP.PERCENT,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
@@ -178,9 +180,9 @@ export const SpreadEuropean: ILeg = legPipeLine({
       'weight',
     ];
 
-    const constituents = dataItem[LEG_FIELD.UNDERLYER_INSTRUMENT_ID].map(item => {
-      return _.omit(item, 'name');
-    });
+    const constituents = dataItem[LEG_FIELD.UNDERLYER_INSTRUMENT_ID].map(item =>
+      _.omit(item, 'name'),
+    );
 
     nextPosition.productType = LEG_TYPE_MAP.SPREAD_EUROPEAN;
     nextPosition.asset = _.omit(dataItem, [
@@ -213,12 +215,10 @@ export const SpreadEuropean: ILeg = legPipeLine({
   },
   getPageData: (env: string, position: any) => {
     if (position.asset.constituents) {
-      const values = position.asset.constituents.map((item, index) => {
-        return {
-          ...item,
-          name: '标的物' + (index + 1),
-        };
-      });
+      const values = position.asset.constituents.map((item, index) => ({
+        ...item,
+        name: `标的物${index + 1}`,
+      }));
 
       return Form2.createFields({
         [LEG_FIELD.UNDERLYER_INSTRUMENT_ID]: values,
@@ -235,9 +235,7 @@ export const SpreadEuropean: ILeg = legPipeLine({
           'initialSpot1',
           'weight1',
         ]),
-        (value, key) => {
-          return key.substr(0, key.length - 1);
-        }
+        (val, key) => key.substr(0, key.length - 1),
       ),
       _.mapKeys(
         _.pick(position.asset, [
@@ -246,16 +244,12 @@ export const SpreadEuropean: ILeg = legPipeLine({
           'initialSpot2',
           'weight2',
         ]),
-        (value, key) => {
-          return key.substr(0, key.length - 1);
-        }
+        (val, key) => key.substr(0, key.length - 1),
       ),
-    ].map((item, index) => {
-      return {
-        ...item,
-        name: '标的物' + (index + 1),
-      };
-    });
+    ].map((item, index) => ({
+      ...item,
+      name: `标的物${index + 1}`,
+    }));
     return Form2.createFields({
       [LEG_FIELD.UNDERLYER_INSTRUMENT_ID]: value,
       [LEG_FIELD.UNDERLYER_MULTIPLIER]: value,
@@ -271,7 +265,7 @@ export const SpreadEuropean: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     const { changedFields } = changeFieldsParams;
 
@@ -292,7 +286,7 @@ export const SpreadEuropean: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });

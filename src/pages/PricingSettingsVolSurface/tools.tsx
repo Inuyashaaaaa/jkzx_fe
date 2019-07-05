@@ -1,7 +1,8 @@
 import React from 'react';
-import { IFormControl } from '@/containers/_Form2';
 import { OptionProps } from 'antd/lib/select';
 import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import { IFormControl } from '@/containers/_Form2';
 import { getCanUsedTranorsOtions } from '@/services/common';
 import { Form2, Select } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
@@ -11,81 +12,75 @@ export const SEARCH_FORM = (groups, formData) => [
   {
     title: '标的',
     dataIndex: MARKET_KEY,
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
-              {
-                required: true,
-              },
-            ],
-          })(<Select style={{ minWidth: 180 }} placeholder="请选择左侧标的物" disabled={true} />)}
-        </FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(<Select style={{ minWidth: 180 }} placeholder="请选择左侧标的物" disabled />)}
+      </FormItem>
+    ),
   },
   {
     title: '分组',
     dataIndex: GROUP_KEY,
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
-              {
-                required: true,
-              },
-            ],
-          })(
-            <Select
-              style={{ minWidth: 180 }}
-              placeholder="选择标的物后，继续选择分组项"
-              options={groups}
-            />
-          )}
-        </FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="选择标的物后，继续选择分组项"
+            options={groups}
+          />,
+        )}
+      </FormItem>
+    ),
   },
   {
     title: '定价环境',
     dataIndex: INSTANCE_KEY,
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(
+          <Select
+            style={{ minWidth: 180 }}
+            placeholder="选择定价环境"
+            disabled={!_.get(formData, `${GROUP_KEY}.value`)}
+            options={[
               {
-                required: true,
+                label: '日内',
+                value: 'INTRADAY',
               },
-            ],
-          })(
-            <Select
-              style={{ minWidth: 180 }}
-              placeholder="选择定价环境"
-              disabled={!formData[GROUP_KEY]}
-              options={[
-                {
-                  label: '日内',
-                  value: 'INTRADAY',
-                },
-                {
-                  label: '收盘',
-                  value: 'CLOSE',
-                },
-              ]}
-            />
-          )}
-        </FormItem>
-      );
-    },
+              {
+                label: '收盘',
+                value: 'CLOSE',
+              },
+            ]}
+          />,
+        )}
+      </FormItem>
+    ),
   },
 ];
 
 export const SEARCH_FORM_CONTROLS: (groups: OptionProps[], formData: any) => IFormControl[] = (
   groups,
-  formData
+  formData,
 ) => [
   {
     control: {
@@ -162,26 +157,22 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 120,
     dataIndex: 'tenor',
     defaultEditing: false,
-    editable: record => {
-      return true;
-    },
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <Select
-              defaultOpen={true}
-              autoSelect={true}
-              options={getCanUsedTranorsOtions(
-                tableDataSource.map(item => Form2.getFieldsValue(item)),
-                Form2.getFieldsValue(record)
-              )}
-              editing={editing}
-            />
-          )}
-        </FormItem>
-      );
-    },
+    editable: record => true,
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            defaultOpen
+            autoSelect
+            options={getCanUsedTranorsOtions(
+              tableDataSource.map(item => Form2.getFieldsValue(item)),
+              Form2.getFieldsValue(record),
+            )}
+            editing={editing}
+          />,
+        )}
+      </FormItem>
+    ),
   },
   {
     dataIndex: '80% SPOT',
@@ -189,19 +180,13 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 150,
     percent: 0.8,
     align: 'right',
-    editable: record => {
-      return true;
-    },
+    editable: record => true,
     defaultEditing: false,
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+      </FormItem>
+    ),
   },
   {
     dataIndex: '90% SPOT',
@@ -209,19 +194,13 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 150,
     align: 'right',
     percent: 0.9,
-    editable: record => {
-      return true;
-    },
+    editable: record => true,
     defaultEditing: false,
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+      </FormItem>
+    ),
   },
   {
     dataIndex: '95% SPOT',
@@ -229,19 +208,13 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 150,
     align: 'right',
     percent: 0.95,
-    editable: record => {
-      return true;
-    },
+    editable: record => true,
     defaultEditing: false,
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+      </FormItem>
+    ),
   },
   {
     dataIndex: '100% SPOT',
@@ -249,19 +222,13 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 150,
     align: 'right',
     percent: 1,
-    editable: record => {
-      return true;
-    },
+    editable: record => true,
     defaultEditing: false,
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+      </FormItem>
+    ),
   },
   {
     dataIndex: '105% SPOT',
@@ -269,19 +236,13 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 150,
     percent: 1.05,
     align: 'right',
-    editable: record => {
-      return true;
-    },
+    editable: record => true,
     defaultEditing: false,
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+      </FormItem>
+    ),
   },
   {
     dataIndex: '110% SPOT',
@@ -289,19 +250,13 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 150,
     align: 'right',
     percent: 1.1,
-    editable: record => {
-      return true;
-    },
+    editable: record => true,
     defaultEditing: false,
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+      </FormItem>
+    ),
   },
   {
     dataIndex: '120% SPOT',
@@ -309,18 +264,12 @@ export const TABLE_COLUMN = tableDataSource => [
     width: 150,
     align: 'right',
     percent: 1.2,
-    editable: record => {
-      return true;
-    },
+    editable: record => true,
     defaultEditing: false,
-    render: (val, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+      </FormItem>
+    ),
   },
 ];

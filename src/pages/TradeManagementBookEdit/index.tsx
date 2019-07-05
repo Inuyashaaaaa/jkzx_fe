@@ -1,5 +1,5 @@
 /*eslint-disable */
-import { Divider, Menu, message, Skeleton, Typography } from 'antd';
+import { Divider, Menu, message, Skeleton, Typography, Button } from 'antd';
 import { connect } from 'dva';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
@@ -31,7 +31,9 @@ import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord } from '@/tools';
 import { ILeg } from '@/types/leg';
+import BackBtn from '@/containers/BackBtn';
 
+const ButtonGroup = Button.Group;
 const TradeManagementBooking = props => {
   const { currentUser } = props;
   const { tradeManagementBookEditPageData, dispatch } = props;
@@ -189,10 +191,12 @@ const TradeManagementBooking = props => {
   const getContextMenu = params => {
     const menuItem =
       eventTypes[params.record.id] &&
-      eventTypes[params.record.id].map(eventType => ({
-        key: eventType,
-        value: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
-      }));
+      eventTypes[params.record.id]
+        .map(eventType => ({
+          key: eventType,
+          value: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
+        }))
+        .sort((a, b) => b.value.localeCompare(a.value));
     if (!menuItem) return;
     return (
       <Menu onClick={({ key }) => handleEventAction(key, params)}>
@@ -218,7 +222,16 @@ const TradeManagementBooking = props => {
   });
 
   return (
-    <Page back title="交易详情">
+    <Page
+      back
+      title="交易详情"
+      extra={
+        <ButtonGroup>
+          <BackBtn />
+          <ActionBar tableData={tableData} />
+        </ButtonGroup>
+      }
+    >
       {tableLoading ? (
         <Skeleton active paragraph={{ rows: 4 }} />
       ) : (
@@ -228,7 +241,7 @@ const TradeManagementBooking = props => {
           <div className={styles.bookingBaseInfoFormWrapper}>
             <BookingBaseInfoForm
               hideRequiredMark
-              columnNumberOneRow={2}
+              columnNumberOneRow={3}
               editableStatus={FORM_EDITABLE_STATUS.SHOW}
               createFormData={createFormData}
               setCreateFormData={setCreateFormData}
@@ -295,7 +308,7 @@ const TradeManagementBooking = props => {
           />
         </>
       )}
-      <ActionBar tableData={tableData} />
+      {/* <ActionBar tableData={tableData} /> */}
     </Page>
   );
 };
