@@ -381,24 +381,36 @@ export const BarrierLeg: ILeg = legPipeLine({
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.STRIKE, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER_TYPE, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.STRIKE_TYPE, changedFields)
+      Form2.fieldValueIsChange(LEG_FIELD.STRIKE_TYPE, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)
     ) {
       let barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
       let strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
       const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
       if (barrier != null && strike != null) {
-        if (Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
-          barrier = new BigNumber(barrier)
-            .multipliedBy(0.01)
-            .multipliedBy(initialSpot)
-            .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+        if (
+          Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) ===
+          Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE])
+        ) {
+          barrier = barrier;
+          strike = strike;
+        } else if (initialSpot === undefined) {
+          barrier = strike;
+        } else {
+          if (Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
+            barrier = new BigNumber(barrier)
+              .multipliedBy(0.01)
+              .multipliedBy(initialSpot)
+              .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+          }
+          if (Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
+            strike = new BigNumber(strike)
+              .multipliedBy(0.01)
+              .multipliedBy(initialSpot)
+              .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+          }
         }
-        if (Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
-          strike = new BigNumber(strike)
-            .multipliedBy(0.01)
-            .multipliedBy(initialSpot)
-            .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
-        }
+
         record[LEG_FIELD.OPTION_TYPE] =
           barrier > strike
             ? Form2.createField(OPTION_TYPE_MAP.CALL)
