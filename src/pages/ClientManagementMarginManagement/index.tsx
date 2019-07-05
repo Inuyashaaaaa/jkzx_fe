@@ -90,6 +90,9 @@ class ClientManagementMarginManagement extends PureComponent {
       message.error('批量更新失败');
       return false;
     }
+    this.setState({
+      modalVisible: false,
+    });
     message.success('批量更新成功');
     this.fetchTable();
     return true;
