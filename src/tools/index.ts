@@ -1,3 +1,4 @@
+/*eslint-disable */
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import { notification } from 'antd';
@@ -35,6 +36,7 @@ import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { SpreadEuropean } from '@/domains/legs/SpreadEuropean';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
+import { CashFlow } from '@/domains/legs/CashFlow';
 import { Asia } from '@/domains/legs/Asia';
 import { Straddle } from '@/domains/legs/Straddle';
 import { Forward } from '@/domains/legs/Forward';
@@ -246,6 +248,9 @@ export const getLegByProductType = (productType, exerciseType?) => {
   }
   if (productType === PRODUCT_TYPE_MAP.RATIO_SPREAD_EUROPEAN) {
     return RatioSpreadEuropean;
+  }
+  if (productType === PRODUCT_TYPE_MAP.CASH_FLOW) {
+    return CashFlow;
   }
   throw new Error('not match productType!');
 };

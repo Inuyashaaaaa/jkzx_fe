@@ -1,5 +1,3 @@
-import SiderMenu from '@/containers/SiderMenu';
-import ErrorBoundary from '@/containers/ErrorBoundary';
 import { Layout, BackTop } from 'antd';
 import classNames from 'classnames';
 import { connect } from 'dva';
@@ -9,6 +7,8 @@ import React from 'react';
 import { ContainerQuery } from 'react-container-query';
 import DocumentTitle from 'react-document-title';
 import Media from 'react-media';
+import ErrorBoundary from '@/containers/ErrorBoundary';
+import SiderMenu from '@/containers/SiderMenu';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
@@ -88,6 +88,7 @@ class BasicLayout extends React.PureComponent {
       pageTitle: getPageTitle(pathname, breadcrumbNameMap),
     };
   }
+
   public state = {
     pageTitle: '',
     // eslint-disable-next-line react/no-unused-state

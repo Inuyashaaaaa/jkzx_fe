@@ -589,6 +589,11 @@ export const LEG_FIELD = {
   COMMENT: 'comment',
   UNIT: 'unit',
   TRADE_NUMBER: 'tradeNumber',
+  PAYMENT_DATE: 'paymentDate',
+  PAYMENT_AMOUNT: 'paymentAmount',
+  PAYMENT_DIRECTION: 'paymentDirection',
+  PAYMENT_STATE: 'paymentState',
+  CURRENCY: 'currency',
 };
 
 /**
@@ -631,6 +636,11 @@ export const INSTRUMENT_TYPE_ZHCN_MAP = {
   FUTURES: '期货',
 };
 
+export const PAYMENT_STATE_TYPE_MAP = {
+  PAID: 'PAID',
+  UNPAID: 'UNPAID',
+};
+
 export const INSTRUMENT_TYPE_OPTIONS = convertOptions(
   INSTRUMENT_TYPE_MAP,
   INSTRUMENT_TYPE_ZHCN_MAP,
@@ -661,6 +671,8 @@ export const EXERCISETYPE_MAP = {
 export const EXTRA_FIELDS = ['positionId', 'quantity', 'lcmEventType', 'productType'];
 
 export const LEG_INJECT_FIELDS = [LEG_ID_FIELD, LEG_TYPE_FIELD, LEG_NAME_FIELD, LEG_ENV_FIELD];
+
+export const TRADESCOLDEFS_LEG_FIELDS = ['underlyerPrice', 'vol', 'q', 'r'];
 
 export const BIG_NUMBER_CONFIG = {
   DECIMAL_PLACES: 4,
@@ -737,6 +749,7 @@ export const LEG_TYPE_MAP = {
   FORWARD_UNANNUAL: 'FORWARD_UNANNUAL',
   SPREAD_EUROPEAN: 'SPREAD_EUROPEAN',
   RATIO_SPREAD_EUROPEAN: 'RATIO_SPREAD_EUROPEAN',
+  CASH_FLOW: 'CASH_FLOW',
 };
 
 export const PRODUCT_TYPE_MAP = {
@@ -812,6 +825,7 @@ export const LEG_TYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.FORWARD_UNANNUAL]: '远期 - 非年化',
   [LEG_TYPE_MAP.SPREAD_EUROPEAN]: '价差欧式(a-b)',
   [LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN]: '价差欧式(a/b)',
+  [LEG_TYPE_MAP.CASH_FLOW]: '单笔现金流',
 };
 
 export const PRODUCT_TYPE_OPTIONS = convertOptions(PRODUCT_TYPE_MAP, LEG_TYPE_ZHCH_MAP);
@@ -839,6 +853,7 @@ export const PRODUCTTYPE_ZHCH_MAP = {
   [LEG_TYPE_MAP.RANGE_ACCRUALS]: '区间累积',
   [LEG_TYPE_MAP.STRADDLE]: '跨式',
   [LEG_TYPE_MAP.DIGITAL]: '二元',
+  [LEG_TYPE_MAP.CASH_FLOW]: '单笔现金流',
   // 暂时去掉下面2个类型
   // [LEG_TYPE_MAP.SPREAD_EUROPEAN]: '价差欧式(a-b)',
   // [LEG_TYPE_MAP.RATIO_SPREAD_EUROPEAN]: '价差欧式(a/b)',
@@ -867,6 +882,7 @@ export const PRODUCTTYPE_MAP = {
   // DIGITAL_AMERICAN: 'DIGITAL_AMERICAN',
   // DIGITAL_EUROPEAN: 'DIGITAL_EUROPEAN',
   DIGITAL: 'DIGITAL',
+  CASH_FLOW: 'CASH_FLOW',
   // 暂时去掉下面2个类型
   // SPREAD_EUROPEAN: 'SPREAD_EUROPEAN',
   // RATIO_SPREAD_EUROPEAN: 'RATIO_SPREAD_EUROPEAN',
@@ -975,6 +991,7 @@ export const DATE_ARRAY = [
   LEG_FIELD.DOWN_BARRIER_DATE,
   LEG_FIELD.OBSERVE_START_DAY,
   LEG_FIELD.OBSERVE_END_DAY,
+  LEG_FIELD.PAYMENT_DATE,
 ];
 
 export const DOC_MAP = {

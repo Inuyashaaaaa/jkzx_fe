@@ -1,3 +1,8 @@
+import { Divider, Menu } from 'antd';
+import { connect } from 'dva';
+import _ from 'lodash';
+import React, { memo, useRef } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
 import { IFormField } from '@/components/type';
 import {
   LEG_FIELD,
@@ -15,26 +20,22 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
 import { createLegDataSourceItem } from '@/services/pages';
 import { getLegByRecord, insert, remove, uuid, getMoment } from '@/tools';
-import { Divider, Menu } from 'antd';
-import { connect } from 'dva';
-import _ from 'lodash';
-import React, { memo, useRef } from 'react';
 import ActionBar from './ActionBar';
 import './index.less';
-import useLifecycles from 'react-use/lib/useLifecycles';
 
 const TradeManagementBooking = props => {
+  const tableEl = useRef<IMultiLegTableEl>(null);
+
   const { location, currentUser, tableData: modalTableData, dispatch } = props;
   const { query } = location;
   const { from } = query;
-  const getPricingPermium = record => {
-    return Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY
+  const getPricingPermium = record =>
+    Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]) === PREMIUM_TYPE_MAP.CNY
       ? record[COMPUTED_LEG_FIELD_MAP.PRICE]
       : record[COMPUTED_LEG_FIELD_MAP.PRICE_PER];
-  };
 
-  const tableData = _.map(modalTableData, iitem => {
-    return _.mapValues(iitem, (item, key) => {
+  const tableData = _.map(modalTableData, iitem =>
+    _.mapValues(iitem, (item, key) => {
       if (_.includes(DATE_ARRAY, key)) {
         return {
           type: 'field',
@@ -42,8 +43,8 @@ const TradeManagementBooking = props => {
         };
       }
       return item;
-    });
-  });
+    }),
+  );
 
   const setTableData = payload => {
     dispatch({
@@ -84,7 +85,7 @@ const TradeManagementBooking = props => {
               },
             });
           },
-          setTableData
+          setTableData,
         );
       }
       return newData;
@@ -93,13 +94,13 @@ const TradeManagementBooking = props => {
 
   useLifecycles(() => {
     if (from === BOOKING_FROM_PRICING) {
-      setTableData(pre => {
-        return (props.pricingData.tableData || []).map(item => {
+      setTableData(pre =>
+        (props.pricingData.tableData || []).map(item => {
           const leg = getLegByRecord(item);
           if (!leg) return item;
           const omits = _.difference(
-            leg.getColumns(LEG_ENV.PRICING, item).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.BOOKING, item).map(item => item.dataIndex)
+            leg.getColumns(LEG_ENV.PRICING, item).map(items => items.dataIndex),
+            leg.getColumns(LEG_ENV.BOOKING, item).map(items => items.dataIndex),
           );
 
           const pricingPermium = getPricingPermium(item);
@@ -112,13 +113,12 @@ const TradeManagementBooking = props => {
             ..._.omit(item, [...omits, ...LEG_INJECT_FIELDS]),
             [LEG_FIELD.PREMIUM]: Form2.createField(permium),
           };
-        });
-      });
+        }),
+      );
     }
     return modalTableData;
   });
 
-  const tableEl = useRef<IMultiLegTableEl>(null);
   return (
     <Page>
       <ActionBar
@@ -133,32 +133,30 @@ const TradeManagementBooking = props => {
         env={LEG_ENV.BOOKING}
         onCellFieldsChange={onCellFieldsChange}
         dataSource={tableData}
-        getContextMenu={params => {
-          return (
-            <Menu
-              onClick={event => {
-                if (event.key === 'copy') {
-                  setTableData(pre => {
-                    const next = insert(pre, params.rowIndex, {
-                      ..._.cloneDeep(params.record),
-                      [LEG_ID_FIELD]: uuid(),
-                    });
-                    return next;
+        getContextMenu={params => (
+          <Menu
+            onClick={event => {
+              if (event.key === 'copy') {
+                setTableData(pre => {
+                  const next = insert(pre, params.rowIndex, {
+                    ..._.cloneDeep(params.record),
+                    [LEG_ID_FIELD]: uuid(),
                   });
-                }
-                if (event.key === 'remove') {
-                  setTableData(pre => {
-                    const next = remove(pre, params.rowIndex);
-                    return next;
-                  });
-                }
-              }}
-            >
-              <Menu.Item key="copy">复制</Menu.Item>
-              <Menu.Item key="remove">删除</Menu.Item>
-            </Menu>
-          );
-        }}
+                  return next;
+                });
+              }
+              if (event.key === 'remove') {
+                setTableData(pre => {
+                  const next = remove(pre, params.rowIndex);
+                  return next;
+                });
+              }
+            }}
+          >
+            <Menu.Item key="copy">复制</Menu.Item>
+            <Menu.Item key="remove">删除</Menu.Item>
+          </Menu>
+        )}
       />
     </Page>
   );
@@ -169,5 +167,5 @@ export default memo(
     currentUser: (state.user as any).currentUser,
     pricingData: state.pricingData,
     tableData: state.tradeManagementBooking.tableData,
-  }))(TradeManagementBooking)
+  }))(TradeManagementBooking),
 );

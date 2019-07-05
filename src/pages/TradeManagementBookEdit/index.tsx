@@ -128,11 +128,12 @@ const TradeManagementBooking = props => {
     if (error) return;
 
     const tableFormData = getTradeCreateModalData(data);
+    const unUnitLeg = [LEG_TYPE_MAP.SPREAD_EUROPEAN, LEG_TYPE_MAP.CASH_FLOW];
 
     const { positions } = data;
     const unitPositions = await Promise.all(
       positions.map(position => {
-        if (position.productType === LEG_TYPE_MAP.SPREAD_EUROPEAN) {
+        if (unUnitLeg.includes(position.productType)) {
           return Promise.resolve(position);
         }
         return mktInstrumentInfo({

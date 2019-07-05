@@ -1,5 +1,6 @@
 import { Button } from 'antd';
 import React from 'react';
+import FormItem from 'antd/lib/form/FormItem';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
@@ -7,6 +8,8 @@ import {
   LEG_TYPE_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
+import { DatePicker, Select } from '@/containers';
+import { UnitInputNumber } from '@/containers/UnitInputNumber';
 
 export const SETTLE_FORM_CONTROLS: (
   notionalType,
@@ -82,6 +85,41 @@ export const SETTLE_FORM_CONTROLS: (
         },
       ],
     },
+  },
+];
+
+export const CASHFLOW_SETTLE_FORM_CONTROLS = [
+  {
+    title: '支付日',
+    dataIndex: 'paymentDate',
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<DatePicker format="YYYY-MM-DD" editing={false} />)}
+      </FormItem>
+    ),
+  },
+  {
+    title: '支付金额',
+    dataIndex: 'paymentAmount',
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<UnitInputNumber editing={false} unit="¥" />)}
+      </FormItem>
+    ),
+  },
+  {
+    title: '支付方向',
+    dataIndex: 'paymentDirection',
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            editing={false}
+            options={[{ label: '收入', value: 'RECEIVE' }, { label: '支出', value: 'PAID' }]}
+          />,
+        )}
+      </FormItem>
+    ),
   },
 ];
 
