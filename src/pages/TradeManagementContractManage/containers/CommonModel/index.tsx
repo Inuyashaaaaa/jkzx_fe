@@ -5,7 +5,12 @@ import _ from 'lodash';
 import { isMoment } from 'moment';
 import React, { PureComponent } from 'react';
 import { Form2, Loading, Select, Table2, SmartTable } from '@/containers';
-import { BOOK_NAME_FIELD, LCM_EVENT_TYPE_OPTIONS, PRODUCTTYPE_OPTIONS } from '@/constants/common';
+import {
+  BOOK_NAME_FIELD,
+  LCM_EVENT_TYPE_OPTIONS,
+  PRODUCTTYPE_OPTIONS,
+  LCM_EVENT_TYPE_MAP,
+} from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { trdTradeListBySimilarTradeId, trdTradeSearchIndexPaged } from '@/services/general-service';
 import { mktInstrumentSearch } from '@/services/market-data-service';
@@ -413,7 +418,7 @@ class CommonModel extends PureComponent<any> {
                       fetchOptionsOnSearch
                       options={LCM_EVENT_TYPE_OPTIONS.sort((a, b) =>
                         b.value.localeCompare(a.value),
-                      )}
+                      ).filter(item => item.value !== LCM_EVENT_TYPE_MAP.PAYMENT)}
                     />,
                   )}
                 </FormItem>

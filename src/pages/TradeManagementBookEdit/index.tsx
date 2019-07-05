@@ -196,7 +196,8 @@ const TradeManagementBooking = props => {
           key: eventType,
           value: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
         }))
-        .sort((a, b) => b.value.localeCompare(a.value));
+        .sort((a, b) => b.value.localeCompare(a.value))
+        .filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT);
     if (!menuItem) return;
     return (
       <Menu onClick={({ key }) => handleEventAction(key, params)}>

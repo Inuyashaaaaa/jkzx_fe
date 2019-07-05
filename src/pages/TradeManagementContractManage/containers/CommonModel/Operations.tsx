@@ -148,7 +148,7 @@ class Operations extends PureComponent<{
     const lcmEvent = this.props.record;
     return _.get(this.state.eventTypes, lcmEvent.positionId, [])
       .sort((a, b) => LCM_EVENT_TYPE_ZHCN_MAP[b].localeCompare(LCM_EVENT_TYPE_ZHCN_MAP[a]))
-      .filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT)
+      .filter(item => item !== 'PAYMENT')
       .map(node => <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>);
   };
 

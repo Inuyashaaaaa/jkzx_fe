@@ -219,7 +219,7 @@ export const PROCESS_STATUS_TYPE_OPTIONS = convertOptions(
 );
 
 export const LCM_EVENT_TYPE_MAP = {
-  // PAYMENT: 'PAYMENT',
+  PAYMENT: 'PAYMENT',
   OPEN: 'OPEN',
   UNWIND: 'UNWIND',
   EXPIRATION: 'EXPIRATION',
@@ -234,7 +234,7 @@ export const LCM_EVENT_TYPE_MAP = {
 };
 
 export const LCM_EVENT_TYPE_ZHCN_MAP = {
-  // PAYMENT: '支付',
+  PAYMENT: '支付',
   EXPIRATION: '到期',
   KNOCK_OUT: '敲出',
   OPEN: '开仓',
