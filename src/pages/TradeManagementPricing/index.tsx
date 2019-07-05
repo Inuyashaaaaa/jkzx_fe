@@ -46,7 +46,7 @@ import {
 } from '@/services/cash';
 import { convertTradePositions } from '@/services/pages';
 import { prcTrialPositionsService } from '@/services/pricing';
-import { prcPricingEnvironmentsList } from '@/services/pricing-service';
+import { prcPricingEnvironmentsList, prcPricingEnvironmentGet } from '@/services/pricing-service';
 import { getActualNotionAmountBigNumber } from '@/services/trade';
 import { getLegByRecord, getMoment, insert, remove, uuid } from '@/tools';
 import { computedShift } from '@/tools/leg';
@@ -281,10 +281,9 @@ const TradeManagementPricing = props => {
   const [pricingEnvironmentsList, setPricingEnvironmentsList] = useState([]);
 
   const loadPricingEnv = async () => {
-    const { error, data } = await prcPricingEnvironmentsList();
-    if (error) return;
+    const data = await prcPricingEnvironmentsList();
     setPricingEnvironmentsList(data);
-    setCurPricingEnv(data[0]);
+    setCurPricingEnv(_.get(data, '[0].pricingEnvironmentId'));
   };
 
   useLifecycles(() => {
