@@ -104,8 +104,8 @@ const ActionBar = memo<any>(props => {
               style={{ width: 200 }}
             >
               {pricingEnvironmentsList.map(item => (
-                <Select.Option key={item} value={item}>
-                  {item}
+                <Select.Option key={item.pricingEnvironmentId} value={item.pricingEnvironmentId}>
+                  {item.description}
                 </Select.Option>
               ))}
             </Select>
