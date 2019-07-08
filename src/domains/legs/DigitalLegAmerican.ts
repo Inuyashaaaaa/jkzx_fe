@@ -60,6 +60,7 @@ import { UnderlyerMultiplier } from '../../containers/legFields/UnderlyerMultipl
 import { commonLinkage } from '../common';
 import { PaymentType } from '../../containers/legFields/PaymentType';
 import { Payment } from '../../containers/legFields/Payment';
+import { Rebate } from '../../containers/legFields/Rebate';
 import { RebateType } from '../../containers/legFields/RebateType';
 import { ObservationType } from '../../containers/legFields/ObservationType';
 import { Unit } from '../../containers/legFields/Unit';
@@ -85,7 +86,9 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         Strike,
         Term,
         ExpirationDate,
-        Payment,
+        // Payment,
+        Rebate,
+        RebateType,
         ParticipationRate,
         NotionalAmount,
         ObservationType,
@@ -144,8 +147,8 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         ParticipationRate,
         NotionalAmountType,
         NotionalAmount,
-        PaymentType,
-        Payment,
+        // PaymentType,
+        // Payment,
         PremiumType,
         Premium,
         FrontPremium,
@@ -153,6 +156,7 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         ExpirationDate,
         EffectiveDate,
         ObservationType,
+        Rebate,
         RebateType,
         Unit,
         TradeNumber,
@@ -184,7 +188,8 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
             [LEG_FIELD.TERM]: DEFAULT_TERM,
           }
         : null),
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      [LEG_FIELD.REBATE_TYPE]:
+        env === LEG_ENV.PRICING || env === LEG_ENV.BOOKING ? '' : REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.CONTINUOUS,
     });
   },
@@ -229,13 +234,20 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
     nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
-    nextPosition.asset.rebate = nextPosition.asset.payment;
-    nextPosition.asset.rebateType = nextPosition.asset.paymentType;
-    nextPosition.asset = _.omit(nextPosition.asset, ['payment', 'paymentType']);
-
+    if (env === LEG_ENV.PRICING || env === LEG_ENV.BOOKING) {
+      nextPosition.asset.rebateUnit = nextPosition.asset.rebateType;
+      return {
+        ...nextPosition,
+        asset: _.omit(nextPosition.asset, ['paymentType', 'payment', 'rebateType']),
+      };
+    }
     return nextPosition;
   },
-  getPageData: (env: string, position: any) => {},
+  getPageData: (env: string, position: any) =>
+    Form2.createFields({
+      [LEG_FIELD.REBATE_TYPE]: position.asset.paymentType,
+    }), // return position;
+
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
