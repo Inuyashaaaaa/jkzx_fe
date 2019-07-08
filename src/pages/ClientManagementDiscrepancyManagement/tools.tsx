@@ -64,8 +64,8 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
                     color: 'rgba(0, 0, 0, 0.35)',
                   }}
                 >
-                  <Col>账户名: {item.bankName ? item.bankName : '-'}</Col>
-                  <Col>开户行: {item.bankAccountName ? item.bankAccountName : '-'}</Col>
+                  <Col>账户名: {item.bankAccountName ? item.bankAccountName : '-'}</Col>
+                  <Col>开户行: {item.bankName ? item.bankName : '-'}</Col>
                 </Row>
               </Option>
             ))}
