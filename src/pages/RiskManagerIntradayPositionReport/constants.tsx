@@ -21,11 +21,6 @@ export const TABLE_COL_DEFS = [
     width: 150,
   },
   {
-    title: '交易代码',
-    dataIndex: 'tradeId',
-    width: 150,
-  },
-  {
     title: '标的物代码',
     dataIndex: 'underlyerInstrumentId',
     width: 150,
