@@ -115,7 +115,7 @@ class PricingSettingVolSurface extends PureComponent {
             '105% SPOT': 0,
             '110% SPOT': 0,
             '120% SPOT': 0,
-            id: uuidv4(),
+            // id: uuidv4(),
           },
         ];
         data = {
@@ -181,7 +181,7 @@ class PricingSettingVolSurface extends PureComponent {
           };
         });
     let tableDataSource = this.sortDataSource(dataSource);
-    tableDataSource = tableDataSource.map(item => Form2.createFields(item));
+    tableDataSource = tableDataSource.map(item => ({ ...Form2.createFields(item), id: uuidv4() }));
     const tableSelfFormData = {
       quote: underlyer.quote,
     };
