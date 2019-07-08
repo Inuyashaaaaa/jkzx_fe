@@ -323,7 +323,7 @@ const instrumentId = type => ({
         rules: [
           {
             required: true,
-            message: '标的物代码是必填项',
+            message: '合约代码是必填项',
           },
         ],
       })(<Input disabled={type === 'edit'} />)}
@@ -498,7 +498,7 @@ const expirationDate = {
         rules: [
           {
             required: true,
-            message: '期权到期时间是必填项',
+            message: '期权到期日是必填项',
           },
         ],
       })(<DatePicker editing format="YYYY-MM-DD" />)}
