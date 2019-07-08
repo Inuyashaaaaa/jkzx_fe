@@ -19,6 +19,7 @@ const TradeManagementMarketManagement = props => {
   };
 
   const [searchFormData, setSearchFormData] = useState({});
+  const [searchForm, setSearchForm] = useState({});
   const [createFormData, setCreateFormData] = useState({});
   const [pagination, setPagination] = useState(defaultPagination);
   const [total, setTotal] = useState(0);
@@ -29,11 +30,11 @@ const TradeManagementMarketManagement = props => {
   const [creating, setCreating] = useState(false);
   const [noData, setNoData] = useState(true);
 
-  const fetchTable = useCallback(async (paramsPagination?, searchForm?) => {
+  const fetchTable = useCallback(async (paramsPagination?, formData?) => {
     const actualPagination = paramsPagination || pagination;
     setLoading(true);
     const newSearchFormData = _.mapValues(
-      searchForm || Form2.getFieldsValue(searchFormData),
+      formData || Form2.getFieldsValue(searchFormData),
       (value, key) => {
         if (key === 'instrumentIds' && (!value || !value.length)) {
           return undefined;
@@ -156,7 +157,7 @@ const TradeManagementMarketManagement = props => {
       pageSize,
     };
     setPagination(next);
-    fetchTable(next);
+    fetchTable(next, Form2.getFieldsValue(searchForm));
   };
 
   const switchModal = () => {
@@ -166,6 +167,7 @@ const TradeManagementMarketManagement = props => {
   };
 
   const onSearch = () => {
+    setSearchForm(searchFormData);
     setPagination(defaultPagination);
     fetchTable(defaultPagination);
   };
@@ -208,6 +210,7 @@ const TradeManagementMarketManagement = props => {
           showQuickJumper: true,
           showSizeChanger: true,
           onChange: onPaginationChange,
+          onShowSizeChange: onPaginationChange,
         }}
       />
       <Modal
