@@ -1,10 +1,10 @@
-import { TOTAL_LEGS } from '@/constants/legs';
-import { ILeg } from '@/types/leg';
 import { Button, Dropdown, Menu, Icon } from 'antd';
 import React, { PureComponent } from 'react';
+import _ from 'lodash';
+import { TOTAL_LEGS } from '@/constants/legs';
+import { ILeg } from '@/types/leg';
 import { getLegByType } from '@/tools';
 import { LEG_TYPE_FIELD, LEG_TYPE_MAP, LEG_FIELD } from '@/constants/common';
-import _ from 'lodash';
 import { Form2 } from '..';
 import { validateExpirationDate } from '@/tools/leg';
 
@@ -29,15 +29,13 @@ export default class MultilLegCreateButton extends PureComponent<{
     const usedLegs = this.props.isPricing ? filterLegs : TOTAL_LEGS;
 
     // 移除暂不支持风险报告的交易结构
-    const leftUsedLegs = _.reject(usedLegs, item => {
-      return item.type === LEG_TYPE_MAP.CASH_FLOW;
-    });
+    const leftUsedLegs = _.reject(usedLegs, item => item.type === LEG_TYPE_MAP.CASH_FLOW);
 
     return leftUsedLegs;
   };
 
-  public getLegMenuNodes = menus => {
-    return menus.map(item => {
+  public getLegMenuNodes = menus =>
+    menus.map(item => {
       if (item.children) {
         return (
           <Menu.ItemGroup key={item.name} title={item.name}>
@@ -47,7 +45,6 @@ export default class MultilLegCreateButton extends PureComponent<{
       }
       return <Menu.Item key={item.type}>{item.name}</Menu.Item>;
     });
-  };
 
   public handleAddleg = leg => {
     if (leg.getDefaultData) {
