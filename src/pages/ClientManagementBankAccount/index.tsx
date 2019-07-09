@@ -214,7 +214,7 @@ class ClientManagementBankAccount extends PureComponent {
               ),
             },
             {
-              title: '交易账号',
+              title: '交易对手银行账号',
               dataIndex: 'bankAccount',
               render: (value, record, index, { form, editing }) => (
                 <FormItem>
@@ -255,7 +255,7 @@ class ClientManagementBankAccount extends PureComponent {
               ),
             },
             {
-              title: '交易对手账户名',
+              title: '交易对手银行账户名',
               dataIndex: 'bankAccountName',
               render: (value, record, index, { form, editing }) => (
                 <FormItem>

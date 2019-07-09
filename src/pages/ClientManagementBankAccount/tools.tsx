@@ -39,7 +39,7 @@ export const TABLE_COLUMN_DEFS: (fetchTable) => IColumnDef[] = fetchTable => [
 
 export const SEARCH_FORM_CONTROL: (legalNameList, markets) => IFormControl[] = (
   legalNameList,
-  markets
+  markets,
 ) => {
   return [
     {
@@ -66,7 +66,7 @@ export const SEARCH_FORM_CONTROL: (legalNameList, markets) => IFormControl[] = (
     },
     {
       control: {
-        label: '交易账号',
+        label: '交易对手银行账号',
       },
       field: 'bankAccount',
       input: {
@@ -90,7 +90,7 @@ export const SEARCH_FORM_CONTROL: (legalNameList, markets) => IFormControl[] = (
     },
     {
       control: {
-        label: '交易对手账户名',
+        label: '交易对手银行账户名',
       },
       field: 'bankAccountName',
       input: {
