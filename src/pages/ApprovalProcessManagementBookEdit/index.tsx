@@ -8,7 +8,7 @@ import moment from 'moment';
 import React, { memo, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import uuidv4 from 'uuid/v4';
-import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG } from '@/constants/common';
+import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG, LEG_TYPE_MAP } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { ILegColDef, LEG_ENV, TOTAL_EDITING_FIELDS } from '@/constants/legs';
 import { Form2 } from '@/containers';
@@ -19,11 +19,13 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
 import { ITableData } from '@/components/type';
 import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
-import { convertTradePageData2ApiData } from '@/services/pages';
+import { convertTradePageData2ApiData, getTradeCreateModalData } from '@/services/pages';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord, getMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
 import './index.less';
 import BigNumber from 'bignumber.js';
+import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
+import { mktInstrumentInfo } from '@/services/market-data-service';
 
 const DATE_ARRAY = [
   LEG_FIELD.SETTLEMENT_DATE,
@@ -85,19 +87,54 @@ const TradeManagementBooking = props => {
       processInstanceId: props.id,
     });
     if (error) return;
-    const approvalData = {
-      tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
-      bookName: _.get(data, 'process._business_payload.trade.bookName'),
-      tradeDate: moment(_.get(data, 'process._business_payload.trade.tradeDate')),
-      salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
-      counterPartyCode: _.get(
-        data,
-        'process._business_payload.trade.positions[0].counterPartyCode',
-      ),
-      comment: _.get(data, 'process._business_payload.trade.comment'),
-    };
+    const tableFormData = getTradeCreateModalData(_.get(data, 'process._business_payload.trade'));
+    const unUnitLeg = [LEG_TYPE_MAP.SPREAD_EUROPEAN, LEG_TYPE_MAP.CASH_FLOW];
+    const { positions } = _.get(data, 'process._business_payload.trade');
 
-    const mockAddLegItem = async (composePositions, tableFormData) => {
+    const unitPositions = await Promise.all(
+      (positions || []).map(position => {
+        if (unUnitLeg.includes(position.productType)) {
+          return Promise.resolve(position);
+        }
+        return mktInstrumentInfo({
+          instrumentId: position.productType.includes('SPREAD_EUROPEAN')
+            ? _.get(position.asset, 'underlyerInstrumentId1')
+            : position.asset[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
+        }).then(rsp => {
+          const { error: _error, data: _data } = rsp;
+          if (_error || _data.instrumentInfo.unit === undefined) {
+            return {
+              ...position,
+              asset: {
+                ...position.asset,
+                [LEG_FIELD.UNIT]: '-',
+              },
+            };
+          }
+          return {
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.UNIT]: _data.instrumentInfo.unit,
+            },
+          };
+        });
+      }),
+    );
+
+    // const approvalData = {
+    //   tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
+    //   bookName: _.get(data, 'process._business_payload.trade.bookName'),
+    //   tradeDate: moment(_.get(data, 'process._business_payload.trade.tradeDate')),
+    //   salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
+    //   counterPartyCode: _.get(
+    //     data,
+    //     'process._business_payload.trade.positions[0].counterPartyCode',
+    //   ),
+    //   comment: _.get(data, 'process._business_payload.trade.comment'),
+    // };
+
+    const mockAddLegItem = async (composePositions, tableForm) => {
       composePositions.forEach(position => {
         const leg = getLegByProductType(position.productType, position.asset.exerciseType);
         addLeg(leg, position);
@@ -130,8 +167,8 @@ const TradeManagementBooking = props => {
         .toNumber();
     };
 
-    const positions = _.get(data, 'process._business_payload.trade.positions');
-    const composePositions = (positions || []).map(position => ({
+    // const positions = _.get(data, 'process._business_payload.trade.positions');
+    const composePositions = (unitPositions || []).map(position => ({
       ...position,
       asset: {
         ...position.asset,
@@ -139,9 +176,9 @@ const TradeManagementBooking = props => {
       },
     }));
     setTableLoading(false);
-    setCreateFormData(Form2.createFields(approvalData));
+    setCreateFormData(Form2.createFields(tableFormData));
     if (!composePositions) return;
-    mockAddLegItem(composePositions, approvalData);
+    mockAddLegItem(composePositions, tableFormData);
   };
 
   const handelSave = async () => {
