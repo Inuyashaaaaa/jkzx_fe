@@ -174,13 +174,13 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(env === LEG_ENV.PRICING
-        ? {
-            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : null),
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      ...(env === LEG_ENV.BOOKING && {
+        [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      }),
+      ...(env === LEG_ENV.PRICING && {
+        [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
+        [LEG_FIELD.TERM]: DEFAULT_TERM,
+      }),
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
@@ -224,6 +224,12 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
     nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
+
+    // 定价的时候要注入额外 2 个参数
+    if (LEG_ENV.PRICING === env) {
+      nextPosition.asset[LEG_FIELD.REBATE_TYPE] = REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY;
+      nextPosition.asset[LEG_FIELD.OBSERVATION_TYPE] = OBSERVATION_TYPE_MAP.TERMINAL;
+    }
 
     return nextPosition;
   },
