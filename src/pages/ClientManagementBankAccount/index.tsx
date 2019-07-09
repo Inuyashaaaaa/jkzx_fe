@@ -53,6 +53,8 @@ class ClientManagementBankAccount extends PureComponent {
     this.setState(
       {
         searchFormData: {},
+        bankAccountNames: null,
+        markets: null,
       },
       () => {
         this.fetchTable();
