@@ -146,9 +146,13 @@ const TradeManagementMarketManagement = props => {
   };
 
   const onSearchFormChange = (p, fields, allFields) => {
-    const formData = Form2.getFieldsValue(allFields);
-    const createData = Form2.createFields(formData);
-    setSearchFormData(createData);
+    if (fields.assetClass) {
+      return setSearchFormData({
+        ..._.omit(searchFormData, ['instrumentType']),
+        ...fields,
+      });
+    }
+    return setSearchFormData(allFields);
   };
 
   const onPaginationChange = (current, pageSize) => {

@@ -203,40 +203,46 @@ const instrumentTypeSearch = {
   dataIndex: 'instrumentType',
   render: (value, record, index, { form, editing }) => {
     const disable = () => !!_.get(record, 'instrumentIds.value.length');
-    const getOptions = () => [
-      {
-        label: '现货',
-        value: 'SPOT',
-      },
-      {
-        label: '期货',
-        value: 'FUTURES',
-      },
-      {
-        label: '期货期权',
-        value: 'FUTURES_OPTION',
-      },
-      {
-        label: '股票',
-        value: 'STOCK',
-      },
-      {
-        label: '股指',
-        value: 'INDEX',
-      },
-      {
-        label: '股指期货',
-        value: 'INDEX_FUTURES',
-      },
-      {
-        label: '股指期权',
-        value: 'INDEX_OPTION',
-      },
-      {
-        label: '个股/ETF期权',
-        value: 'STOCK_OPTION',
-      },
-    ];
+    const getOptions = () => {
+      if (record.assetClass && record.assetClass.value === 'EQUITY') {
+        return [
+          {
+            label: '股票',
+            value: 'STOCK',
+          },
+          {
+            label: '股指',
+            value: 'INDEX',
+          },
+          {
+            label: '股指期货',
+            value: 'INDEX_FUTURES',
+          },
+          {
+            label: '股指期权',
+            value: 'INDEX_OPTION',
+          },
+          {
+            label: '个股/ETF期权',
+            value: 'STOCK_OPTION',
+          },
+        ];
+      }
+      return [
+        {
+          label: '现货',
+          value: 'SPOT',
+        },
+        {
+          label: '期货',
+          value: 'FUTURES',
+        },
+        {
+          label: '期货期权',
+          value: 'FUTURES_OPTION',
+        },
+      ];
+    };
 
     return (
       <FormItem>
