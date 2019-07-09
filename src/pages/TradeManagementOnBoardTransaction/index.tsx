@@ -14,7 +14,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment, { isMoment } from 'moment';
-import React, { memo, useEffect, useState, useCallback } from 'react';
+import React, { memo, useEffect, useState, useCallback, useRef } from 'react';
 import { BIG_NUMBER_CONFIG } from '@/constants/common';
 import { Select, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
@@ -45,6 +45,7 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 
 const TradeManagementOnBoardTansaction = props => {
+  const formEl = useRef<Form>(null);
   const [loading, setLoading] = useState(false);
   const [flowData, setFlowData] = useState([]);
   const [positionData, setPositionData] = useState([]);
@@ -67,6 +68,7 @@ const TradeManagementOnBoardTansaction = props => {
   const [updatePortfolioModalVisible, setUpdatePortfolioModalVisible] = useState(false);
   const [portfolioSelected, setPortfolioSelected] = useState([]);
   const [tradeIdToUpdate, setTradeIdToUpdate] = useState([]);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const sortBy = (data, field) => {
     data.sort((a, b) => {
@@ -221,6 +223,9 @@ const TradeManagementOnBoardTansaction = props => {
 
   const createFormModal = () => {
     setCreateFormVisible(true);
+    setCreateModalDataSource({
+      dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
+    });
   };
 
   const hideCreateForm = () => {
@@ -228,7 +233,9 @@ const TradeManagementOnBoardTansaction = props => {
   };
 
   const handleCreateForm = async () => {
-    setCreateFormVisible(false);
+    const { error: formError } = await formEl.current.validate();
+    if (formError) return;
+    setConfirmLoading(true);
     const formatValues = _.mapValues(createModalDataSource, val => {
       if (isMoment(val)) {
         return val.format('YYYY-MM-DDTHH:mm:ss');
@@ -238,15 +245,20 @@ const TradeManagementOnBoardTansaction = props => {
     const mktInstrumentInfoRef = await mktInstrumentInfo({
       instrumentId: formatValues.instrumentId,
     });
-    if (mktInstrumentInfoRef.error) return;
+    if (mktInstrumentInfoRef.error) {
+      setConfirmLoading(false);
+      return;
+    }
     const { error, data } = await exeTradeRecordSave({
       ...formatValues,
       multiplier: mktInstrumentInfoRef.data.instrumentInfo.multiplier || 1,
     });
+    setConfirmLoading(false);
     if (error) {
       message.error('新建失败');
       return;
     }
+    setCreateFormVisible(false);
     message.success('新建成功');
 
     const dataSwitch = _.mapValues(data, (item, key) => {
@@ -265,9 +277,6 @@ const TradeManagementOnBoardTansaction = props => {
       return item;
     });
     setFlowData([...flowData, dataSwitch]);
-    setCreateModalDataSource({
-      dealTime: moment().format('YYYY-MM-DDTHH:mm:ss'),
-    });
   };
 
   const onValueChange = params => {
@@ -576,8 +585,12 @@ const TradeManagementOnBoardTansaction = props => {
         onCancel={hideCreateForm}
         onOk={handleCreateForm}
         title="新建场内流水"
+        confirmLoading={confirmLoading}
       >
         <Form
+          ref={node => {
+            formEl.current = node;
+          }}
           controlNumberOneRow={1}
           footer={false}
           dataSource={createModalDataSource}
