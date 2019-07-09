@@ -51,6 +51,8 @@ const AmendModal = props => {
   const [createCash, setCreateCash] = useState(false);
   const [cashModalVisible, setCashModalVisible] = useState(false);
   const [tradeData, setTradeData] = useState({});
+  const [positionId, setPositionId] = useState(null);
+
   const [store, setStore] = useState<{
     record?: any;
     tableFormData?: any;
@@ -59,6 +61,7 @@ const AmendModal = props => {
   }>({});
   current({
     show: (record, tableFormData, currentUser, reload) => {
+      setPositionId(_.get(record, 'id'));
       const newData = _.mapValues(record, (item, key) => {
         if (_.includes(DATE_ARRAY, key)) {
           return {
@@ -112,14 +115,13 @@ const AmendModal = props => {
       store.reload();
     }
   };
-
   return (
     <>
       <CashExportModal visible={cashModalVisible} trade={tradeData} convertVisible={handleCancel} />
       <Modal
         okText="保存"
         visible={visible}
-        title="修改交易要素"
+        title={`修改交易要素${positionId ? `(${positionId})` : ''}`}
         width={700}
         onCancel={() => setVisible(false)}
         onOk={async () => {
