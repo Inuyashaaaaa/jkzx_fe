@@ -264,6 +264,7 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
+                      filterOption
                       ref={node => {
                         this.$select.bankAccountName = node;
                       }}
