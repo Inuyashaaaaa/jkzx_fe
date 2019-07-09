@@ -5,7 +5,7 @@ import _ from 'lodash';
 import React from 'react';
 import uuidv4 from 'uuid/v4';
 import { TRNORS_OPTS } from '@/constants/model';
-import { Form2, Select, SmartTable } from '@/containers';
+import { Form2, Select, SmartTable, Table2 } from '@/containers';
 import { PureStateComponent } from '@/containers/Components';
 import Page from '@/containers/Page';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
@@ -17,6 +17,8 @@ import Action from './Action';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
+
+  public $table: Table2 = null;
 
   public state = {
     tableFormData: {},
@@ -114,6 +116,10 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public saveTableData = async () => {
+    const res = await this.$table.validate();
+    if (_.isArray(res) && res.some(value => value.errors)) {
+      return;
+    }
     const { tableDataSource } = this.state;
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error } = await saveModelRiskFreeCurve({
@@ -266,6 +272,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
           ) : null}
         </Row>
         <SmartTable
+          ref={node => {
+            this.$table = node;
+          }}
           rowKey="id"
           onCellFieldsChange={this.handleCellValueChanged}
           dataSource={this.state.tableDataSource}
@@ -278,7 +287,14 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               editable: record => true,
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
-                  {form.getFieldDecorator({})(
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '期限必填',
+                      },
+                    ],
+                  })(
                     <Select
                       defaultOpen
                       autoSelect
@@ -302,9 +318,14 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               defaultEditing: false,
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
-                  {form.getFieldDecorator({})(
-                    <UnitInputNumber autoSelect editing={editing} unit="%" />,
-                  )}
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '利率必填',
+                      },
+                    ],
+                  })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
                 </FormItem>
               ),
             },

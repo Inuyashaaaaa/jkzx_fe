@@ -23,7 +23,14 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
     editable: record => true,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '期限必填',
+            },
+          ],
+        })(
           <Select
             defaultOpen
             autoSelect
@@ -47,7 +54,14 @@ export const TABLE_COL_DEFS: (tableDataSource, onRemove, showModal) => ITableCol
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '利率必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
