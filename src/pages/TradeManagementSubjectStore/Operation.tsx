@@ -98,19 +98,19 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
   };
 
   const filterFormData = (allFields, fields, columns) => {
-    const changed = Form2.getFieldsValue(fields);
+    const changed = fields;
     const column = columns.map(item => item.dataIndex);
-    const formData = _.pick(Form2.getFieldsValue(allFields), column);
+    const formData = _.pick(allFields, column);
     if (Object.keys(changed)[0] === 'assetClass') {
       return {
         ..._.pick(props.record, ['instrumentId']),
-        ...changed,
+        ...fields,
       };
     }
-    if (changed.instrumentType === 'STOCK') {
+    if (Form2.getFieldValue(changed.instrumentType) === 'STOCK') {
       return {
         ...formData,
-        multiplier: 1,
+        multiplier: Form2.createField(1),
       };
     }
     return formData;
@@ -119,7 +119,7 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
   const onEditFormChange = (p, fields, allFields) => {
     const columns = editFormControls(Form2.getFieldsValue(allFields), 'edit');
     setEditformControlsState(columns);
-    setEditFormData(Form2.createFields(filterFormData(allFields, fields, columns)));
+    setEditFormData(filterFormData(allFields, fields, columns));
   };
 
   return (
