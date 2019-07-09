@@ -6,7 +6,11 @@ import React, { PureComponent } from 'react';
 import { PAGE_SIZE } from '@/constants/component';
 import { Form2, Select, SmartTable } from '@/containers';
 import SmartForm from '@/containers/SmartForm';
-import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
+import {
+  trdTradeListByBook,
+  trdTradeListBySimilarTradeId,
+  trdTradeGet,
+} from '@/services/general-service';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { positionDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
 import SettlementModal from './SettlementModal';
@@ -126,9 +130,9 @@ class SettlementAdvice extends PureComponent {
 
   public onSearchFormChange = async (props, changedFields) => {
     const { searchFormData } = this.state;
-    if (changedFields.name === 'bookName' && changedFields.value) {
+    if (changedFields.bookName && changedFields.bookName.value) {
       const { error, data } = await trdTradeListByBook({
-        bookName: changedFields.value,
+        bookName: changedFields.bookName.value,
       });
       if (error) return;
       this.setState({
@@ -140,18 +144,30 @@ class SettlementAdvice extends PureComponent {
       });
       return;
     }
-    if (changedFields.name === 'tradeId' && changedFields.value) {
-      const { error, data } = await trdTradeListByBook({
-        bookName: changedFields.value,
-      });
-      if (error) return;
-      this.setState({
-        positionIdList: data,
-        searchFormData: {
-          ...searchFormData,
-          ...changedFields,
+    if (changedFields.tradeId && changedFields.tradeId.value) {
+      this.setState(
+        {
+          searchFormData: {
+            ...searchFormData,
+            ...Form2.createFields({ positionId: '' }),
+          },
         },
-      });
+        async () => {
+          const { error, data } = await trdTradeGet({
+            tradeId: changedFields.tradeId.value,
+          });
+          if (error) return;
+          const searchForm = this.state.searchFormData;
+          this.setState({
+            positionIdList: (_.get(data, 'positions') || []).map(item => item.positionId),
+            searchFormData: {
+              ...searchForm,
+              ...changedFields,
+            },
+          });
+        },
+      );
+
       return;
     }
     this.setState({
