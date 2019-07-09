@@ -22,6 +22,8 @@ class PricingSettingsDividendCurve extends PureComponent {
 
   public $insertForm: Form2 = null;
 
+  public $table: Table2 = null;
+
   public state = {
     saveLoading: false,
     tableDataSource: [],
@@ -89,6 +91,10 @@ class PricingSettingsDividendCurve extends PureComponent {
   };
 
   public saveTableData = async () => {
+    const res = await this.$table.validate();
+    if (_.isArray(res) && res.some(value => value.errors)) {
+      return;
+    }
     const { tableDataSource, searchFormData } = this.state;
     this.setState({
       saveLoading: true,
@@ -282,6 +288,9 @@ class PricingSettingsDividendCurve extends PureComponent {
               保存
             </Button>
             <SmartTable
+              ref={node => {
+                this.$table = node;
+              }}
               rowKey="id"
               pagination={false}
               loading={this.state.tableLoading}

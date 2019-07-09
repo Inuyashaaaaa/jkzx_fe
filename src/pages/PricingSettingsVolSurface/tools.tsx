@@ -160,7 +160,14 @@ export const TABLE_COLUMN = tableDataSource => [
     editable: record => true,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(
           <Select
             defaultOpen
             autoSelect
@@ -184,7 +191,14 @@ export const TABLE_COLUMN = tableDataSource => [
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
@@ -198,7 +212,14 @@ export const TABLE_COLUMN = tableDataSource => [
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
@@ -212,7 +233,14 @@ export const TABLE_COLUMN = tableDataSource => [
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
@@ -226,7 +254,14 @@ export const TABLE_COLUMN = tableDataSource => [
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
@@ -240,7 +275,14 @@ export const TABLE_COLUMN = tableDataSource => [
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
@@ -254,7 +296,14 @@ export const TABLE_COLUMN = tableDataSource => [
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
@@ -268,7 +317,14 @@ export const TABLE_COLUMN = tableDataSource => [
     defaultEditing: false,
     render: (val, record, index, { form, editing }) => (
       <FormItem>
-        {form.getFieldDecorator({})(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '必填',
+            },
+          ],
+        })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
       </FormItem>
     ),
   },
