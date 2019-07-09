@@ -58,7 +58,7 @@ const TradeManagementMarketManagement = props => {
   const filterFormData = (allFields, fields) => {
     if (fields.assetClass) {
       return {
-        ..._.pick(allFields, 'instrumentId'),
+        ..._.pick(allFields, ['instrumentId', 'name']),
         ...fields,
       };
     }
