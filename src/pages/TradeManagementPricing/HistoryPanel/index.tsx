@@ -38,6 +38,7 @@ import {
   TRADESCOL_FIELDS,
   VERTICAL_GUTTER,
   DEFAULT_TERM,
+  COMPUTED_LEG_FIELD_MAP,
 } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { DATE_LEG_FIELDS } from '@/constants/legType';
@@ -496,6 +497,9 @@ const TradeManagementPricingManagement = props => {
                   const groups = _.toPairs(
                     _.mapValues(val, (data = {}, key) => {
                       const unit = _.get(data, 'unit', '');
+                      if (key === COMPUTED_LEG_FIELD_MAP.PRICE && data.value < 0) {
+                        data.value *= -1;
+                      }
                       if (unit === '¥' || unit === '$') {
                         return formatMoney(data.value, {
                           unit,
