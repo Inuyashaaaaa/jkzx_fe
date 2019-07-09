@@ -20,72 +20,63 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'dailyPnl',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '当日期权盈亏 (¥)',
     dataIndex: 'dailyOptionPnl',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '当日标的物盈亏 (¥)',
     dataIndex: 'dailyUnderlyerPnl',
     width: 150,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Delta 贡献 (¥)',
     dataIndex: 'pnlContributionDelta',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
+  },
+  {
+    title: 'Gamma贡献 (¥)',
+    align: 'right',
+    dataIndex: 'pnlContributionGamma',
+    width: 130,
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Vega 贡献 (¥)',
     dataIndex: 'pnlContributionVega',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Theta 贡献 (¥)',
     dataIndex: 'pnlContributionTheta',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Rho 贡献 (¥)',
     dataIndex: 'pnlContributionRho',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '其它贡献 (¥)',
     dataIndex: 'pnlContributionUnexplained',
     align: 'right',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '定价环境',
