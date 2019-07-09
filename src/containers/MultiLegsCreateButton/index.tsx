@@ -27,7 +27,13 @@ export default class MultilLegCreateButton extends PureComponent<{
       );
     });
     const usedLegs = this.props.isPricing ? filterLegs : TOTAL_LEGS;
-    return usedLegs;
+
+    // 移除暂不支持风险报告的交易结构
+    const leftUsedLegs = _.reject(usedLegs, item => {
+      return item.type === LEG_TYPE_MAP.CASH_FLOW;
+    });
+
+    return leftUsedLegs;
   };
 
   public getLegMenuNodes = menus => {
