@@ -97,8 +97,8 @@ const TradeManagementOnBoardTansaction = props => {
         } = item;
         const { last = 0, multiplier = 1 } = findItem;
         const marketValue = new BigNumber(new BigNumber(longPosition).minus(shortPosition))
-          .multipliedBy(last)
-          .multipliedBy(multiplier)
+          .multipliedBy(last || 0)
+          .multipliedBy(multiplier || 1)
           .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
           .toNumber();
         const totalPnl = new BigNumber(marketValue)
