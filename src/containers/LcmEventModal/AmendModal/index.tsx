@@ -94,10 +94,7 @@ const AmendModal = props => {
       const { cashFlowChange } = cashData;
       setCashData({
         ...cashData,
-        cashFlowChange: {
-          ...cashFlowChange,
-          errors: undefined,
-        },
+        cashFlowChange: Form2.createField(undefined),
       });
     }
   }, [createCash]);
@@ -138,7 +135,8 @@ const AmendModal = props => {
             LEG_ENV.BOOKING,
           );
           const newData = Form2.getFieldsValue(cashData);
-          newData.cashFlowChange = JSON.stringify(newData.cashFlowChange);
+          newData.cashFlowChange =
+            newData.cashFlowChange === undefined ? '' : String(newData.cashFlowChange);
           newData.paymentDate = moment(newData.paymentDate).format('YYYY-MM-DD');
           const { error, data } = await trdTradeLCMEventProcess({
             positionId: store.record[LEG_ID_FIELD],
