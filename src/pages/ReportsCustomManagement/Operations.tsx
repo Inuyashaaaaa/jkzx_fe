@@ -1,8 +1,8 @@
-import { SmartTable } from '@/containers';
 import { Modal } from 'antd';
 import _ from 'lodash';
 import React, { memo, useState } from 'react';
 import XLSX from 'xlsx';
+import { SmartTable } from '@/containers';
 
 const Operations = memo<any>(props => {
   const [visible, setVisible] = useState(false);
@@ -23,14 +23,12 @@ const Operations = memo<any>(props => {
 
   const downloadFormModal = () => {
     const cols = ['sheet'];
-    const colData = cols.map(() => {
-      return _.concat(
+    const colData = cols.map(() =>
+      _.concat(
         [Object.keys(record.reportData[0])],
-        (record.reportData || []).map(item => {
-          return _.values(item);
-        })
-      );
-    });
+        (record.reportData || []).map(item => _.values(item)),
+      ),
+    );
     const wb = XLSX.utils.book_new();
     cols.forEach((item, index) => {
       const ws = XLSX.utils.aoa_to_sheet(colData[index]);
@@ -38,6 +36,7 @@ const Operations = memo<any>(props => {
     });
     XLSX.writeFile(wb, `${record.reportName}.xlsx`);
   };
+  console.log(record.reportData);
   return (
     <>
       {/* {
@@ -47,12 +46,10 @@ const Operations = memo<any>(props => {
                     </a>
                 ) : null
             } */}
-      <a href="javascript:;" onClick={showModel} style={{ marginRight: 10 }}>
+      <a onClick={showModel} style={{ marginRight: 10 }}>
         预览
       </a>
-      <a href="javascript:;" onClick={downloadFormModal}>
-        下载
-      </a>
+      <a onClick={downloadFormModal}>下载</a>
       <Modal
         title={`正在预览 ${record.reportName} （${record.valuationDate}）`}
         visible={visible}
@@ -64,13 +61,11 @@ const Operations = memo<any>(props => {
         <SmartTable
           rowKey="uuid"
           dataSource={record.reportData || []}
-          columns={Object.keys(record.reportData[0]).map(item => {
-            return {
-              title: item,
-              dataIndex: item,
-              width: 150,
-            };
-          })}
+          columns={Object.keys(record.reportData[0]).map(item => ({
+            title: item,
+            dataIndex: item,
+            width: 200,
+          }))}
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,
@@ -78,7 +73,7 @@ const Operations = memo<any>(props => {
           loading={loading}
           scroll={
             record.reportData && record.reportData.length > 0
-              ? { x: `${record.reportData.length * 150}px` }
+              ? { x: `${Object.keys(_.get(record, 'reportData[0]') || {}).length * 200}px` }
               : { x: false }
           }
         />
