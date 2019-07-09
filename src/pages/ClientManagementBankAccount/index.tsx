@@ -53,8 +53,8 @@ class ClientManagementBankAccount extends PureComponent {
     this.setState(
       {
         searchFormData: {},
-        bankAccountNames: null,
         markets: null,
+        bankAccountNames: null,
       },
       () => {
         this.fetchTable();
@@ -75,8 +75,8 @@ class ClientManagementBankAccount extends PureComponent {
       BankAccountSearch.legalName = _.get(Form2.getFieldsValue(allFields), 'legalName');
     }
     if (
-      _.get(Form2.getFieldsValue(allFields), 'bankAccount') &&
-      _.get(Form2.getFieldsValue(changedFields), 'bankAccountName')
+      _.get(Form2.getFieldsValue(allFields), 'bankAccount')
+      // && _.get(Form2.getFieldsValue(changedFields), 'bankAccountName')
     ) {
       BankAccountSearch.bankAccount = _.get(Form2.getFieldsValue(allFields), 'bankAccount');
     }
