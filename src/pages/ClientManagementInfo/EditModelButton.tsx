@@ -745,7 +745,16 @@ const EditModalButton = memo<any>(props => {
                   ]}
                 />
               </TabPane>
-              <TabPane tab="产品信息" key="2">
+              <TabPane
+                tab="产品信息"
+                key="2"
+                disabled={
+                  _.get(baseFormData, `${BASE_FORM_FIELDS.TRADER_TYPE}.value`) ===
+                  TRADER_TYPE.ENTERPRISE
+                    ? true
+                    : false
+                }
+              >
                 <Form2
                   ref={node => {
                     formRef.current = node;
