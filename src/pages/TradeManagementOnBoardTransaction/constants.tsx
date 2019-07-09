@@ -238,6 +238,7 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     field: 'bookId',
     input: {
       type: 'select',
+      showSearch: true,
       options: async (value: string = '') => {
         const { data, error } = await trdBookListBySimilarBookName({
           similarBookName: value,
