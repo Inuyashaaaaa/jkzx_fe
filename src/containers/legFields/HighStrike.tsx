@@ -39,7 +39,10 @@ export const HighStrike: ILegColDef = {
     const getRules = () => {
       const data = Form2.getFieldsValue(record);
 
-      if (LEG_TYPE_MAP.DOUBLE_SHARK_FIN === record.$legType) {
+      if (
+        LEG_TYPE_MAP.DOUBLE_SHARK_FIN === record.$legType ||
+        LEG_TYPE_MAP.STRADDLE === record.$legType
+      ) {
         return ([
           {
             message: '必须满足条件(低行权价 <= 高行权价)',
@@ -52,8 +55,7 @@ export const HighStrike: ILegColDef = {
           },
         ] as ValidationRule[]).concat(getRequiredRule());
       }
-      const higher = [LEG_TYPE_MAP.DOUBLE_DIGITAL, LEG_TYPE_MAP.STRADDLE];
-      if (higher.indexOf(record.$legType) >= 0) {
+      if (LEG_TYPE_MAP.DOUBLE_DIGITAL === record.$legType) {
         return ([
           {
             message: '必须满足条件(低行权价 < 高行权价)',
