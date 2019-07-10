@@ -97,12 +97,12 @@ class ClientManagementBankAccount extends PureComponent {
 
     const markets = _data.map(item => ({
       label: item.bankAccount,
-      value: item.bankAccount,
+      value: `${item.bankAccount}_${uuidv4()}`,
     }));
 
     const bankAccountNames = _data.map(item => ({
       label: item.bankAccountName,
-      value: item.bankAccountName,
+      value: `${item.bankAccountName}_${uuidv4()}`,
     }));
 
     let bankAccountNameValue;
