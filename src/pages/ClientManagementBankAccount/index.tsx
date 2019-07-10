@@ -38,8 +38,12 @@ class ClientManagementBankAccount extends PureComponent {
     this.setState({
       loading: true,
     });
+    const { searchFormData } = this.state;
+    const { bankAccount, bankAccountName, legalName } = Form2.getFieldsValue(searchFormData);
     const { error, data } = await refBankAccountSearch({
-      ...Form2.getFieldsValue(this.state.searchFormData),
+      bankAccount: (bankAccount || '').split('_')[0],
+      legalName: (legalName || '').split('_')[0],
+      bankAccountName: (bankAccountName || '').split('_')[0],
     });
     this.setState({
       loading: false,
@@ -77,20 +81,7 @@ class ClientManagementBankAccount extends PureComponent {
         '_',
       );
     }
-    if (
-      _.get(Form2.getFieldsValue(allFields), 'bankAccount')
-      // && _.get(Form2.getFieldsValue(changedFields), 'bankAccountName')
-    ) {
-      [BankAccountSearch.bankAccount] = _.get(Form2.getFieldsValue(allFields), 'bankAccount').split(
-        '_',
-      );
-    }
-    if (_.get(Form2.getFieldsValue(allFields), 'bankAccountName')) {
-      [BankAccountSearch.bankAccountName] = _.get(
-        Form2.getFieldsValue(allFields),
-        'bankAccountName',
-      ).split('_');
-    }
+    const { searchFormData } = this.state;
 
     const { error: _error, data: _data } = await refBankAccountSearch(BankAccountSearch);
     if (_error) return false;
@@ -105,32 +96,25 @@ class ClientManagementBankAccount extends PureComponent {
       value: `${item.bankAccountName}_${uuidv4()}`,
     }));
 
-    let bankAccountNameValue;
-    let legalNameValue;
-    let bankAccountValue;
-
-    if (changedFields.bankAccount && changedFields.bankAccount.value) {
-      const { error, data } = await refBankAccountSearch(BankAccountSearch);
-      bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
-      legalNameValue = data[0].legalName;
-      bankAccountValue = data[0].bankAccount;
-    }
-
-    if (changedFields.bankAccountName && changedFields.bankAccountName.value) {
-      const { error, data } = await refBankAccountSearch(BankAccountSearch);
-      bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
-      legalNameValue = data[0].legalName;
-      bankAccountValue = data[0].bankAccount;
+    if (changedFields.legalName) {
+      return this.setState({
+        markets,
+        bankAccountNames,
+        searchFormData: {
+          ...searchFormData,
+          ...changedFields,
+          ...Form2.createFields({ bankAccount: '', bankAccountName: '' }),
+        },
+      });
     }
 
     this.setState({
       markets,
       bankAccountNames,
-      searchFormData: Form2.createFields({
-        legalName: legalNameValue || (allFields.legalName || {}).value,
-        bankAccount: bankAccountValue,
-        bankAccountName: bankAccountNameValue,
-      }),
+      searchFormData: {
+        ...searchFormData,
+        ...changedFields,
+      },
     });
     return true;
   };
@@ -199,6 +183,7 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
+                      filterOption
                       ref={node => {
                         this.$select.legalName = node;
                       }}
@@ -209,7 +194,7 @@ class ClientManagementBankAccount extends PureComponent {
                       }}
                       options={async (values: string = '') => {
                         const { data, error } = await refSimilarLegalNameList({
-                          similarLegalName: values,
+                          similarLegalName: '',
                         });
                         if (error) return [];
                         return data.map(item => ({
