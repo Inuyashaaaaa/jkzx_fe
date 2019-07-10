@@ -87,7 +87,6 @@ const TradeManagementBooking = props => {
       processInstanceId: props.id,
     });
     if (error) return;
-    const tableFormData = getTradeCreateModalData(_.get(data, 'process._business_payload.trade'));
     const unUnitLeg = [LEG_TYPE_MAP.SPREAD_EUROPEAN, LEG_TYPE_MAP.CASH_FLOW];
     const { positions } = _.get(data, 'process._business_payload.trade');
 
@@ -122,17 +121,17 @@ const TradeManagementBooking = props => {
       }),
     );
 
-    // const approvalData = {
-    //   tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
-    //   bookName: _.get(data, 'process._business_payload.trade.bookName'),
-    //   tradeDate: moment(_.get(data, 'process._business_payload.trade.tradeDate')),
-    //   salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
-    //   counterPartyCode: _.get(
-    //     data,
-    //     'process._business_payload.trade.positions[0].counterPartyCode',
-    //   ),
-    //   comment: _.get(data, 'process._business_payload.trade.comment'),
-    // };
+    const tableFormData = {
+      tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
+      bookName: _.get(data, 'process._business_payload.trade.bookName'),
+      tradeDate: moment(_.get(data, 'process._business_payload.trade.tradeDate')),
+      salesCode: _.get(data, 'process._business_payload.trade.salesCode'),
+      counterPartyCode: _.get(
+        data,
+        'process._business_payload.trade.positions[0].counterPartyCode',
+      ),
+      comment: _.get(data, 'process._business_payload.trade.comment'),
+    };
 
     const mockAddLegItem = async (composePositions, tableForm) => {
       composePositions.forEach(position => {
@@ -167,7 +166,7 @@ const TradeManagementBooking = props => {
         .toNumber();
     };
 
-    // const positions = _.get(data, 'process._business_payload.trade.positions');
+    // const unitPositions = _.get(data, 'process._business_payload.trade.positions');
     const composePositions = (unitPositions || []).map(position => ({
       ...position,
       asset: {
