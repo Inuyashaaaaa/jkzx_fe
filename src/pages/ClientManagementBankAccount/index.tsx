@@ -2,6 +2,7 @@ import { message, Divider, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
 import _ from 'lodash';
+import uuidv4 from 'uuid/v4';
 import { Form2, Select, SmartTable } from '@/containers';
 import ModalButton from '@/containers/ModalButton';
 import Page from '@/containers/Page';
@@ -72,17 +73,25 @@ class ClientManagementBankAccount extends PureComponent {
     }
     const BankAccountSearch = {};
     if (_.get(Form2.getFieldsValue(allFields), 'legalName')) {
-      BankAccountSearch.legalName = _.get(Form2.getFieldsValue(allFields), 'legalName');
+      [BankAccountSearch.legalName] = _.get(Form2.getFieldsValue(allFields), 'legalName').split(
+        '_',
+      );
     }
     if (
       _.get(Form2.getFieldsValue(allFields), 'bankAccount')
       // && _.get(Form2.getFieldsValue(changedFields), 'bankAccountName')
     ) {
-      BankAccountSearch.bankAccount = _.get(Form2.getFieldsValue(allFields), 'bankAccount');
+      [BankAccountSearch.bankAccount] = _.get(Form2.getFieldsValue(allFields), 'bankAccount').split(
+        '_',
+      );
     }
     if (_.get(Form2.getFieldsValue(allFields), 'bankAccountName')) {
-      BankAccountSearch.bankAccountName = _.get(Form2.getFieldsValue(allFields), 'bankAccountName');
+      [BankAccountSearch.bankAccountName] = _.get(
+        Form2.getFieldsValue(allFields),
+        'bankAccountName',
+      ).split('_');
     }
+
     const { error: _error, data: _data } = await refBankAccountSearch(BankAccountSearch);
     if (_error) return false;
 
@@ -205,7 +214,7 @@ class ClientManagementBankAccount extends PureComponent {
                         if (error) return [];
                         return data.map(item => ({
                           label: item,
-                          value: item,
+                          value: `${item}_${uuidv4()}`,
                         }));
                       }}
                     />,
@@ -245,7 +254,7 @@ class ClientManagementBankAccount extends PureComponent {
                               if (error) return [];
                               return data.map(item => ({
                                 label: item,
-                                value: item,
+                                value: `${item}_${uuidv4()}`,
                               }));
                             }
                       }
@@ -287,7 +296,7 @@ class ClientManagementBankAccount extends PureComponent {
                               if (error) return [];
                               return data.map(item => ({
                                 label: item,
-                                value: item,
+                                value: `${item}_${uuidv4()}`,
                               }));
                             }
                       }
