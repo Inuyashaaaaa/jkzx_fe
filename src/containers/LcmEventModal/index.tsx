@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
@@ -189,6 +189,11 @@ const LcmEventModal = memo<{
   };
 
   current(meta);
+  const [fixingEdited, setFixingEdited] = useState(false);
+
+  const handleFixingEdited = () => {
+    setFixingEdited(true);
+  };
 
   return (
     <>
@@ -206,16 +211,19 @@ const LcmEventModal = memo<{
         ref={node => {
           $expirationModal.current = node;
         }}
+        fixingEdited={fixingEdited}
       />
       <KnockOutModal
         ref={node => {
           $knockOutModal.current = node;
         }}
+        fixingEdited={fixingEdited}
       />
       <FixingModal
         ref={node => {
           $fixingModal.current = node;
         }}
+        handleFixingEdited={handleFixingEdited}
       />
       <SettleModal
         ref={node => {
