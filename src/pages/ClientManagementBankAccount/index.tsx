@@ -100,28 +100,32 @@ class ClientManagementBankAccount extends PureComponent {
     let legalNameValue;
     let bankAccountValue;
 
-    if (changedFields.bankAccount && changedFields.bankAccount.value) {
-      const { error, data } = await refBankAccountSearch(BankAccountSearch);
-      bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
-      legalNameValue = data[0].legalName;
-      bankAccountValue = data[0].bankAccount;
-    }
+    // if (changedFields.bankAccount && changedFields.bankAccount.value) {
+    //   const { error, data } = await refBankAccountSearch(BankAccountSearch);
+    //   bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
+    //   legalNameValue = data[0].legalName;
+    //   bankAccountValue = data[0].bankAccount;
+    // }
 
-    if (changedFields.bankAccountName && changedFields.bankAccountName.value) {
-      const { error, data } = await refBankAccountSearch(BankAccountSearch);
-      bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
-      legalNameValue = data[0].legalName;
-      bankAccountValue = data[0].bankAccount;
-    }
-
+    // if (changedFields.bankAccountName && changedFields.bankAccountName.value) {
+    //   const { error, data } = await refBankAccountSearch(BankAccountSearch);
+    //   bankAccountNameValue = data[0] ? data[0].bankAccountName : '';
+    //   legalNameValue = data[0].legalName;
+    //   bankAccountValue = data[0].bankAccount;
+    // }
+    const { searchFormData } = this.state;
     this.setState({
       markets,
       bankAccountNames,
-      searchFormData: Form2.createFields({
-        legalName: legalNameValue || (allFields.legalName || {}).value,
-        bankAccount: bankAccountValue,
-        bankAccountName: bankAccountNameValue,
-      }),
+      searchFormData: {
+        ...searchFormData,
+        ...changedFields,
+      },
+      // searchFormData: Form2.createFields({
+      //   legalName: legalNameValue || (allFields.legalName || {}).value,
+      //   bankAccount: bankAccountValue,
+      //   bankAccountName: bankAccountNameValue,
+      // }),
     });
     return true;
   };
