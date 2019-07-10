@@ -2,7 +2,7 @@ import { Divider, Menu, message, notification } from 'antd';
 import BigNumber from 'bignumber.js';
 import { connect } from 'dva';
 import _ from 'lodash';
-import { evaluate } from 'mathjs';
+import { evaluate, abs } from 'mathjs';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
@@ -245,14 +245,36 @@ const TradeManagementPricing = props => {
         .map(record => {
           const leg = getLegByRecord(record);
           if (!leg) return record;
+          const pricingColumns = leg.getColumns(LEG_ENV.PRICING, record);
           const omits = _.difference(
             leg.getColumns(LEG_ENV.EDITING, record).map(item => item.dataIndex),
-            leg.getColumns(LEG_ENV.PRICING, record).map(item => item.dataIndex),
+            pricingColumns.map(item => item.dataIndex),
           );
+
+          const leftData = _.omit(record, omits);
+
+          const getDiffTerm = (): null | object => {
+            if (!pricingColumns.find(col => col.dataIndex === LEG_FIELD.TERM)) {
+              return null;
+            }
+            const effectiveDateField = record[LEG_FIELD.EFFECTIVE_DATE];
+            const expirationDateField = record[LEG_FIELD.EXPIRATION_DATE];
+            const effectiveDateValue = Form2.getFieldValue(effectiveDateField);
+            const expirationDateValue = Form2.getFieldValue(expirationDateField);
+
+            return !!effectiveDateValue && !!expirationDateValue
+              ? {
+                  [LEG_FIELD.TERM]: Form2.createField(
+                    abs(getMoment(effectiveDateValue).diff(expirationDateValue, 'd')),
+                  ),
+                }
+              : null;
+          };
 
           const result = {
             ...leg.getDefaultData(LEG_ENV.PRICING),
-            ..._.omit(record, omits),
+            ...getDiffTerm(),
+            ...leftData,
             [LEG_ENV_FIELD]: LEG_ENV.PRICING,
             [LEG_FIELD.UNDERLYER_PRICE]: record[LEG_FIELD.INITIAL_SPOT],
           };

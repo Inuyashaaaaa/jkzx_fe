@@ -1,14 +1,50 @@
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
-import { Checkbox, Form2 } from '@/containers';
+import { Checkbox, Form2, Select } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 
 const unAnnualArray = [LEG_TYPE_MAP.FORWARD, LEG_TYPE_MAP.CASH_FLOW];
 
+const SelectCheckbox = props => {
+  const { value, onChange = () => {} } = props;
+  const normalValue = () => {
+    if (value === true) {
+      return 'true';
+    }
+    return 'false';
+  };
+
+  return (
+    <Select
+      {...props}
+      value={normalValue()}
+      onChange={_value => {
+        const formatValue = () => {
+          if (_value === 'true') {
+            return true;
+          }
+          return false;
+        };
+        onChange(formatValue());
+      }}
+      options={[
+        {
+          label: '是',
+          value: 'true',
+        },
+        {
+          label: '否',
+          value: 'false',
+        },
+      ]}
+    ></Select>
+  );
+};
+
 export const IsAnnual: ILegColDef = {
-  title: '是否年化',
+  title: '年化/非年华',
   dataIndex: LEG_FIELD.IS_ANNUAL,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
@@ -27,11 +63,7 @@ export const IsAnnual: ILegColDef = {
     <FormItem>
       {form.getFieldDecorator({
         rules: [getRequiredRule()],
-      })(
-        <Checkbox editing={editing} renderingLabels={['年化', '非年化']}>
-          {val ? '年化' : '非年化'}
-        </Checkbox>,
-      )}
+      })(<SelectCheckbox editing={editing} defaultOpen></SelectCheckbox>)}
     </FormItem>
   ),
 };

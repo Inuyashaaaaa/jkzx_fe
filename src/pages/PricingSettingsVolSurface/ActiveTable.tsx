@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState, useRef } from 'react';
 import { Divider, Button, Checkbox, Row, Popover, Col, message } from 'antd';
-import { Form2, InputNumber, Table2, SmartTable } from '@/containers';
 import FormItem from 'antd/lib/form/FormItem';
+import { Form2, InputNumber, Table2, SmartTable } from '@/containers';
 import InputButton from '@/containers/_InputButton';
 import { saveModelVolSurface } from '@/services/model';
 import { GROUP_KEY, INSTANCE_KEY, TENOR_KEY, OPERATION } from './constants';
@@ -25,56 +25,44 @@ const ActiveTable = memo<any>(props => {
   const [rowSelection, setRowSelection] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
   const [number, setNumber] = useState();
+  const tableEl = useRef<Table2>(null);
 
-  useEffect(
-    () => {
-      setBatch(false);
-    },
-    [searchFormData]
-  );
+  useEffect(() => {
+    setBatch(false);
+  }, [searchFormData]);
 
-  useEffect(
-    () => {
-      setDataSource(props.dataSource);
-    },
-    [props.dataSource]
-  );
+  useEffect(() => {
+    setDataSource(props.dataSource);
+  }, [props.dataSource]);
 
-  useEffect(
-    () => {
-      setSelectColumns(() => {
-        return props.columns.map((item, index) => {
-          if (!batch) return item;
-          if (index === 0 || index === props.columns.length - 1) return item;
-          return {
-            ...item,
-            oldTitle: item.oldTitle || item.title,
-            onCell: () => {
-              return {
-                className: !!selectedColKeys[item.dataIndex] ? 'col-selected' : '',
-              };
-            },
-            title: (
-              <Checkbox
-                checked={!!selectedColKeys[item.dataIndex]}
-                onChange={e => {
-                  setSelectedColKeys((pre: any) => {
-                    return {
-                      ...pre,
-                      [item.dataIndex]: e.target.checked,
-                    };
-                  });
-                }}
-              >
-                {item.oldTitle || item.title}
-              </Checkbox>
-            ),
-          };
-        });
-      });
-    },
-    [selectedColKeys, props.columns, batch]
-  );
+  useEffect(() => {
+    setSelectColumns(() =>
+      props.columns.map((item, index) => {
+        if (!batch) return item;
+        if (index === 0 || index === props.columns.length - 1) return item;
+        return {
+          ...item,
+          oldTitle: item.oldTitle || item.title,
+          onCell: () => ({
+            className: selectedColKeys[item.dataIndex] ? 'col-selected' : '',
+          }),
+          title: (
+            <Checkbox
+              checked={!!selectedColKeys[item.dataIndex]}
+              onChange={e => {
+                setSelectedColKeys((pre: any) => ({
+                  ...pre,
+                  [item.dataIndex]: e.target.checked,
+                }));
+              }}
+            >
+              {item.oldTitle || item.title}
+            </Checkbox>
+          ),
+        };
+      }),
+    );
+  }, [selectedColKeys, props.columns, batch]);
 
   // 批量选择
   const rowSelectionData = {
@@ -84,6 +72,10 @@ const ActiveTable = memo<any>(props => {
   };
 
   const handleSaveTable = async () => {
+    const res = await tableEl.current.validate();
+    if (_.isArray(res) && res.some(value => value.errors)) {
+      return;
+    }
     const searchFormDataValues = Form2.getFieldsValue(searchFormData);
     const { error } = await saveModelVolSurface({
       columns: columns.filter(col => !(col.dataIndex === TENOR_KEY || col.dataIndex === OPERATION)),
@@ -112,7 +104,8 @@ const ActiveTable = memo<any>(props => {
 
   const handleBatchSave = event => {
     if (_.isEmpty(selectedRow) && _.isEmpty(selectedColKeys)) {
-      return message.warn('还未选择行或者列');
+      message.warn('还未选择行或者列');
+      return;
     }
 
     (_.isEmpty(selectedRow) ? dataSource.map(item => item.id) : selectedRow).forEach(rowKey => {
@@ -125,8 +118,8 @@ const ActiveTable = memo<any>(props => {
         : selectedColIds
       ).forEach(colKey => {
         if (colKey === TENOR_KEY || colKey === OPERATION) return;
-        setDataSource(pre => {
-          return pre.map(record => {
+        setDataSource(pre =>
+          pre.map(record => {
             if (record.id === rowKey) {
               return {
                 ...record,
@@ -137,8 +130,8 @@ const ActiveTable = memo<any>(props => {
               };
             }
             return record;
-          });
-        });
+          }),
+        );
       });
     });
 
@@ -169,19 +162,17 @@ const ActiveTable = memo<any>(props => {
                 {
                   dataIndex: 'quote',
                   title: '标的物价格',
-                  render: (value, record, index, { form, editing }) => {
-                    return (
-                      <FormItem>
-                        {form.getFieldDecorator({
-                          rules: [
-                            {
-                              required: true,
-                            },
-                          ],
-                        })(<InputNumber style={{ width: 200 }} disabled={batch} />)}
-                      </FormItem>
-                    );
-                  },
+                  render: (value, record, index, { form, editing }) => (
+                    <FormItem>
+                      {form.getFieldDecorator({
+                        rules: [
+                          {
+                            required: true,
+                          },
+                        ],
+                      })(<InputNumber style={{ width: 200 }} disabled={batch} />)}
+                    </FormItem>
+                  ),
                 },
               ]}
             />
@@ -208,6 +199,9 @@ const ActiveTable = memo<any>(props => {
         </>
       ) : null}
       <SmartTable
+        ref={node => {
+          tableEl.current = node;
+        }}
         className={styles.scope}
         dataSource={dataSource}
         columns={selectColumns}

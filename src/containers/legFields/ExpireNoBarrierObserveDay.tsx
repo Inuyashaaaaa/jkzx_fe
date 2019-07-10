@@ -161,7 +161,6 @@ class ObserveModalInput extends InputBase<{
 
     const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE]))
       .clone()
-      .add(1, 'days')
       .format('YYYY-MM-DD');
     const end = getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).format(
       'YYYY-MM-DD',
@@ -344,6 +343,7 @@ class ObserveModalInput extends InputBase<{
             destroyOnClose: true,
             width: 700,
             visible: this.state.visible,
+            onCancel: this.onCancel,
           }}
           onClick={this.onOpen}
           style={{ width: '100%', display: 'block' }}

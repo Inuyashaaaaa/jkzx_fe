@@ -39,6 +39,7 @@ class ExpirationModal extends PureComponent<
   {
     visible?: boolean;
     data?: any;
+    fixingEdited?: boolean;
   },
   any
 > {
@@ -178,9 +179,16 @@ class ExpirationModal extends PureComponent<
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: false,
-    });
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        if (this.props.fixingEdited) {
+          this.reload();
+        }
+      },
+    );
   };
 
   public getUsedFormData = () => {

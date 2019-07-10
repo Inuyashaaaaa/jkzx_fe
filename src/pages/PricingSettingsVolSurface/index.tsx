@@ -151,7 +151,14 @@ class PricingSettingVolSurface extends PureComponent {
               editable: record => true,
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
-                  {form.getFieldDecorator({})(
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '必填',
+                      },
+                    ],
+                  })(
                     <Select
                       style={{ minWidth: 180 }}
                       editing={editing}
@@ -173,9 +180,14 @@ class PricingSettingVolSurface extends PureComponent {
             editable: record => true,
             render: (val, record, index, { form, editing }) => (
               <FormItem>
-                {form.getFieldDecorator({})(
-                  <UnitInputNumber autoSelect editing={editing} unit="%" min={0} />,
-                )}
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '必填',
+                    },
+                  ],
+                })(<UnitInputNumber autoSelect editing={editing} unit="%" min={0} />)}
               </FormItem>
             ),
           };

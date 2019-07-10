@@ -34,6 +34,7 @@ class FixingModal extends PureComponent<
   {
     visible?: boolean;
     data?: any;
+    handleFixingEdited?: any;
   },
   any
 > {
@@ -49,6 +50,7 @@ class FixingModal extends PureComponent<
     tableData: [],
     avg: 0,
     upBarrierType: '',
+    edited: false,
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -233,6 +235,16 @@ class FixingModal extends PureComponent<
       },
     });
     if (error) return;
+    this.setState(
+      {
+        edited: true,
+      },
+      () => {
+        if (this.props.handleFixingEdited) {
+          this.props.handleFixingEdited();
+        }
+      },
+    );
     message.success('观察价格更新成功');
   };
 
@@ -453,11 +465,13 @@ class FixingModal extends PureComponent<
           ref={node => {
             this.$expirationModal = node;
           }}
+          fixingEdited={this.state.edited}
         />
         <KnockOutModal
           ref={node => {
             this.$knockOutModal = node;
           }}
+          fixingEdited={this.state.edited}
         />
         <AsianExerciseModal
           ref={node => {
