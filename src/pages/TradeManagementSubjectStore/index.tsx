@@ -131,12 +131,13 @@ const TradeManagementMarketManagement = props => {
 
     setCreating(true);
     const { error } = await mktInstrumentCreate(newCreateFormData);
+    setCreating(false);
+
     if (error) {
       message.error('创建失败');
       return;
     }
     message.success('创建成功');
-    setCreating(false);
 
     setCreateVisible(false);
     setCreateFormData({});
