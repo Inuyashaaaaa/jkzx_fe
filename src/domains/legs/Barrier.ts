@@ -95,7 +95,8 @@ const asyncLinkageBarrierShift = (
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.OBSERVATION_STEP, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.KNOCK_DIRECTION, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields)
+      Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.BARRIER_TYPE, changedFields)
     ) {
       const vol = Form2.getFieldValue(record[LEG_FIELD.VOL]);
       if (vol != null) {
