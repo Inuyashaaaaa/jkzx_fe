@@ -313,17 +313,15 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public handleCellValueChanged = params => {
-    this.setState(pre => {
-      return {
-        ...pre,
-        tableDataSource: pre.tableDataSource.map(item => {
-          if (item.id === params.record.id) {
-            return params.record;
-          }
-          return item;
-        }),
-      };
-    });
+    this.setState(pre => ({
+      ...pre,
+      tableDataSource: pre.tableDataSource.map(item => {
+        if (item.id === params.record.id) {
+          return params.record;
+        }
+        return item;
+      }),
+    }));
   };
 
   public render() {
