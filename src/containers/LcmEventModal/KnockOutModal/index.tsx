@@ -184,6 +184,7 @@ class ExerciseModal extends PureComponent<
             }}
             dataSource={this.state.dataSource}
             onValueChange={this.onValueChange}
+            onFieldChange={() => {}}
             controlNumberOneRow={1}
             footer={false}
             controls={KNOCKOUT_FORM_CONTROLS(this.state.notionalType, this.handleSettleAmount)}
