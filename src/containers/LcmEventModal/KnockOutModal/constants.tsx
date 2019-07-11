@@ -79,7 +79,7 @@ export const KNOCKOUT_FORM_CONTROLS: (notionalType, handleSettleAmount) => IForm
       rules: [
         {
           required: true,
-          message: '期权数量 (手)为必填项',
+          message: '结算金额为必填项',
         },
       ],
     },
