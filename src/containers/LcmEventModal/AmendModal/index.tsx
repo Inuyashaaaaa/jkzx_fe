@@ -4,7 +4,13 @@ import React, { memo, useState, useRef, useEffect } from 'react';
 import moment from 'moment';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';
-import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD, DATE_ARRAY } from '@/constants/common';
+import {
+  LCM_EVENT_TYPE_MAP,
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  DATE_ARRAY,
+  PREMIUM_TYPE_MAP,
+} from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
@@ -52,6 +58,7 @@ const AmendModal = props => {
   const [cashModalVisible, setCashModalVisible] = useState(false);
   const [tradeData, setTradeData] = useState({});
   const [positionId, setPositionId] = useState(null);
+  const [oldPremium, setOldPremium] = useState(null);
 
   const [store, setStore] = useState<{
     record?: any;
@@ -61,6 +68,12 @@ const AmendModal = props => {
   }>({});
   current({
     show: (record, tableFormData, currentUser, reload) => {
+      if (oldPremium === null) {
+        setOldPremium({
+          premium: _.get(record, 'premium.value'),
+          premiumType: _.get(record, 'premiumType.value'),
+        });
+      }
       setPositionId(_.get(record, 'id'));
       const newData = _.mapValues(record, (item, key) => {
         if (_.includes(DATE_ARRAY, key)) {
@@ -156,7 +169,17 @@ const AmendModal = props => {
 
           message.success('修改交易要素成功');
 
-          if (createCash) {
+          let premiumChanged = false;
+          if (oldPremium) {
+            premiumChanged =
+              oldPremium.premiumType === PREMIUM_TYPE_MAP.PERCENT
+                ? oldPremium.premium / 100 !== _.get(position, 'asset.premium') ||
+                  oldPremium.premiumType !== _.get(position, 'asset.premiumType')
+                : oldPremium.premium !== _.get(position, 'asset.premium') ||
+                  oldPremium.premiumType !== _.get(position, 'asset.premiumType');
+          }
+
+          if (createCash || premiumChanged) {
             setTradeData({
               ...data,
               counterPartyCode: store.tableFormData.counterPartyCode,
