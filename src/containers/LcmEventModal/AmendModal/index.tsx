@@ -4,7 +4,14 @@ import React, { memo, useState, useRef, useEffect } from 'react';
 import moment from 'moment';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';
-import { LCM_EVENT_TYPE_MAP, LEG_FIELD, LEG_ID_FIELD, DATE_ARRAY } from '@/constants/common';
+import {
+  LCM_EVENT_TYPE_MAP,
+  LEG_FIELD,
+  LEG_ID_FIELD,
+  DATE_ARRAY,
+  LEG_TYPE_MAP,
+  BIG_NUMBER_CONFIG,
+} from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import MultiLegTable from '@/containers/MultiLegTable';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
@@ -15,6 +22,9 @@ import { Form2, DatePicker } from '@/containers';
 import { ITableData } from '@/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import CashExportModal from '@/containers/CashExportModal';
+import { mktInstrumentInfo } from '@/services/market-data-service';
+import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
+import BigNumber from 'bignumber.js';
 
 /* eslint-disable @typescript-eslint/interface-name-prefix */
 /* eslint-disable prefer-rest-params */
@@ -53,6 +63,30 @@ const AmendModal = props => {
   const [tradeData, setTradeData] = useState({});
   const [positionId, setPositionId] = useState(null);
 
+  const handleTradeNumber = position => {
+    const record = Form2.getFieldsValue(position);
+    const notionalAmountType = record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const multipler = record[LEG_FIELD.UNDERLYER_MULTIPLIER];
+    const annualCoefficient =
+      record[LEG_FIELD.IS_ANNUAL] &&
+      new BigNumber(record[LEG_FIELD.TERM]).div(record[LEG_FIELD.DAYS_IN_YEAR]).toNumber();
+    const notionalAmount = record[LEG_FIELD.IS_ANNUAL]
+      ? new BigNumber(record[LEG_FIELD.NOTIONAL_AMOUNT]).multipliedBy(annualCoefficient).toNumber()
+      : record[LEG_FIELD.NOTIONAL_AMOUNT];
+
+    const notional =
+      notionalAmountType === 'LOT'
+        ? notionalAmount
+        : new BigNumber(notionalAmount)
+            .div(record[LEG_FIELD.INITIAL_SPOT])
+            .div(multipler)
+            .toNumber();
+    return new BigNumber(notional)
+      .multipliedBy(multipler)
+      .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+      .toNumber();
+  };
+
   const [store, setStore] = useState<{
     record?: any;
     tableFormData?: any;
@@ -60,9 +94,57 @@ const AmendModal = props => {
     reload?: any;
   }>({});
   current({
-    show: (record, tableFormData, currentUser, reload) => {
+    show: async (record, tableFormData, currentUser, reload) => {
       setPositionId(_.get(record, 'id'));
-      const newData = _.mapValues(record, (item, key) => {
+      const unUnitLeg = [LEG_TYPE_MAP.SPREAD_EUROPEAN, LEG_TYPE_MAP.CASH_FLOW];
+      const unitPositions = await Promise.all(
+        [record].map(position => {
+          if (unUnitLeg.includes(record.$legType)) {
+            return Promise.resolve(record);
+          }
+          return mktInstrumentInfo({
+            instrumentId: position.$legType.includes('SPREAD_EUROPEAN')
+              ? _.get(position, 'underlyerInstrumentId1.value')
+              : _.get(position, `${LEG_FIELD.UNDERLYER_INSTRUMENT_ID}.value`),
+          }).then(rsp => {
+            const { error: _error, data: _data } = rsp;
+            if (_error || _data.instrumentInfo.unit === undefined) {
+              return {
+                ...position,
+                ...Form2.createFields({
+                  [LEG_FIELD.UNIT]: '_',
+                }),
+              };
+            }
+            return {
+              ...position,
+              ...Form2.createFields({
+                [LEG_FIELD.UNIT]: _data.instrumentInfo.unit,
+              }),
+            };
+          });
+        }),
+      );
+
+      const composePositions = await Promise.all(
+        unitPositions.map(position =>
+          trdTradeLCMUnwindAmountGet({
+            tradeId: tableFormData.tradeId,
+            positionId: position.id,
+          }).then(rsp => {
+            const { error: _error, data: _data } = rsp;
+            if (_error) return position;
+            return {
+              ...position,
+              ...Form2.createFields({
+                [LEG_FIELD.TRADE_NUMBER]: handleTradeNumber(position),
+              }),
+            };
+          }),
+        ),
+      );
+
+      const newData = _.mapValues(composePositions[0], (item, key) => {
         if (_.includes(DATE_ARRAY, key)) {
           return {
             type: 'field',
