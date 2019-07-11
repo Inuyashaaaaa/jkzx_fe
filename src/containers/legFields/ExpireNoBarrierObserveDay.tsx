@@ -185,9 +185,11 @@ class ObserveModalInput extends InputBase<{
     if (error) return;
     this.setState({
       dealDataSource: this.computeDataSource(
-        data.map(item => ({
-          [OB_DAY_FIELD]: moment(item),
-        })),
+        data
+          .filter(item => moment(item).isAfter(start))
+          .map(item => ({
+            [OB_DAY_FIELD]: moment(item),
+          })),
       ),
     });
   };
