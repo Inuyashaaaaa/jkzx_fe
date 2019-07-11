@@ -4,6 +4,7 @@ import React, { memo, useState, useRef, useEffect } from 'react';
 import moment from 'moment';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';
+import BigNumber from 'bignumber.js';
 import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
@@ -11,10 +12,15 @@ import {
   DATE_ARRAY,
   LEG_TYPE_MAP,
   BIG_NUMBER_CONFIG,
+  PREMIUM_TYPE_MAP,
 } from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import MultiLegTable from '@/containers/MultiLegTable';
-import { trdTradeLCMEventProcess } from '@/services/trade-service';
+import {
+  trdTradeLCMEventProcess,
+  trdPositionLCMEventTypes,
+  trdTradeLCMUnwindAmountGet,
+} from '@/services/trade-service';
 import { convertLegDataByEnv, getLegByRecord } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { convertTradePositions } from '@/services/pages';
@@ -23,8 +29,6 @@ import { ITableData } from '@/components/type';
 import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import CashExportModal from '@/containers/CashExportModal';
 import { mktInstrumentInfo } from '@/services/market-data-service';
-import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
-import BigNumber from 'bignumber.js';
 
 /* eslint-disable @typescript-eslint/interface-name-prefix */
 /* eslint-disable prefer-rest-params */
@@ -62,6 +66,7 @@ const AmendModal = props => {
   const [cashModalVisible, setCashModalVisible] = useState(false);
   const [tradeData, setTradeData] = useState({});
   const [positionId, setPositionId] = useState(null);
+  const [oldPremium, setOldPremium] = useState(null);
 
   const handleTradeNumber = position => {
     const record = Form2.getFieldsValue(position);
@@ -94,7 +99,13 @@ const AmendModal = props => {
     reload?: any;
   }>({});
   current({
-    show: async (record, tableFormData, currentUser, reload) => {
+    show: (record, tableFormData, currentUser, reload) => {
+      if (oldPremium === null) {
+        setOldPremium({
+          premium: _.get(record, 'premium.value'),
+          premiumType: _.get(record, 'premiumType.value'),
+        });
+      }
       setPositionId(_.get(record, 'id'));
       const unUnitLeg = [LEG_TYPE_MAP.SPREAD_EUROPEAN, LEG_TYPE_MAP.CASH_FLOW];
       const unitPositions = await Promise.all(
@@ -238,7 +249,17 @@ const AmendModal = props => {
 
           message.success('修改交易要素成功');
 
-          if (createCash) {
+          let premiumChanged = false;
+          if (oldPremium) {
+            premiumChanged =
+              oldPremium.premiumType === PREMIUM_TYPE_MAP.PERCENT
+                ? oldPremium.premium / 100 !== _.get(position, 'asset.premium') ||
+                  oldPremium.premiumType !== _.get(position, 'asset.premiumType')
+                : oldPremium.premium !== _.get(position, 'asset.premium') ||
+                  oldPremium.premiumType !== _.get(position, 'asset.premiumType');
+          }
+
+          if (createCash || premiumChanged) {
             setTradeData({
               ...data,
               counterPartyCode: store.tableFormData.counterPartyCode,

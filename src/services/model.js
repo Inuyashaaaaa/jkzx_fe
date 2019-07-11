@@ -79,9 +79,10 @@ export function queryModelDividendCurve(params, passError) {
     const { error, data } = result;
     if (error) return result;
 
-    const {
-      modelInfo: { instruments },
-    } = data;
+    // const {
+    //   modelInfo: { instruments },
+    // } = data;
+    const instruments = lodash.get(data, 'modelInfo.instruments') || [];
 
     return {
       error,
@@ -179,9 +180,11 @@ export async function queryModelVolSurface(params, passError) {
 
     if (error) return result;
 
-    const {
-      modelInfo: { volGrid, underlyer },
-    } = data;
+    // const {
+    //   modelInfo: { volGrid, underlyer },
+    // } = data;
+    const volGrid = lodash.get(data, 'modelInfo.volGrid') || [];
+    const underlyer = lodash.get(data, 'modelInfo.underlyer') || {};
 
     const columns = [
       {
