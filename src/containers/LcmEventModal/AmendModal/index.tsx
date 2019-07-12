@@ -99,7 +99,7 @@ const AmendModal = props => {
     reload?: any;
   }>({});
   current({
-    show: (record, tableFormData, currentUser, reload) => {
+    show: async (record, tableFormData, currentUser, reload) => {
       if (oldPremium === null) {
         setOldPremium({
           premium: _.get(record, 'premium.value'),
