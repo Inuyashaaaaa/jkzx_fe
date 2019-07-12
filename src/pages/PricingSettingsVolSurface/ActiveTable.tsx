@@ -95,6 +95,8 @@ const ActiveTable = memo<any>(props => {
     setBatch(false);
     setNumber(null);
     setRowSelection(null);
+    setSelectedRow([]);
+    setSelectedColKeys([]);
   };
 
   const handleBatchSelect = () => {
