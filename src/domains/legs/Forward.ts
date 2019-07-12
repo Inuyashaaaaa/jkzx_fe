@@ -164,6 +164,10 @@ export const Forward: ILeg = legPipeLine({
       'premiumPercent',
       'unit',
       'tradeNumber',
+      'vol',
+      'underlyerPrice',
+      'q',
+      'r',
     ];
 
     nextPosition.productType = LEG_TYPE_MAP.FORWARD;
@@ -204,7 +208,7 @@ export const Forward: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -214,7 +218,7 @@ export const Forward: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });
