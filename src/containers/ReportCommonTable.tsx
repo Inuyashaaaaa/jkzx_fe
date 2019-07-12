@@ -156,7 +156,7 @@ const ReportCommonTable = memo<any>(props => {
     setSearchFormData(formData);
     setExcelFormData(formData);
     setSearchForm(formData);
-    if (_.get(newMarkets.length) && _.get(newMarkets.length) > 0) {
+    if (newMarkets.length && newMarkets.length > 0) {
       fetchTable(formData);
     }
   });
