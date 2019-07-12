@@ -17,6 +17,7 @@ import {
   LEG_TYPE_MAP,
   OBSERVATION_TYPE_MAP,
   LEG_TYPE_ZHCH_MAP,
+  EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP,
 } from '@/constants/common';
 import {
   COMPUTED_LEG_FIELDS,
@@ -104,7 +105,15 @@ const TradeManagementPricing = props => {
         ),
     );
 
-    const leftKeys = leftColumns.map(item => item.dataIndex);
+    let leftKeys = leftColumns.map(item => item.dataIndex);
+    // 雪球到期未敲出收益类型为固定去除到期未敲出行权价格验证
+    if (
+      record.$legType === LEG_TYPE_MAP.AUTOCALL &&
+      record[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE].value ===
+        EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
+    ) {
+      leftKeys = leftKeys.filter(item => item !== LEG_FIELD.AUTO_CALL_STRIKE);
+    }
 
     const fills = leftKeys.reduce(
       (obj, key) => ({
@@ -128,7 +137,6 @@ const TradeManagementPricing = props => {
     if (judgeLegColumnsHasError(record)) {
       return;
     }
-
     const requiredTradeOptions = getSelfTradesColDataIndexs(record).filter(
       item =>
         item !== TRADESCOLDEFS_LEG_FIELD_MAP.UNDERLYER_PRICE &&
@@ -234,6 +242,8 @@ const TradeManagementPricing = props => {
   useLifecycles(() => {
     if (from === PRICING_FROM_EDITING) {
       const { tableData: editingTableData = [] } = tradeManagementBookEditPageData;
+
+      tableData.forEach(record => fetchDefaultPricingEnvData(record));
 
       const recordTypeIsModelXY = record =>
         Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.MODEL_XY;
