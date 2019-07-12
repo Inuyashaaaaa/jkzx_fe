@@ -49,7 +49,13 @@ const ActionBar = memo<any>(props => {
 
   const onPricingEnvSelectChange = val => {
     setCurPricingEnv(val);
-    tableData.forEach(item => fetchDefaultPricingEnvData(item, true));
+    tableData.forEach(item =>
+      fetchDefaultPricingEnvData({
+        record: item,
+        reload: true,
+        pricingEnv: val,
+      }),
+    );
   };
 
   const [affix, setAffix] = useState(false);
