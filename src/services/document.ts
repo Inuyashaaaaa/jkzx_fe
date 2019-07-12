@@ -124,7 +124,12 @@ export async function DOWN_LOAD(url, options) {
     },
   })
     .then(response => {
-      console.log(response);
+      if (response.headers.get('statustext')) {
+        const errortext = decodeURIComponent(response.headers.get('statustext'));
+        const error = new Error(errortext);
+        error.code = response.status;
+        throw error;
+      }
       if (response.status >= 200 && response.status < 300) {
         return response.blob();
         // return response.url;
