@@ -122,7 +122,9 @@ const TradeManagementPricing = props => {
     return false;
   };
 
-  const fetchDefaultPricingEnvData = async (record, reload = false) => {
+  const fetchDefaultPricingEnvData = async (params: any = {}) => {
+    const { record, reload = false, pricingEnv = curPricingEnv } = params;
+
     if (judgeLegColumnsHasError(record)) {
       return;
     }
@@ -152,7 +154,7 @@ const TradeManagementPricing = props => {
       return;
     }
 
-    if (!curPricingEnv) {
+    if (!pricingEnv) {
       message.warn('定价环境不能为空');
       return;
     }
@@ -167,7 +169,7 @@ const TradeManagementPricing = props => {
 
     const { error, data = [], raw } = await prcTrialPositionsService({
       positions: [position],
-      pricingEnvironmentId: curPricingEnv,
+      pricingEnvironmentId: pricingEnv,
       valuationDateTime: validateDateTime.format('YYYY-MM-DD'),
     });
 
@@ -295,7 +297,7 @@ const TradeManagementPricing = props => {
       if (fetched) return;
       if (!curPricingEnv || !curPricingEnv.length) return;
       if (_.isEmpty(tableData)) return;
-      tableData.forEach(record => fetchDefaultPricingEnvData(record));
+      tableData.forEach(record => fetchDefaultPricingEnvData({ record }));
       setFetched(true);
     }
   }, [tableData, curPricingEnv]);
@@ -560,7 +562,7 @@ const TradeManagementPricing = props => {
 
   const onCellValuesChange = params => {
     if (_.get(params, 'changedValues.OBSERVATION_DATES')) {
-      fetchDefaultPricingEnvData(params.record);
+      fetchDefaultPricingEnvData({ record: params.record });
     }
   };
 
@@ -587,7 +589,7 @@ const TradeManagementPricing = props => {
         tableEl={tableEl}
         onCellFieldsChange={onCellFieldsChange}
         onCellEditingChanged={params => {
-          fetchDefaultPricingEnvData(params.record);
+          fetchDefaultPricingEnvData({ record: params.record });
         }}
         onCellValuesChange={onCellValuesChange}
         dataSource={tableData}
