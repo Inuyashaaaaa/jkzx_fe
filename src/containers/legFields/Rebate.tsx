@@ -15,7 +15,14 @@ import {
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/containers';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
+import {
+  legEnvIsBooking,
+  legEnvIsPricing,
+  getLegEnvs,
+  getRequiredRule,
+  getLegByRecord,
+  getLegByType,
+} from '@/tools';
 import { ILegColDef } from '@/types/leg';
 
 export const Rebate: ILegColDef = {
@@ -30,9 +37,8 @@ export const Rebate: ILegColDef = {
   },
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     const getUnit = () => {
-      if (isPricing || isBooking) {
+      if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL_AMERICAN) {
         if (_.get(record, [LEG_FIELD.REBATE_TYPE, 'value']) === REBATETYPE_UNIT_OPTIONS_MAP.CNY) {
           return '¥';
         }
