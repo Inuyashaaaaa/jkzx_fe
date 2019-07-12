@@ -218,8 +218,14 @@ class AccountOpeningApproval extends PureComponent<any, any> {
   };
 
   public handleGetData = param => {
+    const approvalData = {
+      legalName: _.get(param, 'legalName'),
+      salesName: _.get(param, 'salesName'),
+      clientType: _.get(param, 'clientType'),
+    };
     this.setState({
       accountData: param,
+      detailData: Form2.createFields(approvalData),
     });
   };
 
