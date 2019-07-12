@@ -39,20 +39,11 @@ class TradeManagementMarketManagement extends PureComponent {
     intradayFormData: { valuationDate: Form2.createField(moment()) },
     closeFormData: { valuationDate: Form2.createField(moment()) },
     confirmLoading: false,
+    searchForm: {},
   };
 
   public paginationChange = (current, pageSize) => {
-    this.setState(
-      {
-        pagination: {
-          current,
-          pageSize,
-        },
-      },
-      () => {
-        this.fetchTable(true);
-      },
-    );
+    this.fetchTable({ current, pageSize });
   };
 
   public componentDidMount = () => {
@@ -60,10 +51,10 @@ class TradeManagementMarketManagement extends PureComponent {
       this.setState({
         lastUpdateTime: moment().format('HH:mm:ss'),
       });
-      this.fetchTable(false);
+      this.fetchTable(this.state.pagination, this.state.searchForm);
     }, 1000 * 30);
 
-    this.fetchTable(true);
+    this.fetchTable(this.state.pagination, this.state.searchForm);
   };
 
   public componentWillUnmount = () => {
@@ -72,24 +63,28 @@ class TradeManagementMarketManagement extends PureComponent {
     }
   };
 
-  public fetchTable = loading => {
-    const { pagination } = this.state;
+  public fetchTable = (pagination, searchFormData) => {
     this.setState({
       lastUpdateTime: moment().format('HH:mm:ss'),
-      loading,
+      loading: true,
     });
     return mktQuotesListPaged({
       page: pagination.current - 1,
       pageSize: pagination.pageSize,
-      ...Form2.getFieldsValue(this.state.searchFormData),
+      ...Form2.getFieldsValue(searchFormData || this.state.searchForm),
     }).then(result => {
       this.setState({
         loading: false,
       });
-      if (result.error) return;
+      if (result.error) {
+        return;
+      }
+      const { searchForm } = this.state;
       this.setState({
         tableDataSource: result.data.page,
         total: result.data.totalCount,
+        searchForm: searchFormData || searchForm,
+        pagination,
       });
     });
   };
@@ -101,30 +96,21 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public onSearchFormChange = event => {
-    this.setState(
-      {
-        pagination: {
-          current: 1,
-          pageSize: PAGE_SIZE,
-        },
-      },
-      () => {
-        this.fetchTable(true);
-      },
-    );
+    this.fetchTable({ current: 1, pageSize: PAGE_SIZE }, this.state.searchFormData);
   };
 
   public onReset = () => {
     this.setState(
       {
         searchFormData: {},
+        searchForm: {},
         pagination: {
           current: 1,
           pageSize: PAGE_SIZE,
         },
       },
       () => {
-        this.fetchTable(true);
+        this.fetchTable(this.state.pagination, {});
       },
     );
   };
@@ -173,7 +159,7 @@ class TradeManagementMarketManagement extends PureComponent {
       intradayFormData: { valuationDate: Form2.createField(moment()) },
       closeFormData: { valuationDate: Form2.createField(moment()) },
     });
-    this.fetchTable(true);
+    this.fetchTable(this.state.pagination);
   };
 
   public handleTabChange = activeKey => {
