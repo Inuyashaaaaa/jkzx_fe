@@ -57,7 +57,6 @@ class ClientManagementFundStatistics extends PureComponent {
     }
     this.setState({
       tableDataSource: sortByCreateAt(data),
-      searchForm: searchFormData,
     });
   };
 
@@ -90,6 +89,7 @@ class ClientManagementFundStatistics extends PureComponent {
     this.setState(
       {
         searchFormData: {},
+        searchForm: {},
       },
       () => {
         this.fetchTable();

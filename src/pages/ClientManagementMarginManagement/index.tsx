@@ -36,6 +36,7 @@ class ClientManagementMarginManagement extends PureComponent {
     this.setState(
       {
         searchFormData: {},
+        searchForm: {},
       },
       () => {
         this.fetchTable();
