@@ -32,28 +32,34 @@ class ClientManagementFundStatistics extends PureComponent {
     this.fetchTable();
   };
 
-  public fetchTable = async () => {
+  public fetchTable = async (option = false) => {
     const { searchFormData, searchForm } = this.state;
     this.setState({ loading: true });
+    const searchData = option ? this.state.searchFormData : this.state.searchForm;
 
     const { error, data } = await clientAccountSearch(
-      Object.keys(searchForm).length > 0
+      Object.keys(searchData).length > 0
         ? {
-            ..._.omit(Form2.getFieldsValue(searchForm), ['normalStatus']),
-            ...(searchForm.normalStatus && searchForm.normalStatus.value === 'all'
+            ..._.omit(Form2.getFieldsValue(searchData), ['normalStatus']),
+            ...(searchData.normalStatus && searchData.normalStatus.value === 'all'
               ? null
-              : { normalStatus: searchForm.normalStatus.value }),
+              : { normalStatus: searchData.normalStatus.value }),
           }
         : {},
     );
     this.setState({ loading: false });
 
     if (error) return;
-
+    if (option) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
     this.setState({
       tableDataSource: sortByCreateAt(data),
       searchForm: searchFormData,
     });
+    return;
   };
 
   public onFieldsChange = async (props, changedFields, allFields) => {
@@ -102,7 +108,7 @@ class ClientManagementFundStatistics extends PureComponent {
           submitButtonProps={{
             icon: 'search',
           }}
-          onSubmitButtonClick={this.fetchTable}
+          onSubmitButtonClick={() => this.fetchTable(true)}
           onResetButtonClick={this.onReset}
           onFieldsChange={this.onFieldsChange}
           columns={[
