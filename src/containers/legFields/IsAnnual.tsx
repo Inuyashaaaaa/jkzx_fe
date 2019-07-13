@@ -31,11 +31,11 @@ const SelectCheckbox = props => {
       }}
       options={[
         {
-          label: '是',
+          label: '年化',
           value: 'true',
         },
         {
-          label: '否',
+          label: '非年化',
           value: 'false',
         },
       ]}
@@ -44,7 +44,7 @@ const SelectCheckbox = props => {
 };
 
 export const IsAnnual: ILegColDef = {
-  title: '年化/非年华',
+  title: '年化/非年化',
   dataIndex: LEG_FIELD.IS_ANNUAL,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
