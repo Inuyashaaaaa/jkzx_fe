@@ -21,6 +21,7 @@ import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { qlDateScheduleCreate } from '@/services/quant-service';
 import { getLegEnvs, getMoment, getRequiredRule, remove } from '@/tools';
 import { ILegColDef } from '@/types/leg';
+import { PAGE_SIZE } from '@/constants/component';
 
 class ObserveModalInput extends InputBase<{
   direction?: string;
@@ -388,6 +389,10 @@ class ObserveModalInput extends InputBase<{
                 rowKey={record => record[OB_DAY_FIELD].format('YYYY-MM-DD')}
                 onCellFieldsChange={this.handleCellValueChanged}
                 columns={this.getColumnDefs()}
+                pagination={{
+                  simple: true,
+                  pageSize: PAGE_SIZE,
+                }}
               />
             </>
           }
