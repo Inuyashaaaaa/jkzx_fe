@@ -109,7 +109,6 @@ class Operation extends PureComponent<{ record: any; fetchTable: any; fetchData:
         <Modal
           title="编辑销售"
           visible={this.state.visible}
-          width={1200}
           onCancel={this.onCancel}
           onOk={this.onEdit}
           confirmLoading={this.state.confirmLoading}
