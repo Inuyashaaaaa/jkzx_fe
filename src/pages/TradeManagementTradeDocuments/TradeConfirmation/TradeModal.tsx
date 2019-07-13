@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
@@ -72,7 +73,7 @@ class TradeModal extends PureComponent {
           title="生成交易确认书"
           visible={this.state.visible}
           footer={false}
-          width={1200}
+          width={800}
           onCancel={this.onCancel}
         >
           <>
@@ -140,8 +141,9 @@ class TradeModal extends PureComponent {
             </Row>
             <Row type="flex" justify="end" align="middle" gutter={8}>
               <p style={{ lineHeight: '40px' }}>
-                {data.docProcessStatus === 'UN_PROCESSED' ? `${username} 未处理过交易确认书` : null}
-                {data.docProcessStatus === 'DOWNLOADED'
+                {data.docProcessStatus === 'UN_PROCESSED'
+                  ? `${username} 未处理过交易确认书`
+                  : data.docProcessStatus === 'DOWNLOADED'
                   ? `${username} 于 ${moment(data.updateAt).format(
                       'YYYY-MM-DD HH:mm',
                     )}下载过交易确认书`
