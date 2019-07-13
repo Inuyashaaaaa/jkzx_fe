@@ -214,7 +214,7 @@ const ClientManagementInfo = memo(() => {
         rowKey="accountId"
         dataSource={tableData}
         loading={searchLoading}
-        scroll={tableData ? { x: '1550px' } : { x: false }}
+        scroll={{ x: 1000 }}
         columns={[
           {
             title: '交易对手',
@@ -259,7 +259,6 @@ const ClientManagementInfo = memo(() => {
           },
           {
             title: '操作',
-            width: 250,
             dataIndex: 'actions',
             render: (value, record, index) => (
               <span className={styles.action}>

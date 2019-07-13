@@ -69,7 +69,6 @@ export const TABLE_COL_DEFS = [
     render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
-
   {
     title: '预期 Delta (手)',
     dataIndex: 'deltaWithDecay',
@@ -109,11 +108,11 @@ export const TABLE_COL_DEFS = [
     title: 'Rho/1% (¥)',
     dataIndex: 'rho',
     render: (value, record, index) => formatNumber(value, 4),
+    width: 130,
     align: 'right',
   },
   {
     title: '定价环境',
     dataIndex: 'pricingEnvironment',
-    width: 130,
   },
 ];

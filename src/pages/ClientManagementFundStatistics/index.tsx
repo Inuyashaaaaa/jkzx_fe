@@ -1,3 +1,7 @@
+import { Divider } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React, { PureComponent } from 'react';
 import { Form2, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import {
@@ -8,12 +12,9 @@ import {
 } from '@/services/reference-data-service';
 import { sortByCreateAt } from '@/services/sort';
 import { formatNumber } from '@/tools';
-import { Divider } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React, { PureComponent } from 'react';
 import { ADDRESS_CASCADER } from './constants';
 import Operation from './Operation';
+import Ellipsis from '@/containers/Ellipsis';
 
 class ClientManagementFundStatistics extends PureComponent {
   public state = {
@@ -21,25 +22,11 @@ class ClientManagementFundStatistics extends PureComponent {
       ...Form2.createFields({ normalStatus: 'all' }),
     },
     loading: false,
-    branchSalesList: [],
     tableDataSource: [],
   };
 
   public componentDidMount = async () => {
-    this.fetchSimilarLegalName();
     this.fetchTable();
-  };
-
-  public fetchSimilarLegalName = async () => {
-    const { error, data } = await refSimilarLegalNameList({
-      similarLegalName: '',
-    });
-    if (error) return;
-    const markets = data.map(item => ({
-      label: item,
-      value: item,
-    }));
-    this.setState({ markets });
   };
 
   public fetchTable = async () => {
@@ -55,7 +42,7 @@ class ClientManagementFundStatistics extends PureComponent {
               ? null
               : { normalStatus: this.state.searchFormData.normalStatus.value }),
           }
-        : {}
+        : {},
     );
     this.setState({ loading: false });
 
@@ -79,7 +66,7 @@ class ClientManagementFundStatistics extends PureComponent {
           ...allFields,
           ...Form2.createFields({
             [ADDRESS_CASCADER]: _.values(
-              _.pick(refSalesGetByLegalNameRsp.data, ['subsidiary', 'branch', 'salesName'])
+              _.pick(refSalesGetByLegalNameRsp.data, ['subsidiary', 'branch', 'salesName']),
             ),
           }),
         },
@@ -98,7 +85,7 @@ class ClientManagementFundStatistics extends PureComponent {
       },
       () => {
         this.fetchTable();
-      }
+      },
     );
   };
 
@@ -108,7 +95,7 @@ class ClientManagementFundStatistics extends PureComponent {
         <Form2
           layout="inline"
           dataSource={this.state.searchFormData}
-          submitText={'查询'}
+          submitText="查询"
           submitButtonProps={{
             icon: 'search',
           }}
@@ -119,93 +106,87 @@ class ClientManagementFundStatistics extends PureComponent {
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (_value: string = '') => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: _value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '主协议编号',
               dataIndex: 'masterAgreementId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refMasterAgreementSearch({
-                            masterAgreementId: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (_value: string = '') => {
+                        const { data, error } = await refMasterAgreementSearch({
+                          masterAgreementId: _value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '状态',
               dataIndex: 'normalStatus',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        filterOption={true}
-                        options={[
-                          {
-                            label: '全部',
-                            value: 'all',
-                          },
-                          {
-                            label: '正常',
-                            value: true,
-                          },
-                          {
-                            label: '异常',
-                            value: false,
-                          },
-                        ]}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      filterOption
+                      options={[
+                        {
+                          label: '全部',
+                          value: 'all',
+                        },
+                        {
+                          label: '正常',
+                          value: true,
+                        },
+                        {
+                          label: '异常',
+                          value: false,
+                        },
+                      ]}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
@@ -218,6 +199,18 @@ class ClientManagementFundStatistics extends PureComponent {
               dataIndex: 'legalName',
               width: 180,
               fixed: 'left',
+              render: val => (
+                <span
+                  style={{
+                    overflow: 'hidden',
+                    display: 'inline-block',
+                    wordBreak: 'break-all',
+                    width: '100%',
+                  }}
+                >
+                  {val}
+                </span>
+              ),
             },
             {
               title: '状态',
@@ -235,97 +228,75 @@ class ClientManagementFundStatistics extends PureComponent {
               title: '保证金 (¥)',
               align: 'right',
               dataIndex: 'margin',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '现金余额 (¥)',
               align: 'right',
               dataIndex: 'cash',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '已用授信额度 (¥)',
               align: 'right',
               dataIndex: 'creditUsed',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '负债 (¥)',
               dataIndex: 'debt',
               align: 'right',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '出入金总额 (¥)',
               align: 'right',
               dataIndex: 'netDeposit',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '已实现盈亏 (¥)',
               align: 'right',
               dataIndex: 'realizedPnL',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '授信总额 (¥)',
               align: 'right',
               dataIndex: 'credit',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '我方授信总额 (¥)',
               dataIndex: 'counterPartyCredit',
               align: 'right',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '我方剩余授信余额 (¥)',
               dataIndex: 'counterPartyCreditBalance',
               align: 'right',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '我方可用资金 (¥)',
               dataIndex: 'counterPartyFund',
               align: 'right',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '我方冻结保证金 (¥)',
               dataIndex: 'counterPartyMargin',
               align: 'right',
-              render: (text, record, index) => {
-                return formatNumber(text, 4);
-              },
+              render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '操作',
               fixed: 'right',
               width: 150,
-              render: (text, record, index) => {
-                return <Operation record={record} fetchTable={this.fetchTable} />;
-              },
+              render: (text, record, index) => (
+                <Operation record={record} fetchTable={this.fetchTable} />
+              ),
             },
           ]}
           pagination={{
@@ -334,7 +305,7 @@ class ClientManagementFundStatistics extends PureComponent {
           }}
           loading={this.state.loading}
           rowKey="accountId"
-          scroll={this.state.tableDataSource ? { x: '2000px' } : { x: false }}
+          scroll={{ x: 2400 }}
         />
       </Page>
     );
