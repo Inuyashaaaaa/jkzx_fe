@@ -1,12 +1,12 @@
-import { INPUT_NUMBER_CURRENCY_CNY_CONFIG, INPUT_NUMBER_DIGITAL_CONFIG } from '@/constants/common';
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
+import { IFormColDef } from '@/components/type';
+import { Input, InputNumber, Select } from '@/containers';
 import { IFormControl } from '@/containers/Form/types';
 import {
   refMasterAgreementSearch,
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
-import React from 'react';
-import { InputNumber, Input } from '@/containers';
-import FormItem from 'antd/lib/form/FormItem';
 
 export const SEARCH_FORM_CONTROLS: IFormControl[] = [
   {
@@ -70,146 +70,138 @@ export const PAGE_TABLE_COL_DEFS = [
   {
     title: '客户名称',
     dataIndex: 'legalName',
-    editable: record => {
-      return false;
-    },
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
-              {
-                required: true,
-              },
-            ],
-          })(<Input editing={false} />)}
-        </FormItem>
-      );
-    },
+    editable: record => false,
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(<Input editing={false} />)}
+      </FormItem>
+    ),
   },
   {
     title: '维持保证金 (¥)',
     dataIndex: 'maintenanceMargin',
-    editable: record => {
-      return true;
-    },
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({
-            rules: [
+    editable: record => true,
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(<InputNumber editing={editing} min={0} precision={4} />)}
+      </FormItem>
+    ),
+  },
+];
+
+export const IOGLOD_FORM_CONTROLS: IFormColDef[] = [
+  {
+    title: '客户名称',
+    dataIndex: 'legalName',
+    render: (val, record, index, { form }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+            },
+          ],
+        })(<Input disabled></Input>)}
+      </FormItem>
+    ),
+  },
+  {
+    title: '资金类型',
+    dataIndex: 'cashType',
+    render: (val, record, index, { form }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '资产类型时必填项',
+            },
+          ],
+        })(
+          <Select
+            options={[
               {
-                required: true,
+                label: '保证金冻结',
+                value: '保证金冻结',
               },
-            ],
-          })(<InputNumber editing={editing} min={0} precision={4} />)}
-        </FormItem>
-      );
-    },
+              {
+                label: '保证金释放',
+                value: '保证金释放',
+              },
+            ]}
+          ></Select>,
+        )}
+      </FormItem>
+    ),
+  },
+  {
+    title: '金额',
+    dataIndex: 'cashFlow',
+    render: (val, record, index, { form }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '金额必填',
+            },
+          ],
+        })(<InputNumber precision={4}></InputNumber>)}
+      </FormItem>
+    ),
   },
 ];
 
-export const IOGLOD_FORM_CONTROLS: IFormControl[] = [
+export const UPDATE_FORM_CONTROLS: IFormColDef[] = [
   {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '客户名称',
-    },
-    field: 'legalName',
-    input: {
-      disabled: true,
-    },
+    title: '客户名称',
+    dataIndex: 'legalName',
+    render: (val, record, index, { form }) => (
+      <FormItem>{form.getFieldDecorator({})(<Input disabled></Input>)}</FormItem>
+    ),
   },
   {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '资金类型',
-    },
-    input: {
-      showSearch: true,
-      type: 'select',
-      options: [
-        {
-          label: '保证金冻结',
-          value: '保证金冻结',
-        },
-        {
-          label: '保证金释放',
-          value: '保证金释放',
-        },
-      ],
-    },
-    field: 'cashType',
+    title: '主协议编号',
+    dataIndex: 'masterAgreementId',
+    render: (val, record, index, { form }) => (
+      <FormItem>{form.getFieldDecorator({})(<Input disabled></Input>)}</FormItem>
+    ),
   },
   {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '金额',
-    },
-    field: 'cashFlow',
-    input: INPUT_NUMBER_DIGITAL_CONFIG,
-  },
-];
-
-export const UPDATE_FORM_CONTROLS: IFormControl[] = [
-  {
-    control: {
-      label: '客户名称',
-    },
-    field: 'legalName',
-    input: {
-      disabled: true,
-    },
+    title: '当前维持保证金',
+    dataIndex: 'originMaintenanceMargin',
+    render: (val, record, index, { form }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(<InputNumber disabled precision={4}></InputNumber>)}
+      </FormItem>
+    ),
   },
   {
-    control: {
-      label: '主协议编号',
-    },
-    field: 'masterAgreementId',
-    input: {
-      disabled: true,
-    },
-  },
-  {
-    control: {
-      label: '当前维持保证金',
-    },
-    field: 'originMaintenanceMargin',
-    input: {
-      disabled: true,
-      ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-    },
-  },
-  {
-    decorator: {
-      rules: [
-        {
-          required: true,
-        },
-      ],
-    },
-    control: {
-      label: '新维持保证金',
-    },
-    field: 'maintenanceMargin',
-    input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+    title: '新维持保证金',
+    dataIndex: 'maintenanceMargin',
+    render: (val, record, index, { form }) => (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '新维持保证金必填',
+            },
+          ],
+        })(<InputNumber precision={4}></InputNumber>)}
+      </FormItem>
+    ),
   },
 ];

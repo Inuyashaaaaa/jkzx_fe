@@ -140,7 +140,7 @@ export function arr2treeOptions(arr, paths, labelPaths) {
 }
 
 export const getLegByRecord = record => {
-  const leg = TOTAL_LEGS.find(item => item.type === record[LEG_TYPE_FIELD]);
+  const leg = TOTAL_LEGS.find(item => item.type === _.get(record, [LEG_TYPE_FIELD]));
   return leg;
 };
 

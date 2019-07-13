@@ -54,6 +54,7 @@ class ClientManagementSalesManagement extends PureComponent {
       pageSize: PAGE_SIZE,
     },
     subList: [],
+    fetchData: undefined,
   };
 
   public componentDidMount = () => {
@@ -99,11 +100,11 @@ class ClientManagementSalesManagement extends PureComponent {
     });
   };
 
-  public fetchTable = async () => {
+  public fetchTable = async (props?) => {
     this.setState({
       loading: true,
     });
-    const { error, data } = await querySalers();
+    const { error, data } = await querySalers(props);
     this.setState({
       loading: false,
     });
@@ -334,14 +335,17 @@ class ClientManagementSalesManagement extends PureComponent {
     });
     let salesRsp;
     if (arr.length === 3) {
+      this.setState({ fetchData: { branchId: arr[2] } });
       salesRsp = await querySalers({
         branchId: arr[2],
       });
     }
     if (arr.length === 1) {
       if (arr[0] === 'all') {
+        this.setState({ fetchData: undefined });
         salesRsp = await querySalers();
       } else {
+        this.setState({ fetchData: { subsidiaryId: arr[0] } });
         salesRsp = await querySalers({
           subsidiaryId: arr[0],
         });
@@ -540,7 +544,11 @@ class ClientManagementSalesManagement extends PureComponent {
                   title: '操作',
                   width: 250,
                   render: (text, record, index) => (
-                    <Operation record={record} fetchTable={this.fetchTable} />
+                    <Operation
+                      record={record}
+                      fetchTable={this.fetchTable}
+                      fetchData={this.state.fetchData}
+                    />
                   ),
                 },
               ]}

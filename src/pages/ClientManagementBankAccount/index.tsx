@@ -15,9 +15,12 @@ import {
   refBankAccountSearch,
 } from '@/services/reference-data-service';
 import Operation from './Operation';
+import { getMoment } from '@/tools';
 
 class ClientManagementBankAccount extends PureComponent {
   public $select = {};
+
+  public $form: Form2 = null;
 
   public state = {
     dataSource: [],
@@ -49,8 +52,11 @@ class ClientManagementBankAccount extends PureComponent {
       loading: false,
     });
     if (error) return;
+    const sortData = [...data].sort(
+      (a, b) => getMoment(b.updatedAt).valueOf() - getMoment(a.updatedAt).valueOf(),
+    );
     this.setState({
-      dataSource: data,
+      dataSource: sortData,
     });
   };
 
@@ -132,11 +138,13 @@ class ClientManagementBankAccount extends PureComponent {
   };
 
   public handleCreate = async () => {
+    const res = await this.$form.validate();
+    if (res.error) return;
     this.setState({
       confirmLoading: true,
     });
     const { error, data } = await refBankAccountSave({
-      ...this.state.createFormData,
+      ...Form2.getFieldsValue(this.state.createFormData),
     });
     this.setState({
       confirmLoading: false,
@@ -150,10 +158,13 @@ class ClientManagementBankAccount extends PureComponent {
     this.fetchTable();
   };
 
-  public onCreateFormChange = params => {
-    this.setState({
-      createFormData: params.values,
-    });
+  public onCreateFormChange = (props, changedFields, allFields) => {
+    this.setState(state => ({
+      createFormData: {
+        ...state.createFormData,
+        ...changedFields,
+      },
+    }));
   };
 
   public render() {
@@ -183,7 +194,7 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption
+                      // filterOption
                       ref={node => {
                         this.$select.legalName = node;
                       }}
@@ -194,7 +205,7 @@ class ClientManagementBankAccount extends PureComponent {
                       }}
                       options={async (values: string = '') => {
                         const { data, error } = await refSimilarLegalNameList({
-                          similarLegalName: '',
+                          similarLegalName: values,
                         });
                         if (error) return [];
                         return data.map(item => ({
@@ -219,7 +230,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption
+                      filterOption={(val, option) =>
+                        _.get(option, 'props.children').indexOf(val) >= 0
+                      }
                       ref={node => {
                         this.$select.bankAccount = node;
                       }}
@@ -260,7 +273,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption
+                      filterOption={(val, option) =>
+                        _.get(option, 'props.children').indexOf(val) >= 0
+                      }
                       ref={node => {
                         this.$select.bankAccountName = node;
                       }}
@@ -307,6 +322,9 @@ class ClientManagementBankAccount extends PureComponent {
           }}
           content={
             <CommonModalForm
+              refCreateFormModal={node => {
+                this.$form = node;
+              }}
               createFormData={this.state.createFormData}
               onCreateFormChange={this.onCreateFormChange}
             />

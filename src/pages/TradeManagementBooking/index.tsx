@@ -107,11 +107,23 @@ const TradeManagementBooking = props => {
           const permium =
             pricingPermium == null ? undefined : Math.abs(Form2.getFieldValue(pricingPermium));
 
-          return {
+          const leftRecord = _.omit(item, [...omits, ...LEG_INJECT_FIELDS]);
+
+          const next = {
             ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
             ...leg.getDefaultData(LEG_ENV.BOOKING),
-            ..._.omit(item, [...omits, ...LEG_INJECT_FIELDS]),
+            ...leftRecord,
             [LEG_FIELD.PREMIUM]: Form2.createField(permium),
+          };
+
+          const expirationDate = next[LEG_FIELD.EXPIRATION_DATE];
+          const expirationDateVal = Form2.getFieldValue(expirationDate);
+
+          return {
+            ...next,
+            [LEG_FIELD.SETTLEMENT_DATE]: expirationDateVal
+              ? expirationDate
+              : next[LEG_FIELD.SETTLEMENT_DATE],
           };
         }),
       );

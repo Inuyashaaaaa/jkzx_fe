@@ -15,6 +15,7 @@ import {
 } from '@/services/reference-data-service';
 import { PAGE_TABLE_COL_DEFS } from './constants';
 import { TABLE_COLUMNS } from './tools';
+import { getMoment } from '@/tools';
 
 class ClientManagementMarginManagement extends PureComponent {
   public state = {
@@ -68,8 +69,11 @@ class ClientManagementMarginManagement extends PureComponent {
       });
     }
     const { searchFormData } = this.state;
+    const sortData = [...data].sort(
+      (a, b) => getMoment(b.updatedAt).valueOf() - getMoment(a.updatedAt).valueOf(),
+    );
     this.setState({
-      dataSource: data,
+      dataSource: sortData,
       searchForm: searchFormData,
     });
     return null;

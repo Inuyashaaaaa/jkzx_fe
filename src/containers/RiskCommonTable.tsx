@@ -53,7 +53,11 @@ const RiskCommonTable = memo<any>(props => {
     setSearchFormData(allFields);
   };
 
-  const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
+  const fetchTable = async (
+    paramsSearchFormData?,
+    paramsPagination?,
+    setFetchFromUserAction = false,
+  ) => {
     const usedFormData = paramsSearchFormData || searchForm;
     setExcelFormData(usedFormData);
 
@@ -72,7 +76,9 @@ const RiskCommonTable = memo<any>(props => {
     });
     setLoading(false);
     if (error) return;
-    setSearchForm(searchFormData);
+    if (setFetchFromUserAction) {
+      setSearchForm(searchFormData);
+    }
     if (paramsPagination) {
       setPagination(paramsPagination);
     }
@@ -175,7 +181,7 @@ const RiskCommonTable = memo<any>(props => {
                 current: 1,
                 pageSize: PAGE_SIZE,
               });
-              fetchTable(searchFormData, { current: 1, pageSize: PAGE_SIZE });
+              fetchTable(searchFormData, { current: 1, pageSize: PAGE_SIZE }, true);
             }}
             resetable={false}
           />

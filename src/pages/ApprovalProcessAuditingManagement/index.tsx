@@ -62,6 +62,7 @@ class SystemSettingsRoleManagement extends PureComponent {
 
   public componentDidMount = () => {
     this.fetchList();
+    this.getDepartments();
   };
 
   public handleDelete = async key => {
@@ -94,6 +95,17 @@ class SystemSettingsRoleManagement extends PureComponent {
     this.setState({ userList: userListData });
   };
 
+  public toArray = data => {
+    return data.concat(
+      data.map(item => {
+        if (item.children) {
+          return this.toArray(item.children);
+        }
+        return item.children;
+      }),
+    );
+  };
+
   public fetchList = async () => {
     this.setState({
       loading: true,
@@ -105,13 +117,8 @@ class SystemSettingsRoleManagement extends PureComponent {
     let approveGroupList = [];
     approveGroupList = _.sortBy(data, ['approveGroupName']);
 
-    const department = await queryAuthDepartmentList();
-    if (department.error) {
-      return;
-    }
-
-    const cloneDepartments = JSON.parse(JSON.stringify(department.data || {}));
-    const array = this.toArray(cloneDepartments);
+    // const cloneDepartments = JSON.parse(JSON.stringify(department.data || {}));
+    // const array = this.toArray(cloneDepartments);
     if (this.$gourpLists) {
       this.$gourpLists.handleMenber(data[0]);
     }
@@ -119,21 +126,8 @@ class SystemSettingsRoleManagement extends PureComponent {
     this.setState({
       approveGroupList,
       loading: false,
-      department: array,
+      // department: array,
     });
-  };
-
-  public toArray = data => {
-    let array = [];
-    const { children, ...rest } = data;
-    array.push(rest);
-
-    array = array.concat(children);
-    if (!children) return;
-    children.forEach(item => {
-      this.toArray(item);
-    });
-    return array;
   };
 
   public handleDrawer = () => {
@@ -157,7 +151,17 @@ class SystemSettingsRoleManagement extends PureComponent {
     });
   };
 
+  public getDepartments = async () => {
+    const departmentsRes = await queryAuthDepartmentList({});
+    const department = departmentsRes.data || {};
+    const array = _.flattenDeep(this.toArray([department])).filter(item => !!item);
+    this.setState({
+      department: array,
+    });
+  };
+
   public handleMenber = async param => {
+    this.getDepartments();
     if (!param) return;
     this.setState({
       userList: param.userList,

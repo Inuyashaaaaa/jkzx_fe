@@ -1,13 +1,13 @@
+import { Col, message, Row, Popconfirm, Modal, Divider } from 'antd';
+import React, { PureComponent } from 'react';
 import PopconfirmButton from '@/containers/PopconfirmButton';
 import ModalButton from '@/containers/ModalButton';
 import { arr2treeOptions } from '@/tools';
 import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales';
-import { Col, message, Row, Popconfirm, Modal, Divider } from 'antd';
-import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
 import { Form2 } from '@/containers';
 
-class Operation extends PureComponent<{ record: any; fetchTable: any }> {
+class Operation extends PureComponent<{ record: any; fetchTable: any; fetchData: any }> {
   public $refCreateFormModal: Form2 = null;
 
   public state = {
@@ -32,20 +32,16 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     const newData = arr2treeOptions(
       data,
       ['subsidiaryId', 'branchId'],
-      ['subsidiaryName', 'branchName']
+      ['subsidiaryName', 'branchName'],
     );
-    const branchSalesList = newData.map(subsidiaryName => {
-      return {
-        value: subsidiaryName.value,
-        label: subsidiaryName.label,
-        children: subsidiaryName.children.map(branchName => {
-          return {
-            value: branchName.value,
-            label: branchName.label,
-          };
-        }),
-      };
-    });
+    const branchSalesList = newData.map(subsidiaryName => ({
+      value: subsidiaryName.value,
+      label: subsidiaryName.label,
+      children: subsidiaryName.children.map(branchName => ({
+        value: branchName.value,
+        label: branchName.label,
+      })),
+    }));
     this.setState({
       visible: true,
       branchSalesList,
@@ -81,8 +77,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       message.error('编辑失败');
       return;
     }
-    this.props.fetchTable();
-    return;
+    this.props.fetchTable(this.props.fetchData);
   };
 
   public handleValueChange = params => {
@@ -100,8 +95,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       return;
     }
     message.success('删除成功');
-    this.props.fetchTable();
-    return;
+    this.props.fetchTable(this.props.fetchData);
   };
 
   public render() {
@@ -115,13 +109,14 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
         <Modal
           title="编辑销售"
           visible={this.state.visible}
-          width={1200}
           onCancel={this.onCancel}
           onOk={this.onEdit}
           confirmLoading={this.state.confirmLoading}
         >
           <CreateFormModal
-            refCreateFormModal={node => (this.$refCreateFormModal = node)}
+            refCreateFormModal={node => {
+              this.$refCreateFormModal = node;
+            }}
             dataSource={this.state.editFormData}
             handleValueChange={this.handleValueChange}
             branchSalesList={this.state.branchSalesList}
