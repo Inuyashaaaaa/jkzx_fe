@@ -32,7 +32,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     const newData = arr2treeOptions(
       data,
       ['subsidiaryId', 'branchId'],
-      ['subsidiaryName', 'branchName']
+      ['subsidiaryName', 'branchName'],
     );
     const branchSalesList = newData.map(subsidiaryName => {
       return {
@@ -115,13 +115,14 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
         <Modal
           title="编辑销售"
           visible={this.state.visible}
-          width={1200}
           onCancel={this.onCancel}
           onOk={this.onEdit}
           confirmLoading={this.state.confirmLoading}
         >
           <CreateFormModal
-            refCreateFormModal={node => (this.$refCreateFormModal = node)}
+            refCreateFormModal={node => {
+              this.$refCreateFormModal = node;
+            }}
             dataSource={this.state.editFormData}
             handleValueChange={this.handleValueChange}
             branchSalesList={this.state.branchSalesList}
