@@ -13,7 +13,7 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { ITableColDef, IFormColDef } from '@/components/type';
-import { formatNumber, formatMoney, parseMoney } from '@/tools';
+import { formatNumber, formatMoney, parseMoney, getMoment } from '@/tools';
 import { Select, Input, InputNumber } from '@/containers';
 
 const { RangePicker } = AntdDatePicker;
@@ -65,7 +65,8 @@ export const TABLE_COL_DEFS: ITableColDef[] = [
   },
   {
     title: '录入时间',
-    dataIndex: 'createdAt',
+    dataIndex: 'updatedAt',
+    render: (val, record, index) => getMoment(val).format('YYYY-MM-DD HH:mm'),
   },
 ];
 
@@ -136,19 +137,19 @@ export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
       <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>
     ),
   },
-  {
-    title: '出入金状态',
-    dataIndex: 'processStatus',
-    render: (value, record, index, { form }) => (
-      <FormItem>
-        {form.getFieldDecorator({})(
-          <Select
-            style={{ minWidth: 180 }}
-            allowClear
-            options={[{ label: '全部', value: 'all' }, ...PROCESS_STATUS_TYPES_OPTIONS]}
-          />,
-        )}
-      </FormItem>
-    ),
-  },
+  // {
+  //   title: '出入金状态',
+  //   dataIndex: 'processStatus',
+  //   render: (value, record, index, { form }) => (
+  //     <FormItem>
+  //       {form.getFieldDecorator({})(
+  //         <Select
+  //           style={{ minWidth: 180 }}
+  //           allowClear
+  //           options={[{ label: '全部', value: 'all' }, ...PROCESS_STATUS_TYPES_OPTIONS]}
+  //         />,
+  //       )}
+  //     </FormItem>
+  //   ),
+  // },
 ];
