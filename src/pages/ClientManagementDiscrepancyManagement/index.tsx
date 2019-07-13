@@ -15,7 +15,7 @@ import { SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
 import { CREATE_FORM_CONTROLS } from './tools';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SmartForm from '@/containers/SmartForm';
-import { formatMoney } from '@/tools';
+import { formatMoney, getMoment } from '@/tools';
 import {
   PAYMENT_DIRECTION_TYPE_ZHCN_MAP,
   ACCOUNT_DIRECTION_TYPE_ZHCN_MAP,
@@ -30,9 +30,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
 
   public state = {
     dataSource: [],
-    searchFormData: {
-      processStatus: Form2.createField('all'),
-    },
+    searchFormData: {},
     loading: false,
     visible: false,
     confirmLoading: false,
@@ -50,16 +48,13 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
   public handleSearchForm = () => {
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     return {
-      ..._.omit(searchFormData, ['paymentDate', 'processStatus']),
+      ..._.omit(searchFormData, ['paymentDate']),
       ...(searchFormData.paymentDate
         ? {
             startDate: moment(searchFormData.paymentDate[0]).format('YYYY-MM-DD'),
             endDate: moment(searchFormData.paymentDate[1]).format('YYYY-MM-DD'),
           }
         : null),
-      ...(searchFormData.processStatus && searchFormData.processStatus === 'all'
-        ? null
-        : { processStatus: searchFormData.processStatus }),
     };
   };
 
@@ -72,8 +67,13 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       loading: false,
     });
     if (error) return;
+    const sortDataClient = [...data].sort((a, b) => a.clientId.localeCompare(b.clientId));
+
+    const sortDataDate = [...sortDataClient].sort(
+      (a, b) => getMoment(b.paymentDate).valueOf() - getMoment(a.paymentDate).valueOf(),
+    );
     this.setState({
-      dataSource: data,
+      dataSource: sortDataDate,
     });
   };
 
@@ -86,9 +86,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
   public onReset = () => {
     this.setState(
       {
-        searchFormData: {
-          processStatus: Form2.createField('all'),
-        },
+        searchFormData: {},
       },
       () => {
         this.fetchTable();
