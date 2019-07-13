@@ -16,6 +16,7 @@ import {
   OB_PRICE_FIELD,
   OPTION_TYPE_OPTIONS,
   STRIKE_TYPES_MAP,
+  NOTIONAL_AMOUNT_TYPE_MAP,
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
@@ -140,7 +141,14 @@ class ExpirationModal extends PureComponent<
   };
 
   public computeFixedDataSource = value => {
-    const notionalAmount = value[LEG_FIELD.NOTIONAL_AMOUNT];
+    const notionalType = value[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const notionalAmount =
+      notionalType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+        ? value[LEG_FIELD.NOTIONAL_AMOUNT]
+        : new BigNumber(value[LEG_FIELD.NOTIONAL_AMOUNT])
+            .multipliedBy(value[LEG_FIELD.UNDERLYER_MULTIPLIER])
+            .multipliedBy(value[LEG_FIELD.INITIAL_SPOT])
+            .toNumber();
     const matures = value[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM];
     const countDay = new BigNumber(
       moment(value[LEG_FIELD.EXPIRATION_DATE]).valueOf() -
@@ -153,7 +161,7 @@ class ExpirationModal extends PureComponent<
     return {
       [EXPIRE_NO_BARRIER_PREMIUM_TYPE]:
         EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[value[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]],
-      [NOTIONAL_AMOUNT]: notionalAmount,
+      [NOTIONAL_AMOUNT]: value[LEG_FIELD.NOTIONAL_AMOUNT],
       [MATURES]: matures,
       [SETTLE_AMOUNT]: new BigNumber(notionalAmount)
         .multipliedBy(new BigNumber(matures).div(100))
@@ -164,12 +172,19 @@ class ExpirationModal extends PureComponent<
   };
 
   public computeCallPutDataSource = value => {
-    const notionalAmount = value[LEG_FIELD.NOTIONAL_AMOUNT];
+    const notionalType = value[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
+    const notionalAmount =
+      notionalType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+        ? value[LEG_FIELD.NOTIONAL_AMOUNT]
+        : new BigNumber(value[LEG_FIELD.NOTIONAL_AMOUNT])
+            .multipliedBy(value[LEG_FIELD.UNDERLYER_MULTIPLIER])
+            .multipliedBy(value[LEG_FIELD.INITIAL_SPOT])
+            .toNumber();
     const autoCallStrike = value[LEG_FIELD.AUTO_CALL_STRIKE];
     return {
       [EXPIRE_NO_BARRIER_PREMIUM_TYPE]:
         EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[value[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]],
-      [NOTIONAL_AMOUNT]: notionalAmount,
+      [NOTIONAL_AMOUNT]: value[LEG_FIELD.NOTIONAL_AMOUNT],
       [EXERCISE_PRICE]: autoCallStrike,
     };
   };
