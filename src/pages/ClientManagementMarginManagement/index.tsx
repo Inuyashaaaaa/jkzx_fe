@@ -24,6 +24,7 @@ class ClientManagementMarginManagement extends PureComponent {
     excelVisible: false,
     excelData: [],
     modalVisible: false,
+    searchForm: {},
   };
 
   public componentDidMount = () => {
@@ -52,7 +53,7 @@ class ClientManagementMarginManagement extends PureComponent {
       loading: true,
     });
     const { error, data } = await mgnMarginSearch({
-      ...Form2.getFieldsValue(this.state.searchFormData),
+      ...Form2.getFieldsValue(this.state.searchForm),
     });
     this.setState({
       loading: false,
@@ -60,13 +61,16 @@ class ClientManagementMarginManagement extends PureComponent {
     if (error) {
       this.setState({
         searchFormData: {},
+        searchForm: {},
       });
       return notification.error({
         message: `${error.message ? error.message : ''}请重新查询`,
       });
     }
+    const { searchFormData } = this.state;
     this.setState({
       dataSource: data,
+      searchForm: searchFormData,
     });
     return null;
   };
