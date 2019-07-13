@@ -1,5 +1,5 @@
-import Form from '@/containers/Form';
 import React, { PureComponent } from 'react';
+import Form from '@/containers/Form';
 import { CREATE_FORM_CONTROLS } from './constants';
 import { Form2 } from '@/containers';
 

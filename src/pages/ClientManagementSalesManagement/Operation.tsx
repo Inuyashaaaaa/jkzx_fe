@@ -1,9 +1,9 @@
+import { Col, message, Row, Popconfirm, Modal, Divider } from 'antd';
+import React, { PureComponent } from 'react';
 import PopconfirmButton from '@/containers/PopconfirmButton';
 import ModalButton from '@/containers/ModalButton';
 import { arr2treeOptions } from '@/tools';
 import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales';
-import { Col, message, Row, Popconfirm, Modal, Divider } from 'antd';
-import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
 import { Form2 } from '@/containers';
 
@@ -34,18 +34,14 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       ['subsidiaryId', 'branchId'],
       ['subsidiaryName', 'branchName'],
     );
-    const branchSalesList = newData.map(subsidiaryName => {
-      return {
-        value: subsidiaryName.value,
-        label: subsidiaryName.label,
-        children: subsidiaryName.children.map(branchName => {
-          return {
-            value: branchName.value,
-            label: branchName.label,
-          };
-        }),
-      };
-    });
+    const branchSalesList = newData.map(subsidiaryName => ({
+      value: subsidiaryName.value,
+      label: subsidiaryName.label,
+      children: subsidiaryName.children.map(branchName => ({
+        value: branchName.value,
+        label: branchName.label,
+      })),
+    }));
     this.setState({
       visible: true,
       branchSalesList,
@@ -82,7 +78,6 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       return;
     }
     this.props.fetchTable();
-    return;
   };
 
   public handleValueChange = params => {
@@ -101,7 +96,6 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     }
     message.success('删除成功');
     this.props.fetchTable();
-    return;
   };
 
   public render() {
