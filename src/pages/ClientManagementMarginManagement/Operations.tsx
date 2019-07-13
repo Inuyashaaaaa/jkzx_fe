@@ -1,11 +1,16 @@
+import { message, Modal, Divider } from 'antd';
+import React, { PureComponent } from 'react';
 import Form from '@/containers/Form';
 import ModalButton from '@/containers/ModalButton';
 import { clientTradeCashFlow, mgnMarginUpdate } from '@/services/reference-data-service';
-import { message, Modal, Divider } from 'antd';
-import React, { PureComponent } from 'react';
 import { IOGLOD_FORM_CONTROLS, UPDATE_FORM_CONTROLS } from './constants';
+import { Form2 } from '@/containers';
 
 class Operations extends PureComponent<{ record: any; fetchTable: any }> {
+  public $form: Form2 = null;
+
+  public $updateForm: Form2 = null;
+
   public state = {
     ioglodVisible: false,
     ioGlodConfirmLoading: false,
@@ -15,18 +20,19 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
     updateDataSource: {},
   };
 
-  public handleIoGlodConfirm = () => {
+  public handleIoGlodConfirm = async () => {
+    const validateRsp = await this.$form.validate();
+    if (validateRsp.error) return;
     this.setState({
       ioGlodConfirmLoading: true,
-      ioglodVisible: false,
     });
     this.onCreateIoGlod();
   };
 
   public onCreateIoGlod = async () => {
-    const values = { ...this.state.ioGlodDataSource };
+    const values = Form2.getFieldsValue(this.state.ioGlodDataSource);
     if (values.cashType === '保证金释放') {
-      values.cashFlow = '-' + values.cashFlow;
+      values.cashFlow = `-${values.cashFlow}`;
     }
     const { error, data } = await clientTradeCashFlow({
       accountId: this.props.record.accountId,
@@ -43,6 +49,7 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
       message.error(data.information);
       return false;
     }
+    this.setState({ ioglodVisible: false });
     this.props.fetchTable();
     message.success('录入成功');
     return true;
@@ -57,25 +64,29 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
   public switchIoGlodModal = () => {
     this.setState({
       ioglodVisible: true,
-      ioGlodDataSource: {
+      ioGlodDataSource: Form2.createFields({
         legalName: this.props.record.legalName,
         cashFlow: 0,
+      }),
+    });
+  };
+
+  public IOGlodFormValueChange = (props, changeFields, allFields) => {
+    this.setState(state => ({
+      ioGlodDataSource: {
+        ...state.ioGlodDataSource,
+        ...changeFields,
       },
-    });
+    }));
   };
 
-  public IOGlodFormValueChange = params => {
-    const values = params.values;
-    this.setState({
-      ioGlodDataSource: values,
-    });
-  };
-
-  public updateFormValueChange = params => {
-    const values = params.values;
-    this.setState({
-      updateDataSource: values,
-    });
+  public updateFormValueChange = (props, changeFields, allFields) => {
+    this.setState(state => ({
+      updateDataSource: {
+        ...state.updateDataSource,
+        ...changeFields,
+      },
+    }));
   };
 
   public handleUpdateCancel = () => {
@@ -85,9 +96,10 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
   };
 
   public handleUpdateConfirm = async () => {
-    const values = this.state.updateDataSource;
+    const validateRsp = await this.$updateForm.validate();
+    if (validateRsp.error) return;
+    const values = Form2.getFieldsValue(this.state.updateDataSource);
     this.setState({
-      updateVisible: false,
       updateConfirmLoading: true,
     });
     const { error, data } = await mgnMarginUpdate({
@@ -99,11 +111,13 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
     });
     if (error) {
       message.error('更新失败');
-      return false;
+      return;
     }
+    this.setState({
+      updateVisible: false,
+    });
     this.props.fetchTable();
     message.success('更新成功');
-    return true;
   };
 
   public switchUpdateMargin = () => {
@@ -115,18 +129,18 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
     };
     this.setState({
       updateVisible: true,
-      updateDataSource: dataSource,
+      updateDataSource: Form2.createFields(dataSource),
     });
   };
 
   public render() {
     return (
       <>
-        <a href="javascript:;" key="ioglod" onClick={this.switchIoGlodModal}>
+        <a key="ioglod" onClick={this.switchIoGlodModal}>
           台账调整
         </a>
         <Divider type="vertical" />
-        <a href="javascript:;" key="update" onClick={this.switchUpdateMargin}>
+        <a key="update" onClick={this.switchUpdateMargin}>
           更新维持保证金
         </a>
         <Modal
@@ -139,11 +153,13 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
             closable: false,
           }}
         >
-          <Form
-            controlNumberOneRow={1}
-            controls={IOGLOD_FORM_CONTROLS}
+          <Form2
+            ref={node => {
+              this.$form = node;
+            }}
+            columns={IOGLOD_FORM_CONTROLS}
             dataSource={this.state.ioGlodDataSource}
-            onValueChange={this.IOGlodFormValueChange}
+            onFieldsChange={this.IOGlodFormValueChange}
             footer={false}
           />
         </Modal>
@@ -157,11 +173,13 @@ class Operations extends PureComponent<{ record: any; fetchTable: any }> {
             closable: false,
           }}
         >
-          <Form
-            controlNumberOneRow={1}
-            controls={UPDATE_FORM_CONTROLS}
+          <Form2
+            ref={node => {
+              this.$updateForm = node;
+            }}
+            columns={UPDATE_FORM_CONTROLS}
             dataSource={this.state.updateDataSource}
-            onValueChange={this.updateFormValueChange}
+            onFieldsChange={this.updateFormValueChange}
             footer={false}
           />
         </Modal>
