@@ -1,3 +1,8 @@
+import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React, { PureComponent } from 'react';
+import uuidv4 from 'uuid/v4';
 import { Form2, Input, InputNumber, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import TabHeader from '@/containers/TabHeader';
@@ -11,22 +16,15 @@ import {
 } from '@/services/market-data-service';
 import { tradeReferenceGet } from '@/services/trade-service';
 import { formatMoney } from '@/tools';
-import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React, { PureComponent } from 'react';
 import { PAGE_TABLE_COL_DEFS } from './constants';
 import { PAGE_SIZE } from '@/constants/component';
 
 class SystemSettingsRiskSettings extends PureComponent {
   public $createFrom: Form2 = null;
+
   public initialFetchTableData = null;
 
   public state = {
-    formData: {},
-    rowData: [],
-    canSave: false,
-    saveLoading: false,
     loading: false,
     searchFormData: {
       ...Form2.createFields({
@@ -44,17 +42,26 @@ class SystemSettingsRiskSettings extends PureComponent {
     createFormData: {},
     tableDataSource: [],
     activeKey: '1',
+    searchForm: {
+      ...Form2.createFields({
+        instrumentIds: [],
+      }),
+    },
   };
 
   public componentDidMount() {
-    this.fetchTable(null);
+    this.fetchTable();
   }
 
-  public fetchTable = async currentPagination => {
-    const { error: _error, data: _data } = await tradeReferenceGet();
-    if (_data) {
+  public fetchTable = async (
+    currentSearchForm,
+    currentPagination,
+    setFetchFromUserAction = false,
+  ) => {
+    const { error: _error, data: newData } = await tradeReferenceGet();
+    if (newData) {
       this.setState({
-        venueCodes: _data.businessCenters.map(item => ({
+        venueCodes: newData.businessCenters.map(item => ({
           label: item.description,
           value: item.name,
         })),
@@ -63,7 +70,7 @@ class SystemSettingsRiskSettings extends PureComponent {
     this.setState({
       loading: true,
     });
-    const { pagination, searchFormData } = this.state;
+    const { pagination, searchFormData, searchForm } = this.state;
     const { error, data } = await mktInstrumentWhitelistListPaged({
       page:
         currentPagination && currentPagination.current
@@ -73,14 +80,19 @@ class SystemSettingsRiskSettings extends PureComponent {
         currentPagination && currentPagination.pageSize
           ? currentPagination.pageSize
           : pagination.pageSize,
-      ...Form2.getFieldsValue(searchFormData),
+      ...Form2.getFieldsValue(currentSearchForm || searchForm),
       // ...(event.searchFormData.instrumentIds ? event.searchFormData : { instrumentIds: [] }),
     });
     this.setState({
       loading: false,
     });
     if (error) return false;
-    this.setState({
+    if (setFetchFromUserAction) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
+    return this.setState({
       tableDataSource: data.page,
       pagination: {
         ...pagination,
@@ -103,21 +115,18 @@ class SystemSettingsRiskSettings extends PureComponent {
     // });
   };
 
-  public excelTable = event => {
-    return {
-      tableDataSource: this.state.excelData,
-    };
-  };
+  public excelTable = event => ({
+    tableDataSource: this.state.excelData,
+  });
 
-  public onRemove = (data = {}) => {
-    return mktInstrumentWhitelistDelete({
+  public onRemove = (data = {}) =>
+    mktInstrumentWhitelistDelete({
       instrumentIds: [data.instrumentId],
     }).then(rsp => {
       if (rsp.error) return message.error('删除失败');
       message.success('删除成功');
-      this.fetchTable(null);
+      return this.fetchTable();
     });
-  };
 
   public onCreate = async () => {
     const { error: _error } = await this.$createFrom.validate();
@@ -129,37 +138,34 @@ class SystemSettingsRiskSettings extends PureComponent {
 
     if (error) {
       message.error('白名单上传失败');
-      return this.setState({
+      this.setState({
         createVisible: false,
       });
+      return;
     }
 
     message.success('白名单上传成功');
-    this.fetchTable(null);
-    return this.setState({
+    this.fetchTable();
+    this.setState({
       createVisible: false,
     });
   };
 
-  public handleExcelFile = data => {
-    return mktAllInstrumentWhitelistSave({
-      content: data.map(item => {
-        return _.values(item).join();
-      }),
+  public handleExcelFile = data =>
+    mktAllInstrumentWhitelistSave({
+      content: data.map(item => _.values(item).join()),
     }).then(result => {
       if (result.error) return message.error('导入失败');
       message.success('导入成功');
       return result;
     });
-  };
 
-  public onCellValueChanged = event => {
-    return mktInstrumentWhitelistSave(event.data).then(result => {
+  public onCellValueChanged = event =>
+    mktInstrumentWhitelistSave(event.data).then(result => {
       if (result.error) return message.error('更新错误');
       message.success('更新成功');
       return event.data;
     });
-  };
 
   public handleConfirm = event => {
     this.setState(
@@ -167,12 +173,8 @@ class SystemSettingsRiskSettings extends PureComponent {
         visible: false,
       },
       () => {
-        this.handleExcelFile(
-          this.state.excelData.map(item => {
-            return Form2.getFieldsValue(item);
-          })
-        );
-      }
+        this.handleExcelFile(this.state.excelData.map(item => Form2.getFieldsValue(item)));
+      },
     );
   };
 
@@ -209,8 +211,8 @@ class SystemSettingsRiskSettings extends PureComponent {
         },
       },
       () => {
-        this.fetchTable(null);
-      }
+        this.fetchTable();
+      },
     );
   };
 
@@ -224,8 +226,8 @@ class SystemSettingsRiskSettings extends PureComponent {
         },
       },
       () => {
-        this.fetchTable(null);
-      }
+        this.fetchTable();
+      },
     );
   };
 
@@ -236,8 +238,9 @@ class SystemSettingsRiskSettings extends PureComponent {
   };
 
   public handleCellValueChanged = params => {
+    const { excelData } = this.state;
     this.setState({
-      excelData: this.state.excelData.map(item => {
+      excelData: excelData.map(item => {
         if (item.uuid === params.record.uuid) {
           return params.record;
         }
@@ -262,43 +265,43 @@ class SystemSettingsRiskSettings extends PureComponent {
             <Form2
               layout="inline"
               dataSource={this.state.searchFormData}
-              submitText={'搜索'}
+              submitText="搜索"
               submitButtonProps={{
                 icon: 'search',
               }}
-              onSubmitButtonClick={() => this.fetchTable({ current: 1 })}
+              onSubmitButtonClick={() =>
+                this.fetchTable(this.state.searchFormData, { current: 1 }, true)
+              }
               onResetButtonClick={this.onReset}
               onFieldsChange={this.onSearchFormChange}
               columns={[
                 {
                   title: '标的物列表',
                   dataIndex: 'instrumentIds',
-                  render: (value, record, index, { form, editing }) => {
-                    return (
-                      <FormItem>
-                        {form.getFieldDecorator({})(
-                          <Select
-                            style={{ minWidth: 180 }}
-                            placeholder="请输入内容搜索"
-                            allowClear={true}
-                            showSearch={true}
-                            fetchOptionsOnSearch={true}
-                            mode="multiple"
-                            options={async (value: string = '') => {
-                              const { data, error } = await mktInstrumentWhitelistSearch({
-                                instrumentIdPart: value,
-                              });
-                              if (error) return [];
-                              return data.map(item => ({
-                                label: item,
-                                value: item,
-                              }));
-                            }}
-                          />
-                        )}
-                      </FormItem>
-                    );
-                  },
+                  render: (val, record, index, { form, editing }) => (
+                    <FormItem>
+                      {form.getFieldDecorator({})(
+                        <Select
+                          style={{ minWidth: 180 }}
+                          placeholder="请输入内容搜索"
+                          allowClear
+                          showSearch
+                          fetchOptionsOnSearch
+                          mode="multiple"
+                          options={async (value: string = '') => {
+                            const { data, error } = await mktInstrumentWhitelistSearch({
+                              instrumentIdPart: value,
+                            });
+                            if (error) return [];
+                            return data.map(item => ({
+                              label: item,
+                              value: item,
+                            }));
+                          }}
+                        />,
+                      )}
+                    </FormItem>
+                  ),
                 },
               ]}
             />
@@ -320,19 +323,17 @@ class SystemSettingsRiskSettings extends PureComponent {
                 key="import"
                 type="primary"
                 onImport={data => {
-                  const _data = data.data[0][Object.keys(data.data[0])[0]];
+                  const newData = data.data[0][Object.keys(data.data[0])[0]];
                   this.setState({
                     visible: true,
-                    excelData: _data.slice(1).map(item => {
-                      return {
-                        ...Form2.createFields({
-                          venueCode: item[0],
-                          instrumentId: item[1],
-                          notionalLimit: item[2] ? item[2] : 100000000,
-                        }),
-                        uuid: uuidv4(),
-                      };
-                    }),
+                    excelData: newData.slice(1).map(item => ({
+                      ...Form2.createFields({
+                        venueCode: item[0],
+                        instrumentId: item[1],
+                        notionalLimit: item[2] ? item[2] : 100000000,
+                      }),
+                      uuid: uuidv4(),
+                    })),
                   });
                 }}
               >
@@ -354,19 +355,15 @@ class SystemSettingsRiskSettings extends PureComponent {
                   align: 'right',
                   title: '存续期名义金额上限（￥）',
                   dataIndex: 'notionalLimit',
-                  render: (text, record, index) => {
-                    return text ? formatMoney(text, {}) : text;
-                  },
+                  render: (text, record, index) => (text ? formatMoney(text, {}) : text),
                 },
                 {
                   title: '操作',
-                  render: (text, record, index) => {
-                    return (
-                      <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(record)}>
-                        <a style={{ color: 'red' }}>删除</a>
-                      </Popconfirm>
-                    );
-                  },
+                  render: (text, record, index) => (
+                    <Popconfirm title="确定要删除吗？" onConfirm={() => this.onRemove(record)}>
+                      <a style={{ color: 'red' }}>删除</a>
+                    </Popconfirm>
+                  ),
                 },
               ]}
               pagination={{
@@ -408,7 +405,9 @@ class SystemSettingsRiskSettings extends PureComponent {
           closable={false}
         >
           <Form2
-            ref={node => (this.$createFrom = node)}
+            ref={node => {
+              this.$createFrom = node;
+            }}
             layout="horizontal"
             dataSource={this.state.createFormData}
             wrapperCol={{ span: 18 }}
@@ -419,49 +418,43 @@ class SystemSettingsRiskSettings extends PureComponent {
               {
                 title: '交易所',
                 dataIndex: 'venueCode',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [{ required: true, message: '交易所为必填项' }],
-                      })(
-                        <Select
-                          style={{ minWidth: 180 }}
-                          placeholder="请输入内容搜索"
-                          allowClear={true}
-                          showSearch={true}
-                          options={this.state.venueCodes || []}
-                        />
-                      )}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form, editing }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true, message: '交易所为必填项' }],
+                    })(
+                      <Select
+                        style={{ minWidth: 180 }}
+                        placeholder="请输入内容搜索"
+                        allowClear
+                        showSearch
+                        options={this.state.venueCodes || []}
+                      />,
+                    )}
+                  </FormItem>
+                ),
               },
               {
                 title: '标的',
                 dataIndex: 'instrumentId',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [{ required: true, message: '标的为必填项' }],
-                      })(<Input />)}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form, editing }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true, message: '标的为必填项' }],
+                    })(<Input />)}
+                  </FormItem>
+                ),
               },
               {
                 title: '存续期名义金额',
                 dataIndex: 'notionalLimit',
-                render: (value, record, index, { form, editing }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [{ required: true, message: '存续期名义金额交易所为必填项' }],
-                      })(<InputNumber />)}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form, editing }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [{ required: true, message: '存续期名义金额交易所为必填项' }],
+                    })(<InputNumber />)}
+                  </FormItem>
+                ),
               },
             ]}
           />

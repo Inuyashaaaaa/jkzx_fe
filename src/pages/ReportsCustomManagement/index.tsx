@@ -38,7 +38,7 @@ const ReportsCustomManagement = memo<any>(props => {
   const [tabelData, setTabelData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const OnSearch = async (searchData, currentPage) => {
+  const OnSearch = async (searchData, currentPage, setFetchFromUserAction = false) => {
     // const { error: verror } = await formSearch.current.validate();
     // if (verror) return;
     searchData = Form2.getFieldsValue(searchData);
@@ -56,6 +56,9 @@ const ReportsCustomManagement = memo<any>(props => {
     });
     setLoading(false);
     if (error) return;
+    if (setFetchFromUserAction) {
+      setSearchForm(searchFormData);
+    }
     setPagination({
       ...currentPage,
       total: data.totalCount,
@@ -81,7 +84,7 @@ const ReportsCustomManagement = memo<any>(props => {
   };
 
   useLifecycles(() => {
-    OnSearch(searchFormData, pagination);
+    OnSearch(searchForm, pagination);
   });
 
   return (
@@ -106,11 +109,15 @@ const ReportsCustomManagement = memo<any>(props => {
           }}
           onSubmitButtonClick={async ({ domEvent }) => {
             domEvent.preventDefault();
-            setSearchForm(searchFormData);
-            OnSearch(searchFormData, {
-              page: 1,
-              pageSize: 15,
-            });
+            // setSearchForm(searchFormData);
+            OnSearch(
+              searchFormData,
+              {
+                page: 1,
+                pageSize: 15,
+              },
+              true,
+            );
           }}
           layout="inline"
           submitText="查询"
