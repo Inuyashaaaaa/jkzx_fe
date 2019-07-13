@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
-import { InputBase, ITableColDef } from '@/components/type';
+import { InputBase, ITableColDef, IRenderOptions, ITableApi } from '@/components/type';
 import {
   KNOCK_DIRECTION_MAP,
   LEG_FIELD,
@@ -28,6 +28,7 @@ class ObserveModalInput extends InputBase<
   {
     direction?: string;
     record: any;
+    api: ITableApi;
   },
   any
 > {
@@ -73,6 +74,7 @@ class ObserveModalInput extends InputBase<
   };
 
   public onOpen = () => {
+    this.props.api.tableApi.looseActive();
     this.setState({
       visible: true,
     });
@@ -426,10 +428,6 @@ class ObserveModalInput extends InputBase<
                 rowKey={record => record[OB_DAY_FIELD].format('YYYY-MM-DD')}
                 onCellFieldsChange={this.handleCellValueChanged}
                 columns={this.getColumnDefs()}
-                pagination={{
-                  simple: true,
-                  pageSize: PAGE_SIZE,
-                }}
               />
             </>
           }
@@ -460,11 +458,11 @@ export const ObservationDates: ILegColDef = {
     }
     return false;
   },
-  render: (val, record, index, { form, editing, colDef }) => (
+  render: (val, record, index, { form, editing, colDef, api }) => (
     <FormItem>
       {form.getFieldDecorator({
         rules: [getRequiredRule()],
-      })(<ObserveModalInput editing={editing} record={record} />)}
+      })(<ObserveModalInput editing={editing} record={record} api={api} />)}
     </FormItem>
   ),
 };
