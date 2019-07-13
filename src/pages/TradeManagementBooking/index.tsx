@@ -121,7 +121,7 @@ const TradeManagementBooking = props => {
 
           return {
             ...next,
-            [LEG_FIELD.SETTLEMENT_DATE]: !!expirationDateVal
+            [LEG_FIELD.SETTLEMENT_DATE]: expirationDateVal
               ? expirationDate
               : next[LEG_FIELD.SETTLEMENT_DATE],
           };
