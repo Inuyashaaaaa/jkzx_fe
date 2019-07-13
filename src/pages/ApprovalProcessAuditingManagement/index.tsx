@@ -226,7 +226,7 @@ class SystemSettingsRoleManagement extends PureComponent {
     let { userList } = this.state;
     const { department } = this.state;
     userList = (userList || []).sort((a, b) => a.username.localeCompare(b.username));
-    userList.map(param => {
+    userList = userList.map(param => {
       const dp = department.find(obj => obj.id === param.departmentId) || {};
       return {
         ...param,
