@@ -183,7 +183,7 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption
+                      // filterOption
                       ref={node => {
                         this.$select.legalName = node;
                       }}
@@ -194,7 +194,7 @@ class ClientManagementBankAccount extends PureComponent {
                       }}
                       options={async (values: string = '') => {
                         const { data, error } = await refSimilarLegalNameList({
-                          similarLegalName: '',
+                          similarLegalName: values,
                         });
                         if (error) return [];
                         return data.map(item => ({
@@ -219,7 +219,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption
+                      filterOption={(val, option) =>
+                        _.get(option, 'props.children').indexOf(val) >= 0
+                      }
                       ref={node => {
                         this.$select.bankAccount = node;
                       }}
@@ -260,7 +262,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption
+                      filterOption={(val, option) =>
+                        _.get(option, 'props.children').indexOf(val) >= 0
+                      }
                       ref={node => {
                         this.$select.bankAccountName = node;
                       }}
