@@ -1,5 +1,5 @@
 import fetch from 'dva/fetch';
-import { notification } from 'antd';
+import { notification, message } from 'antd';
 import { HOST_TEST } from '@/constants/global';
 import request from '@/tools/request';
 
@@ -149,11 +149,12 @@ export async function DOWN_LOAD(url, options) {
       return null;
     })
     .catch(error => {
-      const { code, message } = error;
-      notification.error({
-        message: '请求失败',
-        description: message,
-      });
+      const { code, message: msg } = error;
+      // notification.error({
+      //   message: '请求失败',
+      //   description: message,
+      // });
+      message.error(msg);
       const failAction = { error };
 
       if (code === 401) {
