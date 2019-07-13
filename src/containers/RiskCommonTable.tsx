@@ -38,6 +38,7 @@ const RiskCommonTable = memo<any>(props => {
   const [isMount, setIsMount] = useState(false);
   const [data, setData] = useState([]);
   const [excelFormData, setExcelFormData] = useState({});
+  const [searchForm, setSearchForm] = useState({});
 
   const onPaginationChange = (current, pageSize) => {
     if (!pageSize) return;
@@ -53,7 +54,7 @@ const RiskCommonTable = memo<any>(props => {
   };
 
   const fetchTable = async (paramsSearchFormData?, paramsPagination?) => {
-    const usedFormData = paramsSearchFormData || searchFormData;
+    const usedFormData = paramsSearchFormData || searchForm;
     setExcelFormData(usedFormData);
 
     if (searchFormControls) {
@@ -71,6 +72,10 @@ const RiskCommonTable = memo<any>(props => {
     });
     setLoading(false);
     if (error) return;
+    setSearchForm(searchFormData);
+    if (paramsPagination) {
+      setPagination(paramsPagination);
+    }
     if (!fetchData.page.length) {
       message.warning('当日暂无数据');
       setDataSource(fetchData.page);
