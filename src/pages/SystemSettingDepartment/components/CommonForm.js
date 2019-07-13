@@ -93,7 +93,7 @@ export default class CommonForm extends Component {
   chooseDepartment = () => {};
 
   handleChange = (val, property) => {
-    let value = null;
+    let value = val;
     if (typeof val === 'string') {
       value = (val && val.trim()) || '';
     }
