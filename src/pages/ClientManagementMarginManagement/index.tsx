@@ -36,6 +36,7 @@ class ClientManagementMarginManagement extends PureComponent {
     this.setState(
       {
         searchFormData: {},
+        searchForm: {},
       },
       () => {
         this.fetchTable();
@@ -49,34 +50,34 @@ class ClientManagementMarginManagement extends PureComponent {
     });
   };
 
-  public fetchTable = async () => {
+  public fetchTable = async (option = false) => {
     this.setState({
       loading: true,
     });
     const { error, data } = await mgnMarginSearch({
-      ...Form2.getFieldsValue(this.state.searchForm),
+      ...Form2.getFieldsValue(option ? this.state.searchFormData : this.state.searchForm),
     });
     this.setState({
       loading: false,
     });
     if (error) {
-      this.setState({
-        searchFormData: {},
-        searchForm: {},
-      });
-      return notification.error({
+      notification.error({
         message: `${error.message ? error.message : ''}请重新查询`,
       });
+      return;
     }
-    const { searchFormData } = this.state;
     const sortData = [...data].sort(
       (a, b) => getMoment(b.updatedAt).valueOf() - getMoment(a.updatedAt).valueOf(),
     );
+    const { searchFormData } = this.state;
+    if (option) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
     this.setState({
       dataSource: sortData,
-      searchForm: searchFormData,
     });
-    return null;
   };
 
   public handleConfirmExcel = () => {
@@ -146,7 +147,7 @@ class ClientManagementMarginManagement extends PureComponent {
           submitButtonProps={{
             icon: 'search',
           }}
-          onSubmitButtonClick={this.fetchTable}
+          onSubmitButtonClick={() => this.fetchTable(true)}
           onResetButtonClick={this.onReset}
           onFieldsChange={this.onSearchFormChange}
           columns={[
