@@ -23,6 +23,9 @@ class ClientManagementFundStatistics extends PureComponent {
     },
     loading: false,
     tableDataSource: [],
+    searchForm: {
+      ...Form2.createFields({ normalStatus: 'all' }),
+    },
   };
 
   public componentDidMount = async () => {
@@ -30,17 +33,16 @@ class ClientManagementFundStatistics extends PureComponent {
   };
 
   public fetchTable = async () => {
-    const { searchFormData } = this.state;
+    const { searchFormData, searchForm } = this.state;
     this.setState({ loading: true });
 
     const { error, data } = await clientAccountSearch(
-      Object.keys(this.state.searchFormData).length > 0
+      Object.keys(searchForm).length > 0
         ? {
-            ..._.omit(Form2.getFieldsValue(this.state.searchFormData), ['normalStatus']),
-            ...(this.state.searchFormData.normalStatus &&
-            this.state.searchFormData.normalStatus.value === 'all'
+            ..._.omit(Form2.getFieldsValue(searchForm), ['normalStatus']),
+            ...(searchForm.normalStatus && searchForm.normalStatus.value === 'all'
               ? null
-              : { normalStatus: this.state.searchFormData.normalStatus.value }),
+              : { normalStatus: searchForm.normalStatus.value }),
           }
         : {},
     );
@@ -50,6 +52,7 @@ class ClientManagementFundStatistics extends PureComponent {
 
     this.setState({
       tableDataSource: sortByCreateAt(data),
+      searchForm: searchFormData,
     });
   };
 
