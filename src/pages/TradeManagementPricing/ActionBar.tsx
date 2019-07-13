@@ -65,12 +65,16 @@ const ActionBar = memo<any>(props => {
   const [counterPartyCode, setCounterPartyCode] = useState(undefined);
   const [visible, setVisible] = useState(false);
 
-  const onValidateDateTimeChange = useCallback(
-    value => {
-      setValidateDateTime(value);
-    },
-    [setValidateDateTime],
-  );
+  const onValidateDateTimeChange = value => {
+    setValidateDateTime(value);
+    tableData.forEach(item =>
+      fetchDefaultPricingEnvData({
+        record: item,
+        reload: true,
+        curValidateDateTime: value,
+      }),
+    );
+  };
 
   return (
     <Affix offsetTop={0} onChange={affixs => setAffix(affixs)}>

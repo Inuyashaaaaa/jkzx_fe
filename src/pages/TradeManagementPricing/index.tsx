@@ -132,7 +132,12 @@ const TradeManagementPricing = props => {
   };
 
   const fetchDefaultPricingEnvData = async (params: any = {}) => {
-    const { record, reload = false, pricingEnv = curPricingEnv } = params;
+    const {
+      record,
+      reload = false,
+      pricingEnv = curPricingEnv,
+      curValidateDateTime = validateDateTime,
+    } = params;
 
     if (judgeLegColumnsHasError(record)) {
       return;
@@ -178,7 +183,7 @@ const TradeManagementPricing = props => {
     const { error, data = [], raw } = await prcTrialPositionsService({
       positions: [position],
       pricingEnvironmentId: pricingEnv,
-      valuationDateTime: validateDateTime.format('YYYY-MM-DD'),
+      valuationDateTime: curValidateDateTime.format('YYYY-MM-DD'),
     });
 
     inlineSetLoadings(false);
