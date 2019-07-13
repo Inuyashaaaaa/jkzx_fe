@@ -197,7 +197,7 @@ class ClientManagementFundStatistics extends PureComponent {
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              width: 180,
+              width: 200,
               fixed: 'left',
               render: val => (
                 <span
@@ -215,6 +215,7 @@ class ClientManagementFundStatistics extends PureComponent {
             {
               title: '状态',
               dataIndex: 'normalStatus',
+              width: 50,
               render: (text, record, index) => {
                 if (text) return '正常';
                 return '错误';
@@ -227,18 +228,21 @@ class ClientManagementFundStatistics extends PureComponent {
             {
               title: '保证金 (¥)',
               align: 'right',
+              width: 150,
               dataIndex: 'margin',
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '现金余额 (¥)',
               align: 'right',
+              width: 150,
               dataIndex: 'cash',
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '已用授信额度 (¥)',
               align: 'right',
+              width: 150,
               dataIndex: 'creditUsed',
               render: (text, record, index) => formatNumber(text, 4),
             },
@@ -246,23 +250,27 @@ class ClientManagementFundStatistics extends PureComponent {
               title: '负债 (¥)',
               dataIndex: 'debt',
               align: 'right',
+              width: 150,
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '出入金总额 (¥)',
               align: 'right',
+              width: 150,
               dataIndex: 'netDeposit',
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '已实现盈亏 (¥)',
               align: 'right',
+              width: 150,
               dataIndex: 'realizedPnL',
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '授信总额 (¥)',
               align: 'right',
+              width: 150,
               dataIndex: 'credit',
               render: (text, record, index) => formatNumber(text, 4),
             },
@@ -270,24 +278,28 @@ class ClientManagementFundStatistics extends PureComponent {
               title: '我方授信总额 (¥)',
               dataIndex: 'counterPartyCredit',
               align: 'right',
+              width: 150,
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '我方剩余授信余额 (¥)',
               dataIndex: 'counterPartyCreditBalance',
               align: 'right',
+              width: 160,
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '我方可用资金 (¥)',
               dataIndex: 'counterPartyFund',
               align: 'right',
+              width: 150,
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
               title: '我方冻结保证金 (¥)',
               dataIndex: 'counterPartyMargin',
               align: 'right',
+              width: 150,
               render: (text, record, index) => formatNumber(text, 4),
             },
             {
@@ -305,7 +317,7 @@ class ClientManagementFundStatistics extends PureComponent {
           }}
           loading={this.state.loading}
           rowKey="accountId"
-          scroll={{ x: 2400 }}
+          scroll={{ x: 2300 }}
         />
       </Page>
     );
