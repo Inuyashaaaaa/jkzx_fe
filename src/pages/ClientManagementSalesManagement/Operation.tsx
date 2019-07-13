@@ -7,7 +7,7 @@ import { queryCompanys, refSalesDelete, refSalesUpdate } from '@/services/sales'
 import CreateFormModal from './CreateFormModal';
 import { Form2 } from '@/containers';
 
-class Operation extends PureComponent<{ record: any; fetchTable: any }> {
+class Operation extends PureComponent<{ record: any; fetchTable: any; fetchData: any }> {
   public $refCreateFormModal: Form2 = null;
 
   public state = {
@@ -77,7 +77,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       message.error('编辑失败');
       return;
     }
-    this.props.fetchTable();
+    this.props.fetchTable(this.props.fetchData);
   };
 
   public handleValueChange = params => {
@@ -95,7 +95,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
       return;
     }
     message.success('删除成功');
-    this.props.fetchTable();
+    this.props.fetchTable(this.props.fetchData);
   };
 
   public render() {
