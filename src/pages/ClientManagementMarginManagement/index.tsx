@@ -77,7 +77,6 @@ class ClientManagementMarginManagement extends PureComponent {
     this.setState({
       dataSource: sortData,
     });
-    return;
   };
 
   public handleConfirmExcel = () => {

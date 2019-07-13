@@ -59,7 +59,6 @@ class ClientManagementFundStatistics extends PureComponent {
       tableDataSource: sortByCreateAt(data),
       searchForm: searchFormData,
     });
-    return;
   };
 
   public onFieldsChange = async (props, changedFields, allFields) => {
