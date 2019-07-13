@@ -56,6 +56,10 @@ const ReportsCustomManagement = memo<any>(props => {
     });
     setLoading(false);
     if (error) return;
+    setPagination({
+      ...currentPage,
+      total: data.totalCount,
+    });
     setTabelData(data.page);
   };
 
@@ -94,12 +98,19 @@ const ReportsCustomManagement = memo<any>(props => {
               valuationDate: [moment().subtract(1, 'day'), moment()],
             });
             setSearchFormData(newsearch);
-            OnSearch(newsearch, pagination);
+            OnSearch(newsearch, {
+              page: 1,
+              pageSize: 15,
+              total: null,
+            });
           }}
           onSubmitButtonClick={async ({ domEvent }) => {
             domEvent.preventDefault();
             setSearchForm(searchFormData);
-            OnSearch(searchFormData, pagination);
+            OnSearch(searchFormData, {
+              page: 1,
+              pageSize: 15,
+            });
           }}
           layout="inline"
           submitText="查询"
