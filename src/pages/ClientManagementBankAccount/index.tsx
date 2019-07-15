@@ -91,23 +91,25 @@ class ClientManagementBankAccount extends PureComponent {
     }
     const BankAccountSearch = {};
     if (_.get(Form2.getFieldsValue(allFields), 'legalName')) {
-      [BankAccountSearch.legalName] = _.get(Form2.getFieldsValue(allFields), 'legalName').split(
-        '_',
-      );
+      // [BankAccountSearch.legalName] = _.get(Form2.getFieldsValue(allFields), 'legalName').split(
+      //   '_',
+      // );
+      BankAccountSearch.legalName = _.get(Form2.getFieldsValue(allFields), 'legalName');
     }
     const { searchFormData } = this.state;
-
     const { error: _error, data: _data } = await refBankAccountSearch(BankAccountSearch);
     if (_error) return false;
 
     const markets = _data.map(item => ({
       label: item.bankAccount,
-      value: `${item.bankAccount}_${uuidv4()}`,
+      value: item.bankAccount,
+      // value: `${item.bankAccount}_${uuidv4()}`,
     }));
 
     const bankAccountNames = _data.map(item => ({
       label: item.bankAccountName,
-      value: `${item.bankAccountName}_${uuidv4()}`,
+      value: item.bankAccountName,
+      // value: `${item.bankAccountName}_${uuidv4()}`,
     }));
 
     if (changedFields.legalName) {
@@ -218,7 +220,8 @@ class ClientManagementBankAccount extends PureComponent {
                         if (error) return [];
                         return data.map(item => ({
                           label: item,
-                          value: `${item}_${uuidv4()}`,
+                          value: item,
+                          // value: `${item}_${uuidv4()}`,
                         }));
                       }}
                     />,
@@ -260,7 +263,8 @@ class ClientManagementBankAccount extends PureComponent {
                               if (error) return [];
                               return data.map(item => ({
                                 label: item,
-                                value: `${item}_${uuidv4()}`,
+                                value: item,
+                                // value: `${item}_${uuidv4()}`,
                               }));
                             }
                       }
@@ -304,7 +308,8 @@ class ClientManagementBankAccount extends PureComponent {
                               if (error) return [];
                               return data.map(item => ({
                                 label: item,
-                                value: `${item}_${uuidv4()}`,
+                                value: item,
+                                // value: `${item}_${uuidv4()}`,
                               }));
                             }
                       }
