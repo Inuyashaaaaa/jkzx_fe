@@ -12,6 +12,7 @@ import {
   refEnablePartyByLegalName,
   refPartyList,
   refSimilarLegalNameList,
+  refMasterAgreementSearch,
 } from '@/services/reference-data-service';
 import { queryCompleteCompanys } from '@/services/sales';
 import { arr2treeOptions, getMoment } from '@/tools';
@@ -23,45 +24,49 @@ const SALER_CASCADER = 'SALER_CASCADER';
 
 const STATUS_FIELD = 'status';
 
-const useTableData = initFormData => {
-  // stateful logic
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [tableData, setTableData] = useState([]);
-  const fetchTableData = async formData => {
-    setSearchLoading(true);
-    const { data, error } = await refPartyList(formData);
-    setSearchLoading(false);
-    if (error) return;
-    setTableData(data);
-  };
-
-  useLifecycles(() => {
-    fetchTableData(initFormData);
-  });
-
-  return {
-    searchLoading,
-    tableData,
-    fetchTableData,
-    setTableData,
-  };
-};
-
 const ClientManagementInfo = memo(() => {
   const formEl = useRef<Form2>(null);
+
+  const initialFormData = {};
+  const [searchFormData, setSearchFormData] = useState(initialFormData);
+  const [searchForm, setSearchForm] = useState(initialFormData);
+
+  const useTableData = initFormData => {
+    // stateful logic
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [tableData, setTableData] = useState([]);
+    const fetchTableData = async (formData, useSeacrchFormData = false) => {
+      setSearchLoading(true);
+      const { data, error } = await refPartyList(formData || searchForm);
+      setSearchLoading(false);
+      if (error) return;
+      if (useSeacrchFormData) {
+        setSearchForm(searchFormData);
+      }
+      setTableData(data);
+    };
+
+    useLifecycles(() => {
+      fetchTableData(initFormData);
+    });
+
+    return {
+      searchLoading,
+      tableData,
+      fetchTableData,
+      setTableData,
+    };
+  };
+
   const { searchLoading, tableData, fetchTableData } = useTableData({});
   const [salesCascaderList, setSalesCascaderList] = useState([]);
 
-  const initialFormData = {
-    [STATUS_FIELD]: { type: 'field', value: ALL_OPTIONS_VALUE },
-  };
-  const [searchFormData, setSearchFormData] = useState(initialFormData);
-
-  const getFormData = () => {
-    const salerValue = _.get(searchFormData[SALER_CASCADER], 'value', []);
+  const getFormData = form => {
+    const formData = form || searchForm;
+    const salerValue = _.get(formData[SALER_CASCADER], 'value', []);
     const [subsidiaryName, branchName, salesName] = salerValue;
     return {
-      ..._.mapValues(_.omit(searchFormData, [SALER_CASCADER]), item => _.get(item, 'value')),
+      ..._.mapValues(_.omit(formData, [SALER_CASCADER]), item => _.get(item, 'value')),
       subsidiaryName,
       branchName,
       salesName,
@@ -128,12 +133,14 @@ const ClientManagementInfo = memo(() => {
         }}
         onResetButtonClick={() => {
           setSearchFormData(initialFormData);
-          setResetFetchNumber(resetFetchNumber + 1);
+          const formData = getFormData(initialFormData);
+          fetchTableData(formData, true);
+          // setResetFetchNumber(resetFetchNumber + 1);
         }}
         onSubmitButtonClick={async ({ domEvent }) => {
           domEvent.preventDefault();
-          const formData = getFormData();
-          fetchTableData(formData);
+          const formData = getFormData(searchFormData);
+          fetchTableData(formData, true);
         }}
         layout="inline"
         submitText="查询"
@@ -176,7 +183,27 @@ const ClientManagementInfo = memo(() => {
             title: '主协议编号',
             dataIndex: 'masterAgreementId',
             render: (value, record, index, { form, editing }) => (
-              <FormItem>{form.getFieldDecorator({})(<Input placeholder="请输入内容" />)}</FormItem>
+              <FormItem>
+                {form.getFieldDecorator({})(
+                  <Select
+                    style={{ minWidth: 180 }}
+                    placeholder="请输入内容搜索"
+                    allowClear
+                    showSearch
+                    fetchOptionsOnSearch
+                    options={async (_value: string = '') => {
+                      const { data, error } = await refMasterAgreementSearch({
+                        masterAgreementId: _value,
+                      });
+                      if (error) return [];
+                      return data.map(item => ({
+                        label: item,
+                        value: item,
+                      }));
+                    }}
+                  />,
+                )}
+              </FormItem>
             ),
           },
           {
