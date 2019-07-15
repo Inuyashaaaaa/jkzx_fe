@@ -405,13 +405,13 @@ export const commonLinkage = (
     );
   }
 
-  if (Form2.fieldValueIsChange(LEG_FIELD.PREMIUM_TYPE, changedFields)) {
-    const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
-    record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
-      permiumType === PREMIUM_TYPE_MAP.PERCENT
-        ? Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.CNY)
-        : Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.LOT);
-  }
+  // if (Form2.fieldValueIsChange(LEG_FIELD.PREMIUM_TYPE, changedFields)) {
+  //   const permiumType = Form2.getFieldValue(record[LEG_FIELD.PREMIUM_TYPE]);
+  //   record[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] =
+  //     permiumType === PREMIUM_TYPE_MAP.PERCENT
+  //       ? Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.CNY)
+  //       : Form2.createField(NOTIONAL_AMOUNT_TYPE_MAP.LOT);
+  // }
 
   inline(
     env,
