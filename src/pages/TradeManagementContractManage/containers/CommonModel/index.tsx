@@ -63,11 +63,7 @@ class CommonModel extends PureComponent<any> {
 
   public onSearch = ({ domEvent }) => {
     domEvent.preventDefault();
-    const { searchFormData } = this.state;
-    this.setState({
-      searchForm: searchFormData,
-    });
-    this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
+    this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE }, this.state.searchFormData, true);
   };
 
   public search = () => {
@@ -76,11 +72,15 @@ class CommonModel extends PureComponent<any> {
 
   public getFormData = data => _.mapValues(data, item => _.get(item, 'value'));
 
-  public onTradeTableSearch = async (paramsPagination = undefined, searchForm) => {
-    const { searchFormData } = this.state;
+  public onTradeTableSearch = async (
+    paramsPagination = undefined,
+    formData,
+    setSearchForm = false,
+  ) => {
+    const { searchFormData, searchForm } = this.state;
     const { activeTabKey } = this.props;
     const { pagination } = this.props[activeTabKey];
-    const newFormData = this.getFormData(searchForm || searchFormData);
+    const newFormData = this.getFormData(formData || searchForm);
     const formatValues = _.mapValues(newFormData, (val, key) => {
       if (isMoment(val)) {
         return val.format('YYYY-MM-DD');
@@ -99,6 +99,11 @@ class CommonModel extends PureComponent<any> {
     this.setState({ loading: false });
 
     if (error) return;
+    if (setSearchForm) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
     if (_.isEmpty(data)) return;
 
     const tableDataSource = _.flatten(
@@ -152,7 +157,7 @@ class CommonModel extends PureComponent<any> {
         current,
         pageSize,
       },
-      this.state.searchForm,
+      // this.state.searchForm,
     );
   };
 
@@ -163,7 +168,11 @@ class CommonModel extends PureComponent<any> {
         bookIdList: [],
       },
       () => {
-        this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
+        this.onTradeTableSearch(
+          { current: 1, pageSize: PAGE_SIZE },
+          this.state.searchFormData,
+          true,
+        );
       },
     );
   };
