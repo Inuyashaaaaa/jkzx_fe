@@ -22,23 +22,30 @@ class History extends PureComponent {
     dataSource: [],
     loading: false,
     searchFormData: {},
+    searchForm: {},
   };
 
   public componentDidMount = () => {
     this.fetchTable();
   };
 
-  public fetchTable = async () => {
+  public fetchTable = async (fromData, useSearchFormData = false) => {
     this.setState({
       loading: true,
     });
+    const { searchFormData, searchForm } = this.state;
     const { error, data } = await clientAccountOpRecordSearch({
-      ...Form2.getFieldsValue(this.state.searchFormData),
+      ...Form2.getFieldsValue(fromData || searchForm),
     });
     this.setState({
       loading: false,
     });
     if (error) return;
+    if (useSearchFormData) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
     this.setState({
       dataSource: sortByCreateAt(data),
     });
@@ -50,7 +57,7 @@ class History extends PureComponent {
         searchFormData: {},
       },
       () => {
-        this.fetchTable();
+        this.fetchTable(this.state.searchFormData, true);
       },
     );
   };
@@ -93,7 +100,7 @@ class History extends PureComponent {
           submitButtonProps={{
             icon: 'search',
           }}
-          onSubmitButtonClick={this.fetchTable}
+          onSubmitButtonClick={() => this.fetchTable(this.state.searchFormData, true)}
           onResetButtonClick={this.onReset}
           onFieldsChange={this.onSearchFormChange}
           columns={[
