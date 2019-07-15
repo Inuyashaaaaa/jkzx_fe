@@ -203,6 +203,7 @@ export async function queryModelVolSurface(params, passError) {
         .unionBy(volGrid.reduce((allVols, vg) => allVols.concat(vg.vols), []), item => item.label)
         .map(vol => ({
           percent: vol.percent,
+          strike: vol.strike,
           headerName: vol.label,
           field: vol.label,
           editable: true,
@@ -261,14 +262,14 @@ export async function saveModelVolSurface(params) {
           vols: columns
             .filter(col => col.dataIndex !== 'tenor')
             .map(col => {
-              const { percent, title: label } = col;
+              const { percent, title: label, strike } = col;
               return {
                 label,
                 quote: new BigNumber(record[label])
                   .dividedBy(100)
                   .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
                   .toNumber(),
-                // strike: new BigNumber(newQuote).multipliedBy(percent).toNumber(),
+                strike,
                 percent,
               };
             }),
