@@ -107,6 +107,10 @@ export const DOWN_LOAD_TRADE_URL = `${HOST_TEST}document-service/bct/download/su
 
 export const DOWN_LOAD_SETTLEMENT_URL = `${HOST_TEST}document-service/bct/download/settlement/?`;
 
+export const DOWN_LOAD_TRADE_URL_POI = `${HOST_TEST}document-service/bct/download/poi/supplementary_agreement/?`;
+
+export const DOWN_LOAD_SETTLEMENT_URL_POI = `${HOST_TEST}document-service/bct/download/poi/settlement/?`;
+
 export const DOWN_LOAD_VALUATION_URL = `${HOST_TEST}document-service/bct/download/valuationReport?valuationReportId=`;
 
 export const HREF_UPLOAD_URL = `${HOST_TEST}document-service/bct/download/bct-template?templateId=`;

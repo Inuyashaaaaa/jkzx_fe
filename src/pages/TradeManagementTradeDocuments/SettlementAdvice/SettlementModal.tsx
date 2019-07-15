@@ -3,7 +3,7 @@ import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { DOWN_LOAD_SETTLEMENT_URL, emlSendSettleReport } from '@/services/document';
+import { DOWN_LOAD_SETTLEMENT_URL_POI, emlSendSettleReport } from '@/services/document';
 import ModalButton from '@/containers/ModalButton';
 import DownloadButton from '@/containers/DownloadButton';
 
@@ -67,7 +67,7 @@ class TradeModal extends PureComponent {
             <Col>
               <DownloadButton
                 content="下载"
-                url={DOWN_LOAD_SETTLEMENT_URL}
+                url={DOWN_LOAD_SETTLEMENT_URL_POI}
                 name={`${this.props.data.tradeId}结算通知书.doc`}
                 options={`tradeId=${this.props.data.tradeId}&positionId=${this.props.data.positionId}&partyName=${this.props.data.partyName}`}
               />

@@ -3,11 +3,7 @@ import { Alert, Button, Col, message, Row, Modal } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  DOWN_LOAD_TRADE_URL,
-  DOWN_LOAD_TRADE_URL_URL,
-  emlSendSupplementaryAgreementReport,
-} from '@/services/document';
+import { DOWN_LOAD_TRADE_URL_POI, emlSendSupplementaryAgreementReport } from '@/services/document';
 import Form from '@/containers/Form';
 import DownloadButton from '@/containers/DownloadButton';
 
@@ -129,8 +125,8 @@ class TradeModal extends PureComponent {
                 <DownloadButton
                   content="下载"
                   name={`${this.props.data.tradeId}交易确认书.doc`}
-                  url={DOWN_LOAD_TRADE_URL}
-                  options={`tradeId=${this.props.data.tradeId}&partyName=${this.props.data.partyName}&description7=${this.state.modalData.marketDisruption}&description8=${this.state.modalData.tradeOption}`}
+                  url={DOWN_LOAD_TRADE_URL_POI}
+                  options={`tradeId=${this.props.data.tradeId}&partyName=${this.props.data.partyName}&marketInterruptionMessage=${this.state.modalData.marketDisruption}&earlyTerminationMessage=${this.state.modalData.tradeOption}`}
                 />
               </Col>
               <Col>
