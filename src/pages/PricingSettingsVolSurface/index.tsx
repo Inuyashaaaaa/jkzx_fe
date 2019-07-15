@@ -176,6 +176,7 @@ class PricingSettingVolSurface extends PureComponent {
             dataIndex: item.field,
             defaultEditing: false,
             percent: item.percent,
+            strike: item.strike,
             width: 150,
             editable: record => true,
             render: (val, record, index, { form, editing }) => (
