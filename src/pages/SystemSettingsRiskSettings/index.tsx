@@ -226,7 +226,7 @@ class SystemSettingsRiskSettings extends PureComponent {
         },
       },
       () => {
-        this.fetchTable();
+        this.fetchTable(this.state.searchFormData, null, true);
       },
     );
   };
