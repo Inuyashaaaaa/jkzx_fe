@@ -27,6 +27,7 @@ class TradeConfirmation extends PureComponent {
       onShowSizeChange: (page, pagesize) => this.onTablePaginationChange(page, pagesize),
     },
     bookIdList: [],
+    searchForm: {},
   };
 
   public onTablePaginationChange = (page, pagesize) => {
@@ -57,6 +58,7 @@ class TradeConfirmation extends PureComponent {
     this.setState(
       {
         searchFormData,
+        searchForm: searchFormData,
       },
       () => {
         this.onFetch();
@@ -66,11 +68,13 @@ class TradeConfirmation extends PureComponent {
 
   public getFormData = data => _.mapValues(data, item => _.get(item, 'value'));
 
-  public onFetch = async paramsPagination => {
+  public onFetch = async (paramsPagination, formData, useSearchFormData) => {
+    const { searchFormData, searchForm } = this.state;
+    const form = formData || searchForm;
     const formValues = {
-      startDate: _.get(this.state.searchFormData, 'tradeDate.value[0]').format('YYYY-MM-DD'),
-      endDate: _.get(this.state.searchFormData, 'tradeDate.value[1]').format('YYYY-MM-DD'),
-      ...this.getFormData(_.omit(this.state.searchFormData, 'tradeDate')),
+      startDate: _.get(form, 'tradeDate.value[0]').format('YYYY-MM-DD'),
+      endDate: _.get(form, 'tradeDate.value[1]').format('YYYY-MM-DD'),
+      ...this.getFormData(_.omit(form, 'tradeDate')),
     };
     const { pagination } = this.state;
     this.setState({
@@ -85,6 +89,11 @@ class TradeConfirmation extends PureComponent {
       loading: false,
     });
     if (error) return;
+    if (useSearchFormData) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
     const dataSource = data.page.map(item => {
       let status = '';
       if (item.docProcessStatus === 'UN_PROCESSED') {
@@ -119,7 +128,7 @@ class TradeConfirmation extends PureComponent {
         searchFormData,
       },
       () => {
-        this.onFetch({ current: 1, pageSize: PAGE_SIZE });
+        this.onFetch({ current: 1, pageSize: PAGE_SIZE }, searchFormData, true);
       },
     );
   };
@@ -150,7 +159,7 @@ class TradeConfirmation extends PureComponent {
   };
 
   public onSearch = () => {
-    this.onFetch({ current: 1, pageSize: PAGE_SIZE });
+    this.onFetch({ current: 1, pageSize: PAGE_SIZE }, this.state.searchFormData, true);
   };
 
   public render() {
