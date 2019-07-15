@@ -30,11 +30,11 @@ const TradeManagementMarketManagement = props => {
   const [creating, setCreating] = useState(false);
   const [noData, setNoData] = useState(true);
 
-  const fetchTable = useCallback(async (paramsPagination?, formData?) => {
+  const fetchTable = useCallback(async (paramsPagination?, formData?, useSearchForm = false) => {
     const actualPagination = paramsPagination || pagination;
     setLoading(true);
     const newSearchFormData = _.mapValues(
-      formData || Form2.getFieldsValue(searchFormData),
+      Form2.getFieldsValue(formData || searchForm),
       (value, key) => {
         if (key === 'instrumentIds' && (!value || !value.length)) {
           return undefined;
@@ -50,6 +50,9 @@ const TradeManagementMarketManagement = props => {
     });
     setLoading(false);
     if (error) return;
+    if (useSearchForm) {
+      setSearchForm(searchFormData);
+    }
     setTableDataSource(data.page);
     setTotal(data.totalCount);
     setNoData(data.page.length === 0);
@@ -162,7 +165,7 @@ const TradeManagementMarketManagement = props => {
       pageSize,
     };
     setPagination(next);
-    fetchTable(next, Form2.getFieldsValue(searchForm));
+    fetchTable(next);
   };
 
   const switchModal = () => {
@@ -172,15 +175,14 @@ const TradeManagementMarketManagement = props => {
   };
 
   const onSearch = () => {
-    setSearchForm(searchFormData);
     setPagination(defaultPagination);
-    fetchTable(defaultPagination);
+    fetchTable(defaultPagination, searchFormData, true);
   };
 
   const onReset = () => {
     setPagination(defaultPagination);
     setSearchFormData({});
-    fetchTable();
+    fetchTable(defaultPagination, {}, true);
   };
 
   useEffect(() => {
@@ -205,7 +207,7 @@ const TradeManagementMarketManagement = props => {
       </Button>
       <SmartTable
         rowKey="instrumentId"
-        columns={TABLE_COL_DEFS(fetchTable)}
+        columns={TABLE_COL_DEFS(() => fetchTable(null, searchForm, false))}
         loading={loading}
         scroll={{ x: noData ? false : 2300 }}
         dataSource={tableDataSource}
