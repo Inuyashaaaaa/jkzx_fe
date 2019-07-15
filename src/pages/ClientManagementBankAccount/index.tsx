@@ -31,18 +31,21 @@ class ClientManagementBankAccount extends PureComponent {
     visible: false,
     confirmLoading: false,
     createFormData: {},
+    searchForm: {},
   };
 
   public componentDidMount = () => {
     this.fetchTable();
   };
 
-  public fetchTable = async () => {
+  public fetchTable = async (formData, setSearchFormData = false) => {
     this.setState({
       loading: true,
     });
-    const { searchFormData } = this.state;
-    const { bankAccount, bankAccountName, legalName } = Form2.getFieldsValue(searchFormData);
+    const { searchFormData, searchForm } = this.state;
+    const { bankAccount, bankAccountName, legalName } = Form2.getFieldsValue(
+      formData || searchForm,
+    );
     const { error, data } = await refBankAccountSearch({
       bankAccount: (bankAccount || '').split('_')[0],
       legalName: (legalName || '').split('_')[0],
@@ -52,6 +55,11 @@ class ClientManagementBankAccount extends PureComponent {
       loading: false,
     });
     if (error) return;
+    if (setSearchFormData) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
     const sortData = [...data].sort(
       (a, b) => getMoment(b.updatedAt).valueOf() - getMoment(a.updatedAt).valueOf(),
     );
@@ -68,7 +76,7 @@ class ClientManagementBankAccount extends PureComponent {
         bankAccountNames: null,
       },
       () => {
-        this.fetchTable();
+        this.fetchTable({}, true);
       },
     );
   };
@@ -178,7 +186,7 @@ class ClientManagementBankAccount extends PureComponent {
           submitButtonProps={{
             icon: 'search',
           }}
-          onSubmitButtonClick={this.fetchTable}
+          onSubmitButtonClick={() => this.fetchTable(this.state.searchFormData, true)}
           onResetButtonClick={this.onReset}
           onFieldsChange={this.onSearchFormChange}
           columns={[
