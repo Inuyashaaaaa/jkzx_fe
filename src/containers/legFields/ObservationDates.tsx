@@ -386,6 +386,7 @@ class ObserveModalInput extends InputBase<
             width: 700,
             visible: this.state.visible,
             onCancel: this.onCancel,
+            maskClosable: false,
           }}
           onClick={this.onOpen}
           style={{ width: '100%', display: 'block' }}
