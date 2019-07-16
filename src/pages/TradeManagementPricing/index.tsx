@@ -106,13 +106,17 @@ const TradeManagementPricing = props => {
     );
 
     let leftKeys = leftColumns.map(item => item.dataIndex);
-    // 雪球到期未敲出收益类型为固定去除到期未敲出行权价格验证
-    if (
-      record.$legType === LEG_TYPE_MAP.AUTOCALL &&
-      record[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE].value ===
+    if (record.$legType === LEG_TYPE_MAP.AUTOCALL) {
+      // 雪球到期未敲出收益类型为看涨或看跌去除到期未敲出固定收益
+      // 雪球到期未敲出收益类型为固定去除到期未敲出行权价格验证
+      if (
+        record[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE].value ===
         EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
-    ) {
-      leftKeys = leftKeys.filter(item => item !== LEG_FIELD.AUTO_CALL_STRIKE);
+      ) {
+        leftKeys = leftKeys.filter(item => item !== LEG_FIELD.AUTO_CALL_STRIKE);
+      } else {
+        leftKeys = leftKeys.filter(item => item !== LEG_FIELD.EXPIRE_NOBARRIERPREMIUM);
+      }
     }
 
     const fills = leftKeys.reduce(
@@ -138,7 +142,9 @@ const TradeManagementPricing = props => {
       pricingEnv = curPricingEnv,
       curValidateDateTime = validateDateTime,
     } = params;
-
+    if (!record) {
+      return;
+    }
     if (judgeLegColumnsHasError(record)) {
       return;
     }
