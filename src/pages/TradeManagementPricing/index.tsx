@@ -138,6 +138,9 @@ const TradeManagementPricing = props => {
       pricingEnv = curPricingEnv,
       curValidateDateTime = validateDateTime,
     } = params;
+    if (!record) {
+      return;
+    }
 
     if (judgeLegColumnsHasError(record)) {
       return;
@@ -496,7 +499,7 @@ const TradeManagementPricing = props => {
                   return val;
                 }
                 return val
-                  ? new BigNumber(val)
+                  ? new BigNumber(value)
                       .multipliedBy(100)
                       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
                       .toNumber()
