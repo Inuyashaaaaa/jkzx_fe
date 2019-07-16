@@ -246,6 +246,7 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
   getPageData: (env: string, position: any) =>
     Form2.createFields({
       [LEG_FIELD.REBATE_TYPE]: position.asset.rebateUnit,
+      [LEG_FIELD.REBATE_UNIT]: null,
     }),
 
   onDataChange: (
