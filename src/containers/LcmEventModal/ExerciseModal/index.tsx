@@ -1,3 +1,7 @@
+import { Alert, message, Modal } from 'antd';
+import BigNumber from 'bignumber.js';
+import React, { PureComponent } from 'react';
+import _ from 'lodash';
 import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
@@ -8,9 +12,6 @@ import {
 import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
-import { Alert, message, Modal } from 'antd';
-import BigNumber from 'bignumber.js';
-import React, { PureComponent } from 'react';
 import {
   EXERCISE_FORM_CONTROLS,
   NOTIONAL_AMOUNT,
@@ -20,7 +21,6 @@ import {
   UNDERLYER_PRICE1,
   UNDERLYER_PRICE2,
 } from './constants';
-import _ from 'lodash';
 
 class ExerciseModal extends PureComponent<
   {
@@ -29,16 +29,6 @@ class ExerciseModal extends PureComponent<
   },
   any
 > {
-  public $exerciseForm: Form;
-
-  public data: any;
-
-  public tableFormData: any;
-
-  public currentUser: any;
-
-  public reload: any;
-
   public state = {
     visible: false,
     direction: 'BUYER',
@@ -54,7 +44,7 @@ class ExerciseModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-    const direction = this.data.direction;
+    const { direction } = this.data;
     this.setState({
       visible: true,
       notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
@@ -115,7 +105,7 @@ class ExerciseModal extends PureComponent<
   };
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    this.setState(state => ({ modalConfirmLoading: !state.modalConfirmLoading }));
   };
 
   public switchModal = () => {
@@ -127,7 +117,7 @@ class ExerciseModal extends PureComponent<
   public onConfirm = async () => {
     const rsp = await this.$exerciseForm.validate();
     if (rsp.error) return;
-    const dataSource = this.state.dataSource;
+    const { dataSource } = this.state;
     this.switchConfirmLoading();
     const params = this.state.productType.includes('SPREAD_EUROPEAN')
       ? {
@@ -174,7 +164,7 @@ class ExerciseModal extends PureComponent<
   };
 
   public handleSettleAmount = async () => {
-    const dataSource = this.state.dataSource;
+    const { dataSource } = this.state;
     if (
       !(
         (_.has(dataSource, 'UNDERLYER_PRICE') && dataSource[UNDERLYER_PRICE]) ||
@@ -217,6 +207,16 @@ class ExerciseModal extends PureComponent<
     });
   };
 
+  public $exerciseForm: Form;
+
+  public data: any;
+
+  public tableFormData: any;
+
+  public currentUser: any;
+
+  public reload: any;
+
   public render() {
     const { direction, visible } = this.state;
     return (
@@ -231,7 +231,7 @@ class ExerciseModal extends PureComponent<
           closable={false}
           onCancel={this.switchModal}
           onOk={this.onConfirm}
-          destroyOnClose={true}
+          destroyOnClose
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
           title={direction === 'BUYER' ? '我方行权' : '客户行权'}
@@ -247,7 +247,7 @@ class ExerciseModal extends PureComponent<
             controls={EXERCISE_FORM_CONTROLS(
               this.state.notionalType,
               this.handleSettleAmount,
-              this.state.productType
+              this.state.productType,
             )}
           />
           <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />

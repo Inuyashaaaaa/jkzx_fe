@@ -44,6 +44,8 @@ class AsianExerciseModal extends PureComponent<
 
   public currentUser: any = {};
 
+  public cancelNeedReload: boolean = false;
+
   public state = {
     visible: false,
     modalConfirmLoading: false,
@@ -53,11 +55,12 @@ class AsianExerciseModal extends PureComponent<
     strikeType: null,
   };
 
-  public show = (data, tableFormData, currentUser, reload) => {
+  public show = (data, tableFormData, currentUser, reload, cancelNeedReload) => {
     this.data = data;
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
+    this.cancelNeedReload = cancelNeedReload;
     this.setState({
       visible: true,
       productType: this.data[LEG_TYPE_FIELD],
@@ -111,9 +114,16 @@ class AsianExerciseModal extends PureComponent<
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: false,
-    });
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        if (this.cancelNeedReload) {
+          this.reload();
+        }
+      },
+    );
   };
 
   public filterObDays = tableData =>
