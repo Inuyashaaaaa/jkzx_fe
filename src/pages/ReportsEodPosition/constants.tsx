@@ -1,5 +1,5 @@
 import { multiply } from 'mathjs';
-import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
+import { PRODUCT_TYPE_OPTIONS } from '@/constants/common';
 import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
@@ -33,7 +33,7 @@ export const TABLE_COL_DEFS = [
     title: '期权类型',
     dataIndex: 'productType',
     width: 150,
-    render: (value, record, index) => PRODUCTTYPE_ZHCH_MAP[value],
+    render: (value, record, index) => PRODUCT_TYPE_OPTIONS[value],
   },
   {
     title: '交易日',
