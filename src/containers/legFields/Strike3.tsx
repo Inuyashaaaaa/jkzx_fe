@@ -33,39 +33,35 @@ export const Strike3: ILegColDef = {
       if (LEG_TYPE_MAP.TRIPLE_DIGITAL === record.$legType) {
         return ([
           {
-            message: '必须满足条件(行权价1 < 行权价2 < 行权价3)',
+            message: '必须满足条件(行权价2 < 行权价3)',
             validator(rule, value, callback) {
-              if (
-                !(
-                  Form2.getFieldValue(record[LEG_FIELD.STRIKE1]) <
-                    Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) &&
-                  Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) < value
-                )
-              ) {
-                return callback(true);
+              const strike3Val = value;
+              const strike2Val = Form2.getFieldValue(record[LEG_FIELD.STRIKE2]);
+              if (strike3Val != null && strike2Val != null) {
+                if (!(strike2Val < strike3Val)) {
+                  callback(true);
+                }
               }
-              return callback();
+              callback();
             },
           },
         ] as ValidationRule[]).concat(RULES_REQUIRED);
       }
       return ([
         {
-          message: '必须满足条件(行权价1 < 行权价2 <= 行权价3)',
+          message: '必须满足条件(行权价2 <= 行权价3)',
           validator(rule, value, callback) {
-            if (
-              !(
-                Form2.getFieldValue(record[LEG_FIELD.STRIKE1]) <
-                  Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) &&
-                Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) <= value
-              )
-            ) {
-              return callback(true);
+            const strike3Val = value;
+            const strike2Val = Form2.getFieldValue(record[LEG_FIELD.STRIKE2]);
+            if (strike3Val != null && strike2Val != null) {
+              if (!(strike2Val <= strike3Val)) {
+                callback(true);
+              }
             }
-            return callback();
+            callback();
           },
         },
-      ] as ValidationRule[]).concat(RULES_REQUIRED);
+      ] as ValidationRule[]).concat(getRequiredRule());
     };
 
     return (
