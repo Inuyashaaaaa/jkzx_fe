@@ -17,6 +17,11 @@ import { TABLE_CELL_FIELDS_CHANGE, TABLE_CELL_VALUES_CHANGE } from '../constants
 const EditableContext = React.createContext<WrappedFormUtils>(null);
 
 class EditableRow extends React.Component<ITableRowProps> {
+  public state = {
+    visible: false,
+    disabled: false,
+  };
+
   public componentDidMount = () => {
     const { record, getRowKey } = this.props;
     this.props.api.tableManager.registeRow(record[getRowKey()], this);
@@ -30,15 +35,15 @@ class EditableRow extends React.Component<ITableRowProps> {
   public validate = (options: any = {}, colIds = []) => {
     const { silence, scroll = true, ...rest } = options;
 
-    return new Promise<{ errors: any; values: any }>((resolve, reject) => {
-      return this.props.form[scroll ? 'validateFieldsAndScroll' : 'validateFields'](
+    return new Promise<{ errors: any; values: any }>((resolve, reject) =>
+      this.props.form[scroll ? 'validateFieldsAndScroll' : 'validateFields'](
         colIds,
         rest,
         (errors, values) => {
           resolve({ errors, values });
-        }
-      );
-    });
+        },
+      ),
+    );
   };
 
   public getContextMenu = () => {
@@ -54,12 +59,38 @@ class EditableRow extends React.Component<ITableRowProps> {
           'getRowKey',
           'columns',
           'rowId',
-        ])
+        ]),
       )
     );
   };
 
+  public changeDropdownMenuVisible = visible => {
+    this.setState({
+      visible,
+    });
+  };
+
+  public switchDropdownMenu = disabled => {
+    this.setState({
+      disabled: !disabled,
+    });
+  };
+
+  public cloneMenu = contextMenu => {
+    const upperThis = this;
+    return React.cloneElement(contextMenu, {
+      ...contextMenu.props,
+      onClick(...args) {
+        upperThis.changeDropdownMenuVisible(false);
+        if (contextMenu.props.onClick) {
+          contextMenu.props.onClick.call(this, ...args);
+        }
+      },
+    });
+  };
+
   public render() {
+    const { visible, disabled } = this.state;
     const { form } = this.props;
     const child = (
       <tr
@@ -82,10 +113,17 @@ class EditableRow extends React.Component<ITableRowProps> {
       />
     );
     const contextMenu = this.getContextMenu();
+
     return (
       <EditableContext.Provider value={this.props.form}>
         {contextMenu ? (
-          <Dropdown trigger={['contextMenu']} overlay={contextMenu}>
+          <Dropdown
+            disabled={disabled}
+            visible={visible}
+            trigger={['contextMenu']}
+            overlay={this.cloneMenu(contextMenu)}
+            onVisibleChange={this.changeDropdownMenuVisible}
+          >
             {child}
           </Dropdown>
         ) : (
@@ -134,16 +172,13 @@ const FormRow = Form.create({
     const { record, columns } = props;
     if (!record) return null;
     const filledDataSource = columns.reduce((data, next) => {
+      // eslint-disable-next-line no-param-reassign
       data[next.dataIndex] = record[next.dataIndex];
       return data;
     }, {});
     const result = _.mapValues(
-      _.pickBy(filledDataSource, (val: IFormField) => {
-        return Form2.isField(val);
-      }),
-      (val: IFormField) => {
-        return Form.createFormField(val);
-      }
+      _.pickBy(filledDataSource, (val: IFormField) => Form2.isField(val)),
+      (val: IFormField) => Form.createFormField(val),
     );
     return result;
   },
