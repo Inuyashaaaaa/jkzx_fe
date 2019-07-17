@@ -502,7 +502,7 @@ const TradeManagementPricing = props => {
                   return val;
                 }
                 return val
-                  ? new BigNumber(val)
+                  ? new BigNumber(value)
                       .multipliedBy(100)
                       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
                       .toNumber()
