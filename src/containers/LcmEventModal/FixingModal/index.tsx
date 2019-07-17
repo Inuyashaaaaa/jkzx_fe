@@ -44,6 +44,10 @@ class FixingModal extends PureComponent<
 
   public currentUser: any = {};
 
+  public changedPrice: boolean = false;
+
+  public rowKey: string = OB_DAY_FIELD;
+
   public state = {
     visible: false,
     modalConfirmLoading: false,
@@ -58,6 +62,7 @@ class FixingModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
+    this.changedPrice = false;
     const tableData = filterObDays(getObservertionFieldData(data)).map(item => ({
       ...item,
       [OB_PRICE_FIELD]: Form2.createField(item[OB_PRICE_FIELD]),
@@ -97,7 +102,9 @@ class FixingModal extends PureComponent<
         visible: false,
       },
       () => {
-        this.reload();
+        if (this.changedPrice) {
+          this.reload();
+        }
       },
     );
   };
@@ -125,7 +132,13 @@ class FixingModal extends PureComponent<
         visible: false,
       },
       () => {
-        this.$asianExerciseModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+        this.$asianExerciseModal.show(
+          this.data,
+          this.tableFormData,
+          this.currentUser,
+          this.reload,
+          this.changedPrice,
+        );
       },
     );
   };
@@ -235,6 +248,9 @@ class FixingModal extends PureComponent<
       },
     });
     if (error) return;
+
+    this.changedPrice = true;
+
     this.setState(
       {
         edited: true,
@@ -271,7 +287,7 @@ class FixingModal extends PureComponent<
           render: (val, record, index) => `${formatMoney(val)} %`,
         },
         {
-          title: '已观察到价格(可编辑)',
+          title: '已观察到价格',
           dataIndex: OB_PRICE_FIELD,
           defaultEditing: false,
           editable: record => true,
@@ -315,7 +331,7 @@ class FixingModal extends PureComponent<
             },
           ]),
       {
-        title: '已观察到价格(可编辑)',
+        title: '已观察到价格',
         dataIndex: OB_PRICE_FIELD,
         defaultEditing: false,
         editable: record => true,
@@ -487,9 +503,8 @@ class FixingModal extends PureComponent<
           width={900}
         >
           <SmartTable
-            pagination={false}
             dataSource={this.state.tableData}
-            rowKey={OB_DAY_FIELD}
+            rowKey={this.rowKey}
             onCellFieldsChange={this.onCellFieldsChanged}
             onCellEditingChanged={this.onCellValueChanged}
             columns={this.getColumnDefs()}
