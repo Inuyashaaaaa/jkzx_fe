@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
@@ -20,8 +22,6 @@ import {
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -212,7 +212,7 @@ export const VerticalSpread: ILeg = legPipeLine({
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
 
     return nextPosition;
   },
