@@ -19,11 +19,13 @@ import {
 import { VERTICAL_GUTTER } from '@/constants/global';
 import Form from '@/containers/Form';
 import { convertObservetions } from '@/services/common';
-import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import { getMoment } from '@/tools';
+import { trdTradeLCMEventProcess, tradeExercisePreSettle } from '@/services/trade-service';
+import { getMoment, delay } from '@/tools';
 import { countAvg } from '../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 import CashExportModal from '@/containers/CashExportModal';
+import { Form2 } from '@/components';
+import Loading from '@/containers/Loading';
 
 const OPTIONS_NUMBER = 'optionsNumber';
 
@@ -51,6 +53,7 @@ class AsianExerciseModal extends PureComponent<
     productType: 'ASIAN',
     exportVisible: false,
     strikeType: null,
+    tradeExercisePreSettleLoading: false,
   };
 
   public show = (data, tableFormData, currentUser, reload) => {
@@ -58,12 +61,15 @@ class AsianExerciseModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
+    const formData = this.getDefaultFormData();
     this.setState({
       visible: true,
       productType: this.data[LEG_TYPE_FIELD],
-      formData: this.getDefaultFormData(),
+      formData,
       strikeType: this.data[LEG_FIELD.STRIKE_TYPE],
     });
+
+    this.getSettleAmount(formData);
   };
 
   public getDefaultFormData = () => ({
@@ -78,6 +84,29 @@ class AsianExerciseModal extends PureComponent<
     [SUBJECT_MATTER_AVG]: countAvg(convertObservetions(this.data), this.data),
     [LEG_FIELD.STRIKE]: this.data[LEG_FIELD.STRIKE],
   });
+
+  public getSettleAmount = async values => {
+    this.setState({
+      tradeExercisePreSettleLoading: true,
+    });
+    const { error, data } = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+      eventDetail: {
+        underlyerPrice: String(values[SUBJECT_MATTER_AVG]),
+      },
+    });
+    this.setState({
+      tradeExercisePreSettleLoading: false,
+    });
+    if (error) return;
+    this.setState({
+      formData: {
+        ...values,
+        [SETTLEA_MOUNT]: data,
+      },
+    });
+  };
 
   public getDefaultOptionsNumber = () =>
     // 名义本金 / 期初价格 / 合约乘数
@@ -208,78 +237,80 @@ class AsianExerciseModal extends PureComponent<
           visible={visible}
           title={this.getTitle()}
         >
-          <Form
-            ref={node => {
-              this.$form = node;
-            }}
-            footer={false}
-            dataSource={this.state.formData}
-            onValueChange={this.onValueChange}
-            controls={[
-              {
-                field: OPTIONS_NUMBER,
-                control: {
-                  label: '期权数量(手数)',
+          <Loading loading={this.state.tradeExercisePreSettleLoading}>
+            <Form
+              ref={node => {
+                this.$form = node;
+              }}
+              footer={false}
+              dataSource={this.state.formData}
+              onValueChange={this.onValueChange}
+              controls={[
+                {
+                  field: OPTIONS_NUMBER,
+                  control: {
+                    label: '期权数量(手数)',
+                  },
+                  input: {
+                    ...INPUT_NUMBER_DIGITAL_CONFIG,
+                    disabled: true,
+                  },
                 },
-                input: {
-                  ...INPUT_NUMBER_DIGITAL_CONFIG,
-                  disabled: true,
+                {
+                  field: LEG_FIELD.NOTIONAL_AMOUNT,
+                  control: {
+                    label: '名义金额 (￥)',
+                  },
+                  input: {
+                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                    disabled: true,
+                  },
                 },
-              },
-              {
-                field: LEG_FIELD.NOTIONAL_AMOUNT,
-                control: {
-                  label: '名义金额 (￥)',
+                {
+                  field: SUBJECT_MATTER_AVG,
+                  control: {
+                    label: '标的物均价（¥）',
+                  },
+                  input: {
+                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                    disabled: true,
+                  },
                 },
-                input: {
-                  ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                  disabled: true,
-                },
-              },
-              {
-                field: SUBJECT_MATTER_AVG,
-                control: {
-                  label: '标的物均价（¥）',
-                },
-                input: {
-                  ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                  disabled: true,
-                },
-              },
-              ...(this.isRange()
-                ? []
-                : [
-                    {
-                      field: LEG_FIELD.STRIKE,
-                      control: {
-                        label:
-                          this.state.strikeType === UNIT_ENUM_MAP.CNY
-                            ? '行权价（¥）'
-                            : '行权价（%）',
+                ...(this.isRange()
+                  ? []
+                  : [
+                      {
+                        field: LEG_FIELD.STRIKE,
+                        control: {
+                          label:
+                            this.state.strikeType === UNIT_ENUM_MAP.CNY
+                              ? '行权价（¥）'
+                              : '行权价（%）',
+                        },
+                        input: {
+                          ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                          disabled: true,
+                        },
                       },
-                      input: {
-                        ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                        disabled: true,
+                    ]),
+                {
+                  field: SETTLEA_MOUNT,
+                  control: {
+                    label: '结算金额',
+                  },
+                  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                  decorator: {
+                    rules: [
+                      {
+                        required: true,
+                        message: '结算金额为必填项',
                       },
-                    },
-                  ]),
-              {
-                field: SETTLEA_MOUNT,
-                control: {
-                  label: '结算金额',
+                    ],
+                  },
                 },
-                input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                decorator: {
-                  rules: [
-                    {
-                      required: true,
-                      message: '结算金额为必填项',
-                    },
-                  ],
-                },
-              },
-            ]}
-          />
+              ]}
+            />
+          </Loading>
           <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>
