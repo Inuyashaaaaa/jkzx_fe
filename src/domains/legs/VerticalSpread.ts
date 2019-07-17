@@ -112,6 +112,8 @@ export const VerticalSpread: ILeg = legPipeLine({
         NotionalAmount,
         PremiumType,
         Premium,
+        MinimumPremium,
+        FrontPremium,
         Unit,
         TradeNumber,
         ...TOTAL_EDITING_FIELDS,
@@ -139,6 +141,8 @@ export const VerticalSpread: ILeg = legPipeLine({
         NotionalAmount,
         PremiumType,
         Premium,
+        MinimumPremium,
+        FrontPremium,
         Unit,
         TradeNumber,
       ];
@@ -221,7 +225,7 @@ export const VerticalSpread: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -231,7 +235,7 @@ export const VerticalSpread: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });
