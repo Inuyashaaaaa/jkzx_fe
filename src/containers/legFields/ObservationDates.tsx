@@ -12,6 +12,7 @@ import {
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
   LEG_ENV_FIELD,
+  LEG_ID_FIELD,
 } from '@/constants/common';
 import { Form2, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
@@ -73,14 +74,30 @@ class ObserveModalInput extends InputBase<
     return nextDataSource;
   };
 
+  public getRowInstance = () => {
+    const { api, record } = this.props;
+    const { tableApi, tableManager } = api;
+    const id = record[LEG_ID_FIELD];
+    const row = tableManager.rowNodes.find(item => item.id === id);
+    return row;
+  };
+
   public onOpen = () => {
-    this.props.api.tableApi.looseActive();
+    const { api, record } = this.props;
+    const { tableApi, tableManager } = api;
+    const id = record[LEG_ID_FIELD];
+    const row = this.getRowInstance();
+    row.node.changeDropdownMenuVisible(false);
+    row.node.switchDropdownMenu(false);
+    tableApi.looseActive();
     this.setState({
       visible: true,
     });
   };
 
   public onOk = async () => {
+    const row = this.getRowInstance();
+    row.node.switchDropdownMenu(true);
     this.setState(
       state => ({
         visible: !state.visible,
@@ -103,6 +120,8 @@ class ObserveModalInput extends InputBase<
   };
 
   public onCancel = () => {
+    const row = this.getRowInstance();
+    row.node.switchDropdownMenu(true);
     this.setState(state => ({
       visible: !state.visible,
     }));
@@ -311,9 +330,9 @@ class ObserveModalInput extends InputBase<
                   //   height: params.context.rowHeight,
                   // }}
                 >
-                  <Button size="small" type="danger" onClick={this.bindRemove(index)}>
+                  <a style={{ color: 'red' }} onClick={this.bindRemove(index)}>
                     删除
-                  </Button>
+                  </a>
                 </Row>
               ),
             },
