@@ -44,23 +44,24 @@ class ExerciseModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
+
     const { direction } = this.data;
+
+    const dataSource =
+      this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+        ? this.computeLotDataSource({
+            [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+          })
+        : this.computeCnyDataSource({
+            [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+          });
+
     this.setState({
       visible: true,
       notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
       productType: this.data[LEG_TYPE_FIELD],
       direction,
-      ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        ? {
-            dataSource: this.computeLotDataSource({
-              [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-            }),
-          }
-        : {
-            dataSource: this.computeCnyDataSource({
-              [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-            }),
-          }),
+      dataSource,
     });
   };
 
