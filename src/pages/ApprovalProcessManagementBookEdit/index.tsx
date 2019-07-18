@@ -287,7 +287,11 @@ const TradeManagementBooking = props => {
             }}
             dataSource={tableData}
             chainColumns={(columns: ILegColDef[]) => {
-              const totalFields = TOTAL_EDITING_FIELDS.map(item => item.dataIndex);
+              let totalFields = TOTAL_EDITING_FIELDS.map(item => item.dataIndex);
+              // 一触即付去除多余行权支付类型和行权收益字段
+              if (_.get(tableData, '[0].$legType') === LEG_TYPE_MAP.DIGITAL_AMERICAN) {
+                totalFields = _.concat(totalFields, [LEG_FIELD.PAYMENT_TYPE, LEG_FIELD.PAYMENT]);
+              }
               return columns.filter(item => !totalFields.includes(item.dataIndex));
             }}
           />
