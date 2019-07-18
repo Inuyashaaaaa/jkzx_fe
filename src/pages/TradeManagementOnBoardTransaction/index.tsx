@@ -438,7 +438,7 @@ const TradeManagementOnBoardTansaction = props => {
                   placeholder: '请输入内容搜索',
                   options: async value => {
                     const { data, error } = await excListAllInstrumentsInTradeRecords({
-                      instrumentIdPart: value,
+                      criteria: value,
                     });
                     if (error) return [];
                     return data.map(item => ({
