@@ -38,12 +38,6 @@ export const Rebate: ILegColDef = {
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
     const getUnit = () => {
-      if (record[LEG_TYPE_FIELD] === LEG_TYPE_MAP.DIGITAL_AMERICAN) {
-        if (_.get(record, [LEG_FIELD.REBATE_TYPE, 'value']) === REBATETYPE_UNIT_OPTIONS_MAP.CNY) {
-          return '¥';
-        }
-        return '%';
-      }
       if (_.get(record, [LEG_FIELD.REBATE_UNIT, 'value']) === REBATETYPE_UNIT_OPTIONS_MAP.CNY) {
         return '¥';
       }

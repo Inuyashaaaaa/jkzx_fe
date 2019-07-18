@@ -31,9 +31,6 @@ export const RebateType: ILegColDef = {
     );
     // const { isPricing, isBooking } = getLegEnvs(record);
     const getSelectOptions = () => {
-      if (record.$legType === LEG_TYPE_MAP.DIGITAL_AMERICAN) {
-        return UNIT_ENUM_OPTIONS2;
-      }
       if (
         Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DOUBLE_SHARK_FIN ||
         Form2.getFieldValue(record[LEG_TYPE_FIELD]) === LEG_TYPE_MAP.DIGITAL_AMERICAN
