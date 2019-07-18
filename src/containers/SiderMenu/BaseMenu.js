@@ -24,11 +24,6 @@ const getIcon = icon => {
 };
 
 export default class BaseMenu extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.getSelectedMenuKeys = memoizeOne(this.getSelectedMenuKeys, isEqual);
-  }
-
   /**
    * 获得菜单子节点
    * @memberof SiderMenu

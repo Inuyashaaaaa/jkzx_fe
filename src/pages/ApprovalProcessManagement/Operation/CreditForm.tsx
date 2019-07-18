@@ -126,7 +126,6 @@ class ApprovalForm extends PureComponent<any, any> {
       currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
       isCompleted,
     });
-    console.log(params);
     this.setState({
       data,
       loading: false,
