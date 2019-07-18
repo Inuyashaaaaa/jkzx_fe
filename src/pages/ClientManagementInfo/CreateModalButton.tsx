@@ -873,7 +873,7 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '姓名为必填项',
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -889,7 +889,7 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '身份证号为必填项',
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -905,7 +905,7 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '证件有效期为必填项',
                             },
                           ],
                         })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
@@ -921,7 +921,7 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '联系电话为必填项',
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -1479,7 +1479,7 @@ const CreateModalButton = memo<any>(props => {
                 const ref = currenStep === 3 ? tableEl : formRef;
                 const res = await ref.current.validate();
                 if (_.isArray(res)) {
-                  if (res.some(value => value.error)) return;
+                  if (_.some(res, value => value.errors)) return;
                 } else if (res.error) {
                   return;
                 }
