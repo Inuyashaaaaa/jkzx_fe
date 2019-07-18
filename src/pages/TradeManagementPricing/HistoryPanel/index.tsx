@@ -578,7 +578,6 @@ const TradeManagementPricingManagement = props => {
                             }),
                           };
                         });
-                        console.log(next);
                         setTableData(next);
                         setCurPricingEnv(pricingEnvironmentId);
                         setVisible(false);

@@ -1430,10 +1430,8 @@ const CreateModalButton = memo<any>(props => {
                         attachFormData[item].value,
                         '[0].response.result.uuid',
                       );
-                      console.log(baseData[item], attachFormData[item].value);
                     }
                   });
-                  console.log(baseData);
 
                   const tradeAuthorizer = traderList.map(item => ({
                     tradeAuthorizerName: item.姓名.value,

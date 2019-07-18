@@ -1,7 +1,4 @@
-import ImportExcelButton from '@/containers/_ImportExcelButton';
-import Page from '@/containers/Page';
-import { trdTradeSearchIndexPaged } from '@/services/general-service';
-import { mdlModelDataGet, mdlModelXYCreate } from '@/services/model';
+/* eslint-disable */
 import {
   Button,
   Input,
@@ -20,13 +17,17 @@ import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import XLSX from 'xlsx';
+import { mdlModelDataGet, mdlModelXYCreate } from '@/services/model';
+import { trdTradeSearchIndexPaged } from '@/services/general-service';
+import Page from '@/containers/Page';
+import ImportExcelButton from '@/containers/_ImportExcelButton';
 import styles from './customModel.less';
 import { SmartTable } from '@/containers';
 import { PAGE_SIZE } from '@/constants/component';
 
-const Search = Input.Search;
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
+const { Search } = Input;
+const { TabPane } = Tabs;
+const { Option } = Select;
 
 const tabPaneData = [
   {
@@ -164,8 +165,8 @@ const CustomModel = memo(() => {
     // 创建自定义模型
     let dataJSON = [];
     // debugger
-    dataJSON = uploadData.data.map((col, index) => {
-      return _.keys(col).map(param => {
+    dataJSON = uploadData.data.map((col, index) =>
+      _.keys(col).map(param => {
         let zipData = _.zip(...col[param]);
         zipData = zipData.map(z => {
           z = z.slice(1);
@@ -185,8 +186,8 @@ const CustomModel = memo(() => {
           };
         });
         return _data;
-      });
-    });
+      }),
+    );
     dataJSON = _.flatten(_.flatten(dataJSON));
     dataJSON = merge(dataJSON);
     setTableLoading(true);
@@ -209,9 +210,9 @@ const CustomModel = memo(() => {
         key.push(String(i));
         return { title: column, dataIndex: String(i) };
       });
-      item.dataSource = uploadData.data[index][item.key].slice(1).map((ds, i) => {
-        return { ..._.zipObject(key, ds), key: String(i) };
-      });
+      item.dataSource = uploadData.data[index][item.key]
+        .slice(1)
+        .map((ds, i) => ({ ..._.zipObject(key, ds), key: String(i) }));
       _columns = item.columns;
       return item;
     });
@@ -260,14 +261,10 @@ const CustomModel = memo(() => {
         const _index = Object.keys(item).indexOf(tab.key);
         const d = item[Object.keys(item)[_index]];
         if (_index >= 0) {
-          dataSource.push(
-            d.map((ditem, dindex) => {
-              return { key: dindex, [String(i + 1)]: ditem };
-            })
-          );
+          dataSource.push(d.map((ditem, dindex) => ({ key: dindex, [String(i + 1)]: ditem })));
         }
       });
-      dataSource.unshift(_spots.map((s, i) => ({ '0': s, key: i })));
+      dataSource.unshift(_spots.map((s, i) => ({ 0: s, key: i })));
       tab.columns = columns;
       tab.dataSource = mergeDataSource(_.flatten(dataSource));
       return tab;
@@ -333,14 +330,10 @@ const CustomModel = memo(() => {
         const _index = Object.keys(item).indexOf(tab.key);
         const d = item[Object.keys(item)[_index]];
         if (_index >= 0) {
-          dataSource.push(
-            d.map((ditem, dindex) => {
-              return { key: dindex, [String(i + 1)]: ditem };
-            })
-          );
+          dataSource.push(d.map((ditem, dindex) => ({ key: dindex, [String(i + 1)]: ditem })));
         }
       });
-      dataSource.unshift(_spots.map((s, i) => ({ '0': s, key: i })));
+      dataSource.unshift(_spots.map((s, i) => ({ 0: s, key: i })));
       tab.columns = columns;
       tab.dataSource = mergeDataSource(_.flatten(dataSource));
       return tab;
@@ -391,9 +384,7 @@ const CustomModel = memo(() => {
       return;
     }
     const _data = cols.map(tab => {
-      const tindex = _.findIndex(tabPane, t => {
-        return t.key === tab;
-      });
+      const tindex = _.findIndex(tabPane, t => t.key === tab);
       const _tab = tabPane[tindex];
       let tabData = [];
       tabData.push(_tab.columns.map(column => column.title));
@@ -425,46 +416,42 @@ const CustomModel = memo(() => {
               itemLayout="vertical"
               size="large"
               pagination={{
-                onChange: page => {
-                  console.log(page);
-                },
+                onChange: page => {},
                 pageSize: PAGE_SIZE,
                 size: 'small',
               }}
               dataSource={tradeList}
               footer={null}
               className={styles.searchList}
-              renderItem={item => {
-                return (
-                  <List.Item
-                    key={item.id}
-                    className={
-                      currentTrade &&
-                      currentTrade.positions &&
-                      currentTrade.positions.positionId === item.positions.positionId
-                        ? styles.checked
-                        : styles.liItme
-                    }
+              renderItem={item => (
+                <List.Item
+                  key={item.id}
+                  className={
+                    currentTrade &&
+                    currentTrade.positions &&
+                    currentTrade.positions.positionId === item.positions.positionId
+                      ? styles.checked
+                      : styles.liItme
+                  }
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      paddingLeft: '20px',
+                    }}
+                    onClick={e => handleSelect(e, item)}
                   >
-                    <div
-                      style={{
-                        width: '100%',
-                        paddingLeft: '20px',
-                      }}
-                      onClick={e => handleSelect(e, item)}
-                    >
-                      <span className={styles.itemName}>
-                        {item.tradeId}
-                        <br />
-                        标的物 {item.positions.asset.underlyerInstrumentId}
-                        <br />
-                        到期日 {item.positions.asset.expirationDate}
-                        <br />
-                      </span>
-                    </div>
-                  </List.Item>
-                );
-              }}
+                    <span className={styles.itemName}>
+                      {item.tradeId}
+                      <br />
+                      标的物 {item.positions.asset.underlyerInstrumentId}
+                      <br />
+                      到期日 {item.positions.asset.expirationDate}
+                      <br />
+                    </span>
+                  </div>
+                </List.Item>
+              )}
             />
           </Spin>
         </div>
@@ -505,7 +492,7 @@ const CustomModel = memo(() => {
                     <TabPane tab={item.tab} key={index}>
                       <SmartTable
                         pagination={false}
-                        rowKey={'key'}
+                        rowKey="key"
                         dataSource={tabledataSource}
                         loading={tableLoading}
                         columns={tablecolumns}

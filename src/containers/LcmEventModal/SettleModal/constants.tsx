@@ -110,19 +110,16 @@ export const CASHFLOW_SETTLE_FORM_CONTROLS = [
   {
     title: '支付方向',
     dataIndex: 'paymentDirection',
-    render: (val, record, index, { form, editing }) => {
-      console.log(val);
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <Select
-              editing={false}
-              options={[{ label: '收入', value: 'RECEIVE' }, { label: '支出', value: 'PAY' }]}
-            />,
-          )}
-        </FormItem>
-      );
-    },
+    render: (val, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <Select
+            editing={false}
+            options={[{ label: '收入', value: 'RECEIVE' }, { label: '支出', value: 'PAY' }]}
+          />,
+        )}
+      </FormItem>
+    ),
   },
 ];
 

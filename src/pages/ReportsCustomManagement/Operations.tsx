@@ -36,7 +36,6 @@ const Operations = memo<any>(props => {
     });
     XLSX.writeFile(wb, `${record.reportName}.xlsx`);
   };
-  console.log(record.reportData);
   return (
     <>
       {/* {

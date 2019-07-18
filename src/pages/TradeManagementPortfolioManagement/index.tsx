@@ -84,7 +84,6 @@ class TradeManagementPortfolioManagement extends PureComponent<any, any> {
       if (!this.$createForm) return;
 
       const result = await this.$createForm.validate();
-      console.log(result);
       if (result.error) return;
 
       const { error } = await trdPortfolioCreate(Form2.getFieldsValue(this.state.createFormData));

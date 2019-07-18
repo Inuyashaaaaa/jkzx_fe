@@ -327,7 +327,6 @@ class ClientManagementSalesManagement extends PureComponent {
     });
 
   public onSelect = async selectedKeys => {
-    console.log(selectedKeys);
     if (!selectedKeys.length) return;
     const arr = selectedKeys[0].split('/');
     this.setState({
@@ -402,7 +401,6 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleConfirmBranch = async () => {
     const { error } = await this.$branchModalForm.validate();
     if (error) return;
-    console.log(this.state.branchFormData);
     const branchEdit = this.state.editBranch ? refBranchUpdate : refBranchCreate;
     const params = this.state.editBranch
       ? {
