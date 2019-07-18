@@ -62,7 +62,7 @@ const AmendModal = props => {
       paymentDate: moment(),
     }),
   });
-  const [createCash, setCreateCash] = useState(false);
+  const [createCash, setCreateCash] = useState(true);
   const [cashModalVisible, setCashModalVisible] = useState(false);
   const [tradeData, setTradeData] = useState({});
   const [positionId, setPositionId] = useState(null);
@@ -215,10 +215,10 @@ const AmendModal = props => {
         width={700}
         onCancel={() => setVisible(false)}
         onOk={async () => {
-          if (createCash) {
-            const res = await $form.current.validate();
-            if (res.error) return;
-          }
+          // if (createCash) {
+          //   const res = await $form.current.validate();
+          //   if (res.error) return;
+          // }
           const rsps = await tableEl.current.table.validate();
           if (rsps.some(item => item.errors)) {
             return;
@@ -338,7 +338,7 @@ const AmendModal = props => {
             }))
           }
         />
-        <Checkbox checked={createCash} onChange={handleChange} style={{ margin: '20px 0' }}>
+        {/* <Checkbox checked={createCash} onChange={handleChange} style={{ margin: '20px 0' }}>
           产生现金流
         </Checkbox>
         <Form2
@@ -384,12 +384,12 @@ const AmendModal = props => {
               ),
             },
           ]}
-        />
+        /> 
         <Alert
           message="现金流金额为正时代表我方收入，金额为负时代表我方支出。"
           type="info"
           showIcon
-        />
+        />*/}
       </Modal>
     </>
   );
