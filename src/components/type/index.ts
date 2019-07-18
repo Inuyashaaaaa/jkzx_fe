@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ButtonProps } from 'antd/lib/button';
 import { FormItemProps } from 'antd/lib/form';
 import {
@@ -184,6 +185,7 @@ export interface ITableTriggerCellEditingChangedParams<T = any> {
   rowIndex: number;
   dataIndex: string;
   rowId?: string;
+  api?: ITableApi;
 }
 
 export interface ITableTriggerCellValueChangeParams<T = any> {
@@ -193,6 +195,7 @@ export interface ITableTriggerCellValueChangeParams<T = any> {
   changedValues?: any;
   allValues?: any;
   rowId?: string;
+  api?: ITableApi;
 }
 
 export interface ITableTriggerCellFieldsChangeParams<T = any> {
@@ -202,6 +205,7 @@ export interface ITableTriggerCellFieldsChangeParams<T = any> {
   rowId?: string;
   changedFields?: any;
   allFields?: any;
+  api?: ITableApi;
 }
 
 export interface IFormTriggerCellValueChangeParams<T = any> {

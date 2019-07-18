@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -175,9 +176,9 @@ class Table2 extends PureComponent<ITableProps> {
       render: undefined,
       onCell: (record, rowIndex): ITableCellProps => {
         const getRowKey = () =>
-          (typeof this.props.rowKey === 'string'
+          typeof this.props.rowKey === 'string'
             ? this.props.rowKey
-            : this.props.rowKey(record, rowIndex));
+            : this.props.rowKey(record, rowIndex);
         const rowId = record[getRowKey()];
         return {
           ...(colDef.onCell ? colDef.onCell(record, rowIndex, { colDef }) : undefined),
@@ -201,9 +202,9 @@ class Table2 extends PureComponent<ITableProps> {
 
   public getOnRow = () => (record, rowIndex): ITableRowProps => {
     const getRowKey = () =>
-      (typeof this.props.rowKey === 'string'
+      typeof this.props.rowKey === 'string'
         ? this.props.rowKey
-        : this.props.rowKey(record, rowIndex));
+        : this.props.rowKey(record, rowIndex);
     const rowKey = getRowKey();
     const rowId = record[rowKey];
     return {
@@ -221,13 +222,31 @@ class Table2 extends PureComponent<ITableProps> {
 
   public handleTableEvent = (params, eventName) => {
     if (eventName === TABLE_CELL_EDITING_CHANGED) {
-      return this.props.onCellEditingChanged && this.props.onCellEditingChanged(params);
+      return (
+        this.props.onCellEditingChanged &&
+        this.props.onCellEditingChanged({
+          ...params,
+          api: this.api,
+        })
+      );
     }
     if (eventName === TABLE_CELL_VALUES_CHANGE) {
-      return this.props.onCellValuesChange && this.props.onCellValuesChange(params);
+      return (
+        this.props.onCellValuesChange &&
+        this.props.onCellValuesChange({
+          ...params,
+          api: this.api,
+        })
+      );
     }
     if (eventName === TABLE_CELL_FIELDS_CHANGE) {
-      return this.props.onCellFieldsChange && this.props.onCellFieldsChange(params);
+      return (
+        this.props.onCellFieldsChange &&
+        this.props.onCellFieldsChange({
+          ...params,
+          api: this.api,
+        })
+      );
     }
     if (eventName === TABLE_CELL_CLICK) {
       return this.onTableCellClick(params);

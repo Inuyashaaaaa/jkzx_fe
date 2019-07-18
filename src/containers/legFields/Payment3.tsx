@@ -1,11 +1,11 @@
+import { ValidationRule } from 'antd/lib/form';
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
 import { LEG_FIELD, OPTION_TYPE_MAP, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { ValidationRule } from 'antd/lib/form';
-import FormItem from 'antd/lib/form/FormItem';
-import React from 'react';
 
 export const Payment3: ILegColDef = {
   title: '行权收益3',
@@ -17,9 +17,7 @@ export const Payment3: ILegColDef = {
     }
     return true;
   },
-  defaultEditing: record => {
-    return false;
-  },
+  defaultEditing: record => false,
   render: (val, record, index, { form, editing, colDef }) => {
     const getUnit = () => {
       if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
@@ -28,49 +26,57 @@ export const Payment3: ILegColDef = {
       return '%';
     };
 
-    const getRules = () => {
-      return Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL
+    const getRules = () =>
+      (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL
         ? ([
             {
-              message: '必须满足条件(行权收益1<行权收益2<行权收益3)',
+              message: '必须满足条件(行权收益2 < 行权收益3)',
               validator(rule, value, callback) {
-                if (
-                  !(
-                    Form2.getFieldValue(record[LEG_FIELD.PAYMENT1]) <
-                      Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]) &&
-                    Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]) < value
-                  )
-                ) {
-                  return callback(true);
+                const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
+                if (optionType == null) {
+                  callback();
+                  return;
+                }
+                const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
+                const payment3Val = value;
+                if (payment3Val != null && payment2Val != null) {
+                  if (!(payment2Val < payment3Val)) {
+                    callback(true);
+                  }
                 }
                 callback();
               },
             },
-          ] as ValidationRule[]).concat(RULES_REQUIRED)
+          ] as ValidationRule[])
         : ([
             {
-              message: '必须满足条件(行权收益1>行权收益2>行权收益3)',
+              message: '必须满足条件(行权收益2 > 行权收益3)',
               validator(rule, value, callback) {
-                if (
-                  !(
-                    Form2.getFieldValue(record[LEG_FIELD.PAYMENT1]) >
-                      Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]) &&
-                    Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]) > value
-                  )
-                ) {
-                  return callback(true);
+                const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
+                if (optionType == null) {
+                  callback();
+                  return;
+                }
+                const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
+                const payment3Val = value;
+                if (payment3Val != null && payment2Val != null) {
+                  if (!(payment2Val > payment3Val)) {
+                    callback(true);
+                  }
                 }
                 callback();
               },
             },
-          ] as ValidationRule[]).concat(RULES_REQUIRED);
-    };
+          ] as ValidationRule[])
+      ).concat(RULES_REQUIRED);
 
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: getRules(),
-        })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
+        })(<UnitInputNumber autoSelect editing={editing} unit={getUnit()} />)}
       </FormItem>
     );
   },
