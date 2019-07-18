@@ -175,7 +175,7 @@ class History extends PureComponent {
                           similarTradeId: value,
                         });
                         if (error) return [];
-                        return data.map(item => ({
+                        return data.slice(0, 100).map(item => ({
                           label: item,
                           value: item,
                         }));

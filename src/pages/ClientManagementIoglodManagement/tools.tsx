@@ -90,7 +90,7 @@ export const PROCESSED_FORM_CONTROLS: (tabKey) => IFormControl[] = tabKey => {
             similarTradeId: value,
           });
           if (error) return [];
-          return data.map(item => ({
+          return data.slice(0, 100).map(item => ({
             label: item,
             value: item,
           }));
