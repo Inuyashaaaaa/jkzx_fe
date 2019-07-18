@@ -32,6 +32,13 @@ export const Payment1: ILegColDef = {
             {
               message: '必须满足条件(行权收益1 < 行权收益2)',
               validator(rule, value, callback) {
+                const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
+                if (optionType == null) {
+                  callback();
+                  return;
+                }
+
                 const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
                 const payment1Val = value;
                 if (payment2Val != null && payment1Val != null) {

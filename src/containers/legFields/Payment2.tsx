@@ -32,6 +32,11 @@ export const Payment2: ILegColDef = {
           {
             message: '必须满足条件(行权收益1 < 行权收益2)',
             validator(rule, value, callback) {
+              const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+              if (optionType == null) {
+                callback();
+                return;
+              }
               const payment1Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT1]);
               const payment2Val = value;
               if (payment2Val != null && payment1Val != null) {
@@ -45,6 +50,11 @@ export const Payment2: ILegColDef = {
           {
             message: '必须满足条件(行权收益2 < 行权收益3)',
             validator(rule, value, callback) {
+              const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+              if (optionType == null) {
+                callback();
+                return;
+              }
               const payment3Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT3]);
               const payment2Val = value;
               if (payment2Val != null && payment3Val != null) {
@@ -61,6 +71,11 @@ export const Payment2: ILegColDef = {
         {
           message: '必须满足条件(行权收益1 > 行权收益2)',
           validator(rule, value, callback) {
+            const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+            if (optionType == null) {
+              callback();
+              return;
+            }
             const payment1Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT1]);
             const payment2Val = value;
             if (payment2Val != null && payment1Val != null) {
@@ -74,6 +89,11 @@ export const Payment2: ILegColDef = {
         {
           message: '必须满足条件(行权收益2 > 行权收益3)',
           validator(rule, value, callback) {
+            const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+            if (optionType == null) {
+              callback();
+              return;
+            }
             const payment3Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT3]);
             const payment2Val = value;
             if (payment2Val != null && payment3Val != null) {

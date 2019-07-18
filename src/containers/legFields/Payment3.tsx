@@ -27,11 +27,17 @@ export const Payment3: ILegColDef = {
     };
 
     const getRules = () =>
-      Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL
+      (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL
         ? ([
             {
               message: '必须满足条件(行权收益2 < 行权收益3)',
               validator(rule, value, callback) {
+                const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
+                if (optionType == null) {
+                  callback();
+                  return;
+                }
                 const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
                 const payment3Val = value;
                 if (payment3Val != null && payment2Val != null) {
@@ -42,11 +48,17 @@ export const Payment3: ILegColDef = {
                 callback();
               },
             },
-          ] as ValidationRule[]).concat(RULES_REQUIRED)
+          ] as ValidationRule[])
         : ([
             {
               message: '必须满足条件(行权收益2 > 行权收益3)',
               validator(rule, value, callback) {
+                const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
+                if (optionType == null) {
+                  callback();
+                  return;
+                }
                 const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
                 const payment3Val = value;
                 if (payment3Val != null && payment2Val != null) {
@@ -57,7 +69,8 @@ export const Payment3: ILegColDef = {
                 callback();
               },
             },
-          ] as ValidationRule[]).concat(RULES_REQUIRED);
+          ] as ValidationRule[])
+      ).concat(RULES_REQUIRED);
 
     return (
       <FormItem>

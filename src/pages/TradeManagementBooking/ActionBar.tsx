@@ -133,7 +133,7 @@ const ActionBar = memo<any>(props => {
               return;
             }
 
-            const rsps = await tableEl.current.table.validate();
+            const rsps = await tableEl.current.table.validate({ force: true });
             if (rsps.some(item => item.errors)) {
               return;
             }
