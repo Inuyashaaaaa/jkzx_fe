@@ -133,8 +133,12 @@ class UnwindModal extends PureComponent<
       .minus(values[UNWIND_NUM])
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
       .toNumber(),
-    [UNWIND_TOTAL]: new BigNumber(values[UNWIND_PER])
-      .multipliedBy(values[UNWIND_NUM])
+    // [UNWIND_TOTAL]: new BigNumber(values[UNWIND_PER])
+    //   .multipliedBy(values[UNWIND_NUM])
+    //   .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
+    //   .toNumber(),
+    [UNWIND_PER]: new BigNumber(values[UNWIND_TOTAL])
+      .div(values[UNWIND_NUM])
       .decimalPlaces(BIG_NUMBER_CONFIG.DECIMAL_PLACES)
       .toNumber(),
     ...changed,
@@ -531,9 +535,14 @@ class UnwindModal extends PureComponent<
                   control: {
                     label: '平仓金额',
                   },
-                  input: {
-                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                    disabled: true,
+                  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                  decorator: {
+                    rules: [
+                      {
+                        message: '平仓金额为必填项',
+                        required: true,
+                      },
+                    ],
                   },
                 },
                 {
@@ -541,25 +550,45 @@ class UnwindModal extends PureComponent<
                   control: {
                     label: '平仓单价（每手）',
                   },
-                  input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
-                  decorator: {
-                    rules: [
-                      {
-                        message: '数值必须大于0',
-                        validator: (rule, value, callback) => {
-                          if (value < 0) {
-                            return callback(true);
-                          }
-                          callback();
-                        },
-                      },
-                      {
-                        message: '平仓单价（每手）为必填项',
-                        required: true,
-                      },
-                    ],
+                  input: {
+                    ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                    disabled: true,
                   },
                 },
+                // {
+                //   field: UNWIND_TOTAL,
+                //   control: {
+                //     label: '平仓金额',
+                //   },
+                //   input: {
+                //     ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                //     disabled: false,
+                //   },
+                // },
+                // {
+                //   field: UNWIND_PER,
+                //   control: {
+                //     label: '平仓单价（每手）',
+                //   },
+                //   input: INPUT_NUMBER_CURRENCY_CNY_CONFIG,
+                //   decorator: {
+                //     rules: [
+                //       {
+                //         message: '数值必须大于0',
+                //         validator: (rule, value, callback) => {
+                //           if (value < 0) {
+                //             return callback(true);
+                //           }
+                //           callback();
+                //         },
+                //       },
+                //       {
+                //         message: '平仓单价（每手）为必填项',
+                //         required: true,
+                //       },
+                //     ],
+                //   },
+                // },
               ]}
             />
           )}
