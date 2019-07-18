@@ -275,7 +275,7 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
   },
   getPageData: (env: string, position: any) => {
     const data = position.asset.fixingObservations || [];
-    const data2 = position.asset.knockInObservationDates || [];
+    const data2 = position.asset.knockInObservationDates;
     const fields = Form2.createFields({
       [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: Object.keys(data).map(key => ({
         [OB_DAY_FIELD]: key,
