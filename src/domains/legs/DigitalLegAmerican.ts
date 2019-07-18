@@ -58,14 +58,13 @@ import { Term } from '../../containers/legFields/Term';
 import { UnderlyerInstrumentId } from '../../containers/legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../../containers/legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../common';
-import { PaymentType } from '../../containers/legFields/PaymentType';
-import { Payment } from '../../containers/legFields/Payment';
 import { Rebate } from '../../containers/legFields/Rebate';
 import { RebateType } from '../../containers/legFields/RebateType';
 import { ObservationType } from '../../containers/legFields/ObservationType';
 import { Unit } from '../../containers/legFields/Unit';
 import { legPipeLine } from '../_utils';
 import { TradeNumber } from '../../containers/legFields/TradeNumber';
+import { RebateUnit } from '../../containers/legFields/RebateUnit';
 
 export const DigitalLegAmerican: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DIGITAL_AMERICAN],
@@ -86,9 +85,9 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         Strike,
         Term,
         ExpirationDate,
-        // Payment,
-        Rebate,
         RebateType,
+        RebateUnit,
+        Rebate,
         ParticipationRate,
         NotionalAmount,
         ObservationType,
@@ -114,17 +113,16 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         ParticipationRate,
         NotionalAmountType,
         NotionalAmount,
-        PaymentType,
-        Payment,
         PremiumType,
         Premium,
         FrontPremium,
         MinimumPremium,
         ExpirationDate,
-        // ExpirationTime,
         EffectiveDate,
         ObservationType,
         RebateType,
+        RebateUnit,
+        Rebate,
         Unit,
         TradeNumber,
         ...TOTAL_EDITING_FIELDS,
@@ -147,8 +145,6 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         ParticipationRate,
         NotionalAmountType,
         NotionalAmount,
-        // PaymentType,
-        // Payment,
         PremiumType,
         Premium,
         FrontPremium,
@@ -156,8 +152,9 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         ExpirationDate,
         EffectiveDate,
         ObservationType,
-        Rebate,
         RebateType,
+        RebateUnit,
+        Rebate,
         Unit,
         TradeNumber,
       ];
@@ -181,13 +178,6 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
       [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
       [LEG_FIELD.MINIMUM_PREMIUM]: 0,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(env === LEG_ENV.PRICING
-        ? {
-            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : null),
       [LEG_FIELD.REBATE_TYPE]:
         env === LEG_ENV.PRICING || env === LEG_ENV.BOOKING ? '' : REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.CONTINUOUS,
@@ -234,21 +224,9 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
     nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
-    if (env === LEG_ENV.PRICING || env === LEG_ENV.BOOKING) {
-      nextPosition.asset.rebateUnit = nextPosition.asset.rebateType;
-      return {
-        ...nextPosition,
-        asset: _.omit(nextPosition.asset, ['paymentType', 'payment', 'rebateType']),
-      };
-    }
     return nextPosition;
   },
-  getPageData: (env: string, position: any) =>
-    Form2.createFields({
-      [LEG_FIELD.REBATE_TYPE]: position.asset.rebateUnit,
-      [LEG_FIELD.REBATE_UNIT]: null,
-    }),
-
+  getPageData: (env: string, position: any) => {},
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,
