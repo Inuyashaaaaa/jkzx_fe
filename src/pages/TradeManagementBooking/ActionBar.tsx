@@ -61,14 +61,14 @@ const ActionBar = memo<any>(props => {
     });
 
     if (_error) return true;
-    if (_data.processInstanceId) {
-      message.success('已进入流程');
-    } else {
+    if (!_data.processInstanceId) {
       setTableData([]);
 
       setCashModalVisible(true);
       message.success('簿记成功');
+      return true;
     }
+    message.success('已进入流程');
     setCreateModalVisible(false);
 
     // 发起审批成功关联附件
@@ -79,7 +79,7 @@ const ActionBar = memo<any>(props => {
       });
       if (aerror) return true;
     }
-    return true;
+    return false;
   };
 
   const transactionHandleOk = async () => {
