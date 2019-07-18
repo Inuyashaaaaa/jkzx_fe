@@ -437,10 +437,7 @@ const TradeManagementPricingManagement = props => {
                 align: 'right',
                 render: (val, record) => {
                   if (val == null) return null;
-                  if (
-                    _.get(record, `quotePositions[0].asset.${LEG_FIELD.STRIKE_TYPE}`) ===
-                    STRIKE_TYPES_MAP.CNY
-                  ) {
+                  if (_.get(record, `asset.${LEG_FIELD.STRIKE_TYPE}`) === STRIKE_TYPES_MAP.CNY) {
                     return formatMoney(val, {
                       unit: '￥',
                     });
