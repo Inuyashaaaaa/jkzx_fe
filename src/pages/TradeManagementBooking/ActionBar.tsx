@@ -61,14 +61,16 @@ const ActionBar = memo<any>(props => {
     });
 
     if (_error) return true;
-    if (!_data.processInstanceId) {
+    if (_data.processInstanceId) {
+      message.success('已进入流程');
+    } else {
       setTableData([]);
 
       setCashModalVisible(true);
       message.success('簿记成功');
+      setCreateModalVisible(false);
       return true;
     }
-    message.success('已进入流程');
     setCreateModalVisible(false);
 
     // 发起审批成功关联附件
