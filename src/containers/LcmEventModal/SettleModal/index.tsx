@@ -19,9 +19,11 @@ import {
   SETTLE_FORM_CONTROLS,
   UNDERLYER_PRICE,
   CASHFLOW_SETTLE_FORM_CONTROLS,
+  SETTLE_FORM_CONTROLS_RANGE_ACCRUALS,
 } from './constants';
 import { Form2 } from '@/containers';
 import { getMoment } from '@/tools';
+import _ from 'lodash';
 
 class ExerciseModal extends PureComponent<
   {
@@ -40,33 +42,46 @@ class ExerciseModal extends PureComponent<
     cashFlowDataSource: {},
   };
 
+  // public componentDidMount = () => {
+  //   if (_.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+  //     this.handleSettleAmount();
+  //   }
+  // }
+
   public show = (data = {}, tableFormData, currentUser, reload) => {
     this.data = data;
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-    this.setState({
-      visible: true,
-      productType: this.data[LEG_TYPE_FIELD],
-      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
-      cashFlowDataSource:
-        this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.CASH_FLOW
-          ? Form2.createFields({
-              ...this.data,
-            })
-          : {},
-      ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        ? {
-            dataSource: this.computeLotDataSource({
-              [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+    this.setState(
+      {
+        visible: true,
+        productType: this.data[LEG_TYPE_FIELD],
+        notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
+        cashFlowDataSource:
+          this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.CASH_FLOW
+            ? Form2.createFields({
+                ...this.data,
+              })
+            : {},
+        ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+          ? {
+              dataSource: this.computeLotDataSource({
+                [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+              }),
+            }
+          : {
+              dataSource: this.computeCnyDataSource({
+                [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+              }),
             }),
-          }
-        : {
-            dataSource: this.computeCnyDataSource({
-              [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-            }),
-          }),
-    });
+      },
+      () => {
+        if (_.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+          this.handleSettleAmount();
+        }
+      },
+    );
   };
 
   public computeCnyDataSource = value => {
@@ -186,6 +201,24 @@ class ExerciseModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const { dataSource } = this.state;
+    if (_.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+      const { error, data } = await tradeExercisePreSettle({
+        positionId: this.data.id,
+        eventDetail: {
+          numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+          notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+        },
+        eventType: LCM_EVENT_TYPE_MAP.SETTLE,
+      });
+      if (error) return;
+      this.setState({
+        dataSource: {
+          ...dataSource,
+          [SETTLE_AMOUNT]: data,
+        },
+      });
+      return;
+    }
     if (!dataSource[UNDERLYER_PRICE]) {
       if (!(dataSource[UNDERLYER_PRICE] === 0)) {
         message.error('请填标的物价格');
@@ -257,11 +290,19 @@ class ExerciseModal extends PureComponent<
               onValueChange={this.onValueChange}
               controlNumberOneRow={1}
               footer={false}
-              controls={SETTLE_FORM_CONTROLS(
-                this.state.notionalType,
-                this.state.productType,
-                this.handleSettleAmount,
-              )}
+              controls={
+                _.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS
+                  ? SETTLE_FORM_CONTROLS_RANGE_ACCRUALS(
+                      this.state.notionalType,
+                      this.state.productType,
+                      this.handleSettleAmount,
+                    )
+                  : SETTLE_FORM_CONTROLS(
+                      this.state.notionalType,
+                      this.state.productType,
+                      this.handleSettleAmount,
+                    )
+              }
             />
           )}
 
