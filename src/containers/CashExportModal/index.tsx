@@ -87,16 +87,12 @@ const CashExportModal = memo<{
     }
   }, [props.visible]);
 
-  useEffect(() => {
-    searchData();
-  }, [props.trade]);
-
   return (
     <>
       <Modal
         visible={props.visible}
         title="现金流管理"
-        width={900}
+        width={1100}
         style={{ height: '500px' }}
         onCancel={() => {
           props.convertVisible();
