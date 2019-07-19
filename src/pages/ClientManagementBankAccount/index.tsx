@@ -47,9 +47,9 @@ class ClientManagementBankAccount extends PureComponent {
       formData || searchForm,
     );
     const { error, data } = await refBankAccountSearch({
-      bankAccount: (bankAccount || '').split('_')[0],
-      legalName: (legalName || '').split('_')[0],
-      bankAccountName: (bankAccountName || '').split('_')[0],
+      bankAccount,
+      legalName,
+      bankAccountName,
     });
     this.setState({
       loading: false,
@@ -91,26 +91,27 @@ class ClientManagementBankAccount extends PureComponent {
     }
     const BankAccountSearch = {};
     if (_.get(Form2.getFieldsValue(allFields), 'legalName')) {
-      // [BankAccountSearch.legalName] = _.get(Form2.getFieldsValue(allFields), 'legalName').split(
-      //   '_',
-      // );
       BankAccountSearch.legalName = _.get(Form2.getFieldsValue(allFields), 'legalName');
     }
     const { searchFormData } = this.state;
     const { error: _error, data: _data } = await refBankAccountSearch(BankAccountSearch);
     if (_error) return false;
 
-    const markets = _data.map(item => ({
-      label: item.bankAccount,
-      value: item.bankAccount,
-      // value: `${item.bankAccount}_${uuidv4()}`,
-    }));
+    const markets = _.uniqBy(
+      _data.slice(0, 50).map(item => ({
+        label: item.bankAccount,
+        value: item.bankAccount,
+      })),
+      'value',
+    );
 
-    const bankAccountNames = _data.map(item => ({
-      label: item.bankAccountName,
-      value: item.bankAccountName,
-      // value: `${item.bankAccountName}_${uuidv4()}`,
-    }));
+    const bankAccountNames = _.uniqBy(
+      _data.slice(0, 50).map(item => ({
+        label: item.bankAccountName,
+        value: item.bankAccountName,
+      })),
+      'value',
+    );
 
     if (changedFields.legalName) {
       return this.setState({
@@ -204,7 +205,6 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      // filterOption
                       ref={node => {
                         this.$select.legalName = node;
                       }}
@@ -221,7 +221,6 @@ class ClientManagementBankAccount extends PureComponent {
                         return data.map(item => ({
                           label: item,
                           value: item,
-                          // value: `${item}_${uuidv4()}`,
                         }));
                       }}
                     />,
@@ -241,9 +240,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption={(val, option) =>
-                        _.get(option, 'props.children').indexOf(val) >= 0
-                      }
+                      filterOption={(val, option) => {
+                        return _.get(option, 'props.children').indexOf(val) >= 0;
+                      }}
                       ref={node => {
                         this.$select.bankAccount = node;
                       }}
@@ -261,11 +260,13 @@ class ClientManagementBankAccount extends PureComponent {
                                 similarBankAccount: values,
                               });
                               if (error) return [];
-                              return data.map(item => ({
-                                label: item,
-                                value: item,
-                                // value: `${item}_${uuidv4()}`,
-                              }));
+                              return _.uniqBy(
+                                data.slice(0, 50).map(item => ({
+                                  label: item,
+                                  value: item,
+                                })),
+                                'value',
+                              );
                             }
                       }
                     />,
@@ -285,9 +286,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption={(val, option) =>
-                        _.get(option, 'props.children').indexOf(val) >= 0
-                      }
+                      filterOption={(val, option) => {
+                        return _.get(option, 'props.children').indexOf(val) >= 0;
+                      }}
                       ref={node => {
                         this.$select.bankAccountName = node;
                       }}
@@ -306,11 +307,13 @@ class ClientManagementBankAccount extends PureComponent {
                                 similarAccountName: values,
                               });
                               if (error) return [];
-                              return data.map(item => ({
-                                label: item,
-                                value: item,
-                                // value: `${item}_${uuidv4()}`,
-                              }));
+                              return _.uniqBy(
+                                data.slice(0, 50).map(item => ({
+                                  label: item,
+                                  value: item,
+                                })),
+                                'value',
+                              );
                             }
                       }
                     />,
