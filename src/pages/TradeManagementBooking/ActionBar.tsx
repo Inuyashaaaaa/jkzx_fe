@@ -63,25 +63,25 @@ const ActionBar = memo<any>(props => {
     if (_error) return true;
     if (_data.processInstanceId) {
       message.success('已进入流程');
-    } else {
-      setTableData([]);
-
-      setCashModalVisible(true);
-      message.success('簿记成功');
       setCreateModalVisible(false);
-      return true;
-    }
-    setCreateModalVisible(false);
 
-    // 发起审批成功关联附件
-    if (attachmentId) {
-      const { error: aerror, data: adata } = await wkAttachmentProcessInstanceModify({
-        attachmentId,
-        processInstanceId: _data.processInstanceId,
-      });
-      if (aerror) return true;
+      // 发起审批成功关联附件
+      if (attachmentId) {
+        const { error: aerror, data: adata } = await wkAttachmentProcessInstanceModify({
+          attachmentId,
+          processInstanceId: _data.processInstanceId,
+        });
+        if (aerror) return true;
+      }
+      return false;
     }
-    return false;
+
+    setTableData([]);
+
+    setCashModalVisible(true);
+    message.success('簿记成功');
+    setCreateModalVisible(false);
+    return true;
   };
 
   const transactionHandleOk = async () => {
