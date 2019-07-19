@@ -405,7 +405,7 @@ const TradeManagementPricing = props => {
                 message: `第${index + 1}条结构(${
                   LEG_TYPE_ZHCH_MAP[position.productType]
                 })定价产生错误`,
-                description: `xxxxx${_.get(next.raw, 'diagnostics.[0].message', [])}`,
+                description: `${_.get(next.raw, 'diagnostics.[0].message', [])}`,
               });
             }
             return prev.concat(null);
