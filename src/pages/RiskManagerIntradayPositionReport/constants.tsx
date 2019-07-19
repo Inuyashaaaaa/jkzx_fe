@@ -5,7 +5,7 @@ import { formatNumber } from '@/tools';
 export const TABLE_COL_DEFS = [
   {
     title: '持仓ID',
-    dataIndex: 'tradeId',
+    dataIndex: 'positionId',
     fixed: 'left',
     width: 150,
   },
