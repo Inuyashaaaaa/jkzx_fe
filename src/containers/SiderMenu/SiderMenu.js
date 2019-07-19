@@ -2,6 +2,7 @@ import React, { PureComponent, Suspense } from 'react';
 import { Layout } from 'antd';
 import classNames from 'classnames';
 import Link from 'umi/link';
+import _ from 'lodash';
 import styles from './index.less';
 import PageLoading from '../PageLoading';
 import { getDefaultCollapsedSubMenus } from './SiderMenuUtils';
@@ -14,15 +15,19 @@ export default class SiderMenu extends PureComponent {
     super(props);
     this.state = {
       openKeys: getDefaultCollapsedSubMenus(props),
+      flatMenuKeysLen: _.get(props, 'flatMenuKeys.length'),
     };
   }
 
   static getDerivedStateFromProps(props, state) {
     const { pathname } = state;
-    if (props.location.pathname !== pathname) {
+    const len = _.get(props, 'flatMenuKeys.length');
+    if (props.location.pathname !== pathname || len !== state.flatMenuKeysLen) {
+      const openKeys = getDefaultCollapsedSubMenus(props);
       return {
         pathname: props.location.pathname,
-        openKeys: getDefaultCollapsedSubMenus(props),
+        openKeys,
+        flatMenuKeysLen: len,
       };
     }
     return null;
@@ -49,6 +54,8 @@ export default class SiderMenu extends PureComponent {
     const { logo, collapsed, onCollapse, fixSiderbar, theme } = this.props;
     const { openKeys } = this.state;
     const defaultProps = collapsed ? {} : { openKeys };
+
+    console.log(collapsed, defaultProps);
 
     const siderClassName = classNames(styles.sider, {
       [styles.fixSiderbar]: fixSiderbar,

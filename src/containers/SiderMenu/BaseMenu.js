@@ -3,6 +3,7 @@ import { Menu, Icon } from 'antd';
 import Link from 'umi/link';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
+import _ from 'lodash';
 import { urlToList, isUrl } from '@/tools';
 import { getMenuMatches } from './SiderMenuUtils';
 import styles from './index.less';
@@ -39,7 +40,7 @@ export default class BaseMenu extends PureComponent {
   };
 
   // Get the currently selected menu
-  getSelectedMenuKeys = pathname => {
+  getSelectedMenuKeys = (pathname, flatMenuKeysLen) => {
     const { flatMenuKeys } = this.props;
     return urlToList(pathname).map(itemPath => getMenuMatches(flatMenuKeys, itemPath).pop());
   };
@@ -126,7 +127,7 @@ export default class BaseMenu extends PureComponent {
       location: { pathname },
     } = this.props;
     // if pathname can't match, use the nearest parent's key
-    let selectedKeys = this.getSelectedMenuKeys(pathname);
+    let selectedKeys = this.getSelectedMenuKeys(pathname, _.get(this.props, 'flatMenuKeys.length'));
     if (!selectedKeys.length && openKeys) {
       selectedKeys = [openKeys[openKeys.length - 1]];
     }
