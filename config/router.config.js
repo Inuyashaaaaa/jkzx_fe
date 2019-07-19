@@ -121,11 +121,11 @@ export default [
               name: 'dividendCurve',
               component: './PricingSettingsDividendCurve/index',
             },
-            {
-              path: '/pricingSettings/base-contract-management',
-              name: 'baseContractManagement',
-              component: './PricingSettingsBaseContractManagement/index',
-            },
+            // {
+            //   path: '/pricingSettings/base-contract-management',
+            //   name: 'baseContractManagement',
+            //   component: './PricingSettingsBaseContractManagement/index',
+            // },
             // {
             //   path: '/pricingSettings/pricingEnvironment',
             //   name: 'pricingEnvironment',
@@ -356,7 +356,7 @@ export default [
       }
       return node;
     },
-    'routes'
+    'routes',
   ),
   {
     component: '404',
