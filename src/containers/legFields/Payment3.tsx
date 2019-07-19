@@ -27,50 +27,35 @@ export const Payment3: ILegColDef = {
     };
 
     const getRules = () =>
-      (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL
-        ? ([
-            {
-              message: '必须满足条件(行权收益2 < 行权收益3)',
-              validator(rule, value, callback) {
-                const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+      ([
+        {
+          validator(rule, value, callback) {
+            const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
 
-                if (optionType == null) {
-                  callback();
-                  return;
+            if (optionType == null) {
+              callback();
+              return;
+            }
+            const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
+            const payment3Val = value;
+            if (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL) {
+              if (payment3Val != null && payment2Val != null) {
+                if (!(payment2Val < payment3Val)) {
+                  callback('必须满足条件(行权收益2 < 行权收益3)');
                 }
-                const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
-                const payment3Val = value;
-                if (payment3Val != null && payment2Val != null) {
-                  if (!(payment2Val < payment3Val)) {
-                    callback(true);
-                  }
-                }
-                callback();
-              },
-            },
-          ] as ValidationRule[])
-        : ([
-            {
-              message: '必须满足条件(行权收益2 > 行权收益3)',
-              validator(rule, value, callback) {
-                const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
-
-                if (optionType == null) {
-                  callback();
-                  return;
-                }
-                const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
-                const payment3Val = value;
-                if (payment3Val != null && payment2Val != null) {
-                  if (!(payment2Val > payment3Val)) {
-                    callback(true);
-                  }
-                }
-                callback();
-              },
-            },
-          ] as ValidationRule[])
-      ).concat(RULES_REQUIRED);
+              }
+              callback();
+              return;
+            }
+            if (payment3Val != null && payment2Val != null) {
+              if (!(payment2Val > payment3Val)) {
+                callback('必须满足条件(行权收益2 > 行权收益3)');
+              }
+            }
+            callback();
+          },
+        },
+      ] as ValidationRule[]).concat(RULES_REQUIRED);
 
     return (
       <FormItem>

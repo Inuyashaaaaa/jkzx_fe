@@ -26,86 +26,63 @@ export const Payment2: ILegColDef = {
       return '%';
     };
 
-    const getRules = () => {
-      if (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL) {
-        return ([
-          {
-            message: '必须满足条件(行权收益1 < 行权收益2)',
-            validator(rule, value, callback) {
-              const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
-              if (optionType == null) {
-                callback();
-                return;
-              }
-              const payment1Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT1]);
-              const payment2Val = value;
-              if (payment2Val != null && payment1Val != null) {
-                if (!(payment1Val < payment2Val)) {
-                  callback(true);
-                }
-              }
-              callback();
-            },
-          },
-          {
-            message: '必须满足条件(行权收益2 < 行权收益3)',
-            validator(rule, value, callback) {
-              const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
-              if (optionType == null) {
-                callback();
-                return;
-              }
-              const payment3Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT3]);
-              const payment2Val = value;
-              if (payment2Val != null && payment3Val != null) {
-                if (!(payment2Val < payment3Val)) {
-                  callback(true);
-                }
-              }
-              callback();
-            },
-          },
-        ] as ValidationRule[]).concat(RULES_REQUIRED);
-      }
-      return ([
+    const getRules = () =>
+      ([
         {
-          message: '必须满足条件(行权收益1 > 行权收益2)',
           validator(rule, value, callback) {
             const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
             if (optionType == null) {
               callback();
               return;
             }
             const payment1Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT1]);
             const payment2Val = value;
-            if (payment2Val != null && payment1Val != null) {
-              if (!(payment1Val > payment2Val)) {
-                callback(true);
+            if (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL) {
+              if (payment1Val != null && payment2Val != null) {
+                if (!(payment2Val > payment1Val)) {
+                  callback('必须满足条件(行权收益2 > 行权收益1)');
+                }
+              }
+              callback();
+              return;
+            }
+            if (payment1Val != null && payment2Val != null) {
+              if (!(payment2Val < payment1Val)) {
+                callback('必须满足条件(行权收益2 < 行权收益1)');
               }
             }
             callback();
           },
         },
         {
-          message: '必须满足条件(行权收益2 > 行权收益3)',
           validator(rule, value, callback) {
             const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
             if (optionType == null) {
               callback();
               return;
             }
             const payment3Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT3]);
             const payment2Val = value;
-            if (payment2Val != null && payment3Val != null) {
+            if (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL) {
+              if (payment3Val != null && payment2Val != null) {
+                if (!(payment2Val < payment3Val)) {
+                  callback('必须满足条件(行权收益2 < 行权收益3)');
+                }
+              }
+              callback();
+              return;
+            }
+            if (payment3Val != null && payment2Val != null) {
               if (!(payment2Val > payment3Val)) {
-                callback(true);
+                callback('必须满足条件(行权收益2 > 行权收益3)');
               }
             }
             callback();
           },
         },
       ] as ValidationRule[]).concat(RULES_REQUIRED);
-    };
 
     return (
       <FormItem>
