@@ -241,13 +241,25 @@ const ClientManagementInfo = memo(() => {
         rowKey="accountId"
         dataSource={tableData}
         loading={searchLoading}
-        scroll={{ x: 1000 }}
+        scroll={{ x: 1500 }}
         columns={[
           {
             title: '交易对手',
             dataIndex: 'legalName',
             width: 250,
             fixed: 'left',
+            render: val => (
+              <span
+                style={{
+                  overflow: 'hidden',
+                  display: 'inline-block',
+                  wordBreak: 'break-all',
+                  width: '100%',
+                }}
+              >
+                {val}
+              </span>
+            ),
           },
           {
             title: '开户销售',

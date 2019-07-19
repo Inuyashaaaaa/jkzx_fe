@@ -256,6 +256,7 @@ class ClientManagementValuationManagement extends PureComponent {
               selectedRowKeys: this.state.selectedRowKeys,
               onChange: this.onSelectionChanged,
             }}
+            scroll={{ x: 1500 }}
           />
         </div>
       </Page>
