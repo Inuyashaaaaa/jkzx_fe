@@ -241,7 +241,7 @@ const ClientManagementInfo = memo(() => {
         rowKey="accountId"
         dataSource={tableData}
         loading={searchLoading}
-        scroll={{ x: 1000 }}
+        scroll={{ x: 1500 }}
         columns={[
           {
             title: '交易对手',
