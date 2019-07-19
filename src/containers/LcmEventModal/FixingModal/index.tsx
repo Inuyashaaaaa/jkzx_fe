@@ -137,7 +137,8 @@ class FixingModal extends PureComponent<
           this.tableFormData,
           this.currentUser,
           this.reload,
-          this.changedPrice,
+          // this.changedPrice,
+          true,
         );
       },
     );
@@ -248,7 +249,6 @@ class FixingModal extends PureComponent<
       },
     });
     if (error) return;
-
     this.changedPrice = true;
 
     this.setState(
