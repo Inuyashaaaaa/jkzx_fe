@@ -7,6 +7,19 @@ export const VALUATION_COL_DEFS = (uploading, unUploading) => [
     title: '交易对手',
     dataIndex: 'legalName',
     checkboxSelection: true,
+    width: 250,
+    render: val => (
+      <span
+        style={{
+          overflow: 'hidden',
+          display: 'inline-block',
+          wordBreak: 'break-all',
+          width: '100%',
+        }}
+      >
+        {val}
+      </span>
+    ),
   },
   {
     title: 'SAC协议编号',
