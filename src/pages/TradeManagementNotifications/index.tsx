@@ -1,15 +1,14 @@
-/*eslint-disable */
-import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
-import { Form2, Select, SmartTable } from '@/containers';
-import Page from '@/containers/Page';
-import { removeCalendar } from '@/services/calendars';
-import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 import { DatePicker, Divider, Table, Icon, Tooltip } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import produce from 'immer';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { EVENT_TYPE_OPTIONS, PRODUCT_TYPE_OPTIONS, EVENT_TYPE_MAP } from '@/constants/common';
+import { Form2, Select, SmartTable } from '@/containers';
+import Page from '@/containers/Page';
+import { removeCalendar } from '@/services/calendars';
+import { traTradeLCMNotificationSearch } from '@/services/trade-service';
 import Calendars from './Calendars';
 import { DEFAULT_CALENDAR } from './constants';
 import TabHeader from '@/containers/TabHeader';
@@ -22,29 +21,25 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     this.state = {
       loading: false,
       activeTabKey: 'list',
-      open: true,
       tableDataSource: [],
-      visible: false,
       searchFormData: Form2.createFields(this.getInitialSearchFormData()),
     };
   }
 
-  public getInitialSearchFormData = () => {
-    return {
-      notificationEventType: 'all',
-      date: [moment(), moment().add(7, 'days')],
-    };
-  };
+  public getInitialSearchFormData = () => ({
+    notificationEventType: 'all',
+    date: [moment(), moment().add(7, 'days')],
+  });
 
   public componentDidMount = () => {
     this.onFetch();
   };
 
   public getNotificationEventType = type => {
-    if (type.value === 'all') {
+    if (type === 'all') {
       return '';
     }
-    return type.value;
+    return type;
   };
 
   public onFetch = async () => {
@@ -53,10 +48,23 @@ class TradeManagementNotifications extends PureComponent<any, any> {
     });
 
     const { searchFormData } = this.state;
+    const date = Form2.getFieldsValue(searchFormData).date.length
+      ? Form2.getFieldsValue(searchFormData).date
+      : [moment(), moment().add(7, 'day')];
+    const notificationEventType =
+      Form2.getFieldsValue(searchFormData).notificationEventType || 'all';
+    if (!Form2.getFieldsValue(searchFormData).date.length) {
+      this.setState({
+        searchFormData: {
+          date: Form2.createField(date),
+          notificationEventType: Form2.createField(notificationEventType),
+        },
+      });
+    }
     const { error, data } = await traTradeLCMNotificationSearch({
-      after: _.get(searchFormData, 'date.value[0]').format('YYYY-MM-DD'),
-      before: _.get(searchFormData, 'date.value[1]').format('YYYY-MM-DD'),
-      notificationEventType: this.getNotificationEventType(searchFormData.notificationEventType),
+      after: date[0].format('YYYY-MM-DD'),
+      before: date[1].format('YYYY-MM-DD'),
+      notificationEventType: this.getNotificationEventType(notificationEventType),
     });
 
     this.setState({
@@ -104,12 +112,12 @@ class TradeManagementNotifications extends PureComponent<any, any> {
   };
 
   public onSearchFormChange = async (props, changedFields) => {
-    this.setState({
+    this.setState(state => ({
       searchFormData: {
-        ...this.state.searchFormData,
+        ...state.searchFormData,
         ...changedFields,
       },
-    });
+    }));
   };
 
   public onHeaderTabChange = key => {
@@ -128,6 +136,13 @@ class TradeManagementNotifications extends PureComponent<any, any> {
       },
     );
   };
+
+  public disabledDate = current =>
+    current &&
+    current <
+      moment()
+        .subtract(1, 'day')
+        .endOf('day');
 
   public render() {
     return (
@@ -155,7 +170,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
             <Form2
               layout="inline"
               dataSource={this.state.searchFormData}
-              submitText={`搜索`}
+              submitText="搜索"
               submitButtonProps={{
                 icon: 'search',
               }}
@@ -166,35 +181,35 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                 {
                   title: '选择日期',
                   dataIndex: 'date',
-                  render: (value, record, index, { form, editing }) => {
-                    return <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>;
-                  },
+                  render: (value, record, index, { form, editing }) => (
+                    <FormItem>
+                      {form.getFieldDecorator({})(<RangePicker disabledDate={this.disabledDate} />)}
+                    </FormItem>
+                  ),
                 },
                 {
                   title: '事件类型',
                   dataIndex: 'notificationEventType',
-                  render: (value, record, index, { form, editing }) => {
-                    return (
-                      <FormItem>
-                        {form.getFieldDecorator({})(
-                          <Select
-                            style={{ minWidth: 180 }}
-                            placeholder="请输入内容搜索"
-                            allowClear={true}
-                            showSearch={true}
-                            fetchOptionsOnSearch={true}
-                            options={[
-                              {
-                                label: '全部',
-                                value: 'all',
-                              },
-                              ...EVENT_TYPE_OPTIONS,
-                            ]}
-                          />,
-                        )}
-                      </FormItem>
-                    );
-                  },
+                  render: (value, record, index, { form, editing }) => (
+                    <FormItem>
+                      {form.getFieldDecorator({})(
+                        <Select
+                          style={{ minWidth: 180 }}
+                          placeholder="请输入内容搜索"
+                          allowClear
+                          showSearch
+                          fetchOptionsOnSearch
+                          options={[
+                            {
+                              label: '全部',
+                              value: 'all',
+                            },
+                            ...EVENT_TYPE_OPTIONS,
+                          ]}
+                        />,
+                      )}
+                    </FormItem>
+                  ),
                 },
               ]}
             />
@@ -219,9 +234,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   fixed: 'left',
                   width: 200,
                   render: (text, record) => {
-                    const find = _.find(EVENT_TYPE_OPTIONS, option => {
-                      return option.value === text;
-                    });
+                    const find = _.find(EVENT_TYPE_OPTIONS, option => option.value === text);
                     return find.label;
                   },
                 },
@@ -229,9 +242,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   title: '事件日期',
                   dataIndex: 'notificationTime',
                   width: 200,
-                  render: (text, record, index) => {
-                    return text.split('T')[0];
-                  },
+                  render: (text, record, index) => text.split('T')[0],
                 },
                 {
                   title: '交易ID',
@@ -246,9 +257,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   dataIndex: 'productType',
                   width: 200,
                   render: (text, record, index) => {
-                    const i = _.findIndex(PRODUCT_TYPE_OPTIONS, option => {
-                      return option.value === text;
-                    });
+                    const i = _.findIndex(PRODUCT_TYPE_OPTIONS, option => option.value === text);
                     return PRODUCT_TYPE_OPTIONS[i].label;
                   },
                 },
@@ -262,9 +271,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   align: 'right',
                   dataIndex: 'underlyerPrice',
                   width: 200,
-                  render: (text, record, index) => {
-                    return text ? text.toFixed(4) : text;
-                  },
+                  render: (text, record, index) => (text ? text.toFixed(4) : text),
                 },
                 {
                   title: '障碍价 (¥)',
@@ -282,9 +289,7 @@ class TradeManagementNotifications extends PureComponent<any, any> {
                   align: 'right',
                   dataIndex: 'payment',
                   width: 200,
-                  render: (text, record, index) => {
-                    return text ? text.toFixed(4) : text;
-                  },
+                  render: (text, record, index) => (text ? text.toFixed(4) : text),
                 },
               ]}
               loading={this.state.loading}

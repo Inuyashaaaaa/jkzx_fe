@@ -1,20 +1,21 @@
+import React, { PureComponent } from 'react';
+import _ from 'lodash';
+import moment from 'moment';
+import { Button, Divider, Icon, Modal, Row, Tabs, Tooltip } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+
+import { CLOSE_FORM_CONTROLS, columns, INTRADAY_FORM_CONTROLS } from './constants';
+import { PAGE_SIZE } from '@/constants/component';
 import { Form2, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import {
   mktInstrumentSearch,
-  mktQuotesListPaged,
   mktQuoteSave,
+  mktQuotesListPaged,
 } from '@/services/market-data-service';
-import { Button, Divider, Icon, Modal, Row, Table, Tabs, Tooltip } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import moment from 'moment';
-import React, { PureComponent } from 'react';
-import { CLOSE_FORM_CONTROLS, columns, INTRADAY_FORM_CONTROLS } from './constants';
-import _ from 'lodash';
 import { getMoment } from '@/tools';
-import { PAGE_SIZE } from '@/constants/component';
 
-const TabPane = Tabs.TabPane;
+const { TabPane } = Tabs;
 
 class TradeManagementMarketManagement extends PureComponent {
   public $intradayForm: Form2 = null;
@@ -24,8 +25,6 @@ class TradeManagementMarketManagement extends PureComponent {
   public clean = null;
 
   public state = {
-    columnDefs: [],
-    dataSource: [],
     lastUpdateTime: '',
     searchFormData: {},
     tableDataSource: [],
@@ -40,20 +39,11 @@ class TradeManagementMarketManagement extends PureComponent {
     intradayFormData: { valuationDate: Form2.createField(moment()) },
     closeFormData: { valuationDate: Form2.createField(moment()) },
     confirmLoading: false,
+    searchForm: {},
   };
 
   public paginationChange = (current, pageSize) => {
-    this.setState(
-      {
-        pagination: {
-          current,
-          pageSize,
-        },
-      },
-      () => {
-        this.fetchTable(true);
-      }
-    );
+    this.fetchTable({ current, pageSize });
   };
 
   public componentDidMount = () => {
@@ -61,10 +51,10 @@ class TradeManagementMarketManagement extends PureComponent {
       this.setState({
         lastUpdateTime: moment().format('HH:mm:ss'),
       });
-      this.fetchTable(false);
+      this.fetchTable(this.state.pagination, this.state.searchForm);
     }, 1000 * 30);
 
-    this.fetchTable(true);
+    this.fetchTable(this.state.pagination, this.state.searchForm);
   };
 
   public componentWillUnmount = () => {
@@ -73,24 +63,28 @@ class TradeManagementMarketManagement extends PureComponent {
     }
   };
 
-  public fetchTable = loading => {
-    const pagination = this.state.pagination;
+  public fetchTable = (pagination, searchFormData) => {
     this.setState({
       lastUpdateTime: moment().format('HH:mm:ss'),
-      loading,
+      loading: true,
     });
     return mktQuotesListPaged({
       page: pagination.current - 1,
       pageSize: pagination.pageSize,
-      ...Form2.getFieldsValue(this.state.searchFormData),
+      ...Form2.getFieldsValue(searchFormData || this.state.searchForm),
     }).then(result => {
       this.setState({
         loading: false,
       });
-      if (result.error) return undefined;
+      if (result.error) {
+        return;
+      }
+      const { searchForm } = this.state;
       this.setState({
         tableDataSource: result.data.page,
         total: result.data.totalCount,
+        searchForm: searchFormData || searchForm,
+        pagination,
       });
     });
   };
@@ -102,31 +96,22 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public onSearchFormChange = event => {
-    this.setState(
-      {
-        pagination: {
-          current: 1,
-          pageSize: PAGE_SIZE,
-        },
-      },
-      () => {
-        this.fetchTable(true);
-      }
-    );
+    this.fetchTable({ current: 1, pageSize: PAGE_SIZE }, this.state.searchFormData);
   };
 
   public onReset = () => {
     this.setState(
       {
         searchFormData: {},
+        searchForm: {},
         pagination: {
           current: 1,
           pageSize: PAGE_SIZE,
         },
       },
       () => {
-        this.fetchTable(true);
-      }
+        this.fetchTable(this.state.pagination, {});
+      },
     );
   };
 
@@ -174,7 +159,7 @@ class TradeManagementMarketManagement extends PureComponent {
       intradayFormData: { valuationDate: Form2.createField(moment()) },
       closeFormData: { valuationDate: Form2.createField(moment()) },
     });
-    this.fetchTable(true);
+    this.fetchTable(this.state.pagination);
   };
 
   public handleTabChange = activeKey => {
@@ -197,7 +182,7 @@ class TradeManagementMarketManagement extends PureComponent {
         <Form2
           layout="inline"
           dataSource={this.state.searchFormData}
-          submitText={'查询'}
+          submitText="查询"
           submitButtonProps={{
             icon: 'search',
           }}
@@ -208,44 +193,42 @@ class TradeManagementMarketManagement extends PureComponent {
             {
               title: '标的物列表',
               dataIndex: 'instrumentIds',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        fetchOptionsOnSearch={true}
-                        editing={editing}
-                        style={{ minWidth: 180, maxWidth: 400 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        mode="multiple"
-                        options={async (value: string = '') => {
-                          const { data, error } = await mktInstrumentSearch({
-                            instrumentIdPart: value,
-                          });
-                          if (error) return [];
-                          return data.slice(0, 50).map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      fetchOptionsOnSearch
+                      editing={editing}
+                      style={{ minWidth: 180, maxWidth: 400 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      mode="multiple"
+                      options={async (values: string = '') => {
+                        const { data, error } = await mktInstrumentSearch({
+                          instrumentIdPart: values,
+                        });
+                        if (error) return [];
+                        return data.slice(0, 50).map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
         <Divider type="horizontal" />
         <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between" align="bottom">
           <Button type="primary" onClick={this.handleMarketBtnClick}>
-            行情管理
+            录入行情
           </Button>
           <span>
             {`最近刷新时间 ${this.state.lastUpdateTime}`}
-            <Tooltip title="每隔30秒自动刷新行情" placement="topRight" arrowPointAtCenter={true}>
+            <Tooltip title="每隔30秒自动刷新行情" placement="topRight" arrowPointAtCenter>
               <Icon style={{ marginLeft: 4 }} type="info-circle" theme="twoTone" />
             </Tooltip>
           </span>
@@ -261,7 +244,7 @@ class TradeManagementMarketManagement extends PureComponent {
             onChange: this.paginationChange,
           }}
           loading={this.state.loading}
-          rowKey={'instrumentId'}
+          rowKey="instrumentId"
           scroll={this.state.tableDataSource ? { x: '1800px' } : { x: false }}
         />
         <Modal
@@ -275,7 +258,9 @@ class TradeManagementMarketManagement extends PureComponent {
           <Tabs onChange={this.handleTabChange} activeKey={this.state.activeKey}>
             <TabPane tab="日内" key="intraday">
               <Form2
-                ref={node => (this.$intradayForm = node)}
+                ref={node => {
+                  this.$intradayForm = node;
+                }}
                 dataSource={this.state.intradayFormData}
                 columns={INTRADAY_FORM_CONTROLS}
                 footer={false}
@@ -284,7 +269,9 @@ class TradeManagementMarketManagement extends PureComponent {
             </TabPane>
             <TabPane tab="收盘" key="close">
               <Form2
-                ref={node => (this.$closeForm = node)}
+                ref={node => {
+                  this.$closeForm = node;
+                }}
                 dataSource={this.state.closeFormData}
                 columns={CLOSE_FORM_CONTROLS}
                 footer={false}

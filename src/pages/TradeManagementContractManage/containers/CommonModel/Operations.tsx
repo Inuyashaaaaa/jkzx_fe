@@ -1,3 +1,13 @@
+/*eslint-disable */
+import { Divider, Dropdown, Icon, Menu } from 'antd';
+import { connect } from 'dva';
+import moment from 'moment';
+import React, { PureComponent } from 'react';
+import router from 'umi/router';
+import uuidv4 from 'uuid';
+import _ from 'lodash';
+import LifeModalTable from '../../LifeModalTable';
+import PortfolioModalTable from '../../PortfolioModalTable';
 import { LCM_EVENT_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_MAP } from '@/constants/common';
 import { LEG_ENV } from '@/constants/legs';
 import LcmEventModal, { ILcmEventModalEl } from '@/containers/LcmEventModal';
@@ -6,17 +16,8 @@ import { trdTradeLCMEventList } from '@/services/general-service';
 import { getTradeCreateModalData } from '@/services/pages';
 import { trdPositionLCMEventTypes } from '@/services/trade-service';
 import { createLegRecordByPosition, getLegByProductType } from '@/tools';
-import { Divider, Dropdown, Icon, Menu } from 'antd';
-import { connect } from 'dva';
-import moment from 'moment';
-import React, { PureComponent } from 'react';
-import router from 'umi/router';
-import uuidv4 from 'uuid';
-import LifeModalTable from '../../LifeModalTable';
-import PortfolioModalTable from '../../PortfolioModalTable';
-import _ from 'lodash';
 
-const SubMenu = Menu.SubMenu;
+const { SubMenu } = Menu;
 const MenuItem = Menu.Item;
 
 class Operations extends PureComponent<{
@@ -28,16 +29,11 @@ class Operations extends PureComponent<{
 }> {
   public $modelButton: ModalButton = null;
 
-  public activeRowData: any;
-
-  public $lcmEventModal: ILcmEventModalEl;
-
   public state = {
     modalVisible: false,
     lifeTableData: [],
     portfolioModalVisible: false,
     eventTypes: {},
-    tableFormData: {},
   };
 
   public componentDidMount = async () => {
@@ -46,12 +42,12 @@ class Operations extends PureComponent<{
       positionId: item.positionId,
     });
     if (rsp.error) return;
-    this.setState({
+    this.setState(state => ({
       eventTypes: {
-        ...this.state.eventTypes,
+        ...state.eventTypes,
         [item.positionId]: rsp.data,
       },
-    });
+    }));
   };
 
   public handleBookEdit = () => {
@@ -78,7 +74,7 @@ class Operations extends PureComponent<{
         },
         () => {
           this.fetchOverviewTableData();
-        }
+        },
       );
     }
     if (key === 'portfolio') {
@@ -87,16 +83,16 @@ class Operations extends PureComponent<{
       });
     }
     if (keyPath.length === 2) {
-      const position = (this.props.record.positions || []).find(item => {
-        return item.positionId === this.props.record.positionId;
-      });
+      const position = (this.props.record.positions || []).find(
+        params => params.positionId === this.props.record.positionId,
+      );
       if (!position) {
         throw new Error('position 没有找到！');
       }
       const tableFormData = getTradeCreateModalData(this.props.record);
       const leg = getLegByProductType(
         this.props.record.productType,
-        this.props.record.asset.exerciseType
+        this.props.record.asset.exerciseType,
       );
       const record = createLegRecordByPosition(leg, position, LEG_ENV.BOOKING);
 
@@ -126,16 +122,14 @@ class Operations extends PureComponent<{
     // this.switchLifeLoading();
     if (error) return;
     const result = [...data];
-    result.sort((item1, item2) => {
-      return moment(item1.createdAt).valueOf() - moment(item2.createdAt).valueOf();
-    });
+    result.sort(
+      (item1, item2) => moment(item1.createdAt).valueOf() - moment(item2.createdAt).valueOf(),
+    );
     this.setState({
-      lifeTableData: result.map(item => {
-        return {
-          ...item,
-          uuid: uuidv4(),
-        };
-      }),
+      lifeTableData: result.map(item => ({
+        ...item,
+        uuid: uuidv4(),
+      })),
     });
   };
 
@@ -146,18 +140,21 @@ class Operations extends PureComponent<{
       },
       () => {
         this.props.onSearch();
-      }
+      },
     );
   };
 
   public loadCommon = () => {
-    const item = this.props.record;
-    return _.get(this.state.eventTypes, item.positionId, [])
-      .filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT)
-      .map(node => {
-        return <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>;
-      });
+    const lcmEvent = this.props.record;
+    return _.get(this.state.eventTypes, lcmEvent.positionId, [])
+      .sort((a, b) => LCM_EVENT_TYPE_ZHCN_MAP[b].localeCompare(LCM_EVENT_TYPE_ZHCN_MAP[a]))
+      .filter(item => item !== 'PAYMENT')
+      .map(node => <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>);
   };
+
+  public activeRowData: any;
+
+  public $lcmEventModal: ILcmEventModalEl;
 
   public render() {
     return (
@@ -165,7 +162,7 @@ class Operations extends PureComponent<{
         <a href="javascript:;" onClick={this.handleBookEdit}>
           详情
         </a>
-        <Divider type={'vertical'} />
+        <Divider type="vertical" />
         <Dropdown
           overlay={
             <Menu onClick={this.onMenuClick}>

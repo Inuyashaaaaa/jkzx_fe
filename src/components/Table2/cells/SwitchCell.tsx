@@ -19,9 +19,8 @@ import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
 
-const getEditable = (editable, colDef, record, rowIndex) => {
-  return typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable;
-};
+const getEditable = (editable, colDef, record, rowIndex) =>
+  (typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable);
 
 class SwitchCell extends PureComponent<
   ITableCellProps,
@@ -101,9 +100,7 @@ class SwitchCell extends PureComponent<
     return this.oldValue !== EMPTY_VALUE && this.oldValue !== newVal;
   };
 
-  public isSelectionCell = () => {
-    return this.props.className === 'ant-table-selection-column';
-  };
+  public isSelectionCell = () => this.props.className === 'ant-table-selection-column';
 
   public registeCell = () => {
     if (this.isSelectionCell()) {
@@ -127,8 +124,8 @@ class SwitchCell extends PureComponent<
     return get(record, getRowKey());
   };
 
-  public renderElement = elements => {
-    return React.Children.toArray(elements).map((element, index) => {
+  public renderElement = elements =>
+    React.Children.toArray(elements).map((element, index) => {
       if (!React.isValidElement<FormItemProps & React.ReactNode>(element)) return element;
       return React.cloneElement(element, {
         key: index,
@@ -143,7 +140,6 @@ class SwitchCell extends PureComponent<
           : undefined,
       });
     });
-  };
 
   public getRef = node => {
     this.$cell = node;
@@ -173,9 +169,7 @@ class SwitchCell extends PureComponent<
     this.startEditing();
   };
 
-  public getEditing = () => {
-    return _.get(this.props.colDef, 'editing', this.state.editing);
-  };
+  public getEditing = () => _.get(this.props.colDef, 'editing', this.state.editing);
 
   public startEditing = async () => {
     if (!this.getEditable()) return;
@@ -186,12 +180,12 @@ class SwitchCell extends PureComponent<
         },
         () => {
           this.setAcitve();
-        }
+        },
       );
     }
   };
 
-  public saveCell = async (callback?) => {
+  public saveCell = async callback => {
     if (!this.getEditable()) return;
     if (!this.getEditing()) return;
 
@@ -277,15 +271,14 @@ class SwitchCell extends PureComponent<
         ref: this.getEditingCellRef,
         colDef,
       });
-    } else {
-      return React.createElement(RenderingCell, {
-        ...this.props,
-        cellApi: this,
-        form: wrapedForm,
-        ref: this.getRenderingCellRef,
-        colDef,
-      });
     }
+    return React.createElement(RenderingCell, {
+      ...this.props,
+      cellApi: this,
+      form: wrapedForm,
+      ref: this.getRenderingCellRef,
+      colDef,
+    });
   };
 
   public onTableKeyDown = (e: KeyboardEvent) => {
@@ -371,9 +364,7 @@ class SwitchCell extends PureComponent<
     });
   };
 
-  public getActive = () => {
-    return this.state.active;
-  };
+  public getActive = () => this.state.active;
 
   public _getNextCell = (rowId: string, colId: string, directionCode: number) => {
     const cell = this.getNextCellInstance(rowId, colId, directionCode);
@@ -384,9 +375,8 @@ class SwitchCell extends PureComponent<
     return cell;
   };
 
-  public getNextCell = directionCode => {
-    return this._getNextCell(this.getRowId(), this.getDataIndex(), directionCode);
-  };
+  public getNextCell = directionCode =>
+    this._getNextCell(this.getRowId(), this.getDataIndex(), directionCode);
 
   public nextCellStartEditing = directionCode => {
     const nextCell = this.getNextCell(directionCode);
@@ -410,39 +400,33 @@ class SwitchCell extends PureComponent<
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.DOWN) {
       if (this.props.vertical) {
         return this.props.api.tableManager.getDownCell(rowId, colId);
-      } else {
-        return this.props.api.tableManager.getRightCell(rowId, colId);
       }
+      return this.props.api.tableManager.getRightCell(rowId, colId);
     }
 
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.UP) {
       if (this.props.vertical) {
         return this.props.api.tableManager.getUpCell(rowId, colId);
-      } else {
-        return this.props.api.tableManager.getLeftCell(rowId, colId);
       }
+      return this.props.api.tableManager.getLeftCell(rowId, colId);
     }
 
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.LEFT) {
       if (this.props.vertical) {
         return this.props.api.tableManager.getLeftCell(rowId, colId);
-      } else {
-        return this.props.api.tableManager.getUpCell(rowId, colId);
       }
+      return this.props.api.tableManager.getUpCell(rowId, colId);
     }
 
     if (directionCode === TABLE_ARROW_KEY_CODE_MAP.RIGHT) {
       if (this.props.vertical) {
         return this.props.api.tableManager.getRightCell(rowId, colId);
-      } else {
-        return this.props.api.tableManager.getDownCell(rowId, colId);
       }
+      return this.props.api.tableManager.getDownCell(rowId, colId);
     }
   };
 
-  public isEditing = () => {
-    return !!this.getEditing();
-  };
+  public isEditing = () => !!this.getEditing();
 
   public onCellBlur = event => {
     if (!this.getEditable()) return;

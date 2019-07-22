@@ -1,11 +1,20 @@
 import { INPUT_NUMBER_DIGITAL_CONFIG, IOGLOD_EVENT_TYPE_OPTIONS } from '@/constants/common';
 import { IColumnDef } from '@/containers/Table/types';
 
+export const HISTORY_CLOUNMS_STATUS_MAP = {
+  NORMAL: '正常',
+  INVALID: '错误',
+};
+
 export const HISTORY_COL_DEFS: IColumnDef[] = [
   {
     headerName: '交易对手',
     field: 'legalName',
     pinned: 'left',
+  },
+  {
+    title: '主协议编号',
+    dataIndex: 'masterAgreementId',
   },
   {
     headerName: '交易ID',

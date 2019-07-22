@@ -1,7 +1,8 @@
-import { DatePicker, Input, InputNumber, Select, Form2, TimePicker } from '@/containers';
-import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
+import _ from 'lodash';
+import { mktInstrumentSearch } from '@/services/market-data-service';
+import { DatePicker, Input, InputNumber, Select, Form2, TimePicker } from '@/containers';
 
 const multiplier = {
   title: '合约乘数',
@@ -201,12 +202,7 @@ const instrumentTypeSearch = {
   title: '合约类型',
   dataIndex: 'instrumentType',
   render: (value, record, index, { form, editing }) => {
-    const disable = () => {
-      if (record.instrumentIds && record.instrumentIds.value && record.instrumentIds.value.length) {
-        return true;
-      }
-      return false;
-    };
+    const disable = () => !!_.get(record, 'instrumentIds.value.length');
     const getOptions = () => {
       if (record.assetClass && record.assetClass.value === 'EQUITY') {
         return [
@@ -251,7 +247,12 @@ const instrumentTypeSearch = {
     return (
       <FormItem>
         {form.getFieldDecorator({})(
-          <Select style={{ minWidth: 180 }} options={getOptions()} disabled={disable()} />,
+          <Select
+            allowClear
+            style={{ minWidth: 180 }}
+            options={getOptions()}
+            disabled={disable()}
+          />,
         )}
       </FormItem>
     );
@@ -262,12 +263,7 @@ const assetClassSearch = {
   title: '资产类别',
   dataIndex: 'assetClass',
   render: (value, record, index, { form, editing }) => {
-    const disable = () => {
-      if (record.instrumentIds && record.instrumentIds.value && record.instrumentIds.value.length) {
-        return true;
-      }
-      return false;
-    };
+    const disable = () => !!_.get(record, 'instrumentIds.value.length');
     return (
       <FormItem>
         {form.getFieldDecorator({})(
@@ -333,7 +329,7 @@ const instrumentId = type => ({
         rules: [
           {
             required: true,
-            message: '标的物代码是必填项',
+            message: '合约代码是必填项',
           },
         ],
       })(<Input disabled={type === 'edit'} />)}
@@ -345,15 +341,10 @@ const instrumentIds = {
   title: '标的物列表',
   dataIndex: 'instrumentIds',
   render: (value, record, index, { form, editing }) => {
-    const disable = () => {
-      if (
-        (record.assetClass && record.assetClass.value) ||
-        (record.instrumentType && record.instrumentType.value)
-      ) {
-        return true;
-      }
-      return false;
-    };
+    const disable = () =>
+      _.get(record, 'record.assetClass.value') ||
+      _.get(record, 'instrumentType.value') ||
+      _.get(record, 'assetSubClass.value');
     return (
       <FormItem>
         {form.getFieldDecorator({})(
@@ -513,7 +504,7 @@ const expirationDate = {
         rules: [
           {
             required: true,
-            message: '期权到期时间是必填项',
+            message: '期权到期日是必填项',
           },
         ],
       })(<DatePicker editing format="YYYY-MM-DD" />)}
@@ -538,14 +529,100 @@ const expirationTime = {
   ),
 };
 
+export const ASSET_SUB_CLASS_MAP = {
+  BLACK: '黑色',
+  METAL: '有色金属',
+  RESOURCE: '能化',
+  PRECIOUS_METAL: '贵金属',
+  AGRICULTURE: '农产品',
+  EQUITY: '个股',
+  INDEX: '指数',
+  OTHERS: '其它',
+};
+
+const subAssetSearch = {
+  title: '资产子类别',
+  dataIndex: 'assetSubClass',
+  render: (value, record, index, { form, editing }) => {
+    const disable = () => !!_.get(record, 'instrumentIds.value.length');
+    return (
+      <FormItem>
+        {form.getFieldDecorator()(
+          <Select
+            disabled={disable()}
+            style={{ minWidth: 180 }}
+            allowClear
+            options={Object.keys(ASSET_SUB_CLASS_MAP).map(v => ({
+              label: ASSET_SUB_CLASS_MAP[v] || v,
+              value: v,
+            }))}
+          />,
+        )}
+      </FormItem>
+    );
+  },
+};
+
+const subAsset = {
+  title: '资产子类别',
+  dataIndex: 'assetSubClass',
+  render: (value, record, index, { form, editing }) => {
+    const disable = () => !!_.get(record, 'instrumentIds.value.length');
+    return (
+      <FormItem>
+        {form.getFieldDecorator({
+          rules: [
+            {
+              required: true,
+              message: '资产子类别为必墳项',
+            },
+          ],
+        })(
+          <Select
+            disabled={disable()}
+            style={{ minWidth: 180 }}
+            allowClear
+            options={Object.keys(ASSET_SUB_CLASS_MAP).map(v => ({
+              label: ASSET_SUB_CLASS_MAP[v] || v,
+              value: v,
+            }))}
+          />,
+        )}
+      </FormItem>
+    );
+  },
+};
+
+const tradeCategory = {
+  title: '交易品种',
+  dataIndex: 'tradeCategory',
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>{form.getFieldDecorator()(<Input />)}</FormItem>
+  ),
+};
+
+const tradeUnit = {
+  title: '交易单位',
+  dataIndex: 'tradeUnit',
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>{form.getFieldDecorator()(<Input />)}</FormItem>
+  ),
+};
+
+const unit = {
+  title: '报价单位',
+  dataIndex: 'unit',
+  render: (value, record, index, { form, editing }) => (
+    <FormItem>{form.getFieldDecorator()(<Input />)}</FormItem>
+  ),
+};
+
 export const getInstrumenInfo = event => {
   const fieldMap = {
-    'COMMODITY:SPOT': [multiplier, name, exchange],
-    'COMMODITY:FUTURES': [multiplier, name, exchange, maturity],
+    'COMMODITY:SPOT': [multiplier],
+    'COMMODITY:FUTURES': [multiplier, maturity],
     'COMMODITY:FUTURES_OPTION': [
-      name,
       underlyerInstrumentId,
-      exchange,
       multiplier,
       exerciseType,
       optionType,
@@ -553,13 +630,11 @@ export const getInstrumenInfo = event => {
       expirationDate,
       expirationTime,
     ],
-    'EQUITY:STOCK': [multiplier, name, exchange],
-    'EQUITY:INDEX': [indexName, exchange],
-    'EQUITY:INDEX_FUTURES': [multiplier, name, exchange, maturity],
+    'EQUITY:STOCK': [multiplier],
+    'EQUITY:INDEX': [],
+    'EQUITY:INDEX_FUTURES': [multiplier, maturity],
     'EQUITY:INDEX_OPTION': [
-      name,
       underlyerInstrumentId,
-      exchange,
       multiplier,
       exerciseType,
       optionType,
@@ -568,9 +643,7 @@ export const getInstrumenInfo = event => {
       expirationTime,
     ],
     'EQUITY:STOCK_OPTION': [
-      name,
       underlyerInstrumentId,
-      exchange,
       multiplier,
       exerciseType,
       optionType,
@@ -579,9 +652,7 @@ export const getInstrumenInfo = event => {
       expirationTime,
     ],
     'EQUITY:FUTURES_OPTION': [
-      name,
       underlyerInstrumentId,
-      exchange,
       multiplier,
       exerciseType,
       optionType,
@@ -590,14 +661,26 @@ export const getInstrumenInfo = event => {
       expirationTime,
     ],
   };
+  Object.keys(fieldMap).forEach(key => {
+    fieldMap[key] = fieldMap[key].concat([subAsset, tradeCategory, tradeUnit, unit]);
+  });
   const key = [event.assetClass, event.instrumentType].join(':');
   return fieldMap[key] || [];
 };
 
 export const createFormControls = (event = {}, type) =>
-  [instrumentId(type), assetClass(type), instrumentType].concat(getInstrumenInfo(event));
+  [instrumentId(type), name, assetClass(type), instrumentType, exchange].concat(
+    getInstrumenInfo(event),
+  );
 
 export const editFormControls = (event = {}, type) =>
-  [instrumentId(type), assetClass(type), instrumentType].concat(getInstrumenInfo(event));
+  [instrumentId(type), name, assetClass(type), instrumentType, exchange].concat(
+    getInstrumenInfo(event),
+  );
 
-export const searchFormControls = () => [assetClassSearch, instrumentTypeSearch, instrumentIds];
+export const searchFormControls = () => [
+  assetClassSearch,
+  instrumentTypeSearch,
+  subAssetSearch,
+  instrumentIds,
+];

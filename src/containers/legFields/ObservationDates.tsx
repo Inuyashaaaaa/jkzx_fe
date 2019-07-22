@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
-import { InputBase, ITableColDef } from '@/components/type';
+import { InputBase, ITableColDef, IRenderOptions, ITableApi } from '@/components/type';
 import {
   KNOCK_DIRECTION_MAP,
   LEG_FIELD,
@@ -12,6 +12,7 @@ import {
   LEG_TYPE_MAP,
   OB_DAY_FIELD,
   LEG_ENV_FIELD,
+  LEG_ID_FIELD,
 } from '@/constants/common';
 import { Form2, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
@@ -22,11 +23,13 @@ import { qlDateScheduleCreate } from '@/services/quant-service';
 import { getLegEnvs, getMoment, getRequiredRule, isAsian, remove, isBarrier } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { LEG_ENV } from '@/constants/legs';
+import { PAGE_SIZE } from '@/constants/component';
 
 class ObserveModalInput extends InputBase<
   {
     direction?: string;
     record: any;
+    api: ITableApi;
   },
   any
 > {
@@ -71,13 +74,30 @@ class ObserveModalInput extends InputBase<
     return nextDataSource;
   };
 
+  public getRowInstance = () => {
+    const { api, record } = this.props;
+    const { tableApi, tableManager } = api;
+    const id = record[LEG_ID_FIELD];
+    const row = tableManager.rowNodes.find(item => item.id === id);
+    return row;
+  };
+
   public onOpen = () => {
+    const { api, record } = this.props;
+    const { tableApi, tableManager } = api;
+    const id = record[LEG_ID_FIELD];
+    const row = this.getRowInstance();
+    row.node.changeDropdownMenuVisible(false);
+    row.node.switchDropdownMenu(false);
+    tableApi.looseActive();
     this.setState({
       visible: true,
     });
   };
 
   public onOk = async () => {
+    const row = this.getRowInstance();
+    row.node.switchDropdownMenu(true);
     this.setState(
       state => ({
         visible: !state.visible,
@@ -100,6 +120,8 @@ class ObserveModalInput extends InputBase<
   };
 
   public onCancel = () => {
+    const row = this.getRowInstance();
+    row.node.switchDropdownMenu(true);
     this.setState(state => ({
       visible: !state.visible,
     }));
@@ -149,7 +171,6 @@ class ObserveModalInput extends InputBase<
     // 亚式，区间累积,单鲨
     const start = getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE]))
       .clone()
-      .add(1, 'days')
       .format('YYYY-MM-DD');
     const end = getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).format(
       'YYYY-MM-DD',
@@ -170,13 +191,14 @@ class ObserveModalInput extends InputBase<
       holidays: ['DEFAULT_CALENDAR'],
     });
     this.setState({ generateLoading: false });
-
     if (error) return;
     this.setState({
       dealDataSource: this.computeDataSource(
-        data.map(item => ({
-          [OB_DAY_FIELD]: moment(item),
-        })),
+        data
+          .filter(item => moment(item).isAfter(start))
+          .map(item => ({
+            [OB_DAY_FIELD]: moment(item),
+          })),
       ),
     });
   };
@@ -308,9 +330,9 @@ class ObserveModalInput extends InputBase<
                   //   height: params.context.rowHeight,
                   // }}
                 >
-                  <Button size="small" type="danger" onClick={this.bindRemove(index)}>
+                  <a style={{ color: 'red' }} onClick={this.bindRemove(index)}>
                     删除
-                  </Button>
+                  </a>
                 </Row>
               ),
             },
@@ -382,6 +404,8 @@ class ObserveModalInput extends InputBase<
             destroyOnClose: true,
             width: 700,
             visible: this.state.visible,
+            onCancel: this.onCancel,
+            maskClosable: false,
           }}
           onClick={this.onOpen}
           style={{ width: '100%', display: 'block' }}
@@ -421,7 +445,6 @@ class ObserveModalInput extends InputBase<
               )}
               <SmartTable
                 dataSource={this.state.dealDataSource}
-                pagination={false}
                 rowKey={record => record[OB_DAY_FIELD].format('YYYY-MM-DD')}
                 onCellFieldsChange={this.handleCellValueChanged}
                 columns={this.getColumnDefs()}
@@ -455,11 +478,11 @@ export const ObservationDates: ILegColDef = {
     }
     return false;
   },
-  render: (val, record, index, { form, editing, colDef }) => (
+  render: (val, record, index, { form, editing, colDef, api }) => (
     <FormItem>
       {form.getFieldDecorator({
         rules: [getRequiredRule()],
-      })(<ObserveModalInput editing={editing} record={record} />)}
+      })(<ObserveModalInput editing={editing} record={record} api={api} />)}
     </FormItem>
   ),
 };

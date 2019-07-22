@@ -1,6 +1,5 @@
 import { Button } from 'antd';
 import { ButtonProps } from 'antd/lib/button';
-import { AnchorButtonProps, NativeButtonProps } from 'antd/lib/button/button';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
 import XLSX from 'xlsx';
@@ -29,35 +28,30 @@ const SheetJSFT = [
   'htm',
 ]
   // tslint:disable-next-line:only-arrow-functions
-  .map(function(x) {
-    return '.' + x;
-  })
+  .map(x => `.${x}`)
   .join(',');
 
 /* generate an array of column objects */
-const makeCols = refstr => {
-  const outs = [];
-  const cols = XLSX.utils.decode_range(refstr).e.c + 1;
-  for (let i = 0; i < cols; ++i) outs[i] = { name: XLSX.utils.encode_col(i), key: i };
-  return outs;
-};
+// const makeCols = refstr => {
+//   const outs = [];
+//   const cols = XLSX.utils.decode_range(refstr).e.c + 1;
+//   for (let i = 0; i < cols; ++i) outs[i] = { name: XLSX.utils.encode_col(i), key: i };
+//   return outs;
+// };
 
-export interface ISheetData {
-  cols: Array<{
-    name: string;
-    key: string;
-  }>;
+export interface SheetData {
+  cols: any[];
   data: string[][];
 }
 
-interface IImportButtonProps {
-  onImport?: (data: ISheetData) => void;
+interface InlineImportButtonProps {
+  onImport?: (data: SheetData) => void;
 }
 
-export type ImportButtonProps = ButtonProps & IImportButtonProps;
+export type ImportButtonProps = ButtonProps & InlineImportButtonProps;
 
 class ImportExcelButton extends PureComponent<ImportButtonProps> {
-  public handleFile = (file /*:File*/) => {
+  public handleFile = file => {
     /* Boilerplate to set up FileReader */
     const reader = new FileReader();
     const rABS = !!reader.readAsBinaryString;
@@ -72,9 +66,9 @@ class ImportExcelButton extends PureComponent<ImportButtonProps> {
       const ws = wb.Sheets[wsname];
       /* Convert array of arrays */
       //   data = XLSX.utils.sheet_to_json<string[]>(ws, { header: 1 });
-      data = wb.SheetNames.map((item, index) => {
-        return { [item]: XLSX.utils.sheet_to_json<string[]>(wb.Sheets[item], { header: 1 }) };
-      });
+      data = wb.SheetNames.map((item, index) => ({
+        [item]: XLSX.utils.sheet_to_json<string[]>(wb.Sheets[item], { header: 1 }),
+      })).map(item => _.values(item).map(props => props.filter(a => a.length !== 0)));
 
       /* Update state */
       this.onImport({ data, cols: wb.SheetNames, fileName: file.name });
@@ -84,9 +78,9 @@ class ImportExcelButton extends PureComponent<ImportButtonProps> {
     else reader.readAsArrayBuffer(file);
   };
 
-  public onImport = (data: ISheetData) => {
+  public onImport = (data: SheetData) => {
     if ('onImport' in this.props) {
-      return this.props.onImport(data);
+      this.props.onImport(data);
     }
   };
 
@@ -102,7 +96,7 @@ class ImportExcelButton extends PureComponent<ImportButtonProps> {
   public render() {
     const { children, ...rest } = this.props;
     return (
-      <Button {..._.omit(rest, ['onImport']) as ButtonProps}>
+      <Button {...(_.omit(rest, ['onImport']) as ButtonProps)}>
         {children}
         <DataInput handleFile={this.handleFile} />
       </Button>
@@ -120,6 +114,7 @@ export interface DataInputProps {
     handleFile(file:File):void;
 */
 // tslint:disable-next-line:max-classes-per-file
+// eslint-disable-next-line react/no-multi-comp
 class DataInput extends PureComponent<DataInputProps> {
   public $input: HTMLInputElement = null;
 
@@ -128,15 +123,15 @@ class DataInput extends PureComponent<DataInputProps> {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  public handleChange(e) {
-    const files = e.target.files;
-    if (files && files[0]) this.props.handleFile(files[0]);
-    this.$input.value = '';
-  }
-
   public getRef = node => {
     this.$input = node;
   };
+
+  public handleChange(e) {
+    const { files } = e.target;
+    if (files && files[0]) this.props.handleFile(files[0]);
+    this.$input.value = '';
+  }
 
   public render() {
     return (

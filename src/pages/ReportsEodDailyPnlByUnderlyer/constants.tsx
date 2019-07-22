@@ -20,81 +20,73 @@ export const TABLE_COL_DEFS = [
     align: 'right',
     dataIndex: 'dailyPnl',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '当日期权盈亏 (¥)',
     align: 'right',
     dataIndex: 'dailyOptionPnl',
     width: 140,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '当日标的物盈亏 (¥)',
     align: 'right',
     dataIndex: 'dailyUnderlyerPnl',
     width: 150,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
+  },
+  {
+    title: '当日新交易',
+    dataIndex: 'pnlContributionNew',
+    width: 130,
+  },
+  {
+    title: '当日结算贡献',
+    dataIndex: 'pnlContributionSettled',
+    width: 130,
   },
   {
     title: 'Delta贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionDelta',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Gamma贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionGamma',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Vega贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionVega',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Theta贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionTheta',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: 'Rho贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionRho',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '其他贡献 (¥)',
     align: 'right',
     dataIndex: 'pnlContributionUnexplained',
     width: 130,
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '定价环境',

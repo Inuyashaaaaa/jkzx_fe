@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
@@ -23,8 +25,6 @@ import {
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -58,13 +58,13 @@ import { Term } from '../../containers/legFields/Term';
 import { UnderlyerInstrumentId } from '../../containers/legFields/UnderlyerInstrumentId';
 import { UnderlyerMultiplier } from '../../containers/legFields/UnderlyerMultiplier';
 import { commonLinkage } from '../common';
-import { PaymentType } from '../../containers/legFields/PaymentType';
-import { Payment } from '../../containers/legFields/Payment';
+import { Rebate } from '../../containers/legFields/Rebate';
 import { RebateType } from '../../containers/legFields/RebateType';
 import { ObservationType } from '../../containers/legFields/ObservationType';
 import { Unit } from '../../containers/legFields/Unit';
 import { legPipeLine } from '../_utils';
 import { TradeNumber } from '../../containers/legFields/TradeNumber';
+import { RebateUnit } from '../../containers/legFields/RebateUnit';
 
 export const DigitalLegAmerican: ILeg = legPipeLine({
   name: LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP.DIGITAL_AMERICAN],
@@ -85,7 +85,9 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         Strike,
         Term,
         ExpirationDate,
-        Payment,
+        RebateType,
+        RebateUnit,
+        Rebate,
         ParticipationRate,
         NotionalAmount,
         ObservationType,
@@ -111,17 +113,16 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         ParticipationRate,
         NotionalAmountType,
         NotionalAmount,
-        PaymentType,
-        Payment,
         PremiumType,
         Premium,
         FrontPremium,
         MinimumPremium,
         ExpirationDate,
-        // ExpirationTime,
         EffectiveDate,
         ObservationType,
         RebateType,
+        RebateUnit,
+        Rebate,
         Unit,
         TradeNumber,
         ...TOTAL_EDITING_FIELDS,
@@ -144,8 +145,6 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         ParticipationRate,
         NotionalAmountType,
         NotionalAmount,
-        PaymentType,
-        Payment,
         PremiumType,
         Premium,
         FrontPremium,
@@ -154,6 +153,8 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
         EffectiveDate,
         ObservationType,
         RebateType,
+        RebateUnit,
+        Rebate,
         Unit,
         TradeNumber,
       ];
@@ -176,14 +177,9 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
-      [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(env === LEG_ENV.PRICING
-        ? {
-            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : null),
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
+      [LEG_FIELD.REBATE_TYPE]:
+        env === LEG_ENV.PRICING || env === LEG_ENV.BOOKING ? '' : REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.CONTINUOUS,
     });
   },
@@ -227,8 +223,7 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.AMERICAN;
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
-
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
     return nextPosition;
   },
   getPageData: (env: string, position: any) => {},
@@ -240,7 +235,7 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -250,7 +245,7 @@ export const DigitalLegAmerican: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });

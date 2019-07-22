@@ -1,4 +1,4 @@
-/* eslint-disable */
+/*eslint-disable */
 import { Modal, Button, Cascader, Divider, Icon, notification, Row, Steps, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
@@ -16,14 +16,9 @@ import {
   SmartTable,
 } from '@/containers';
 import { remove, uuid } from '@/tools';
-import { UPLOAD_URL } from '@/services/document';
+import { UPLOAD_URL, HREF_UPLOAD_URL } from '@/services/document';
 import { createRefParty } from '@/services/reference-data-service';
-import {
-  BASE_FORM_FIELDS,
-  HREF_UPLOAD_URL,
-  PARTY_DOC_CREATE_OR_UPDATE,
-  TRADER_TYPE,
-} from './constants';
+import { BASE_FORM_FIELDS, PARTY_DOC_CREATE_OR_UPDATE, TRADER_TYPE } from './constants';
 import EmailInput from '@/containers/EmailInput';
 import { getToken } from '@/tools/authority';
 import { wkValidProcessCanStart, wkProcessInstanceCreate } from '@/services/approval';
@@ -450,7 +445,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -495,7 +490,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -551,7 +546,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -661,7 +656,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -676,7 +671,7 @@ const CreateModalButton = memo<any>(props => {
                             required: false,
                           },
                         ],
-                      })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                      })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                     </FormItem>
                   ),
                 },
@@ -878,7 +873,7 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '姓名为必填项',
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -894,7 +889,7 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '身份证号为必填项',
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -910,10 +905,10 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '证件有效期为必填项',
                             },
                           ],
-                        })(<DatePicker editing={editable} format={'YYYY-MM-DD'} />)}
+                        })(<DatePicker editing={editable} format="YYYY-MM-DD" />)}
                       </FormItem>
                     ),
                   },
@@ -926,7 +921,7 @@ const CreateModalButton = memo<any>(props => {
                           rules: [
                             {
                               required: true,
-                              message: '必填',
+                              message: '联系电话为必填项',
                             },
                           ],
                         })(<Input editing={editable} />)}
@@ -1435,10 +1430,8 @@ const CreateModalButton = memo<any>(props => {
                         attachFormData[item].value,
                         '[0].response.result.uuid',
                       );
-                      console.log(baseData[item], attachFormData[item].value);
                     }
                   });
-                  console.log(baseData);
 
                   const tradeAuthorizer = traderList.map(item => ({
                     tradeAuthorizerName: item.姓名.value,
@@ -1484,7 +1477,7 @@ const CreateModalButton = memo<any>(props => {
                 const ref = currenStep === 3 ? tableEl : formRef;
                 const res = await ref.current.validate();
                 if (_.isArray(res)) {
-                  if (res.some(value => value.error)) return;
+                  if (_.some(res, value => value.errors)) return;
                 } else if (res.error) {
                   return;
                 }

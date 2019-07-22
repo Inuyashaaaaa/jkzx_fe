@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
@@ -23,8 +25,6 @@ import {
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -61,7 +61,6 @@ import { commonLinkage } from '../common';
 import { PaymentType } from '../../containers/legFields/PaymentType';
 import { Payment } from '../../containers/legFields/Payment';
 import { RebateType } from '../../containers/legFields/RebateType';
-import { ObservationType } from '../../containers/legFields/ObservationType';
 import { Unit } from '../../containers/legFields/Unit';
 import { legPipeLine } from '../_utils';
 import { TradeNumber } from '../../containers/legFields/TradeNumber';
@@ -88,7 +87,6 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         Payment,
         ParticipationRate,
         NotionalAmount,
-        ObservationType,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
         ...GENERAL_COMPUTED_FIELDS,
@@ -120,7 +118,6 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         ExpirationDate,
         // ExpirationTime,
         EffectiveDate,
-        ObservationType,
         RebateType,
         Unit,
         TradeNumber,
@@ -152,7 +149,6 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         MinimumPremium,
         ExpirationDate,
         EffectiveDate,
-        ObservationType,
         RebateType,
         Unit,
         TradeNumber,
@@ -176,15 +172,15 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [LEG_FIELD.PAYMENT_TYPE]: PAYMENT_TYPE_MAP.PERCENT,
-      ...(env === LEG_ENV.PRICING
-        ? {
-            [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
-            [LEG_FIELD.TERM]: DEFAULT_TERM,
-          }
-        : null),
-      [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
-      [LEG_FIELD.OBSERVATION_TYPE]: OBSERVATION_TYPE_MAP.TERMINAL,
+      ...(env === LEG_ENV.BOOKING && {
+        [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
+      }),
+      ...(env === LEG_ENV.PRICING && {
+        [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
+        [LEG_FIELD.TERM]: DEFAULT_TERM,
+      }),
     });
   },
   getPosition: (env: string, dataItem: any, baseInfo: any) => {
@@ -227,7 +223,13 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
       getMoment(nextPosition.asset.settlementDate).format('YYYY-MM-DD');
 
     nextPosition.asset.exerciseType = EXERCISETYPE_MAP.EUROPEAN;
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
+
+    // 定价的时候要注入额外 2 个参数
+    if (LEG_ENV.PRICING === env) {
+      nextPosition.asset[LEG_FIELD.REBATE_TYPE] = REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY;
+      nextPosition.asset[LEG_FIELD.OBSERVATION_TYPE] = OBSERVATION_TYPE_MAP.TERMINAL;
+    }
 
     return nextPosition;
   },
@@ -240,7 +242,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -250,7 +252,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
   },
 });

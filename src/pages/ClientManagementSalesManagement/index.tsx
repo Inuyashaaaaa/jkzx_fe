@@ -1,4 +1,8 @@
 /*eslint-disable */
+import { Button, Col, Icon, message, Modal, Popconfirm, Row, Tree } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import React, { PureComponent } from 'react';
+import _ from 'lodash';
 import { PAGE_SIZE } from '@/constants/component';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Input, Select, SmartTable } from '@/containers';
@@ -16,19 +20,17 @@ import {
   refSubsidiaryUpdate,
 } from '@/services/sales';
 import { arr2treeOptions, getMoment } from '@/tools';
-import { Button, Col, Icon, message, Modal, Popconfirm, Row, Tree } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import React, { PureComponent } from 'react';
 import CreateFormModal from './CreateFormModal';
 import styles from './index.less';
 import Operation from './Operation';
-import _ from 'lodash';
 
 const { TreeNode } = Tree;
 
 class ClientManagementSalesManagement extends PureComponent {
   public $subModalForm: Form2 = null;
+
   public $branchModalForm: Form2 = null;
+
   public $refCreateFormModal: Form2 = null;
 
   public state = {
@@ -38,8 +40,6 @@ class ClientManagementSalesManagement extends PureComponent {
     confirmLoading: false,
     createFormData: {},
     treeNodeData: [],
-    key: '',
-    editable: false,
     subModalVisible: false,
     branchModalVisible: false,
     subFormData: {},
@@ -54,6 +54,7 @@ class ClientManagementSalesManagement extends PureComponent {
       pageSize: PAGE_SIZE,
     },
     subList: [],
+    fetchData: undefined,
   };
 
   public componentDidMount = () => {
@@ -69,39 +70,29 @@ class ClientManagementSalesManagement extends PureComponent {
       ['subsidiaryId', 'branchId'],
       ['subsidiaryName', 'branchName'],
     );
-    const branchSalesList = newData.map(subsidiaryName => {
-      return {
-        value: subsidiaryName.value,
-        label: subsidiaryName.label,
-        children: subsidiaryName.children.map(branchName => {
-          return {
-            value: branchName.value,
-            label: branchName.label,
-          };
-        }),
-      };
-    });
+    const branchSalesList = newData.map(subsidiaryName => ({
+      value: subsidiaryName.value,
+      label: subsidiaryName.label,
+      children: subsidiaryName.children.map(branchName => ({
+        value: branchName.value,
+        label: branchName.label,
+      })),
+    }));
 
     const subData = arr2treeOptions(data, ['subsidiaryId'], ['subsidiaryName']);
-    const subList = subData.map(subsidiaryName => {
-      return {
-        value: subsidiaryName.value,
-        label: subsidiaryName.label,
-      };
-    });
+    const subList = subData.map(subsidiaryName => ({
+      value: subsidiaryName.value,
+      label: subsidiaryName.label,
+    }));
 
-    const treeData = newData.map(item => {
-      return {
-        title: item.label,
-        key: item.value,
-        children: item.children.map(branchName => {
-          return {
-            title: branchName.label,
-            key: item.label + '/' + item.value + '/' + branchName.value,
-          };
-        }),
-      };
-    });
+    const treeData = newData.map(item => ({
+      title: item.label,
+      key: item.value,
+      children: item.children.map(branchName => ({
+        title: branchName.label,
+        key: `${item.label}/${item.value}/${branchName.value}`,
+      })),
+    }));
     this.setState({
       treeNodeData: treeData,
       branchSalesList,
@@ -109,11 +100,11 @@ class ClientManagementSalesManagement extends PureComponent {
     });
   };
 
-  public fetchTable = async () => {
+  public fetchTable = async (props?) => {
     this.setState({
       loading: true,
     });
-    const { error, data } = await querySalers();
+    const { error, data } = await querySalers(props);
     this.setState({
       loading: false,
     });
@@ -124,9 +115,9 @@ class ClientManagementSalesManagement extends PureComponent {
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: !this.state.visible,
-    });
+    this.setState(state => ({
+      visible: !state.visible,
+    }));
   };
 
   public onCreate = async () => {
@@ -267,8 +258,8 @@ class ClientManagementSalesManagement extends PureComponent {
     );
   };
 
-  public renderTreeNodes = data => {
-    return _.sortBy(data, 'title').map(item => {
+  public renderTreeNodes = data =>
+    _.sortBy(data, 'title').map(item => {
       if (item.children) {
         return (
           <TreeNode
@@ -334,10 +325,8 @@ class ClientManagementSalesManagement extends PureComponent {
         />
       );
     });
-  };
 
   public onSelect = async selectedKeys => {
-    console.log(selectedKeys);
     if (!selectedKeys.length) return;
     const arr = selectedKeys[0].split('/');
     this.setState({
@@ -345,14 +334,17 @@ class ClientManagementSalesManagement extends PureComponent {
     });
     let salesRsp;
     if (arr.length === 3) {
+      this.setState({ fetchData: { branchId: arr[2] } });
       salesRsp = await querySalers({
         branchId: arr[2],
       });
     }
     if (arr.length === 1) {
       if (arr[0] === 'all') {
+        this.setState({ fetchData: undefined });
         salesRsp = await querySalers();
       } else {
+        this.setState({ fetchData: { subsidiaryId: arr[0] } });
         salesRsp = await querySalers({
           subsidiaryId: arr[0],
         });
@@ -362,7 +354,7 @@ class ClientManagementSalesManagement extends PureComponent {
       loading: false,
     });
     if (salesRsp.error) return;
-    return this.setState({
+    this.setState({
       dataSource: salesRsp.data,
     });
   };
@@ -409,7 +401,6 @@ class ClientManagementSalesManagement extends PureComponent {
   public handleConfirmBranch = async () => {
     const { error } = await this.$branchModalForm.validate();
     if (error) return;
-    console.log(this.state.branchFormData);
     const branchEdit = this.state.editBranch ? refBranchUpdate : refBranchCreate;
     const params = this.state.editBranch
       ? {
@@ -464,28 +455,28 @@ class ClientManagementSalesManagement extends PureComponent {
                 <h3>分公司/营业部</h3>
               </Col>
               <Col>
-                <Button onClick={this.onAdd} size={'small'} style={{ borderRadius: '4px' }}>
+                <Button onClick={this.onAdd} size="small" style={{ borderRadius: '4px' }}>
                   <Icon type="plus" />
                   分公司
                 </Button>
               </Col>
               <Col>
-                <Button onClick={this.onAddBranch} size={'small'} style={{ borderRadius: '4px' }}>
+                <Button onClick={this.onAddBranch} size="small" style={{ borderRadius: '4px' }}>
                   <Icon type="plus" />
                   营业部
                 </Button>
               </Col>
             </Row>
             <Tree
-              showLine={true}
+              showLine
               onSelect={this.onSelect}
               blockNode={false}
-              defaultExpandAll={true}
-              autoExpandParent={true}
-              defaultExpandParent={true}
+              defaultExpandAll
+              autoExpandParent
+              defaultExpandParent
               defaultSelectedKeys={['all']}
             >
-              <TreeNode key={'all'} title={'全部'}>
+              <TreeNode key="all" title="全部">
                 {this.renderTreeNodes(this.state.treeNodeData)}
               </TreeNode>
             </Tree>
@@ -510,7 +501,9 @@ class ClientManagementSalesManagement extends PureComponent {
                   }}
                   content={
                     <CreateFormModal
-                      refCreateFormModal={node => (this.$refCreateFormModal = node)}
+                      refCreateFormModal={node => {
+                        this.$refCreateFormModal = node;
+                      }}
                       dataSource={this.state.createFormData}
                       handleValueChange={this.handleValueChange}
                       branchSalesList={this.state.branchSalesList}
@@ -543,16 +536,18 @@ class ClientManagementSalesManagement extends PureComponent {
                   title: '创建时间',
                   width: 250,
                   dataIndex: 'createdAt',
-                  render: (text, record, index) => {
-                    return getMoment(text).format('YYYY-MM-DD HH:mm:ss');
-                  },
+                  render: (text, record, index) => getMoment(text).format('YYYY-MM-DD HH:mm:ss'),
                 },
                 {
                   title: '操作',
                   width: 250,
-                  render: (text, record, index) => {
-                    return <Operation record={record} fetchTable={this.fetchTable} />;
-                  },
+                  render: (text, record, index) => (
+                    <Operation
+                      record={record}
+                      fetchTable={this.fetchTable}
+                      fetchData={this.state.fetchData}
+                    />
+                  ),
                 },
               ]}
               loading={this.state.loading}
@@ -573,7 +568,9 @@ class ClientManagementSalesManagement extends PureComponent {
           onOk={this.handleConfirmSub}
         >
           <Form2
-            ref={node => (this.$subModalForm = node)}
+            ref={node => {
+              this.$subModalForm = node;
+            }}
             columnNumberOneRow={1}
             dataSource={this.state.subFormData}
             onFieldsChange={this.onSubFormChange}
@@ -582,20 +579,18 @@ class ClientManagementSalesManagement extends PureComponent {
               {
                 title: '分公司',
                 dataIndex: 'subsidiaryName',
-                render: (value, record, index, { form }) => {
-                  return (
-                    <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '分公司名称必填',
-                          },
-                        ],
-                      })(<Input placeholder="请输入分公司名称" />)}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form }) => (
+                  <FormItem labelCol={{ span: 8 }} wrapperCol={{ span: 16 }}>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '分公司名称必填',
+                        },
+                      ],
+                    })(<Input placeholder="请输入分公司名称" />)}
+                  </FormItem>
+                ),
               },
             ]}
           />
@@ -607,7 +602,9 @@ class ClientManagementSalesManagement extends PureComponent {
           onOk={this.handleConfirmBranch}
         >
           <Form2
-            ref={node => (this.$branchModalForm = node)}
+            ref={node => {
+              this.$branchModalForm = node;
+            }}
             dataSource={this.state.branchFormData}
             onFieldsChange={this.onBranchFormChange}
             footer={false}
@@ -615,43 +612,34 @@ class ClientManagementSalesManagement extends PureComponent {
               {
                 title: '分公司',
                 dataIndex: 'subsidiaryName',
-                render: (value, record, index, { form }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '分公司名称必填',
-                          },
-                        ],
-                      })(
-                        <Select
-                          options={this.state.subList}
-                          disabled={this.state.editBranch ? true : false}
-                        />,
-                      )}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '分公司名称必填',
+                        },
+                      ],
+                    })(<Select options={this.state.subList} disabled={!!this.state.editBranch} />)}
+                  </FormItem>
+                ),
               },
               {
                 title: '营业部',
                 dataIndex: 'branchName',
-                render: (value, record, index, { form }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '营业部名称必填',
-                          },
-                        ],
-                      })(<Input placeholder="请输入营业部名称" />)}
-                    </FormItem>
-                  );
-                },
+                render: (value, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '营业部名称必填',
+                        },
+                      ],
+                    })(<Input placeholder="请输入营业部名称" />)}
+                  </FormItem>
+                ),
               },
             ]}
           />

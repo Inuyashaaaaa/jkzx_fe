@@ -1,3 +1,5 @@
+import { Button } from 'antd';
+import React from 'react';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
   INPUT_NUMBER_DIGITAL_CONFIG,
@@ -5,8 +7,6 @@ import {
   UNIT_ENUM_MAP,
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
-import { Button } from 'antd';
-import React from 'react';
 
 export const EXPIRATION_FIXED_FORM_CONTROLS: IFormControl[] = [
   {
@@ -144,7 +144,7 @@ export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
       ...INPUT_NUMBER_CURRENCY_CNY_CONFIG,
       after: (
         <Button key="upload" type="primary" onClick={handleSettleAmount}>
-          结算
+          试结算
         </Button>
       ),
     },

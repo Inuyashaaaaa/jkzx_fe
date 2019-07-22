@@ -1,3 +1,6 @@
+import { Divider, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import React, { PureComponent } from 'react';
 import { Form2, Select, SmartTable } from '@/containers';
 import { trdTradeListBySimilarTradeId } from '@/services/general-service';
 import {
@@ -6,9 +9,6 @@ import {
   refSimilarLegalNameList,
 } from '@/services/reference-data-service';
 import { sortByCreateAt } from '@/services/sort';
-import { Divider, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import React, { PureComponent } from 'react';
 import CapitalInputModal from './CapitalInputModal';
 import { PROCESSED_COLUMN } from './tools';
 
@@ -17,23 +17,30 @@ class Processed extends PureComponent {
     dataSource: [],
     loading: false,
     searchFormData: {},
+    searchForm: {},
   };
 
   public componentDidMount = () => {
     this.fetchTable();
   };
 
-  public fetchTable = async () => {
+  public fetchTable = async (fromData, useSearchFormData = false) => {
     this.setState({
       loading: true,
     });
+    const { searchFormData, searchForm } = this.state;
     const { error, data } = await cliTradeTaskSearch({
-      ...Form2.getFieldsValue(this.state.searchFormData),
+      ...Form2.getFieldsValue(fromData || searchForm),
     });
     this.setState({
       loading: false,
     });
     if (error) return;
+    if (useSearchFormData) {
+      this.setState({
+        searchForm: searchFormData,
+      });
+    }
     this.setState({
       dataSource: sortByCreateAt(data),
     });
@@ -45,8 +52,8 @@ class Processed extends PureComponent {
         searchFormData: {},
       },
       () => {
-        this.fetchTable();
-      }
+        this.fetchTable(this.state.searchFormData, true);
+      },
     );
   };
 
@@ -62,100 +69,94 @@ class Processed extends PureComponent {
         <Form2
           layout="inline"
           dataSource={this.state.searchFormData}
-          submitText={'查询'}
+          submitText="查询"
           submitButtonProps={{
             icon: 'search',
           }}
-          onSubmitButtonClick={this.fetchTable}
+          onSubmitButtonClick={() => this.fetchTable(this.state.searchFormData, true)}
           onResetButtonClick={this.onReset}
           onFieldsChange={this.onSearchFormChange}
           columns={[
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (value: string = '') => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '主协议编号',
               dataIndex: 'masterAgreementId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refMasterAgreementSearch({
-                            masterAgreementId: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (value: string = '') => {
+                        const { data, error } = await refMasterAgreementSearch({
+                          masterAgreementId: value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '交易ID',
               dataIndex: 'tradeId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await trdTradeListBySimilarTradeId({
-                            similarTradeId: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (value: string = '') => {
+                        const { data, error } = await trdTradeListBySimilarTradeId({
+                          similarTradeId: value,
+                        });
+                        if (error) return [];
+                        return data.slice(0, 100).map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />

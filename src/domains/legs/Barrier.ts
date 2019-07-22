@@ -14,6 +14,7 @@ import {
   REBATETYPE_TYPE_MAP,
   REBATETYPE_UNIT_MAP,
   UNIT_ENUM_MAP,
+  FREQUENCY_TYPE_MAP,
 } from '@/constants/common';
 import {
   DEFAULT_DAYS_IN_YEAR,
@@ -94,7 +95,8 @@ const asyncLinkageBarrierShift = (
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.OBSERVATION_STEP, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.KNOCK_DIRECTION, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields)
+      Form2.fieldValueIsChange(LEG_FIELD.VOL, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.BARRIER_TYPE, changedFields)
     ) {
       const vol = Form2.getFieldValue(record[LEG_FIELD.VOL]);
       if (vol != null) {
@@ -250,8 +252,10 @@ export const BarrierLeg: ILeg = legPipeLine({
       [LEG_FIELD.REBATE_TYPE]: REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY,
       [LEG_FIELD.STRIKE]: 100,
       [LEG_FIELD.TERM]: DEFAULT_TERM,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [LEG_FIELD.DAYS_IN_YEAR]: DEFAULT_DAYS_IN_YEAR,
       [LEG_FIELD.SPECIFIED_PRICE]: SPECIFIED_PRICE_MAP.CLOSE,
+      [LEG_FIELD.OBSERVATION_STEP]: FREQUENCY_TYPE_MAP['1D'],
       ...(env === LEG_ENV.PRICING
         ? {
             [TRADESCOLDEFS_LEG_FIELD_MAP.Q]: 0,
@@ -378,24 +382,36 @@ export const BarrierLeg: ILeg = legPipeLine({
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.STRIKE, changedFields) ||
       Form2.fieldValueIsChange(LEG_FIELD.BARRIER_TYPE, changedFields) ||
-      Form2.fieldValueIsChange(LEG_FIELD.STRIKE_TYPE, changedFields)
+      Form2.fieldValueIsChange(LEG_FIELD.STRIKE_TYPE, changedFields) ||
+      Form2.fieldValueIsChange(LEG_FIELD.INITIAL_SPOT, changedFields)
     ) {
       let barrier = Form2.getFieldValue(record[LEG_FIELD.BARRIER]);
       let strike = Form2.getFieldValue(record[LEG_FIELD.STRIKE]);
       const initialSpot = Form2.getFieldValue(record[LEG_FIELD.INITIAL_SPOT]);
       if (barrier != null && strike != null) {
-        if (Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
-          barrier = new BigNumber(barrier)
-            .multipliedBy(0.01)
-            .multipliedBy(initialSpot)
-            .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+        if (
+          Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) ===
+          Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE])
+        ) {
+          barrier = barrier;
+          strike = strike;
+        } else if (initialSpot === undefined) {
+          barrier = strike;
+        } else {
+          if (Form2.getFieldValue(record[LEG_FIELD.BARRIER_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
+            barrier = new BigNumber(barrier)
+              .multipliedBy(0.01)
+              .multipliedBy(initialSpot)
+              .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+          }
+          if (Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
+            strike = new BigNumber(strike)
+              .multipliedBy(0.01)
+              .multipliedBy(initialSpot)
+              .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
+          }
         }
-        if (Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]) === UNIT_ENUM_MAP.PERCENT) {
-          strike = new BigNumber(strike)
-            .multipliedBy(0.01)
-            .multipliedBy(initialSpot)
-            .toPrecision(BIG_NUMBER_CONFIG.DECIMAL_PLACES);
-        }
+
         record[LEG_FIELD.OPTION_TYPE] =
           barrier > strike
             ? Form2.createField(OPTION_TYPE_MAP.CALL)

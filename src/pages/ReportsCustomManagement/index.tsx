@@ -1,20 +1,29 @@
+/* eslint-disable no-param-reassign */
 import React, { memo, useRef, useState } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
-import { Form2, Select, SmartTable } from '@/containers';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { Divider, DatePicker } from 'antd';
+import _ from 'lodash';
+import { Form2, Select, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { rptCustomReportNameList, rptCustomReportSearchPaged } from '@/services/report-service';
 import { REPORT_TYPE } from './constants';
 import { TABLE_COL_DEFS } from './tools';
-import _ from 'lodash';
 import { PAGE_SIZE } from '@/constants/component';
+
 const { RangePicker } = DatePicker;
 
 const ReportsCustomManagement = memo<any>(props => {
   const formSearch = useRef<Form2>(null);
   const [searchFormData, setSearchFormData] = useState({
+    ...Form2.createFields({
+      reportName: '',
+      reportType: '',
+      valuationDate: [moment().subtract(1, 'day'), moment()],
+    }),
+  });
+  const [searchForm, setSearchForm] = useState({
     ...Form2.createFields({
       reportName: '',
       reportType: '',
@@ -29,7 +38,7 @@ const ReportsCustomManagement = memo<any>(props => {
   const [tabelData, setTabelData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const OnSearch = async (searchData, currentPage) => {
+  const OnSearch = async (searchData, currentPage, setFetchFromUserAction = false) => {
     // const { error: verror } = await formSearch.current.validate();
     // if (verror) return;
     searchData = Form2.getFieldsValue(searchData);
@@ -47,6 +56,13 @@ const ReportsCustomManagement = memo<any>(props => {
     });
     setLoading(false);
     if (error) return;
+    if (setFetchFromUserAction) {
+      setSearchForm(searchFormData);
+    }
+    setPagination({
+      ...currentPage,
+      total: data.totalCount,
+    });
     setTabelData(data.page);
   };
 
@@ -56,7 +72,7 @@ const ReportsCustomManagement = memo<any>(props => {
       page,
       pageSize,
     });
-    OnSearch(searchFormData, { page, pageSize });
+    OnSearch(searchForm, { page, pageSize });
   };
 
   const handlePaninationChange = (page, pageSize) => {
@@ -68,30 +84,44 @@ const ReportsCustomManagement = memo<any>(props => {
   };
 
   useLifecycles(() => {
-    OnSearch(searchFormData, pagination);
+    OnSearch(searchForm, pagination);
   });
 
   return (
     <>
       <Page title="自定义报告管理">
         <Form2
-          ref={node => (formSearch.current = node)}
+          ref={node => {
+            formSearch.current = node;
+          }}
           onResetButtonClick={() => {
-            const _search = Form2.createFields({
+            const newsearch = Form2.createFields({
               reportName: '',
               reportType: '',
               valuationDate: [moment().subtract(1, 'day'), moment()],
             });
-            setSearchFormData(_search);
-            OnSearch(_search, pagination);
+            setSearchFormData(newsearch);
+            OnSearch(newsearch, {
+              page: 1,
+              pageSize: 15,
+              total: null,
+            });
           }}
           onSubmitButtonClick={async ({ domEvent }) => {
             domEvent.preventDefault();
-            OnSearch(searchFormData, pagination);
+            // setSearchForm(searchFormData);
+            OnSearch(
+              searchFormData,
+              {
+                page: 1,
+                pageSize: 15,
+              },
+              true,
+            );
           }}
           layout="inline"
           submitText="查询"
-          onFieldsChange={(props, changedFields, allFields) => {
+          onFieldsChange={(propsData, changedFields, allFields) => {
             setSearchFormData(allFields);
           }}
           dataSource={searchFormData}
@@ -99,68 +129,62 @@ const ReportsCustomManagement = memo<any>(props => {
             {
               title: '报告名称',
               dataIndex: 'reportName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        filterOption={true}
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        options={async value => {
-                          const { data, error } = await rptCustomReportNameList({});
-                          if (error) return [];
-                          return _.concat(
-                            {
-                              label: '全部',
-                              value: '',
-                            },
-                            data.map(item => ({
-                              label: item,
-                              value: item,
-                            }))
-                          );
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      filterOption
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      options={async value => {
+                        const { data, error } = await rptCustomReportNameList({});
+                        if (error) return [];
+                        return _.concat(
+                          {
+                            label: '全部',
+                            value: '',
+                          },
+                          data.map(item => ({
+                            label: item,
+                            value: item,
+                          })),
+                        );
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '报告类型',
               dataIndex: 'reportType',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        fetchOptionsOnSearch={true}
-                        showSearch={true}
-                        options={REPORT_TYPE}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      fetchOptionsOnSearch
+                      showSearch
+                      options={REPORT_TYPE}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '报告日期',
               dataIndex: 'valuationDate',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true }],
-                    })(<RangePicker allowClear={false} />)}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [{ required: true }],
+                  })(<RangePicker allowClear={false} />)}
+                </FormItem>
+              ),
             },
           ]}
         />

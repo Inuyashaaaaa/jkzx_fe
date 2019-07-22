@@ -1,4 +1,9 @@
-/*eslint-disable */
+import { Button, Col, message, Modal, Row, Tag } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { PureComponent } from 'react';
 import { ITableColDef } from '@/components/type';
 import {
   BIG_NUMBER_CONFIG,
@@ -17,12 +22,6 @@ import Form from '@/containers/Form';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
 import { formatMoney, getMoment, isRangeAccruals, isAsian } from '@/tools';
-import { Button, Col, message, Modal, Row, Tag } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import BigNumber from 'bignumber.js';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { PureComponent } from 'react';
 import AsianExerciseModal from '../AsianExerciseModal';
 import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
 import ExpirationModal from '../ExpirationModal';
@@ -35,6 +34,7 @@ class FixingModal extends PureComponent<
   {
     visible?: boolean;
     data?: any;
+    handleFixingEdited?: any;
   },
   any
 > {
@@ -44,12 +44,17 @@ class FixingModal extends PureComponent<
 
   public currentUser: any = {};
 
+  public changedPrice: boolean = false;
+
+  public rowKey: string = OB_DAY_FIELD;
+
   public state = {
     visible: false,
     modalConfirmLoading: false,
     tableData: [],
     avg: 0,
     upBarrierType: '',
+    edited: false,
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -57,6 +62,7 @@ class FixingModal extends PureComponent<
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
+    this.changedPrice = false;
     const tableData = filterObDays(getObservertionFieldData(data)).map(item => ({
       ...item,
       [OB_PRICE_FIELD]: Form2.createField(item[OB_PRICE_FIELD]),
@@ -87,7 +93,7 @@ class FixingModal extends PureComponent<
   });
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    this.setState(state => ({ modalConfirmLoading: !state.modalConfirmLoading }));
   };
 
   public switchModal = () => {
@@ -96,7 +102,9 @@ class FixingModal extends PureComponent<
         visible: false,
       },
       () => {
-        this.reload();
+        if (this.changedPrice) {
+          this.reload();
+        }
       },
     );
   };
@@ -124,7 +132,14 @@ class FixingModal extends PureComponent<
         visible: false,
       },
       () => {
-        this.$asianExerciseModal.show(this.data, this.tableFormData, this.currentUser, this.reload);
+        this.$asianExerciseModal.show(
+          this.data,
+          this.tableFormData,
+          this.currentUser,
+          this.reload,
+          // this.changedPrice,
+          true,
+        );
       },
     );
   };
@@ -234,6 +249,18 @@ class FixingModal extends PureComponent<
       },
     });
     if (error) return;
+    this.changedPrice = true;
+
+    this.setState(
+      {
+        edited: true,
+      },
+      () => {
+        if (this.props.handleFixingEdited) {
+          this.props.handleFixingEdited();
+        }
+      },
+    );
     message.success('观察价格更新成功');
   };
 
@@ -260,7 +287,7 @@ class FixingModal extends PureComponent<
           render: (val, record, index) => `${formatMoney(val)} %`,
         },
         {
-          title: '已观察到价格(可编辑)',
+          title: '已观察到价格',
           dataIndex: OB_PRICE_FIELD,
           defaultEditing: false,
           editable: record => true,
@@ -304,7 +331,7 @@ class FixingModal extends PureComponent<
             },
           ]),
       {
-        title: '已观察到价格(可编辑)',
+        title: '已观察到价格',
         dataIndex: OB_PRICE_FIELD,
         defaultEditing: false,
         editable: record => true,
@@ -454,11 +481,13 @@ class FixingModal extends PureComponent<
           ref={node => {
             this.$expirationModal = node;
           }}
+          fixingEdited={this.state.edited}
         />
         <KnockOutModal
           ref={node => {
             this.$knockOutModal = node;
           }}
+          fixingEdited={this.state.edited}
         />
         <AsianExerciseModal
           ref={node => {
@@ -474,9 +503,8 @@ class FixingModal extends PureComponent<
           width={900}
         >
           <SmartTable
-            pagination={false}
             dataSource={this.state.tableData}
-            rowKey={OB_DAY_FIELD}
+            rowKey={this.rowKey}
             onCellFieldsChange={this.onCellFieldsChanged}
             onCellEditingChanged={this.onCellValueChanged}
             columns={this.getColumnDefs()}

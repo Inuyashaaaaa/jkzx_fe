@@ -1,28 +1,36 @@
-import { LEG_ENV } from '@/constants/legs';
-import { BOOKING_FROM_PRICING } from '@/constants/trade';
-import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
+import moment from 'moment';
 import {
-  createLegDataSourceItem,
-  convertTradePositions,
-  convertPricingHistoryTradePositions,
-} from '@/services/pages';
-import { ILeg } from '@/types/leg';
-import { Affix, Button, Col, Input, Modal, Row, notification, Alert, Drawer } from 'antd';
+  Affix,
+  Alert,
+  Button,
+  Col,
+  Drawer,
+  Input,
+  Modal,
+  notification,
+  Row,
+  DatePicker,
+} from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import router from 'umi/router';
-import './index.less';
-import { quotePrcCreate } from '@/services/trade-service';
 import {
-  TRADESCOL_FIELDS,
   COMPUTED_LEG_FIELDS,
   TRADESCOLDEFS_LEG_FIELD_MAP,
+  TRADESCOL_FIELDS,
 } from '@/constants/global';
+import { LEG_ENV } from '@/constants/legs';
+import { BOOKING_FROM_PRICING } from '@/constants/trade';
 import { Form2, Select } from '@/containers';
-import BigNumber from 'bignumber.js';
+import MultilLegCreateButton from '@/containers/MultiLegsCreateButton';
+import { convertPricingHistoryTradePositions, createLegDataSourceItem } from '@/services/pages';
 import { refSimilarLegalNameList } from '@/services/reference-data-service';
-import FormItem from 'antd/lib/form/FormItem';
+import { quotePrcCreate } from '@/services/trade-service';
+import { ILeg } from '@/types/leg';
 import HistoryPanel from './HistoryPanel';
+import './index.less';
 
 const ActionBar = memo<any>(props => {
   const {
@@ -35,11 +43,19 @@ const ActionBar = memo<any>(props => {
     testPricing,
     pricingLoading,
     tableEl,
+    validateDateTime,
+    setValidateDateTime,
   } = props;
 
   const onPricingEnvSelectChange = val => {
     setCurPricingEnv(val);
-    tableData.forEach(item => fetchDefaultPricingEnvData(item, true));
+    tableData.forEach(item =>
+      fetchDefaultPricingEnvData({
+        record: item,
+        reload: true,
+        pricingEnv: val,
+      }),
+    );
   };
 
   const [affix, setAffix] = useState(false);
@@ -48,6 +64,17 @@ const ActionBar = memo<any>(props => {
   const [saveLoading, setSaveLoading] = useState(false);
   const [counterPartyCode, setCounterPartyCode] = useState(undefined);
   const [visible, setVisible] = useState(false);
+
+  const onValidateDateTimeChange = value => {
+    setValidateDateTime(value);
+    tableData.forEach(item =>
+      fetchDefaultPricingEnvData({
+        record: item,
+        reload: true,
+        curValidateDateTime: value,
+      }),
+    );
+  };
 
   return (
     <Affix offsetTop={0} onChange={affixs => setAffix(affixs)}>
@@ -79,24 +106,38 @@ const ActionBar = memo<any>(props => {
             />
           </Col>
           <Col style={{ marginLeft: 15 }}>定价环境:</Col>
-          <Col style={{ marginLeft: 10, width: 400 }}>
-            <Input.Group compact>
-              <Select
-                loading={curPricingEnv === null}
-                onChange={onPricingEnvSelectChange}
-                value={curPricingEnv}
-                style={{ width: 200 }}
-              >
-                {pricingEnvironmentsList.map(item => (
-                  <Select.Option key={item} value={item}>
-                    {item}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Button loading={pricingLoading} key="试定价" type="primary" onClick={testPricing}>
-                试定价
-              </Button>
-            </Input.Group>
+          <Col style={{ marginLeft: 10 }}>
+            <Select
+              loading={curPricingEnv === null}
+              onChange={onPricingEnvSelectChange}
+              value={curPricingEnv}
+              style={{ width: 200 }}
+            >
+              {pricingEnvironmentsList.map(item => (
+                <Select.Option key={item.pricingEnvironmentId} value={item.pricingEnvironmentId}>
+                  {item.description}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col style={{ marginLeft: 15 }}>估值日期:</Col>
+          <Col style={{ marginLeft: 10 }}>
+            <DatePicker
+              value={validateDateTime}
+              onChange={onValidateDateTimeChange}
+              allowClear={false}
+            ></DatePicker>
+          </Col>
+          <Col style={{ marginLeft: 15 }}>
+            <Button
+              loading={pricingLoading}
+              key="试定价"
+              type="primary"
+              onClick={testPricing}
+              disabled={_.isEmpty(tableData)}
+            >
+              试定价
+            </Button>
           </Col>
         </Row>
         <Button.Group>

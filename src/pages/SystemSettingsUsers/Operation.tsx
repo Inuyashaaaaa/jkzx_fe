@@ -181,9 +181,13 @@ class Operation extends PureComponent<{
             <Menu onClick={this.onMenuClick}>
               <MenuItem key="reset">重置密码</MenuItem>
               <MenuItem key="modify">修改用户</MenuItem>
-              <MenuItem key="expired">
-                {this.props.record.expired ? '使用户在期' : '过期用户'}
-              </MenuItem>
+              {
+                this.props.record.userTypeName === '脚本用户' ? null : (
+                  <MenuItem key="expired">
+                    {this.props.record.expired ? '使用户在期' : '过期用户'}
+                  </MenuItem>
+                )
+              }
               <MenuItem key="locked">{this.props.record.locked ? '解锁用户' : '锁定用户'}</MenuItem>
             </Menu>
           }

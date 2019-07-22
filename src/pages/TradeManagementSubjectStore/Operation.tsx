@@ -1,12 +1,12 @@
 /*eslint-disable */
-import React, { useRef, useState, memo } from 'react';
-import { Popconfirm, Divider, Modal, message } from 'antd';
 import { Form2 } from '@/containers';
-import { editFormControls } from './services';
 import { mktInstrumentCreate, mktInstrumentDelete } from '@/services/market-data-service';
-import _ from 'lodash';
-import moment, { isMoment } from 'moment';
 import { getMoment } from '@/tools';
+import { Divider, message, Modal, Popconfirm } from 'antd';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { memo, useRef, useState } from 'react';
+import { editFormControls } from './services';
 
 const Operation = memo<{ record: any; fetchTable: any }>(props => {
   let $form = useRef<Form2>(null);
@@ -44,6 +44,8 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     setEditformControlsState(editFormControls(props.record, 'edit'));
   };
 
+  const omitNull = obj => _.omitBy(obj, val => val === null);
+
   const composeInstrumentInfo = modalFormData => {
     modalFormData.expirationDate = modalFormData.expirationDate
       ? getMoment(modalFormData.expirationDate).format('YYYY-MM-DD')
@@ -66,24 +68,22 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
       'strike',
       'multiplier',
       'underlyerInstrumentId',
+      'tradeUnit',
+      'tradeCategory',
+      'unit',
     ];
-    let instrumentInfoSomeFields = instrumentInfoFields;
-    if (modalFormData.instrumentType === 'INDEX') {
-      instrumentInfoSomeFields = ['name', 'exchange'];
-    }
     const params = {
       ..._.omit(modalFormData, instrumentInfoFields),
-      instrumentInfo: omitNull(_.pick(modalFormData, instrumentInfoSomeFields)),
+      instrumentInfo: omitNull(_.pick(modalFormData, instrumentInfoFields)),
     };
     return omitNull(params);
   };
-
-  const omitNull = obj => _.omitBy(obj, val => val === null);
 
   const onEdit = async () => {
     const rsp = await $form.validate();
     if (rsp.error) return;
     setEditing(false);
+
     const newEditFormData = composeInstrumentInfo(Form2.getFieldsValue(editFormData));
     const { error, data } = await mktInstrumentCreate(newEditFormData);
     setEditing(false);
@@ -95,54 +95,53 @@ const Operation = memo<{ record: any; fetchTable: any }>(props => {
     message.success('编辑成功');
     setEditVisible(false);
     props.fetchTable();
-    return;
   };
 
   const filterFormData = (allFields, fields, columns) => {
-    const changed = Form2.getFieldsValue(fields);
+    const changed = fields;
     const column = columns.map(item => item.dataIndex);
-    const formData = _.pick(Form2.getFieldsValue(allFields), column);
+    const formData = _.pick(allFields, column);
     if (Object.keys(changed)[0] === 'assetClass') {
       return {
         ..._.pick(props.record, ['instrumentId']),
-        ...changed,
+        ...fields,
       };
     }
-    if (changed.instrumentType === 'STOCK') {
+    if (Form2.getFieldValue(changed.instrumentType) === 'STOCK') {
       return {
         ...formData,
-        multiplier: 1,
+        multiplier: Form2.createField(1),
       };
     }
     return formData;
   };
 
-  const onEditFormChange = (props, fields, allFields) => {
+  const onEditFormChange = (p, fields, allFields) => {
     const columns = editFormControls(Form2.getFieldsValue(allFields), 'edit');
     setEditformControlsState(columns);
-    setEditFormData(Form2.createFields(filterFormData(allFields, fields, columns)));
+    setEditFormData(filterFormData(allFields, fields, columns));
   };
 
   return (
     <>
-      <a href="javascript:;" style={{ color: '#1890ff' }} onClick={switchModal}>
+      <a style={{ color: '#1890ff' }} onClick={switchModal}>
         编辑
       </a>
       <Divider type="vertical" />
       <Popconfirm title="确定要删除吗？" onConfirm={onRemove}>
-        <a href="javascript:;" style={{ color: 'red' }}>
-          删除
-        </a>
+        <a style={{ color: 'red' }}>删除</a>
       </Popconfirm>
       <Modal
         visible={editVisible}
         onOk={onEdit}
         onCancel={switchModal}
         okButtonProps={{ loading: editing }}
-        title={'编辑标的物'}
+        title="编辑标的物"
       >
         <Form2
-          ref={node => ($form = node)}
+          ref={node => {
+            $form = node;
+          }}
           columns={editFormControlsState}
           dataSource={editFormData}
           onFieldsChange={onEditFormChange}

@@ -1,11 +1,11 @@
-import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP } from '@/constants/common';
+import { ValidationRule } from 'antd/lib/form';
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
+import { LEG_FIELD, RULES_REQUIRED, STRIKE_TYPES_MAP, LEG_TYPE_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { ValidationRule } from 'antd/lib/form';
-import FormItem from 'antd/lib/form/FormItem';
-import React from 'react';
 
 export const Strike3: ILegColDef = {
   title: '行权价3',
@@ -20,35 +20,48 @@ export const Strike3: ILegColDef = {
   render: (val, record, index, { form, editing, colDef }) => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     const getUnit = () => {
-      const val = Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]);
-      if (val === STRIKE_TYPES_MAP.CNY) {
+      if (Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]) === STRIKE_TYPES_MAP.CNY) {
         return '¥';
       }
-      if (val === STRIKE_TYPES_MAP.PERCENT) {
+      if (Form2.getFieldValue(record[LEG_FIELD.STRIKE_TYPE]) === STRIKE_TYPES_MAP.PERCENT) {
         return '%';
       }
       return '%';
     };
 
     const getRules = () => {
-      const val = Form2.getFieldValue(record[LEG_FIELD.STRIKE1]);
+      if (LEG_TYPE_MAP.TRIPLE_DIGITAL === record.$legType) {
+        return ([
+          {
+            message: '必须满足条件(行权价2 < 行权价3)',
+            validator(rule, value, callback) {
+              const strike3Val = value;
+              const strike2Val = Form2.getFieldValue(record[LEG_FIELD.STRIKE2]);
+              if (strike3Val != null && strike2Val != null) {
+                if (!(strike2Val < strike3Val)) {
+                  callback(true);
+                }
+              }
+              callback();
+            },
+          },
+        ] as ValidationRule[]).concat(RULES_REQUIRED);
+      }
       return ([
         {
-          message: '必须满足条件(行权价1 < 行权价2 < 行权价3)',
+          message: '必须满足条件(行权价2 <= 行权价3)',
           validator(rule, value, callback) {
-            if (
-              !(
-                Form2.getFieldValue(record[LEG_FIELD.STRIKE1]) <
-                  Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) &&
-                Form2.getFieldValue(record[LEG_FIELD.STRIKE2]) < value
-              )
-            ) {
-              return callback(true);
+            const strike3Val = value;
+            const strike2Val = Form2.getFieldValue(record[LEG_FIELD.STRIKE2]);
+            if (strike3Val != null && strike2Val != null) {
+              if (!(strike2Val <= strike3Val)) {
+                callback(true);
+              }
             }
             callback();
           },
         },
-      ] as ValidationRule[]).concat(RULES_REQUIRED);
+      ] as ValidationRule[]).concat(getRequiredRule());
     };
 
     return (
@@ -57,10 +70,10 @@ export const Strike3: ILegColDef = {
           rules: getRules(),
         })(
           <UnitInputNumber
-            autoSelect={true}
+            autoSelect
             editing={isBooking || isPricing ? editing : false}
             unit={getUnit()}
-          />
+          />,
         )}
       </FormItem>
     );

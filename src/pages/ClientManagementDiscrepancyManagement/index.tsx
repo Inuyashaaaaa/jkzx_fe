@@ -1,17 +1,27 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-param-reassign */
+import { message, Button, Modal, Divider, Row } from 'antd';
+import produce from 'immer';
+import _ from 'lodash';
+import moment, { isMoment } from 'moment';
+import React, { PureComponent } from 'react';
+import router from 'umi/router';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { createApprovalProcess } from '@/services/approval';
 import { cliFundEventSearch, refBankAccountSearch } from '@/services/reference-data-service';
-import { message, Button, Modal, Divider } from 'antd';
-import produce from 'immer';
-import _ from 'lodash';
-import moment, { isMoment } from 'moment';
-import React, { PureComponent } from 'react';
 import { SEARCH_FORM_CONTROLS, TABLE_COL_DEFS } from './constants';
 import { CREATE_FORM_CONTROLS } from './tools';
-import router from 'umi/router';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import SmartForm from '@/containers/SmartForm';
+import { formatMoney, getMoment } from '@/tools';
+import {
+  PAYMENT_DIRECTION_TYPE_ZHCN_MAP,
+  ACCOUNT_DIRECTION_TYPE_ZHCN_MAP,
+  PROCESS_STATUS_TYPES_ZHCN_MAPS,
+} from '@/constants/common';
+import styles from './index.less';
 
 class ClientManagementDiscrepancyManagement extends PureComponent {
   public $searchForm: Form2 = null;
@@ -20,9 +30,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
 
   public state = {
     dataSource: [],
-    searchFormData: {
-      processStatus: Form2.createField('all'),
-    },
+    searchFormData: {},
     loading: false,
     visible: false,
     confirmLoading: false,
@@ -37,31 +45,36 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     this.fetchTable();
   };
 
-  public fetchTable = async () => {
-    this.setState({
-      loading: true,
-    });
+  public handleSearchForm = () => {
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
-    const { error, data } = await cliFundEventSearch({
-      ..._.omit(searchFormData, ['paymentDate', 'processStatus']),
+    return {
+      ..._.omit(searchFormData, ['paymentDate']),
       ...(searchFormData.paymentDate
         ? {
             startDate: moment(searchFormData.paymentDate[0]).format('YYYY-MM-DD'),
             endDate: moment(searchFormData.paymentDate[1]).format('YYYY-MM-DD'),
           }
         : null),
-      ...(searchFormData.processStatus && searchFormData.processStatus === 'all'
-        ? null
-        : { processStatus: searchFormData.processStatus }),
+    };
+  };
+
+  public fetchTable = async () => {
+    this.setState({
+      loading: true,
     });
+    const { error, data } = await cliFundEventSearch(this.handleSearchForm());
     this.setState({
       loading: false,
     });
     if (error) return;
+    const sortDataClient = [...data].sort((a, b) => a.clientId.localeCompare(b.clientId));
+
+    const sortDataDate = [...sortDataClient].sort(
+      (a, b) => getMoment(b.paymentDate).valueOf() - getMoment(a.paymentDate).valueOf(),
+    );
     this.setState({
-      dataSource: data,
+      dataSource: sortDataDate,
     });
-    return;
   };
 
   public onSearchFormChange = (props, fields, allFields) => {
@@ -73,13 +86,11 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
   public onReset = () => {
     this.setState(
       {
-        searchFormData: {
-          processStatus: Form2.createField('all'),
-        },
+        searchFormData: {},
       },
       () => {
         this.fetchTable();
-      }
+      },
     );
   };
 
@@ -126,9 +137,10 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       () => {
         message.success(data.processInstanceId ? '已进入流程' : '资金录入成功');
         if (data.processInstanceId) {
-          router.push('/approval-process/process-manangement');
+          return router.push('/approval-process/process-manangement');
         }
-      }
+        this.fetchTable();
+      },
     );
   };
 
@@ -140,12 +152,12 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
         legalName: Form2.getFieldValue(values.clientId),
       });
       if (error) return;
-      const bankAccountList = _.map(data, (val, key) => {
-        return {
-          label: _.pick(val, ['bankAccount']).bankAccount,
-          value: _.pick(val, ['bankAccount']).bankAccount,
-        };
-      });
+      const bankAccountList = _.map(data, (val, key) => ({
+        label: _.pick(val, ['bankAccount']).bankAccount,
+        value: _.pick(val, ['bankAccount']).bankAccount,
+        bankName: _.pick(val, ['bankName']).bankName,
+        bankAccountName: _.pick(val, ['bankAccountName']).bankAccountName,
+      }));
       this.setState({
         bankAccountList,
         createFormData: values,
@@ -158,15 +170,29 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
   };
 
   public showModal = () => {
-    this.setState({ visible: !this.state.visible });
+    const { visible } = this.state;
+    this.setState({ visible: !visible });
   };
+
+  public handleDataSource = data =>
+    data.map(item => ({
+      ...item,
+      paymentAmount: formatMoney(item.paymentAmount),
+      paymentDirection:
+        PAYMENT_DIRECTION_TYPE_ZHCN_MAP[item.paymentDirection] || item.paymentDirection,
+      accountDirection:
+        ACCOUNT_DIRECTION_TYPE_ZHCN_MAP[item.accountDirection] || item.accountDirection,
+      processStatus: PROCESS_STATUS_TYPES_ZHCN_MAPS[item.processStatus] || item.processStatus,
+    }));
 
   public render() {
     return (
       <Page>
         <SmartForm
           spread={3}
-          ref={node => (this.$searchForm = node)}
+          ref={node => {
+            this.$searchForm = node;
+          }}
           dataSource={this.state.searchFormData}
           columns={SEARCH_FORM_CONTROLS}
           layout="inline"
@@ -176,9 +202,29 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
           onSubmitButtonClick={this.fetchTable}
         />
         <Divider />
-        <Button type="primary" style={{ marginBottom: VERTICAL_GUTTER }} onClick={this.showModal}>
-          出入金录入
-        </Button>
+        <Row style={{ marginBottom: '20px' }} type="flex" justify="space-between">
+          <Button type="primary" style={{ marginBottom: VERTICAL_GUTTER }} onClick={this.showModal}>
+            出入金录入
+          </Button>
+          <DownloadExcelButton
+            style={{ margin: '10px 0' }}
+            key="export"
+            type="primary"
+            data={{
+              searchMethod: cliFundEventSearch,
+              argument: {
+                searchFormData: this.handleSearchForm(),
+              },
+              cols: TABLE_COL_DEFS,
+              name: '财务出入金管理',
+              colSwitch: [],
+              handleDataSource: this.handleDataSource,
+            }}
+          >
+            导出Excel
+          </DownloadExcelButton>
+        </Row>
+
         <SmartTable
           rowKey="uuid"
           columns={TABLE_COL_DEFS}
@@ -188,17 +234,20 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
         <Modal
           visible={this.state.visible}
           confirmLoading={this.state.confirmLoading}
-          title={'出入金录入'}
+          title="出入金录入"
           onOk={this.onOk}
           onCancel={this.onCancel}
           maskClosable={false}
         >
           <Form2
-            ref={node => (this.$createForm = node)}
+            ref={node => {
+              this.$createForm = node;
+            }}
             dataSource={this.state.createFormData}
             columns={CREATE_FORM_CONTROLS(this.state.bankAccountList)}
             footer={false}
             onFieldsChange={this.createFormChange}
+            className={styles.createForm}
           />
         </Modal>
       </Page>

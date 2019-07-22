@@ -18,7 +18,7 @@ import _ from 'lodash';
 import React from 'react';
 
 export const RebateUnit: ILegColDef = {
-  title: '障碍补偿类型',
+  title: '敲出补偿类型',
   dataIndex: LEG_FIELD.REBATE_UNIT,
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
@@ -46,7 +46,7 @@ export const RebateUnit: ILegColDef = {
             defaultOpen={getDefaultOpen()}
             editing={editing}
             options={REBATETYPE_UNIT_OPTIONS}
-          />
+          />,
         )}
       </FormItem>
     );

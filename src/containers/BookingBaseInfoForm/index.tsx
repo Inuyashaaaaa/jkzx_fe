@@ -1,17 +1,18 @@
+import { Button, Input as AntInput, Modal, Typography } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import moment, { isMoment } from 'moment';
+import React, { memo, useState } from 'react';
+import _ from 'lodash';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { DatePicker, Form2, Input, Loading, Select, Table2 } from '@/containers';
 import {
   cliAccountListByLegalNames,
   refSalesGetByLegalName,
   refSimilarLegalNameList,
+  refFuzzyQueryEnabledPartyNames,
 } from '@/services/reference-data-service';
 import { refPartyGetByLegalName, trdBookListBySimilarBookName } from '@/services/trade-service';
 import { getFormEditingMeta } from '@/tools';
-import { Button, Input as AntInput, Modal, Typography } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import moment, { isMoment } from 'moment';
-import React, { memo, useState } from 'react';
-import _ from 'lodash';
 
 const InputGroup = AntInput.Group;
 const { Title } = Typography;
@@ -64,7 +65,7 @@ const BookingBaseInfoForm = memo<any>(props => {
       settradeTableData(
         !refPartyGetByLegalNameRsp.data.authorizers
           ? []
-          : refPartyGetByLegalNameRsp.data.authorizers
+          : refPartyGetByLegalNameRsp.data.authorizers,
       );
     }
 
@@ -118,11 +119,11 @@ const BookingBaseInfoForm = memo<any>(props => {
                     const val = () => {
                       if (value === 'BUY') {
                         return '买';
-                      } else if (value === 'SELL') {
-                        return '卖';
-                      } else {
-                        return '买卖';
                       }
+                      if (value === 'SELL') {
+                        return '卖';
+                      }
+                      return '买卖';
                     };
                     return <FormItem>{val()}</FormItem>;
                   },
@@ -134,11 +135,11 @@ const BookingBaseInfoForm = memo<any>(props => {
                     const val = () => {
                       if (value === 'FULL') {
                         return '交易';
-                      } else if (value === 'LIMITED') {
-                        return '限制交易';
-                      } else {
-                        return '交易标的';
                       }
+                      if (value === 'LIMITED') {
+                        return '限制交易';
+                      }
+                      return '交易标的';
                     };
                     return <FormItem>{val()}</FormItem>;
                   },
@@ -146,9 +147,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                 {
                   dataIndex: 'tradingPermissionNote',
                   title: '交易权限备注',
-                  render: (value, record, index) => {
-                    return <FormItem>{value}</FormItem>;
-                  },
+                  render: (value, record, index) => <FormItem>{value}</FormItem>,
                 },
                 {
                   dataIndex: 'tradingUnderlyers',
@@ -157,9 +156,8 @@ const BookingBaseInfoForm = memo<any>(props => {
                     const val = () => {
                       if (value === 'COMMODITY') {
                         return '商品';
-                      } else {
-                        return '个股商品';
                       }
+                      return '个股商品';
                     };
                     return <FormItem>{val()}</FormItem>;
                   },
@@ -177,7 +175,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                 {
                   dataIndex: 'cash',
                   title: '可用资金',
-                  render: value => <FormItem>{'¥ ' + value}</FormItem>,
+                  render: value => <FormItem>{`¥ ${value}`}</FormItem>,
                 },
               ]}
             />
@@ -199,7 +197,8 @@ const BookingBaseInfoForm = memo<any>(props => {
                 {
                   title: '证件有效期',
                   dataIndex: 'tradeAuthorizerIdExpiryDate',
-                  render: (value, record, index, { form }) => {
+                  render: (val, record, index, { form }) => {
+                    let value = val;
                     if (isMoment(value)) {
                       value = value.format('YYYY-MM-DD');
                     }
@@ -232,7 +231,7 @@ const BookingBaseInfoForm = memo<any>(props => {
         columnNumberOneRow={columnNumberOneRow}
         footer={false}
         dataSource={createFormData}
-        onFieldsChange={(props, changedFields, allFields) => {
+        onFieldsChange={(params, changedFields, allFields) => {
           setCreateFormData({
             ...createFormData,
             ..._.mapValues<any>(changedFields, (val, key) => {
@@ -246,7 +245,7 @@ const BookingBaseInfoForm = memo<any>(props => {
             }),
           });
         }}
-        onValuesChange={(props, changedValues, allValues) => {
+        onValuesChange={(params, changedValues, allValues) => {
           if (changedValues.counterPartyCode) {
             featchTradeData(Form2.getFieldValue(changedValues.counterPartyCode));
           }
@@ -256,216 +255,200 @@ const BookingBaseInfoForm = memo<any>(props => {
             ...formEditingMeta,
             dataIndex: 'bookName',
             title: '交易簿',
-            render: (val, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [
-                      {
-                        required: true,
-                        message: '交易簿为必填项',
-                      },
-                    ],
-                  })(
-                    <Select
-                      {...{
-                        editing,
-                        defaultOpen: editing ? false : true,
-                        showSearch: true,
-                        allowClear: true,
-                        fetchOptionsOnSearch: true,
-                        placeholder: '请输入内容搜索',
-                        options: async (value: string = '') => {
-                          const { data, error } = await trdBookListBySimilarBookName({
-                            similarBookName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
+            render: (val, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '交易簿为必填项',
+                    },
+                  ],
+                })(
+                  <Select
+                    {...{
+                      editing,
+                      defaultOpen: !editing,
+                      showSearch: true,
+                      allowClear: true,
+                      fetchOptionsOnSearch: true,
+                      placeholder: '请输入内容搜索',
+                      options: async (value: string = '') => {
+                        const { data, error } = await trdBookListBySimilarBookName({
+                          similarBookName: value,
+                        });
+                        if (error) return [];
+                        return data
+                          .sort((a, b) => a.localeCompare(b))
+                          .map(item => ({
                             label: item,
                             value: item,
                           }));
-                        },
-                      }}
-                    />
-                  )}
-                </FormItem>
-              );
-            },
+                      },
+                    }}
+                  />,
+                )}
+              </FormItem>
+            ),
           },
           {
             title: '交易编号',
             ...formEditingMeta,
             dataIndex: 'tradeId',
-            render: (val, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [
-                      {
-                        required: true,
-                        message: '交易编号为必填项',
-                      },
-                    ],
-                  })(<Input editing={editing} autoSelect={editing ? false : true} />)}
-                </FormItem>
-              );
-            },
+            render: (val, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '交易编号为必填项',
+                    },
+                  ],
+                })(<Input editing={editing} autoSelect={!editing} />)}
+              </FormItem>
+            ),
           },
           {
             title: '交易对手',
             ...formEditingMeta,
             dataIndex: 'counterPartyCode',
-            render: (val, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {editing ? (
-                    <>
-                      <InputGroup compact={true}>
-                        {form.getFieldDecorator({
-                          rules: [
-                            {
-                              required: true,
-                              message: '交易对手为必填项',
+            render: (val, record, index, { form, editing }) => (
+              <FormItem>
+                {editing ? (
+                  <>
+                    <InputGroup compact>
+                      {form.getFieldDecorator({
+                        rules: [
+                          {
+                            required: true,
+                            message: '交易对手为必填项',
+                          },
+                        ],
+                      })(
+                        <Select
+                          {...{
+                            style: {
+                              width: '60%',
                             },
-                          ],
-                        })(
-                          <Select
-                            {...{
-                              style: {
-                                width: '60%',
-                              },
-                              defaultOpen: editing ? false : true,
-                              editing,
-                              fetchOptionsOnSearch: true,
-                              showSearch: true,
-                              allowClear: true,
-                              placeholder: '请输入内容搜索',
-                              options: async (value: string = '') => {
-                                const { data, error } = await refSimilarLegalNameList({
-                                  similarLegalName: value,
-                                });
-                                if (error) return [];
-                                return data.map(item => ({
-                                  label: item,
-                                  value: item,
-                                }));
-                              },
-                            }}
-                          />
-                        )}
-                        <Button
-                          type="primary"
-                          style={{
-                            width: '40%',
+                            defaultOpen: !editing,
+                            editing,
+                            fetchOptionsOnSearch: true,
+                            showSearch: true,
+                            allowClear: true,
+                            placeholder: '请输入内容搜索',
+                            options: async (value: string = '') => {
+                              const { data, error } = await refFuzzyQueryEnabledPartyNames({
+                                similarLegalName: value,
+                              });
+                              if (error) return [];
+                              return data.map(item => ({
+                                label: item,
+                                value: item,
+                              }));
+                            },
                           }}
-                          onClick={async () => {
-                            setModalVisible(true);
-                            setLoading(true);
-                            await featchTraderInfo();
-                            setLoading(false);
-                          }}
-                          disabled={!Form2.getFieldValue(createFormData.counterPartyCode)}
-                        >
-                          查看交易对手
-                        </Button>
-                      </InputGroup>
-                    </>
-                  ) : (
-                    form.getFieldDecorator({
-                      rules: [
-                        {
-                          required: true,
-                          message: '交易对手为必填项',
-                        },
-                      ],
-                    })(<Input editing={editing} />)
-                  )}
-                </FormItem>
-              );
-            },
+                        />,
+                      )}
+                      <Button
+                        type="primary"
+                        style={{
+                          width: '40%',
+                        }}
+                        onClick={async () => {
+                          setModalVisible(true);
+                          setLoading(true);
+                          await featchTraderInfo();
+                          setLoading(false);
+                        }}
+                        disabled={!Form2.getFieldValue(createFormData.counterPartyCode)}
+                      >
+                        查看交易对手
+                      </Button>
+                    </InputGroup>
+                  </>
+                ) : (
+                  form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '交易对手为必填项',
+                      },
+                    ],
+                  })(<Input editing={editing} />)
+                )}
+              </FormItem>
+            ),
           },
           {
             title: '销售',
             ...formEditingMeta,
             dataIndex: 'salesCode',
-            render: (value, record, index, { form, editing }) => {
-              return (
-                <Loading loading={tradeBaseLoading}>
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [
-                        {
-                          required: true,
-                          message: '销售为必填项',
-                        },
-                      ],
-                    })(<Input editing={editing} disabled={true} />)}
-                  </FormItem>
-                </Loading>
-              );
-            },
-          },
-          {
-            title: '交易日',
-            ...formEditingMeta,
-            dataIndex: 'tradeDate',
-            render: (value, record, index, { form, editing }) => {
-              return (
+            render: (value, record, index, { form, editing }) => (
+              <Loading loading={tradeBaseLoading}>
                 <FormItem>
                   {form.getFieldDecorator({
                     rules: [
                       {
                         required: true,
-                        message: '交易日为必填项',
+                        message: '销售为必填项',
                       },
                     ],
-                  })(
-                    <DatePicker
-                      editing={editing}
-                      format="YYYY-MM-DD"
-                      defaultOpen={editing ? false : true}
-                    />
-                  )}
+                  })(<Input editing={editing} disabled />)}
                 </FormItem>
-              );
-            },
+              </Loading>
+            ),
+          },
+          {
+            title: '交易日',
+            ...formEditingMeta,
+            dataIndex: 'tradeDate',
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '交易日为必填项',
+                    },
+                  ],
+                })(<DatePicker editing={editing} format="YYYY-MM-DD" defaultOpen={!editing} />)}
+              </FormItem>
+            ),
           },
           {
             title: '备注',
             ...formEditingMeta,
             dataIndex: COMMON_FIELD,
-            render: (value, record, index, { form, editing }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator()(
-                    <Select
-                      editing={editing}
-                      mode="tags"
-                      style={{ width: '100%' }}
-                      tokenSeparators={[',']}
-                      options={[
-                        {
-                          label: '期权',
-                          value: '期权',
-                        },
-                        {
-                          label: '线性互换',
-                          value: '线性互换',
-                        },
-                        {
-                          label: '非线性互换',
-                          value: '非线性互换',
-                        },
-                        {
-                          label: '远期',
-                          value: '远期',
-                        },
-                      ]}
-                    />
-                  )}
-                </FormItem>
-              );
-            },
+            render: (value, record, index, { form, editing }) => (
+              <FormItem>
+                {form.getFieldDecorator()(
+                  <Select
+                    editing={editing}
+                    mode="tags"
+                    style={{ width: '100%' }}
+                    tokenSeparators={[',']}
+                    options={[
+                      {
+                        label: '期权',
+                        value: '期权',
+                      },
+                      {
+                        label: '线性互换',
+                        value: '线性互换',
+                      },
+                      {
+                        label: '非线性互换',
+                        value: '非线性互换',
+                      },
+                      {
+                        label: '远期',
+                        value: '远期',
+                      },
+                    ]}
+                  />,
+                )}
+              </FormItem>
+            ),
           },
         ]}
       />

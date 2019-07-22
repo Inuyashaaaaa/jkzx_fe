@@ -1,3 +1,7 @@
+import { Divider, message, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React, { PureComponent } from 'react';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, Select, SmartTable, Table2 } from '@/containers';
 import ModalButton from '@/containers/ModalButton';
@@ -8,12 +12,9 @@ import {
   rptValuationReportSearch,
 } from '@/services/reference-data-service';
 import { emlSendValuationReport } from '@/services/report-service';
-import { Divider, message, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React, { PureComponent } from 'react';
 import { VALUATION_COL_DEFS } from './tools';
 import { PAGE_SIZE } from '@/constants/component';
+import { getMoment } from '@/tools';
 
 class ClientManagementValuationManagement extends PureComponent {
   public $form: Form2 = null;
@@ -25,22 +26,13 @@ class ClientManagementValuationManagement extends PureComponent {
     searchFormData: {},
     selectedRows: [],
     selectedRowKeys: [],
-    pagination: {
-      current: 1,
-      pageSize: PAGE_SIZE,
-      total: 0,
-    },
   };
 
   public componentDidMount = () => {
     this.fetchTable();
   };
 
-  public getFormData = () => {
-    return _.mapValues(this.state.searchFormData, item => {
-      return _.get(item, 'value');
-    });
-  };
+  public getFormData = () => _.mapValues(this.state.searchFormData, item => _.get(item, 'value'));
 
   public fetchTable = async () => {
     this.uploading();
@@ -50,17 +42,17 @@ class ClientManagementValuationManagement extends PureComponent {
     });
     this.unUploading();
     if (error) return;
+    const sortClient = [...data].sort((a, b) => a.legalName.localeCompare(b.legalName));
+    const sortData = [...sortClient].sort(
+      (a, b) => getMoment(b.valuationDate).valueOf() - getMoment(a.valuationDate).valueOf(),
+    );
     this.setState({
-      dataSource: data,
-      pagination: {
-        ...this.state.pagination,
-        total: data.length,
-      },
+      dataSource: sortData,
     });
   };
 
   public onSearchFormChange = params => {
-    const values = params.values;
+    const { values } = params;
     this.setState({
       searchFormData: values,
     });
@@ -73,7 +65,7 @@ class ClientManagementValuationManagement extends PureComponent {
       },
       () => {
         this.fetchTable();
-      }
+      },
     );
   };
 
@@ -82,16 +74,17 @@ class ClientManagementValuationManagement extends PureComponent {
       visible: false,
       loading: true,
     });
-    const reportData = this.state.selectedRows.map(item => {
-      return _.mapKeys(_.pick(item, ['uuid', 'tradeEmail']), (value, key) => {
+    const reportData = this.state.selectedRows.map(item =>
+      _.mapKeys(_.pick(item, ['uuid', 'tradeEmail']), (value, key) => {
         if (key === 'tradeEmail') {
           return 'tos';
         }
         if (key === 'uuid') {
           return 'valuationReportId';
         }
-      });
-    });
+        return value;
+      }),
+    );
     const { error, data } = await emlSendValuationReport({
       params: reportData,
     });
@@ -101,22 +94,18 @@ class ClientManagementValuationManagement extends PureComponent {
       return;
     }
     if (data.ERROR) {
-      data.ERROR.map(item => {
+      data.ERROR.forEach(item => {
         if (item.error.includes('501 Bad address')) {
           message.error(`邮箱为${item.email}的用户文档发送失败,请确认邮箱是否正确`);
-          return;
         } else if (item.error.includes('UUID string')) {
           message.error(`邮箱为${item.email}的用户文档发送失败,文档不可用`);
-          return;
         } else {
           message.error(`邮箱为${item.email}的用户文档发送失败`);
-          return;
         }
       });
       return;
     }
     message.success('批量发送成功');
-    return;
   };
 
   public onClickBatch = async () => {
@@ -150,17 +139,8 @@ class ClientManagementValuationManagement extends PureComponent {
       },
       () => {
         this.fetchTable();
-      }
-    );
-  };
-
-  public onChange = (current, pageSize) => {
-    this.setState({
-      pagination: {
-        current,
-        pageSize,
       },
-    });
+    );
   };
 
   public onSelectionChanged = (selectedRowKeys, selectedRows) => {
@@ -180,7 +160,9 @@ class ClientManagementValuationManagement extends PureComponent {
     return (
       <Page>
         <Form2
-          ref={node => (this.$form = node)}
+          ref={node => {
+            this.$form = node;
+          }}
           layout="inline"
           dataSource={this.state.searchFormData}
           submitText="查询"
@@ -194,60 +176,56 @@ class ClientManagementValuationManagement extends PureComponent {
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (values: string = '') => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: values,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '主协议编号',
               dataIndex: 'masterAgreementId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refMasterAgreementSearch({
-                            masterAgreementId: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (values: string = '') => {
+                        const { data, error } = await refMasterAgreementSearch({
+                          masterAgreementId: values,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
@@ -270,17 +248,7 @@ class ClientManagementValuationManagement extends PureComponent {
         </Row>
         <div style={{ marginTop: VERTICAL_GUTTER }}>
           <SmartTable
-            pagination={{
-              position: 'bottom',
-              showSizeChanger: true,
-              onShowSizeChange: this.onChange,
-              showQuickJumper: true,
-              current: this.state.pagination.current,
-              pageSize: this.state.pagination.pageSize,
-              total: this.state.pagination.total,
-              onChange: this.onChange,
-            }}
-            rowKey={'uuid'}
+            rowKey="uuid"
             loading={this.state.loading}
             dataSource={this.state.dataSource}
             columns={VALUATION_COL_DEFS(this.uploading, this.unUploading)}
@@ -288,6 +256,7 @@ class ClientManagementValuationManagement extends PureComponent {
               selectedRowKeys: this.state.selectedRowKeys,
               onChange: this.onSelectionChanged,
             }}
+            scroll={{ x: 1500 }}
           />
         </div>
       </Page>

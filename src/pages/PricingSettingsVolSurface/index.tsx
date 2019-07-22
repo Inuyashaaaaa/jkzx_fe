@@ -115,7 +115,7 @@ class PricingSettingVolSurface extends PureComponent {
             '105% SPOT': 0,
             '110% SPOT': 0,
             '120% SPOT': 0,
-            id: uuidv4(),
+            // id: uuidv4(),
           },
         ];
         data = {
@@ -151,7 +151,14 @@ class PricingSettingVolSurface extends PureComponent {
               editable: record => true,
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
-                  {form.getFieldDecorator({})(
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '必填',
+                      },
+                    ],
+                  })(
                     <Select
                       style={{ minWidth: 180 }}
                       editing={editing}
@@ -169,19 +176,25 @@ class PricingSettingVolSurface extends PureComponent {
             dataIndex: item.field,
             defaultEditing: false,
             percent: item.percent,
+            strike: item.strike,
             width: 150,
             editable: record => true,
             render: (val, record, index, { form, editing }) => (
               <FormItem>
-                {form.getFieldDecorator({})(
-                  <UnitInputNumber autoSelect editing={editing} unit="%" min={0} />,
-                )}
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '必填',
+                    },
+                  ],
+                })(<UnitInputNumber autoSelect editing={editing} unit="%" min={0} />)}
               </FormItem>
             ),
           };
         });
     let tableDataSource = this.sortDataSource(dataSource);
-    tableDataSource = tableDataSource.map(item => Form2.createFields(item));
+    tableDataSource = tableDataSource.map(item => ({ ...Form2.createFields(item), id: uuidv4() }));
     const tableSelfFormData = {
       quote: underlyer.quote,
     };
@@ -301,14 +314,15 @@ class PricingSettingVolSurface extends PureComponent {
   };
 
   public handleCellValueChanged = params => {
-    this.setState({
-      tableDataSource: this.state.tableDataSource.map(item => {
+    this.setState(pre => ({
+      ...pre,
+      tableDataSource: pre.tableDataSource.map(item => {
         if (item.id === params.record.id) {
           return params.record;
         }
         return item;
       }),
-    });
+    }));
   };
 
   public render() {

@@ -8,13 +8,17 @@ import { Button, Icon, Input, Modal, notification, Popconfirm, List } from 'antd
 import React, { PureComponent } from 'react';
 import styles from './AuditGourpLists.less';
 import _ from 'lodash';
+import { Table2, Select, Form2 } from '@/containers';
+import FormItem from 'antd/lib/form/FormItem';
+
 class AuditLists extends PureComponent {
+  public $form: Form2 = null;
+
   public state = {
     approveGroupList: [],
     visible: false,
-    approveGroupName: '',
-    description: '',
     approveGroupId: '',
+    createFormData: {},
   };
 
   constructor(props) {
@@ -109,8 +113,10 @@ class AuditLists extends PureComponent {
     if (param) {
       this.setState({
         approveGroupId: param.approveGroupId,
-        approveGroupName: param.approveGroupName,
-        description: param.description,
+        createFormData: Form2.createFields({
+          approveGroupName: param.approveGroupName,
+          description: param.description,
+        }),
       });
     }
     this.setState({
@@ -120,10 +126,13 @@ class AuditLists extends PureComponent {
 
   public handleOk = async e => {
     if (this.state.approveGroupId) {
+      const res = await this.$form.validate();
+      if (res.error) {
+        return;
+      }
       const { data, error } = await wkApproveGroupModify({
         approveGroupId: this.state.approveGroupId,
-        approveGroupName: this.state.approveGroupName,
-        description: this.state.description ? this.state.description : '',
+        ...Form2.getFieldsValue(this.state.createFormData),
       });
       const { message } = error;
       if (error) {
@@ -144,8 +153,6 @@ class AuditLists extends PureComponent {
           approveGroupList,
           visible: false,
           approveGroupId: '',
-          approveGroupName: '',
-          description: '',
         },
         () => {
           this.changeGroupList();
@@ -153,9 +160,12 @@ class AuditLists extends PureComponent {
       );
       return;
     }
+    const res = await this.$form.validate();
+    if (res.error) {
+      return;
+    }
     const { data, error, raw } = await wkApproveGroupCreate({
-      approveGroupName: this.state.approveGroupName,
-      description: this.state.description,
+      ...Form2.getFieldsValue(this.state.createFormData),
     });
     const { message } = error;
     if (error) {
@@ -190,24 +200,22 @@ class AuditLists extends PureComponent {
     this.props.handleGroupList(this.state.approveGroupList);
   };
 
-  public handleInput = e => {
-    if (e.target.name === 'approveGroupName') {
-      this.setState({
-        approveGroupName: e.target.value,
-      });
-    } else {
-      this.setState({
-        description: e.target.value,
-      });
-    }
-  };
-
   public handleMenber = param => {
     if (!param) return;
     this.setState({
       indexGroupId: param.approveGroupId,
     });
     this.props.handleMenber(param);
+  };
+
+  public onValuesChange = (data, changedValues, allValues) => {
+    const { createFormData } = this.state;
+    this.setState({
+      createFormData: {
+        ...createFormData,
+        ...changedValues,
+      },
+    });
   };
 
   public render() {
@@ -275,18 +283,39 @@ class AuditLists extends PureComponent {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
         >
-          <p className={styles.modelInput}>
-            <span>名称:</span>
-            <Input
-              onChange={this.handleInput}
-              value={this.state.approveGroupName}
-              name="approveGroupName"
-            />
-          </p>
-          <p className={styles.modelInput}>
-            <span>描述:</span>
-            <Input onChange={this.handleInput} value={this.state.description} name="description" />
-          </p>
+          <Form2
+            ref={node => {
+              this.$form = node;
+            }}
+            dataSource={this.state.createFormData}
+            columns={[
+              {
+                title: '名称',
+                dataIndex: 'approveGroupName',
+                render: (val, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '名称为必填项',
+                        },
+                      ],
+                    })(<Input />)}
+                  </FormItem>
+                ),
+              },
+              {
+                title: '描述',
+                dataIndex: 'description',
+                render: (val, record, index, { form }) => (
+                  <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>
+                ),
+              },
+            ]}
+            footer={false}
+            onFieldsChange={this.onValuesChange}
+          />
         </Modal>
       </div>
     );

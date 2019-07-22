@@ -1,20 +1,20 @@
-import { uuid } from '@/tools';
 import { Select as AntdSelect, Tag } from 'antd';
 import { OptionProps, SelectProps } from 'antd/lib/select';
 import _, { debounce, omit } from 'lodash';
 import React from 'react';
+import { uuid } from '@/tools';
 import Loading from '../Loading';
 import { InputBase } from '../../components/type';
 
 export type IOptionProps = OptionProps & { label?: string | React.ReactNode };
 
-export interface ISelectProps extends SelectProps {
+export interface SelectProps extends SelectProps {
   options?: (IOptionProps[]) | ((value: any) => Promise<IOptionProps[]>);
   fetchOptionsOnSearch?: boolean;
 }
 
 class Select extends InputBase<
-  ISelectProps,
+  SelectProps,
   {
     loading: boolean;
     options?: IOptionProps[];
@@ -103,9 +103,15 @@ class Select extends InputBase<
         () => {
           this.lastRequestId = uuid();
           this.fetchOptions(value, this.lastRequestId);
-        }
+        },
       );
     }
+  };
+
+  public setOptions = options => {
+    this.setState({
+      options,
+    });
   };
 
   public renderEditing() {
@@ -122,10 +128,10 @@ class Select extends InputBase<
         {this.props.children ||
           (Array.isArray(this.props.options) ? this.props.options : this.state.options).map(
             (item, index) => (
-              <AntdSelect.Option key={index} {...omit(item, ['label'])}>
+              <AntdSelect.Option key={item.value} {...omit(item, ['label'])}>
                 {item.label}
               </AntdSelect.Option>
-            )
+            ),
           )}
       </AntdSelect>
     );

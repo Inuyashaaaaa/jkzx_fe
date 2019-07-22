@@ -1,3 +1,6 @@
+/*eslint-disable */
+import _ from 'lodash';
+import moment from 'moment';
 import {
   ASSET_CLASS_MAP,
   FREQUENCY_TYPE_MAP,
@@ -22,8 +25,6 @@ import { Form2 } from '@/containers';
 import { getMoment, getCurDateMoment } from '@/tools';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import {
   LEG_FIELD,
   NOTIONAL_AMOUNT_TYPE_MAP,
@@ -43,8 +44,6 @@ import { NotionalAmount } from '../../containers/legFields/NotionalAmount';
 import { NotionalAmountType } from '../../containers/legFields/NotionalAmountType';
 import { ObservationDates } from '../../containers/legFields/ObservationDates';
 import { ObservationStep } from '../../containers/legFields/ObservationStep';
-import { ObserveEndDay } from '../../containers/legFields/ObserveEndDay';
-import { ObserveStartDay } from '../../containers/legFields/ObserveStartDay';
 import { OptionType } from '../../containers/legFields/OptionType';
 import { ParticipationRate } from '../../containers/legFields/ParticipationRate';
 import { Premium } from '../../containers/legFields/Premium';
@@ -83,8 +82,6 @@ export const Asia: ILeg = legPipeLine({
         NotionalAmountType,
         NotionalAmount,
         ObservationStep,
-        ObserveStartDay,
-        ObserveEndDay,
         ObservationDates,
         TradeNumber,
         ...TOTAL_TRADESCOL_FIELDS,
@@ -114,8 +111,6 @@ export const Asia: ILeg = legPipeLine({
         FrontPremium,
         NotionalAmountType,
         NotionalAmount,
-        ObserveStartDay,
-        ObserveEndDay,
         ObservationStep,
         ObservationDates,
         Unit,
@@ -146,8 +141,6 @@ export const Asia: ILeg = legPipeLine({
         FrontPremium,
         NotionalAmountType,
         NotionalAmount,
-        ObserveStartDay,
-        ObserveEndDay,
         ObservationStep,
         ObservationDates,
         Unit,
@@ -166,14 +159,13 @@ export const Asia: ILeg = legPipeLine({
       [Strike.dataIndex]: 100,
       [SpecifiedPrice.dataIndex]: SPECIFIED_PRICE_MAP.CLOSE,
       [Term.dataIndex]: DEFAULT_TERM,
+      [LEG_FIELD.MINIMUM_PREMIUM]: 0,
       [EffectiveDate.dataIndex]: curDateMoment.clone(),
       [ExpirationDate.dataIndex]: curDateMoment.clone(),
       [SettlementDate.dataIndex]: curDateMoment.clone().add(DEFAULT_TERM, 'day'),
       [DaysInYear.dataIndex]: DEFAULT_DAYS_IN_YEAR,
       [PremiumType.dataIndex]: PREMIUM_TYPE_MAP.PERCENT,
       [NotionalAmountType.dataIndex]: NOTIONAL_AMOUNT_TYPE_MAP.CNY,
-      [ObserveStartDay.dataIndex]: curDateMoment.clone(),
-      [ObserveEndDay.dataIndex]: curDateMoment.clone().add(DEFAULT_TERM, 'day'),
       [ObservationStep.dataIndex]: FREQUENCY_TYPE_MAP['1D'],
       [LEG_FIELD.EXPIRATION_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
       [LEG_FIELD.SETTLEMENT_DATE]: curDateMoment.clone().add(DEFAULT_TERM, 'days'),
@@ -189,8 +181,6 @@ export const Asia: ILeg = legPipeLine({
     const nextPosition: any = {};
 
     const DATE_FIELDS = [
-      ObserveEndDay.dataIndex,
-      ObserveEndDay.dataIndex,
       EffectiveDate.dataIndex,
       ExpirationDate.dataIndex,
       SettlementDate.dataIndex,
@@ -229,7 +219,7 @@ export const Asia: ILeg = legPipeLine({
           result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.weight;
           return result;
         },
-        {}
+        {},
       );
     }
 
@@ -239,7 +229,7 @@ export const Asia: ILeg = legPipeLine({
           result[getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD')] = item.price || null;
           return result;
         },
-        {}
+        {},
       );
     }
 
@@ -248,7 +238,7 @@ export const Asia: ILeg = legPipeLine({
         ? nextPosition.asset.expirationDate
         : nextPosition.asset.settlementDate;
 
-    nextPosition.asset.annualized = dataItem[LEG_FIELD.IS_ANNUAL] ? true : false;
+    nextPosition.asset.annualized = !!dataItem[LEG_FIELD.IS_ANNUAL];
 
     return nextPosition;
   },
@@ -263,14 +253,12 @@ export const Asia: ILeg = legPipeLine({
       [LEG_FIELD.OBSERVE_END_DAY]: moment(days[days.length - 1]),
       [LEG_FIELD.OBSERVATION_DATES]: !odays.length
         ? []
-        : days.map(day => {
-            return {
-              [OB_DAY_FIELD]: day,
-              weight: position.asset.fixingWeights && position.asset.fixingWeights[day],
-              [OB_PRICE_FIELD]:
-                position.asset.fixingObservations && position.asset.fixingObservations[day],
-            };
-          }),
+        : days.map(day => ({
+            [OB_DAY_FIELD]: day,
+            weight: position.asset.fixingWeights && position.asset.fixingWeights[day],
+            [OB_PRICE_FIELD]:
+              position.asset.fixingObservations && position.asset.fixingObservations[day],
+          })),
     });
   },
   onDataChange: (
@@ -281,7 +269,7 @@ export const Asia: ILeg = legPipeLine({
     setColLoading: (colId: string, loading: boolean) => void,
     setLoading: (rowId: string, colId: string, loading: boolean) => void,
     setColValue: (colId: string, newVal: IFormField) => void,
-    setTableData: (newData: ITableData[]) => void
+    setTableData: (newData: ITableData[]) => void,
   ) => {
     commonLinkage(
       env,
@@ -291,18 +279,18 @@ export const Asia: ILeg = legPipeLine({
       setColLoading,
       setLoading,
       setColValue,
-      setTableData
+      setTableData,
     );
     const { changedFields } = changeFieldsParams;
     if (Form2.fieldValueIsChange(LEG_FIELD.EXPIRATION_DATE, changedFields)) {
       record[LEG_FIELD.OBSERVE_END_DAY] = Form2.createField(
-        getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).clone()
+        getMoment(Form2.getFieldValue(record[LEG_FIELD.EXPIRATION_DATE])).clone(),
       );
     }
 
     if (Form2.fieldValueIsChange(LEG_FIELD.EFFECTIVE_DATE, changedFields)) {
       record[LEG_FIELD.OBSERVE_START_DAY] = Form2.createField(
-        getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).clone()
+        getMoment(Form2.getFieldValue(record[LEG_FIELD.EFFECTIVE_DATE])).clone(),
       );
     }
   },

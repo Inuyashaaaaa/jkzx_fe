@@ -1,21 +1,24 @@
+/* eslint-disable no-shadow */
+import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React from 'react';
+import uuidv4 from 'uuid/v4';
 import { TRNORS_OPTS } from '@/constants/model';
-import { Form2, Select, SmartTable } from '@/containers';
+import { Form2, Select, SmartTable, Table2 } from '@/containers';
 import { PureStateComponent } from '@/containers/Components';
 import Page from '@/containers/Page';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import ModalButton from '@/containers/_ModalButton2';
 import { getCanUsedTranorsOtions } from '@/services/common';
 import { queryModelName, queryModelRiskFreeCurve, saveModelRiskFreeCurve } from '@/services/model';
-import { Button, Divider, message, Modal, Popconfirm, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React from 'react';
-import uuidv4 from 'uuid/v4';
 import { GROUP_KEY } from './constants';
 import Action from './Action';
 
 class PricingSettingsRiskFreeCurve extends PureStateComponent {
   public $modalButton: ModalButton = null;
+
+  public $table: Table2 = null;
 
   public state = {
     tableFormData: {},
@@ -57,7 +60,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             value: modelName,
           };
         }),
-        item => item.value
+        item => item.value,
       ),
     });
   };
@@ -70,10 +73,10 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public sortDataSource = dataSource => {
-    const a = dataSource.map(item => {
-      item.id = _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id;
-      return item;
-    });
+    const a = dataSource.map(item => ({
+      ...item,
+      id: _.get(item, 'id.value') ? _.get(item, 'id.value') : item.id,
+    }));
     const c = a.map(record => {
       const tenor = record.tenor.value || record.tenor;
       return {
@@ -105,11 +108,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
         },
       ];
     } else {
-      tableDataSource = this.sortDataSource(
-        dataSource.map(item => {
-          return { ...item, visible: false };
-        })
-      );
+      tableDataSource = this.sortDataSource(dataSource.map(item => ({ ...item, visible: false })));
     }
     this.setState({
       tableDataSource: tableDataSource.map(item => Form2.createFields(item, ['id', 'visible'])),
@@ -117,6 +116,10 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public saveTableData = async () => {
+    const res = await this.$table.validate();
+    if (_.isArray(res) && res.some(value => value.errors)) {
+      return;
+    }
     const { tableDataSource } = this.state;
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error } = await saveModelRiskFreeCurve({
@@ -140,7 +143,8 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public onRemove = rowIndex => {
-    const clone = [...this.state.tableDataSource];
+    const { tableDataSource } = this.state;
+    const clone = [...tableDataSource];
     clone.splice(rowIndex, 1);
     this.setState({
       tableDataSource: clone,
@@ -150,8 +154,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public onClick = record => {
+    const { tableDataSource } = this.state;
     this.setState({
-      tableDataSource: this.state.tableDataSource.map(item => {
+      tableDataSource: tableDataSource.map(item => {
         if (item.id === record.id) {
           return {
             ...item,
@@ -174,15 +179,14 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     return this.confirmPromise;
   };
 
-  public onCancel = () => {
-    return {
-      formData: {},
-    };
-  };
+  public onCancel = () => ({
+    formData: {},
+  });
 
   public onInsertCancel = record => {
+    const { tableDataSource } = this.state;
     this.setState({
-      tableDataSource: this.state.tableDataSource.map(item => {
+      tableDataSource: tableDataSource.map(item => {
         if (item.id === record.id) {
           return { ...item, visible: false };
         }
@@ -192,17 +196,19 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public onInsertFormChange = (props, changedFields) => {
+    const { insertFormData } = this.state;
     this.setState({
       insertFormData: {
-        ...this.state.insertFormData,
+        ...insertFormData,
         ...changedFields,
       },
     });
   };
 
   public handleCellValueChanged = params => {
+    const { tableDataSource } = this.state;
     this.setState({
-      tableDataSource: this.state.tableDataSource.map(item => {
+      tableDataSource: tableDataSource.map(item => {
         if (item.id === params.record.id) {
           return params.record;
         }
@@ -228,33 +234,32 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
             {
               title: '分组',
               dataIndex: GROUP_KEY,
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [
-                        {
-                          required: true,
-                          message: '请选择分组后搜索',
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '请选择分组后搜索',
+                      },
+                    ],
+                  })(
+                    <Select
+                      {...{
+                        editing,
+                        style: {
+                          width: 280,
                         },
-                      ],
-                    })(
-                      <Select
-                        {...{
-                          editing,
-                          style: {
-                            width: 280,
-                          },
-                          placeholder: '请输入内容搜索',
-                          showSearch: true,
-                          fetchOptionsOnSearch: true,
-                          options: this.state.options,
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+                        placeholder: '请输入内容搜索',
+                        showSearch: true,
+                        // fetchOptionsOnSearch: true,
+                        filterOption: true,
+                        options: this.state.options,
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
@@ -267,6 +272,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
           ) : null}
         </Row>
         <SmartTable
+          ref={node => {
+            this.$table = node;
+          }}
           rowKey="id"
           onCellFieldsChange={this.handleCellValueChanged}
           dataSource={this.state.tableDataSource}
@@ -276,65 +284,67 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
               dataIndex: 'tenor',
               width: 450,
               defaultEditing: false,
-              editable: record => {
-                return true;
-              },
-              render: (val, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        defaultOpen={true}
-                        autoSelect={true}
-                        //   style={{ minWidth: 180 }}
-                        options={getCanUsedTranorsOtions(
-                          this.state.tableDataSource.map(item => Form2.getFieldsValue(item)),
-                          Form2.getFieldsValue(record)
-                        )}
-                        editing={editing}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              editable: record => true,
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '期限必填',
+                      },
+                    ],
+                  })(
+                    <Select
+                      defaultOpen
+                      autoSelect
+                      //   style={{ minWidth: 180 }}
+                      options={getCanUsedTranorsOtions(
+                        this.state.tableDataSource.map(item => Form2.getFieldsValue(item)),
+                        Form2.getFieldsValue(record),
+                      )}
+                      editing={editing}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '利率(%)',
               dataIndex: 'quote',
               width: 450,
               align: 'right',
-              editable: record => {
-                return true;
-              },
+              editable: record => true,
               defaultEditing: false,
-              render: (val, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <UnitInputNumber autoSelect={true} editing={editing} unit={'%'} />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '利率必填',
+                      },
+                    ],
+                  })(<UnitInputNumber autoSelect editing={editing} unit="%" />)}
+                </FormItem>
+              ),
             },
             {
               title: '操作',
-              render: (value, record, index) => {
-                return (
-                  <Action
-                    value={value}
-                    record={record}
-                    index={index}
-                    onRemove={this.onRemove}
-                    tableDataSource={this.state.tableDataSource}
-                    onClick={this.onClick}
-                    insertFormData={this.state.insertFormData}
-                    onInsertFormChange={this.onInsertFormChange}
-                    onInsertCancel={this.onInsertCancel}
-                    onInsertConfirm={this.onInsertConfirm}
-                  />
-                );
-              },
+              render: (value, record, index) => (
+                <Action
+                  value={value}
+                  record={record}
+                  index={index}
+                  onRemove={this.onRemove}
+                  tableDataSource={this.state.tableDataSource}
+                  onClick={this.onClick}
+                  insertFormData={this.state.insertFormData}
+                  onInsertFormChange={this.onInsertFormChange}
+                  onInsertCancel={this.onInsertCancel}
+                  onInsertConfirm={this.onInsertConfirm}
+                />
+              ),
             },
           ]}
           pagination={false}

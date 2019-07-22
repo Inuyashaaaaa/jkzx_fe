@@ -1,3 +1,8 @@
+import { Affix, Alert, Button, message, Modal, Row } from 'antd';
+import _ from 'lodash';
+import React, { memo, useRef, useState } from 'react';
+import router from 'umi/router';
+import moment from 'moment';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { LEG_ENV } from '@/constants/legs';
 import { Form2, ModalButton, Upload } from '@/containers';
@@ -14,10 +19,6 @@ import {
 import { convertTradePageData2ApiData, createLegDataSourceItem } from '@/services/pages';
 import { getToken } from '@/tools/authority';
 import { ILeg } from '@/types/leg';
-import { Affix, Alert, Button, message, Modal, Row } from 'antd';
-import _ from 'lodash';
-import React, { memo, useRef, useState } from 'react';
-import router from 'umi/router';
 import './index.less';
 
 const ActionBar = memo<any>(props => {
@@ -36,30 +37,18 @@ const ActionBar = memo<any>(props => {
     setCreateFormData({});
   };
 
-  const transactionHandleOk = async () => {
-    setTransactionModalVisible(false);
-    const error = await handelTrdTradeCreate();
-    if (!error) {
-      router.push('/approval-process/process-manangement');
-    }
-  };
-
-  const transactionHandleCancel = () => {
-    setTransactionModalVisible(false);
-  };
-
   const handelTrdTradeCreate = async () => {
-    const _createFormData = Form2.getFieldsValue(createFormData);
-    Object.keys(_createFormData).forEach(item => {
+    const newCreateFormData = Form2.getFieldsValue(createFormData);
+    Object.keys(newCreateFormData).forEach(item => {
       if (!_.endsWith(item, 'Date')) {
-        _createFormData[item] = _.trim(_createFormData[item]);
+        newCreateFormData[item] = _.trim(newCreateFormData[item]);
       }
     });
     const trade = convertTradePageData2ApiData(
       tableData.map(item => Form2.getFieldsValue(item)),
-      _createFormData,
+      newCreateFormData,
       currentUser.username,
-      LEG_ENV.BOOKING
+      LEG_ENV.BOOKING,
     );
 
     // 发起审批
@@ -74,27 +63,42 @@ const ActionBar = memo<any>(props => {
     if (_error) return true;
     if (_data.processInstanceId) {
       message.success('已进入流程');
-    } else {
-      setTableData([]);
+      setCreateModalVisible(false);
 
-      setCashModalVisible(true);
-      message.success('簿记成功');
+      // 发起审批成功关联附件
+      if (attachmentId) {
+        const { error: aerror, data: adata } = await wkAttachmentProcessInstanceModify({
+          attachmentId,
+          processInstanceId: _data.processInstanceId,
+        });
+        if (aerror) return true;
+      }
+      return false;
     }
+
+    setTableData([]);
+
+    setCashModalVisible(true);
+    message.success('簿记成功');
     setCreateModalVisible(false);
+    return true;
+  };
 
-    // 发起审批成功关联附件
-    if (attachmentId) {
-      const { error: aerror, data: adata } = await wkAttachmentProcessInstanceModify({
-        attachmentId,
-        processInstanceId: _data.processInstanceId,
-      });
-      if (aerror) return true;
+  const transactionHandleOk = async () => {
+    setTransactionModalVisible(false);
+    const error = await handelTrdTradeCreate();
+    if (!error) {
+      router.push('/approval-process/process-manangement');
     }
+  };
+
+  const transactionHandleCancel = () => {
+    setTransactionModalVisible(false);
   };
 
   const [fileList, setFileList] = useState([]);
   return (
-    <Affix offsetTop={0} onChange={affix => setAffix(affix)}>
+    <Affix offsetTop={0} onChange={affixs => setAffix(affixs)}>
       <Row
         type="flex"
         justify="space-between"
@@ -115,7 +119,7 @@ const ActionBar = memo<any>(props => {
               pre.concat({
                 ...createLegDataSourceItem(leg, LEG_ENV.BOOKING),
                 ...leg.getDefaultData(LEG_ENV.BOOKING),
-              })
+              }),
             );
           }}
         />
@@ -127,14 +131,16 @@ const ActionBar = memo<any>(props => {
           loading={createTradeLoading}
           onClick={async () => {
             if (tableData.length === 0) {
-              return message.warn('缺少交易结构');
+              message.warn('缺少交易结构');
+              return;
             }
 
-            const rsps = await tableEl.current.table.validate();
+            const rsps = await tableEl.current.table.validate({ force: true });
             if (rsps.some(item => item.errors)) {
               return;
             }
             setCreateModalVisible(true);
+            setCreateFormData(Form2.createFields({ tradeDate: moment() }));
           }}
           modalProps={{
             title: '创建簿记',
@@ -142,17 +148,17 @@ const ActionBar = memo<any>(props => {
             onOk: async () => {
               const res = await currentCreateFormRef.validate();
               if (res.error) return;
-              const _createFormData = Form2.getFieldsValue(createFormData);
-              Object.keys(_createFormData).forEach(item => {
+              const createFormDataSource = Form2.getFieldsValue(createFormData);
+              Object.keys(createFormDataSource).forEach(item => {
                 if (!_.endsWith(item, 'Date')) {
-                  _createFormData[item] = _.trim(_createFormData[item]);
+                  createFormDataSource[item] = _.trim(createFormDataSource[item]);
                 }
               });
               const trade = convertTradePageData2ApiData(
                 tableData.map(item => Form2.getFieldsValue(item)),
-                _createFormData,
+                createFormDataSource,
                 currentUser.username,
-                LEG_ENV.BOOKING
+                LEG_ENV.BOOKING,
               );
               const { error: _error, data: _data } = await wkValidProcessCanStart({
                 processName: '交易录入',
@@ -163,7 +169,8 @@ const ActionBar = memo<any>(props => {
               if (_error) return;
               // 是否可以发起审批
               if (_data === true) {
-                return setTransactionModalVisible(true);
+                setTransactionModalVisible(true);
+                return;
               }
 
               handelTrdTradeCreate();
@@ -198,9 +205,9 @@ const ActionBar = memo<any>(props => {
       >
         <div style={{ margin: '20px' }}>
           <Alert
-            showIcon={true}
+            showIcon
             type="info"
-            message={'您提交的交易需要通过审批才能完成簿记。请上传相关材料后发起审批。'}
+            message="您提交的交易需要通过审批才能完成簿记。请上传相关材料后发起审批。"
           />
           <p style={{ margin: '20px', textAlign: 'center' }}>
             <Upload
@@ -215,11 +222,11 @@ const ActionBar = memo<any>(props => {
                 message.info('请重新选择上传文件');
                 return false;
               }}
-              onChange={fileList => {
-                setFileList(fileList);
-                if (!fileList || fileList.length <= 0) return;
-                if (fileList[0].status === 'done') {
-                  setAttachmentId(fileList[0].response.result.attachmentId);
+              onChange={list => {
+                setFileList(list);
+                if (!list || list.length <= 0) return;
+                if (list[0].status === 'done') {
+                  setAttachmentId(list[0].response.result.attachmentId);
                 }
               }}
               value={fileList}

@@ -4,7 +4,7 @@ import React, { memo, useRef } from 'react';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import { getCanUsedTranorsOtionsNotIncludingSelf } from '@/services/common';
-import { Form2, Input, Select, InputNumber } from '@/containers';
+import { Form2, Select, InputNumber } from '@/containers';
 
 const Action = memo<any>(props => {
   const formEl = useRef<Form2>(null);
@@ -65,7 +65,7 @@ const Action = memo<any>(props => {
                     rules: [
                       {
                         required: true,
-                        message: '期限必填',
+                        message: '期限为必填项',
                       },
                     ],
                   })(
@@ -83,7 +83,16 @@ const Action = memo<any>(props => {
               title: '利率(%)',
               dataIndex: 'quote',
               render: (val, recordData, i, { form }) => (
-                <FormItem>{form.getFieldDecorator({})(<InputNumber />)}</FormItem>
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                        message: '利率为必填项',
+                      },
+                    ],
+                  })(<InputNumber />)}
+                </FormItem>
               ),
             },
           ]}

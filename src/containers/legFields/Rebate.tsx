@@ -1,3 +1,6 @@
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React from 'react';
 import {
   LEG_FIELD,
   LEG_TYPE_FIELD,
@@ -12,11 +15,15 @@ import {
 } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/containers';
-import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
+import {
+  legEnvIsBooking,
+  legEnvIsPricing,
+  getLegEnvs,
+  getRequiredRule,
+  getLegByRecord,
+  getLegByType,
+} from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React from 'react';
 
 export const Rebate: ILegColDef = {
   title: '敲出补偿',
@@ -30,7 +37,6 @@ export const Rebate: ILegColDef = {
   },
   defaultEditing: false,
   render: (val, record, index, { form, editing, colDef }) => {
-    // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     const getUnit = () => {
       if (_.get(record, [LEG_FIELD.REBATE_UNIT, 'value']) === REBATETYPE_UNIT_OPTIONS_MAP.CNY) {
         return '¥';
@@ -41,7 +47,7 @@ export const Rebate: ILegColDef = {
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<UnitInputNumber autoSelect={true} unit={getUnit()} editing={editing} />)}
+        })(<UnitInputNumber autoSelect unit={getUnit()} editing={editing} />)}
       </FormItem>
     );
   },

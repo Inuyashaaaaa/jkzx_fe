@@ -1,9 +1,10 @@
+/* eslint-disable */
 import { notification } from 'antd';
 import fetch from 'dva/fetch';
 import hash from 'hash.js';
-import { getToken } from './authority';
-import router from 'umi/router';
+import { router } from 'umi';
 import _ from 'lodash';
+import { getToken } from './authority';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -166,7 +167,7 @@ export default function request(url, _options = {}, passError = false) {
           const { code, message } = error;
           if (!passError) {
             notification.error({
-              message: `请求失败`,
+              message: '请求失败',
               description: message,
             });
           }
@@ -179,7 +180,6 @@ export default function request(url, _options = {}, passError = false) {
             });
             setTimeout(() => {
               // @HACK
-              /* eslint-disable no-underscore-dangle */
               window.g_app._store.dispatch({
                 type: 'login/logout',
               });
@@ -189,7 +189,7 @@ export default function request(url, _options = {}, passError = false) {
           }
 
           return failAction;
-        })
+        }),
     );
 }
 

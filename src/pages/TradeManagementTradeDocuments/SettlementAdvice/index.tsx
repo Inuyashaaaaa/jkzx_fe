@@ -1,14 +1,18 @@
-import { PAGE_SIZE } from '@/constants/component';
-import { Form2, Select, SmartTable } from '@/containers';
-import SmartForm from '@/containers/SmartForm';
-import { trdTradeListByBook, trdTradeListBySimilarTradeId } from '@/services/general-service';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
-import { positionDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
 import { DatePicker, Divider, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { PAGE_SIZE } from '@/constants/component';
+import { Form2, Select, SmartTable } from '@/containers';
+import SmartForm from '@/containers/SmartForm';
+import {
+  trdTradeListByBook,
+  trdTradeListBySimilarTradeId,
+  trdTradeGet,
+} from '@/services/general-service';
+import { refSimilarLegalNameList } from '@/services/reference-data-service';
+import { positionDocSearch, trdBookListBySimilarBookName } from '@/services/trade-service';
 import SettlementModal from './SettlementModal';
 
 const { RangePicker } = DatePicker;
@@ -44,7 +48,7 @@ class SettlementAdvice extends PureComponent {
           current: page,
           pageSize: pagesize,
         });
-      }
+      },
     );
   };
 
@@ -60,23 +64,19 @@ class SettlementAdvice extends PureComponent {
       },
       () => {
         this.onFetch();
-      }
+      },
     );
   };
 
-  public getFormData = data => {
-    return _.mapValues(data, item => {
-      return _.get(item, 'value');
-    });
-  };
+  public getFormData = data => _.mapValues(data, item => _.get(item, 'value'));
 
-  public onFetch = async (paramsPagination?) => {
+  public onFetch = async paramsPagination => {
     const formValues = {
       startDate: _.get(this.state.searchFormData, 'expirationDate.value[0]').format('YYYY-MM-DD'),
       endDate: _.get(this.state.searchFormData, 'expirationDate.value[1]').format('YYYY-MM-DD'),
       ...this.getFormData(_.omit(this.state.searchFormData, 'expirationDate')),
     };
-    const pagination = this.state.pagination;
+    const { pagination } = this.state;
     this.setState({
       loading: true,
     });
@@ -90,14 +90,17 @@ class SettlementAdvice extends PureComponent {
     });
     if (error) return;
     const dataSource = data.page.map(item => {
+      let status = '';
+      if (item.docProcessStatus === 'UN_PROCESSED') {
+        status = '未处理';
+      } else if (item.docProcessStatus === 'DOWNLOADED') {
+        status = `下载 于 ${moment(item.updatedAt).format('YYYY-MM-DD HH:mm')}`;
+      } else {
+        status = `发送 于 ${moment(item.updatedAt).format('YYYY-MM-DD HH:mm')}`;
+      }
       return {
         ...item,
-        status:
-          item.docProcessStatus === 'UN_PROCESSED'
-            ? '未处理'
-            : item.docProcessStatus === 'DOWNLOADED'
-            ? `下载 于 ${moment(item.updateAt).format('YYYY-MM-DD HH:mm')}`
-            : `发送 于 ${moment(item.updateAt).format('YYYY-MM-DD HH:mm')}`,
+        status,
       };
     });
     this.setState({
@@ -121,44 +124,57 @@ class SettlementAdvice extends PureComponent {
       },
       () => {
         this.onFetch({ current: 1, pageSize: PAGE_SIZE });
-      }
+      },
     );
   };
 
   public onSearchFormChange = async (props, changedFields) => {
-    if (changedFields.name === 'bookName' && changedFields.value) {
+    const { searchFormData } = this.state;
+    if (changedFields.bookName && changedFields.bookName.value) {
       const { error, data } = await trdTradeListByBook({
-        bookName: changedFields.value,
+        bookName: changedFields.bookName.value,
       });
       if (error) return;
       this.setState({
         bookIdList: data,
         searchFormData: {
-          ...this.state.searchFormData,
+          ...searchFormData,
           ...changedFields,
         },
       });
       return;
     }
-    if (changedFields.name === 'tradeId' && changedFields.value) {
-      const { error, data } = await trdTradeListByBook({
-        bookName: changedFields.value,
-      });
-      if (error) return;
-      this.setState({
-        positionIdList: data,
-        searchFormData: {
-          ...this.state.searchFormData,
-          ...changedFields,
+    if (changedFields.tradeId && changedFields.tradeId.value) {
+      this.setState(
+        {
+          searchFormData: {
+            ...searchFormData,
+            ...Form2.createFields({ positionId: '' }),
+          },
         },
-      });
+        async () => {
+          const { error, data } = await trdTradeGet({
+            tradeId: changedFields.tradeId.value,
+          });
+          if (error) return;
+          const searchForm = this.state.searchFormData;
+          this.setState({
+            positionIdList: (_.get(data, 'positions') || []).map(item => item.positionId),
+            searchFormData: {
+              ...searchForm,
+              ...changedFields,
+            },
+          });
+        },
+      );
+
       return;
     }
     this.setState({
       bookIdList: [],
       positionIdList: [],
       searchFormData: {
-        ...this.state.searchFormData,
+        ...searchFormData,
         ...changedFields,
       },
     });
@@ -177,7 +193,7 @@ class SettlementAdvice extends PureComponent {
           spread={3}
           layout="inline"
           dataSource={searchFormData}
-          submitText={`搜索`}
+          submitText="搜索"
           submitButtonProps={{
             icon: 'search',
           }}
@@ -188,167 +204,151 @@ class SettlementAdvice extends PureComponent {
             {
               title: '到期日',
               dataIndex: 'expirationDate',
-              render: (value, record, index, { form, editing }) => {
-                return <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>;
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>{form.getFieldDecorator({})(<RangePicker />)}</FormItem>
+              ),
             },
             {
               title: '结算通知书处理状态',
               dataIndex: 'docProcessStatus',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={[
-                          {
-                            label: '未处理',
-                            value: 'UN_PROCESSED',
-                          },
-                          {
-                            label: '已下载',
-                            value: 'DOWNLOADED',
-                          },
-                          {
-                            label: '已发送',
-                            value: 'SENT',
-                          },
-                        ]}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={[
+                        {
+                          label: '未处理',
+                          value: 'UN_PROCESSED',
+                        },
+                        {
+                          label: '已下载',
+                          value: 'DOWNLOADED',
+                        },
+                        {
+                          label: '已发送',
+                          value: 'SENT',
+                        },
+                      ]}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '交易簿',
               dataIndex: 'bookName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await trdBookListBySimilarBookName({
-                            similarBookName: value,
-                          });
-                          if (error) return [];
-                          return data
-                            .sort((a, b) => {
-                              return a.localeCompare(b);
-                            })
-                            .map(item => ({
-                              label: item,
-                              value: item,
-                            }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (value: string = '') => {
+                        const { data, error } = await trdBookListBySimilarBookName({
+                          similarBookName: value,
+                        });
+                        if (error) return [];
+                        return data
+                          .sort((a, b) => a.localeCompare(b))
+                          .map(item => ({
+                            label: item,
+                            value: item,
+                          }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '交易ID',
               dataIndex: 'tradeId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={
-                          this.state.bookIdList.length
-                            ? this.state.bookIdList.map(item => {
-                                return {
-                                  label: item,
-                                  value: item,
-                                };
-                              })
-                            : async (value: string = '') => {
-                                const { data, error } = await trdTradeListBySimilarTradeId({
-                                  similarTradeId: value,
-                                });
-                                if (error) return [];
-                                return data.map(item => ({
-                                  label: item,
-                                  value: item,
-                                }));
-                              }
-                        }
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={
+                        this.state.bookIdList.length
+                          ? this.state.bookIdList.map(item => ({
+                              label: item,
+                              value: item,
+                            }))
+                          : async (value: string = '') => {
+                              const { data, error } = await trdTradeListBySimilarTradeId({
+                                similarTradeId: value,
+                              });
+                              if (error) return [];
+                              return data.map(item => ({
+                                label: item,
+                                value: item,
+                              }));
+                            }
+                      }
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '持仓ID',
               dataIndex: 'positionId',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={(this.state.positionIdList || []).map(item => {
-                          return {
-                            label: item,
-                            value: item,
-                          };
-                        })}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={(this.state.positionIdList || []).map(item => ({
+                        label: item,
+                        value: item,
+                      }))}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               title: '交易对手',
               dataIndex: 'partyName',
-              render: (value, record, index, { form, editing }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({})(
-                      <Select
-                        style={{ minWidth: 180 }}
-                        placeholder="请输入内容搜索"
-                        allowClear={true}
-                        showSearch={true}
-                        fetchOptionsOnSearch={true}
-                        options={async (value: string = '') => {
-                          const { data, error } = await refSimilarLegalNameList({
-                            similarLegalName: value,
-                          });
-                          if (error) return [];
-                          return data.map(item => ({
-                            label: item,
-                            value: item,
-                          }));
-                        }}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({})(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="请输入内容搜索"
+                      allowClear
+                      showSearch
+                      fetchOptionsOnSearch
+                      options={async (value: string = '') => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: value,
+                        });
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
           ]}
         />
@@ -386,13 +386,11 @@ class SettlementAdvice extends PureComponent {
             },
             {
               title: '操作',
-              render: (text, record, index) => {
-                return (
-                  <Row type="flex" align="middle">
-                    <SettlementModal data={text} onFetch={this.onFetch} />
-                  </Row>
-                );
-              },
+              render: (text, record, index) => (
+                <Row type="flex" align="middle">
+                  <SettlementModal data={text} onFetch={this.onFetch} />
+                </Row>
+              ),
             },
           ]}
           pagination={this.state.pagination}

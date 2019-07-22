@@ -1,6 +1,14 @@
-/* eslint-disable */
-
-import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG } from '@/constants/common';
+/* eslint-disable import/order */
+/* eslint-disable consistent-return */
+/* eslint-disable no-underscore-dangle */
+import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
+import { connect } from 'dva';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { memo, useRef, useState } from 'react';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import uuidv4 from 'uuid/v4';
+import { LEG_FIELD, LEG_ID_FIELD, BIG_NUMBER_CONFIG, LEG_TYPE_MAP } from '@/constants/common';
 import { FORM_EDITABLE_STATUS } from '@/constants/global';
 import { ILegColDef, LEG_ENV, TOTAL_EDITING_FIELDS } from '@/constants/legs';
 import { Form2 } from '@/containers';
@@ -11,18 +19,13 @@ import { IMultiLegTableEl } from '@/containers/MultiLegTable/type';
 import Page from '@/containers/Page';
 import { ITableData } from '@/components/type';
 import { queryProcessForm, queryProcessHistoryForm } from '@/services/approval';
-import { convertTradePageData2ApiData } from '@/services/pages';
+import { convertTradePageData2ApiData, getTradeCreateModalData } from '@/services/pages';
 import { createLegRecordByPosition, getLegByProductType, getLegByRecord, getMoment } from '@/tools';
 import { ILeg } from '@/types/leg';
-import { Button, Divider, message, Row, Skeleton, Typography } from 'antd';
-import { connect } from 'dva';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { memo, useRef, useState } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import uuidv4 from 'uuid/v4';
 import './index.less';
 import BigNumber from 'bignumber.js';
+import { trdPositionLCMEventTypes, trdTradeLCMUnwindAmountGet } from '@/services/trade-service';
+import { mktInstrumentInfo } from '@/services/market-data-service';
 
 const DATE_ARRAY = [
   LEG_FIELD.SETTLEMENT_DATE,
@@ -84,7 +87,41 @@ const TradeManagementBooking = props => {
       processInstanceId: props.id,
     });
     if (error) return;
-    const _detailData = {
+    const unUnitLeg = [LEG_TYPE_MAP.SPREAD_EUROPEAN, LEG_TYPE_MAP.CASH_FLOW];
+    const { positions } = _.get(data, 'process._business_payload.trade');
+
+    const unitPositions = await Promise.all(
+      (positions || []).map(position => {
+        if (unUnitLeg.includes(position.productType)) {
+          return Promise.resolve(position);
+        }
+        return mktInstrumentInfo({
+          instrumentId: position.productType.includes('SPREAD_EUROPEAN')
+            ? _.get(position.asset, 'underlyerInstrumentId1')
+            : position.asset[LEG_FIELD.UNDERLYER_INSTRUMENT_ID],
+        }).then(rsp => {
+          const { error: _error, data: _data } = rsp;
+          if (_error || _data.instrumentInfo.unit === undefined) {
+            return {
+              ...position,
+              asset: {
+                ...position.asset,
+                [LEG_FIELD.UNIT]: '-',
+              },
+            };
+          }
+          return {
+            ...position,
+            asset: {
+              ...position.asset,
+              [LEG_FIELD.UNIT]: _data.instrumentInfo.unit,
+            },
+          };
+        });
+      }),
+    );
+
+    const tableFormData = {
       tradeId: _.get(data, 'process._business_payload.trade.tradeId'),
       bookName: _.get(data, 'process._business_payload.trade.bookName'),
       tradeDate: moment(_.get(data, 'process._business_payload.trade.tradeDate')),
@@ -94,6 +131,13 @@ const TradeManagementBooking = props => {
         'process._business_payload.trade.positions[0].counterPartyCode',
       ),
       comment: _.get(data, 'process._business_payload.trade.comment'),
+    };
+
+    const mockAddLegItem = async (composePositions, tableForm) => {
+      composePositions.forEach(position => {
+        const leg = getLegByProductType(position.productType, position.asset.exerciseType);
+        addLeg(leg, position);
+      });
     };
 
     const handleTradeNumber = position => {
@@ -122,8 +166,8 @@ const TradeManagementBooking = props => {
         .toNumber();
     };
 
-    const positions = _.get(data, 'process._business_payload.trade.positions');
-    const composePositions = (positions || []).map(position => ({
+    // const unitPositions = _.get(data, 'process._business_payload.trade.positions');
+    const composePositions = (unitPositions || []).map(position => ({
       ...position,
       asset: {
         ...position.asset,
@@ -131,16 +175,9 @@ const TradeManagementBooking = props => {
       },
     }));
     setTableLoading(false);
-    setCreateFormData(Form2.createFields(_detailData));
+    setCreateFormData(Form2.createFields(tableFormData));
     if (!composePositions) return;
-    mockAddLegItem(composePositions, _detailData);
-  };
-
-  const mockAddLegItem = async (composePositions, tableFormData) => {
-    composePositions.forEach(position => {
-      const leg = getLegByProductType(position.productType, position.asset.exerciseType);
-      addLeg(leg, position);
-    });
+    mockAddLegItem(composePositions, tableFormData);
   };
 
   const handelSave = async () => {
@@ -159,6 +196,8 @@ const TradeManagementBooking = props => {
     props.confirmModify(trade);
   };
 
+  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
+
   const handleEventAction = (eventType, params) => {
     lcmEventModalEl.current.show({
       eventType,
@@ -173,7 +212,6 @@ const TradeManagementBooking = props => {
     loadTableData();
   });
 
-  const lcmEventModalEl = useRef<ILcmEventModalEl>(null);
   return (
     <>
       {tableLoading ? (
@@ -229,8 +267,8 @@ const TradeManagementBooking = props => {
                     },
                     tableEl.current.setLoadingsByRow,
                     (colId: string, newVal: ITableData) => {
-                      setTableData(pre =>
-                        pre.map(item => {
+                      setTableData(p =>
+                        p.map(item => {
                           if (item[LEG_ID_FIELD] === params.rowId) {
                             return {
                               ...item,

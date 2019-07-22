@@ -47,7 +47,7 @@ const getTooltip = ({ tooltip, overlayStyle, title, children }) => {
 };
 
 const EllipsisText = ({ text, length, tooltip, fullWidthRecognition, ...other }) => {
-  if (typeof text !== 'string') {
+  if (typeof text !== 'string' && text.toString === undefined) {
     throw new Error('Ellipsis children must be string.');
   }
   const textLength = fullWidthRecognition ? getStrFullLength(text) : text.length;

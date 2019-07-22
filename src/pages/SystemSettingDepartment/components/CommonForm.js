@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { Component } from 'react';
 import {
   Input,
@@ -15,6 +14,9 @@ import {
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { getToken } from '@/tools/authority';
+
+/* eslint-disable consistent-return */
+/* eslint-disable no-unused-expressions */
 
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
@@ -70,12 +72,12 @@ export default class CommonForm extends Component {
     this.date = value;
   };
 
-  generateTree = (data, key, display) => {
+  generateTree = (data, keyData, display) => {
     if (!data) {
       return '';
     }
     const { children } = data;
-    key = key === undefined ? 0 : key;
+    const key = keyData === undefined ? 0 : keyData;
     const title = data[display];
 
     if (children && children.length > 0) {
@@ -90,9 +92,10 @@ export default class CommonForm extends Component {
 
   chooseDepartment = () => {};
 
-  handleChange = (value, property) => {
-    if (typeof value === 'string') {
-      value = (value && value.trim()) || '';
+  handleChange = (val, property) => {
+    let value = val;
+    if (typeof val === 'string') {
+      value = (val && val.trim()) || '';
     }
     this.valueContainer[property] = value;
     const nextState = Object.assign({}, this.state);
@@ -420,7 +423,6 @@ export default class CommonForm extends Component {
               action={attachData.url}
               headers={{
                 Authorization: `Bearer ${getToken()}`,
-                // Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ3YW5nbmFuIiwicm9sZXMiOlsidHJhZGVyIiwiYWRtaW4iXSwiaXNzIjoidG9uZ3l1LnRlY2giLCJleHAiOjE1NTk3MTI5MTc0MTIsImlhdCI6MTU1MTkzNjkxNzQxMiwidXNlcm5hbWUiOiJ3YW5nbmFuIn0.9b1zb6JG_XcaJSVukH2Num0djh5P9cEi3pvhHPYBJeU`,
               }}
               data={attachData.uploadData}
               beforeUpload={file => this.checkFileType(file, attachData)}

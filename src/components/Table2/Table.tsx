@@ -1,8 +1,9 @@
-import { hasElement } from '@/utils/hasElement';
+/* eslint-disable */
 import { Table } from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import { hasElement } from '@/utils/hasElement';
 import { createEventBus, EVERY_EVENT_TYPE, uuid } from '../../utils';
 import { ITableApi, ITableCellProps, ITableContext, ITableProps, ITableRowProps } from '../type';
 import TableManager from './api';
@@ -57,13 +58,9 @@ class Table2 extends PureComponent<ITableProps> {
     this.context = this.getContext();
   }
 
-  public getTbody = (): HTMLElement => {
-    return this.$dom.querySelector('.ant-table-tbody');
-  };
+  public getTbody = (): HTMLElement => this.$dom.querySelector('.ant-table-tbody');
 
-  public getThead = (): HTMLElement => {
-    return this.$dom.querySelector('.ant-table-thead');
-  };
+  public getThead = (): HTMLElement => this.$dom.querySelector('.ant-table-thead');
 
   public componentDidMount = () => {
     Table2.setActiveTableInstance(this);
@@ -95,7 +92,6 @@ class Table2 extends PureComponent<ITableProps> {
       (event.target instanceof HTMLElement && hasElement(this.getThead(), event.target))
     ) {
       this.save();
-      return;
     }
   };
 
@@ -109,64 +105,54 @@ class Table2 extends PureComponent<ITableProps> {
     Table2.setActiveTableInstance(this);
   };
 
-  public getFieldNames = () => {
-    return this.props.columns.map(item => item.dataIndex);
-  };
+  public getFieldNames = () => this.props.columns.map(item => item.dataIndex);
 
-  public looseActive = () => {
-    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+  public looseActive = () =>
+    _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
       items.forEach(item => {
         item.node.looseActive();
       });
     });
-  };
 
   public validate = (
     options = {},
     rowIds?: string[],
-    colIds = this.getFieldNames()
+    colIds = this.getFieldNames(),
   ): Promise<
-    Array<{
+    {
       errors: any;
       values: any;
-    }>
-  > => {
-    return Promise.all(
+    }[]
+  > =>
+    Promise.all(
       this.api.tableManager.rowNodes
         .filter(item => (rowIds == null ? true : !!rowIds.find(id => id === item.id)))
-        .map(item => {
-          return item.node.validate(options, colIds);
-        })
+        .map(item => item.node.validate(options, colIds)),
     );
-  };
 
-  public save = (rowIds?: string[], colIds?: string[]) => {
-    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+  public save = (rowIds?: string[], colIds?: string[]) =>
+    _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
       if (rowIds && rowIds.indexOf(rowId) === -1) return;
       items.forEach(item => {
         if (colIds && colIds.indexOf(item.id) === -1) return;
         item.node.saveCell();
       });
     });
-  };
 
-  public saveBy = (predicate: (rowId?: string, colId?: string) => boolean) => {
-    return _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
+  public saveBy = (predicate: (rowId?: string, colId?: string) => boolean) =>
+    _.forEach(this.api.tableManager.cellNodes, (items, rowId) => {
       items.forEach(item => {
         if (predicate && predicate(rowId, item.id)) {
           item.node.saveCell();
         }
       });
     });
-  };
 
   public getValues = () => {};
 
-  public getContext = (): ITableContext => {
-    return {
-      ...this.context,
-    };
-  };
+  public getContext = (): ITableContext => ({
+    ...this.context,
+  });
 
   public convertInputSize = tableSize => {
     if (tableSize === 'default') {
@@ -184,71 +170,83 @@ class Table2 extends PureComponent<ITableProps> {
 
   public getColumnDefs = () => {
     const { size, vertical } = this.props;
-    const columns = this.props.columns.map(colDef => {
-      return {
-        ...colDef,
-        // colDef.render 会首先自己执行一次，因此将它挂在其他位置
-        render: undefined,
-        onCell: (record, rowIndex): ITableCellProps => {
-          const getRowKey = () => {
-            return typeof this.props.rowKey === 'string'
-              ? this.props.rowKey
-              : this.props.rowKey(record, rowIndex);
-          };
-          const rowId = record[getRowKey()];
-          return {
-            ...(colDef.onCell ? colDef.onCell(record, rowIndex, { colDef }) : undefined),
-            $$render: colDef.render,
-            record,
-            rowIndex,
-            colDef,
-            tableApi: this,
-            size: this.convertInputSize(size),
-            api: this.api,
-            context: this.context,
-            getRowKey,
-            rowId,
-            vertical,
-          };
-        },
-      };
-    });
+    const columns = this.props.columns.map(colDef => ({
+      ...colDef,
+      // colDef.render 会首先自己执行一次，因此将它挂在其他位置
+      render: undefined,
+      onCell: (record, rowIndex): ITableCellProps => {
+        const getRowKey = () =>
+          typeof this.props.rowKey === 'string'
+            ? this.props.rowKey
+            : this.props.rowKey(record, rowIndex);
+        const rowId = record[getRowKey()];
+        return {
+          ...(colDef.onCell ? colDef.onCell(record, rowIndex, { colDef }) : undefined),
+          $$render: colDef.render,
+          record,
+          rowIndex,
+          colDef,
+          tableApi: this,
+          size: this.convertInputSize(size),
+          api: this.api,
+          context: this.context,
+          getRowKey,
+          rowId,
+          vertical,
+        };
+      },
+    }));
 
     return columns;
   };
 
-  public getOnRow = () => {
-    return (record, rowIndex): ITableRowProps => {
-      const getRowKey = () => {
-        return typeof this.props.rowKey === 'string'
-          ? this.props.rowKey
-          : this.props.rowKey(record, rowIndex);
-      };
-      const rowKey = getRowKey();
-      const rowId = record[rowKey];
-      return {
-        ...(this.props.onRow ? this.props.onRow(record, rowIndex) : undefined),
-        api: this.api,
-        record,
-        rowId,
-        rowIndex,
-        context: this.context,
-        getRowKey,
-        columns: this.props.columns,
-        getContextMenu: this.props.getContextMenu,
-      };
+  public getOnRow = () => (record, rowIndex): ITableRowProps => {
+    const getRowKey = () =>
+      typeof this.props.rowKey === 'string'
+        ? this.props.rowKey
+        : this.props.rowKey(record, rowIndex);
+    const rowKey = getRowKey();
+    const rowId = record[rowKey];
+    return {
+      ...(this.props.onRow ? this.props.onRow(record, rowIndex) : undefined),
+      api: this.api,
+      record,
+      rowId,
+      rowIndex,
+      context: this.context,
+      getRowKey,
+      columns: this.props.columns,
+      getContextMenu: this.props.getContextMenu,
     };
   };
 
   public handleTableEvent = (params, eventName) => {
     if (eventName === TABLE_CELL_EDITING_CHANGED) {
-      return this.props.onCellEditingChanged && this.props.onCellEditingChanged(params);
+      return (
+        this.props.onCellEditingChanged &&
+        this.props.onCellEditingChanged({
+          ...params,
+          api: this.api,
+        })
+      );
     }
     if (eventName === TABLE_CELL_VALUES_CHANGE) {
-      return this.props.onCellValuesChange && this.props.onCellValuesChange(params);
+      return (
+        this.props.onCellValuesChange &&
+        this.props.onCellValuesChange({
+          ...params,
+          api: this.api,
+        })
+      );
     }
     if (eventName === TABLE_CELL_FIELDS_CHANGE) {
-      return this.props.onCellFieldsChange && this.props.onCellFieldsChange(params);
+      return (
+        this.props.onCellFieldsChange &&
+        this.props.onCellFieldsChange({
+          ...params,
+          api: this.api,
+        })
+      );
     }
     if (eventName === TABLE_CELL_CLICK) {
       return this.onTableCellClick(params);

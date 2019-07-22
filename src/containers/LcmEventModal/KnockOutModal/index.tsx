@@ -1,3 +1,7 @@
+/* eslint-disable react/sort-comp */
+import { Alert, message, Modal } from 'antd';
+import moment from 'moment';
+import React, { PureComponent } from 'react';
 import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
@@ -8,9 +12,6 @@ import CashExportModal from '@/containers/CashExportModal';
 import Form from '@/containers/Form';
 import { tradeExercisePreSettle, trdTradeLCMEventProcess } from '@/services/trade-service';
 import { getMoment } from '@/tools';
-import { Alert, message, Modal } from 'antd';
-import moment from 'moment';
-import React, { PureComponent } from 'react';
 import {
   KNOCK_OUT_DATE,
   KNOCKOUT_FORM_CONTROLS,
@@ -23,6 +24,7 @@ class ExerciseModal extends PureComponent<
   {
     visible?: boolean;
     data?: any;
+    fixingEdited?: boolean;
   },
   any
 > {
@@ -75,19 +77,27 @@ class ExerciseModal extends PureComponent<
   };
 
   public switchConfirmLoading = () => {
-    this.setState({ modalConfirmLoading: !this.state.modalConfirmLoading });
+    const { modalConfirmLoading } = this.state;
+    this.setState({ modalConfirmLoading: !modalConfirmLoading });
   };
 
   public switchModal = () => {
-    this.setState({
-      visible: false,
-    });
+    this.setState(
+      {
+        visible: false,
+      },
+      () => {
+        if (this.props.fixingEdited) {
+          this.reload();
+        }
+      },
+    );
   };
 
   public onConfirm = async () => {
     const rsp = await this.$knockOutModal.validate();
     if (rsp.error) return;
-    const dataSource = this.state.dataSource;
+    const { dataSource } = this.state;
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
@@ -124,7 +134,7 @@ class ExerciseModal extends PureComponent<
   };
 
   public handleSettleAmount = async () => {
-    const dataSource = this.state.dataSource;
+    const { dataSource } = this.state;
     if (!dataSource[UNDERLYER_PRICE]) {
       if (!(dataSource[UNDERLYER_PRICE] === 0)) {
         message.error('请填标的物价格');
@@ -163,7 +173,7 @@ class ExerciseModal extends PureComponent<
           closable={false}
           onCancel={this.switchModal}
           onOk={this.onConfirm}
-          destroyOnClose={true}
+          destroyOnClose
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
           title={`敲出 (${LEG_TYPE_ZHCH_MAP[this.data[LEG_TYPE_FIELD]]})`}
@@ -174,6 +184,7 @@ class ExerciseModal extends PureComponent<
             }}
             dataSource={this.state.dataSource}
             onValueChange={this.onValueChange}
+            onFieldChange={() => {}}
             controlNumberOneRow={1}
             footer={false}
             controls={KNOCKOUT_FORM_CONTROLS(this.state.notionalType, this.handleSettleAmount)}

@@ -1,8 +1,14 @@
 import { multiply } from 'mathjs';
-import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
+import { PRODUCT_TYPE_OPTIONS, PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
 import { formatNumber } from '@/tools';
 
 export const TABLE_COL_DEFS = [
+  {
+    title: '持仓ID',
+    dataIndex: 'positionId',
+    fixed: 'left',
+    width: 150,
+  },
   {
     title: '交易簿',
     dataIndex: 'bookName',
@@ -12,11 +18,6 @@ export const TABLE_COL_DEFS = [
   {
     title: '交易对手',
     dataIndex: 'partyName',
-    width: 150,
-  },
-  {
-    title: '交易代码',
-    dataIndex: 'tradeId',
     width: 150,
   },
   {

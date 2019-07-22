@@ -1,9 +1,13 @@
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_LOT_CONFIG } from '@/constants/common';
+import { Select } from '@/containers';
 import { IFormControl } from '@/containers/Form/types';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
   trdBookListBySimilarBookName,
   trdPortfolioListBySimilarPortfolioName,
+  trdPortfolioSearch,
 } from '@/services/trade-service';
 import { formatMoney } from '@/tools';
 
@@ -75,9 +79,7 @@ export const historyBuyAmount = {
   width: 150,
   align: 'right',
   title: '总买金额(￥)',
-  render: (text, record, index) => {
-    return formatMoney(text);
-  },
+  render: (text, record, index) => formatMoney(text),
 };
 
 export const historySellAmount = {
@@ -85,9 +87,7 @@ export const historySellAmount = {
   width: 150,
   title: '总卖金额(￥)',
   align: 'right',
-  render: (text, record, index) => {
-    return formatMoney(text);
-  },
+  render: (text, record, index) => formatMoney(text),
 };
 
 export const totalBuy = {
@@ -130,9 +130,7 @@ export const totalPnl = {
   width: 150,
   title: '总盈亏',
   align: 'right',
-  render: (text, record, index) => {
-    return formatMoney(text);
-  },
+  render: (text, record, index) => formatMoney(text),
 };
 
 export const marketValue = {
@@ -140,27 +138,21 @@ export const marketValue = {
   width: 150,
   align: 'right',
   title: '市值(￥)',
-  render: (text, record, index) => {
-    return formatMoney(text);
-  },
+  render: (text, record, index) => formatMoney(text),
 };
 
 export const portfolios = {
   dataIndex: 'portfolioNames',
   width: 150,
   title: '投资组合',
-  render: (text, record, index) => {
-    return Array.isArray(text) ? text.join(',') : text;
-  },
+  render: (text, record, index) => (Array.isArray(text) ? text.join(',') : text),
 };
 
 export const portfolio = {
   dataIndex: 'portfolioName',
   width: 150,
   title: '投资组合',
-  render: (text, record, index) => {
-    return Array.isArray(text) ? text.join(',') : text;
-  },
+  render: (text, record, index) => (Array.isArray(text) ? text.join(',') : text),
 };
 
 export const resultTableFailureColumns = [
@@ -212,6 +204,32 @@ export function generateColumns(type) {
   return baseColumns;
 }
 
+export const UPDATE_PORTFOLIO_CONTROLS = [
+  {
+    title: '交易编号',
+    dataIndex: 'tradeId',
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>
+        {form.getFieldDecorator({ required: true })(
+          <Select
+            fetchOptionsOnSearch
+            options={async (v: string = '') => {
+              const { data, error } = await trdPortfolioSearch({
+                similarPortfolioName: v,
+              });
+              if (error) return [];
+              return data.map(item => ({
+                label: item,
+                value: item,
+              }));
+            }}
+          />,
+        )}
+      </FormItem>
+    ),
+  },
+];
+
 export const CREATE_FORM_CONTROLS: IFormControl[] = [
   {
     control: {
@@ -220,6 +238,7 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
     field: 'bookId',
     input: {
       type: 'select',
+      showSearch: true,
       options: async (value: string = '') => {
         const { data, error } = await trdBookListBySimilarBookName({
           similarBookName: value,
@@ -417,18 +436,4 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
       ],
     },
   },
-  // {
-  //   control: {
-  //     label: '合约乘数',
-  //   },
-  //   field: 'multiplier',
-  //   input: INPUT_NUMBER_DIGITAL_CONFIG,
-  //   decorator: {
-  //     rules: [
-  //       {
-  //         required: true,
-  //       },
-  //     ],
-  //   },
-  // },
 ];

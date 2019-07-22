@@ -1,10 +1,11 @@
-import { LEG_FIELD, STRIKE_TYPES_MAP } from '@/constants/common';
+import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
+import { ValidationRule } from 'antd/lib/form';
+import { LEG_FIELD, STRIKE_TYPES_MAP, RULES_REQUIRED, OPTION_TYPE_MAP } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2 } from '@/containers';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
-import React from 'react';
 
 export const Payment1: ILegColDef = {
   title: '行权收益1',
@@ -16,9 +17,7 @@ export const Payment1: ILegColDef = {
     }
     return true;
   },
-  defaultEditing: record => {
-    return false;
-  },
+  defaultEditing: record => false,
   render: (val, record, index, { form, editing, colDef }) => {
     const getUnit = () => {
       if (Form2.getFieldValue(record[LEG_FIELD.PAYMENT_TYPE]) === STRIKE_TYPES_MAP.CNY) {
@@ -27,11 +26,42 @@ export const Payment1: ILegColDef = {
       return '%';
     };
 
+    const getRules = () =>
+      ([
+        {
+          validator(rule, value, callback) {
+            const optionType = Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]);
+
+            if (optionType == null) {
+              callback();
+              return;
+            }
+            const payment2Val = Form2.getFieldValue(record[LEG_FIELD.PAYMENT2]);
+            const payment1Val = value;
+            if (Form2.getFieldValue(record[LEG_FIELD.OPTION_TYPE]) === OPTION_TYPE_MAP.CALL) {
+              if (payment1Val != null && payment2Val != null) {
+                if (!(payment1Val < payment2Val)) {
+                  callback('必须满足条件(行权收益1 < 行权收益2)');
+                }
+              }
+              callback();
+              return;
+            }
+            if (payment1Val != null && payment2Val != null) {
+              if (!(payment1Val > payment2Val)) {
+                callback('必须满足条件(行权收益1 > 行权收益2)');
+              }
+            }
+            callback();
+          },
+        },
+      ] as ValidationRule[]).concat(RULES_REQUIRED);
+
     return (
       <FormItem>
         {form.getFieldDecorator({
-          rules: [getRequiredRule()],
-        })(<UnitInputNumber autoSelect={true} editing={editing} unit={getUnit()} />)}
+          rules: getRules(),
+        })(<UnitInputNumber autoSelect editing={editing} unit={getUnit()} />)}
       </FormItem>
     );
   },

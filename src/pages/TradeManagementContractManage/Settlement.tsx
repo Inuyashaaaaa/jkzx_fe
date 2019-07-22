@@ -1,4 +1,10 @@
-/* eslint-disable */
+import { Button, Col, Icon, message, Modal, Pagination, Row } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import BigNumber from 'bignumber.js';
+import { connect } from 'dva';
+import _, { get } from 'lodash';
+import moment from 'moment';
+import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import {
   BIG_NUMBER_CONFIG,
   DIRECTION_ZHCN_MAP,
@@ -22,13 +28,6 @@ import {
 } from '@/services/trade-service';
 import { formatMoney, formatNumber, getRequiredRule } from '@/tools';
 import { getNumOfOptionsByNotionalAmount } from '@/tools/getNumOfOptions';
-import { Button, Col, Icon, message, Modal, Pagination, Row } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import BigNumber from 'bignumber.js';
-import { connect } from 'dva';
-import _, { get } from 'lodash';
-import moment from 'moment';
-import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
 const ALREADY = 'ALREADY';
 
@@ -76,7 +75,53 @@ const Settlement = props => {
   const tableEl = useRef<Table2>(null);
   const [cacheTableDataMapCurrent, setCacheTableDataMapCurrent] = useState({});
 
-  const fetch = async (paramsPagination?) => {
+  const startTradeExercisePreSettle = record => {
+    const values = Form2.getFieldsValue(record);
+
+    const underlyerPrice = parseFloat(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`));
+
+    return tradeExercisePreSettle({
+      positionId: record[POSITION_ID],
+      eventDetail: {
+        underlyerPrice: Number.isNaN(underlyerPrice) ? '' : String(underlyerPrice),
+        numOfOptions: String(
+          getNumOfOptionsByNotionalAmount(
+            get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
+            get(values, `asset.${LEG_FIELD.INITIAL_SPOT}`),
+            get(values, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`),
+          ),
+        ), // 名义本金(手数)
+        notionalAmount: String(get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`)), // 名义本金
+      },
+      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
+    });
+  };
+
+  const canSett = record => {
+    if (record[ALREADY]) {
+      return false;
+    }
+
+    if (
+      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.EXPIRATION || // 到期
+      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.EXERCISE || // 行权
+      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.SETTLE || // 结算
+      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND // 平仓
+    ) {
+      return false;
+    }
+
+    // 未结算：持仓状态 != 到期 or 行权 or 结算 or 平仓
+    if (record[LEG_FIELD.PRODUCT_TYPE] === LEG_TYPE_MAP.VANILLA_EUROPEAN) {
+      const expirationDate = get(record, `asset.${LEG_FIELD.EXPIRATION_DATE}`);
+      if (moment(expirationDate).isAfter(moment().format('YYYY-MM-DD'))) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const fetch = async (paramsPagination = undefined) => {
     setLoading(true);
     const { error, data = {} } = await trdTradeSettleablePaged({
       page: (paramsPagination || pagination).current - 1,
@@ -99,20 +144,16 @@ const Settlement = props => {
     };
 
     const tableDataSource = _.flatten(
-      page.map(item => {
-        return item.positions.map((node, key) => {
-          return {
-            ...node,
-            ...item,
-            ...(item.positions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
-            ...(item.positions.length <= 1
-              ? null
-              : key === 0
-              ? { timeLineNumber: item.positions.length }
-              : null),
-          };
-        });
-      }),
+      page.map(item =>
+        item.positions.map((node, key) => ({
+          ...node,
+          ...item,
+          ...(item.positions.length > 1 ? { style: { background: '#f2f4f5' } } : null),
+          ...(item.positions.length > 1 && key === 0
+            ? { timeLineNumber: item.positions.length }
+            : null),
+        })),
+      ),
     );
 
     const nextPagination = {
@@ -125,22 +166,23 @@ const Settlement = props => {
     const canSettTableData = tableDataSource.filter(record => canSett(record));
 
     const instrumentIds = canSettTableData
-      .filter(item => !!_.get(item, `asset.underlyerInstrumentId`))
-      .map(item => _.get(item, `asset.underlyerInstrumentId`));
+      .filter(item => !!_.get(item, 'asset.underlyerInstrumentId'))
+      .map(item => _.get(item, 'asset.underlyerInstrumentId'));
     const mktQuotesListPagedRsp = await mktQuotesListPaged({
       instrumentIds,
     });
 
     // 如果标的物价格获取失败，结算金额就停止获取
     if (mktQuotesListPagedRsp.error) {
-      return setLoading(false);
+      setLoading(false);
+      return;
     }
 
     const quotes = _.get(mktQuotesListPagedRsp, 'data.page', []);
 
     const nextCanSettTableData = canSettTableData.map(item => {
       const result = quotes.find(
-        quote => _.get(item, `asset.underlyerInstrumentId`) === quote.instrumentId,
+        quote => _.get(item, 'asset.underlyerInstrumentId') === quote.instrumentId,
       );
       if (result) {
         return {
@@ -158,12 +200,12 @@ const Settlement = props => {
 
     const startTradeExercisePreSettleRsps = await Promise.all(
       nextCanSettTableData.map(item => startTradeExercisePreSettle(item)),
-    ).then(rsps => {
-      return rsps.map((rsp, index) => ({
+    ).then(rsps =>
+      rsps.map((rsp, index) => ({
         rsp,
         record: nextCanSettTableData[index],
-      }));
-    });
+      })),
+    );
 
     setLoading(false);
 
@@ -201,6 +243,14 @@ const Settlement = props => {
 
   const onChange = (current, pageSize) => {
     onPagination(current, pageSize);
+  };
+
+  const generateEvent = async record => {
+    if (!record) return;
+    const { error, data } = await cliTasksGenerateByTradeId({
+      tradeId: record.tradeId,
+      legalName: record.counterPartyCode,
+    });
   };
 
   const settlement = async () => {
@@ -250,9 +300,7 @@ const Settlement = props => {
       }),
     );
 
-    const successRsps = rsps.filter(item => {
-      return !item.error;
-    });
+    const successRsps = rsps.filter(item => !item.error);
 
     if (!_.isEmpty(successRsps)) {
       message.success(
@@ -264,8 +312,8 @@ const Settlement = props => {
 
     // 根据接口返回的 positionIds 判断是否结算成功
     successRsps.forEach(rsp => {
-      setTableData(pre => {
-        return pre.map(record => {
+      setTableData(pre =>
+        pre.map(record => {
           if (((rsp.data || {}).positionIds || []).indexOf(record[POSITION_ID]) !== -1) {
             return {
               ...record,
@@ -273,8 +321,8 @@ const Settlement = props => {
             };
           }
           return record;
-        });
-      });
+        }),
+      );
     });
 
     successRsps.forEach(rsp => {
@@ -282,35 +330,13 @@ const Settlement = props => {
       generateEvent(tableData.find(item => item[POSITION_ID] === positionId));
     });
 
-    setSelectedRowKeys(pre => {
-      return _.reject(pre, key =>
+    setSelectedRowKeys(pre =>
+      _.reject(pre, key =>
         successRsps.some(rsp => ((rsp.data || {}).positionIds || []).indexOf(key) !== -1),
-      );
-    });
+      ),
+    );
     setSettLoading(false);
     setSetted(true);
-  };
-
-  const startTradeExercisePreSettle = record => {
-    const values = Form2.getFieldsValue(record);
-
-    const underlyerPrice = parseFloat(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`));
-
-    return tradeExercisePreSettle({
-      positionId: record[POSITION_ID],
-      eventDetail: {
-        underlyerPrice: Number.isNaN(underlyerPrice) ? '' : String(underlyerPrice),
-        numOfOptions: String(
-          getNumOfOptionsByNotionalAmount(
-            get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`),
-            get(values, `asset.${LEG_FIELD.INITIAL_SPOT}`),
-            get(values, `asset.${LEG_FIELD.UNDERLYER_MULTIPLIER}`),
-          ),
-        ), // 名义本金(手数)
-        notionalAmount: String(get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`)), // 名义本金
-      },
-      eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
-    });
   };
 
   const preSettlement = async (record): Promise<boolean> => {
@@ -326,10 +352,10 @@ const Settlement = props => {
 
     const { error, data } = await startTradeExercisePreSettle(record);
 
-    if (error) return;
+    if (error) return false;
 
-    setTableData(pre => {
-      return pre.map(item => {
+    setTableData(pre =>
+      pre.map(item => {
         if (item[POSITION_ID] === record[POSITION_ID]) {
           return {
             ...item,
@@ -339,18 +365,10 @@ const Settlement = props => {
           };
         }
         return item;
-      });
-    });
+      }),
+    );
 
     return error;
-  };
-
-  const generateEvent = async record => {
-    if (!record) return;
-    const { error, data } = await cliTasksGenerateByTradeId({
-      tradeId: record.tradeId,
-      legalName: record.counterPartyCode,
-    });
   };
 
   useEffect(() => {
@@ -362,32 +380,8 @@ const Settlement = props => {
     fetch();
   }, [modalVisible]);
 
-  const canSett = record => {
-    if (record[ALREADY]) {
-      return false;
-    }
-
-    if (
-      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.EXPIRATION || // 到期
-      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.EXERCISE || // 行权
-      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.SETTLE || // 结算
-      record[LEG_FIELD.LCM_EVENT_TYPE] === LCM_EVENT_TYPE_MAP.UNWIND // 平仓
-    ) {
-      return false;
-    }
-
-    // 未结算：持仓状态 != 到期 or 行权 or 结算 or 平仓
-    if (record[LEG_FIELD.PRODUCT_TYPE] === LEG_TYPE_MAP.VANILLA_EUROPEAN) {
-      const expirationDate = get(record, `asset.${LEG_FIELD.EXPIRATION_DATE}`);
-      if (moment(expirationDate).isAfter(moment().format('YYYY-MM-DD'))) {
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const handleRowSelectChange = selectedRowKeys => {
-    setSelectedRowKeys(selectedRowKeys);
+  const handleRowSelectChange = selectedRowKey => {
+    setSelectedRowKeys(selectedRowKey);
   };
 
   const getFooter = () => {
@@ -415,7 +409,7 @@ const Settlement = props => {
     if (settLoading) {
       return (
         <Row type="flex" gutter={10} justify="end">
-          <Button type="primary" loading={true}>
+          <Button type="primary" loading>
             结算中
           </Button>
         </Row>
@@ -449,7 +443,7 @@ const Settlement = props => {
 
   return (
     <Modal
-      destroyOnClose={true}
+      destroyOnClose
       title="批量结算"
       width={1300}
       visible={modalVisible}
@@ -460,7 +454,9 @@ const Settlement = props => {
     >
       <Loading loading={loading}>
         <SmartTable
-          ref={node => (tableEl.current = node)}
+          ref={node => {
+            tableEl.current = node;
+          }}
           rowSelection={{
             selectedRowKeys,
             onChange: handleRowSelectChange,
@@ -474,8 +470,8 @@ const Settlement = props => {
             }
           }}
           onCellFieldsChange={({ record, rowIndex, value, rowId, changedFields, allFields }) => {
-            setTableData(pre => {
-              return pre.map(item => {
+            setTableData(pre =>
+              pre.map(item => {
                 if (item[POSITION_ID] === rowId) {
                   return {
                     ...item,
@@ -483,8 +479,8 @@ const Settlement = props => {
                   };
                 }
                 return item;
-              });
-            });
+              }),
+            );
           }}
           pagination={false}
           rowKey={POSITION_ID}
@@ -537,9 +533,7 @@ const Settlement = props => {
               title: '到期日',
               width: 150,
               dataIndex: `asset.${LEG_FIELD.EXPIRATION_DATE}`,
-              render: (value, record, index, { form, editing }) => {
-                return value;
-              },
+              render: (value, record, index, { form, editing }) => value,
             },
             {
               title: '标的物',
@@ -559,9 +553,7 @@ const Settlement = props => {
               fixed: 'right',
               align: 'right',
               width: 150,
-              editable: record => {
-                return canSett(record);
-              },
+              editable: record => canSett(record),
               defaultEditing: false,
               dataIndex: LEG_FIELD.UNDERLYER_PRICE,
               render: (val, record, index, { form, editing }) => {
@@ -572,7 +564,7 @@ const Settlement = props => {
                   <FormItem>
                     {form.getFieldDecorator({
                       rules: [getRequiredRule()],
-                    })(<InputNumber autoFocus={true} autoSelect={true} editing={editing} />)}
+                    })(<InputNumber autoFocus autoSelect editing={editing} />)}
                   </FormItem>
                 );
               },
@@ -582,9 +574,7 @@ const Settlement = props => {
               fixed: 'right',
               align: 'right',
               width: 150,
-              editable: record => {
-                return canSett(record);
-              },
+              editable: record => canSett(record),
               defaultEditing: false,
               dataIndex: LEG_FIELD.SETTLE_AMOUNT,
               render: (val, record, index, { form, editing }) => {
@@ -597,7 +587,7 @@ const Settlement = props => {
                       rules: [getRequiredRule()],
                     })(
                       <SettleInputNumber
-                        autoSelect={true}
+                        autoSelect
                         showReload={!record[ALREADY]}
                         editing={editing}
                         onReload={async () => {
@@ -646,9 +636,7 @@ const Settlement = props => {
 };
 
 export default memo<any>(
-  connect(state => {
-    return {
-      currentUser: state.user.currentUser,
-    };
-  })(Settlement),
+  connect(state => ({
+    currentUser: state.user.currentUser,
+  }))(Settlement),
 );

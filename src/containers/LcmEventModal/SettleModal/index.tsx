@@ -18,7 +18,12 @@ import {
   SETTLE_AMOUNT,
   SETTLE_FORM_CONTROLS,
   UNDERLYER_PRICE,
+  CASHFLOW_SETTLE_FORM_CONTROLS,
+  SETTLE_FORM_CONTROLS_RANGE_ACCRUALS,
 } from './constants';
+import { Form2 } from '@/containers';
+import { getMoment } from '@/tools';
+import _ from 'lodash';
 
 class ExerciseModal extends PureComponent<
   {
@@ -27,16 +32,6 @@ class ExerciseModal extends PureComponent<
   },
   any
 > {
-  public $settleForm: Form;
-
-  public data: any;
-
-  public tableFormData: any;
-
-  public currentUser: any;
-
-  public reload: any;
-
   public state = {
     visible: false,
     modalConfirmLoading: false,
@@ -44,29 +39,49 @@ class ExerciseModal extends PureComponent<
     exportVisible: false,
     productType: 'MODEL_XY',
     notionalType: '',
+    cashFlowDataSource: {},
   };
+
+  // public componentDidMount = () => {
+  //   if (_.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+  //     this.handleSettleAmount();
+  //   }
+  // }
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
     this.data = data;
     this.tableFormData = tableFormData;
     this.currentUser = currentUser;
     this.reload = reload;
-    this.setState({
-      visible: true,
-      productType: this.data[LEG_TYPE_FIELD],
-      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
-      ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        ? {
-            dataSource: this.computeLotDataSource({
-              [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+    this.setState(
+      {
+        visible: true,
+        productType: this.data[LEG_TYPE_FIELD],
+        notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
+        cashFlowDataSource:
+          this.data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.CASH_FLOW
+            ? Form2.createFields({
+                ...this.data,
+              })
+            : {},
+        ...(this.data.notionalAmountType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
+          ? {
+              dataSource: this.computeLotDataSource({
+                [NOTIONAL_AMOUNT]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+              }),
+            }
+          : {
+              dataSource: this.computeCnyDataSource({
+                [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
+              }),
             }),
-          }
-        : {
-            dataSource: this.computeCnyDataSource({
-              [NUM_OF_OPTIONS]: this.data[LEG_FIELD.NOTIONAL_AMOUNT],
-            }),
-          }),
-    });
+      },
+      () => {
+        if (_.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+          this.handleSettleAmount();
+        }
+      },
+    );
   };
 
   public computeCnyDataSource = value => {
@@ -103,25 +118,68 @@ class ExerciseModal extends PureComponent<
   };
 
   public onConfirm = async () => {
+    // if (this.state.productType === LEG_TYPE_MAP.CASH_FLOW) {
+    //   this.switchConfirmLoading();
+    //   const formData = Form2.getFieldsValue(this.state.cashFlowDataSource);
+    //   const { error, data } = await trdTradeLCMEventProcess({
+    //     positionId: this.data.id,
+    //     tradeId: this.tableFormData.tradeId,
+    //     eventType: LCM_EVENT_TYPE_MAP.SETTLE,
+    //     userLoginId: this.currentUser.username,
+    //     eventDetail: {
+    //       paymentDate: getMoment(formData.paymentDate).format('YYYY-MM-DD'),
+    //       paymentAmount: String(formData.paymentAmount),
+    //       paymentDirection: formData.paymentDirection,
+    //     },
+    //   });
+
+    //   this.switchConfirmLoading();
+    //   if (error) return;
+    //   message.success('结算成功');
+    //   this.setState({
+    //     visible: false,
+    //     exportVisible: true,
+    //   });
+    //   return;
+    // }
+
     const rsp = await this.$settleForm.validate();
     if (rsp.error) return;
-    const { dataSource } = this.state;
+    const { dataSource, cashFlowDataSource } = this.state;
+    let rspError;
     this.switchConfirmLoading();
-    const { error, data } = await trdTradeLCMEventProcess({
-      positionId: this.data.id,
-      tradeId: this.tableFormData.tradeId,
-      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
-      userLoginId: this.currentUser.username,
-      eventDetail: {
-        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
-        settleAmount: String(dataSource[SETTLE_AMOUNT]),
-        numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
-        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
-      },
-    });
+    if (this.state.productType === LEG_TYPE_MAP.CASH_FLOW) {
+      const formData = Form2.getFieldsValue(cashFlowDataSource);
+      const { error, data } = await trdTradeLCMEventProcess({
+        positionId: this.data.id,
+        tradeId: this.tableFormData.tradeId,
+        eventType: LCM_EVENT_TYPE_MAP.SETTLE,
+        userLoginId: this.currentUser.username,
+        eventDetail: {
+          paymentDate: getMoment(formData.paymentDate).format('YYYY-MM-DD'),
+          paymentAmount: String(formData.paymentAmount),
+          paymentDirection: formData.paymentDirection,
+        },
+      });
+      rspError = error;
+    } else {
+      const { error, data } = await trdTradeLCMEventProcess({
+        positionId: this.data.id,
+        tradeId: this.tableFormData.tradeId,
+        eventType: LCM_EVENT_TYPE_MAP.SETTLE,
+        userLoginId: this.currentUser.username,
+        eventDetail: {
+          underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+          settleAmount: String(dataSource[SETTLE_AMOUNT]),
+          numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+          notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+        },
+      });
+      rspError = error;
+    }
 
     this.switchConfirmLoading();
-    if (error) return;
+    if (rspError) return;
     message.success('结算成功');
     this.setState({
       visible: false,
@@ -143,6 +201,24 @@ class ExerciseModal extends PureComponent<
 
   public handleSettleAmount = async () => {
     const { dataSource } = this.state;
+    if (_.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS) {
+      const { error, data } = await tradeExercisePreSettle({
+        positionId: this.data.id,
+        eventDetail: {
+          numOfOptions: String(dataSource[NUM_OF_OPTIONS]),
+          notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+        },
+        eventType: LCM_EVENT_TYPE_MAP.SETTLE,
+      });
+      if (error) return;
+      this.setState({
+        dataSource: {
+          ...dataSource,
+          [SETTLE_AMOUNT]: data,
+        },
+      });
+      return;
+    }
     if (!dataSource[UNDERLYER_PRICE]) {
       if (!(dataSource[UNDERLYER_PRICE] === 0)) {
         message.error('请填标的物价格');
@@ -167,6 +243,16 @@ class ExerciseModal extends PureComponent<
     });
   };
 
+  public $settleForm: Form;
+
+  public data: any;
+
+  public tableFormData: any;
+
+  public currentUser: any;
+
+  public reload: any;
+
   public render() {
     const { visible } = this.state;
     return (
@@ -186,20 +272,40 @@ class ExerciseModal extends PureComponent<
           confirmLoading={this.state.modalConfirmLoading}
           title={`结算: (${LEG_TYPE_ZHCH_MAP[LEG_TYPE_MAP[this.state.productType]]})`}
         >
-          <Form
-            ref={node => {
-              this.$settleForm = node;
-            }}
-            dataSource={this.state.dataSource}
-            onValueChange={this.onValueChange}
-            controlNumberOneRow={1}
-            footer={false}
-            controls={SETTLE_FORM_CONTROLS(
-              this.state.notionalType,
-              this.state.productType,
-              this.handleSettleAmount,
-            )}
-          />
+          {this.state.productType === LEG_TYPE_MAP.CASH_FLOW ? (
+            <Form2
+              ref={node => {
+                this.$settleForm = node;
+              }}
+              dataSource={this.state.cashFlowDataSource}
+              footer={false}
+              columns={CASHFLOW_SETTLE_FORM_CONTROLS}
+            />
+          ) : (
+            <Form
+              ref={node => {
+                this.$settleForm = node;
+              }}
+              dataSource={this.state.dataSource}
+              onValueChange={this.onValueChange}
+              controlNumberOneRow={1}
+              footer={false}
+              controls={
+                _.get(this.data, '$legType') === LEG_TYPE_MAP.RANGE_ACCRUALS
+                  ? SETTLE_FORM_CONTROLS_RANGE_ACCRUALS(
+                      this.state.notionalType,
+                      this.state.productType,
+                      this.handleSettleAmount,
+                    )
+                  : SETTLE_FORM_CONTROLS(
+                      this.state.notionalType,
+                      this.state.productType,
+                      this.handleSettleAmount,
+                    )
+              }
+            />
+          )}
+
           <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>
       </>

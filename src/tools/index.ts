@@ -1,3 +1,8 @@
+/*eslint-disable */
+import _ from 'lodash';
+import BigNumber from 'bignumber.js';
+import { notification } from 'antd';
+import moment, { isMoment } from 'moment';
 import {
   EXERCISETYPE_MAP,
   LCM_EVENT_TYPE_MAP,
@@ -30,8 +35,8 @@ import { VanillaAmerican } from '@/domains/legs/VanillaAmerican';
 import { VanillaEuropean } from '@/domains/legs/VanillaEuropean';
 import { VerticalSpread } from '@/domains/legs/VerticalSpread';
 import { SpreadEuropean } from '@/domains/legs/SpreadEuropean';
-import _ from 'lodash';
 import { AutoCallPhoenix } from '@/domains/legs/AutoCallPhoenix';
+import { CashFlow } from '@/domains/legs/CashFlow';
 import { Asia } from '@/domains/legs/Asia';
 import { Straddle } from '@/domains/legs/Straddle';
 import { Forward } from '@/domains/legs/Forward';
@@ -39,82 +44,56 @@ import { createLegDataSourceItem, backConvertPercent } from '@/services/pages';
 import { Form2 } from '@/containers';
 import { ITableData } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import BigNumber from 'bignumber.js';
-import { notification } from 'antd';
-import moment, { isMoment } from 'moment';
 import mapTree from './mapTree';
 import request from './request';
 
-export const isModelXY = data => {
-  return (
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_ANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_UNANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY
-  );
-};
+export const isModelXY = data =>
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_ANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY_UNANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.MODEL_XY;
 
-export const isAutocallPhoenix = data => {
-  return (
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX
-  );
-};
+export const isAutocallPhoenix = data =>
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_ANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX_UNANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_PHOENIX;
 
-export const isAutocallSnow = data => {
-  return (
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_UNANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL
-  );
-};
+export const isAutocallSnow = data =>
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_ANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL_UNANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.AUTOCALL;
 
-export const isAsian = data => {
-  return (
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN
-  );
-};
+export const isAsian = data =>
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_ANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN_UNANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.ASIAN;
 
-export const isBarrier = data => {
-  return data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER;
-};
+export const isBarrier = data => data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.BARRIER;
 
-export const isRangeAccruals = data => {
-  return (
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
-    data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS
-  );
-};
+export const isRangeAccruals = data =>
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_ANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS_UNANNUAL ||
+  data[LEG_TYPE_FIELD] === LEG_TYPE_MAP.RANGE_ACCRUALS;
 
-export const isKnockIn = data => {
-  return data[LEG_FIELD.ALREADY_BARRIER];
-};
+export const isKnockIn = data => data[LEG_FIELD.ALREADY_BARRIER];
 
-export const getMinRule = (message: string = '不允许小于0') => {
-  return {
-    message,
-    validator: (rule, value, callback) => {
-      if (value < 0) {
-        return callback(true);
-      }
-      return callback();
-    },
-  };
-};
+export const getMinRule = (message: string = '不允许小于0') => ({
+  message,
+  validator: (rule, value, callback) => {
+    if (value < 0) {
+      return callback(true);
+    }
+    return callback();
+  },
+});
 
-export const getRequiredRule = (message: string = '必填') => {
-  return {
-    message,
-    required: true,
-  };
-};
+export const getRequiredRule = (message: string = '必填') => ({
+  message,
+  required: true,
+});
 
 export function arr2treeOptions(arr, paths, labelPaths) {
   if (!arr || arr.length === 0) return [];
-  const length = paths.length;
+  const { length } = paths;
   if (paths.length !== labelPaths.length) {
     throw new Error('arr2treeOptions: paths.length should be equal with labelPaths.length.');
   }
@@ -125,19 +104,13 @@ export function arr2treeOptions(arr, paths, labelPaths) {
     }
     if (a === null) return;
     const data = _.uniq(
-      arr
-        .filter(iitem => {
-          return iitem[paths[index]] === a;
-        })
-        .map(value => value[paths[index + 1]])
+      arr.filter(iitem => iitem[paths[index]] === a).map(value => value[paths[index + 1]]),
     );
     return {
       [a]: data.map(c => getTreeData(c, index + 1)),
     };
   }
-  const x = deeps.map(item => {
-    return getTreeData(item, 0);
-  });
+  const x = deeps.map(item => getTreeData(item, 0));
   function getTree(deep, index = 0) {
     if (!deep) return [];
 
@@ -167,7 +140,7 @@ export function arr2treeOptions(arr, paths, labelPaths) {
 }
 
 export const getLegByRecord = record => {
-  const leg = TOTAL_LEGS.find(item => item.type === record[LEG_TYPE_FIELD]);
+  const leg = TOTAL_LEGS.find(item => item.type === _.get(record, [LEG_TYPE_FIELD]));
   return leg;
 };
 
@@ -184,27 +157,25 @@ export const getLegEnvs = record => ({
 });
 
 export const getFormEditingMeta = (
-  status: 'EDITING_NO_CONVERT' | 'NO_EDITING_CAN_CONVERT' | 'SHOW'
+  status: 'EDITING_NO_CONVERT' | 'NO_EDITING_CAN_CONVERT' | 'SHOW',
 ) => {
   if (status === FORM_EDITABLE_STATUS.EDITING_NO_CONVERT) {
     return {
       editable: false,
     };
-  } else if (status === FORM_EDITABLE_STATUS.NO_EDITING_CAN_CONVERT) {
+  }
+  if (status === FORM_EDITABLE_STATUS.NO_EDITING_CAN_CONVERT) {
     return {
       editable: true,
     };
-  } else {
-    return {
-      editable: false,
-      editing: false,
-    };
   }
+  return {
+    editable: false,
+    editing: false,
+  };
 };
 
-export const getLegByType = (type: string) => {
-  return TOTAL_LEGS.find(item => item.type === type);
-};
+export const getLegByType = (type: string) => TOTAL_LEGS.find(item => item.type === type);
 
 export const getLegByProductType = (productType, exerciseType?) => {
   if (productType === PRODUCT_TYPE_MAP.DIGITAL) {
@@ -278,6 +249,9 @@ export const getLegByProductType = (productType, exerciseType?) => {
   if (productType === PRODUCT_TYPE_MAP.RATIO_SPREAD_EUROPEAN) {
     return RatioSpreadEuropean;
   }
+  if (productType === PRODUCT_TYPE_MAP.CASH_FLOW) {
+    return CashFlow;
+  }
   throw new Error('not match productType!');
 };
 
@@ -286,7 +260,7 @@ export const convertLegDataByEnv = (record: ITableData, toEnv: string) => {
   if (!leg) return record;
   const omits = _.difference(
     leg.getColumns(record[LEG_ENV_FIELD], record).map(record => record.dataIndex),
-    leg.getColumns(toEnv, record).map(record => record.dataIndex)
+    leg.getColumns(toEnv, record).map(record => record.dataIndex),
   );
   return {
     ...createLegDataSourceItem(leg, toEnv),
@@ -306,7 +280,7 @@ export const createLegRecordByPosition = (leg: ILeg, position, env: string) => {
       ...Form2.createFields({
         ..._.omitBy(
           _.omit(position.asset, ['counterpartyCode', 'annualized', 'exerciseType']),
-          _.isNull
+          _.isNull,
         ),
         [LEG_FIELD.IS_ANNUAL]: isAnnualized,
       }),
@@ -319,7 +293,7 @@ export const formatNumber = (
   value: BigNumber.Value,
   decimalPlaces?: number,
   roundingMode?: BigNumber.RoundingMode,
-  config?: BigNumber.Format
+  config?: BigNumber.Format,
 ) => {
   if (!_.isNumber(value)) {
     return '';
@@ -333,7 +307,7 @@ export const formatMoney = (
     unit?: string;
     space?: boolean;
     decimalPlaces?: number;
-  }
+  },
 ) => {
   const { unit = '', space = false, decimalPlaces = 4 } = config || {};
   return formatNumber(value, decimalPlaces, null, {
@@ -362,7 +336,7 @@ export const catchCallbackError = (target: any) => {
   const handleError = error => {
     notification.error({
       message: '抱歉，发送了未知错误',
-      description: error + '',
+      description: `${error}`,
     });
   };
   return function() {
@@ -392,17 +366,15 @@ export { mapTree };
 export * from './utils';
 export * from './extensibleProduce';
 
-export const convertOptions = (maps, zhcn) => {
-  return Object.keys(maps).map(key => ({
+export const convertOptions = (maps, zhcn) =>
+  Object.keys(maps).map(key => ({
     label: zhcn[key],
     value: maps[key],
   }));
-};
 
 // NOTE: 如果 val 是空，则返回当前时间
-export const getMoment = (val, clone = false) => {
-  return isMoment(val) ? (clone ? val.clone() : val) : !!val ? moment(val) : moment();
-};
+export const getMoment = (val, clone = false) =>
+  isMoment(val) ? (clone ? val.clone() : val) : val ? moment(val) : moment();
 
 export const getCurDateMoment = () => {
   const m = moment();
