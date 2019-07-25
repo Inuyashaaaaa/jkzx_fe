@@ -24,6 +24,10 @@ export default [
     path: '/',
     redirect: '/welcome-page',
   },
+  {
+    path: '/chart-talk',
+    component: './ChartTalk',
+  },
   mapTree(
     {
       appRoute: true,
