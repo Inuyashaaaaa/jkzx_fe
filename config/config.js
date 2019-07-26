@@ -47,7 +47,6 @@ export default {
   // https://ant.design/docs/react/customize-theme-cn
   theme: setting.themeVars,
   externals: {
-    '@antv/data-set': 'DataSet',
     moment: 'moment',
     jquery: '$',
     mockjs: 'Mock',
