@@ -3121,9 +3121,9 @@ antd-mobile@2.x:
     rmc-tooltip "~1.0.0"
 
 antd@3.x:
-  version "3.20.6"
-  resolved "https://registry.npm.taobao.org/antd/download/antd-3.20.6.tgz#d42f7f444ca7a57deb80759722b653732a3b94da"
-  integrity sha1-1C9/REynpX3rgHWXIrZTcyo7lNo=
+  version "3.20.7"
+  resolved "https://registry.npm.taobao.org/antd/download/antd-3.20.7.tgz#a01b0a23dc9bb93de79b8847fa754c6caae1686c"
+  integrity sha1-oBsKI9ybuT3nm4hH+nVMbKrhaGw=
   dependencies:
     "@ant-design/create-react-context" "^0.2.4"
     "@ant-design/icons" "~2.1.1"
@@ -8452,9 +8452,9 @@ eslint-plugin-import@^2.14.0, eslint-plugin-import@^2.17.3:
     resolve "^1.11.0"
 
 eslint-plugin-jest@^22.4.1:
-  version "22.13.6"
-  resolved "https://registry.npm.taobao.org/eslint-plugin-jest/download/eslint-plugin-jest-22.13.6.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Feslint-plugin-jest%2Fdownload%2Feslint-plugin-jest-22.13.6.tgz#85630e7709fe1ecbe0099956590af32d5e157448"
-  integrity sha1-hWMOdwn+HsvgCZlWWQrzLV4VdEg=
+  version "22.13.7"
+  resolved "https://registry.npm.taobao.org/eslint-plugin-jest/download/eslint-plugin-jest-22.13.7.tgz#08516e7c77dd2a95d41dadd4e2ed9b7b29d18ce6"
+  integrity sha1-CFFufHfdKpXUHa3U4u2beynRjOY=
   dependencies:
     "@typescript-eslint/experimental-utils" "^1.13.0"
 
@@ -8579,9 +8579,9 @@ eslint-rule-composer@^0.3.0:
   integrity sha1-eTIMknsMXA09PSt2yLSkiPJbuvk=
 
 eslint-rule-docs@^1.1.5:
-  version "1.1.151"
-  resolved "https://registry.npm.taobao.org/eslint-rule-docs/download/eslint-rule-docs-1.1.151.tgz#2b3b9623c0c88109ca7b1cf32d9a3e91b54a7737"
-  integrity sha1-KzuWI8DIgQnKexzzLZo+kbVKdzc=
+  version "1.1.152"
+  resolved "https://registry.npm.taobao.org/eslint-rule-docs/download/eslint-rule-docs-1.1.152.tgz#33f6367db7504d901dac170118534180ffae0c3c"
+  integrity sha1-M/Y2fbdQTZAdrBcBGFNBgP+uDDw=
 
 eslint-scope@3.7.1:
   version "3.7.1"
@@ -11509,7 +11509,7 @@ intl-format-cache@^2.0.5:
 
 intl-messageformat-parser@1.4.0:
   version "1.4.0"
-  resolved "https://registry.npm.taobao.org/intl-messageformat-parser/download/intl-messageformat-parser-1.4.0.tgz#b43d45a97468cadbe44331d74bb1e8dea44fc075"
+  resolved "https://registry.npm.taobao.org/intl-messageformat-parser/download/intl-messageformat-parser-1.4.0.tgz?cache=0&sync_timestamp=1564051992135&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fintl-messageformat-parser%2Fdownload%2Fintl-messageformat-parser-1.4.0.tgz#b43d45a97468cadbe44331d74bb1e8dea44fc075"
   integrity sha1-tD1FqXRoytvkQzHXS7Ho3qRPwHU=
 
 intl-messageformat@^2.0.0, intl-messageformat@^2.1.0:
@@ -17266,9 +17266,9 @@ rc-notification@~3.3.1:
     rc-util "^4.0.4"
 
 rc-pagination@~1.20.1:
-  version "1.20.3"
-  resolved "https://registry.npm.taobao.org/rc-pagination/download/rc-pagination-1.20.3.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-pagination%2Fdownload%2Frc-pagination-1.20.3.tgz#8060bb2c0e0ea7047bec079ff86da25f79b6072f"
-  integrity sha1-gGC7LA4OpwR77Aef+G2iX3m2By8=
+  version "1.20.4"
+  resolved "https://registry.npm.taobao.org/rc-pagination/download/rc-pagination-1.20.4.tgz#7f78cf882a72a2449edb4d8d7d91bf9f7237bd87"
+  integrity sha1-f3jPiCpyokSe202NfZG/n3I3vYc=
   dependencies:
     babel-runtime "6.x"
     classnames "^2.2.6"
@@ -17303,7 +17303,7 @@ rc-rate@~2.5.0:
 
 rc-select@~9.1.4:
   version "9.1.5"
-  resolved "https://registry.npm.taobao.org/rc-select/download/rc-select-9.1.5.tgz?cache=0&sync_timestamp=1563247213049&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-select%2Fdownload%2Frc-select-9.1.5.tgz#6811dd5f984e876cd6baa4767aaf6c152a4a1004"
+  resolved "https://registry.npm.taobao.org/rc-select/download/rc-select-9.1.5.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-select%2Fdownload%2Frc-select-9.1.5.tgz#6811dd5f984e876cd6baa4767aaf6c152a4a1004"
   integrity sha1-aBHdX5hOh2zWuqR2eq9sFSpKEAQ=
   dependencies:
     babel-runtime "^6.23.0"
@@ -17320,9 +17320,9 @@ rc-select@~9.1.4:
     warning "^4.0.2"
 
 rc-select@~9.2.0:
-  version "9.2.0"
-  resolved "https://registry.npm.taobao.org/rc-select/download/rc-select-9.2.0.tgz?cache=0&sync_timestamp=1563247213049&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-select%2Fdownload%2Frc-select-9.2.0.tgz#b5dacccf3ce3fcdd27e0a0f598133d6284ca5292"
-  integrity sha1-tdrMzzzj/N0n4KD1mBM9YoTKUpI=
+  version "9.2.1"
+  resolved "https://registry.npm.taobao.org/rc-select/download/rc-select-9.2.1.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-select%2Fdownload%2Frc-select-9.2.1.tgz#0fbf47a933c36e1e6ef76c88fab32f58029e6a01"
+  integrity sha1-D79HqTPDbh5u92yI+rMvWAKeagE=
   dependencies:
     babel-runtime "^6.23.0"
     classnames "2.x"
@@ -17833,7 +17833,7 @@ react-hot-loader@^4.6.3, react-hot-loader@^4.8.4:
 
 react-intl@2.7.2:
   version "2.7.2"
-  resolved "https://registry.npm.taobao.org/react-intl/download/react-intl-2.7.2.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-intl%2Fdownload%2Freact-intl-2.7.2.tgz#efe97e3fc0e99b4e88a6e6150854d3d1852a4381"
+  resolved "https://registry.npm.taobao.org/react-intl/download/react-intl-2.7.2.tgz?cache=0&sync_timestamp=1564061134892&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Freact-intl%2Fdownload%2Freact-intl-2.7.2.tgz#efe97e3fc0e99b4e88a6e6150854d3d1852a4381"
   integrity sha1-7+l+P8Dpm06IpuYVCFTT0YUqQ4E=
   dependencies:
     hoist-non-react-statics "^2.5.5"
@@ -20969,9 +20969,9 @@ sver-compat@^1.5.0:
     es6-symbol "^3.1.1"
 
 svg-parser@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.npm.taobao.org/svg-parser/download/svg-parser-2.0.1.tgz#2379e84748b31fad7bf80913e173492f3bcc9f20"
-  integrity sha1-I3noR0izH617+AkT4XNJLzvMnyA=
+  version "2.0.2"
+  resolved "https://registry.npm.taobao.org/svg-parser/download/svg-parser-2.0.2.tgz?cache=0&sync_timestamp=1564059719764&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fsvg-parser%2Fdownload%2Fsvg-parser-2.0.2.tgz#d134cc396fa2681dc64f518330784e98bd801ec8"
+  integrity sha1-0TTMOW+iaB3GT1GDMHhOmL2AHsg=
 
 svg-tags@^1.0.0:
   version "1.0.0"
@@ -21651,15 +21651,15 @@ tslint@5.11.0:
 
 tsutils@^2.27.2:
   version "2.29.0"
-  resolved "https://registry.npm.taobao.org/tsutils/download/tsutils-2.29.0.tgz#32b488501467acbedd4b85498673a0812aca0b99"
+  resolved "https://registry.npm.taobao.org/tsutils/download/tsutils-2.29.0.tgz?cache=0&sync_timestamp=1564061135807&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ftsutils%2Fdownload%2Ftsutils-2.29.0.tgz#32b488501467acbedd4b85498673a0812aca0b99"
   integrity sha1-MrSIUBRnrL7dS4VJhnOggSrKC5k=
   dependencies:
     tslib "^1.8.1"
 
 tsutils@^3.7.0:
-  version "3.14.0"
-  resolved "https://registry.npm.taobao.org/tsutils/download/tsutils-3.14.0.tgz#bf8d5a7bae5369331fa0f2b0a5a10bd7f7396c77"
-  integrity sha1-v41ae65TaTMfoPKwpaEL1/c5bHc=
+  version "3.14.1"
+  resolved "https://registry.npm.taobao.org/tsutils/download/tsutils-3.14.1.tgz?cache=0&sync_timestamp=1564061135807&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ftsutils%2Fdownload%2Ftsutils-3.14.1.tgz#f1d2b93d2a0876481f2f1f98c25ba42bbd7ee860"
+  integrity sha1-8dK5PSoIdkgfLx+YwlukK71+6GA=
   dependencies:
     tslib "^1.8.1"
 
@@ -21729,12 +21729,12 @@ typedarray@^0.0.6, typedarray@~0.0.5:
 
 typescript@3.2.2:
   version "3.2.2"
-  resolved "https://registry.npm.taobao.org/typescript/download/typescript-3.2.2.tgz?cache=0&sync_timestamp=1563948402168&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ftypescript%2Fdownload%2Ftypescript-3.2.2.tgz#fe8101c46aa123f8353523ebdcf5730c2ae493e5"
+  resolved "https://registry.npm.taobao.org/typescript/download/typescript-3.2.2.tgz#fe8101c46aa123f8353523ebdcf5730c2ae493e5"
   integrity sha1-/oEBxGqhI/g1NSPr3PVzDCrkk+U=
 
 typescript@3.3.4000:
   version "3.3.4000"
-  resolved "https://registry.npm.taobao.org/typescript/download/typescript-3.3.4000.tgz?cache=0&sync_timestamp=1563948402168&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ftypescript%2Fdownload%2Ftypescript-3.3.4000.tgz#76b0f89cfdbf97827e1112d64f283f1151d6adf0"
+  resolved "https://registry.npm.taobao.org/typescript/download/typescript-3.3.4000.tgz#76b0f89cfdbf97827e1112d64f283f1151d6adf0"
   integrity sha1-drD4nP2/l4J+ERLWTyg/EVHWrfA=
 
 ua-parser-js@0.7.17:

@@ -5,6 +5,8 @@ import { scaleLinear } from 'd3-scale';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import moment from 'moment';
+import { connect } from 'dva';
 import ChartTitle from '../containers/ChartTitle';
 import ThemeSelect from '../containers/ThemeSelect';
 import ThemeDatePickerRanger from '../containers/ThemeDatePickerRanger';
@@ -12,11 +14,15 @@ import ThemeButton from '../containers/ThemeButton';
 import { Loading } from '@/containers';
 import { delay } from '@/tools';
 import PosCenter from '../containers/PosCenter';
+import { getInstrumentRollingVol } from '@/services/terminal';
 
-const Rollong = memo(props => {
+const Rollong = props => {
+  const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
+  const [window, setWindow] = useState('22');
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -35,72 +41,18 @@ const Rollong = memo(props => {
 
   const fetch = async () => {
     setLoading(true);
-    await delay(2000);
-    const fdata = [
-      {
-        time: '2009/1/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/3/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/4/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/5/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/6/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/7/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/8/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/9/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-      {
-        time: '2009/10/12',
-        value: _.round(Math.random() * 10, 0),
-        value1: _.round(Math.random() * 10, 0),
-        value2: _.round(Math.random() * 10, 0),
-        value3: _.round(Math.random() * 10, 0),
-      },
-    ];
+    const rsp = await getInstrumentRollingVol({
+      instrumentId,
+      startDate: dates[0].format('YYYY-MM-DD'),
+      endDate: dates[1].format('YYYY-MM-DD'),
+      window: _.toNumber(window),
+    });
+    if (rsp.error) return;
+
+    const fdata = rsp.data.map(item => ({
+      time: item.tradeDate,
+      value: item.vol,
+    }));
 
     const dv = new DataSet.View().source(fdata);
 
@@ -129,18 +81,24 @@ const Rollong = memo(props => {
     <>
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
         <Col>
-          <ThemeDatePickerRanger allowClear={false}></ThemeDatePickerRanger>
+          <ThemeDatePickerRanger
+            onChange={pDates => setDates(pDates)}
+            value={dates}
+            allowClear={false}
+          ></ThemeDatePickerRanger>
         </Col>
         <Col>
-          <ThemeSelect placeholder="窗口" style={{ minWidth: 200 }}>
-            <Select.Option value="1">窗口1</Select.Option>
-            <Select.Option value="2">窗口2</Select.Option>
-            <Select.Option value="3">窗口2</Select.Option>
-            <Select.Option value="4">窗口2</Select.Option>
-            <Select.Option value="5">窗口2</Select.Option>
-            <Select.Option value="6">窗口2</Select.Option>
-            <Select.Option value="7">窗口2</Select.Option>
-            <Select.Option value="29">窗口2</Select.Option>
+          <ThemeSelect
+            value={window}
+            onChange={val => setWindow(val)}
+            placeholder="窗口"
+            style={{ minWidth: 200 }}
+          >
+            {[1, 3, 5, 10, 22, 44, 66, 132].map(item => (
+              <Select.Option value={item} key={item}>
+                {item}
+              </Select.Option>
+            ))}
           </ThemeSelect>
         </Col>
         <Col>
@@ -161,15 +119,16 @@ const Rollong = memo(props => {
           <Chart
             animate
             forceFit
-            height={610}
+            height={630}
             padding={[40, 20, 40, 40]}
             width={750}
             data={meta.dv}
             scale={{
               time: {
                 type: 'timeCat',
-                tickCount: 8,
+                tickCount: 5,
                 alias: '日期',
+                mask: 'YYYY/MM/DD',
               },
               value: {
                 alias: '波动率',
@@ -195,7 +154,7 @@ const Rollong = memo(props => {
               }}
               label={{
                 textStyle: {
-                  fontSize: '14',
+                  fontSize: '12',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -214,7 +173,7 @@ const Rollong = memo(props => {
               line={null}
               label={{
                 textStyle: {
-                  fontSize: '14',
+                  fontSize: '12',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -247,7 +206,6 @@ const Rollong = memo(props => {
                 type: 'y',
                 style: {
                   stroke: '#00BAFF',
-                  opacity: '0.1',
                 },
               }}
             />
@@ -262,21 +220,25 @@ const Rollong = memo(props => {
                   animation: 'clipIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
                 appear: {
                   animation: 'clipIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
                 leave: {
                   animation: 'lineWidthOut', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 300, // 动画执行时间
+                  delay: 100,
                 },
                 update: {
                   animation: 'fadeIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
               }}
             />
@@ -292,21 +254,25 @@ const Rollong = memo(props => {
                   animation: 'clipIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
                 appear: {
                   animation: 'clipIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
                 leave: {
                   animation: 'lineWidthOut', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 300, // 动画执行时间
+                  delay: 100,
                 },
                 update: {
                   animation: 'fadeIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
               }}
             />
@@ -319,6 +285,10 @@ const Rollong = memo(props => {
       </Row>
     </>
   );
-});
+};
 
-export default Rollong;
+export default memo(
+  connect(state => ({
+    instrumentId: state.chartTalkModel.instrumentId,
+  }))(Rollong),
+);

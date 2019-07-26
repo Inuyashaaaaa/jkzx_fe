@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import React, { memo } from 'react';
-import { Select } from 'antd';
 import classnames from 'classnames';
 import styles from './ThemeSelect.less';
+import { Select } from '@/containers';
 
 // eslint-disable-next-line
 const imgPath = require('../assets/4.png');
@@ -26,6 +26,9 @@ const ThemeSelectWrap = styled.div`
   }
   .ant-select-selection-selected-value {
     color: #00e8e8;
+  }
+  .ant-select-search__field {
+    color: #ffffff;
   }
 `;
 

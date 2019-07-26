@@ -5,10 +5,10 @@ import Panels from './Panels';
 
 const InstrumentId = memo(props => (
   <div>
-    <div style={{ marginBottom: 25 }}>
+    <div style={{ marginBottom: 18 }}>
       <Header></Header>
     </div>
-    <div style={{ marginBottom: 25 }}>
+    <div style={{ marginBottom: 18 }}>
       <Panels></Panels>
     </div>
     <Body></Body>

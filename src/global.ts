@@ -1,8 +1,87 @@
-import { connectSocket, disconnectSocket } from '@/services/socket';
+/* eslint-disable */
 import 'animate.css';
 import BigNumber from 'bignumber.js';
 import { setAutoFreeze } from 'immer';
 import numeral from 'numeral';
+import { connectSocket, disconnectSocket } from '@/services/socket';
+
+const userData = {
+  expired: false,
+  code: '0',
+  roles: ['all_page', 'admin'],
+  locked: false,
+  loginStatus: true,
+  message: '登录成功',
+  userId: '04ebe123-312a-4dc0-b6d0-1a6d0af82707',
+  username: 'admin',
+  token:
+    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbImFsbF9wYWdlIiwiYWRtaW4iXSwiaXNzIjoidG9uZ3l1LnRlY2giLCJleHAiOjE1NzE5MDE3MjIxMzEsImlhdCI6MTU2NDEyNTcyMjEzMSwidXNlcm5hbWUiOiJhZG1pbiJ9.4T1kgHHe321QqkocnVwbFFuCCCVXNOiq0FNOgtBRWlU',
+  permissions: {
+    welcomePage: true,
+    default: true,
+    approvalProcess: true,
+    triggerManagement: true,
+    processConfiguration: true,
+    auditingManagement: true,
+    approvalProcessManagement: true,
+    reports: true,
+    eodRiskByUnderlyer: true,
+    eodDailyPnlByUnderlyer: true,
+    spotLadder: true,
+    tradingStatements: true,
+    eodPosition: true,
+    customerFundsSummaryStatements: true,
+    fundsDetailedStatements: true,
+    reportsCustomManagement: true,
+    eodHistoricalPnlByUnderlyer: true,
+    riskManager: true,
+    intradayDailyPnlByUnderlyerReport: true,
+    intradayPositionReport: true,
+    intradayExpiringPositionReport: true,
+    portfolioRisk: true,
+    customReport: true,
+    intradayRiskByUnderlyerReport: true,
+    tradeManagement: true,
+    pricing: true,
+    notifications: true,
+    bookEdit: true,
+    subjectStore: true,
+    portfolioManagement: true,
+    onBoardTransaction: true,
+    marketManagement: true,
+    tradeDocuments: true,
+    booking: true,
+    contractManagement: true,
+    pricingSettings: true,
+    pricingEnvironment: true,
+    baseContractManagement: true,
+    dividendCurve: true,
+    riskFreeCurve: true,
+    customModel: true,
+    volSurface: true,
+    clientManagement: true,
+    fundStatistics: true,
+    salesManagement: true,
+    marginManagement: true,
+    valuationManagement: true,
+    discrepancyManagement: true,
+    ioglodManagement: true,
+    clientInfo: true,
+    bankAccount: true,
+    systemSettings: true,
+    tradeBooks: true,
+    documentManagement: true,
+    riskSettings: true,
+    users: true,
+    volatilityCalendar: true,
+    roleManagement: true,
+    department: true,
+    calendars: true,
+    resources: true,
+  },
+};
+
+window.localStorage.setItem('tongyu_USER_LOCAL_FIELD', JSON.stringify(userData));
 
 numeral.register('format', 'de', {
   regexps: {
@@ -25,9 +104,7 @@ numeral.register('format', 'de', {
 
     return `${numeral._.numberToFormat(value, format, roundingFunction)}`;
   },
-  unformat: str => {
-    return numeral._.stringToNumber(str);
-  },
+  unformat: str => numeral._.stringToNumber(str),
 });
 
 numeral.register('format', 'pe', {
@@ -51,9 +128,7 @@ numeral.register('format', 'pe', {
 
     return `${numeral._.numberToFormat(value, format, roundingFunction)}${space} %`;
   },
-  unformat: str => {
-    return numeral._.stringToNumber(str);
-  },
+  unformat: str => numeral._.stringToNumber(str),
 });
 
 numeral.register('format', 'pde', {
@@ -79,9 +154,7 @@ numeral.register('format', 'pde', {
 
     return `${numeral._.numberToFormat(value, format, roundingFunction)}${space} %`;
   },
-  unformat: str => {
-    return new BigNumber(numeral._.stringToNumber(str)).div(100).toNumber();
-  },
+  unformat: str => new BigNumber(numeral._.stringToNumber(str)).div(100).toNumber(),
 });
 
 numeral.register('format', '¥', {
@@ -107,12 +180,10 @@ numeral.register('format', '¥', {
     return `${start ? '¥ ' : ''}${numeral._.numberToFormat(
       value,
       format,
-      roundingFunction
+      roundingFunction,
     )}${space}${!start ? ' ¥' : ''}`;
   },
-  unformat: str => {
-    return numeral._.stringToNumber(str);
-  },
+  unformat: str => numeral._.stringToNumber(str),
 });
 
 numeral.register('format', 'days', {
@@ -127,9 +198,7 @@ numeral.register('format', 'days', {
 
     return `${numeral._.numberToFormat(value, format, roundingFunction)}${space}天`;
   },
-  unformat: str => {
-    return numeral._.stringToNumber(str);
-  },
+  unformat: str => numeral._.stringToNumber(str),
 });
 
 numeral.register('format', 'ss', {
@@ -144,9 +213,7 @@ numeral.register('format', 'ss', {
 
     return `${numeral._.numberToFormat(value, format, roundingFunction)}${space}手`;
   },
-  unformat: str => {
-    return numeral._.stringToNumber(str);
-  },
+  unformat: str => numeral._.stringToNumber(str),
 });
 
 const startSocket = () => {

@@ -5,27 +5,48 @@ import { scaleLinear } from 'd3-scale';
 import _ from 'lodash';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { connect } from 'dva';
+import moment from 'moment';
 import ChartTitle from '../containers/ChartTitle';
 import ThemeDatePickerRanger from '../containers/ThemeDatePickerRanger';
 import ThemeButton from '../containers/ThemeButton';
 import { Loading } from '@/containers';
 import PosCenter from '../containers/PosCenter';
 import { delay } from '@/tools';
+import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+
+const LATEST_PER = 'latest';
 
 const colorMap = {
-  London: 'l(100) 0:#FF4200 0.2:#FFC000 1:#FFC000',
-  Sini: 'l(100) 0:#AC1212 0.2:#D33C3C 1:#D33C3C',
-  Wka: 'l(100) 0:#7715C3 0.2:#AD5AEE 1:#AD5AEE',
+  0: 'l(100) 0:#0FB299 0.2:#52D0CC 1:#52D0CC',
+  10: 'l(100) 0:#0F14CA 0.2:#494DE8 1:#494DE8',
+  25: 'l(100) 0:#7715C3 0.2:#AD5AEE 1:#AD5AEE',
+  50: 'l(100) 0:#9D60E2 0.2:#BE8AF9 1:#BE8AF9',
+  75: 'l(100) 0:#8E1F7B 0.2:#C516B3 1:#C516B3',
+  90: 'l(100) 0:#AC1212 0.2:#D33C3C 1:#D33C3C',
+  100: 'l(100) 0:#FF4200 0.2:#FFC000 1:#FFC000',
+  [LATEST_PER]: 'l(100) 0:#BFBFBF 0.2:#EFEFEF 1:#EFEFEF',
 };
 
-// #9D60E2, #BE8AF9
-// #0F14CA, #494DE8
-// #0FB299, #52D0CC
+const lengedMap = {
+  0: 'Min',
+  10: '10分位',
+  25: '25分位',
+  50: '50分位',
+  75: '75分位',
+  90: '90分位',
+  100: 'Max',
+  [LATEST_PER]: 'Latest Vol',
+};
 
-const Rollong = memo(props => {
+const windows = [1, 3, 5, 10, 22, 44, 66, 132];
+
+const Vol = props => {
+  const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -44,144 +65,42 @@ const Rollong = memo(props => {
 
   const fetch = async () => {
     setLoading(true);
-    await delay(2000);
-    const fdata = [
-      {
-        time: '2009/1/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/3/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/4/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/5/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/6/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/7/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/8/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/9/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/10/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'London',
-      },
-      {
-        time: '2009/1/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/3/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/4/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/5/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/6/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/7/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/8/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/9/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/10/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Sini',
-      },
-      {
-        time: '2009/1/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/3/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/4/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/5/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/6/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/7/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/8/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/9/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-      {
-        time: '2009/10/12',
-        value: _.round(Math.random() * 10, 0),
-        type: 'Wka',
-      },
-    ];
+
+    const rsp = await getInstrumentVolCone({
+      instrumentId,
+      start_date: dates[0].format('YYYY-MM-DD'),
+      end_date: dates[1].format('YYYY-MM-DD'),
+      windows,
+      percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
+    });
+    if (rsp.error) return;
+
+    let fdata = _.flatten(
+      rsp.data.map(item =>
+        item.vols.map(iitem => ({
+          percentile: _.toString(iitem.percentile),
+          window: _.toString(item.window),
+          value: iitem.vol,
+          pname: lengedMap[iitem.percentile],
+        })),
+      ),
+    );
+
+    const realRsp = await getInstrumentRealizedVol({
+      instrumentId,
+      tradeDate: dates[1].format('YYYY-MM-DD'),
+    });
+
+    if (!realRsp.error) {
+      fdata = fdata.concat(
+        realRsp.data.map(item => ({
+          percentile: LATEST_PER,
+          window: _.toString(item.window),
+          value: item.vol,
+          pname: lengedMap[LATEST_PER],
+        })),
+      );
+    }
 
     const dv = new DataSet.View().source(fdata);
 
@@ -210,7 +129,11 @@ const Rollong = memo(props => {
     <>
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
         <Col>
-          <ThemeDatePickerRanger allowClear={false}></ThemeDatePickerRanger>
+          <ThemeDatePickerRanger
+            onChange={pDates => setDates(pDates)}
+            value={dates}
+            allowClear={false}
+          ></ThemeDatePickerRanger>
         </Col>
         <Col>
           <ThemeButton
@@ -230,15 +153,15 @@ const Rollong = memo(props => {
           <Chart
             animate
             forceFit
-            height={610}
+            height={630}
             padding={[40, 20, 40, 40]}
             width={750}
             data={meta.dv}
             scale={{
-              time: {
-                type: 'timeCat',
-                tickCount: 8,
-                alias: '日期',
+              window: {
+                ticks: windows.map(item => _.toString(item)),
+                alias: '窗口',
+                type: 'cat',
               },
               value: {
                 alias: '波动率',
@@ -250,7 +173,7 @@ const Rollong = memo(props => {
             }}
           >
             <Axis
-              name="time"
+              name="window"
               title={{
                 offset: 0,
                 position: 'end',
@@ -264,7 +187,7 @@ const Rollong = memo(props => {
               }}
               label={{
                 textStyle: {
-                  fontSize: '14',
+                  fontSize: '12',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -283,7 +206,7 @@ const Rollong = memo(props => {
               line={null}
               label={{
                 textStyle: {
-                  fontSize: '14',
+                  fontSize: '12',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -310,20 +233,25 @@ const Rollong = memo(props => {
               }}
             />
             <Tooltip
-              position="value"
               crosshairs={{
                 type: 'y',
                 style: {
                   stroke: '#00BAFF',
-                  opacity: '0.1',
                 },
               }}
             />
             <Geom
+              tooltip={[
+                'pname*value',
+                (name, value) => ({
+                  name,
+                  value,
+                }),
+              ]}
               size={3}
               type="line"
-              position="time*value"
-              color={['type', type => colorMap[type]]}
+              position="window*value"
+              color={['percentile', percentile => colorMap[percentile]]}
               opacity={0.85}
               shape="smooth"
               animate={{
@@ -331,25 +259,34 @@ const Rollong = memo(props => {
                   animation: 'clipIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
                 appear: {
                   animation: 'clipIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
                 leave: {
                   animation: 'lineWidthOut', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 300, // 动画执行时间
+                  delay: 100,
                 },
                 update: {
                   animation: 'fadeIn', // 动画名称
                   easing: 'easeQuadIn', // 动画缓动效果
                   duration: 450, // 动画执行时间
+                  delay: 100,
                 },
               }}
             />
-            <Legend position="top-left" offsetY={-12} offsetX={-3} />
+            <Legend
+              position="top-left"
+              offsetY={-12}
+              offsetX={-3}
+              itemFormatter={val => lengedMap[val]}
+            />
           </Chart>
         ) : (
           <PosCenter>
@@ -359,6 +296,10 @@ const Rollong = memo(props => {
       </Row>
     </>
   );
-});
+};
 
-export default Rollong;
+export default memo(
+  connect(state => ({
+    instrumentId: state.chartTalkModel.instrumentId,
+  }))(Vol),
+);
