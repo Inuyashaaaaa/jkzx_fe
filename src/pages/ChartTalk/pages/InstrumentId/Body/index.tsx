@@ -1,19 +1,20 @@
-import { Col, Row } from 'antd';
+import { connect } from 'dva';
 import React, { memo } from 'react';
-import styles from './index.less';
-import Rollong from './Rollong';
-import Vol from './Vol';
+import VRChart from './VRchart';
+import Shadow from './Shadow';
 
-const Body = memo(props => (
-  <Row type="flex" justify="space-between" className={styles.wrap}>
-    <Col span={12}>
-      <Rollong></Rollong>
-    </Col>
-    <div className={styles.split}></div>
-    <Col span={12}>
-      <Vol></Vol>
-    </Col>
-  </Row>
-));
+const Body = props => {
+  const { activeKey } = props;
+  return (
+    <div>
+      {activeKey === '0' && <VRChart></VRChart>}
+      {activeKey === '1' && <Shadow></Shadow>}
+    </div>
+  );
+};
 
-export default Body;
+export default memo(
+  connect(state => ({
+    activeKey: state.chartTalkModel.activeKey,
+  }))(Body),
+);

@@ -1,5 +1,5 @@
 import DataSet from '@antv/data-set';
-import { Button, Col, DatePicker, Row, Select } from 'antd';
+import { Button, Col, DatePicker, Row, Select, Radio } from 'antd';
 import { Axis, Chart, Geom, Tooltip, Legend } from 'bizcharts';
 import { scaleLinear } from 'd3-scale';
 import _ from 'lodash';
@@ -7,13 +7,14 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { connect } from 'dva';
 import moment from 'moment';
-import ChartTitle from '../containers/ChartTitle';
-import ThemeDatePickerRanger from '../containers/ThemeDatePickerRanger';
-import ThemeButton from '../containers/ThemeButton';
+import ChartTitle from '../../../containers/ChartTitle';
+import ThemeDatePicker from '../../../containers/ThemeDatePicker';
+import ThemeButton from '../../../containers/ThemeButton';
 import { Loading } from '@/containers';
-import PosCenter from '../containers/PosCenter';
+import PosCenter from '../../../containers/PosCenter';
 import { delay } from '@/tools';
 import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+import ThemeRadio from '../../../containers/ThemeRadio';
 
 const LATEST_PER = 'latest';
 
@@ -41,12 +42,18 @@ const lengedMap = {
 
 const windows = [1, 3, 5, 10, 22, 44, 66, 132];
 
+const STATUS = {
+  CHART: 'chart',
+  TABLE: 'table',
+};
+
 const Vol = props => {
   const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
+  const [status, setStatus] = useState(STATUS.CHART);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -66,14 +73,23 @@ const Vol = props => {
   const fetch = async () => {
     setLoading(true);
 
-    const rsp = await getInstrumentVolCone({
-      instrumentId,
-      start_date: dates[0].format('YYYY-MM-DD'),
-      end_date: dates[1].format('YYYY-MM-DD'),
-      windows,
-      percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
-    });
-    if (rsp.error) return;
+    const [rsp, realRsp] = await Promise.all([
+      getInstrumentVolCone({
+        instrumentId,
+        start_date: dates[0].format('YYYY-MM-DD'),
+        end_date: dates[1].format('YYYY-MM-DD'),
+        windows,
+        percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
+      }),
+      getInstrumentRealizedVol({
+        instrumentId,
+        tradeDate: dates[1].format('YYYY-MM-DD'),
+      }),
+    ]);
+    if (rsp.error) {
+      setLoading(false);
+      return;
+    }
 
     let fdata = _.flatten(
       rsp.data.map(item =>
@@ -85,11 +101,6 @@ const Vol = props => {
         })),
       ),
     );
-
-    const realRsp = await getInstrumentRealizedVol({
-      instrumentId,
-      tradeDate: dates[1].format('YYYY-MM-DD'),
-    });
 
     if (!realRsp.error) {
       fdata = fdata.concat(
@@ -103,15 +114,6 @@ const Vol = props => {
     }
 
     const dv = new DataSet.View().source(fdata);
-
-    // fdv.transform({
-    //   type: 'sort',
-    //   callback(a, b) {
-    //     const time1 = new Date(a.time).getTime();
-    //     const time2 = new Date(b.time).getTime();
-    //     return time2 - time1;
-    //   },
-    // });
 
     const gradualColorStr = generateGradualColorStr(dv);
     setLoading(false);
@@ -127,24 +129,64 @@ const Vol = props => {
 
   return (
     <>
-      <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
+      <Row type="flex" justify="space-between" align="middle" style={{ padding: 17 }} gutter={12}>
         <Col>
-          <ThemeDatePickerRanger
-            onChange={pDates => setDates(pDates)}
-            value={dates}
-            allowClear={false}
-          ></ThemeDatePickerRanger>
+          <ThemeRadio.Group
+            size="small"
+            value={status}
+            onChange={event => {
+              setStatus(event.target.value);
+            }}
+          >
+            <ThemeRadio.Button value={STATUS.CHART}>
+              <img
+                style={{ width: 12 }}
+                src={
+                  status === STATUS.CHART
+                    ? // eslint-disable-next-line
+                      require('../../../assets/chart.png')
+                    : // eslint-disable-next-line
+                      require('../../../assets/chart2.png')
+                }
+                alt=""
+              />
+            </ThemeRadio.Button>
+            <ThemeRadio.Button value={STATUS.TABLE}>
+              <img
+                style={{ width: 12 }}
+                src={
+                  status === STATUS.TABLE
+                    ? // eslint-disable-next-line
+                      require('../../../assets/table.png')
+                    : // eslint-disable-next-line
+                      require('../../../assets/table2.png')
+                }
+                alt=""
+              />
+            </ThemeRadio.Button>
+          </ThemeRadio.Group>
         </Col>
         <Col>
-          <ThemeButton
-            loading={meta && loading}
-            onClick={() => {
-              fetch();
-            }}
-            type="primary"
-          >
-            绘制
-          </ThemeButton>
+          <Row type="flex" justify="space-between" align="middle" gutter={12}>
+            <Col>
+              <ThemeDatePicker
+                onChange={pDates => setDates(pDates)}
+                // value={dates}
+                allowClear={false}
+              ></ThemeDatePicker>
+            </Col>
+            <Col>
+              <ThemeButton
+                loading={meta && loading}
+                onClick={() => {
+                  fetch();
+                }}
+                type="primary"
+              >
+                绘制
+              </ThemeButton>
+            </Col>
+          </Row>
         </Col>
       </Row>
       <ChartTitle>波动率锥</ChartTitle>
@@ -290,7 +332,7 @@ const Vol = props => {
           </Chart>
         ) : (
           <PosCenter>
-            <Loading></Loading>
+            <Loading loading={loading}></Loading>
           </PosCenter>
         )}
       </Row>

@@ -7,7 +7,7 @@ import styles from './ThemeDatePicker.less';
 // eslint-disable-next-line
 const imgPath = require('../assets/3.png');
 
-const ThemeDatePickerRangerWrap = styled.div`
+const ThemeDatePickerWrap = styled.div`
   .ant-calendar-picker-input.ant-input {
     border: 1px solid #05507b;
     background: transparent;
@@ -16,7 +16,8 @@ const ThemeDatePickerRangerWrap = styled.div`
   .ant-calendar-range-picker-separator {
     color: #00e8e8;
   }
-  .ant-calendar-range-picker-input {
+  .ant-calendar-picker-input,
+  .ant-calendar-input {
     color: #00e8e8;
     &::-webkit-input-placeholder {
       color: #f5faff;
@@ -31,17 +32,17 @@ const ThemeDatePickerRangerWrap = styled.div`
   }
 `;
 
-const ThemeDatePickerRanger = memo(props => {
+const ThemeDatePicker = memo(props => {
   const { dropdownClassName } = props;
   return (
-    <ThemeDatePickerRangerWrap>
-      <DatePicker.RangePicker
+    <ThemeDatePickerWrap>
+      <DatePicker
         {...props}
         dropdownClassName={classnames(dropdownClassName, styles.scope)}
         suffixIcon={<img src={imgPath} alt="" />}
-      ></DatePicker.RangePicker>
-    </ThemeDatePickerRangerWrap>
+      ></DatePicker>
+    </ThemeDatePickerWrap>
   );
 });
 
-export default ThemeDatePickerRanger;
+export default ThemeDatePicker;

@@ -1,21 +1,58 @@
 import { Col, Row } from 'antd';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
+import { connect } from 'dva';
 import MiniCard from '../containers/MiniCard';
 
 // eslint-disable-next-line
 const imgPath = require('../assets/1.png');
 // eslint-disable-next-line
 const imgPath2 = require('../assets/2.png');
+// eslint-disable-next-line
+const imgPath3 = require('../assets/5.png');
 
-const Panels = memo(props => (
-  <Row type="flex" justify="start" gutter={20}>
-    <Col>
-      <MiniCard title="历史波动率" active imageUrls={[imgPath, imgPath2]}></MiniCard>
-    </Col>
-    {/* <Col>
-      <MiniCard title="隐含波动率"></MiniCard>
-    </Col> */}
-  </Row>
-));
+const Panels = props => {
+  const { activeKey } = props;
+  const setActiveKey = next => {
+    if (activeKey === next) {
+      return;
+    }
 
-export default Panels;
+    props.dispatch({
+      type: 'chartTalkModel/setState',
+      payload: {
+        activeKey: next,
+      },
+    });
+  };
+
+  const setActiveKeyCache = next => {
+    setActiveKey(next);
+  };
+
+  return (
+    <Row type="flex" justify="start" gutter={20}>
+      <Col>
+        <MiniCard
+          onClick={() => setActiveKeyCache('0')}
+          title="历史波动率"
+          active={activeKey === '0'}
+          imageUrls={[imgPath, imgPath2]}
+        ></MiniCard>
+      </Col>
+      <Col>
+        <MiniCard
+          onClick={() => setActiveKeyCache('1')}
+          title="隐含波动率"
+          active={activeKey === '1'}
+          imageUrls={[imgPath3]}
+        ></MiniCard>
+      </Col>
+    </Row>
+  );
+};
+
+export default memo(
+  connect(state => ({
+    activeKey: state.chartTalkModel.activeKey,
+  }))(Panels),
+);

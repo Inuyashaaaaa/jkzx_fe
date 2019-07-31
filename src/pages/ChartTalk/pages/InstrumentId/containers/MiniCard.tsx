@@ -15,6 +15,7 @@ const MiniCardWrap = styled.div<{ active?: boolean }>`
   border: 1px solid #01c7d1;
   border-radius: 3px;
   opacity: 0.4;
+  cursor: pointer;
 
   ${props =>
     props.active &&
@@ -32,21 +33,28 @@ const Stick = styled.div`
 `;
 
 const MiniCard = memo(props => {
-  const { title, value, active, imageUrls = [] } = props;
+  const { title, value, active, imageUrls = [], onClick } = props;
 
   return (
-    <MiniCardWrap active={active}>
+    <MiniCardWrap active={active} onClick={onClick}>
       <Row type="flex" justify="center">
         <Col>{title}</Col>
       </Row>
       <Row type="flex" justify="center" gutter={20} style={{ position: 'relative' }}>
-        <Col>
-          <img src={imageUrls[0]} alt="缩略图1" />
-        </Col>
-        <Stick></Stick>
-        <Col>
-          <img src={imageUrls[1]} alt="缩略图2" />
-        </Col>
+        {imageUrls.length && imageUrls.length === 2 && (
+          <>
+            <Col>
+              <img src={imageUrls[0]} alt="缩略图1" />
+            </Col>
+            <Stick></Stick>
+            <Col>
+              <img src={imageUrls[1]} alt="缩略图2" />
+            </Col>
+          </>
+        )}
+        {imageUrls.length && imageUrls.length === 1 && (
+          <img style={{ width: 100 }} src={imageUrls[0]} alt="缩略图1" />
+        )}
       </Row>
     </MiniCardWrap>
   );
