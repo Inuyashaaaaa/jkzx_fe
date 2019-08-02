@@ -1,14 +1,14 @@
 import { Col, Row } from 'antd';
 import React, { memo, useState } from 'react';
 import { connect } from 'dva';
-import MiniCard from '../containers/MiniCard';
+import MiniCard from '@/containers/MiniCard';
 
 // eslint-disable-next-line
-const imgPath = require('../assets/1.png');
+const imgPath = require('@/assets/1.png');
 // eslint-disable-next-line
-const imgPath2 = require('../assets/2.png');
+const imgPath2 = require('@/assets/2.png');
 // eslint-disable-next-line
-const imgPath3 = require('../assets/5.png');
+const imgPath3 = require('@/assets/5.png');
 
 const Panels = props => {
   const { activeKey } = props;
@@ -42,7 +42,7 @@ const Panels = props => {
       <Col>
         <MiniCard
           onClick={() => setActiveKeyCache('1')}
-          title="隐含波动率"
+          title="公允波动率"
           active={activeKey === '1'}
           imageUrls={[imgPath3]}
         ></MiniCard>

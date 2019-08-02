@@ -25,9 +25,27 @@ export default [
     redirect: '/welcome-page',
   },
   {
-    path: '/chart-talk',
-    component: './ChartTalk',
+    path: '/center',
+    component: '../layouts/Center/index',
+    routes: [
+      {
+        path: '/center/underlying',
+        component: './CenterUnderlying',
+      },
+      {
+        path: '/center/risk',
+        component: './CenterRisk',
+      },
+      {
+        path: '/center/scenario',
+        component: './CenterScenario',
+      },
+    ],
   },
+  // {
+  //   path: '/center-login',
+  //   component: '/user/login',
+  // },
   mapTree(
     {
       appRoute: true,

@@ -1,22 +1,17 @@
 import DataSet from '@antv/data-set';
-import { Button, Col, DatePicker, Row, Select } from 'antd';
+import { Col, Row, Select } from 'antd';
 import { Axis, Chart, Geom, Tooltip } from 'bizcharts';
 import { scaleLinear } from 'd3-scale';
-import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
-import moment from 'moment';
 import { connect } from 'dva';
-import ChartTitle from '../../containers/ChartTitle';
-import ThemeSelect from '../../containers/ThemeSelect';
-import ThemeDatePickerRanger from '../../containers/ThemeDatePickerRanger';
-import ThemeButton from '../../containers/ThemeButton';
-import { Loading } from '@/containers';
-import { delay } from '@/tools';
-import PosCenter from '../../containers/PosCenter';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { getInstrumentRollingVol } from '@/services/terminal';
+import { Loading } from '@/containers';
+import PosCenter from '@/containers/PosCenter';
+import ThemeSelect from '@/containers/ThemeSelect';
 
-const Rollong = props => {
+const BottomChart = props => {
   const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
@@ -31,7 +26,7 @@ const Rollong = props => {
     const max = _.max<number>(values);
     const color = scaleLinear<string, number>()
       .domain([min, (max - min) / 2 + min, max])
-      .range(['#77A786', '#FF4200', '#FFC000'])
+      .range(['#dbdcd7', '#bc4876', '#a81e59', '#630842', '#26083c'])
       .clamp(true);
     const colorStrs = rows
       .map((item, index) => `${item.value / max}:${color(item.value)}`)
@@ -82,14 +77,7 @@ const Rollong = props => {
 
   return (
     <>
-      <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
-        <Col>
-          <ThemeDatePickerRanger
-            onChange={pDates => setDates(pDates)}
-            value={dates}
-            allowClear={false}
-          ></ThemeDatePickerRanger>
-        </Col>
+      <Row type="flex" justify="end" style={{ padding: 17, paddingBottom: 0 }} gutter={12}>
         <Col>
           <ThemeSelect
             value={window}
@@ -104,25 +92,13 @@ const Rollong = props => {
             ))}
           </ThemeSelect>
         </Col>
-        <Col>
-          <ThemeButton
-            loading={meta && loading}
-            onClick={() => {
-              fetch();
-            }}
-            type="primary"
-          >
-            绘制
-          </ThemeButton>
-        </Col>
       </Row>
-      <ChartTitle>Rolling Volatility</ChartTitle>
-      <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
+      <Row type="flex" justify="start" style={{ padding: 17, paddingTop: 0 }} gutter={12}>
         {meta ? (
           <Chart
             animate
             forceFit
-            height={630}
+            height={315}
             padding={[40, 20, 40, 40]}
             width={750}
             data={meta.dv}
@@ -215,7 +191,7 @@ const Rollong = props => {
             <Geom
               type="area"
               position="time*value"
-              color="l(100) 0:#FF0B194F 0.8:#0d2960 1:#0d2960"
+              color="l(0) 0:#dbdcd740 0.3:#bc487640 0.5:#a81e5940 0.8:#63084240 1:26083c40"
               opacity={0.65}
               shape="smooth"
               animate={{
@@ -293,5 +269,5 @@ const Rollong = props => {
 export default memo(
   connect(state => ({
     instrumentId: state.chartTalkModel.instrumentId,
-  }))(Rollong),
+  }))(BottomChart),
 );

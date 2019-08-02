@@ -1,52 +1,23 @@
 import DataSet from '@antv/data-set';
-import { Button, Col, DatePicker, Row, Select } from 'antd';
-import { Axis, Chart, Geom, Tooltip, Legend } from 'bizcharts';
+import { Col, Row, Select } from 'antd';
+import { Axis, Chart, Geom, Tooltip } from 'bizcharts';
 import { scaleLinear } from 'd3-scale';
-import _ from 'lodash';
-import React, { memo, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
 import { connect } from 'dva';
+import _ from 'lodash';
 import moment from 'moment';
-import ChartTitle from '../../containers/ChartTitle';
-import ThemeDatePickerRanger from '../../containers/ThemeDatePickerRanger';
-import ThemeButton from '../../containers/ThemeButton';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import { getInstrumentRollingVol } from '@/services/terminal';
 import { Loading } from '@/containers';
-import PosCenter from '../../containers/PosCenter';
-import { delay } from '@/tools';
-import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+import PosCenter from '@/containers/PosCenter';
+import ThemeSelect from '@/containers/ThemeSelect';
 
-const LATEST_PER = 'latest';
-
-const colorMap = {
-  0: 'l(100) 0:#0FB299 0.2:#52D0CC 1:#52D0CC',
-  10: 'l(100) 0:#0F14CA 0.2:#494DE8 1:#494DE8',
-  25: 'l(100) 0:#7715C3 0.2:#AD5AEE 1:#AD5AEE',
-  50: 'l(100) 0:#9D60E2 0.2:#BE8AF9 1:#BE8AF9',
-  75: 'l(100) 0:#8E1F7B 0.2:#C516B3 1:#C516B3',
-  90: 'l(100) 0:#AC1212 0.2:#D33C3C 1:#D33C3C',
-  100: 'l(100) 0:#FF4200 0.2:#FFC000 1:#FFC000',
-  [LATEST_PER]: 'l(100) 0:#BFBFBF 0.2:#EFEFEF 1:#EFEFEF',
-};
-
-const lengedMap = {
-  0: 'Min',
-  10: '10分位',
-  25: '25分位',
-  50: '50分位',
-  75: '75分位',
-  90: '90分位',
-  100: 'Max',
-  [LATEST_PER]: 'Latest Vol',
-};
-
-const windows = [1, 3, 5, 10, 22, 44, 66, 132];
-
-const Vol = props => {
+const TopChart = props => {
   const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
+  const [window, setWindow] = useState('22');
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -55,7 +26,7 @@ const Vol = props => {
     const max = _.max<number>(values);
     const color = scaleLinear<string, number>()
       .domain([min, (max - min) / 2 + min, max])
-      .range(['#77A786', '#FF4200', '#FFC000'])
+      .range(['#dbdcd7', '#bc4876', '#a81e59', '#630842', '#26083c'])
       .clamp(true);
     const colorStrs = rows
       .map((item, index) => `${item.value / max}:${color(item.value)}`)
@@ -65,50 +36,25 @@ const Vol = props => {
 
   const fetch = async () => {
     setLoading(true);
-
-    const [rsp, realRsp] = await Promise.all([
-      getInstrumentVolCone({
-        instrumentId,
-        start_date: dates[0].format('YYYY-MM-DD'),
-        end_date: dates[1].format('YYYY-MM-DD'),
-        windows,
-        percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
-      }),
-      getInstrumentRealizedVol({
-        instrumentId,
-        tradeDate: dates[1].format('YYYY-MM-DD'),
-      }),
-    ]);
+    const rsp = await getInstrumentRollingVol({
+      instrumentId,
+      startDate: dates[0].format('YYYY-MM-DD'),
+      endDate: dates[1].format('YYYY-MM-DD'),
+      window: _.toNumber(window),
+    });
     if (rsp.error) {
       setLoading(false);
       return;
     }
 
-    let fdata = _.flatten(
-      rsp.data.map(item =>
-        item.vols.map(iitem => ({
-          percentile: _.toString(iitem.percentile),
-          window: _.toString(item.window),
-          value: iitem.vol,
-          pname: lengedMap[iitem.percentile],
-        })),
-      ),
-    );
-
-    if (!realRsp.error) {
-      fdata = fdata.concat(
-        realRsp.data.map(item => ({
-          percentile: LATEST_PER,
-          window: _.toString(item.window),
-          value: item.vol,
-          pname: lengedMap[LATEST_PER],
-        })),
-      );
-    }
+    const fdata = rsp.data.map(item => ({
+      time: item.tradeDate,
+      value: item.vol,
+    }));
 
     const dv = new DataSet.View().source(fdata);
 
-    // fdv.transform({
+    // dv.transform({
     //   type: 'sort',
     //   callback(a, b) {
     //     const time1 = new Date(a.time).getTime();
@@ -131,41 +77,37 @@ const Vol = props => {
 
   return (
     <>
-      <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
+      <Row type="flex" justify="end" style={{ padding: 17, paddingBottom: 0 }} gutter={12}>
         <Col>
-          <ThemeDatePickerRanger
-            onChange={pDates => setDates(pDates)}
-            value={dates}
-            allowClear={false}
-          ></ThemeDatePickerRanger>
-        </Col>
-        <Col>
-          <ThemeButton
-            loading={meta && loading}
-            onClick={() => {
-              fetch();
-            }}
-            type="primary"
+          <ThemeSelect
+            value={window}
+            onChange={val => setWindow(val)}
+            placeholder="窗口"
+            style={{ minWidth: 200 }}
           >
-            绘制
-          </ThemeButton>
+            {[1, 3, 5, 10, 22, 44, 66, 132].map(item => (
+              <Select.Option value={item} key={item}>
+                {item}
+              </Select.Option>
+            ))}
+          </ThemeSelect>
         </Col>
       </Row>
-      <ChartTitle>波动率锥</ChartTitle>
-      <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
+      <Row type="flex" justify="start" style={{ padding: 17, paddingTop: 0 }} gutter={12}>
         {meta ? (
           <Chart
             animate
             forceFit
-            height={630}
+            height={315}
             padding={[40, 20, 40, 40]}
             width={750}
             data={meta.dv}
             scale={{
-              window: {
-                ticks: windows.map(item => _.toString(item)),
-                alias: '窗口',
-                type: 'cat',
+              time: {
+                type: 'timeCat',
+                tickCount: 5,
+                alias: '日期',
+                mask: 'YYYY/MM/DD',
               },
               value: {
                 alias: '波动率',
@@ -177,7 +119,7 @@ const Vol = props => {
             }}
           >
             <Axis
-              name="window"
+              name="time"
               title={{
                 offset: 0,
                 position: 'end',
@@ -237,6 +179,8 @@ const Vol = props => {
               }}
             />
             <Tooltip
+              shared={false}
+              position="value"
               crosshairs={{
                 type: 'y',
                 style: {
@@ -245,17 +189,43 @@ const Vol = props => {
               }}
             />
             <Geom
-              tooltip={[
-                'pname*value',
-                (name, value) => ({
-                  name,
-                  value,
-                }),
-              ]}
-              size={3}
+              type="area"
+              position="time*value"
+              color="l(0) 0:#dbdcd740 0.3:#bc487640 0.5:#a81e5940 0.8:#63084240 1:26083c40"
+              opacity={0.65}
+              shape="smooth"
+              animate={{
+                enter: {
+                  animation: 'clipIn', // 动画名称
+                  easing: 'easeQuadIn', // 动画缓动效果
+                  duration: 450, // 动画执行时间
+                  delay: 100,
+                },
+                appear: {
+                  animation: 'clipIn', // 动画名称
+                  easing: 'easeQuadIn', // 动画缓动效果
+                  duration: 450, // 动画执行时间
+                  delay: 100,
+                },
+                leave: {
+                  animation: 'lineWidthOut', // 动画名称
+                  easing: 'easeQuadIn', // 动画缓动效果
+                  duration: 300, // 动画执行时间
+                  delay: 100,
+                },
+                update: {
+                  animation: 'fadeIn', // 动画名称
+                  easing: 'easeQuadIn', // 动画缓动效果
+                  duration: 450, // 动画执行时间
+                  delay: 100,
+                },
+              }}
+            />
+            <Geom
+              size={4}
               type="line"
-              position="window*value"
-              color={['percentile', percentile => colorMap[percentile]]}
+              position="time*value"
+              color={meta.gradualColorStr}
               opacity={0.85}
               shape="smooth"
               animate={{
@@ -285,12 +255,6 @@ const Vol = props => {
                 },
               }}
             />
-            <Legend
-              position="top-left"
-              offsetY={-12}
-              offsetX={-3}
-              itemFormatter={val => lengedMap[val]}
-            />
           </Chart>
         ) : (
           <PosCenter>
@@ -305,5 +269,5 @@ const Vol = props => {
 export default memo(
   connect(state => ({
     instrumentId: state.chartTalkModel.instrumentId,
-  }))(Vol),
+  }))(TopChart),
 );

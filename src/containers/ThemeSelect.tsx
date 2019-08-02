@@ -5,7 +5,7 @@ import styles from './ThemeSelect.less';
 import { Select } from '@/containers';
 
 // eslint-disable-next-line
-const imgPath = require('../assets/4.png');
+const imgPath = require('@/assets/4.png');
 
 const ThemeSelectWrap = styled.div`
   .ant-select-selection {

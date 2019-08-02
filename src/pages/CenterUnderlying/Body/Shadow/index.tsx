@@ -2,6 +2,7 @@ import { Col, Row } from 'antd';
 import React, { memo } from 'react';
 import styles from './index.less';
 import Vol3d from './Vol3d';
+import DoubleLine from './DoubleLine';
 
 const Shadow = memo(props => (
   <Row type="flex" justify="space-between" className={styles.wrap}>
@@ -9,7 +10,7 @@ const Shadow = memo(props => (
       <Vol3d></Vol3d>
     </Col>
     <Col span={12}>
-      <Vol3d></Vol3d>
+      <DoubleLine></DoubleLine>
     </Col>
   </Row>
 ));

@@ -7,13 +7,13 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import { connect } from 'dva';
-import ChartTitle from '../../containers/ChartTitle';
-import ThemeSelect from '../../containers/ThemeSelect';
-import ThemeDatePickerRanger from '../../containers/ThemeDatePickerRanger';
-import ThemeButton from '../../containers/ThemeButton';
+import ChartTitle from '@/containers/ChartTitle';
+import ThemeSelect from '@/containers/ThemeSelect';
+import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
+import ThemeButton from '@/containers/ThemeButton';
 import { Loading } from '@/containers';
 import { delay } from '@/tools';
-import PosCenter from '../../containers/PosCenter';
+import PosCenter from '@/containers/PosCenter';
 import { getInstrumentRollingVol } from '@/services/terminal';
 
 const Rollong = props => {

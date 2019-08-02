@@ -1,7 +1,7 @@
 import React, { PureComponent, memo } from 'react';
 import { Select, Row, Col } from 'antd';
 import { connect } from 'dva';
-import ThemeSelect from './containers/ThemeSelect';
+import ThemeSelect from '@/containers/ThemeSelect';
 import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 
 const Header = props => {

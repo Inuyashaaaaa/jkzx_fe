@@ -6,7 +6,7 @@ import Sider from './Sider';
 const ChartTalk = memo(props => (
   <Layout>
     <Sider></Sider>
-    <Content></Content>
+    <Content>{props.children}</Content>
   </Layout>
 ));
 
