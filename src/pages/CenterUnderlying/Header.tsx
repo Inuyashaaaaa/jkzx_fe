@@ -12,7 +12,7 @@ const Header = props => {
         <ThemeSelect
           onChange={val =>
             dispatch({
-              type: 'chartTalkModel/setState',
+              type: 'centerUnderlying/setState',
               payload: {
                 instrumentId: val,
               },
@@ -45,6 +45,6 @@ const Header = props => {
 
 export default memo(
   connect(state => ({
-    instrumentId: state.chartTalkModel.instrumentId,
+    instrumentId: state.centerUnderlying.instrumentId,
   }))(Header),
 );

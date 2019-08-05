@@ -15,6 +15,6 @@ const Body = props => {
 
 export default memo(
   connect(state => ({
-    activeKey: state.chartTalkModel.activeKey,
+    activeKey: state.centerUnderlying.activeKey,
   }))(Body),
 );

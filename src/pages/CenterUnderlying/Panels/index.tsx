@@ -18,7 +18,7 @@ const Panels = props => {
     }
 
     props.dispatch({
-      type: 'chartTalkModel/setState',
+      type: 'centerUnderlying/setState',
       payload: {
         activeKey: next,
       },
@@ -53,6 +53,6 @@ const Panels = props => {
 
 export default memo(
   connect(state => ({
-    activeKey: state.chartTalkModel.activeKey,
+    activeKey: state.centerUnderlying.activeKey,
   }))(Panels),
 );

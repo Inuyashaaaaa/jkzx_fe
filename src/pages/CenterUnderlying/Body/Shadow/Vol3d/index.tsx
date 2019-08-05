@@ -7,7 +7,11 @@ import 'echarts-gl';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { getInstrumentRealizedVol, getInstrumentVolCone } from '@/services/terminal';
+import {
+  getInstrumentRealizedVol,
+  getInstrumentVolCone,
+  getInstrumentVolSurface,
+} from '@/services/terminal';
 import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 import ThemeTable from '@/containers/ThemeTable';
 import { Loading } from '@/containers';
@@ -17,6 +21,7 @@ import ThemeDatePicker from '@/containers/ThemeDatePicker';
 import ThemeRadio from '@/containers/ThemeRadio';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { delay } from '@/utils';
+import { STRIKE_TYPE_ENUM } from '@/constants/global';
 
 const debug = true;
 
@@ -52,123 +57,117 @@ const STATUS = {
 };
 
 const Vol = props => {
-  const { instrumentId } = props;
-  const chartRef = useRef(null);
+  const { instrumentId, data, dispatch, loading, strikeType } = props;
   const [meta, setMeta] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
+  const [valuationDate, setValuationDate] = useState(moment('2019-08-01'));
   const [status, setStatus] = useState(STATUS.CHART);
-  const [strikePercentage, setStrikePercentage] = useState();
+  const [echartInstance, setEchartInstance] = useState(null);
 
-  const generateGradualColorStr = fdv => {
-    const { rows } = fdv;
-    const values = rows.map(item => item.value);
-    const min = _.min<number>(values);
-    const max = _.max<number>(values);
-    const color = scaleLinear<string, number>()
-      .domain([min, (max - min) / 2 + min, max])
-      .range(['#77A786', '#FF4200', '#FFC000'])
-      .clamp(true);
-    const colorStrs = rows
-      .map((item, index) => `${item.value / max}:${color(item.value)}`)
-      .join(' ');
-    return `l(270) ${colorStrs}`;
+  const setData = pData => {
+    dispatch({
+      type: 'centerUnderlying/setState',
+      payload: {
+        data: pData,
+      },
+    });
+  };
+
+  const setLoading = pLoading => {
+    dispatch({
+      type: 'centerUnderlying/setState',
+      payload: {
+        loading: pLoading,
+      },
+    });
+  };
+
+  const setStrikeType = pType => {
+    dispatch({
+      type: 'centerUnderlying/setState',
+      payload: {
+        strikeType: pType,
+      },
+    });
+  };
+
+  const setFetchStrikeType = pType => {
+    dispatch({
+      type: 'centerUnderlying/setState',
+      payload: {
+        fetchStrikeType: pType,
+      },
+    });
   };
 
   const fetch = async () => {
     setLoading(true);
+    const rsp = await getInstrumentVolSurface({
+      instrumentId,
+      valuationDate: valuationDate.format('YYYY-MM-DD'),
+      strikeType,
+    });
+    setLoading(false);
+    if (rsp.error) return;
+    setData(rsp.data);
+  };
 
-    const [rsp, realRsp] = await Promise.all([
-      getInstrumentVolCone({
-        instrumentId,
-        start_date: dates[0].format('YYYY-MM-DD'),
-        end_date: dates[1].format('YYYY-MM-DD'),
-        windows,
-        percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
-      }),
-      getInstrumentRealizedVol({
-        instrumentId,
-        tradeDate: dates[1].format('YYYY-MM-DD'),
-      }),
-    ]);
-    if (rsp.error) {
-      setLoading(false);
-      return;
-    }
+  const convert = async () => {
+    if (_.isEmpty(data)) return;
+    const {
+      modelInfo: { instruments = [] },
+    } = data;
+    const tableColumns = _.map(instruments, val => {
+      const { tenor } = val;
+      return {
+        title: tenor.replace('D', '天'),
+        dataIndex: tenor,
+      };
+    });
 
-    let fdata = _.flatten(
-      rsp.data.map(item =>
-        item.vols.map(iitem => ({
-          percentile: _.toString(iitem.percentile),
-          window: _.toString(item.window),
-          value: iitem.vol,
-          pname: lengedMap[iitem.percentile],
-        })),
-      ),
+    const rowsData = _.map(instruments, val => {
+      const { vols = [], tenor } = val;
+      return vols.map(item => ({
+        [tenor]: item[strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent'],
+      }));
+    });
+    const tableData = [];
+
+    rowsData.forEach(arrs => {
+      arrs.forEach((item, index) => {
+        tableData[index] = {
+          ...item,
+          ...tableData[index],
+        };
+      });
+    });
+
+    const curData = _.flatten(
+      instruments.map(item => {
+        const { vols = [], tenor } = item;
+        return vols.map(iitem => {
+          const { strike, percent, quote } = iitem;
+          return [
+            strikeType === STRIKE_TYPE_ENUM.STRIKE ? strike : percent,
+            Number(tenor.replace('D', '')),
+            quote,
+          ];
+        });
+      }),
     );
 
-    if (!realRsp.error) {
-      fdata = fdata.concat(
-        realRsp.data.map(item => ({
-          percentile: LATEST_PER,
-          window: _.toString(item.window),
-          value: item.vol,
-          pname: lengedMap[LATEST_PER],
-        })),
-      );
-    }
-
-    const dv = new DataSet.View().source(fdata);
-
-    const gradualColorStr = generateGradualColorStr(dv);
-    setLoading(false);
     setMeta({
-      gradualColorStr,
-      dv,
-      tableData: [
-        {
-          strike_percentage: 'strike_percentage',
-          '1天': '1天',
-          '2天': '2天',
-          '3天': '3天',
-          '4天': '4天',
-          '5天': '5天',
-        },
-        {
-          strike_percentage: 'strike_percentage',
-          '1天': '1天',
-          '2天': '2天',
-          '3天': '3天',
-          '4天': '4天',
-          '5天': '5天',
-        },
-        {
-          strike_percentage: 'strike_percentage',
-          '1天': '1天',
-          '2天': '2天',
-          '3天': '3天',
-          '4天': '4天',
-          '5天': '5天',
-        },
-        {
-          strike_percentage: 'strike_percentage',
-          '1天': '1天',
-          '2天': '2天',
-          '3天': '3天',
-          '4天': '4天',
-          '5天': '5天',
-        },
-        {
-          strike_percentage: 'strike_percentage',
-          '1天': '1天',
-          '2天': '2天',
-          '3天': '3天',
-          '4天': '4天',
-          '5天': '5天',
-        },
-      ],
+      tableColumns,
+      tableData,
       option: {
-        tooltip: {},
+        tooltip: {
+          formatter: params => {
+            const { data: pData } = params;
+            const [x, y, z] = pData;
+            return `${
+              strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'
+            }: ${x}<br/>期限: ${y}<br/>波动率: ${z}`;
+          },
+        },
         visualMap: {
           show: false,
           dimension: 2,
@@ -182,21 +181,21 @@ const Vol = props => {
           type: 'value',
           name: 'strike_percentage',
           nameTextStyle: {
-            fontSize: 12,
+            fontSize: 13,
           },
         },
         yAxis3D: {
           type: 'value',
           name: '期限',
           nameTextStyle: {
-            fontSize: 12,
+            fontSize: 13,
           },
         },
         zAxis3D: {
           type: 'value',
           name: '波动率',
           nameTextStyle: {
-            fontSize: 12,
+            fontSize: 13,
           },
         },
         grid3D: {
@@ -227,32 +226,10 @@ const Vol = props => {
         series: [
           {
             type: 'surface',
-            parametric: true,
-            // shading: 'albedo',
             wireframe: {
               show: false,
             },
-            parametricEquation: {
-              u: {
-                min: -Math.PI,
-                max: Math.PI,
-                step: Math.PI / 20,
-              },
-              v: {
-                min: 0,
-                max: Math.PI,
-                step: Math.PI / 20,
-              },
-              x(u, v) {
-                return Math.sin(v) * Math.sin(u);
-              },
-              y(u, v) {
-                return Math.sin(v) * Math.cos(u);
-              },
-              z(u, v) {
-                return Math.cos(v);
-              },
-            },
+            data: curData,
           },
         ],
       },
@@ -262,6 +239,16 @@ const Vol = props => {
   useEffect(() => {
     fetch();
   }, []);
+
+  useEffect(() => {
+    convert();
+  }, [data]);
+
+  useEffect(() => {
+    if (meta && echartInstance) {
+      echartInstance.setOption(meta.option);
+    }
+  }, [meta, echartInstance]);
 
   const getCom = () => {
     if (!meta) return null;
@@ -274,43 +261,20 @@ const Vol = props => {
           notMerge
           lazyUpdate
           onChartReady={ec => {
-            ec.setOption(meta.option);
+            setEchartInstance(ec);
           }}
         />
       );
     }
     return (
       <ThemeTable
+        style={{ width: 828 }}
+        scroll={{ x: meta.tableColumns.length && meta.tableColumns.length * 100 }}
         pagination={{
           simple: true,
         }}
         dataSource={meta.tableData}
-        columns={[
-          {
-            title: 'strike_percentage/期限',
-            dataIndex: 'strike_percentage',
-          },
-          {
-            title: '1天',
-            dataIndex: '1天',
-          },
-          {
-            title: '2天',
-            dataIndex: '2天',
-          },
-          {
-            title: '3天',
-            dataIndex: '3天',
-          },
-          {
-            title: '4天',
-            dataIndex: '4天',
-          },
-          {
-            title: '5天',
-            dataIndex: '5天',
-          },
-        ]}
+        columns={meta.tableColumns}
       />
     );
   };
@@ -358,33 +322,29 @@ const Vol = props => {
           <Row type="flex" justify="space-between" align="middle" gutter={12}>
             <Col>
               <ThemeDatePicker
-                onChange={pDates => setDates(pDates)}
-                // value={dates}
+                onChange={pDate => setValuationDate(pDate)}
+                value={valuationDate}
                 allowClear={false}
               ></ThemeDatePicker>
             </Col>
             <Col>
               <ThemeSelect
-                onChange={val => setStrikePercentage(val)}
-                value={strikePercentage}
+                onChange={val => {
+                  setStrikeType(val);
+                }}
+                value={strikeType}
                 placeholder="strike_percentage"
                 style={{ minWidth: 200 }}
-                fetchOptionsOnSearch
-                showSearch
-                options={async (value: string) => {
-                  // const { data, error } = await mktInstrumentSearch({
-                  //   instrumentIdPart: value,
-                  // });
-                  const { data, error } = await mktInstrumentWhitelistSearch({
-                    instrumentIdPart: value,
-                    excludeOption: true,
-                  });
-                  if (error) return [];
-                  return data.slice(0, 50).map(item => ({
-                    label: item,
-                    value: item,
-                  }));
-                }}
+                options={[
+                  {
+                    label: 'strike',
+                    value: STRIKE_TYPE_ENUM.STRIKE,
+                  },
+                  {
+                    label: 'strike_percentage',
+                    value: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
+                  },
+                ]}
               ></ThemeSelect>
             </Col>
             <Col>
@@ -392,6 +352,7 @@ const Vol = props => {
                 loading={meta && loading}
                 onClick={() => {
                   fetch();
+                  setFetchStrikeType(strikeType);
                 }}
                 type="primary"
               >
@@ -406,7 +367,7 @@ const Vol = props => {
         {meta ? (
           getCom()
         ) : (
-          <PosCenter>
+          <PosCenter height={500}>
             <Loading loading={loading}></Loading>
           </PosCenter>
         )}
@@ -417,6 +378,9 @@ const Vol = props => {
 
 export default memo(
   connect(state => ({
-    instrumentId: state.chartTalkModel.instrumentId,
+    instrumentId: state.centerUnderlying.instrumentId,
+    loading: state.centerUnderlying.loading,
+    data: state.centerUnderlying.data,
+    strikeType: state.centerUnderlying.strikeType,
   }))(Vol),
 );

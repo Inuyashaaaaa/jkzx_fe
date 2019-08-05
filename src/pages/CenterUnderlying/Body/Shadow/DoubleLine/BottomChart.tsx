@@ -6,18 +6,29 @@ import { connect } from 'dva';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
+import FormItem from 'antd/lib/form/FormItem';
+import styled from 'styled-components';
 import { getInstrumentRollingVol } from '@/services/terminal';
 import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
 import ThemeSelect from '@/containers/ThemeSelect';
+import { STRIKE_TYPE_ENUM } from '@/constants/global';
 
-const BottomChart = props => {
-  const { instrumentId } = props;
+const FormItemWrapper = styled.div`
+  .ant-form-item-label label {
+    color: #f5faff;
+  }
+  .ant-row.ant-form-item {
+    margin-bottom: 0;
+  }
+`;
+
+const TopChart = props => {
+  const { instrumentId, loading, data, fetchStrikeType } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
-  const [window, setWindow] = useState('22');
+  const [window, setWindow] = useState();
+  const [options, setOptions] = useState([]);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -34,63 +45,98 @@ const BottomChart = props => {
     return `l(270) ${colorStrs}`;
   };
 
-  const fetch = async () => {
-    setLoading(true);
-    const rsp = await getInstrumentRollingVol({
-      instrumentId,
-      startDate: dates[0].format('YYYY-MM-DD'),
-      endDate: dates[1].format('YYYY-MM-DD'),
-      window: _.toNumber(window),
-    });
-    if (rsp.error) {
-      setLoading(false);
-      return;
-    }
+  const fetchMeta = async () => {
+    if (_.isEmpty(data)) return;
 
-    const fdata = rsp.data.map(item => ({
-      time: item.tradeDate,
-      value: item.vol,
-    }));
+    const { modelInfo = {} } = data;
+    const { instruments = [] } = modelInfo;
+
+    const allData = _.flatten(
+      instruments.map(item => {
+        const { vols = [], tenor } = item;
+        return vols.map(iitem => {
+          const { strike, percent, quote } = iitem;
+          return {
+            value: quote,
+            time: fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? strike : percent,
+            strike,
+            percent,
+            tenor,
+          };
+        });
+      }),
+    );
+
+    const fdata = _.filter(allData, item => window === item.tenor);
 
     const dv = new DataSet.View().source(fdata);
 
-    // dv.transform({
-    //   type: 'sort',
-    //   callback(a, b) {
-    //     const time1 = new Date(a.time).getTime();
-    //     const time2 = new Date(b.time).getTime();
-    //     return time2 - time1;
-    //   },
-    // });
-
     const gradualColorStr = generateGradualColorStr(dv);
-    setLoading(false);
+
+    const strikeX = _.union(
+      allData.map(item => {
+        const field = fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
+        return item[field];
+      }),
+    );
+
     setMeta({
       gradualColorStr,
       dv,
+      strikeX,
     });
   };
 
+  const fetchOption = () => {
+    const { modelInfo = {} } = data;
+    const { instruments = [] } = modelInfo;
+
+    const tenors = _.map(instruments, item => item.tenor);
+
+    setOptions(tenors);
+  };
+
+  const fetchWindow = () => {
+    setWindow(_.first(options));
+  };
+
   useEffect(() => {
-    fetch();
-  }, []);
+    fetchOption();
+  }, [data]);
+
+  useEffect(() => {
+    fetchWindow();
+  }, [options]);
+
+  useEffect(() => {
+    fetchMeta();
+  }, [data, window]);
+
+  const getStrikeLabel = () =>
+    fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage';
 
   return (
     <>
       <Row type="flex" justify="end" style={{ padding: 17, paddingBottom: 0 }} gutter={12}>
         <Col>
-          <ThemeSelect
-            value={window}
-            onChange={val => setWindow(val)}
-            placeholder="窗口"
-            style={{ minWidth: 200 }}
-          >
-            {[1, 3, 5, 10, 22, 44, 66, 132].map(item => (
-              <Select.Option value={item} key={item}>
-                {item}
-              </Select.Option>
-            ))}
-          </ThemeSelect>
+          <FormItemWrapper>
+            <FormItem label="期限" style={{ display: 'flex' }}>
+              <ThemeSelect
+                value={window}
+                onChange={val => {
+                  setWindow(val);
+                }}
+                placeholder="请选择期限"
+                style={{ minWidth: 200 }}
+              >
+                {options.map(item => (
+                  <Select.Option value={item} key={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+              </ThemeSelect>
+            </FormItem>
+          </FormItemWrapper>
         </Col>
       </Row>
       <Row type="flex" justify="start" style={{ padding: 17, paddingTop: 0 }} gutter={12}>
@@ -100,14 +146,11 @@ const BottomChart = props => {
             forceFit
             height={315}
             padding={[40, 20, 40, 40]}
-            width={750}
+            width={800}
             data={meta.dv}
             scale={{
               time: {
-                type: 'timeCat',
-                tickCount: 5,
-                alias: '日期',
-                mask: 'YYYY/MM/DD',
+                alias: getStrikeLabel(),
               },
               value: {
                 alias: '波动率',
@@ -257,7 +300,7 @@ const BottomChart = props => {
             />
           </Chart>
         ) : (
-          <PosCenter>
+          <PosCenter height={315}>
             <Loading loading={loading}></Loading>
           </PosCenter>
         )}
@@ -268,6 +311,8 @@ const BottomChart = props => {
 
 export default memo(
   connect(state => ({
-    instrumentId: state.chartTalkModel.instrumentId,
-  }))(BottomChart),
+    loading: state.centerUnderlying.loading,
+    data: state.centerUnderlying.data,
+    fetchStrikeType: state.centerUnderlying.fetchStrikeType,
+  }))(TopChart),
 );

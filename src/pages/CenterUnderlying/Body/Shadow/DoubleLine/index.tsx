@@ -12,6 +12,6 @@ const DoubleLine = props => (
 
 export default memo(
   connect(state => ({
-    instrumentId: state.chartTalkModel.instrumentId,
+    instrumentId: state.centerUnderlying.instrumentId,
   }))(DoubleLine),
 );

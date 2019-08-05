@@ -124,7 +124,7 @@ const Rollong = props => {
             forceFit
             height={630}
             padding={[40, 20, 40, 40]}
-            width={750}
+            width={800}
             data={meta.dv}
             scale={{
               time: {
@@ -281,7 +281,7 @@ const Rollong = props => {
             />
           </Chart>
         ) : (
-          <PosCenter>
+          <PosCenter height={500}>
             <Loading loading={loading}></Loading>
           </PosCenter>
         )}
@@ -292,6 +292,6 @@ const Rollong = props => {
 
 export default memo(
   connect(state => ({
-    instrumentId: state.chartTalkModel.instrumentId,
+    instrumentId: state.centerUnderlying.instrumentId,
   }))(Rollong),
 );

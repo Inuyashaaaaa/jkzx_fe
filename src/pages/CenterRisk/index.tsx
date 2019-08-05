@@ -12,6 +12,7 @@ import ThemeTable from '@/containers/ThemeTable';
 import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
 import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 
 const Title = styled.div`
   font-size: 16px;
@@ -110,7 +111,32 @@ const Risk = () => {
           </Row>
         </Col>
         <Col>
-          <ThemeButton type="primary">导出</ThemeButton>
+          <DownloadExcelButton
+            component={ThemeButton}
+            type="primary"
+            data={
+              {
+                // searchMethod: cliFundEventSearch,
+                // argument: {
+                //   searchFormData: this.handleSearchForm(),
+                // },
+                // cols: TABLE_COL_DEFS,
+                // name: '财务出入金管理',
+                // colSwitch: [],
+                // handleDataSource: this.handleDataSource,
+                // getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+                //   if (dataIndex === 'paymentAmount' && rowIndex > 0) {
+                //     return {
+                //       t: 'n',
+                //       z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                //     };
+                //   }
+                // },
+              }
+            }
+          >
+            导出
+          </DownloadExcelButton>
         </Col>
       </Row>
       <ThemeTable

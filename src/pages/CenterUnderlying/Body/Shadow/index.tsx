@@ -1,8 +1,9 @@
 import { Col, Row } from 'antd';
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import styles from './index.less';
 import Vol3d from './Vol3d';
 import DoubleLine from './DoubleLine';
+import { getInstrumentVolSurface } from '@/services/terminal';
 
 const Shadow = memo(props => (
   <Row type="flex" justify="space-between" className={styles.wrap}>
