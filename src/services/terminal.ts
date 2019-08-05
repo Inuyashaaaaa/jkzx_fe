@@ -2,7 +2,7 @@ import { HOST_TEST } from '@/constants/global';
 import request from '@/tools/request';
 
 export async function getInstrumentRollingVol(params) {
-  return request(`${HOST_TEST}terminal-service`, {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
     method: 'POST',
     body: {
       method: 'getInstrumentRollingVol',
@@ -14,7 +14,7 @@ export async function getInstrumentRollingVol(params) {
 }
 
 export async function getInstrumentVolCone(params) {
-  return request(`${HOST_TEST}terminal-service`, {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
     method: 'POST',
     body: {
       method: 'getInstrumentVolCone',
@@ -25,8 +25,20 @@ export async function getInstrumentVolCone(params) {
   });
 }
 
+export async function getInstrumentVolSurface(params) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'getInstrumentVolSurface',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
 export async function getInstrumentRealizedVol(params) {
-  return request(`${HOST_TEST}terminal-service`, {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
     method: 'POST',
     body: {
       method: 'getInstrumentRealizedVol',
