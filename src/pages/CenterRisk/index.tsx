@@ -63,6 +63,77 @@ const Risk = () => {
     fetch();
   }, [sorter, pagination, searchFormData]);
 
+  const columns = [
+    {
+      title: '标的物合约',
+      dataIndex: 'underlyerInstrumentId',
+      width: 100,
+    },
+    {
+      title: 'Delta',
+      dataIndex: 'delta',
+      width: 100,
+      sortOrder: sorter.field === 'delta' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+    {
+      title: 'Delta_Cash',
+      dataIndex: 'deltaCash',
+      width: 100,
+      sortOrder: sorter.field === 'deltaCash' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+    {
+      title: 'Gamma',
+      dataIndex: 'gamma',
+      width: 100,
+      sortOrder: sorter.field === 'gamma' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+    {
+      title: 'Gamma_Cash',
+      dataIndex: 'gammaCash',
+      width: 100,
+      sortOrder: sorter.field === 'gammaCash' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+    {
+      title: 'Vega',
+      dataIndex: 'vega',
+      width: 100,
+      sortOrder: sorter.field === 'vega' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+    {
+      title: 'Theta',
+      dataIndex: 'theta',
+      width: 100,
+      sortOrder: sorter.field === 'theta' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+    {
+      title: 'Rho',
+      dataIndex: 'rho',
+      width: 100,
+      sortOrder: sorter.field === 'rho' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+  ];
+
   return (
     <div
       style={{
@@ -114,26 +185,25 @@ const Risk = () => {
           <DownloadExcelButton
             component={ThemeButton}
             type="primary"
-            data={
-              {
-                // searchMethod: cliFundEventSearch,
-                // argument: {
-                //   searchFormData: this.handleSearchForm(),
-                // },
-                // cols: TABLE_COL_DEFS,
-                // name: '财务出入金管理',
-                // colSwitch: [],
-                // handleDataSource: this.handleDataSource,
-                // getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                //   if (dataIndex === 'paymentAmount' && rowIndex > 0) {
-                //     return {
-                //       t: 'n',
-                //       z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
-                //     };
-                //   }
-                // },
-              }
-            }
+            data={{
+              searchMethod: rptSearchPagedMarketRiskDetailReport,
+              argument: {
+                valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+                instrumentIdPart: searchFormData.instrumentIdPart,
+              },
+              cols: columns,
+              name: '风险报告',
+              colSwitch: [],
+              getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+                if (dataIndex !== 'underlyerInstrumentId' && rowIndex > 0) {
+                  return {
+                    t: 'n',
+                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                  };
+                }
+                return null;
+              },
+            }}
           >
             导出
           </DownloadExcelButton>
@@ -151,76 +221,7 @@ const Risk = () => {
           setSorter(psorter);
           setPagination(ppagination);
         }}
-        columns={[
-          {
-            title: '标的物合约',
-            dataIndex: 'underlyerInstrumentId',
-            width: 100,
-          },
-          {
-            title: 'Delta',
-            dataIndex: 'delta',
-            width: 100,
-            sortOrder: sorter.field === 'delta' && sorter.order,
-            sorter: true,
-            render: value => formatNumber({ value, formatter: '0,0.00' }),
-            align: 'right',
-          },
-          {
-            title: 'Delta_Cash',
-            dataIndex: 'deltaCash',
-            width: 100,
-            sortOrder: sorter.field === 'deltaCash' && sorter.order,
-            sorter: true,
-            render: value => formatNumber({ value, formatter: '0,0.00' }),
-            align: 'right',
-          },
-          {
-            title: 'Gamma',
-            dataIndex: 'gamma',
-            width: 100,
-            sortOrder: sorter.field === 'gamma' && sorter.order,
-            sorter: true,
-            render: value => formatNumber({ value, formatter: '0,0.00' }),
-            align: 'right',
-          },
-          {
-            title: 'Gamma_Cash',
-            dataIndex: 'gammaCash',
-            width: 100,
-            sortOrder: sorter.field === 'gammaCash' && sorter.order,
-            sorter: true,
-            render: value => formatNumber({ value, formatter: '0,0.00' }),
-            align: 'right',
-          },
-          {
-            title: 'Vega',
-            dataIndex: 'vega',
-            width: 100,
-            sortOrder: sorter.field === 'vega' && sorter.order,
-            sorter: true,
-            render: value => formatNumber({ value, formatter: '0,0.00' }),
-            align: 'right',
-          },
-          {
-            title: 'Theta',
-            dataIndex: 'theta',
-            width: 100,
-            sortOrder: sorter.field === 'theta' && sorter.order,
-            sorter: true,
-            render: value => formatNumber({ value, formatter: '0,0.00' }),
-            align: 'right',
-          },
-          {
-            title: 'Rho',
-            dataIndex: 'rho',
-            width: 100,
-            sortOrder: sorter.field === 'rho' && sorter.order,
-            sorter: true,
-            render: value => formatNumber({ value, formatter: '0,0.00' }),
-            align: 'right',
-          },
-        ]}
+        columns={columns}
       />
     </div>
   );
