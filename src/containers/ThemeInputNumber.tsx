@@ -14,12 +14,10 @@ const ThemeInputNumberWrapper = styled.div`
   }
 `;
 
-const ThemeInputNumber = memo(props => {
-  return (
-    <ThemeInputNumberWrapper>
-      <InputNumber {...props}></InputNumber>
-    </ThemeInputNumberWrapper>
-  );
-});
+const ThemeInputNumber = memo(props => (
+  <ThemeInputNumberWrapper>
+    <InputNumber {...props}></InputNumber>
+  </ThemeInputNumberWrapper>
+));
 
 export default ThemeInputNumber;
