@@ -1,5 +1,14 @@
 import React, { memo } from 'react';
+import Header from './Header';
+import Contents from './Contents';
 
-const CenterScenario = () => <div style={{ color: '#fff' }}>建设中，敬请期待</div>;
+const CenterScenario = memo(props => (
+  <div>
+    <div style={{ marginBottom: 21 }}>
+      <Header></Header>
+    </div>
+    <Contents></Contents>
+  </div>
+));
 
-export default memo(CenterScenario);
+export default CenterScenario;
