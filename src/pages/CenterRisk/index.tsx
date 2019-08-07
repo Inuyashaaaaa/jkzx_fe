@@ -175,7 +175,10 @@ const Risk = () => {
         </Col>
       </Row>
       <Title>全市场整体风险报告</Title>
-      <BoxPanel style={{ marginBottom: 18, marginTop: 18 }}></BoxPanel>
+      <BoxPanel
+        date={formData.valuationDate}
+        style={{ marginBottom: 18, marginTop: 18 }}
+      ></BoxPanel>
       <Title>全市场分品种风险报告</Title>
       <Row
         type="flex"

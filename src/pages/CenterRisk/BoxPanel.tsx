@@ -1,7 +1,10 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import styled from 'styled-components';
 import ThemeStatistic from '@/containers/ThemeStatistic';
 import Unit from './containers/Unit';
+import { rptMarketRiskReportListByDate } from '@/services/report-service';
+
+import console = require('console');
 
 const BoxWrapper = styled.div`
   display: flex;
@@ -30,31 +33,38 @@ const BoxSplit = styled.div`
   background: rgba(0, 232, 232, 0.3);
 `;
 
-const BoxPanel = memo(props => (
-  <BoxWrapper {...props}>
-    <BoxInner>
-      <Box>
-        <ThemeStatistic title="Delta_Cash" value={112893.22} />
-      </Box>
-      <BoxSplit></BoxSplit>
-      <Box>
-        <ThemeStatistic title="Gamma_Cash" value={112893} />
-      </Box>
-      <BoxSplit></BoxSplit>
-      <Box>
-        <ThemeStatistic title="Vega" value={112893} />
-      </Box>
-      <BoxSplit></BoxSplit>
-      <Box>
-        <ThemeStatistic title="Theta" value={112893} />
-      </Box>
-      <BoxSplit></BoxSplit>
-      <Box>
-        <ThemeStatistic title="Rho" value={11244.21} />
-      </Box>
-    </BoxInner>
-    <Unit borderLeft></Unit>
-  </BoxWrapper>
-));
+const BoxPanel = memo<any>(async props => {
+  const { date, ...rest } = props;
+  const data = await rptMarketRiskReportListByDate({
+    valuationDate: date.format('YYYY-MM-DD'),
+  });
+  const result = data.data[0];
+  return (
+    <BoxWrapper {...rest}>
+      <BoxInner>
+        <Box>
+          <ThemeStatistic title="Delta_Cash" value={result.deltaCash} />
+        </Box>
+        <BoxSplit></BoxSplit>
+        <Box>
+          <ThemeStatistic title="Gamma_Cash" value={result.gammaCash} />
+        </Box>
+        <BoxSplit></BoxSplit>
+        <Box>
+          <ThemeStatistic title="Vega" value={result.vega} />
+        </Box>
+        <BoxSplit></BoxSplit>
+        <Box>
+          <ThemeStatistic title="Theta" value={result.theta} />
+        </Box>
+        <BoxSplit></BoxSplit>
+        <Box>
+          <ThemeStatistic title="Rho" value={result.rho} />
+        </Box>
+      </BoxInner>
+      <Unit borderLeft></Unit>
+    </BoxWrapper>
+  );
+});
 
 export default BoxPanel;
