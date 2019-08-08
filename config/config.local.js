@@ -1,14 +1,14 @@
 export default {
   proxy: {
     '/api': {
-      target: 'http://10.1.100.243:16016/',
+      target: 'http://10.1.100.238:16016/',
       changeOrigin: true,
       pathRewrite: { '^/api': '' },
     },
-    '/api/terminal-service': {
+    '/api/data-service/api/rpc': {
       target: 'http://10.1.2.75:18001/',
       changeOrigin: true,
-      pathRewrite: { '^/api/terminal-service': '' },
+      pathRewrite: { '^/api/data-service/api/rpc': '' },
     },
   },
 };
