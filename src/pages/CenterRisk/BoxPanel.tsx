@@ -1,9 +1,8 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ThemeStatistic from '@/containers/ThemeStatistic';
 import Unit from './containers/Unit';
 import { rptMarketRiskReportListByDate } from '@/services/report-service';
-
 import console = require('console');
 
 const BoxWrapper = styled.div`
@@ -33,12 +32,20 @@ const BoxSplit = styled.div`
   background: rgba(0, 232, 232, 0.3);
 `;
 
-const BoxPanel = memo<any>(async props => {
+const BoxPanel = memo(props => {
   const { date, ...rest } = props;
-  const data = await rptMarketRiskReportListByDate({
-    valuationDate: date.format('YYYY-MM-DD'),
-  });
-  const result = data.data[0];
+  const [result, setResult] = useState({});
+
+  const fechData = async () => {
+    const data = await rptMarketRiskReportListByDate({
+      valuationDate: date.format('YYYY-MM-DD'),
+    });
+    setResult(data.data[0]);
+  };
+
+  useEffect(() => {
+    fechData();
+  }, [date]);
   return (
     <BoxWrapper {...rest}>
       <BoxInner>
