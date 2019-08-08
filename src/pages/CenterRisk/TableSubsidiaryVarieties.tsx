@@ -47,17 +47,31 @@ const TableSubsidiaryVarieties = (props: any) => {
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
-  const fetch = async () => {
+  const fetch = async (bool: boolean) => {
     setLoading(true);
-    const rsp = await rptSearchPagedMarketRiskBySubUnderlyerReport({
-      valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-      page: pagination.current - 1,
-      pageSize: pagination.pageSize,
-      instrumentIdPart: searchFormData.instrumentIdPart,
-      bookNamePart: searchFormData.bookNamePart,
-      order: ORDER_BY[sorter.order],
-      orderBy: sorter.field,
-    });
+    let params;
+    if (bool) {
+      params = {
+        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+        page: pagination.current - 1,
+        pageSize: pagination.pageSize,
+        instrumentIdPart: searchFormData.instrumentIdPart,
+        bookNamePart: searchFormData.bookNamePart,
+        order: ORDER_BY[sorter.order],
+        orderBy: sorter.field,
+      };
+    } else {
+      params = {
+        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+        page: 0,
+        pageSize: pagination.pageSize,
+        instrumentIdPart: searchFormData.instrumentIdPart,
+        bookNamePart: searchFormData.bookNamePart,
+        order: ORDER_BY[sorter.order],
+        orderBy: sorter.field,
+      };
+    }
+    const rsp = await rptSearchPagedMarketRiskBySubUnderlyerReport(params);
     setLoading(false);
     const { error, data = {} } = rsp;
     const { page, totalCount } = data;
@@ -67,13 +81,17 @@ const TableSubsidiaryVarieties = (props: any) => {
   };
 
   useEffect(() => {
-    fetch();
-  }, [sorter, pagination, searchFormData]);
+    fetch(false);
+  }, [sorter, searchFormData]);
+
+  useEffect(() => {
+    fetch(true);
+  }, [pagination]);
 
   const columns = [
     {
       title: '子公司名称',
-      dataIndex: 'bookNamePart',
+      dataIndex: 'bookName',
       width: 100,
     },
     {
@@ -147,7 +165,7 @@ const TableSubsidiaryVarieties = (props: any) => {
   ];
 
   return (
-    <>
+    <div style={{ width: 1213 }}>
       <Title>各子公司分品种风险报告</Title>
       <Row
         type="flex"
@@ -197,9 +215,10 @@ const TableSubsidiaryVarieties = (props: any) => {
             data={{
               searchMethod: rptSearchPagedMarketRiskBySubUnderlyerReport,
               argument: {
-                valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-                instrumentIdPart: searchFormData.instrumentIdPart,
-                searchFormData: searchFormData.searchFormData,
+                searchFormData: {
+                  valuationDate: searchFormData.valuationDate,
+                  instrumentIdPart: searchFormData.instrumentIdPart,
+                },
               },
               cols: columns,
               name: '风险报告',
@@ -229,8 +248,13 @@ const TableSubsidiaryVarieties = (props: any) => {
           }}
           dataSource={tableData}
           onChange={(ppagination, filters, psorter) => {
-            setSorter(psorter);
-            setPagination(ppagination);
+            const bool = sorter.columnKey === psorter.columnKey && sorter.order === psorter.order;
+            if (!bool) {
+              setSorter(psorter);
+            }
+            if (!_.isEqual(pagination, ppagination)) {
+              setPagination(ppagination);
+            }
           }}
           columns={columns}
         />
@@ -238,7 +262,7 @@ const TableSubsidiaryVarieties = (props: any) => {
           <Unit hookTopRight></Unit>
         </UnitWrap>
       </div>
-    </>
+    </div>
   );
 };
 

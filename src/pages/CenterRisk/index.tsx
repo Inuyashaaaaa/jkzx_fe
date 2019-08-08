@@ -1,8 +1,9 @@
-import { Col, Row } from 'antd';
+import { Col, Row, Statistic, Input } from 'antd';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import _ from 'lodash';
+import FormItem from 'antd/lib/form/FormItem';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeDatePicker from '@/containers/ThemeDatePicker';
 import ThemeRadio from '@/containers/ThemeRadio';
@@ -13,14 +14,35 @@ import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service'
 import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import TableSubsidiaryWhole from './TableSubsidiaryWhole';
+import FormItemWrapper from '@/containers/FormItemWrapper';
+
+import ThemeStatistic from '@/containers/ThemeStatistic';
+import BoxPanel from './BoxPanel';
+import Unit from './containers/Unit';
 import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
+import TableSubsidiaryWhole from './TableSubsidiaryWhole';
+import console = require('console');
 
 const Title = styled.div`
   font-size: 16px;
   font-weight: 400;
   color: rgba(246, 250, 255, 1);
   line-height: 32px;
+`;
+
+const BigTitle = styled.div`
+  font-size: 22px;
+  font-weight: 400;
+  color: rgba(246, 250, 255, 1);
+  line-height: 32px;
+`;
+
+const UnitWrap = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
+  height: 60px;
 `;
 
 const ORDER_BY = {
@@ -43,16 +65,29 @@ const Risk = () => {
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
-  const fetch = async () => {
+  const fetch = async (bool: boolean) => {
     setLoading(true);
-    const rsp = await rptSearchPagedMarketRiskDetailReport({
-      valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-      page: pagination.current - 1,
-      pageSize: pagination.pageSize,
-      instrumentIdPart: searchFormData.instrumentIdPart,
-      order: ORDER_BY[sorter.order],
-      orderBy: sorter.field,
-    });
+    let params;
+    if (bool) {
+      params = {
+        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+        page: pagination.current - 1,
+        pageSize: pagination.pageSize,
+        instrumentIdPart: searchFormData.instrumentIdPart,
+        order: ORDER_BY[sorter.order],
+        orderBy: sorter.field,
+      };
+    } else {
+      params = {
+        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+        page: 0,
+        pageSize: pagination.pageSize,
+        instrumentIdPart: searchFormData.instrumentIdPart,
+        order: ORDER_BY[sorter.order],
+        orderBy: sorter.field,
+      };
+    }
+    const rsp = await rptSearchPagedMarketRiskDetailReport(params);
     setLoading(false);
     const { error, data = {} } = rsp;
     const { page, totalCount } = data;
@@ -62,8 +97,12 @@ const Risk = () => {
   };
 
   useEffect(() => {
-    fetch();
-  }, [sorter, pagination, searchFormData]);
+    fetch(false);
+  }, [sorter, searchFormData]);
+
+  useEffect(() => {
+    fetch(true);
+  }, [pagination]);
 
   const columns = [
     {
@@ -142,24 +181,34 @@ const Risk = () => {
         width: 1078,
       }}
     >
+      <Row type="flex" justify="start" gutter={14} style={{ marginBottom: 30 }}>
+        <Col>
+          <BigTitle>全市场风险报告</BigTitle>
+        </Col>
+        <Col>
+          <ThemeDatePicker
+            onChange={pDate => setFormData({ ...formData, valuationDate: pDate })}
+            value={formData.valuationDate}
+            allowClear={false}
+            placeholder="请选择观察日"
+          ></ThemeDatePicker>
+        </Col>
+      </Row>
+      <Title>全市场整体风险报告</Title>
+      <BoxPanel
+        date={formData.valuationDate}
+        style={{ marginBottom: 18, marginTop: 18 }}
+      ></BoxPanel>
       <Title>全市场分品种风险报告</Title>
       <Row
         type="flex"
         justify="space-between"
         align="middle"
         gutter={12}
-        style={{ marginTop: 21, marginBottom: 13 }}
+        style={{ marginTop: 18, marginBottom: 13 }}
       >
         <Col>
           <Row type="flex" justify="start" align="middle" gutter={12}>
-            <Col>
-              <ThemeDatePicker
-                onChange={pDate => setFormData({ ...formData, valuationDate: pDate })}
-                value={formData.valuationDate}
-                allowClear={false}
-                placeholder="观察日"
-              ></ThemeDatePicker>
-            </Col>
             <Col>
               <ThemeInput
                 value={formData.instrumentIdPart}
@@ -190,8 +239,10 @@ const Risk = () => {
             data={{
               searchMethod: rptSearchPagedMarketRiskDetailReport,
               argument: {
-                valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-                instrumentIdPart: searchFormData.instrumentIdPart,
+                searchFormData: {
+                  valuationDate: searchFormData.valuationDate,
+                  instrumentIdPart: searchFormData.instrumentIdPart,
+                },
               },
               cols: columns,
               name: '风险报告',
@@ -211,22 +262,32 @@ const Risk = () => {
           </DownloadExcelButton>
         </Col>
       </Row>
-      <ThemeTable
-        loading={loading}
-        pagination={{
-          ...pagination,
-          total,
-          simple: true,
-        }}
-        dataSource={tableData}
-        onChange={(ppagination, filters, psorter) => {
-          setSorter(psorter);
-          setPagination(ppagination);
-        }}
-        columns={columns}
-      />
-      <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
+      <div style={{ position: 'relative' }}>
+        <ThemeTable
+          loading={loading}
+          pagination={{
+            ...pagination,
+            total,
+            simple: true,
+          }}
+          dataSource={tableData}
+          onChange={(ppagination, filters, psorter) => {
+            const bool = sorter.columnKey === psorter.columnKey && sorter.order === psorter.order;
+            if (!bool) {
+              setSorter(psorter);
+            }
+            if (!_.isEqual(pagination, ppagination)) {
+              setPagination(ppagination);
+            }
+          }}
+          columns={columns}
+        />
+        <UnitWrap>
+          <Unit hookTopRight></Unit>
+        </UnitWrap>
+      </div>
       <TableSubsidiaryVarieties valuationDate={formData.valuationDate} />
+      <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
     </div>
   );
 };

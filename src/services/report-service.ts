@@ -290,3 +290,23 @@ export async function rptSearchPagedMarketRiskBySubUnderlyerReport(params) {
     },
   });
 }
+
+export async function rptMarketRiskReportListByDate(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'rptMarketRiskReportListByDate',
+      params,
+    },
+  });
+}
+
+export async function rptSearchPagedSubsidiaryMarketRiskReport(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'rptSearchPagedSubsidiaryMarketRiskReport',
+      params,
+    },
+  });
+}

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
-import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import { rptSearchPagedSubsidiaryMarketRiskReport } from '@/services/report-service';
 import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
@@ -42,21 +42,24 @@ const TableSubsidiaryWhole = (props: any) => {
   const [total, setTotal] = useState();
   const [formData, setFormData] = useState({
     valuationDate,
-    subsidiaryName: '',
+    subsidiaryPart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
-  const fetch = async () => {
+  const fetch = async (bool: boolean) => {
     setLoading(true);
-    const rsp = await rptSearchPagedMarketRiskDetailReport({
+    let params = {
       valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-      page: pagination.current - 1,
+      page: 0,
       pageSize: pagination.pageSize,
-      subsidiaryName: searchFormData.subsidiaryName,
+      subsidiaryPart: searchFormData.subsidiaryPart,
       order: ORDER_BY[sorter.order],
       orderBy: sorter.field,
-    });
-    console.log(rsp, '我调用了想要联调的借口');
+    };
+    if (bool) {
+      params.page = pagination.current - 1;
+    }
+    const rsp = await rptSearchPagedSubsidiaryMarketRiskReport(params);
     setLoading(false);
     const { error, data = {} } = rsp;
     const { page, totalCount } = data;
@@ -66,13 +69,17 @@ const TableSubsidiaryWhole = (props: any) => {
   };
 
   useEffect(() => {
-    fetch();
-  }, [sorter, pagination, searchFormData]);
+    fetch(false);
+  }, [sorter, searchFormData]);
+
+  useEffect(() => {
+    fetch(true);
+  }, [pagination]);
 
   const columns = [
     {
       title: '子公司名称',
-      dataIndex: 'subsidiaryName',
+      dataIndex: 'subsidiary',
       width: 100,
     },
     {
@@ -123,7 +130,7 @@ const TableSubsidiaryWhole = (props: any) => {
   ];
 
   return (
-    <>
+    <div style={{ width: 808.5 }}>
       <Title>各子公司风险报告</Title>
       <Row
         type="flex"
@@ -136,9 +143,9 @@ const TableSubsidiaryWhole = (props: any) => {
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
               <ThemeInput
-                value={formData.subsidiaryName}
+                value={formData.subsidiaryPart}
                 onChange={event => {
-                  setFormData({ ...formData, subsidiaryName: _.get(event.target, 'value') });
+                  setFormData({ ...formData, subsidiaryPart: _.get(event.target, 'value') });
                 }}
                 placeholder="请输入搜索子公司"
               ></ThemeInput>
@@ -162,16 +169,18 @@ const TableSubsidiaryWhole = (props: any) => {
             component={ThemeButton}
             type="primary"
             data={{
-              searchMethod: rptSearchPagedMarketRiskDetailReport,
+              searchMethod: rptSearchPagedSubsidiaryMarketRiskReport,
               argument: {
-                valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-                subsidiaryName: searchFormData.subsidiaryName,
+                searchFormData: {
+                  valuationDate: searchFormData.valuationDate,
+                  instrumentIdPart: searchFormData.instrumentIdPart,
+                },
               },
               cols: columns,
               name: '风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'subsidiaryName' && rowIndex > 0) {
+                if (dataIndex !== 'subsidiaryPart' && rowIndex > 0) {
                   return {
                     t: 'n',
                     z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
@@ -195,8 +204,13 @@ const TableSubsidiaryWhole = (props: any) => {
           }}
           dataSource={tableData}
           onChange={(ppagination, filters, psorter) => {
-            setSorter(psorter);
-            setPagination(ppagination);
+            const bool = sorter.columnKey === psorter.columnKey && sorter.order === psorter.order;
+            if (!bool) {
+              setSorter(psorter);
+            }
+            if (!_.isEqual(pagination, ppagination)) {
+              setPagination(ppagination);
+            }
           }}
           columns={columns}
         />
@@ -204,7 +218,7 @@ const TableSubsidiaryWhole = (props: any) => {
           <Unit hookTopRight></Unit>
         </UnitWrap>
       </div>
-    </>
+    </div>
   );
 };
 
