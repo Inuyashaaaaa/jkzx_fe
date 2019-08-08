@@ -1,20 +1,14 @@
-import { Col, Row } from 'antd';
+import { Col, Row, Statistic, Input } from 'antd';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import moment from 'moment';
 import _ from 'lodash';
 import ThemeButton from '@/containers/ThemeButton';
-import ThemeDatePicker from '@/containers/ThemeDatePicker';
-import ThemeRadio from '@/containers/ThemeRadio';
-import ThemeSelect from '@/containers/ThemeSelect';
-import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 import ThemeTable from '@/containers/ThemeTable';
-import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import { rptSearchPagedMarketRiskBySubUnderlyerReport } from '@/services/report-service';
 import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import TableSubsidiaryWhole from './TableSubsidiaryWhole';
-import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
+import Unit from './containers/Unit';
 
 const Title = styled.div`
   font-size: 16px;
@@ -28,7 +22,16 @@ const ORDER_BY = {
   descend: 'desc',
 };
 
-const Risk = () => {
+const UnitWrap = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
+  height: 60px;
+`;
+
+const TableSubsidiaryVarieties = (props: any) => {
+  const { valuationDate } = props;
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -38,18 +41,20 @@ const Risk = () => {
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
   const [formData, setFormData] = useState({
-    valuationDate: moment(),
+    valuationDate,
     instrumentIdPart: '',
+    bookNamePart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
   const fetch = async () => {
     setLoading(true);
-    const rsp = await rptSearchPagedMarketRiskDetailReport({
+    const rsp = await rptSearchPagedMarketRiskBySubUnderlyerReport({
       valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
       page: pagination.current - 1,
       pageSize: pagination.pageSize,
       instrumentIdPart: searchFormData.instrumentIdPart,
+      bookNamePart: searchFormData.bookNamePart,
       order: ORDER_BY[sorter.order],
       orderBy: sorter.field,
     });
@@ -66,6 +71,11 @@ const Risk = () => {
   }, [sorter, pagination, searchFormData]);
 
   const columns = [
+    {
+      title: '子公司名称',
+      dataIndex: 'bookNamePart',
+      width: 100,
+    },
     {
       title: '标的物合约',
       dataIndex: 'underlyerInstrumentId',
@@ -137,28 +147,25 @@ const Risk = () => {
   ];
 
   return (
-    <div
-      style={{
-        width: 1078,
-      }}
-    >
-      <Title>全市场分品种风险报告</Title>
+    <>
+      <Title>各子公司分品种风险报告</Title>
       <Row
         type="flex"
         justify="space-between"
         align="middle"
         gutter={12}
-        style={{ marginTop: 21, marginBottom: 13 }}
+        style={{ marginTop: 18, marginBottom: 13 }}
       >
         <Col>
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
-              <ThemeDatePicker
-                onChange={pDate => setFormData({ ...formData, valuationDate: pDate })}
-                value={formData.valuationDate}
-                allowClear={false}
-                placeholder="观察日"
-              ></ThemeDatePicker>
+              <ThemeInput
+                value={formData.searchFormData}
+                onChange={event => {
+                  setFormData({ ...formData, searchFormData: _.get(event.target, 'value') });
+                }}
+                placeholder="请输入搜索子公司"
+              ></ThemeInput>
             </Col>
             <Col>
               <ThemeInput
@@ -166,7 +173,7 @@ const Risk = () => {
                 onChange={event => {
                   setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
                 }}
-                placeholder="标的物搜索，默认全部"
+                placeholder="请输入搜索标的物"
               ></ThemeInput>
             </Col>
             <Col>
@@ -188,16 +195,17 @@ const Risk = () => {
             component={ThemeButton}
             type="primary"
             data={{
-              searchMethod: rptSearchPagedMarketRiskDetailReport,
+              searchMethod: rptSearchPagedMarketRiskBySubUnderlyerReport,
               argument: {
                 valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
                 instrumentIdPart: searchFormData.instrumentIdPart,
+                searchFormData: searchFormData.searchFormData,
               },
               cols: columns,
               name: '风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'underlyerInstrumentId' && rowIndex > 0) {
+                if (dataIndex !== 'bookNamePart' && rowIndex > 0) {
                   return {
                     t: 'n',
                     z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
@@ -211,24 +219,27 @@ const Risk = () => {
           </DownloadExcelButton>
         </Col>
       </Row>
-      <ThemeTable
-        loading={loading}
-        pagination={{
-          ...pagination,
-          total,
-          simple: true,
-        }}
-        dataSource={tableData}
-        onChange={(ppagination, filters, psorter) => {
-          setSorter(psorter);
-          setPagination(ppagination);
-        }}
-        columns={columns}
-      />
-      <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
-      <TableSubsidiaryVarieties valuationDate={formData.valuationDate} />
-    </div>
+      <div style={{ position: 'relative' }}>
+        <ThemeTable
+          loading={loading}
+          pagination={{
+            ...pagination,
+            total,
+            simple: true,
+          }}
+          dataSource={tableData}
+          onChange={(ppagination, filters, psorter) => {
+            setSorter(psorter);
+            setPagination(ppagination);
+          }}
+          columns={columns}
+        />
+        <UnitWrap>
+          <Unit hookTopRight></Unit>
+        </UnitWrap>
+      </div>
+    </>
   );
 };
 
-export default Risk;
+export default TableSubsidiaryVarieties;
