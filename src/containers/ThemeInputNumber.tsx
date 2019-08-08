@@ -11,6 +11,10 @@ const ThemeInputNumberWrapper = styled.div`
     &:hover {
       border-color: #01c7d1;
     }
+    /* .ant-input-number-handler-up,
+    .ant-input-number-handler-down {
+      background-color: #01c7d1;
+    } */
   }
 `;
 
