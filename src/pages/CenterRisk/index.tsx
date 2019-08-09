@@ -1,4 +1,4 @@
-import { Col, Row, Statistic, Input } from 'antd';
+import { Col, Row, Statistic, Input, Tooltip } from 'antd';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -44,6 +44,30 @@ const UnitWrap = styled.div`
   right: 0;
   transform: translateX(100%);
   height: 60px;
+`;
+
+const Anchor = styled.div`
+  .anchorLink {
+    position: fixed;
+    right: 70px;
+    top: 40vh;
+    z-index: 999;
+
+    p {
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      text-align: center;
+      line-height: 28px;
+      color: rgba(222, 230, 240, 1);
+      border: 1px solid rgba(0, 232, 232, 1);
+      box-shadow: 0px 0px 9px 1px rgba(84, 110, 170, 0.55);
+      border-radius: 50%;
+    }
+    p:active {
+      background: rgba(4, 83, 126, 1);
+    }
+  }
 `;
 
 const ORDER_BY = {
@@ -176,9 +200,42 @@ const Risk = () => {
     },
   ];
 
+  const scrollToAnchor = (id: string) => {
+    const anchorElement = document.getElementById(id);
+    if (anchorElement) {
+      anchorElement.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+  };
   return (
     <>
+      <Anchor>
+        <div className="anchorLink">
+          <ul>
+            <li>
+              <Tooltip title="定位到全市场分品种风险报告">
+                <p onClick={() => scrollToAnchor('one')}>1</p>
+              </Tooltip>
+            </li>
+            <li>
+              <Tooltip title="定位到各子公司风险报告">
+                <p onClick={() => scrollToAnchor('two')}>2</p>
+              </Tooltip>
+            </li>
+            <li>
+              <Tooltip title="定位到各子公司分品种风险报告">
+                <p onClick={() => scrollToAnchor('three')}>3</p>
+              </Tooltip>
+            </li>
+            <li>
+              <Tooltip title="定位到交易对手风险报告">
+                <p onClick={() => scrollToAnchor('four')}>4</p>
+              </Tooltip>
+            </li>
+          </ul>
+        </div>
+      </Anchor>
       <div
+        id="one"
         style={{
           width: 1440,
         }}

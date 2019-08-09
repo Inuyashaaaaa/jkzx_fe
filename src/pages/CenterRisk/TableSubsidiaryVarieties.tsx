@@ -165,7 +165,7 @@ const TableSubsidiaryVarieties = (props: any) => {
   ];
 
   return (
-    <div style={{ width: 1620, marginTop: '25px' }}>
+    <div id="three" style={{ width: 1620, marginTop: '25px' }}>
       <Title>各子公司分品种风险报告</Title>
       <Row
         type="flex"
