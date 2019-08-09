@@ -46,7 +46,7 @@ const Vol = props => {
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
+  const [dates, setDates] = useState([moment().subtract(30 * 6, 'd'), moment()]);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;

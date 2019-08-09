@@ -13,15 +13,7 @@ import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
-
-const FormItemWrapper = styled.div`
-  .ant-form-item-label label {
-    color: #f5faff;
-  }
-  .ant-row.ant-form-item {
-    margin-bottom: 0;
-  }
-`;
+import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const TopChart = props => {
   const { instrumentId, loading, data, fetchStrikeType } = props;
