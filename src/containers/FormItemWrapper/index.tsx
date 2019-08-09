@@ -6,6 +6,12 @@ const FormItemWrapper = styled.div`
   }
   .ant-row.ant-form-item {
     margin-bottom: 0;
+    display: flex;
+    align-items: center;
+  }
+  .ant-form-item-label,
+  .ant-form-item-control {
+    line-height: 1;
   }
 `;
 

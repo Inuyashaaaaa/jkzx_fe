@@ -7,6 +7,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { connect } from 'dva';
 import moment from 'moment';
+import FormItem from 'antd/lib/form/FormItem';
 import ChartTitle from '@/containers/ChartTitle';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeButton from '@/containers/ThemeButton';
@@ -14,6 +15,7 @@ import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
 import { delay } from '@/tools';
 import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const LATEST_PER = 'latest';
 
@@ -73,10 +75,12 @@ const Vol = props => {
         end_date: dates[1].format('YYYY-MM-DD'),
         windows,
         percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
+        isPrimary: true,
       }),
       getInstrumentRealizedVol({
         instrumentId,
         tradeDate: dates[1].format('YYYY-MM-DD'),
+        isPrimary: true,
       }),
     ]);
     if (rsp.error) {
@@ -133,11 +137,15 @@ const Vol = props => {
     <>
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
         <Col>
-          <ThemeDatePickerRanger
-            onChange={pDates => setDates(pDates)}
-            value={dates}
-            allowClear={false}
-          ></ThemeDatePickerRanger>
+          <FormItemWrapper>
+            <FormItem label="日期" style={{ display: 'flex' }}>
+              <ThemeDatePickerRanger
+                onChange={pDates => setDates(pDates)}
+                value={dates}
+                allowClear={false}
+              ></ThemeDatePickerRanger>
+            </FormItem>
+          </FormItemWrapper>
         </Col>
         <Col>
           <ThemeButton
@@ -163,7 +171,12 @@ const Vol = props => {
             data={meta.dv}
             scale={{
               window: {
-                ticks: windows.map(item => _.toString(item)),
+                ticks: _.chain(meta.dv.origin)
+                  .map(item => Number(item.window))
+                  .union()
+                  .sort((a, b) => a - b)
+                  .map(item => String(item))
+                  .value(),
                 alias: '窗口',
                 type: 'cat',
               },

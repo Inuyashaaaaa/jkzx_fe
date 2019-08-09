@@ -21,8 +21,9 @@ import BoxPanel from './BoxPanel';
 import Unit from './containers/Unit';
 import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
 import TableSubsidiaryWhole from './TableSubsidiaryWhole';
-import console = require('console');
 import TableTradeRival from './TableTradeRival';
+
+import console = require('console');
 
 const Title = styled.div`
   font-size: 16px;

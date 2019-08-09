@@ -48,3 +48,15 @@ export async function getInstrumentRealizedVol(params) {
     },
   });
 }
+
+export async function getImpliedVolReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'getImpliedVolReport',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}

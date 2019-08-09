@@ -48,7 +48,7 @@ const TableSubsidiaryWhole = (props: any) => {
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
-    let params = {
+    const params = {
       valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
       page: 0,
       pageSize: pagination.pageSize,

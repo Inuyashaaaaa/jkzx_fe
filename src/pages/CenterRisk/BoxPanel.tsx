@@ -1,8 +1,10 @@
 import React, { memo, useState, useEffect } from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
 import ThemeStatistic from '@/containers/ThemeStatistic';
 import Unit from './containers/Unit';
 import { rptMarketRiskReportListByDate } from '@/services/report-service';
+
 import console = require('console');
 import _ from 'lodash';
 
@@ -41,7 +43,7 @@ const BoxPanel = memo(props => {
     const data = await rptMarketRiskReportListByDate({
       valuationDate: date.format('YYYY-MM-DD'),
     });
-    setResult(_.get(data, 'data[0]'));
+    setResult(_.get(data, 'data[0]', {}));
   };
 
   useEffect(() => {
