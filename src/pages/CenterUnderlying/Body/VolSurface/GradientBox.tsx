@@ -12,7 +12,6 @@ const GradientBox = props => {
 
   useEffect(() => {
     setWidth(_.floor((props.value / props.max) * 100));
-    console.log(props.max, props.value);
   }, [props.max, props.value]);
 
   const handleStyle = widthData => ({
@@ -36,7 +35,7 @@ const GradientBox = props => {
       >
         <div style={handleStyle(width)}></div>
       </div>
-      <div>{formatNumber(value, 4)}</div>
+      <div>{formatNumber(value * 100, 2)}</div>
     </div>
   );
 };

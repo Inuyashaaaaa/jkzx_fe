@@ -1,25 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+import { connect } from 'dva';
 import ThemeTable from '@/containers/ThemeTable';
 import GradientBox from './GradientBox';
 import { getImpliedVolReport } from '@/services/terminal';
 
-const Vol = () => {
+const VolTable = props => {
+  const { instrumentId } = props;
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState();
   const [max, setMax] = useState(0);
+  const { loading, dispatch } = props;
 
-  const fetch = async () => {
-    setLoading(true);
+  const setLoading = data => {
+    dispatch({
+      type: 'centerUnderlying/setState',
+      payload: {
+        loading: data,
+      },
+    });
+  };
+  const fetch = async reportDate => {
+    // setLoading(true);
     const rsp = await getImpliedVolReport({
-      instrumentId: '510050.SH',
-      reportDate: '2019-08-08',
+      instrumentId,
+      reportDate: reportDate.format('YYYY-MM-DD'),
     });
     setLoading(false);
     const { error, data = {} } = rsp;
@@ -38,8 +49,8 @@ const Vol = () => {
   };
 
   useEffect(() => {
-    fetch();
-  }, [pagination]);
+    fetch(props.reportDate);
+  }, [props.reportDate, props.loading]);
 
   const columns = [
     {
@@ -90,9 +101,18 @@ const Vol = () => {
           setPagination(ppagination);
         }}
         columns={columns}
+        style={{
+          margin: '0 50px 0 0',
+        }}
       />
     </div>
   );
 };
 
-export default Vol;
+export default memo(
+  connect(state => ({
+    instrumentId: state.centerUnderlying.instrumentId,
+    reportDate: state.centerUnderlying.reportDate,
+    loading: state.centerUnderlying.loading,
+  }))(VolTable),
+);
