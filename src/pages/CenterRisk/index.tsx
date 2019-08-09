@@ -59,7 +59,7 @@ const Anchor = styled.div`
       height: 28px;
       font-size: 14px;
       text-align: center;
-      line-height: 28px;
+      line-height: 26px;
       color: rgba(222, 230, 240, 1);
       border: 1px solid rgba(0, 232, 232, 1);
       box-shadow: 0px 0px 9px 1px rgba(84, 110, 170, 0.55);
@@ -67,6 +67,9 @@ const Anchor = styled.div`
     }
     p:active {
       background: rgba(4, 83, 126, 1);
+    }
+    p:hover {
+      cursor: pointer;
     }
   }
 `;
@@ -213,22 +216,22 @@ const Risk = () => {
         <div className="anchorLink">
           <ul>
             <li>
-              <Tooltip title="定位到全市场分品种风险报告">
+              <Tooltip placement="left" title="定位到全市场分品种风险报告">
                 <p onClick={() => scrollToAnchor('one')}>1</p>
               </Tooltip>
             </li>
             <li>
-              <Tooltip title="定位到各子公司风险报告">
+              <Tooltip placement="left" title="定位到各子公司风险报告">
                 <p onClick={() => scrollToAnchor('two')}>2</p>
               </Tooltip>
             </li>
             <li>
-              <Tooltip title="定位到各子公司分品种风险报告">
+              <Tooltip placement="left" title="定位到各子公司分品种风险报告">
                 <p onClick={() => scrollToAnchor('three')}>3</p>
               </Tooltip>
             </li>
             <li>
-              <Tooltip title="定位到交易对手风险报告">
+              <Tooltip placement="left" title="定位到交易对手风险报告">
                 <p onClick={() => scrollToAnchor('four')}>4</p>
               </Tooltip>
             </li>

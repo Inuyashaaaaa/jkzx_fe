@@ -6,6 +6,7 @@ import Unit from './containers/Unit';
 import { rptMarketRiskReportListByDate } from '@/services/report-service';
 
 import console = require('console');
+import _ from 'lodash';
 
 const BoxWrapper = styled.div`
   display: flex;
