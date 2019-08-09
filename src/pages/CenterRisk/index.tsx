@@ -21,6 +21,7 @@ import BoxPanel from './BoxPanel';
 import Unit from './containers/Unit';
 import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
 import TableSubsidiaryWhole from './TableSubsidiaryWhole';
+
 import console = require('console');
 
 const Title = styled.div`
