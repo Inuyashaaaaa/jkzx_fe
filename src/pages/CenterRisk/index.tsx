@@ -22,6 +22,7 @@ import Unit from './containers/Unit';
 import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
 import TableSubsidiaryWhole from './TableSubsidiaryWhole';
 import console = require('console');
+import TableTradeRival from './TableTradeRival';
 
 const Title = styled.div`
   font-size: 16px;
@@ -176,119 +177,122 @@ const Risk = () => {
   ];
 
   return (
-    <div
-      style={{
-        width: 1078,
-      }}
-    >
-      <Row type="flex" justify="start" gutter={14} style={{ marginBottom: 30 }}>
-        <Col>
-          <BigTitle>全市场风险报告</BigTitle>
-        </Col>
-        <Col>
-          <ThemeDatePicker
-            onChange={pDate => setFormData({ ...formData, valuationDate: pDate })}
-            value={formData.valuationDate}
-            allowClear={false}
-            placeholder="请选择观察日"
-          ></ThemeDatePicker>
-        </Col>
-      </Row>
-      <Title>全市场整体风险报告</Title>
-      <BoxPanel
-        date={formData.valuationDate}
-        style={{ marginBottom: 18, marginTop: 18 }}
-      ></BoxPanel>
-      <Title>全市场分品种风险报告</Title>
-      <Row
-        type="flex"
-        justify="space-between"
-        align="middle"
-        gutter={12}
-        style={{ marginTop: 18, marginBottom: 13 }}
+    <>
+      <div
+        style={{
+          width: 1440,
+        }}
       >
-        <Col>
-          <Row type="flex" justify="start" align="middle" gutter={12}>
-            <Col>
-              <ThemeInput
-                value={formData.instrumentIdPart}
-                onChange={event => {
-                  setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
-                }}
-                placeholder="标的物搜索，默认全部"
-              ></ThemeInput>
-            </Col>
-            <Col>
-              <ThemeButton
-                type="primary"
-                onClick={() => {
-                  setSearchFormData({
-                    ...formData,
-                  });
-                }}
-              >
-                搜索
-              </ThemeButton>
-            </Col>
-          </Row>
-        </Col>
-        <Col>
-          <DownloadExcelButton
-            component={ThemeButton}
-            type="primary"
-            data={{
-              searchMethod: rptSearchPagedMarketRiskDetailReport,
-              argument: {
-                searchFormData: {
-                  valuationDate: searchFormData.valuationDate,
-                  instrumentIdPart: searchFormData.instrumentIdPart,
+        <Row type="flex" justify="start" gutter={14} style={{ marginBottom: 30 }}>
+          <Col>
+            <BigTitle>全市场风险报告</BigTitle>
+          </Col>
+          <Col>
+            <ThemeDatePicker
+              onChange={pDate => setFormData({ ...formData, valuationDate: pDate })}
+              value={formData.valuationDate}
+              allowClear={false}
+              placeholder="请选择观察日"
+            ></ThemeDatePicker>
+          </Col>
+        </Row>
+        <Title>全市场整体风险报告</Title>
+        <BoxPanel
+          date={formData.valuationDate}
+          style={{ marginBottom: 18, marginTop: 18 }}
+        ></BoxPanel>
+        <Title>全市场分品种风险报告</Title>
+        <Row
+          type="flex"
+          justify="space-between"
+          align="middle"
+          gutter={12}
+          style={{ marginTop: 18, marginBottom: 13 }}
+        >
+          <Col>
+            <Row type="flex" justify="start" align="middle" gutter={12}>
+              <Col>
+                <ThemeInput
+                  value={formData.instrumentIdPart}
+                  onChange={event => {
+                    setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
+                  }}
+                  placeholder="标的物搜索，默认全部"
+                ></ThemeInput>
+              </Col>
+              <Col>
+                <ThemeButton
+                  type="primary"
+                  onClick={() => {
+                    setSearchFormData({
+                      ...formData,
+                    });
+                  }}
+                >
+                  搜索
+                </ThemeButton>
+              </Col>
+            </Row>
+          </Col>
+          <Col>
+            <DownloadExcelButton
+              component={ThemeButton}
+              type="primary"
+              data={{
+                searchMethod: rptSearchPagedMarketRiskDetailReport,
+                argument: {
+                  searchFormData: {
+                    valuationDate: searchFormData.valuationDate,
+                    instrumentIdPart: searchFormData.instrumentIdPart,
+                  },
                 },
-              },
-              cols: columns,
-              name: '风险报告',
-              colSwitch: [],
-              getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'underlyerInstrumentId' && rowIndex > 0) {
-                  return {
-                    t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
-                  };
-                }
-                return null;
-              },
+                cols: columns,
+                name: '风险报告',
+                colSwitch: [],
+                getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+                  if (dataIndex !== 'underlyerInstrumentId' && rowIndex > 0) {
+                    return {
+                      t: 'n',
+                      z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                    };
+                  }
+                  return null;
+                },
+              }}
+            >
+              导出
+            </DownloadExcelButton>
+          </Col>
+        </Row>
+        <div style={{ position: 'relative' }}>
+          <ThemeTable
+            loading={loading}
+            pagination={{
+              ...pagination,
+              total,
+              simple: true,
             }}
-          >
-            导出
-          </DownloadExcelButton>
-        </Col>
-      </Row>
-      <div style={{ position: 'relative' }}>
-        <ThemeTable
-          loading={loading}
-          pagination={{
-            ...pagination,
-            total,
-            simple: true,
-          }}
-          dataSource={tableData}
-          onChange={(ppagination, filters, psorter) => {
-            const bool = sorter.columnKey === psorter.columnKey && sorter.order === psorter.order;
-            if (!bool) {
-              setSorter(psorter);
-            }
-            if (!_.isEqual(pagination, ppagination)) {
-              setPagination(ppagination);
-            }
-          }}
-          columns={columns}
-        />
-        <UnitWrap>
-          <Unit hookTopRight></Unit>
-        </UnitWrap>
+            dataSource={tableData}
+            onChange={(ppagination, filters, psorter) => {
+              const bool = sorter.columnKey === psorter.columnKey && sorter.order === psorter.order;
+              if (!bool) {
+                setSorter(psorter);
+              }
+              if (!_.isEqual(pagination, ppagination)) {
+                setPagination(ppagination);
+              }
+            }}
+            columns={columns}
+          />
+          <UnitWrap>
+            <Unit hookTopRight></Unit>
+          </UnitWrap>
+        </div>
       </div>
-      <TableSubsidiaryVarieties valuationDate={formData.valuationDate} />
       <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
-    </div>
+      <TableSubsidiaryVarieties valuationDate={formData.valuationDate} />
+      <TableTradeRival valuationDate={formData.valuationDate} />
+    </>
   );
 };
 

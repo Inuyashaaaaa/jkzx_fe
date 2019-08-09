@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
-import { rptSearchPagedMarketRiskBySubUnderlyerReport } from '@/services/report-service';
+import { rptSearchPagedCounterPartyMarketRiskReport } from '@/services/report-service';
 import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
@@ -30,7 +30,7 @@ const UnitWrap = styled.div`
   height: 60px;
 `;
 
-const TableSubsidiaryVarieties = (props: any) => {
+const TableTradeRival = (props: any) => {
   const { valuationDate } = props;
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -42,36 +42,24 @@ const TableSubsidiaryVarieties = (props: any) => {
   const [total, setTotal] = useState();
   const [formData, setFormData] = useState({
     valuationDate,
-    instrumentIdPart: '',
-    bookNamePart: '',
+    partyNamePart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
-    let params;
+    const params = {
+      valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+      page: 0,
+      pageSize: pagination.pageSize,
+      partyNamePart: searchFormData.partyNamePart,
+      order: ORDER_BY[sorter.order],
+      orderBy: sorter.field,
+    };
     if (bool) {
-      params = {
-        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-        page: pagination.current - 1,
-        pageSize: pagination.pageSize,
-        instrumentIdPart: searchFormData.instrumentIdPart,
-        bookNamePart: searchFormData.bookNamePart,
-        order: ORDER_BY[sorter.order],
-        orderBy: sorter.field,
-      };
-    } else {
-      params = {
-        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
-        page: 0,
-        pageSize: pagination.pageSize,
-        instrumentIdPart: searchFormData.instrumentIdPart,
-        bookNamePart: searchFormData.bookNamePart,
-        order: ORDER_BY[sorter.order],
-        orderBy: sorter.field,
-      };
+      params.page = pagination.current - 1;
     }
-    const rsp = await rptSearchPagedMarketRiskBySubUnderlyerReport(params);
+    const rsp = await rptSearchPagedCounterPartyMarketRiskReport(params);
     setLoading(false);
     const { error, data = {} } = rsp;
     const { page, totalCount } = data;
@@ -90,38 +78,15 @@ const TableSubsidiaryVarieties = (props: any) => {
 
   const columns = [
     {
-      title: '子公司名称',
-      dataIndex: 'bookName',
+      title: '交易对手',
+      dataIndex: 'partyName',
       width: 100,
-    },
-    {
-      title: '标的物合约',
-      dataIndex: 'underlyerInstrumentId',
-      width: 100,
-    },
-    {
-      title: 'Delta',
-      dataIndex: 'delta',
-      width: 100,
-      sortOrder: sorter.field === 'delta' && sorter.order,
-      sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
-      align: 'right',
     },
     {
       title: 'Delta_Cash',
       dataIndex: 'deltaCash',
       width: 100,
       sortOrder: sorter.field === 'deltaCash' && sorter.order,
-      sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
-      align: 'right',
-    },
-    {
-      title: 'Gamma',
-      dataIndex: 'gamma',
-      width: 100,
-      sortOrder: sorter.field === 'gamma' && sorter.order,
       sorter: true,
       render: value => formatNumber({ value, formatter: '0,0.00' }),
       align: 'right',
@@ -165,8 +130,8 @@ const TableSubsidiaryVarieties = (props: any) => {
   ];
 
   return (
-    <div style={{ width: 1620, marginTop: '25px' }}>
-      <Title>各子公司分品种风险报告</Title>
+    <div style={{ width: 1080, marginTop: '25px' }}>
+      <Title>交易对手风险报告</Title>
       <Row
         type="flex"
         justify="space-between"
@@ -178,20 +143,11 @@ const TableSubsidiaryVarieties = (props: any) => {
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
               <ThemeInput
-                value={formData.bookNamePart}
+                value={formData.partyNamePart}
                 onChange={event => {
-                  setFormData({ ...formData, bookNamePart: _.get(event.target, 'value') });
+                  setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
                 }}
-                placeholder="请输入搜索子公司"
-              ></ThemeInput>
-            </Col>
-            <Col>
-              <ThemeInput
-                value={formData.instrumentIdPart}
-                onChange={event => {
-                  setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
-                }}
-                placeholder="请输入搜索标的物"
+                placeholder="请输入搜索交易对手"
               ></ThemeInput>
             </Col>
             <Col>
@@ -213,19 +169,18 @@ const TableSubsidiaryVarieties = (props: any) => {
             component={ThemeButton}
             type="primary"
             data={{
-              searchMethod: rptSearchPagedMarketRiskBySubUnderlyerReport,
+              searchMethod: rptSearchPagedCounterPartyMarketRiskReport,
               argument: {
                 searchFormData: {
                   valuationDate: searchFormData.valuationDate,
-                  instrumentIdPart: searchFormData.instrumentIdPart,
-                  bookNamePart: searchFormData.bookNamePart,
+                  partyNamePart: searchFormData.partyNamePart,
                 },
               },
               cols: columns,
               name: '风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'bookNamePart' && rowIndex > 0) {
+                if (dataIndex !== 'partyNamePart' && rowIndex > 0) {
                   return {
                     t: 'n',
                     z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
@@ -267,4 +222,4 @@ const TableSubsidiaryVarieties = (props: any) => {
   );
 };
 
-export default TableSubsidiaryVarieties;
+export default TableTradeRival;
