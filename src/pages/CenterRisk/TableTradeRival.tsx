@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
-import { rptSearchPagedSubsidiaryMarketRiskReport } from '@/services/report-service';
+import { rptSearchPagedCounterPartyMarketRiskReport } from '@/services/report-service';
 import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
@@ -30,7 +30,7 @@ const UnitWrap = styled.div`
   height: 60px;
 `;
 
-const TableSubsidiaryWhole = (props: any) => {
+const TableTradeRival = (props: any) => {
   const { valuationDate } = props;
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -42,7 +42,7 @@ const TableSubsidiaryWhole = (props: any) => {
   const [total, setTotal] = useState();
   const [formData, setFormData] = useState({
     valuationDate,
-    subsidiaryPart: '',
+    partyNamePart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
@@ -52,14 +52,14 @@ const TableSubsidiaryWhole = (props: any) => {
       valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
       page: 0,
       pageSize: pagination.pageSize,
-      subsidiaryPart: searchFormData.subsidiaryPart,
+      partyNamePart: searchFormData.partyNamePart,
       order: ORDER_BY[sorter.order],
       orderBy: sorter.field,
     };
     if (bool) {
       params.page = pagination.current - 1;
     }
-    const rsp = await rptSearchPagedSubsidiaryMarketRiskReport(params);
+    const rsp = await rptSearchPagedCounterPartyMarketRiskReport(params);
     setLoading(false);
     const { error, data = {} } = rsp;
     const { page, totalCount } = data;
@@ -78,8 +78,8 @@ const TableSubsidiaryWhole = (props: any) => {
 
   const columns = [
     {
-      title: '子公司名称',
-      dataIndex: 'subsidiary',
+      title: '交易对手',
+      dataIndex: 'partyName',
       width: 100,
     },
     {
@@ -130,8 +130,8 @@ const TableSubsidiaryWhole = (props: any) => {
   ];
 
   return (
-    <div style={{ width: 1080, marginTop: 25 }}>
-      <Title>各子公司风险报告</Title>
+    <div style={{ width: 1080, marginTop: '25px' }}>
+      <Title>交易对手风险报告</Title>
       <Row
         type="flex"
         justify="space-between"
@@ -143,11 +143,11 @@ const TableSubsidiaryWhole = (props: any) => {
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
               <ThemeInput
-                value={formData.subsidiaryPart}
+                value={formData.partyNamePart}
                 onChange={event => {
-                  setFormData({ ...formData, subsidiaryPart: _.get(event.target, 'value') });
+                  setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
                 }}
-                placeholder="请输入搜索子公司"
+                placeholder="请输入搜索交易对手"
               ></ThemeInput>
             </Col>
             <Col>
@@ -169,18 +169,18 @@ const TableSubsidiaryWhole = (props: any) => {
             component={ThemeButton}
             type="primary"
             data={{
-              searchMethod: rptSearchPagedSubsidiaryMarketRiskReport,
+              searchMethod: rptSearchPagedCounterPartyMarketRiskReport,
               argument: {
                 searchFormData: {
                   valuationDate: searchFormData.valuationDate,
-                  subsidiaryPart: searchFormData.subsidiaryPart,
+                  partyNamePart: searchFormData.partyNamePart,
                 },
               },
               cols: columns,
               name: '风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'subsidiaryPart' && rowIndex > 0) {
+                if (dataIndex !== 'partyNamePart' && rowIndex > 0) {
                   return {
                     t: 'n',
                     z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
@@ -222,4 +222,4 @@ const TableSubsidiaryWhole = (props: any) => {
   );
 };
 
-export default TableSubsidiaryWhole;
+export default TableTradeRival;

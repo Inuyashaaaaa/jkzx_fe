@@ -165,7 +165,7 @@ const TableSubsidiaryVarieties = (props: any) => {
   ];
 
   return (
-    <div style={{ width: 1213 }}>
+    <div style={{ width: 1620, marginTop: '25px' }}>
       <Title>各子公司分品种风险报告</Title>
       <Row
         type="flex"
@@ -178,9 +178,9 @@ const TableSubsidiaryVarieties = (props: any) => {
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
               <ThemeInput
-                value={formData.searchFormData}
+                value={formData.bookNamePart}
                 onChange={event => {
-                  setFormData({ ...formData, searchFormData: _.get(event.target, 'value') });
+                  setFormData({ ...formData, bookNamePart: _.get(event.target, 'value') });
                 }}
                 placeholder="请输入搜索子公司"
               ></ThemeInput>
@@ -218,6 +218,7 @@ const TableSubsidiaryVarieties = (props: any) => {
                 searchFormData: {
                   valuationDate: searchFormData.valuationDate,
                   instrumentIdPart: searchFormData.instrumentIdPart,
+                  bookNamePart: searchFormData.bookNamePart,
                 },
               },
               cols: columns,

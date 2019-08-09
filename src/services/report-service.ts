@@ -321,3 +321,13 @@ export async function rptSearchPagedSubsidiaryMarketRiskReport(params = {}) {
     },
   });
 }
+
+export async function rptSearchPagedCounterPartyMarketRiskReport(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'rptSearchPagedCounterPartyMarketRiskReport',
+      params,
+    },
+  });
+}
