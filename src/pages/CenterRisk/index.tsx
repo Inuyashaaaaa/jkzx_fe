@@ -90,6 +90,7 @@ const Risk = () => {
     instrumentIdPart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
+  const [visibleTip, setVisibleTip] = useState('');
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
@@ -213,23 +214,92 @@ const Risk = () => {
         <div className="anchorLink">
           <ul>
             <li>
-              <Tooltip placement="left" title="定位到全市场分品种风险报告">
-                <p onClick={() => scrollToAnchor('one')}>1</p>
+              <Tooltip
+                visible={visibleTip === '定位到全市场分品种风险报告'}
+                placement="left"
+                title="定位到全市场分品种风险报告"
+              >
+                <p
+                  onMouseEnter={() => {
+                    setVisibleTip('定位到全市场分品种风险报告');
+                  }}
+                  onMouseLeave={() => {
+                    setVisibleTip('');
+                  }}
+                  onClick={() => {
+                    setVisibleTip('');
+                    scrollToAnchor('one');
+                  }}
+                >
+                  1
+                </p>
               </Tooltip>
             </li>
             <li>
-              <Tooltip placement="left" title="定位到各子公司风险报告">
-                <p onClick={() => scrollToAnchor('two')}>2</p>
+              <Tooltip
+                visible={visibleTip === '定位到各子公司风险报告'}
+                placement="left"
+                title="定位到各子公司风险报告"
+              >
+                <p
+                  onMouseEnter={() => {
+                    setVisibleTip('定位到各子公司风险报告');
+                  }}
+                  onMouseLeave={() => {
+                    setVisibleTip('');
+                  }}
+                  onClick={() => {
+                    setVisibleTip('');
+                    scrollToAnchor('two');
+                  }}
+                >
+                  2
+                </p>
               </Tooltip>
             </li>
             <li>
-              <Tooltip placement="left" title="定位到各子公司分品种风险报告">
-                <p onClick={() => scrollToAnchor('three')}>3</p>
+              <Tooltip
+                visible={visibleTip === '定位到各子公司分品种风险报告'}
+                placement="left"
+                title="定位到各子公司分品种风险报告"
+              >
+                <p
+                  o
+                  onMouseEnter={() => {
+                    setVisibleTip('定位到各子公司分品种风险报告');
+                  }}
+                  onMouseLeave={() => {
+                    setVisibleTip('');
+                  }}
+                  nClick={() => {
+                    setVisibleTip('');
+                    scrollToAnchor('three');
+                  }}
+                >
+                  3
+                </p>
               </Tooltip>
             </li>
             <li>
-              <Tooltip placement="left" title="定位到交易对手风险报告">
-                <p onClick={() => scrollToAnchor('four')}>4</p>
+              <Tooltip
+                visible={visibleTip === '定位到交易对手风险报告'}
+                placement="left"
+                title="定位到交易对手风险报告"
+              >
+                <p
+                  onMouseEnter={() => {
+                    setVisibleTip('定位到交易对手风险报告');
+                  }}
+                  onMouseLeave={() => {
+                    setVisibleTip('');
+                  }}
+                  onClick={() => {
+                    setVisibleTip('');
+                    scrollToAnchor('four');
+                  }}
+                >
+                  4
+                </p>
               </Tooltip>
             </li>
           </ul>

@@ -42,6 +42,10 @@ const ThemeMenuWrap = styled.div`
   .ant-menu-item-selected > a:hover {
     color: rgba(246, 250, 255, 1);
   }
+  .ant-menu-inline .ant-menu-item,
+  .ant-menu-inline .ant-menu-submenu-title {
+    width: 100%;
+  }
 `;
 
 const ThemeMenu = memo(props => (
