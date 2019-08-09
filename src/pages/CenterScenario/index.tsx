@@ -92,82 +92,6 @@ const CenterScenario = memo(props => {
     '109',
     '110',
   ];
-  useLifecycles(() => {
-    setTableColDefs([
-      {
-        title: '标的物情景分析',
-        dataIndex: 'greekLatter',
-      },
-      ...col.map(item => {
-        return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%` };
-      }),
-    ]);
-  });
-
-  useEffect(() => {
-    const reportData = Form2.getFieldsValue(reportFormData);
-    const subFields =
-      !reportData.reportType || reportData.reportType === 'MARKET'
-        ? []
-        : reportData.reportType === 'SUBSIDIARY'
-        ? [
-            {
-              title: '各子公司',
-              dataIndex: 'subName',
-              render: (val, record, index, { form }) => (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [{ required: true, message: '各子公司必填' }],
-                  })(
-                    <ThemeSelect
-                      filterOption
-                      showSearch
-                      key="subName"
-                      options={async (value: string) => {
-                        const { data, error } = await queryNonGroupResource();
-                        if (error) return [];
-                        return data.map(item => ({
-                          label: item.resourceName,
-                          value: item.resourceName,
-                        }));
-                      }}
-                    ></ThemeSelect>,
-                  )}
-                </FormItem>
-              ),
-            },
-          ]
-        : [
-            {
-              title: '交易对手',
-              dataIndex: 'legalName',
-              render: (val, record, index, { form }) => (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [{ required: true, message: '交易对手必填' }],
-                  })(
-                    <ThemeSelect
-                      fetchOptionsOnSearch
-                      showSearch
-                      key="legalName"
-                      options={async (value: string) => {
-                        const { data, error } = await refSimilarLegalNameList({
-                          similarLegalName: value,
-                        });
-                        if (error) return [];
-                        return data.slice(0, 50).map(item => ({
-                          label: item,
-                          value: item,
-                        }));
-                      }}
-                    ></ThemeSelect>,
-                  )}
-                </FormItem>
-              ),
-            },
-          ];
-    setSubNameOrBook(subFields);
-  }, [reportFormData]);
 
   const onSearchFormChange = (props, changedFields, allFields) => {
     setSearchFormData({
@@ -337,6 +261,84 @@ const CenterScenario = memo(props => {
     },
   ];
 
+  useLifecycles(() => {
+    setTableColDefs([
+      {
+        title: '标的物情景分析',
+        dataIndex: 'greekLatter',
+      },
+      ...col.map(item => {
+        return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%` };
+      }),
+    ]);
+    onSearch();
+  });
+
+  useEffect(() => {
+    const reportData = Form2.getFieldsValue(reportFormData);
+    const subFields =
+      !reportData.reportType || reportData.reportType === 'MARKET'
+        ? []
+        : reportData.reportType === 'SUBSIDIARY'
+        ? [
+            {
+              title: '各子公司',
+              dataIndex: 'subName',
+              render: (val, record, index, { form }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '各子公司必填' }],
+                  })(
+                    <ThemeSelect
+                      filterOption
+                      showSearch
+                      key="subName"
+                      options={async (value: string) => {
+                        const { data, error } = await queryNonGroupResource();
+                        if (error) return [];
+                        return data.map(item => ({
+                          label: item.resourceName,
+                          value: item.resourceName,
+                        }));
+                      }}
+                    ></ThemeSelect>,
+                  )}
+                </FormItem>
+              ),
+            },
+          ]
+        : [
+            {
+              title: '交易对手',
+              dataIndex: 'legalName',
+              render: (val, record, index, { form }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '交易对手必填' }],
+                  })(
+                    <ThemeSelect
+                      fetchOptionsOnSearch
+                      showSearch
+                      key="legalName"
+                      options={async (value: string) => {
+                        const { data, error } = await refSimilarLegalNameList({
+                          similarLegalName: value,
+                        });
+                        if (error) return [];
+                        return data.slice(0, 50).map(item => ({
+                          label: item,
+                          value: item,
+                        }));
+                      }}
+                    ></ThemeSelect>,
+                  )}
+                </FormItem>
+              ),
+            },
+          ];
+    setSubNameOrBook(subFields);
+  }, [reportFormData]);
+
   return (
     <>
       <Row type="flex" gutter={18}>
@@ -357,13 +359,7 @@ const CenterScenario = memo(props => {
           </FormItemWrapper>
         </Col>
       </Row>
-      <Row
-        type="flex"
-        justify="start"
-        align="middle"
-        gutter={12}
-        style={{ marginBottom: 21, marginTop: 21 }}
-      >
+      <Row type="flex" justify="start" align="middle" style={{ marginBottom: 21, marginTop: 21 }}>
         <Col>
           <FormItemWrapper>
             <Form2
@@ -378,7 +374,7 @@ const CenterScenario = memo(props => {
           </FormItemWrapper>
         </Col>
         <Col>
-          <ThemeButton loading={searchFormData && loading} onClick={onSearch} type="primary">
+          <ThemeButton onClick={onSearch} type="primary">
             确定
           </ThemeButton>
         </Col>
