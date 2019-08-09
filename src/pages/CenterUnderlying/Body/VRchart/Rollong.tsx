@@ -7,6 +7,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import { connect } from 'dva';
+import FormItem from 'antd/lib/form/FormItem';
 import ChartTitle from '@/containers/ChartTitle';
 import ThemeSelect from '@/containers/ThemeSelect';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
@@ -15,13 +16,14 @@ import { Loading } from '@/containers';
 import { delay } from '@/tools';
 import PosCenter from '@/containers/PosCenter';
 import { getInstrumentRollingVol } from '@/services/terminal';
+import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const Rollong = props => {
   const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(30, 'd'), moment()]);
+  const [dates, setDates] = useState([moment().subtract(30 * 6, 'd'), moment()]);
   const [window, setWindow] = useState('22');
 
   const generateGradualColorStr = fdv => {
@@ -46,6 +48,7 @@ const Rollong = props => {
       startDate: dates[0].format('YYYY-MM-DD'),
       endDate: dates[1].format('YYYY-MM-DD'),
       window: _.toNumber(window),
+      isPrimary: true,
     });
     if (rsp.error) {
       setLoading(false);
@@ -84,25 +87,33 @@ const Rollong = props => {
     <>
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
         <Col>
-          <ThemeDatePickerRanger
-            onChange={pDates => setDates(pDates)}
-            value={dates}
-            allowClear={false}
-          ></ThemeDatePickerRanger>
+          <FormItemWrapper>
+            <FormItem label="日期">
+              <ThemeDatePickerRanger
+                onChange={pDates => setDates(pDates)}
+                value={dates}
+                allowClear={false}
+              ></ThemeDatePickerRanger>
+            </FormItem>
+          </FormItemWrapper>
         </Col>
         <Col>
-          <ThemeSelect
-            value={window}
-            onChange={val => setWindow(val)}
-            placeholder="窗口"
-            style={{ minWidth: 200 }}
-          >
-            {[1, 3, 5, 10, 22, 44, 66, 132].map(item => (
-              <Select.Option value={item} key={item}>
-                {item}
-              </Select.Option>
-            ))}
-          </ThemeSelect>
+          <FormItemWrapper>
+            <FormItem label="窗口">
+              <ThemeSelect
+                value={window}
+                onChange={val => setWindow(val)}
+                placeholder="窗口"
+                style={{ minWidth: 200 }}
+              >
+                {[1, 3, 5, 10, 22, 44, 66, 132].map(item => (
+                  <Select.Option value={item} key={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+              </ThemeSelect>
+            </FormItem>
+          </FormItemWrapper>
         </Col>
         <Col>
           <ThemeButton

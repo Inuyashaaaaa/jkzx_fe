@@ -13,15 +13,7 @@ import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
-
-const FormItemWrapper = styled.div`
-  .ant-form-item-label label {
-    color: #f5faff;
-  }
-  .ant-row.ant-form-item {
-    margin-bottom: 0;
-  }
-`;
+import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const TopChart = props => {
   const { instrumentId, loading, data, fetchStrikeType } = props;
@@ -112,15 +104,19 @@ const TopChart = props => {
     fetchMeta();
   }, [data, window]);
 
-  const getStrikeLabel = () =>
-    fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage';
+  const getStrikeLabel = () => {
+    if (fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE) {
+      return 'strike';
+    }
+    return 'strike_percentage';
+  };
 
   return (
     <>
       <Row type="flex" justify="end" style={{ padding: 17, paddingBottom: 0 }} gutter={12}>
         <Col>
           <FormItemWrapper>
-            <FormItem label="期限" style={{ display: 'flex' }}>
+            <FormItem label="期限">
               <ThemeSelect
                 value={window}
                 onChange={val => {
