@@ -1,6 +1,17 @@
 import { HOST_TEST } from '@/constants/global';
 import request from '@/tools/request';
 
+// 监控中心获取情景分析数据列表
+export async function rptSpotScenariosReportListSearch(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'rptSpotScenariosReportListSearch',
+      params,
+    },
+  });
+}
+
 export async function rptIntradayTradeReportPaged(params = {}) {
   return request(`${HOST_TEST}report-service/api/rpc`, {
     method: 'POST',
