@@ -8,9 +8,11 @@ import ThemeDatePicker from '@/containers/ThemeDatePicker';
 import ThemeRadio from '@/containers/ThemeRadio';
 import ThemeSelect from '@/containers/ThemeSelect';
 import moment from 'moment';
+import FormItemWrapper from '@/containers/FormItemWrapper';
+import FormItem from 'antd/lib/form/FormItem';
 
 const Box = props => {
-  const [DateData, setDateData] = useState(moment('2019-08-08'));
+  const [dateData, setDateData] = useState(moment('2019-08-08'));
   const { loading, reportDate, dispatch } = props;
 
   const setLoading = data => {
@@ -32,21 +34,25 @@ const Box = props => {
   };
 
   return (
-    <div style={{ border: '1px solid #00E8E8', padding: '15px 50px' }}>
+    <div style={{ border: '1px solid #05507b', padding: '15px 15px' }}>
       <Row type="flex" justify="start" align="middle" gutter={12}>
         <Col>
-          <ThemeDatePicker
-            onChange={pDate => setDateData(pDate)}
-            value={DateData}
-            allowClear={false}
-          ></ThemeDatePicker>
+          <FormItemWrapper>
+            <FormItem label="日期">
+              <ThemeDatePicker
+                onChange={pDate => setDateData(pDate)}
+                value={dateData}
+                allowClear={false}
+              ></ThemeDatePicker>
+            </FormItem>
+          </FormItemWrapper>
         </Col>
         <Col>
           <ThemeButton
             loading={loading}
             onClick={() => {
               setLoading(true);
-              setReportDate(DateData);
+              setReportDate(dateData);
             }}
             type="primary"
           >
