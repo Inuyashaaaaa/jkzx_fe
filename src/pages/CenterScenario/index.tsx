@@ -19,6 +19,7 @@ import { refSimilarLegalNameList } from '@/services/reference-data-service';
 import { queryNonGroupResource } from '@/services/tradeBooks';
 import { rptSpotScenariosReportListSearch } from '@/services/report-service';
 import moment from 'moment';
+import useLifecycles from 'react-use/lib/useLifecycles';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -30,15 +31,24 @@ const FormItemWrapper = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 16px;
-  font-weight: 400;
   color: rgba(246, 250, 255, 1);
+  font-weight: 400;
+  font-size: 16px;
   line-height: 32px;
 `;
 
 const CenterScenario = memo(props => {
-  const [searchFormData, setSearchFormData] = useState({});
-  const [reportFormData, setReportFormData] = useState({});
+  const [searchFormData, setSearchFormData] = useState(
+    Form2.createFields({
+      underlyer: '600030.SH',
+    }),
+  );
+  const [reportFormData, setReportFormData] = useState(
+    Form2.createFields({
+      valuationDate: moment(),
+      reportType: 'MARKET',
+    }),
+  );
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
@@ -49,9 +59,6 @@ const CenterScenario = memo(props => {
   const reportForm = useRef<Form2>(null);
 
   const colDefsMirrior = {
-    underlyerPrice: '标的物价格',
-    price: '持仓价格',
-    pnlChange: 'PNL变动',
     delta: 'Delta',
     deltaCash: 'Delta Cash',
     gamma: 'Gamma',
@@ -59,7 +66,43 @@ const CenterScenario = memo(props => {
     vega: 'Vega',
     theta: 'Theta',
     rhoR: 'Rho_R',
+    pnlChange: 'Pnl',
   };
+
+  const col = [
+    '90',
+    '91',
+    '92',
+    '93',
+    '94',
+    '95',
+    '96',
+    '97',
+    '98',
+    '99',
+    '100',
+    '101',
+    '102',
+    '103',
+    '104',
+    '105',
+    '106',
+    '107',
+    '108',
+    '109',
+    '110',
+  ];
+  useLifecycles(() => {
+    setTableColDefs([
+      {
+        title: '标的物情景分析',
+        dataIndex: 'greekLatter',
+      },
+      ...col.map(item => {
+        return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%` };
+      }),
+    ]);
+  });
 
   useEffect(() => {
     const reportData = Form2.getFieldsValue(reportFormData);
@@ -73,10 +116,13 @@ const CenterScenario = memo(props => {
               dataIndex: 'subName',
               render: (val, record, index, { form }) => (
                 <FormItem>
-                  {form.getFieldDecorator({ rules: [{ required: true, message: '各子公司必填' }] })(
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '各子公司必填' }],
+                  })(
                     <ThemeSelect
                       filterOption
                       showSearch
+                      key="subName"
                       options={async (value: string) => {
                         const { data, error } = await queryNonGroupResource();
                         if (error) return [];
@@ -97,10 +143,13 @@ const CenterScenario = memo(props => {
               dataIndex: 'legalName',
               render: (val, record, index, { form }) => (
                 <FormItem>
-                  {form.getFieldDecorator({ rules: [{ required: true, message: '交易对手必填' }] })(
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '交易对手必填' }],
+                  })(
                     <ThemeSelect
                       fetchOptionsOnSearch
                       showSearch
+                      key="legalName"
                       options={async (value: string) => {
                         const { data, error } = await refSimilarLegalNameList({
                           similarLegalName: value,
@@ -128,6 +177,14 @@ const CenterScenario = memo(props => {
   };
 
   const onReportFormChange = (props, changedFields, allFields) => {
+    if (changedFields.reportType && Form2.getFieldsValue(changedFields).reportType === 'MARKET') {
+      return setReportFormData({
+        ...reportFormData,
+        ...changedFields,
+        legalName: Form2.createField(undefined),
+        subName: Form2.createField(undefined),
+      });
+    }
     setReportFormData({
       ...reportFormData,
       ...changedFields,
@@ -144,7 +201,7 @@ const CenterScenario = memo(props => {
     const reportData = _.mapValues(
       _.mapKeys(Form2.getFieldsValue(reportFormData), (val, key) => {
         if (key === 'legalName' || key === 'subName') {
-          return 'bookOrSubName';
+          return 'subOrPartyName';
         }
         return key;
       }),
@@ -164,14 +221,35 @@ const CenterScenario = memo(props => {
     });
     setLoading(false);
     setTableLoading(false);
-    if (error || !data.length) return;
-    const scenarioId = data[0].scenarios.map(item => item.scenarioId);
+    if (error) return;
+    if (!data.length) {
+      setTableColDefs([
+        {
+          title: '标的物情景分析',
+          dataIndex: 'greekLatter',
+        },
+        ...col.map(item => {
+          return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%` };
+        }),
+      ]);
+      setDataSource([]);
+      return;
+    }
+    const scenarioId = data[0].scenarios
+      .map(item => item.scenarioId)
+      .sort((item1, item2) => {
+        console.log(item1.match(/scenario_(\d+)%/));
+        const num1 = Number(item1.match(/scenario_(\d+)%/)[1]);
+        const num2 = Number(item2.match(/scenario_(\d+)%/)[1]);
+        return num1 - num2;
+      });
     const colDef = scenarioId.map(item => ({
       title: item,
       dataIndex: item,
       align: 'right',
       render: val => val && formatNumber(val, 4),
     }));
+
     const tableData = Object.keys(colDefsMirrior).map(item =>
       data[0].scenarios.reduce(
         (prev, next) => ({
@@ -198,7 +276,7 @@ const CenterScenario = memo(props => {
       render: (val, record, index, { form }) => (
         <FormItem>
           {form.getFieldDecorator({ rules: [{ required: true, message: '观察日必填' }] })(
-            <ThemeDatePicker placeholder=""></ThemeDatePicker>,
+            <ThemeDatePicker placeholder="" allowClear={false}></ThemeDatePicker>,
           )}
         </FormItem>
       ),
@@ -257,26 +335,6 @@ const CenterScenario = memo(props => {
         </FormItem>
       ),
     },
-    {
-      title: '价格范围(%)',
-      dataIndex: 'priceRange',
-      render: (val, record, index, { form }) => (
-        <FormItem>
-          {form.getFieldDecorator({})(<ThemeInputNumberRange></ThemeInputNumberRange>)}
-        </FormItem>
-      ),
-    },
-    {
-      title: '情景个数',
-      dataIndex: 'seniorNumber',
-      render: (val, record, index, { form }) => (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <ThemeInputNumber style={{ minWidth: 200 }}></ThemeInputNumber>,
-          )}
-        </FormItem>
-      ),
-    },
   ];
 
   return (
@@ -288,6 +346,7 @@ const CenterScenario = memo(props => {
         <Col>
           <FormItemWrapper>
             <Form2
+              hideRequiredMark
               ref={node => (reportForm.current = node)}
               dataSource={reportFormData}
               onFieldsChange={onReportFormChange}
@@ -308,6 +367,7 @@ const CenterScenario = memo(props => {
         <Col>
           <FormItemWrapper>
             <Form2
+              hideRequiredMark
               ref={node => (searchForm.current = node)}
               dataSource={searchFormData}
               onFieldsChange={onSearchFormChange}
