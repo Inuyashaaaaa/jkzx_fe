@@ -5,8 +5,6 @@ import ThemeStatistic from '@/containers/ThemeStatistic';
 import Unit from './containers/Unit';
 import { rptMarketRiskReportListByDate } from '@/services/report-service';
 
-import console = require('console');
-
 const BoxWrapper = styled.div`
   display: flex;
   justify-content: space-between;

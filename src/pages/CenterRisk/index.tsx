@@ -15,15 +15,12 @@ import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import FormItemWrapper from '@/containers/FormItemWrapper';
-
 import ThemeStatistic from '@/containers/ThemeStatistic';
 import BoxPanel from './BoxPanel';
 import Unit from './containers/Unit';
 import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
 import TableSubsidiaryWhole from './TableSubsidiaryWhole';
 import TableTradeRival from './TableTradeRival';
-
-import console = require('console');
 
 const Title = styled.div`
   font-size: 16px;
