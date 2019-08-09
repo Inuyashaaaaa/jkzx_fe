@@ -104,15 +104,19 @@ const TopChart = props => {
     fetchMeta();
   }, [data, window]);
 
-  const getStrikeLabel = () =>
-    fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage';
+  const getStrikeLabel = () => {
+    if (fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE) {
+      return 'strike';
+    }
+    return 'strike_percentage';
+  };
 
   return (
     <>
       <Row type="flex" justify="end" style={{ padding: 17, paddingBottom: 0 }} gutter={12}>
         <Col>
           <FormItemWrapper>
-            <FormItem label="期限" style={{ display: 'flex' }}>
+            <FormItem label="期限">
               <ThemeSelect
                 value={window}
                 onChange={val => {

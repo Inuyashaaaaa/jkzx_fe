@@ -7,6 +7,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { connect } from 'dva';
 import moment from 'moment';
+import FormItem from 'antd/lib/form/FormItem';
 import ChartTitle from '@/containers/ChartTitle';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeButton from '@/containers/ThemeButton';
@@ -14,6 +15,7 @@ import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
 import { delay } from '@/tools';
 import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const LATEST_PER = 'latest';
 
@@ -135,11 +137,15 @@ const Vol = props => {
     <>
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
         <Col>
-          <ThemeDatePickerRanger
-            onChange={pDates => setDates(pDates)}
-            value={dates}
-            allowClear={false}
-          ></ThemeDatePickerRanger>
+          <FormItemWrapper>
+            <FormItem label="日期" style={{ display: 'flex' }}>
+              <ThemeDatePickerRanger
+                onChange={pDates => setDates(pDates)}
+                value={dates}
+                allowClear={false}
+              ></ThemeDatePickerRanger>
+            </FormItem>
+          </FormItemWrapper>
         </Col>
         <Col>
           <ThemeButton

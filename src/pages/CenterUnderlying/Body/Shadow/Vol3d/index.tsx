@@ -7,6 +7,7 @@ import 'echarts-gl';
 import _ from 'lodash';
 import moment from 'moment';
 import React, { memo, useEffect, useRef, useState } from 'react';
+import FormItem from 'antd/lib/form/FormItem';
 import {
   getInstrumentRealizedVol,
   getInstrumentVolCone,
@@ -22,6 +23,7 @@ import ThemeRadio from '@/containers/ThemeRadio';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { delay } from '@/utils';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
+import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const debug = true;
 
@@ -58,10 +60,10 @@ const STATUS = {
 
 const Vol = props => {
   const { instrumentId, data, dispatch, loading, strikeType } = props;
-  const [meta, setMeta] = useState(null);
+  const [meta, setMeta] = useState();
   const [valuationDate, setValuationDate] = useState(moment('2019-08-01'));
   const [status, setStatus] = useState(STATUS.CHART);
-  const [echartInstance, setEchartInstance] = useState(null);
+  const [echartInstance, setEchartInstance] = useState();
 
   const setData = pData => {
     dispatch({
@@ -238,6 +240,9 @@ const Vol = props => {
 
   useEffect(() => {
     fetch();
+    return () => {
+      setData({});
+    };
   }, []);
 
   useEffect(() => {
@@ -281,7 +286,62 @@ const Vol = props => {
 
   return (
     <>
-      <Row type="flex" justify="space-between" align="middle" style={{ padding: 17 }} gutter={12}>
+      <Row type="flex" justify="start" align="middle" gutter={12} style={{ padding: 17 }}>
+        <Col>
+          <FormItemWrapper>
+            <FormItem label="日期">
+              <ThemeDatePicker
+                onChange={pDate => setValuationDate(pDate)}
+                value={valuationDate}
+                allowClear={false}
+              ></ThemeDatePicker>
+            </FormItem>
+          </FormItemWrapper>
+        </Col>
+        <Col>
+          <FormItemWrapper>
+            <FormItem label="strike_type">
+              <ThemeSelect
+                onChange={val => {
+                  setStrikeType(val);
+                }}
+                value={strikeType}
+                placeholder="strike_percentage"
+                style={{ minWidth: 200 }}
+                options={[
+                  {
+                    label: 'strike',
+                    value: STRIKE_TYPE_ENUM.STRIKE,
+                  },
+                  {
+                    label: 'strike_percentage',
+                    value: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
+                  },
+                ]}
+              ></ThemeSelect>
+            </FormItem>
+          </FormItemWrapper>
+        </Col>
+        <Col>
+          <ThemeButton
+            loading={meta && loading}
+            onClick={() => {
+              fetch();
+              setFetchStrikeType(strikeType);
+            }}
+            type="primary"
+          >
+            绘制
+          </ThemeButton>
+        </Col>
+      </Row>
+      <Row
+        type="flex"
+        justify="space-between"
+        align="middle"
+        style={{ padding: '0px 17px' }}
+        gutter={12}
+      >
         <Col>
           <ThemeRadio.Group
             size="small"
@@ -317,49 +377,6 @@ const Vol = props => {
               />
             </ThemeRadio.Button>
           </ThemeRadio.Group>
-        </Col>
-        <Col>
-          <Row type="flex" justify="space-between" align="middle" gutter={12}>
-            <Col>
-              <ThemeDatePicker
-                onChange={pDate => setValuationDate(pDate)}
-                value={valuationDate}
-                allowClear={false}
-              ></ThemeDatePicker>
-            </Col>
-            <Col>
-              <ThemeSelect
-                onChange={val => {
-                  setStrikeType(val);
-                }}
-                value={strikeType}
-                placeholder="strike_percentage"
-                style={{ minWidth: 200 }}
-                options={[
-                  {
-                    label: 'strike',
-                    value: STRIKE_TYPE_ENUM.STRIKE,
-                  },
-                  {
-                    label: 'strike_percentage',
-                    value: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
-                  },
-                ]}
-              ></ThemeSelect>
-            </Col>
-            <Col>
-              <ThemeButton
-                loading={meta && loading}
-                onClick={() => {
-                  fetch();
-                  setFetchStrikeType(strikeType);
-                }}
-                type="primary"
-              >
-                绘制
-              </ThemeButton>
-            </Col>
-          </Row>
         </Col>
       </Row>
       {/* <ChartTitle>波动率锥</ChartTitle> */}
