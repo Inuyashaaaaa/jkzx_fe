@@ -46,6 +46,7 @@ const Rollong = props => {
       startDate: dates[0].format('YYYY-MM-DD'),
       endDate: dates[1].format('YYYY-MM-DD'),
       window: _.toNumber(window),
+      isPrimary: true,
     });
     if (rsp.error) {
       setLoading(false);

@@ -73,10 +73,12 @@ const Vol = props => {
         end_date: dates[1].format('YYYY-MM-DD'),
         windows,
         percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
+        isPrimary: true,
       }),
       getInstrumentRealizedVol({
         instrumentId,
         tradeDate: dates[1].format('YYYY-MM-DD'),
+        isPrimary: true,
       }),
     ]);
     if (rsp.error) {
