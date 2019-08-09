@@ -130,7 +130,7 @@ const TableTradeRival = (props: any) => {
   ];
 
   return (
-    <div style={{ width: 1080, marginTop: '25px' }}>
+    <div id="four" style={{ width: 1080, marginTop: '25px' }}>
       <Title>交易对手风险报告</Title>
       <Row
         type="flex"
