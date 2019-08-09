@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
+import { formatNumber } from '@/tools';
 
 const GradientBox = props => {
   const [value, setValue] = useState(null);
@@ -11,6 +12,7 @@ const GradientBox = props => {
 
   useEffect(() => {
     setWidth(_.floor((props.value / props.max) * 100));
+    console.log(props.max, props.value);
   }, [props.max, props.value]);
 
   const handleStyle = widthData => ({
@@ -29,11 +31,12 @@ const GradientBox = props => {
       <div
         style={{
           width: 100,
+          marginRight: 20,
         }}
       >
         <div style={handleStyle(width)}></div>
       </div>
-      <div>{value}</div>
+      <div>{formatNumber(value, 4)}</div>
     </div>
   );
 };
