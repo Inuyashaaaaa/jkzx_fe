@@ -171,7 +171,12 @@ const Vol = props => {
             data={meta.dv}
             scale={{
               window: {
-                ticks: windows.map(item => _.toString(item)),
+                ticks: _.chain(meta.dv.origin)
+                  .map(item => Number(item.window))
+                  .union()
+                  .sort((a, b) => a - b)
+                  .map(item => String(item))
+                  .value(),
                 alias: '窗口',
                 type: 'cat',
               },
