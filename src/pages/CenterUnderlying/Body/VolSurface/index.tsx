@@ -1,4 +1,4 @@
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef, useState, useEffect } from 'react';
 import { connect } from 'dva';
 import { Col, Row } from 'antd';
 import BoxFigure from './BoxFigure';
@@ -10,10 +10,11 @@ import ThemeSelect from '@/containers/ThemeSelect';
 import moment from 'moment';
 import FormItemWrapper from '@/containers/FormItemWrapper';
 import FormItem from 'antd/lib/form/FormItem';
+import { getImpliedVolReport } from '@/services/terminal';
 
 const Box = props => {
   const [dateData, setDateData] = useState(moment('2019-08-08'));
-  const { loading, reportDate, dispatch } = props;
+  const { loading, volReport, dispatch, instrumentId } = props;
 
   const setLoading = data => {
     dispatch({
@@ -24,14 +25,30 @@ const Box = props => {
     });
   };
 
-  const setReportDate = data => {
+  const setVolReport = data => {
     dispatch({
       type: 'centerUnderlying/setState',
       payload: {
-        reportDate: data,
+        volReport: data,
       },
     });
   };
+
+  const fetch = async () => {
+    setLoading(true);
+    const rsp = await getImpliedVolReport({
+      instrumentId,
+      reportDate: dateData.format('YYYY-MM-DD'),
+    });
+    setLoading(false);
+    const { error, data = {} } = rsp;
+    if (rsp.error) return;
+    setVolReport(data);
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
 
   return (
     <div style={{ border: '1px solid #05507b', padding: '15px 15px' }}>
@@ -48,14 +65,7 @@ const Box = props => {
           </FormItemWrapper>
         </Col>
         <Col>
-          <ThemeButton
-            loading={loading}
-            onClick={() => {
-              setLoading(true);
-              setReportDate(dateData);
-            }}
-            type="primary"
-          >
+          <ThemeButton loading={loading} onClick={() => fetch()} type="primary">
             绘制
           </ThemeButton>
         </Col>
@@ -69,6 +79,7 @@ const Box = props => {
 export default memo(
   connect(state => ({
     loading: state.centerUnderlying.loading,
-    reportDate: state.centerUnderlying.reportDate,
+    instrumentId: state.centerUnderlying.instrumentId,
+    volReport: state.centerUnderlying.volReport,
   }))(Box),
 );

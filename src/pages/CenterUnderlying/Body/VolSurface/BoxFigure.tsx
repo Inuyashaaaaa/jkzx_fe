@@ -13,10 +13,8 @@ import { getImpliedVolReport } from '@/services/terminal';
 import PosCenter from '@/containers/PosCenter';
 
 const BoxFigure = props => {
-  const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
-  // const [loading, setLoading] = useState(false);
   const [max, setMax] = useState(0);
   const [window, setWindow] = useState('22');
   const $boxFigure = useRef(null);
@@ -31,16 +29,7 @@ const BoxFigure = props => {
     });
   };
 
-  const fetch = async reportDate => {
-    // setLoading(true);
-    const rsp = await getImpliedVolReport({
-      instrumentId,
-      reportDate: reportDate.format('YYYY-MM-DD'),
-    });
-    setLoading(false);
-    const { error, data = [] } = rsp;
-    if (rsp.error) return;
-
+  const fetch = async data => {
     // const d = _.concat(
     //   data,
     //   data.map((item, index) => ({
@@ -96,8 +85,11 @@ const BoxFigure = props => {
   };
 
   useEffect(() => {
-    fetch(props.reportDate);
-  }, [props.reportDate]);
+    console.log(props.volReport);
+    fetch(props.volReport);
+  }, [props.volReport]);
+
+  console.log(meta);
 
   return (
     <>
@@ -217,8 +209,7 @@ const BoxFigure = props => {
 
 export default memo(
   connect(state => ({
-    instrumentId: state.centerUnderlying.instrumentId,
-    reportDate: state.centerUnderlying.reportDate,
+    volReport: state.centerUnderlying.volReport,
     loading: state.centerUnderlying.loading,
   }))(BoxFigure),
 );
