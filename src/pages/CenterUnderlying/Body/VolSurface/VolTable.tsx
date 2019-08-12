@@ -7,13 +7,11 @@ import GradientBox from './GradientBox';
 import { getImpliedVolReport } from '@/services/terminal';
 
 const VolTable = props => {
-  const { instrumentId } = props;
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
-  // const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState();
   const [max, setMax] = useState(0);
   const { loading, dispatch } = props;
@@ -26,15 +24,7 @@ const VolTable = props => {
       },
     });
   };
-  const fetch = async reportDate => {
-    // setLoading(true);
-    const rsp = await getImpliedVolReport({
-      instrumentId,
-      reportDate: reportDate.format('YYYY-MM-DD'),
-    });
-    setLoading(false);
-    const { error, data = {} } = rsp;
-    if (rsp.error) return;
+  const fetch = async data => {
     setTableData(
       data.map(item => ({
         name: item.legalEntityName,
@@ -49,8 +39,8 @@ const VolTable = props => {
   };
 
   useEffect(() => {
-    fetch(props.reportDate);
-  }, [props.reportDate, props.loading]);
+    fetch(props.volReport);
+  }, [props.volReport]);
 
   const columns = [
     {
@@ -111,8 +101,7 @@ const VolTable = props => {
 
 export default memo(
   connect(state => ({
-    instrumentId: state.centerUnderlying.instrumentId,
-    reportDate: state.centerUnderlying.reportDate,
+    volReport: state.centerUnderlying.volReport,
     loading: state.centerUnderlying.loading,
   }))(VolTable),
 );

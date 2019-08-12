@@ -9,7 +9,7 @@ export default {
     activeKey: '0',
     strikeType: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
     fetchStrikeType: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
-    reportDate: moment('2019-08-08'),
+    volReport: [],
   },
   reducers: {
     setState(state, { payload }) {
