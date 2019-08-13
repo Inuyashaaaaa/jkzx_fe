@@ -1,23 +1,17 @@
 /* eslint-disable no-param-reassign */
 import DataSet from '@antv/data-set';
 import { Row } from 'antd';
-import { Axis, Chart, Geom, Tooltip, View, Legend } from 'bizcharts';
-import { scaleLinear } from 'd3-scale';
+import { Axis, Chart, Geom, Tooltip } from 'bizcharts';
 import _ from 'lodash';
 import { connect } from 'dva';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import moment from 'moment';
 
 import { Loading } from '@/containers';
-import { getImpliedVolReport } from '@/services/terminal';
 import PosCenter from '@/containers/PosCenter';
 
 const BoxFigure = props => {
-  const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [max, setMax] = useState(0);
-  const [window, setWindow] = useState('22');
-  const $boxFigure = useRef(null);
   const { loading, dispatch } = props;
 
   const setLoading = data => {
@@ -30,14 +24,6 @@ const BoxFigure = props => {
   };
 
   const fetch = async data => {
-    // const d = _.concat(
-    //   data,
-    //   data.map((item, index) => ({
-    //     ...item,
-    //     legalEntityName: `${item.legalEntityName}${index}`,
-    //   })),
-    // );
-
     const newData = _.slice(_.reverse(_.sortBy(data, 'notionalAmount'), 0, 9));
 
     const dvData = newData.map((item, index) => ({
@@ -85,11 +71,8 @@ const BoxFigure = props => {
   };
 
   useEffect(() => {
-    console.log(props.volReport);
     fetch(props.volReport);
   }, [props.volReport]);
-
-  console.log(meta);
 
   return (
     <>
@@ -192,8 +175,8 @@ const BoxFigure = props => {
               position="x*outliers"
               shape="circle"
               size={3}
-              // color={['key', key => getColor(key)]}
               color="#00e8e8"
+              tooltip={false}
               active={false}
             />
           </Chart>
