@@ -14,16 +14,7 @@ const VolTable = props => {
   });
   const [total, setTotal] = useState();
   const [max, setMax] = useState(0);
-  const { loading, dispatch } = props;
-
-  const setLoading = data => {
-    dispatch({
-      type: 'centerUnderlying/setState',
-      payload: {
-        loading: data,
-      },
-    });
-  };
+  const { dispatch } = props;
   const fetch = async data => {
     setTableData(
       data.map(item => ({
@@ -80,7 +71,6 @@ const VolTable = props => {
       }}
     >
       <ThemeTable
-        loading={loading}
         pagination={{
           ...pagination,
           total,
@@ -102,6 +92,5 @@ const VolTable = props => {
 export default memo(
   connect(state => ({
     volReport: state.centerUnderlying.volReport,
-    loading: state.centerUnderlying.loading,
   }))(VolTable),
 );
