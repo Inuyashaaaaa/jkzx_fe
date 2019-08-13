@@ -21,6 +21,7 @@ import Unit from './containers/Unit';
 import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
 import TableSubsidiaryWhole from './TableSubsidiaryWhole';
 import TableTradeRival from './TableTradeRival';
+import Anchor from '@/containers/Anchor';
 
 const Title = styled.div`
   font-size: 16px;
@@ -44,7 +45,7 @@ const UnitWrap = styled.div`
   height: 60px;
 `;
 
-const Anchor = styled.div`
+const AnchorWrapper = styled.div`
   .anchorLink {
     position: fixed;
     right: 70px;
@@ -90,7 +91,6 @@ const Risk = () => {
     instrumentIdPart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
-  const [visibleTip, setVisibleTip] = useState('');
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
@@ -201,110 +201,29 @@ const Risk = () => {
       align: 'right',
     },
   ];
-
-  const scrollToAnchor = (id: string) => {
-    const anchorElement = document.getElementById(id);
-    if (anchorElement) {
-      anchorElement.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    }
-  };
+  const dataList = [
+    {
+      title: '定位到全市场分品种风险报告',
+      id: 'one',
+    },
+    {
+      title: '定位到各子公司风险报告',
+      id: 'two',
+    },
+    {
+      title: '定位到各子公司分品种风险报告',
+      id: 'three',
+    },
+    {
+      title: '定位到交易对手风险报告',
+      id: 'four',
+    },
+  ];
   return (
     <>
-      <Anchor>
-        <div className="anchorLink">
-          <ul>
-            <li>
-              <Tooltip
-                visible={visibleTip === '定位到全市场分品种风险报告'}
-                placement="left"
-                title="定位到全市场分品种风险报告"
-              >
-                <p
-                  onMouseEnter={() => {
-                    setVisibleTip('定位到全市场分品种风险报告');
-                  }}
-                  onMouseLeave={() => {
-                    setVisibleTip('');
-                  }}
-                  onClick={() => {
-                    setVisibleTip('');
-                    scrollToAnchor('one');
-                  }}
-                >
-                  1
-                </p>
-              </Tooltip>
-            </li>
-            <li>
-              <Tooltip
-                visible={visibleTip === '定位到各子公司风险报告'}
-                placement="left"
-                title="定位到各子公司风险报告"
-              >
-                <p
-                  onMouseEnter={() => {
-                    setVisibleTip('定位到各子公司风险报告');
-                  }}
-                  onMouseLeave={() => {
-                    setVisibleTip('');
-                  }}
-                  onClick={() => {
-                    setVisibleTip('');
-                    scrollToAnchor('two');
-                  }}
-                >
-                  2
-                </p>
-              </Tooltip>
-            </li>
-            <li>
-              <Tooltip
-                visible={visibleTip === '定位到各子公司分品种风险报告'}
-                placement="left"
-                title="定位到各子公司分品种风险报告"
-              >
-                <p
-                  o
-                  onMouseEnter={() => {
-                    setVisibleTip('定位到各子公司分品种风险报告');
-                  }}
-                  onMouseLeave={() => {
-                    setVisibleTip('');
-                  }}
-                  nClick={() => {
-                    setVisibleTip('');
-                    scrollToAnchor('three');
-                  }}
-                >
-                  3
-                </p>
-              </Tooltip>
-            </li>
-            <li>
-              <Tooltip
-                visible={visibleTip === '定位到交易对手风险报告'}
-                placement="left"
-                title="定位到交易对手风险报告"
-              >
-                <p
-                  onMouseEnter={() => {
-                    setVisibleTip('定位到交易对手风险报告');
-                  }}
-                  onMouseLeave={() => {
-                    setVisibleTip('');
-                  }}
-                  onClick={() => {
-                    setVisibleTip('');
-                    scrollToAnchor('four');
-                  }}
-                >
-                  4
-                </p>
-              </Tooltip>
-            </li>
-          </ul>
-        </div>
-      </Anchor>
+      <AnchorWrapper>
+        <Anchor dataList={dataList} placement="left" />
+      </AnchorWrapper>
       <div
         id="one"
         style={{

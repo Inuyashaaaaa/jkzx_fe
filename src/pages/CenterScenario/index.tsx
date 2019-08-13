@@ -20,6 +20,7 @@ import { queryNonGroupResource } from '@/services/tradeBooks';
 import { rptSpotScenariosReportListSearch } from '@/services/report-service';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import ClassicSceneTable from './ ClassicSceneTable';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -388,6 +389,7 @@ const CenterScenario = memo(props => {
         pagination={false}
         rowkey="greekLatter"
       ></ThemeTable>
+      <ClassicSceneTable />
     </>
   );
 });
