@@ -6,7 +6,7 @@ import { Input } from 'antd';
 // eslint-disable-next-line
 const imgPath = require('@/assets/4.png');
 
-const ThemeInputWrap = styled.div`
+const ThemeInputPasswordWrap = styled.div`
   .ant-input {
     border: 1px solid #05507b;
     background: rgba(27, 38, 80, 1);
@@ -18,13 +18,13 @@ const ThemeInputWrap = styled.div`
   }
 `;
 
-const ThemeInput = memo(props => {
+const ThemeInputPassword = memo(props => {
   const { dropdownClassName } = props;
   return (
-    <ThemeInputWrap>
-      <Input {...props}></Input>
-    </ThemeInputWrap>
+    <ThemeInputPasswordWrap>
+      <Input.Password {...props} />
+    </ThemeInputPasswordWrap>
   );
 });
 
-export default ThemeInput;
+export default ThemeInputPassword;
