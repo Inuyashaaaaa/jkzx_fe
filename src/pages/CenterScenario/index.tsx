@@ -33,20 +33,19 @@ const FormItemWrapper = styled.div`
 const Title = styled.div`
   color: rgba(246, 250, 255, 1);
   font-weight: 400;
-  font-size: 16px;
+  font-size: 22px;
   line-height: 32px;
 `;
 
+const ThemeTableWrapper = styled.div`
+  margin-top: 24px;
+`;
 const CenterScenario = memo(props => {
-  const [searchFormData, setSearchFormData] = useState(
-    Form2.createFields({
-      underlyer: '600030.SH',
-    }),
-  );
   const [reportFormData, setReportFormData] = useState(
     Form2.createFields({
       valuationDate: moment(),
       reportType: 'MARKET',
+      underlyer: '600030.SH',
     }),
   );
   const [loading, setLoading] = useState(false);
@@ -93,13 +92,6 @@ const CenterScenario = memo(props => {
     '110',
   ];
 
-  const onSearchFormChange = (props, changedFields, allFields) => {
-    setSearchFormData({
-      ...searchFormData,
-      ...changedFields,
-    });
-  };
-
   const onReportFormChange = (props, changedFields, allFields) => {
     if (changedFields.reportType && Form2.getFieldsValue(changedFields).reportType === 'MARKET') {
       return setReportFormData({
@@ -116,12 +108,8 @@ const CenterScenario = memo(props => {
   };
 
   const onSearch = async () => {
-    const [searchRsp, reportRsp] = await Promise.all([
-      searchForm.current.validate(),
-      reportForm.current.validate(),
-    ]);
-    if (searchRsp.error || reportRsp.error) return;
-    const searchData = Form2.getFieldsValue(searchFormData);
+    const [reportRsp] = await Promise.all([reportForm.current.validate()]);
+    if (reportRsp.error) return;
     const reportData = _.mapValues(
       _.mapKeys(Form2.getFieldsValue(reportFormData), (val, key) => {
         if (key === 'legalName' || key === 'subName') {
@@ -139,10 +127,7 @@ const CenterScenario = memo(props => {
     setLoading(true);
     setTableLoading(true);
 
-    const { error, data } = await rptSpotScenariosReportListSearch({
-      ...searchData,
-      ...reportData,
-    });
+    const { error, data } = await rptSpotScenariosReportListSearch(reportData);
     setLoading(false);
     setTableLoading(false);
     if (error) return;
@@ -162,7 +147,7 @@ const CenterScenario = memo(props => {
     const scenarioId = data[0].scenarios
       .map(item => item.scenarioId)
       .sort((item1, item2) => {
-        console.log(item1.match(/scenario_(\d+)%/));
+        // console.log(item1.match(/scenario_(\d+)%/));
         const num1 = Number(item1.match(/scenario_(\d+)%/)[1]);
         const num2 = Number(item2.match(/scenario_(\d+)%/)[1]);
         return num1 - num2;
@@ -201,6 +186,30 @@ const CenterScenario = memo(props => {
         <FormItem>
           {form.getFieldDecorator({ rules: [{ required: true, message: '观察日必填' }] })(
             <ThemeDatePicker placeholder="" allowClear={false}></ThemeDatePicker>,
+          )}
+        </FormItem>
+      ),
+    },
+    {
+      title: '标的物',
+      dataIndex: 'underlyer',
+      render: (val, record, index, { form }) => (
+        <FormItem>
+          {form.getFieldDecorator({ rules: [{ required: true, message: '标的物必填' }] })(
+            <ThemeSelect
+              fetchOptionsOnSearch
+              showSearch
+              options={async (value: string) => {
+                const { data, error } = await mktInstrumentWhitelistSearch({
+                  instrumentIdPart: value,
+                });
+                if (error) return [];
+                return data.slice(0, 50).map(item => ({
+                  label: item,
+                  value: item,
+                }));
+              }}
+            ></ThemeSelect>,
           )}
         </FormItem>
       ),
@@ -341,10 +350,8 @@ const CenterScenario = memo(props => {
 
   return (
     <>
+      <Title>情景分析</Title>
       <Row type="flex" gutter={18}>
-        <Col>
-          <Title>情景分析</Title>
-        </Col>
         <Col>
           <FormItemWrapper>
             <Form2
@@ -358,36 +365,23 @@ const CenterScenario = memo(props => {
             ></Form2>
           </FormItemWrapper>
         </Col>
-      </Row>
-      <Row type="flex" justify="start" align="middle" style={{ marginBottom: 21, marginTop: 21 }}>
-        <Col>
-          <FormItemWrapper>
-            <Form2
-              hideRequiredMark
-              ref={node => (searchForm.current = node)}
-              dataSource={searchFormData}
-              onFieldsChange={onSearchFormChange}
-              columns={searchFormControls}
-              layout="inline"
-              footer={false}
-            ></Form2>
-          </FormItemWrapper>
-        </Col>
         <Col>
           <ThemeButton onClick={onSearch} type="primary">
             确定
           </ThemeButton>
         </Col>
       </Row>
-      <ThemeTable
-        loading={tableLoading}
-        wrapStyle={{ width: 1685 }}
-        dataSource={dataSource}
-        columns={tableColDefs}
-        scroll={{ x: tableColDefs.length && tableColDefs.length * 150 }}
-        pagination={false}
-        rowkey="greekLatter"
-      ></ThemeTable>
+      <ThemeTableWrapper>
+        <ThemeTable
+          loading={tableLoading}
+          wrapStyle={{ width: 1685 }}
+          dataSource={dataSource}
+          columns={tableColDefs}
+          scroll={{ x: tableColDefs.length && tableColDefs.length * 150 }}
+          pagination={false}
+          rowkey="greekLatter"
+        ></ThemeTable>
+      </ThemeTableWrapper>
     </>
   );
 });
