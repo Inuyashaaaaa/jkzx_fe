@@ -1,13 +1,15 @@
 import React, { memo, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { connect } from 'dva';
-import { Button, Form, Icon, Modal, Row } from 'antd';
+import { Button, Form, Icon, Modal, Row, Popconfirm, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
+import useLifecycles from 'react-use/lib/useLifecycles';
 import { Form2 } from '@/containers';
 import { IFormColDef } from '@/components/type';
 import ThemeInput from '@/containers/ThemeInput';
 import ThemeInputPassword from '@/containers/ThemeInputPassword';
 import ThemeButton from '@/containers/ThemeButton';
+import settings from '@/defaultSettings';
 // import user from '@/models/user';
 
 const AdminWrap = styled.div`
@@ -29,25 +31,13 @@ const AdminWrap = styled.div`
   }
 `;
 
-const UserLayout = memo(props => {
-  //   const { dispatch } = props;
-  const [logon, setLogon] = useState(true);
+const UserLayout = props => {
+  const { login, submitting } = props;
+  const [logon, setLogon] = useState();
   const [formData, setFormData] = useState({});
-  const [user, setUser] = useState({
-    pirture:
-      'https://yyb.gtimg.com/aiplat/page/product/visionimgidy/img/demo6-16a47e5d31.jpg?max_age=31536000',
-    name: 'admin',
-  });
+  const [user, setUser] = useState({});
 
-  const handleSubmit = async () => {
-    const values = Form2.getFieldsValue(formData);
-    props.dispatch({
-      type: 'login/login',
-      payload: values,
-    });
-    setLogon(false);
-  };
-
+  const textLogout = '确定要退出登录吗？';
   const bodyStyle = {
     height: 290,
     background: 'rgba(0,115,139,0.8)',
@@ -90,10 +80,45 @@ const UserLayout = memo(props => {
     },
   ];
 
+  const handleSubmit = async () => {
+    const { error, values } = await formData.validate();
+    if (error) return;
+    values.captcha = '';
+    props.dispatch({
+      type: 'login/login',
+      payload: values,
+    });
+    setLogon(false);
+  };
+
+  const confirm = async () => {
+    props.dispatch({
+      type: 'login/logout',
+    });
+    message.info('退出登录');
+  };
+
+  useLifecycles(() => {
+    const tokenField: any = JSON.parse(window.localStorage.getItem(settings.tokenField));
+    setLogon(!tokenField.loginStatus);
+    setUser({
+      pirture:
+        'https://yyb.gtimg.com/aiplat/page/product/visionimgidy/img/demo6-16a47e5d31.jpg?max_age=31536000',
+      name: tokenField.username,
+    });
+  });
   return (
     <>
       <AdminWrap>
-        <img src={user.pirture} alt="头像" onClick={() => setLogon(true)}></img>
+        <Popconfirm
+          placement="rightTop"
+          title={textLogout}
+          onConfirm={confirm}
+          okText="确定"
+          cancelText="取消"
+        >
+          <img src={user.pirture} alt="头像"></img>
+        </Popconfirm>
         <p>{user.name}</p>
       </AdminWrap>
       <Modal
@@ -106,13 +131,19 @@ const UserLayout = memo(props => {
       >
         <div style={{ marginTop: 25 }}>
           <Form2
+            ref={form => {
+              setFormData(form);
+            }}
             columnNumberOneRow={1}
             wrapperCol={{ span: 16, offset: 4 }}
-            dataSource={formData}
-            onFieldsChange={(props2, changedFields, allFields) => {
-              setFormData({
-                ...formData,
-                ...changedFields,
+            dataSource={login.loginFormData}
+            onFieldsChange={(props2, fields) => {
+              props.dispatch({
+                type: 'login/changeForm',
+                payload: {
+                  ...login.loginFormData,
+                  ...fields,
+                },
               });
             }}
             columns={columns}
@@ -124,7 +155,7 @@ const UserLayout = memo(props => {
                   type="primary"
                   block
                   onClick={handleSubmit}
-                  //   loading={submitting}
+                  loading={submitting}
                 >
                   登 录
                 </ThemeButton>
@@ -135,6 +166,11 @@ const UserLayout = memo(props => {
       </Modal>
     </>
   );
-});
+};
 
-export default UserLayout;
+export default memo(
+  connect(({ login, loading }) => ({
+    login,
+    submitting: loading.effects['login/login'],
+  }))(UserLayout),
+);
