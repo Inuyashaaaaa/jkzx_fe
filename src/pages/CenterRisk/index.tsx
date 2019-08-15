@@ -21,6 +21,7 @@ import Unit from './containers/Unit';
 import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
 import TableSubsidiaryWhole from './TableSubsidiaryWhole';
 import TableTradeRival from './TableTradeRival';
+import TableTradeRivalVarieties from './TableTradeRivalVarieties';
 
 const Title = styled.div`
   font-size: 16px;
@@ -420,6 +421,7 @@ const Risk = () => {
       <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
       <TableSubsidiaryVarieties valuationDate={formData.valuationDate} />
       <TableTradeRival valuationDate={formData.valuationDate} />
+      <TableTradeRivalVarieties valuationDate={formData.valuationDate} />
     </>
   );
 };

@@ -41,7 +41,6 @@ const TableSubsidiaryVarieties = (props: any) => {
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
   const [formData, setFormData] = useState({
-    valuationDate,
     instrumentIdPart: '',
     bookNamePart: '',
   });
@@ -52,7 +51,7 @@ const TableSubsidiaryVarieties = (props: any) => {
     let params;
     if (bool) {
       params = {
-        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+        valuationDate: valuationDate.format('YYYY-MM-DD'),
         page: pagination.current - 1,
         pageSize: pagination.pageSize,
         instrumentIdPart: searchFormData.instrumentIdPart,
@@ -62,7 +61,7 @@ const TableSubsidiaryVarieties = (props: any) => {
       };
     } else {
       params = {
-        valuationDate: searchFormData.valuationDate.format('YYYY-MM-DD'),
+        valuationDate: valuationDate.format('YYYY-MM-DD'),
         page: 0,
         pageSize: pagination.pageSize,
         instrumentIdPart: searchFormData.instrumentIdPart,
@@ -216,7 +215,7 @@ const TableSubsidiaryVarieties = (props: any) => {
               searchMethod: rptSearchPagedMarketRiskBySubUnderlyerReport,
               argument: {
                 searchFormData: {
-                  valuationDate: searchFormData.valuationDate,
+                  valuationDate,
                   instrumentIdPart: searchFormData.instrumentIdPart,
                   bookNamePart: searchFormData.bookNamePart,
                 },
