@@ -55,6 +55,8 @@ const CenterScenario = memo(props => {
   const [dataSource, setDataSource] = useState([]);
   const [tableColDefs, setTableColDefs] = useState([]);
   const [subNameOrBook, setSubNameOrBook] = useState([]);
+  setClassicSceneTable;
+  const [classicSceneTable, setClassicSceneTable] = useState(true);
 
   const searchForm = useRef<Form2>(null);
   const reportForm = useRef<Form2>(null);
@@ -117,6 +119,7 @@ const CenterScenario = memo(props => {
   };
 
   const onSearch = async () => {
+    setClassicSceneTable(!classicSceneTable);
     const [searchRsp, reportRsp] = await Promise.all([
       searchForm.current.validate(),
       reportForm.current.validate(),
@@ -139,7 +142,6 @@ const CenterScenario = memo(props => {
     );
     setLoading(true);
     setTableLoading(true);
-
     const { error, data } = await rptSpotScenariosReportListSearch({
       ...searchData,
       ...reportData,
@@ -163,7 +165,7 @@ const CenterScenario = memo(props => {
     const scenarioId = data[0].scenarios
       .map(item => item.scenarioId)
       .sort((item1, item2) => {
-        console.log(item1.match(/scenario_(\d+)%/));
+        // console.log(item1.match(/scenario_(\d+)%/));
         const num1 = Number(item1.match(/scenario_(\d+)%/)[1]);
         const num2 = Number(item2.match(/scenario_(\d+)%/)[1]);
         return num1 - num2;
@@ -339,7 +341,6 @@ const CenterScenario = memo(props => {
           ];
     setSubNameOrBook(subFields);
   }, [reportFormData]);
-
   return (
     <>
       <Row type="flex" gutter={18}>
@@ -389,7 +390,11 @@ const CenterScenario = memo(props => {
         pagination={false}
         rowkey="greekLatter"
       ></ThemeTable>
-      <ClassicSceneTable />
+      <ClassicSceneTable
+        classicSceneTable={classicSceneTable}
+        valuationDate={Form2.getFieldsValue(reportFormData.valuationDate)}
+        instrumentId={Form2.getFieldsValue(reportFormData.underlyer)}
+      />
     </>
   );
 });
