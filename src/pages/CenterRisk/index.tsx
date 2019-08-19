@@ -265,14 +265,13 @@ const Risk = () => {
                 title="定位到各子公司分品种风险报告"
               >
                 <p
-                  o
                   onMouseEnter={() => {
                     setVisibleTip('定位到各子公司分品种风险报告');
                   }}
                   onMouseLeave={() => {
                     setVisibleTip('');
                   }}
-                  nClick={() => {
+                  onClick={() => {
                     setVisibleTip('');
                     scrollToAnchor('three');
                   }}
