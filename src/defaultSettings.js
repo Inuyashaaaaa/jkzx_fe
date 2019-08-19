@@ -11,5 +11,4 @@ module.exports = {
     '@border-radius-sm': '0px',
   },
   enable: false, // 是否开启动态配置的组件
-  tokenField: 'tongyu_USER_LOCAL_FIELD',
 };
