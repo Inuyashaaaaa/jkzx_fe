@@ -20,6 +20,7 @@ import { queryNonGroupResource } from '@/services/tradeBooks';
 import { rptSpotScenariosReportListSearch } from '@/services/report-service';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import ClassicSceneTable from './ ClassicSceneTable';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -53,6 +54,8 @@ const CenterScenario = memo(props => {
   const [dataSource, setDataSource] = useState([]);
   const [tableColDefs, setTableColDefs] = useState([]);
   const [subNameOrBook, setSubNameOrBook] = useState([]);
+  setClassicSceneTable;
+  const [classicSceneTable, setClassicSceneTable] = useState(true);
 
   const searchForm = useRef<Form2>(null);
   const reportForm = useRef<Form2>(null);
@@ -108,6 +111,7 @@ const CenterScenario = memo(props => {
   };
 
   const onSearch = async () => {
+    setClassicSceneTable(!classicSceneTable);
     const [reportRsp] = await Promise.all([reportForm.current.validate()]);
     if (reportRsp.error) return;
     const reportData = _.mapValues(
@@ -347,7 +351,6 @@ const CenterScenario = memo(props => {
           ];
     setSubNameOrBook(subFields);
   }, [reportFormData]);
-
   return (
     <>
       <Title>情景分析</Title>
@@ -382,6 +385,11 @@ const CenterScenario = memo(props => {
           rowkey="greekLatter"
         ></ThemeTable>
       </ThemeTableWrapper>
+      <ClassicSceneTable
+        classicSceneTable={classicSceneTable}
+        valuationDate={Form2.getFieldsValue(reportFormData.valuationDate)}
+        instrumentId={Form2.getFieldsValue(reportFormData.underlyer)}
+      />
     </>
   );
 });
