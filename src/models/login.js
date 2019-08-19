@@ -1,8 +1,8 @@
+import { notification } from 'antd';
+import router from 'umi/router';
 import { getPageQuery } from '@/tools';
 import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
-import { notification } from 'antd';
 import pageRouters from '../../config/router.config';
-import router from 'umi/router';
 import { updatePermission } from '@/services/permission';
 import { PERMISSIONS } from '@/constants/user';
 
@@ -77,11 +77,11 @@ export default {
       });
 
       const urlParams = new URL(window.location.href);
+      const { pathname } = urlParams;
       const params = getPageQuery();
       let { redirect } = params;
-
-      // CROS 判断
       if (redirect) {
+        // CROS 判断
         const redirectUrlParams = new URL(redirect);
         if (redirectUrlParams.origin === urlParams.origin) {
           redirect = redirect.substr(urlParams.origin.length);
@@ -96,7 +96,7 @@ export default {
 
       const appRoutes = pageRouters.find(item => !!item.appRoute);
       if (!validateRedirect(appRoutes, redirect, updatedPermissionUserInfo.permissions)) {
-        redirect = '/welcome-page';
+        redirect = '/center/underlying';
       }
 
       router.push({
@@ -130,6 +130,13 @@ export default {
         type: 'user/cleanCurrentUser',
       });
 
+      const urlParams = new URL(window.location.href);
+      const { pathname } = urlParams;
+      if (pathname.split('/')[1] === 'center') {
+        router.push('/center/login');
+        return;
+      }
+
       router.push({
         pathname: '/user/login',
         query: {
@@ -141,7 +148,7 @@ export default {
       //   redirect: window.location.href,
       // })}`;
     },
-
+    // eslint-disable-next-line
     *updatePassword({ payload }, { call, put }) {
       const { data } = yield call(updateOwnPassword, payload);
       if (!data || data.error) {
@@ -150,7 +157,7 @@ export default {
         });
       }
       notification.success({
-        message: `更新成功`,
+        message: '更新成功',
       });
       yield put({
         type: 'queryCaptcha',
