@@ -341,3 +341,13 @@ export async function rptClassicScenarioMarketRiskReportListByDate(params = {}) 
     },
   });
 }
+
+export async function rptSearchPagedCounterPartyMarketRiskByUnderlyerReport(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'rptSearchPagedCounterPartyMarketRiskByUnderlyerReport',
+      params,
+    },
+  });
+}

@@ -22,6 +22,7 @@ import TableSubsidiaryVarieties from './TableSubsidiaryVarieties';
 import TableSubsidiaryWhole from './TableSubsidiaryWhole';
 import TableTradeRival from './TableTradeRival';
 import Anchor from '@/containers/Anchor';
+import TableTradeRivalVarieties from './TableTradeRivalVarieties';
 
 const Title = styled.div`
   font-size: 16px;
@@ -218,6 +219,10 @@ const Risk = () => {
       title: '定位到交易对手风险报告',
       id: 'four',
     },
+    {
+      title: '定位到交易对手分品种风险报告',
+      id: 'five',
+    },
   ];
   return (
     <>
@@ -339,6 +344,7 @@ const Risk = () => {
       <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
       <TableSubsidiaryVarieties valuationDate={formData.valuationDate} />
       <TableTradeRival valuationDate={formData.valuationDate} />
+      <TableTradeRivalVarieties valuationDate={formData.valuationDate} />
     </>
   );
 };

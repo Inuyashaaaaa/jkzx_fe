@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
-import { rptSearchPagedSubsidiaryMarketRiskReport } from '@/services/report-service';
+import { rptSearchPagedCounterPartyMarketRiskByUnderlyerReport } from '@/services/report-service';
 import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
@@ -30,8 +30,9 @@ const UnitWrap = styled.div`
   height: 60px;
 `;
 
-const TableSubsidiaryWhole = (props: any) => {
+const TableTradeRivalVarieties = (props: any) => {
   const { valuationDate } = props;
+  //   const [valuationDate, setValuationDate] = useState(props.valuationDate);
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -41,24 +42,36 @@ const TableSubsidiaryWhole = (props: any) => {
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
   const [formData, setFormData] = useState({
-    subsidiaryPart: '',
+    instrumentIdPart: '',
+    partyNamePart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
-    const params = {
-      valuationDate: valuationDate.format('YYYY-MM-DD'),
-      page: 0,
-      pageSize: pagination.pageSize,
-      subsidiaryPart: searchFormData.subsidiaryPart,
-      order: ORDER_BY[sorter.order],
-      orderBy: sorter.field,
-    };
+    let params;
     if (bool) {
-      params.page = pagination.current - 1;
+      params = {
+        valuationDate: valuationDate.format('YYYY-MM-DD'),
+        page: pagination.current - 1,
+        pageSize: pagination.pageSize,
+        instrumentIdPart: searchFormData.instrumentIdPart,
+        partyNamePart: searchFormData.partyNamePart,
+        order: ORDER_BY[sorter.order],
+        orderBy: sorter.field,
+      };
+    } else {
+      params = {
+        valuationDate: valuationDate.format('YYYY-MM-DD'),
+        page: 0,
+        pageSize: pagination.pageSize,
+        instrumentIdPart: searchFormData.instrumentIdPart,
+        partyNamePart: searchFormData.partyNamePart,
+        order: ORDER_BY[sorter.order],
+        orderBy: sorter.field,
+      };
     }
-    const rsp = await rptSearchPagedSubsidiaryMarketRiskReport(params);
+    const rsp = await rptSearchPagedCounterPartyMarketRiskByUnderlyerReport(params);
     setLoading(false);
     const { error, data = {} } = rsp;
     const { page, totalCount } = data;
@@ -66,6 +79,11 @@ const TableSubsidiaryWhole = (props: any) => {
     setTableData(page);
     setTotal(totalCount);
   };
+  console.log(valuationDate.format('YYYY-MM-DD'));
+  //   useEffect(() => {
+  //     setValuationDate(props.valuationDate)
+  //     console.log('initialCount changed', valuationDate.format());
+  //   }, [props.valuationDate]);
 
   useEffect(() => {
     fetch(false);
@@ -77,15 +95,38 @@ const TableSubsidiaryWhole = (props: any) => {
 
   const columns = [
     {
-      title: '子公司名称',
-      dataIndex: 'subsidiary',
+      title: '交易对手',
+      dataIndex: 'partyName',
       width: 100,
+    },
+    {
+      title: '标的物合约',
+      dataIndex: 'underlyerInstrumentId',
+      width: 100,
+    },
+    {
+      title: 'Delta',
+      dataIndex: 'delta',
+      width: 100,
+      sortOrder: sorter.field === 'delta' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
     },
     {
       title: 'Delta_Cash',
       dataIndex: 'deltaCash',
       width: 100,
       sortOrder: sorter.field === 'deltaCash' && sorter.order,
+      sorter: true,
+      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      align: 'right',
+    },
+    {
+      title: 'Gamma',
+      dataIndex: 'gamma',
+      width: 100,
+      sortOrder: sorter.field === 'gamma' && sorter.order,
       sorter: true,
       render: value => formatNumber({ value, formatter: '0,0.00' }),
       align: 'right',
@@ -129,8 +170,8 @@ const TableSubsidiaryWhole = (props: any) => {
   ];
 
   return (
-    <div id="two" style={{ width: 1080, marginTop: 25 }}>
-      <Title>各子公司风险报告</Title>
+    <div id="five" style={{ width: 1620, marginTop: '25px' }}>
+      <Title>交易对手分品种风险报告</Title>
       <Row
         type="flex"
         justify="space-between"
@@ -142,11 +183,20 @@ const TableSubsidiaryWhole = (props: any) => {
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
               <ThemeInput
-                value={formData.subsidiaryPart}
+                value={formData.partyNamePart}
                 onChange={event => {
-                  setFormData({ ...formData, subsidiaryPart: _.get(event.target, 'value') });
+                  setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
                 }}
                 placeholder="请输入搜索子公司"
+              ></ThemeInput>
+            </Col>
+            <Col>
+              <ThemeInput
+                value={formData.instrumentIdPart}
+                onChange={event => {
+                  setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
+                }}
+                placeholder="请输入搜索标的物"
               ></ThemeInput>
             </Col>
             <Col>
@@ -168,18 +218,19 @@ const TableSubsidiaryWhole = (props: any) => {
             component={ThemeButton}
             type="primary"
             data={{
-              searchMethod: rptSearchPagedSubsidiaryMarketRiskReport,
+              searchMethod: rptSearchPagedCounterPartyMarketRiskByUnderlyerReport,
               argument: {
                 searchFormData: {
                   valuationDate,
-                  subsidiaryPart: searchFormData.subsidiaryPart,
+                  instrumentIdPart: searchFormData.instrumentIdPart,
+                  partyNamePart: searchFormData.partyNamePart,
                 },
               },
               cols: columns,
               name: '风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'subsidiaryPart' && rowIndex > 0) {
+                if (dataIndex !== 'partyNamePart' && rowIndex > 0) {
                   return {
                     t: 'n',
                     z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
@@ -221,4 +272,4 @@ const TableSubsidiaryWhole = (props: any) => {
   );
 };
 
-export default TableSubsidiaryWhole;
+export default TableTradeRivalVarieties;
