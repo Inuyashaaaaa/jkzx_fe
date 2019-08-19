@@ -12,7 +12,6 @@ const removeImg = require('@/assets/6.png');
 
 const ThemeSelectWrap = styled.div`
   .ant-select-selection {
-    width: 200px;
     border: 1px solid #05507b;
     border-radius: 3px;
     background: transparent;
