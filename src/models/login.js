@@ -96,11 +96,7 @@ export default {
 
       const appRoutes = pageRouters.find(item => !!item.appRoute);
       if (!validateRedirect(appRoutes, redirect, updatedPermissionUserInfo.permissions)) {
-        if (pathname.split('/')[1] === 'center') {
-          redirect = '/center/underlying';
-        } else {
-          redirect = '/welcome-page';
-        }
+        redirect = '/center/underlying';
       }
 
       router.push({

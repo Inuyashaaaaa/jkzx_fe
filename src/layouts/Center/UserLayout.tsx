@@ -14,6 +14,7 @@ const AdminWrap = styled.div`
     border-radius: 50%;
     width: 50px;
     height: 50px;
+    cursor: pointer;
   }
   p {
     font-size: 14px;
@@ -46,20 +47,18 @@ const UserLayout = props => {
     });
   });
   return (
-    <>
-      <AdminWrap>
-        <Popconfirm
-          placement="rightTop"
-          title={textLogout}
-          onConfirm={confirm}
-          okText="确定"
-          cancelText="取消"
-        >
-          <img src={user.pirture} alt="头像"></img>
-        </Popconfirm>
-        <p>{user.name}</p>
-      </AdminWrap>
-    </>
+    <AdminWrap>
+      <Popconfirm
+        placement="rightTop"
+        title={textLogout}
+        onConfirm={confirm}
+        okText="确定"
+        cancelText="取消"
+      >
+        <img src={user.pirture} alt="头像"></img>
+      </Popconfirm>
+      <p>{user.name}</p>
+    </AdminWrap>
   );
 };
 

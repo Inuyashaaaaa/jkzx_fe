@@ -32,7 +32,7 @@ export default [
   },
   {
     path: '/',
-    redirect: '/welcome-page',
+    redirect: '/center/underlying',
   },
   {
     path: '/center',
