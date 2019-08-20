@@ -87,6 +87,7 @@ const Risk = () => {
   const [loading, setLoading] = useState(false);
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
+  const [store, setStore] = useState({});
   const [formData, setFormData] = useState({
     valuationDate: moment(),
     instrumentIdPart: '',
@@ -125,12 +126,21 @@ const Risk = () => {
   };
 
   useEffect(() => {
-    fetch(false);
+    if (store.first) {
+      fetch(false);
+    }
   }, [sorter, searchFormData]);
 
   useEffect(() => {
-    fetch(true);
+    if (store.first) {
+      fetch(true);
+    }
   }, [pagination]);
+
+  useEffect(() => {
+    fetch(false);
+    setStore({ first: true });
+  }, []);
 
   const columns = [
     {

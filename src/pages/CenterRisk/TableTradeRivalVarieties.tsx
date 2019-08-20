@@ -41,6 +41,7 @@ const TableTradeRivalVarieties = (props: any) => {
   const [loading, setLoading] = useState(false);
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
+  const [store, setStore] = useState({});
   const [formData, setFormData] = useState({
     instrumentIdPart: '',
     partyNamePart: '',
@@ -79,19 +80,23 @@ const TableTradeRivalVarieties = (props: any) => {
     setTableData(page);
     setTotal(totalCount);
   };
-  console.log(valuationDate.format('YYYY-MM-DD'));
-  //   useEffect(() => {
-  //     setValuationDate(props.valuationDate)
-  //     console.log('initialCount changed', valuationDate.format());
-  //   }, [props.valuationDate]);
 
   useEffect(() => {
-    fetch(false);
+    if (store.first) {
+      fetch(false);
+    }
   }, [sorter, searchFormData]);
 
   useEffect(() => {
-    fetch(true);
+    if (store.first) {
+      fetch(true);
+    }
   }, [pagination]);
+
+  useEffect(() => {
+    fetch(false);
+    setStore({ first: true });
+  }, []);
 
   const columns = [
     {
