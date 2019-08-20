@@ -60,3 +60,15 @@ export async function getImpliedVolReport(params = {}) {
     },
   });
 }
+
+export async function getHistoricalAndNeutralVolList(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'getHistoricalAndNeutralVolList',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}

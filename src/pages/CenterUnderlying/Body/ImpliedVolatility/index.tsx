@@ -1,4 +1,4 @@
-import { Col, Row } from 'antd';
+import { Col, Row, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useRef, useState } from 'react';
 import Mock from 'mockjs';
@@ -13,8 +13,9 @@ import { Form2, Loading } from '@/containers';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeSelect from '@/containers/ThemeSelect';
-import { delay } from '@/tools';
+import { delay, getMoment } from '@/tools';
 import PosCenter from '@/containers/PosCenter';
+import { getHistoricalAndNeutralVolList } from '@/services/terminal';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -41,9 +42,9 @@ const ImpliedVolatility = props => {
 
   const newData = dataSource.map(item => ({
     ...item,
-    min: [item.minVol, item.impliedVol],
-    max: [item.impliedVol, item.maxVol],
-    middle: [item.impliedVol, item.impliedVol],
+    min: [item.minVol, item.neutralVol],
+    max: [item.neutralVol, item.maxVol],
+    middle: [item.neutralVol, item.neutralVol],
   }));
 
   const dv = new DataSet.View().source(newData);
@@ -54,26 +55,39 @@ const ImpliedVolatility = props => {
     value: 'vol',
   });
 
-  const mockData = () =>
-    Mock.mock({
-      'data|10': [
-        {
-          instrumentId: '@string(8)',
-          minVol: '@natural(1,4)',
-          maxVol: '@natural(7,9)',
-          impliedVol: '@natural(5,6)',
-        },
-      ],
-    });
+  // const mockData = () =>
+  //   Mock.mock({
+  //     'data|10': [
+  //       {
+  //         instrumentId: '@string(8)',
+  //         minVol: '@natural(1,4)',
+  //         maxVol: '@natural(7,9)',
+  //         neutralVol: '@natural(5,6)',
+  //       },
+  //     ],
+  //   });
+  const formatDate = data => ({
+    startDate: getMoment(data.valuationDate[0]).format('YYYY-MM-DD'),
+    endDate: getMoment(data.valuationDate[1]).format('YYYY-MM-DD'),
+    window: data.window,
+  });
 
   const onSearch = async () => {
     const rsp = await formRef.current.validate();
     if (rsp.error) return;
+    const formatFormData = formatDate(Form2.getFieldsValue(formData));
     setLoading(true);
-    const result = delay(1000, mockData()).then(rsps => {
-      setLoading(false);
-      const { data } = rsps;
-      setDataSource(data);
+
+    const { data, error } = await getHistoricalAndNeutralVolList({
+      instrumentIds,
+      isPrimary: true,
+      ...formatFormData,
+    });
+    setLoading(false);
+    if (error) return;
+    setDataSource(data.data);
+    data.diagnostics.forEach(item => {
+      message.error(item.message);
     });
   };
 
@@ -222,20 +236,20 @@ const ImpliedVolatility = props => {
               }}
               shared={false}
               itemTpl={
-                '<li data-index={index} style="margin-bottom:4px;"><span style="padding-left: 16px">最大值：{maxVol}</span><br/><span style="padding-left: 16px">最小值：{minVol}</span><br/><span style="padding-left: 16px">波动率：{impliedVol}</span></li>'
+                '<li data-index={index} style="margin-bottom:4px;"><span style="padding-left: 16px">最大值：{maxVol}</span><br/><span style="padding-left: 16px">最小值：{minVol}</span><br/><span style="padding-left: 16px">波动率：{neutralVol}</span></li>'
               }
             ></Tooltip>
             <Geom
               type="interval"
               position="instrumentId*vol"
               tooltip={[
-                'min*max*minVol*maxVol*impliedVol',
-                (min, max, minVol, maxVol, impliedVol) => ({
+                'min*max*minVol*maxVol*neutralVol',
+                (min, max, minVol, maxVol, neutralVol) => ({
                   min,
                   max,
                   minVol,
                   maxVol,
-                  impliedVol,
+                  neutralVol,
                 }),
               ]}
               color={['name', val => (val === 'max' ? '#F15345' : '#7070D3')]}
