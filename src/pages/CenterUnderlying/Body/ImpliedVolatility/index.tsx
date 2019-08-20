@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { Col, Row, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useRef, useState } from 'react';
@@ -31,7 +32,7 @@ const ImpliedVolatility = props => {
   const [formData, setFormData] = useState(
     Form2.createFields({
       valuationDate: [moment().subtract(2, 'years'), moment()],
-      window: '22',
+      window: 22,
     }),
   );
   const [dataSource, setDataSource] = useState([]);
@@ -55,17 +56,6 @@ const ImpliedVolatility = props => {
     value: 'vol',
   });
 
-  // const mockData = () =>
-  //   Mock.mock({
-  //     'data|10': [
-  //       {
-  //         instrumentId: '@string(8)',
-  //         minVol: '@natural(1,4)',
-  //         maxVol: '@natural(7,9)',
-  //         neutralVol: '@natural(5,6)',
-  //       },
-  //     ],
-  //   });
   const formatDate = data => ({
     startDate: getMoment(data.valuationDate[0]).format('YYYY-MM-DD'),
     endDate: getMoment(data.valuationDate[1]).format('YYYY-MM-DD'),
@@ -186,9 +176,11 @@ const ImpliedVolatility = props => {
             forceFit
             data={dv}
             scale={{
-              instrumentId: { alias: '标的物品种' },
-              vol: { alias: '波动率', min: 0, max: 10 },
-              middle: { min: 0, max: 10 },
+              instrumentId: {
+                alias: '标的物品种',
+              },
+              vol: { alias: '波动率', min: 0, max: 2 },
+              middle: { min: 0, max: 2 },
             }}
           >
             <Axis
@@ -236,11 +228,20 @@ const ImpliedVolatility = props => {
               }}
               shared={false}
               itemTpl={
-                '<li data-index={index} style="margin-bottom:4px;"><span style="padding-left: 16px">最大值：{maxVol}</span><br/><span style="padding-left: 16px">最小值：{minVol}</span><br/><span style="padding-left: 16px">波动率：{neutralVol}</span></li>'
+                '<li data-index={index} style="margin-bottom:4px;"><span style="padding-left: 16px">最大值：{maxVol}</span><br/><span style="padding-left: 16px">最小值：{minVol}</span><br/><span style="padding-left: 16px">公允波动率点：{neutralVol}</span></li>'
               }
             ></Tooltip>
             <Geom
               type="interval"
+              size={[
+                'instrumentId',
+                instrumentId => {
+                  if (dataSource.length < 10) {
+                    return 80;
+                  }
+                  return;
+                },
+              ]}
               position="instrumentId*vol"
               tooltip={[
                 'min*max*minVol*maxVol*neutralVol',
@@ -256,6 +257,15 @@ const ImpliedVolatility = props => {
             ></Geom>
             <Geom
               type="interval"
+              size={[
+                'instrumentId',
+                instrumentId => {
+                  if (dataSource.length < 10) {
+                    return 80;
+                  }
+                  return;
+                },
+              ]}
               position="instrumentId*middle"
               tooltip={false}
               style={{
