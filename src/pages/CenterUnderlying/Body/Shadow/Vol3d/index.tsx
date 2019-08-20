@@ -59,7 +59,7 @@ const STATUS = {
 };
 
 const Vol = props => {
-  const { instrumentId, data, dispatch, loading, strikeType } = props;
+  const { instrumentId, data = {}, dispatch, loading, strikeType } = props;
   const [meta, setMeta] = useState();
   const [valuationDate, setValuationDate] = useState(moment('2019-08-01'));
   const [status, setStatus] = useState(STATUS.CHART);
