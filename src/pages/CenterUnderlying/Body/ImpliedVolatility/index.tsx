@@ -178,6 +178,8 @@ const ImpliedVolatility = props => {
             scale={{
               instrumentId: {
                 alias: '标的物品种',
+                type: 'cat',
+                ...(dataSource.length < 10 ? { range: [0.08, dataSource.length * 0.1] } : {}),
               },
               vol: { alias: '波动率', min: 0, max: 2 },
               middle: { min: 0, max: 2 },
