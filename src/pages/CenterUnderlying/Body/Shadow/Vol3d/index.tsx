@@ -128,8 +128,10 @@ const Vol = props => {
 
     const rowsData = _.map(instruments, val => {
       const { vols = [], tenor } = val;
+      const itemName = strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
+      vols.sort((a, b) => a[itemName] - b[itemName]);
       return vols.map(item => ({
-        [tenor]: item[strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent'],
+        [tenor]: item[itemName],
       }));
     });
     const tableData = [];
