@@ -183,7 +183,7 @@ const Vol = props => {
         },
         xAxis3D: {
           type: 'value',
-          name: 'strike_percentage',
+          name: `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'}`,
           nameTextStyle: {
             fontSize: 13,
           },
