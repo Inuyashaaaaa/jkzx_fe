@@ -40,6 +40,7 @@ const TableSubsidiaryVarieties = (props: any) => {
   const [loading, setLoading] = useState(false);
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
+  const [store, setStore] = useState({});
   const [formData, setFormData] = useState({
     instrumentIdPart: '',
     bookNamePart: '',
@@ -80,12 +81,21 @@ const TableSubsidiaryVarieties = (props: any) => {
   };
 
   useEffect(() => {
-    fetch(false);
+    if (store.first) {
+      fetch(false);
+    }
   }, [sorter, searchFormData]);
 
   useEffect(() => {
-    fetch(true);
+    if (store.first) {
+      fetch(true);
+    }
   }, [pagination]);
+
+  useEffect(() => {
+    fetch(false);
+    setStore({ first: true });
+  }, []);
 
   const columns = [
     {
