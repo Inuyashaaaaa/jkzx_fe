@@ -20,9 +20,19 @@ export default [
       { path: '/user/register-result', component: './User/RegisterResult' },
     ],
   },
+  // center login
+  {
+    path: '/center/login',
+    component: './User/Login/Center',
+  },
+
+  {
+    path: '/component-test',
+    component: './ComponentTest/index',
+  },
   {
     path: '/',
-    redirect: '/welcome-page',
+    redirect: '/center/underlying',
   },
   {
     path: '/center',
