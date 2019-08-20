@@ -131,7 +131,8 @@ const Vol = props => {
       const itemName = strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
       vols.sort((a, b) => a[itemName] - b[itemName]);
       return vols.map(item => ({
-        [tenor]: item[itemName],
+        [tenor]: item.quote,
+        percent: item[strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent'],
       }));
     });
     const tableData = [];
@@ -273,6 +274,14 @@ const Vol = props => {
         />
       );
     }
+
+    const ColumnsHead = [
+      {
+        title: 'strike_percentage/期限',
+        dataIndex: 'percent',
+      },
+    ];
+
     return (
       <ThemeTable
         style={{ width: 828 }}
@@ -281,7 +290,7 @@ const Vol = props => {
           simple: true,
         }}
         dataSource={meta.tableData}
-        columns={meta.tableColumns}
+        columns={_.concat(ColumnsHead, ...meta.tableColumns)}
       />
     );
   };
