@@ -128,6 +128,8 @@ const Vol = props => {
 
     const rowsData = _.map(instruments, val => {
       const { vols = [], tenor } = val;
+      const itemName = strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
+      vols.sort((a, b) => a[itemName] - b[itemName]);
       return vols.map(item => ({
         [tenor]: item.quote,
         percent: item[strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent'],
@@ -182,7 +184,7 @@ const Vol = props => {
         },
         xAxis3D: {
           type: 'value',
-          name: 'strike_percentage',
+          name: `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'}`,
           nameTextStyle: {
             fontSize: 13,
           },
