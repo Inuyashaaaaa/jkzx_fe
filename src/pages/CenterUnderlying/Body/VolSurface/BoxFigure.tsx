@@ -142,7 +142,16 @@ const BoxFigure = props => {
                   stroke: '#00BAFF',
                 },
               }}
-              itemTpl='<li data-index={index} style="margin-bottom:4px;"><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}<br/><span style="padding-left: 16px">最大值：{high}</span><br/><span style="padding-left: 16px">上四分位数：{q3}</span><br/><span style="padding-left: 16px">中位数：{median}</span><br/><span style="padding-left: 16px">下四分位数：{q1}</span><br/><span style="padding-left: 16px">最小值：{low}</span><br/></li>'
+              itemTpl='
+              <li data-index={index} style="margin-bottom:4px;">
+                <span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}<br/>
+                <span style="padding-left: 16px">最大值：{high}</span><br/>
+                <span style="padding-left: 16px">上四分位数：{q3}</span><br/>
+                <span style="padding-left: 16px">中位数：{median}</span><br/>
+                <span style="padding-left: 16px">平均数：{outlier}</span><br/>
+                <span style="padding-left: 16px">下四分位数：{q1}</span><br/>
+                <span style="padding-left: 16px">最小值：{low}</span><br/>
+              </li>'
             />
             <Geom
               type="schema"
@@ -151,12 +160,13 @@ const BoxFigure = props => {
               opacity={0.9}
               color={['key', key => getColor(key)]}
               tooltip={[
-                'x*low*q1*median*q3*high',
-                (x, low, q1, median, q3, high) => ({
+                'x*low*q1*median*outliers*q3*high',
+                (x, low, q1, median, outliers, q3, high) => ({
                   name: x,
                   low,
                   q1,
                   median,
+                  outlier: outliers[0],
                   q3,
                   high,
                 }),
