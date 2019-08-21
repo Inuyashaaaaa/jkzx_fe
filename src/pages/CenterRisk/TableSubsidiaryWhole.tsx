@@ -139,7 +139,7 @@ const TableSubsidiaryWhole = (props: any) => {
   ];
 
   return (
-    <div id="two" style={{ width: 1080, marginTop: 25 }}>
+    <div style={{ width: 1080 }}>
       <Title>各子公司风险报告</Title>
       <Row
         type="flex"
