@@ -4,8 +4,6 @@ import styled from 'styled-components';
 import _ from 'lodash';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
-import { rptSearchPagedCounterPartyMarketRiskReport } from '@/services/report-service';
-import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './containers/Unit';
@@ -30,8 +28,18 @@ const UnitWrap = styled.div`
   height: 60px;
 `;
 
-const TableTradeRival = (props: any) => {
-  const { valuationDate } = props;
+const TableRisk = (props: any) => {
+  const {
+    title,
+    style,
+    riskButton,
+    dataValue,
+    riskColumns,
+    tableParams,
+    method,
+    searchParams,
+    valuationDate,
+  } = props;
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -42,24 +50,18 @@ const TableTradeRival = (props: any) => {
   const [total, setTotal] = useState();
   const [store, setStore] = useState({});
   const [formData, setFormData] = useState({
-    partyNamePart: '',
+    instrumentIdPart: '',
+    bookNamePart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
-    const params = {
-      valuationDate: valuationDate.format('YYYY-MM-DD'),
-      page: 0,
-      pageSize: pagination.pageSize,
-      partyNamePart: searchFormData.partyNamePart,
-      order: ORDER_BY[sorter.order],
-      orderBy: sorter.field,
-    };
+    const params = tableParams(valuationDate, pagination, searchFormData, ORDER_BY, sorter);
     if (bool) {
       params.page = pagination.current - 1;
     }
-    const rsp = await rptSearchPagedCounterPartyMarketRiskReport(params);
+    const rsp = await method(params);
     setLoading(false);
     const { error, data = {} } = rsp;
     const { page, totalCount } = data;
@@ -85,62 +87,10 @@ const TableTradeRival = (props: any) => {
     setStore({ first: true });
   }, []);
 
-  const columns = [
-    {
-      title: '交易对手',
-      dataIndex: 'partyName',
-      width: 100,
-    },
-    {
-      title: 'Delta_Cash',
-      dataIndex: 'deltaCash',
-      width: 100,
-      sortOrder: sorter.field === 'deltaCash' && sorter.order,
-      sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
-      align: 'right',
-    },
-    {
-      title: 'Gamma_Cash',
-      dataIndex: 'gammaCash',
-      width: 100,
-      sortOrder: sorter.field === 'gammaCash' && sorter.order,
-      sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
-      align: 'right',
-    },
-    {
-      title: 'Vega',
-      dataIndex: 'vega',
-      width: 100,
-      sortOrder: sorter.field === 'vega' && sorter.order,
-      sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
-      align: 'right',
-    },
-    {
-      title: 'Theta',
-      dataIndex: 'theta',
-      width: 100,
-      sortOrder: sorter.field === 'theta' && sorter.order,
-      sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
-      align: 'right',
-    },
-    {
-      title: 'Rho',
-      dataIndex: 'rho',
-      width: 100,
-      sortOrder: sorter.field === 'rho' && sorter.order,
-      sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
-      align: 'right',
-    },
-  ];
-
+  const columns = riskColumns(sorter);
   return (
-    <div id="four" style={{ width: 1080, marginTop: '25px' }}>
-      <Title>交易对手风险报告</Title>
+    <div style={style}>
+      <Title>{title}</Title>
       <Row
         type="flex"
         justify="space-between"
@@ -150,15 +100,45 @@ const TableTradeRival = (props: any) => {
       >
         <Col>
           <Row type="flex" justify="start" align="middle" gutter={12}>
-            <Col>
-              <ThemeInput
-                value={formData.partyNamePart}
-                onChange={event => {
-                  setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
-                }}
-                placeholder="请输入搜索交易对手"
-              ></ThemeInput>
-            </Col>
+            {riskButton.bookNamePart ? (
+              <Col>
+                <ThemeInput
+                  value={formData.bookNamePart}
+                  onChange={event => {
+                    setFormData({ ...formData, bookNamePart: _.get(event.target, 'value') });
+                  }}
+                  placeholder="请输入搜索子公司"
+                ></ThemeInput>
+              </Col>
+            ) : (
+              ''
+            )}
+            {riskButton.partyNamePart ? (
+              <Col>
+                <ThemeInput
+                  value={formData.partyNamePart}
+                  onChange={event => {
+                    setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
+                  }}
+                  placeholder="请输入搜索子公司"
+                ></ThemeInput>
+              </Col>
+            ) : (
+              ''
+            )}
+            {riskButton.instrumentIdPart ? (
+              <Col>
+                <ThemeInput
+                  value={formData.instrumentIdPart}
+                  onChange={event => {
+                    setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
+                  }}
+                  placeholder="请输入搜索标的物"
+                ></ThemeInput>
+              </Col>
+            ) : (
+              ''
+            )}
             <Col>
               <ThemeButton
                 type="primary"
@@ -178,18 +158,15 @@ const TableTradeRival = (props: any) => {
             component={ThemeButton}
             type="primary"
             data={{
-              searchMethod: rptSearchPagedCounterPartyMarketRiskReport,
+              searchMethod: method,
               argument: {
-                searchFormData: {
-                  valuationDate,
-                  partyNamePart: searchFormData.partyNamePart,
-                },
+                searchFormData: searchParams(valuationDate, searchFormData),
               },
               cols: columns,
               name: '风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'partyNamePart' && rowIndex > 0) {
+                if (dataIndex !== dataValue && rowIndex > 0) {
                   return {
                     t: 'n',
                     z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
@@ -231,4 +208,4 @@ const TableTradeRival = (props: any) => {
   );
 };
 
-export default TableTradeRival;
+export default TableRisk;
