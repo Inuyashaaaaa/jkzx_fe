@@ -203,6 +203,7 @@ const CenterScenario = memo(props => {
             <ThemeSelect
               fetchOptionsOnSearch
               showSearch
+              style={{ minWidth: 200 }}
               options={async (value: string) => {
                 const { data, error } = await mktInstrumentWhitelistSearch({
                   instrumentIdPart: value,
@@ -225,6 +226,7 @@ const CenterScenario = memo(props => {
         <FormItem>
           {form.getFieldDecorator({ rules: [{ required: true, message: '数据范围必填' }] })(
             <ThemeSelect
+              style={{ minWidth: 200 }}
               options={[
                 {
                   label: '全市场',
@@ -257,6 +259,7 @@ const CenterScenario = memo(props => {
             <ThemeSelect
               fetchOptionsOnSearch
               showSearch
+              style={{ minWidth: 200 }}
               options={async (value: string) => {
                 const { data, error } = await mktInstrumentWhitelistSearch({
                   instrumentIdPart: value,
@@ -305,6 +308,7 @@ const CenterScenario = memo(props => {
                     <ThemeSelect
                       filterOption
                       showSearch
+                      style={{ minWidth: 200 }}
                       key="subName"
                       options={async (value: string) => {
                         const { data, error } = await queryNonGroupResource();
@@ -332,6 +336,7 @@ const CenterScenario = memo(props => {
                     <ThemeSelect
                       fetchOptionsOnSearch
                       showSearch
+                      style={{ minWidth: 200 }}
                       key="legalName"
                       options={async (value: string) => {
                         const { data, error } = await refSimilarLegalNameList({
