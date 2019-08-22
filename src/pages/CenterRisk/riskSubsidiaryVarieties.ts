@@ -1,15 +1,18 @@
+import React from 'react';
 import formatNumber from '@/utils/format';
 
 export const columns = sorter => [
   {
-    title: '交易对手',
-    dataIndex: 'partyName',
+    title: '子公司名称',
+    dataIndex: 'bookName',
     width: 100,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '标的物合约',
     dataIndex: 'underlyerInstrumentId',
     width: 100,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: 'Delta',
@@ -19,6 +22,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Delta_Cash',
@@ -28,6 +32,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Gamma',
@@ -37,6 +42,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Gamma_Cash',
@@ -46,6 +52,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Vega',
@@ -55,6 +62,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Theta',
@@ -64,6 +72,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Rho',
@@ -73,6 +82,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
 ];
 
@@ -88,7 +98,7 @@ export const params = (
     page: 0,
     pageSize: pagination.pageSize,
     instrumentIdPart: searchFormData.instrumentIdPart,
-    partyNamePart: searchFormData.partyNamePart,
+    bookNamePart: searchFormData.bookNamePart,
     order: ORDER_BY[sorter.order],
     orderBy: sorter.field,
   };
@@ -99,12 +109,12 @@ export const searchParams = (valuationDate, searchFormData) => {
   const obj = {
     valuationDate,
     instrumentIdPart: searchFormData.instrumentIdPart,
-    partyNamePart: searchFormData.partyNamePart,
+    bookNamePart: searchFormData.bookNamePart,
   };
   return obj;
 };
 
-export const TableTradeRivalVarieties = {
+export const riskSubsidiaryVarieties = {
   columns,
   params,
   searchParams,

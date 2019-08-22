@@ -1,8 +1,8 @@
 import React, { memo, useState, useEffect } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import _ from 'lodash';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptClassicScenarioMarketRiskReportListByDate } from '@/services/report-service';
-import _ from 'lodash';
 
 const ClassicSceneTable = memo(props => {
   const { valuationDate, instrumentId, classicSceneTable } = props;
@@ -23,20 +23,24 @@ const ClassicSceneTable = memo(props => {
       title: '经典场景',
       dataIndex: 'classicScene',
       width: 150,
+      onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {
       title: '股灾（2015/6/22）',
       dataIndex: 'STOCK_CRASH_2015',
-      width: 150,
+      width: 160,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: '贸易战（2018/3/22）',
       dataIndex: 'TRADE_WAR_2018',
-      width: 150,
+      width: 160,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: '2008年金融危机（2018/9/15）',
       dataIndex: 'FINANCIAL_CRISIS_2008',
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
   ];
 

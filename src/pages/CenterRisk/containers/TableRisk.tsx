@@ -6,7 +6,7 @@ import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import Unit from './containers/Unit';
+import Unit from './Unit';
 
 const Title = styled.div`
   font-size: 16px;
@@ -39,6 +39,7 @@ const TableRisk = (props: any) => {
     method,
     searchParams,
     valuationDate,
+    scroll,
   } = props;
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -54,6 +55,7 @@ const TableRisk = (props: any) => {
     bookNamePart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
+  const [showScroll, setShowScroll] = useState(getShowScroll());
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
@@ -69,6 +71,20 @@ const TableRisk = (props: any) => {
     setTableData(page);
     setTotal(totalCount);
   };
+
+  useEffect(() => {
+    const handler = _.debounce(event => {
+      if (getShowScroll()) {
+        setShowScroll(true);
+        return;
+      }
+      setShowScroll(false);
+    }, 200);
+    window.addEventListener('resize', handler);
+    return () => {
+      window.removeEventListener('resize', handler);
+    };
+  }, []);
 
   useEffect(() => {
     if (store.first) {
@@ -120,7 +136,7 @@ const TableRisk = (props: any) => {
                   onChange={event => {
                     setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
                   }}
-                  placeholder="请输入搜索子公司"
+                  placeholder="请输入搜索交易对手"
                 ></ThemeInput>
               </Col>
             ) : (
@@ -182,6 +198,7 @@ const TableRisk = (props: any) => {
       </Row>
       <div style={{ position: 'relative' }}>
         <ThemeTable
+          scroll={showScroll ? scroll : undefined}
           loading={loading}
           pagination={{
             ...pagination,
@@ -206,6 +223,11 @@ const TableRisk = (props: any) => {
       </div>
     </div>
   );
+
+  function getShowScroll() {
+    const viewport = document.documentElement.clientWidth;
+    return viewport < scroll.x;
+  }
 };
 
 export default TableRisk;

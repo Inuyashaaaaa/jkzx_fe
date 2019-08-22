@@ -167,7 +167,7 @@ const ImpliedVolatility = props => {
           </ThemeButton>
         </Col>
       </Row>
-      <Row type="flex" justify="start" style={{ margin: 0 }} gutter={12}>
+      <Row style={{ margin: 0 }} gutter={12}>
         {dataSource.length ? (
           <Chart
             width={1450}

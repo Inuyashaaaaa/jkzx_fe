@@ -5,6 +5,7 @@ export const columns = sorter => [
     title: '交易对手',
     dataIndex: 'partyName',
     width: 100,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: 'Delta_Cash',
@@ -14,6 +15,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Gamma_Cash',
@@ -23,6 +25,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Vega',
@@ -32,6 +35,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Theta',
@@ -41,6 +45,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: 'Rho',
@@ -50,6 +55,7 @@ export const columns = sorter => [
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
     align: 'right',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
 ];
 
