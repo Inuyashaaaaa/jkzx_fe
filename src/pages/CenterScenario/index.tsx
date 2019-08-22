@@ -140,9 +140,14 @@ const CenterScenario = memo(props => {
         {
           title: '标的物情景分析',
           dataIndex: 'greekLatter',
+          onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
         },
         ...col.map(item => {
-          return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%` };
+          return {
+            title: `scenario_${item}%`,
+            dataIndex: `scenario_${item}%`,
+            onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+          };
         }),
       ]);
       setDataSource([]);
@@ -161,6 +166,7 @@ const CenterScenario = memo(props => {
       dataIndex: item,
       align: 'right',
       render: val => val && formatNumber(val, 4),
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     }));
 
     const tableData = Object.keys(colDefsMirrior).map(item =>
@@ -176,6 +182,7 @@ const CenterScenario = memo(props => {
       {
         title: '标的物情景分析',
         dataIndex: 'greekLatter',
+        onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
       },
       ...colDef,
     ]);
@@ -382,7 +389,7 @@ const CenterScenario = memo(props => {
       <ThemeTableWrapper>
         <ThemeTable
           loading={tableLoading}
-          wrapStyle={{ width: 1685 }}
+          wrapStyle={{ maxWidth: 1685 }}
           dataSource={dataSource}
           columns={tableColDefs}
           scroll={{ x: tableColDefs.length && tableColDefs.length * 150 }}

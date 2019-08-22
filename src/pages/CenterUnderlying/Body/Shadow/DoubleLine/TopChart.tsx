@@ -145,7 +145,7 @@ const TopChart = props => {
           </FormItemWrapper>
         </Col>
       </Row>
-      <Row type="flex" justify="start" style={{ padding: 17, paddingTop: 0 }} gutter={12}>
+      <Row style={{ padding: 17, paddingTop: 0 }} gutter={12}>
         {meta ? (
           <Chart
             animate

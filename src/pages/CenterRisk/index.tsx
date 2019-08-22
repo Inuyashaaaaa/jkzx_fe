@@ -12,11 +12,11 @@ import {
   rptSearchPagedMarketRiskDetailReport,
   rptSearchPagedCounterPartyMarketRiskByUnderlyerReport,
 } from '@/services/report-service';
-import { riskSubsidiaryVarieties } from './containers/riskSubsidiaryVarieties';
-import { TableTradeRival } from './containers/TableTradeRival';
-import { TableTradeRivalVarieties } from './containers/TableTradeRivalVarieties';
-import { TableWholeBreed } from './containers/TableWholeBreed';
-import TableRisk from './TableRisk';
+import { riskSubsidiaryVarieties } from './riskSubsidiaryVarieties';
+import { TableTradeRival } from './TableTradeRival';
+import { TableTradeRivalVarieties } from './TableTradeRivalVarieties';
+import { TableWholeBreed } from './TableWholeBreed';
+import TableRisk from './containers/TableRisk';
 
 const { TabPane } = ThemeTabs;
 
@@ -64,7 +64,7 @@ const Risk = () => {
           ></BoxPanel>
           <TableRisk
             title="全市场分品种风险报告"
-            style={{ width: 1440 }}
+            scroll={{ x: 1440 }}
             riskButton={{
               instrumentIdPart: true,
             }}
@@ -80,7 +80,8 @@ const Risk = () => {
           <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
           <TableRisk
             title="各子公司分品种风险报告"
-            style={{ width: 1620, marginTop: 18 }}
+            style={{ marginTop: 18 }}
+            scroll={{ x: 1600 }}
             riskButton={{
               bookNamePart: true,
               instrumentIdPart: true,
@@ -97,7 +98,8 @@ const Risk = () => {
         <TabPane tab="交易对手估值监测 " key="3">
           <TableRisk
             title="交易对手风险报告"
-            style={{ width: 1080 }}
+            // style={{ maxWidth: 1080 }}
+            scroll={{ x: 1130 }}
             riskButton={{
               partyNamePart: true,
             }}
@@ -110,7 +112,8 @@ const Risk = () => {
           />
           <TableRisk
             title="交易对手分品种风险报告"
-            style={{ width: 1620, marginTop: 18 }}
+            style={{ marginTop: 18 }}
+            scroll={{ x: 1600 }}
             riskButton={{
               partyNamePart: true,
               instrumentIdPart: true,

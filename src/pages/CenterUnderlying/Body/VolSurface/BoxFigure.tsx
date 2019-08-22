@@ -23,7 +23,10 @@ const BoxFigure = props => {
     });
   };
 
-  const fetch = async data => {
+  const fetch = async (data = []) => {
+    if (!data.length) {
+      data = [];
+    }
     const newData = _.slice(_.reverse(_.sortBy(data, 'notionalAmount'), 0, 9));
 
     const dvData = newData.map((item, index) => ({
@@ -76,7 +79,7 @@ const BoxFigure = props => {
 
   return (
     <>
-      <Row type="flex" justify="start" style={{ margin: 0 }} gutter={12}>
+      <Row style={{ margin: 0 }} gutter={12}>
         {meta ? (
           <Chart
             data={meta.dv}

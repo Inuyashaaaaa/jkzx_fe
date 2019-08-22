@@ -4,9 +4,11 @@ import { HOST_TEST } from '@/constants/global';
 import request from '@/tools/request';
 
 const composeMsg = (diagnostics = [], prefix) =>
-  diagnostics.map(item =>
-    message[String.prototype.toLocaleLowerCase.call(item.type)](`${prefix}:${item.message}`),
-  );
+  diagnostics.forEach(item => {
+    const type = String.prototype.toLocaleLowerCase.call(item.type);
+    if (type !== 'error') return;
+    message[type](`${prefix}:${item.message}`);
+  });
 
 export async function getInstrumentRollingVol(params) {
   return request(`${HOST_TEST}data-service/api/rpc`, {

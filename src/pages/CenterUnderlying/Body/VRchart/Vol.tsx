@@ -160,7 +160,7 @@ const Vol = props => {
         </Col>
       </Row>
       <ChartTitle>波动率锥</ChartTitle>
-      <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
+      <Row style={{ padding: 17 }} gutter={12}>
         {meta ? (
           <Chart
             animate
