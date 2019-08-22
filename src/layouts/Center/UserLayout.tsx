@@ -40,7 +40,7 @@ const UserLayout = props => {
   const imgPath = require('@/assets/touxiang.png');
 
   useLifecycles(() => {
-    const userInfo: any = getUser();
+    const userInfo: any = getUser() || {};
     setUser({
       pirture: imgPath,
       name: userInfo.username,
