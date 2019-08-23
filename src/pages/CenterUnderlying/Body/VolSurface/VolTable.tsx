@@ -69,27 +69,18 @@ const VolTable = props => {
   ];
 
   return (
-    <div
-      style={{
-        width: 900,
+    <ThemeTable
+      pagination={{
+        ...pagination,
+        total,
+        simple: true,
       }}
-    >
-      <ThemeTable
-        pagination={{
-          ...pagination,
-          total,
-          simple: true,
-        }}
-        dataSource={tableData}
-        onChange={(ppagination, filters, psorter) => {
-          setPagination(ppagination);
-        }}
-        columns={columns}
-        style={{
-          margin: '0 50px 0 0',
-        }}
-      />
-    </div>
+      dataSource={tableData}
+      onChange={(ppagination, filters, psorter) => {
+        setPagination(ppagination);
+      }}
+      columns={columns}
+    />
   );
 };
 
