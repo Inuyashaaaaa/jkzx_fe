@@ -107,10 +107,9 @@ const Vol = props => {
     const rsp = await getInstrumentVolSurface({
       instrumentId,
       valuationDate: valuationDate.format('YYYY-MM-DD'),
-      strikeType,
+      strikeType: strikeTypeData,
     });
     setLoading(false);
-    setStrikeTypeData(strikeType);
     if (rsp.error) return;
     setData(rsp.data);
   };
@@ -323,9 +322,9 @@ const Vol = props => {
             <FormItem label="strike_type">
               <ThemeSelect
                 onChange={val => {
-                  setStrikeType(val);
+                  setStrikeTypeData(val);
                 }}
-                value={strikeType}
+                value={strikeTypeData}
                 placeholder="strike_percentage"
                 style={{ minWidth: 200 }}
                 options={[
@@ -347,7 +346,8 @@ const Vol = props => {
             loading={meta && loading}
             onClick={() => {
               fetch();
-              setFetchStrikeType(strikeType);
+              setFetchStrikeType(strikeTypeData);
+              setStrikeType(strikeTypeData);
             }}
             type="primary"
           >
