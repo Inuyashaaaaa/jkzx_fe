@@ -47,26 +47,26 @@ function upload(config = {}) {
   const remoteFolder = `/home/share/bct_product/frontend/${branchName}/`;
   const remotePaths = path.join(remoteFolder, remoteBundleName);
   console.log(
-    `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${bundleName}`
+    `upload: remoteUsername: ${remoteUsername} remoteIp: ${remoteIp} remoteFolder: ${remoteFolder} bundle: ${bundleName}`,
   );
   try {
     shell.exec(
-      `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${remotePaths}`
+      `rsh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${remoteUsername} ${remoteIp} rm -rf ${remotePaths}`,
     );
     shell.exec(
-      `ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${remoteUsername}@${remoteIp} "[ -d ${remotePaths} ] && echo ok || mkdir -p ${remotePaths}"`
+      `ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${remoteUsername}@${remoteIp} "[ -d ${remotePaths} ] && echo ok || mkdir -p ${remotePaths}"`,
     );
     // https://stackoverflow.com/questions/3663895/ssh-the-authenticity-of-host-hostname-cant-be-established
     shell.exec(
-      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName}/* ${remoteUsername}@${remoteIp}:${remotePaths}`
+      `scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ${bundleName}/* ${remoteUsername}@${remoteIp}:${remotePaths}`,
     );
-    if (notifaction) {
-      shell.exec(
-        `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remotePaths} ${`前端打包上传完毕`} ${
-          process.env.CI_COMMIT_SHA
-        }`
-      );
-    }
+    // if (notifaction) {
+    //   shell.exec(
+    //     `./scripts/ci/greet.sh ${remoteIp}:${branchName}:${remotePaths} ${`前端打包上传完毕`} ${
+    //       process.env.CI_COMMIT_SHA
+    //     }`
+    //   );
+    // }
   } catch (error) {
     console.log(`上传失败: scp -r ${remotePaths} ${remoteUsername}@${remoteIp}:${remoteFolder}`);
   }
