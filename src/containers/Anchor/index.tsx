@@ -10,28 +10,26 @@ const Anchor = memo(props => {
       anchorElement.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   };
-  const list = dataList.map((item, index) => {
-    return (
-      <li>
-        <Tooltip visible={visibleTip === item.title} placement={placement} title={item.title}>
-          <p
-            onMouseEnter={() => {
-              setVisibleTip(item.title);
-            }}
-            onMouseLeave={() => {
-              setVisibleTip('');
-            }}
-            onClick={() => {
-              setVisibleTip('');
-              scrollToAnchor(item.id);
-            }}
-          >
-            {index + 1}
-          </p>
-        </Tooltip>
-      </li>
-    );
-  });
+  const list = dataList.map((item, index) => (
+    <li>
+      <Tooltip visible={visibleTip === item.title} placement={placement} title={item.title}>
+        <p
+          onMouseEnter={() => {
+            setVisibleTip(item.title);
+          }}
+          onMouseLeave={() => {
+            setVisibleTip('');
+          }}
+          onClick={() => {
+            setVisibleTip('');
+            scrollToAnchor(item.id);
+          }}
+        >
+          {index + 1}
+        </p>
+      </Tooltip>
+    </li>
+  ));
   return (
     <div className="anchorLink">
       <ul>{list}</ul>
