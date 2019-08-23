@@ -159,7 +159,6 @@ const Vol = props => {
         });
       }),
     );
-
     setMeta({
       tableColumns,
       tableData,
@@ -250,10 +249,10 @@ const Vol = props => {
 
   useEffect(() => {
     convert();
-  }, [data]);
+  }, [data, status]);
 
   useEffect(() => {
-    if (meta && echartInstance) {
+    if (meta && echartInstance && status === STATUS.CHART) {
       echartInstance.setOption(meta.option);
     }
   }, [meta, echartInstance]);
