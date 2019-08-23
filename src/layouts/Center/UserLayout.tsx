@@ -1,10 +1,8 @@
-import React, { memo, useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { message, Popconfirm } from 'antd';
 import { connect } from 'dva';
-import { Popconfirm, message } from 'antd';
-import useLifecycles from 'react-use/lib/useLifecycles';
 import _ from 'lodash';
-import { getUser } from '@/tools/authority';
+import React, { memo } from 'react';
+import styled from 'styled-components';
 
 const AdminWrap = styled.div`
   position: absolute;
@@ -27,25 +25,21 @@ const AdminWrap = styled.div`
 `;
 
 const UserLayout = props => {
-  const [user, setUser] = useState({});
+  const { user } = props;
 
   const textLogout = '确定要退出登录吗？';
   const confirm = async () => {
     props.dispatch({
       type: 'login/logout',
+      payload: {
+        loginUrl: '/center/login',
+      },
     });
     message.info('退出登录');
   };
   // eslint-disable-next-line
   const imgPath = require('@/assets/touxiang.png');
 
-  useLifecycles(() => {
-    const userInfo: any = getUser() || {};
-    setUser({
-      pirture: imgPath,
-      name: userInfo.username,
-    });
-  });
   return (
     <AdminWrap>
       <Popconfirm
@@ -55,15 +49,16 @@ const UserLayout = props => {
         okText="确定"
         cancelText="取消"
       >
-        <img src={user.pirture} alt="头像"></img>
+        <img src={imgPath} alt="头像"></img>
       </Popconfirm>
-      <p>{user.name}</p>
+      <p>{_.get(user, 'currentUser.username')}</p>
     </AdminWrap>
   );
 };
 
 export default memo(
-  connect(({ login, loading }) => ({
+  connect(({ login, loading, user }) => ({
+    user,
     login,
     submitting: loading.effects['login/login'],
   }))(UserLayout),
