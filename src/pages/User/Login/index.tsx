@@ -1,9 +1,9 @@
-import { Form2 } from '@/containers';
 import { Alert, Button, Form, Icon, Input, Modal, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';
 import _ from 'lodash';
 import React, { Component } from 'react';
+import { Form2 } from '@/containers';
 import styles from './Login.less';
 import UpdatePassword from './UpdatePassword';
 
@@ -35,7 +35,11 @@ class LoginPage extends Component<any> {
     const { dispatch } = this.props;
     dispatch({
       type: 'login/login',
-      payload: values,
+      payload: {
+        loginParams: values,
+        defaultRedirect: '/welcome-page',
+        loginUrl: '/user/login',
+      },
     });
   };
 
@@ -86,71 +90,63 @@ class LoginPage extends Component<any> {
           columns={[
             {
               dataIndex: 'username',
-              render: (val, record, index, { form }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true, message: '请输入用户名' }],
-                    })(
-                      <Input
-                        size="large"
-                        style={{ width: '100%' }}
-                        placeholder="请输入用户名"
-                        prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '请输入用户名' }],
+                  })(
+                    <Input
+                      size="large"
+                      style={{ width: '100%' }}
+                      placeholder="请输入用户名"
+                      prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               dataIndex: 'password',
-              render: (val, record, index, { form }) => {
-                return (
-                  <FormItem>
-                    {form.getFieldDecorator({
-                      rules: [{ required: true, message: '请输入密码' }],
-                    })(
-                      <Input.Password
-                        size="large"
-                        style={{ width: '100%' }}
-                        prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                        placeholder="请输入密码"
-                      />
-                    )}
-                  </FormItem>
-                );
-              },
+              render: (val, record, index, { form }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [{ required: true, message: '请输入密码' }],
+                  })(
+                    <Input.Password
+                      size="large"
+                      style={{ width: '100%' }}
+                      prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                      placeholder="请输入密码"
+                    />,
+                  )}
+                </FormItem>
+              ),
             },
             {
               dataIndex: 'captcha',
-              render: (val, record, index, { form }) => {
-                return (
-                  <FormItem>
-                    <Row type="flex" justify="space-between">
-                      {form.getFieldDecorator({
-                        rules: [{ required: true, message: '请输入验证码' }],
-                      })(
-                        <Input
-                          size="large"
-                          placeholder="请输入验证码"
-                          style={{ width: 'auto', flexGrow: 1 }}
-                          prefix={
-                            <Icon type="security-scan" style={{ color: 'rgba(0,0,0,.25)' }} />
-                          }
-                        />
-                      )}
+              render: (val, record, index, { form }) => (
+                <FormItem>
+                  <Row type="flex" justify="space-between">
+                    {form.getFieldDecorator({
+                      rules: [{ required: true, message: '请输入验证码' }],
+                    })(
+                      <Input
+                        size="large"
+                        placeholder="请输入验证码"
+                        style={{ width: 'auto', flexGrow: 1 }}
+                        prefix={<Icon type="security-scan" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                      />,
+                    )}
 
-                      <img
-                        style={{ cursor: 'pointer' }}
-                        src={login.img}
-                        alt="验证码"
-                        onClick={() => this.queryCaptcha()}
-                      />
-                    </Row>
-                  </FormItem>
-                );
-              },
+                    <img
+                      style={{ cursor: 'pointer' }}
+                      src={login.img}
+                      alt="验证码"
+                      onClick={() => this.queryCaptcha()}
+                    />
+                  </Row>
+                </FormItem>
+              ),
             },
           ]}
           footer={
@@ -159,7 +155,7 @@ class LoginPage extends Component<any> {
                 htmlType="submit"
                 size="large"
                 type="primary"
-                block={true}
+                block
                 onClick={this.handleSubmit}
                 loading={submitting}
               >
@@ -177,14 +173,16 @@ class LoginPage extends Component<any> {
           confirmLoading={pwdUpdating}
         >
           <Alert
-            showIcon={true}
+            showIcon
             type="info"
             message="密码超过有效期，请修改新密码，更新后请重新登录"
             style={{ marginBottom: 20 }}
           />
           <UpdatePassword
             username={_.get(login.loginFormData, 'username')}
-            ref={node => (this.$updatePassword = node)}
+            ref={node => {
+              this.$updatePassword = node;
+            }}
           />
         </Modal>
       </div>

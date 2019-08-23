@@ -166,9 +166,16 @@ export async function DOWN_LOAD(url, options) {
           message: '3秒后自动跳转登录页',
         });
         setTimeout(() => {
+          const urlParams = new URL(window.location.href);
+          const { pathname } = urlParams;
+          const loginUrl = pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
+
           // eslint-disable-next-line  no-underscore-dangle
           window.g_app._store.dispatch({
             type: 'login/logout',
+            payload: {
+              loginUrl,
+            },
           });
         }, 3000);
 

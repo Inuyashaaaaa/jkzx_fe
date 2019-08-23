@@ -1,13 +1,15 @@
-import { Avatar, Dropdown, Icon, Menu, Spin, Tag } from 'antd';
+import { Avatar, Dropdown, Icon, Menu, Spin, Tag, Button } from 'antd';
 import groupBy from 'lodash/groupBy';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 // import NoticeIcon from '../NoticeIcon';
+import withRouter from 'umi/withRouter';
+import router from 'umi/router';
 import HeaderSearch from '../HeaderSearch';
 import styles from './index.less';
 
-export default class GlobalHeaderRight extends PureComponent {
+class GlobalHeaderRight extends PureComponent {
   getNoticeData() {
     const { notices = [] } = this.props;
     if (notices.length === 0) {
@@ -104,58 +106,6 @@ export default class GlobalHeaderRight extends PureComponent {
             formatMessage({ id: 'component.globalHeader.search.example3' }),
           ]}
         />
-        {/* <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>
-          <a
-            target="_blank"
-            href="https://pro.ant.design/docs/getting-started"
-            rel="noopener noreferrer"
-            className={styles.action}
-          >
-            <Icon type="question-circle-o" />
-          </a>
-        </Tooltip> */}
-        {/* <NoticeIcon
-          className={styles.action}
-          count={currentUser.unreadCount}
-          onItemClick={(item, tabProps) => {
-            
-            this.changeReadState(item, tabProps);
-          }}
-          locale={{
-            emptyText: formatMessage({ id: 'component.noticeIcon.empty' }),
-            clear: formatMessage({ id: 'component.noticeIcon.clear' }),
-          }}
-          onClear={onNoticeClear}
-          onPopupVisibleChange={onNoticeVisibleChange}
-          loading={fetchingNotices}
-          popupAlign={{ offset: [20, -16] }}
-          clearClose
-        >
-          <NoticeIcon.Tab
-            count={unreadMsg.notification}
-            list={noticeData.notification}
-            title={formatMessage({ id: 'component.globalHeader.notification' })}
-            name="notification"
-            emptyText={formatMessage({ id: 'component.globalHeader.notification.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg"
-          />
-          <NoticeIcon.Tab
-            count={unreadMsg.message}
-            list={noticeData.message}
-            title={formatMessage({ id: 'component.globalHeader.message' })}
-            name="message"
-            emptyText={formatMessage({ id: 'component.globalHeader.message.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg"
-          />
-          <NoticeIcon.Tab
-            count={unreadMsg.event}
-            list={noticeData.event}
-            title={formatMessage({ id: 'component.globalHeader.event' })}
-            name="event"
-            emptyText={formatMessage({ id: 'component.globalHeader.event.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/HsIsxMZiWKrNUavQUXqx.svg"
-          />
-        </NoticeIcon> */}
         {currentUser.username ? (
           <Dropdown overlay={menu}>
             <span className={`${styles.action} ${styles.account}`}>
@@ -172,8 +122,17 @@ export default class GlobalHeaderRight extends PureComponent {
         ) : (
           <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
         )}
-        {/* <SelectLang className={styles.action} /> */}
+        <Button
+          type="primary"
+          onClick={() => {
+            router.push('/center/underlying');
+          }}
+        >
+          进入监控中心系统
+        </Button>
       </div>
     );
   }
 }
+
+export default withRouter(GlobalHeaderRight);

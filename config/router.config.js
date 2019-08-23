@@ -36,6 +36,7 @@ export default [
   },
   {
     path: '/center',
+    centerRoute: true,
     component: '../layouts/Center/index',
     routes: [
       {

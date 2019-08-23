@@ -185,9 +185,16 @@ export default function request(url, _options = {}, passError = false) {
               message: '3秒后自动跳转登录页',
             });
             setTimeout(() => {
+              const urlParams = new URL(window.location.href);
+              const { pathname } = urlParams;
+              const loginUrl =
+                pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
               // @HACK
               window.g_app._store.dispatch({
                 type: 'login/logout',
+                payload: {
+                  loginUrl,
+                },
               });
             }, 3000);
 
