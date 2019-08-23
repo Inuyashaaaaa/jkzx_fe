@@ -78,6 +78,12 @@ const cachedSave = (response, hashcode) => {
 };
 
 const gotoLogin = _.debounce(() => {
+  const urlParams = new URL(window.location.href);
+  const { pathname } = urlParams;
+  if (pathname.split('/')[1] === 'center') {
+    router.push('/center/login');
+    return;
+  }
   router.push('/user/login');
 }, 100);
 

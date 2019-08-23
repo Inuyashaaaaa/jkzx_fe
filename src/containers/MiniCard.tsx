@@ -16,6 +16,7 @@ const MiniCardWrap = styled.div<{ active?: boolean }>`
   border-radius: 3px;
   opacity: 0.4;
   cursor: pointer;
+  font-size: 13px;
 
   ${props =>
     props.active &&

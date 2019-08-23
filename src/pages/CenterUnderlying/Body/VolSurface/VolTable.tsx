@@ -15,7 +15,11 @@ const VolTable = props => {
   const [total, setTotal] = useState();
   const [max, setMax] = useState(0);
   const { dispatch } = props;
-  const fetch = async data => {
+  const fetch = async (data = []) => {
+    if (!data.length) {
+      // eslint-disable-next-line
+      data = [];
+    }
     setTableData(
       data.map(item => ({
         name: item.legalEntityName,

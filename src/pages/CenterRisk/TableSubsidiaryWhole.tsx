@@ -40,10 +40,12 @@ const TableSubsidiaryWhole = (props: any) => {
   const [loading, setLoading] = useState(false);
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
+  const [store, setStore] = useState({});
   const [formData, setFormData] = useState({
     subsidiaryPart: '',
   });
   const [searchFormData, setSearchFormData] = useState(formData);
+  const [showScroll, setShowScroll] = useState(getShowScroll());
 
   const fetch = async (bool: boolean) => {
     setLoading(true);
@@ -68,18 +70,42 @@ const TableSubsidiaryWhole = (props: any) => {
   };
 
   useEffect(() => {
-    fetch(false);
+    const handler = _.debounce(event => {
+      if (getShowScroll()) {
+        setShowScroll(true);
+        return;
+      }
+      setShowScroll(false);
+    }, 200);
+    window.addEventListener('resize', handler);
+    return () => {
+      window.removeEventListener('resize', handler);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (store.first) {
+      fetch(false);
+    }
   }, [sorter, searchFormData]);
 
   useEffect(() => {
-    fetch(true);
+    if (store.first) {
+      fetch(true);
+    }
   }, [pagination]);
+
+  useEffect(() => {
+    fetch(false);
+    setStore({ first: true });
+  }, []);
 
   const columns = [
     {
       title: '子公司名称',
       dataIndex: 'subsidiary',
       width: 100,
+      onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {
       title: 'Delta_Cash',
@@ -89,6 +115,7 @@ const TableSubsidiaryWhole = (props: any) => {
       sorter: true,
       render: value => formatNumber({ value, formatter: '0,0.00' }),
       align: 'right',
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: 'Gamma_Cash',
@@ -98,6 +125,7 @@ const TableSubsidiaryWhole = (props: any) => {
       sorter: true,
       render: value => formatNumber({ value, formatter: '0,0.00' }),
       align: 'right',
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: 'Vega',
@@ -107,6 +135,7 @@ const TableSubsidiaryWhole = (props: any) => {
       sorter: true,
       render: value => formatNumber({ value, formatter: '0,0.00' }),
       align: 'right',
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: 'Theta',
@@ -116,6 +145,7 @@ const TableSubsidiaryWhole = (props: any) => {
       sorter: true,
       render: value => formatNumber({ value, formatter: '0,0.00' }),
       align: 'right',
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: 'Rho',
@@ -125,11 +155,12 @@ const TableSubsidiaryWhole = (props: any) => {
       sorter: true,
       render: value => formatNumber({ value, formatter: '0,0.00' }),
       align: 'right',
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
   ];
 
   return (
-    <div id="two" style={{ width: 1080, marginTop: 25 }}>
+    <div>
       <Title>各子公司风险报告</Title>
       <Row
         type="flex"
@@ -195,6 +226,7 @@ const TableSubsidiaryWhole = (props: any) => {
       </Row>
       <div style={{ position: 'relative' }}>
         <ThemeTable
+          scroll={showScroll ? { x: 1080 } : undefined}
           loading={loading}
           pagination={{
             ...pagination,
@@ -219,6 +251,10 @@ const TableSubsidiaryWhole = (props: any) => {
       </div>
     </div>
   );
+  function getShowScroll() {
+    const viewport = document.documentElement.clientWidth;
+    return viewport < 1080;
+  }
 };
 
 export default TableSubsidiaryWhole;

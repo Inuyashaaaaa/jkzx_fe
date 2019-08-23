@@ -128,7 +128,7 @@ const Rollong = props => {
         </Col>
       </Row>
       <ChartTitle>Rolling Volatility</ChartTitle>
-      <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
+      <Row style={{ padding: 17 }} gutter={12}>
         {meta ? (
           <Chart
             animate

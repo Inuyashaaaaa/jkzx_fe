@@ -20,6 +20,7 @@ import { queryNonGroupResource } from '@/services/tradeBooks';
 import { rptSpotScenariosReportListSearch } from '@/services/report-service';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
+import ClassicSceneTable from './ ClassicSceneTable';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -53,6 +54,8 @@ const CenterScenario = memo(props => {
   const [dataSource, setDataSource] = useState([]);
   const [tableColDefs, setTableColDefs] = useState([]);
   const [subNameOrBook, setSubNameOrBook] = useState([]);
+  setClassicSceneTable;
+  const [classicSceneTable, setClassicSceneTable] = useState(true);
 
   const searchForm = useRef<Form2>(null);
   const reportForm = useRef<Form2>(null);
@@ -108,6 +111,7 @@ const CenterScenario = memo(props => {
   };
 
   const onSearch = async () => {
+    setClassicSceneTable(!classicSceneTable);
     const [reportRsp] = await Promise.all([reportForm.current.validate()]);
     if (reportRsp.error) return;
     const reportData = _.mapValues(
@@ -136,9 +140,14 @@ const CenterScenario = memo(props => {
         {
           title: '标的物情景分析',
           dataIndex: 'greekLatter',
+          onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
         },
         ...col.map(item => {
-          return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%` };
+          return {
+            title: `scenario_${item}%`,
+            dataIndex: `scenario_${item}%`,
+            onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+          };
         }),
       ]);
       setDataSource([]);
@@ -157,6 +166,7 @@ const CenterScenario = memo(props => {
       dataIndex: item,
       align: 'right',
       render: val => val && formatNumber(val, 4),
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     }));
 
     const tableData = Object.keys(colDefsMirrior).map(item =>
@@ -172,6 +182,7 @@ const CenterScenario = memo(props => {
       {
         title: '标的物情景分析',
         dataIndex: 'greekLatter',
+        onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
       },
       ...colDef,
     ]);
@@ -199,6 +210,7 @@ const CenterScenario = memo(props => {
             <ThemeSelect
               fetchOptionsOnSearch
               showSearch
+              style={{ minWidth: 200 }}
               options={async (value: string) => {
                 const { data, error } = await mktInstrumentWhitelistSearch({
                   instrumentIdPart: value,
@@ -221,6 +233,7 @@ const CenterScenario = memo(props => {
         <FormItem>
           {form.getFieldDecorator({ rules: [{ required: true, message: '数据范围必填' }] })(
             <ThemeSelect
+              style={{ minWidth: 200 }}
               options={[
                 {
                   label: '全市场',
@@ -253,6 +266,7 @@ const CenterScenario = memo(props => {
             <ThemeSelect
               fetchOptionsOnSearch
               showSearch
+              style={{ minWidth: 200 }}
               options={async (value: string) => {
                 const { data, error } = await mktInstrumentWhitelistSearch({
                   instrumentIdPart: value,
@@ -301,6 +315,7 @@ const CenterScenario = memo(props => {
                     <ThemeSelect
                       filterOption
                       showSearch
+                      style={{ minWidth: 200 }}
                       key="subName"
                       options={async (value: string) => {
                         const { data, error } = await queryNonGroupResource();
@@ -328,6 +343,7 @@ const CenterScenario = memo(props => {
                     <ThemeSelect
                       fetchOptionsOnSearch
                       showSearch
+                      style={{ minWidth: 200 }}
                       key="legalName"
                       options={async (value: string) => {
                         const { data, error } = await refSimilarLegalNameList({
@@ -347,7 +363,6 @@ const CenterScenario = memo(props => {
           ];
     setSubNameOrBook(subFields);
   }, [reportFormData]);
-
   return (
     <>
       <Title>情景分析</Title>
@@ -374,7 +389,7 @@ const CenterScenario = memo(props => {
       <ThemeTableWrapper>
         <ThemeTable
           loading={tableLoading}
-          wrapStyle={{ width: 1685 }}
+          wrapStyle={{ maxWidth: 1685 }}
           dataSource={dataSource}
           columns={tableColDefs}
           scroll={{ x: tableColDefs.length && tableColDefs.length * 150 }}
@@ -382,6 +397,11 @@ const CenterScenario = memo(props => {
           rowkey="greekLatter"
         ></ThemeTable>
       </ThemeTableWrapper>
+      <ClassicSceneTable
+        classicSceneTable={classicSceneTable}
+        valuationDate={Form2.getFieldsValue(reportFormData.valuationDate)}
+        instrumentId={Form2.getFieldsValue(reportFormData.underlyer)}
+      />
     </>
   );
 });

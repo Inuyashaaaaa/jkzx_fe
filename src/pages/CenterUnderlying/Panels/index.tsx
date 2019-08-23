@@ -11,6 +11,8 @@ const imgPath2 = require('@/assets/2.png');
 const imgPath3 = require('@/assets/5.png');
 // eslint-disable-next-line
 const imgPath4 = require('@/assets/10.png');
+// eslint-disable-next-line
+const imgPath5 = require('@/assets/11.png');
 
 const Panels = props => {
   const { activeKey } = props;
@@ -55,6 +57,14 @@ const Panels = props => {
           title="子公司波动率对比"
           active={activeKey === '2'}
           imageUrls={[imgPath4]}
+        ></MiniCard>
+      </Col>
+      <Col>
+        <MiniCard
+          onClick={() => setActiveKeyCache('3')}
+          title="公允/隐含波动率对比"
+          active={activeKey === '3'}
+          imageUrls={[imgPath5]}
         ></MiniCard>
       </Col>
     </Row>

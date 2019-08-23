@@ -1,5 +1,14 @@
+import { message } from 'antd';
+import _ from 'lodash';
 import { HOST_TEST } from '@/constants/global';
 import request from '@/tools/request';
+
+const composeMsg = (diagnostics = [], prefix) =>
+  diagnostics.forEach(item => {
+    const type = String.prototype.toLocaleLowerCase.call(item.type);
+    if (type !== 'error') return;
+    message[type](`${prefix}:${item.message}`);
+  });
 
 export async function getInstrumentRollingVol(params) {
   return request(`${HOST_TEST}data-service/api/rpc`, {
@@ -10,6 +19,15 @@ export async function getInstrumentRollingVol(params) {
       jsonrpc: '2.0',
       id: 1,
     },
+  }).then(rsp => {
+    if (rsp.error) {
+      return rsp;
+    }
+    composeMsg(_.get(rsp, 'data.diagnostics', []), '波动率曲线');
+    return {
+      ...rsp,
+      data: _.get(rsp, 'data.data', []),
+    };
   });
 }
 
@@ -22,6 +40,15 @@ export async function getInstrumentVolCone(params) {
       jsonrpc: '2.0',
       id: 1,
     },
+  }).then(rsp => {
+    if (rsp.error) {
+      return rsp;
+    }
+    composeMsg(_.get(rsp, 'data.diagnostics', []), '波动率锥');
+    return {
+      ...rsp,
+      data: _.get(rsp, 'data.data', []),
+    };
   });
 }
 
@@ -46,6 +73,15 @@ export async function getInstrumentRealizedVol(params) {
       jsonrpc: '2.0',
       id: 1,
     },
+  }).then(rsp => {
+    if (rsp.error) {
+      return rsp;
+    }
+    composeMsg(_.get(rsp, 'data.diagnostics', []), '历史波动率');
+    return {
+      ...rsp,
+      data: _.get(rsp, 'data.data', []),
+    };
   });
 }
 
@@ -54,6 +90,18 @@ export async function getImpliedVolReport(params = {}) {
     method: 'POST',
     body: {
       method: 'getImpliedVolReport',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getHistoricalAndNeutralVolList(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'getHistoricalAndNeutralVolList',
       params,
       jsonrpc: '2.0',
       id: 1,
