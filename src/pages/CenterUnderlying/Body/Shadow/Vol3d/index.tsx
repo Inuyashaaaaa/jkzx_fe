@@ -24,6 +24,7 @@ import ThemeSelect from '@/containers/ThemeSelect';
 import { delay } from '@/utils';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
 import FormItemWrapper from '@/containers/FormItemWrapper';
+import { formatNumber } from '@/tools';
 
 const debug = true;
 
@@ -64,7 +65,7 @@ const Vol = props => {
   const [valuationDate, setValuationDate] = useState(moment('2019-08-01'));
   const [status, setStatus] = useState(STATUS.CHART);
   const [echartInstance, setEchartInstance] = useState();
-
+  const [strikeTypeData, setStrikeTypeData] = useState(strikeType);
   const setData = pData => {
     dispatch({
       type: 'centerUnderlying/setState',
@@ -109,6 +110,7 @@ const Vol = props => {
       strikeType,
     });
     setLoading(false);
+    setStrikeTypeData(strikeType);
     if (rsp.error) return;
     setData(rsp.data);
   };
@@ -123,6 +125,7 @@ const Vol = props => {
       return {
         title: tenor.replace('D', '天'),
         dataIndex: tenor,
+        render: (value, record, index) => formatNumber(_.toNumber(value) * 100, 2),
       };
     });
 
@@ -277,8 +280,16 @@ const Vol = props => {
 
     const ColumnsHead = [
       {
-        title: 'strike_percentage/期限',
+        title: `${
+          strikeTypeData === STRIKE_TYPE_ENUM.STRIKE ? 'strike/期限' : 'strike_percentag/期限'
+        }`,
         dataIndex: 'percent',
+        render: (value, record, index) => {
+          if (strikeTypeData === STRIKE_TYPE_ENUM.STRIKE) {
+            return formatNumber(_.toNumber(value), 2);
+          }
+          return formatNumber(_.toNumber(value) * 100, 2);
+        },
       },
     ];
 
