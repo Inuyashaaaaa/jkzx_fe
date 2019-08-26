@@ -23,7 +23,7 @@ export default [
   // center login
   {
     path: '/center/login',
-    component: './User/Login/Center',
+    component: '../layouts/Center/Login',
   },
 
   {

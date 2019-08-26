@@ -24,7 +24,7 @@ const AdminWrap = styled.div`
   }
 `;
 
-const UserLayout = props => {
+const User = props => {
   const { user } = props;
 
   const textLogout = '确定要退出登录吗？';
@@ -61,5 +61,5 @@ export default memo(
     user,
     login,
     submitting: loading.effects['login/login'],
-  }))(UserLayout),
+  }))(User),
 );
