@@ -66,6 +66,8 @@ const Vol = props => {
   const [status, setStatus] = useState(STATUS.CHART);
   const [echartInstance, setEchartInstance] = useState();
   const [strikeTypeData, setStrikeTypeData] = useState(strikeType);
+  const [typeData, setTypeData] = useState(strikeType);
+
   const setData = pData => {
     dispatch({
       type: 'centerUnderlying/setState',
@@ -112,6 +114,7 @@ const Vol = props => {
     setLoading(false);
     if (rsp.error) return;
     setData(rsp.data);
+    setTypeData(strikeTypeData);
   };
 
   const convert = async () => {
@@ -279,11 +282,11 @@ const Vol = props => {
     const ColumnsHead = [
       {
         title: `${
-          strikeTypeData === STRIKE_TYPE_ENUM.STRIKE ? 'strike/期限' : 'strike_percentag/期限'
+          typeData === STRIKE_TYPE_ENUM.STRIKE ? 'strike(￥)\\期限' : 'strike_percentage(%)\\期限'
         }`,
         dataIndex: 'percent',
         render: (value, record, index) => {
-          if (strikeTypeData === STRIKE_TYPE_ENUM.STRIKE) {
+          if (typeData === STRIKE_TYPE_ENUM.STRIKE) {
             return formatNumber(_.toNumber(value), 2);
           }
           return formatNumber(_.toNumber(value) * 100, 2);
@@ -297,6 +300,7 @@ const Vol = props => {
         pagination={{
           simple: true,
         }}
+        loading={loading}
         dataSource={meta.tableData}
         columns={_.concat(ColumnsHead, ...meta.tableColumns)}
       />
