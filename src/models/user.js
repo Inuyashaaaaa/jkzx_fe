@@ -1,8 +1,8 @@
-import { getUser, setUser } from '@/tools/authority';
-import router from 'umi/router';
 import _ from 'lodash';
-import { updatePermission } from '@/services/permission';
+import router from 'umi/router';
 import { PERMISSIONS } from '@/constants/user';
+import { updatePermission } from '@/services/permission';
+import { getUser, setUser } from '@/tools/authority';
 
 export default {
   namespace: 'user',
@@ -12,10 +12,16 @@ export default {
   },
 
   effects: {
-    *replenish($, { put, call }) {
+    *replenish(
+      {
+        payload: { loginUrl, skipMenu },
+      },
+      { put, call },
+    ) {
       const userInfo = getUser();
       if (_.isEmpty(userInfo)) {
-        router.push('/user/login');
+        // router.push('/user/login');
+        router.push(loginUrl);
         return;
       }
 
@@ -26,7 +32,7 @@ export default {
 
       yield put({
         type: 'replenishUserInfo',
-        payload: updatedPermissionUserInfo,
+        payload: { skipMenu, userInfo: updatedPermissionUserInfo },
       });
 
       // eslint-disable-next-line no-underscore-dangle
@@ -36,14 +42,18 @@ export default {
       }
     },
 
-    *replenishUserInfo(action, { put }) {
-      const { payload: userInfo = {} } = action;
-
+    *replenishUserInfo(
+      {
+        payload: { userInfo = {}, skipMenu = false },
+      },
+      { put },
+    ) {
       yield put({
         type: 'saveUserData',
         payload: userInfo,
       });
 
+      if (skipMenu) return;
       yield put({
         type: 'menu/initMenu',
         payload: userInfo,

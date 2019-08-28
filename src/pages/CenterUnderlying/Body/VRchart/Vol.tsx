@@ -166,7 +166,7 @@ const Vol = props => {
             animate
             forceFit
             height={630}
-            padding={[40, 20, 40, 40]}
+            padding={[80, 20, 40, 40]}
             width={800}
             data={meta.dv}
             scale={{

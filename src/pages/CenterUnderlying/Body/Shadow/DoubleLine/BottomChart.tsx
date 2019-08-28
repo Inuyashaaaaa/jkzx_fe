@@ -14,6 +14,7 @@ import PosCenter from '@/containers/PosCenter';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
 import FormItemWrapper from '@/containers/FormItemWrapper';
+import { formatNumber } from '@/tools';
 
 const TopChart = props => {
   const { instrumentId, loading, data, fetchStrikeType } = props;
@@ -141,7 +142,7 @@ const TopChart = props => {
             animate
             forceFit
             height={315}
-            padding={[40, 20, 40, 40]}
+            padding={[40, 50, 40, 40]}
             width={800}
             data={meta.dv}
             scale={{
@@ -149,7 +150,8 @@ const TopChart = props => {
                 alias: getStrikeLabel(),
               },
               value: {
-                alias: '波动率',
+                alias: '波动率(%)',
+                formatter: val => formatNumber(_.toNumber(val) * 100, 2),
               },
             }}
             onGetG2Instance={g2Chart => {

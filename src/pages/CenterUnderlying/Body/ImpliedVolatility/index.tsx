@@ -77,7 +77,9 @@ const ImpliedVolatility = props => {
     if (error) return;
     setDataSource(data.data);
     data.diagnostics.forEach(item => {
-      message.error(item.message);
+      if (item.type === 'ERROR') {
+        message.error(item.message);
+      }
     });
   };
 
@@ -172,7 +174,7 @@ const ImpliedVolatility = props => {
           <Chart
             width={1450}
             height={600}
-            padding={[40, 40, 40, 40]}
+            padding={[40, 40, 40, 60]}
             forceFit
             data={dv}
             scale={{
@@ -181,7 +183,7 @@ const ImpliedVolatility = props => {
                 type: 'cat',
                 ...(dataSource.length < 10 ? { range: [0.08, dataSource.length * 0.1] } : {}),
               },
-              vol: { alias: '波动率', min: 0, max: 2 },
+              vol: { alias: '波动率', min: 0, max: 2, tickCount: 5 },
               middle: { min: 0, max: 2 },
             }}
           >
@@ -208,10 +210,17 @@ const ImpliedVolatility = props => {
             <Axis
               name="vol"
               grid={null}
-              label={false}
+              label={{
+                textStyle: {
+                  fontSize: '12',
+                  fill: 'white',
+                  lineHeight: '32px',
+                  fontWeight: '400',
+                },
+              }}
               title={{
                 position: 'end',
-                offset: 20,
+                offset: 40,
                 autoRotate: false,
               }}
               line={{

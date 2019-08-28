@@ -34,24 +34,25 @@ const ClassicSceneTable = memo(props => {
     {
       title: titleNode('经典场景'),
       dataIndex: 'classicScene',
-      width: 150,
+      width: 100,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {
       title: titleNode('股市异常波动'),
       dataIndex: 'STOCK_CRASH_2015',
-      width: 160,
+      width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: titleNode('贸易战'),
       dataIndex: 'TRADE_WAR_2018',
-      width: 160,
+      width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: titleNode('2008年金融危机'),
       dataIndex: 'FINANCIAL_CRISIS_2008',
+      width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
   ];
@@ -88,7 +89,7 @@ const ClassicSceneTable = memo(props => {
     <div style={{ marginTop: 24 }}>
       <ThemeTable
         loading={tableLoading}
-        wrapStyle={{ width: 670 }}
+        wrapStyle={{ width: 900 }}
         dataSource={dataSource}
         columns={tableColDefs}
         pagination={false}

@@ -13,7 +13,6 @@ import {
   getInstrumentVolCone,
   getInstrumentVolSurface,
 } from '@/services/terminal';
-import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 import ThemeTable from '@/containers/ThemeTable';
 import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
@@ -24,6 +23,7 @@ import ThemeSelect from '@/containers/ThemeSelect';
 import { delay } from '@/utils';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
 import FormItemWrapper from '@/containers/FormItemWrapper';
+import { formatNumber } from '@/tools';
 
 const debug = true;
 
@@ -61,9 +61,11 @@ const STATUS = {
 const Vol = props => {
   const { instrumentId, data = {}, dispatch, loading, strikeType } = props;
   const [meta, setMeta] = useState();
-  const [valuationDate, setValuationDate] = useState(moment('2019-08-01'));
+  const [valuationDate, setValuationDate] = useState(moment());
   const [status, setStatus] = useState(STATUS.CHART);
   const [echartInstance, setEchartInstance] = useState();
+  const [strikeTypeData, setStrikeTypeData] = useState(strikeType);
+  const [typeData, setTypeData] = useState(strikeType);
 
   const setData = pData => {
     dispatch({
@@ -106,11 +108,12 @@ const Vol = props => {
     const rsp = await getInstrumentVolSurface({
       instrumentId,
       valuationDate: valuationDate.format('YYYY-MM-DD'),
-      strikeType,
+      strikeType: strikeTypeData,
     });
     setLoading(false);
     if (rsp.error) return;
     setData(rsp.data);
+    setTypeData(strikeTypeData);
   };
 
   const convert = async () => {
@@ -123,13 +126,17 @@ const Vol = props => {
       return {
         title: tenor.replace('D', '天'),
         dataIndex: tenor,
+        render: (value, record, index) => formatNumber(_.toNumber(value) * 100, 2),
       };
     });
 
     const rowsData = _.map(instruments, val => {
       const { vols = [], tenor } = val;
+      const itemName = strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
+      vols.sort((a, b) => a[itemName] - b[itemName]);
       return vols.map(item => ({
-        [tenor]: item[strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent'],
+        [tenor]: item.quote,
+        percent: item[strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent'],
       }));
     });
     const tableData = [];
@@ -156,7 +163,6 @@ const Vol = props => {
         });
       }),
     );
-
     setMeta({
       tableColumns,
       tableData,
@@ -181,7 +187,7 @@ const Vol = props => {
         },
         xAxis3D: {
           type: 'value',
-          name: 'strike_percentage',
+          name: `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'}`,
           nameTextStyle: {
             fontSize: 13,
           },
@@ -247,10 +253,10 @@ const Vol = props => {
 
   useEffect(() => {
     convert();
-  }, [data]);
+  }, [data, status]);
 
   useEffect(() => {
-    if (meta && echartInstance) {
+    if (meta && echartInstance && status === STATUS.CHART) {
       echartInstance.setOption(meta.option);
     }
   }, [meta, echartInstance]);
@@ -271,15 +277,31 @@ const Vol = props => {
         />
       );
     }
+
+    const ColumnsHead = [
+      {
+        title: `${
+          typeData === STRIKE_TYPE_ENUM.STRIKE ? 'strike(￥)\\期限' : 'strike_percentage(%)\\期限'
+        }`,
+        dataIndex: 'percent',
+        render: (value, record, index) => {
+          if (typeData === STRIKE_TYPE_ENUM.STRIKE) {
+            return formatNumber(_.toNumber(value), 2);
+          }
+          return formatNumber(_.toNumber(value) * 100, 2);
+        },
+      },
+    ];
+
     return (
       <ThemeTable
-        style={{ width: 828 }}
         scroll={{ x: meta.tableColumns.length && meta.tableColumns.length * 100 }}
         pagination={{
           simple: true,
         }}
+        loading={loading}
         dataSource={meta.tableData}
-        columns={meta.tableColumns}
+        columns={_.concat(ColumnsHead, ...meta.tableColumns)}
       />
     );
   };
@@ -303,9 +325,9 @@ const Vol = props => {
             <FormItem label="strike_type">
               <ThemeSelect
                 onChange={val => {
-                  setStrikeType(val);
+                  setStrikeTypeData(val);
                 }}
-                value={strikeType}
+                value={strikeTypeData}
                 placeholder="strike_percentage"
                 style={{ minWidth: 200 }}
                 options={[
@@ -327,7 +349,8 @@ const Vol = props => {
             loading={meta && loading}
             onClick={() => {
               fetch();
-              setFetchStrikeType(strikeType);
+              setFetchStrikeType(strikeTypeData);
+              setStrikeType(strikeTypeData);
             }}
             type="primary"
           >

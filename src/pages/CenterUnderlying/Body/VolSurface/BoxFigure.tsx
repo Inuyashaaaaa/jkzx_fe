@@ -5,6 +5,7 @@ import { Axis, Chart, Geom, Tooltip } from 'bizcharts';
 import _ from 'lodash';
 import { connect } from 'dva';
 import React, { memo, useEffect, useRef, useState } from 'react';
+import { formatNumber } from '@/tools';
 
 import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
@@ -27,7 +28,16 @@ const BoxFigure = props => {
     if (!data.length) {
       data = [];
     }
-    const newData = _.slice(_.reverse(_.sortBy(data, 'notionalAmount'), 0, 9));
+    const newData = _.slice(_.reverse(_.sortBy(data, 'notionalAmount'), 0, 9)).map(item => ({
+      ...item,
+      legalEntityName: item.legalEntityName,
+      minVol: _.toNumber(item.minVol.toFixed(2)),
+      maxVol: _.toNumber(item.maxVol.toFixed(2)),
+      meanVol: _.toNumber(item.meanVol.toFixed(2)),
+      medianVol: _.toNumber(item.medianVol.toFixed(2)),
+      oneQuaterVol: _.toNumber(item.oneQuaterVol.toFixed(2)),
+      threeQuaterVol: _.toNumber(item.threeQuaterVol.toFixed(2)),
+    }));
 
     const dvData = newData.map((item, index) => ({
       key: index,
@@ -39,6 +49,7 @@ const BoxFigure = props => {
       q1: item.oneQuaterVol,
       q3: item.threeQuaterVol,
     }));
+
     const dv = new DataSet.View().source(dvData);
 
     dv.transform({
@@ -145,7 +156,16 @@ const BoxFigure = props => {
                   stroke: '#00BAFF',
                 },
               }}
-              itemTpl='<li data-index={index} style="margin-bottom:4px;"><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}<br/><span style="padding-left: 16px">最大值：{high}</span><br/><span style="padding-left: 16px">上四分位数：{q3}</span><br/><span style="padding-left: 16px">中位数：{median}</span><br/><span style="padding-left: 16px">下四分位数：{q1}</span><br/><span style="padding-left: 16px">最小值：{low}</span><br/></li>'
+              itemTpl='
+              <li data-index={index} style="margin-bottom:4px;">
+                <span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}<br/>
+                <span style="padding-left: 16px">最大值：{high}</span><br/>
+                <span style="padding-left: 16px">上四分位数：{q3}</span><br/>
+                <span style="padding-left: 16px">中位数：{median}</span><br/>
+                <span style="padding-left: 16px">平均值：{outlier}</span><br/>
+                <span style="padding-left: 16px">下四分位数：{q1}</span><br/>
+                <span style="padding-left: 16px">最小值：{low}</span><br/>
+              </li>'
             />
             <Geom
               type="schema"
@@ -154,12 +174,13 @@ const BoxFigure = props => {
               opacity={0.9}
               color={['key', key => getColor(key)]}
               tooltip={[
-                'x*low*q1*median*q3*high',
-                (x, low, q1, median, q3, high) => ({
+                'x*low*q1*median*outliers*q3*high',
+                (x, low, q1, median, outliers, q3, high) => ({
                   name: x,
                   low,
                   q1,
                   median,
+                  outlier: outliers[0],
                   q3,
                   high,
                 }),

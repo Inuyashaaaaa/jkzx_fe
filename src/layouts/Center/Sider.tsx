@@ -4,7 +4,7 @@ import withRouter from 'umi/withRouter';
 import Link from 'umi/link';
 import ThemeMenu from '@/containers/ThemeMenu';
 import styles from './Sider.less';
-import UserLayout from './UserLayout';
+import User from './User';
 
 const { SubMenu, Item } = ThemeMenu;
 
@@ -29,7 +29,7 @@ const Sider = props => (
         <Link to="/center/scenario">情景分析</Link>
       </ThemeMenu.Item>
     </ThemeMenu>
-    <UserLayout />
+    <User />
   </div>
 );
 

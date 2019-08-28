@@ -5,9 +5,9 @@ import Animate from 'rc-animate';
 import { connect } from 'dva';
 import router from 'umi/router';
 import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
 import { Form2 } from '@/containers';
 import { updateOwnPassword } from '@/services/user';
-import _ from 'lodash';
 import GlobalHeader from '@/containers/GlobalHeader';
 import TopNavHeader from '@/containers/TopNavHeader';
 import styles from './Header.less';
@@ -52,7 +52,7 @@ class HeaderView extends PureComponent {
     message.success(
       `${formatMessage({ id: 'component.noticeIcon.cleared' })} ${formatMessage({
         id: `component.globalHeader.${type}`,
-      })}`
+      })}`,
     );
     const { dispatch } = this.props;
     dispatch({
@@ -103,6 +103,9 @@ class HeaderView extends PureComponent {
     if (key === 'logout') {
       dispatch({
         type: 'login/logout',
+        payload: {
+          loginUrl: '/user/login',
+        },
       });
     }
     if (key === 'updatePassword') {
@@ -196,80 +199,75 @@ class HeaderView extends PureComponent {
           title="修改密码"
         >
           <Form2
-            ref={node => (this.form = node)}
+            ref={node => {
+              this.form = node;
+            }}
             columns={[
               {
                 dataIndex: 'oldPassword',
                 title: '旧密码',
-                render: (val, record, index, { form }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '必填',
-                          },
-                          // {
-                          //   pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
-                          //   message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
-                          // },
-                        ],
-                      })(<Input.Password placeholder="请输入旧密码" />)}
-                    </FormItem>
-                  );
-                },
+                render: (val, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '必填',
+                        },
+                        // {
+                        //   pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
+                        //   message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
+                        // },
+                      ],
+                    })(<Input.Password placeholder="请输入旧密码" />)}
+                  </FormItem>
+                ),
               },
               {
                 dataIndex: 'newPassword',
                 title: '新密码',
-                render: (val, record, index, { form }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '必填',
-                          },
-                          {
-                            pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
-                            message:
-                              '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
-                          },
-                        ],
-                      })(
-                        <Input.Password placeholder="至少一位数字、字母以及其他特殊字符，且不少于8位" />
-                      )}
-                    </FormItem>
-                  );
-                },
+                render: (val, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '必填',
+                        },
+                        {
+                          pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
+                          message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
+                        },
+                      ],
+                    })(
+                      <Input.Password placeholder="至少一位数字、字母以及其他特殊字符，且不少于8位" />,
+                    )}
+                  </FormItem>
+                ),
               },
               {
                 dataIndex: 'confirmpassword',
                 title: '确认新密码',
-                render: (val, record, index, { form }) => {
-                  return (
-                    <FormItem>
-                      {form.getFieldDecorator({
-                        rules: [
-                          {
-                            required: true,
-                            message: '必填',
+                render: (val, record, index, { form }) => (
+                  <FormItem>
+                    {form.getFieldDecorator({
+                      rules: [
+                        {
+                          required: true,
+                          message: '必填',
+                        },
+                        {
+                          validator(rule, value, cb) {
+                            if (record.newPassword.value !== value) {
+                              cb('2次密码输入不一致');
+                            }
+                            cb();
                           },
-                          {
-                            validator(rule, value, cb) {
-                              if (record.newPassword.value !== value) {
-                                cb('2次密码输入不一致');
-                              }
-                              cb();
-                            },
-                          },
-                        ],
-                      })(<Input.Password placeholder="请与新密码保持一致" />)}
-                    </FormItem>
-                  );
-                },
+                        },
+                      ],
+                    })(<Input.Password placeholder="请与新密码保持一致" />)}
+                  </FormItem>
+                ),
               },
             ]}
             dataSource={updateFormData}

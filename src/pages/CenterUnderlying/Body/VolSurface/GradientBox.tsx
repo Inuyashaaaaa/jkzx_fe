@@ -35,7 +35,7 @@ const GradientBox = props => {
       >
         <div style={handleStyle(width)}></div>
       </div>
-      <div>{formatNumber(value * 100, 2)}</div>
+      <div>{formatNumber(value, 2)}</div>
     </div>
   );
 };

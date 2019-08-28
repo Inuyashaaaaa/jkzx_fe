@@ -14,6 +14,7 @@ import PosCenter from '@/containers/PosCenter';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
 import FormItemWrapper from '@/containers/FormItemWrapper';
+import { formatNumber } from '@/tools';
 
 const TopChart = props => {
   const { instrumentId, loading, data, fetchStrikeType } = props;
@@ -57,12 +58,13 @@ const TopChart = props => {
         });
       }),
     );
-
     const fdata = _.filter(allData, item => {
       const field = fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
-      return window === item[field];
+      if (field === 'strike') {
+        return window === formatNumber(_.toNumber(item[field]), 2);
+      }
+      return window === formatNumber(_.toNumber(item[field]) * 100, 2);
     });
-
     const dv = new DataSet.View().source(fdata);
 
     const gradualColorStr = generateGradualColorStr(dv);
@@ -96,7 +98,10 @@ const TopChart = props => {
     const pOptions = _.union(
       allData.map(item => {
         const field = fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
-        return item[field];
+        if (field === 'strike') {
+          return formatNumber(_.toNumber(item[field]), 2);
+        }
+        return formatNumber(_.toNumber(item[field]) * 100, 2);
       }),
     );
 
@@ -151,7 +156,7 @@ const TopChart = props => {
             animate
             forceFit
             height={315}
-            padding={[40, 20, 40, 40]}
+            padding={[40, 50, 40, 40]}
             width={800}
             data={meta.dv}
             scale={{
@@ -159,7 +164,8 @@ const TopChart = props => {
                 alias: '期限',
               },
               value: {
-                alias: '波动率',
+                alias: '波动率(%)',
+                formatter: val => formatNumber(_.toNumber(val) * 100, 2),
               },
             }}
             onGetG2Instance={g2Chart => {
