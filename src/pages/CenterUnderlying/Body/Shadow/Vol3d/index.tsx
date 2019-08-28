@@ -13,7 +13,6 @@ import {
   getInstrumentVolCone,
   getInstrumentVolSurface,
 } from '@/services/terminal';
-import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
 import ThemeTable from '@/containers/ThemeTable';
 import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';

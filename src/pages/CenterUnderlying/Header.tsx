@@ -4,7 +4,7 @@ import { connect } from 'dva';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import ThemeSelect from '@/containers/ThemeSelect';
-import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
+import { mktInstrumentSearch } from '@/services/market-data-service';
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const Header = props => {
@@ -12,7 +12,7 @@ const Header = props => {
   const [instrumentIdArr, setInstrumentIdArr] = useState([]);
 
   const fetchArray = async () => {
-    const { data, error } = await mktInstrumentWhitelistSearch({
+    const { data, error } = await mktInstrumentSearch({
       instrumentIdPart: '',
       excludeOption: true,
     });
@@ -55,7 +55,7 @@ const Header = props => {
                 showSearch
                 mode="multiple"
                 options={async (value: string) => {
-                  const { data, error } = await mktInstrumentWhitelistSearch({
+                  const { data, error } = await mktInstrumentSearch({
                     instrumentIdPart: value,
                     excludeOption: true,
                   });
@@ -88,7 +88,7 @@ const Header = props => {
                   // const { data, error } = await mktInstrumentSearch({
                   //   instrumentIdPart: value,
                   // });
-                  const { data, error } = await mktInstrumentWhitelistSearch({
+                  const { data, error } = await mktInstrumentSearch({
                     instrumentIdPart: value,
                     excludeOption: true,
                   });

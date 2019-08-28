@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
-import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
+import { mktInstrumentSearch } from '@/services/market-data-service';
 
 export default {
   namespace: 'centerUnderlying',
@@ -30,7 +30,7 @@ export default {
   },
   effects: {
     *queryInstrumentId({ payload }, { call, put }) {
-      const rsp = yield call(mktInstrumentWhitelistSearch, payload);
+      const rsp = yield call(mktInstrumentSearch, payload);
       if (rsp.error) return;
       yield put({
         type: 'setState',
