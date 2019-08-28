@@ -16,21 +16,24 @@ const VolTable = props => {
   const [max, setMax] = useState(0);
   const { dispatch } = props;
   const fetch = async (data = []) => {
-    if (!data.length) {
+    const newData = _.reverse(_.sortBy(data, 'notionalAmount'));
+    if (!newData.length) {
       // eslint-disable-next-line
-      data = [];
+      newData = [];
     }
     setTableData(
-      data.map(item => ({
+      newData.map(item => ({
         name: item.legalEntityName,
         min: item.minVol,
         max: item.maxVol,
         average: item.meanVol,
         median: item.medianVol,
+        q1: item.oneQuaterVol,
+        q3: item.threeQuaterVol,
       })),
     );
-    setTotal(data.length);
-    setMax(_.max(data.map(item => item.maxVol)));
+    setTotal(newData.length);
+    setMax(_.max(newData.map(item => item.maxVol)));
   };
 
   useEffect(() => {
@@ -63,6 +66,18 @@ const VolTable = props => {
     {
       title: '中位数',
       dataIndex: 'median',
+      width: 100,
+      render: value => <GradientBox value={value} max={max} />,
+    },
+    {
+      title: '上四分位数：',
+      dataIndex: 'q3',
+      width: 100,
+      render: value => <GradientBox value={value} max={max} />,
+    },
+    {
+      title: '下四分位数：',
+      dataIndex: 'q1',
       width: 100,
       render: value => <GradientBox value={value} max={max} />,
     },
