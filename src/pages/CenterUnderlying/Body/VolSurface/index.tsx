@@ -1,19 +1,19 @@
 import React, { memo, useRef, useState, useEffect } from 'react';
 import { connect } from 'dva';
 import { Col, Row } from 'antd';
+import moment from 'moment';
+import FormItem from 'antd/lib/form/FormItem';
 import BoxFigure from './BoxFigure';
 import VolTable from './VolTable';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeDatePicker from '@/containers/ThemeDatePicker';
 import ThemeRadio from '@/containers/ThemeRadio';
 import ThemeSelect from '@/containers/ThemeSelect';
-import moment from 'moment';
 import FormItemWrapper from '@/containers/FormItemWrapper';
-import FormItem from 'antd/lib/form/FormItem';
 import { getImpliedVolReport } from '@/services/terminal';
 
 const Box = props => {
-  const [dateData, setDateData] = useState(moment('2019-08-08'));
+  const [dateData, setDateData] = useState(moment());
   const { loading, volReport, dispatch, instrumentId } = props;
 
   const setLoading = data => {

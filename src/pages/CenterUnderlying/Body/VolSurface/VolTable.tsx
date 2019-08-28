@@ -16,7 +16,7 @@ const VolTable = props => {
   const [max, setMax] = useState(0);
   const { dispatch } = props;
   const fetch = async (data = []) => {
-    const newData = _.reverse(_.sortBy(data, 'notionalAmount'));
+    let newData = _.reverse(_.sortBy(data, 'notionalAmount'));
     if (!newData.length) {
       // eslint-disable-next-line
       newData = [];

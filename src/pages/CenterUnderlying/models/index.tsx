@@ -6,7 +6,7 @@ export default {
   namespace: 'centerUnderlying',
   state: {
     data: {},
-    instrumentId: '510050.SH',
+    instrumentId: '',
     activeKey: '0',
     strikeType: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
     fetchStrikeType: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
