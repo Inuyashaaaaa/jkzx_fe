@@ -165,7 +165,7 @@ const TopChart = props => {
               },
               value: {
                 alias: '波动率(%)',
-                formatter: val => formatNumber(_.toNumber(val) * 100, 2),
+                formatter: val => formatNumber(_.toNumber(val) * 100, 0),
               },
             }}
             onGetG2Instance={g2Chart => {
