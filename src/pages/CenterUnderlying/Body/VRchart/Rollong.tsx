@@ -13,7 +13,7 @@ import ThemeSelect from '@/containers/ThemeSelect';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeButton from '@/containers/ThemeButton';
 import { Loading } from '@/containers';
-import { delay } from '@/tools';
+import { delay, formatNumber } from '@/tools';
 import PosCenter from '@/containers/PosCenter';
 import { getInstrumentRollingVol } from '@/services/terminal';
 import FormItemWrapper from '@/containers/FormItemWrapper';
@@ -127,7 +127,7 @@ const Rollong = props => {
           </ThemeButton>
         </Col>
       </Row>
-      <ChartTitle>Rolling Volatility</ChartTitle>
+      <ChartTitle>历史波动率时间序列</ChartTitle>
       <Row style={{ padding: 17 }} gutter={12}>
         {meta ? (
           <Chart
@@ -146,7 +146,8 @@ const Rollong = props => {
                 range: [0, 0.95],
               },
               value: {
-                alias: '波动率',
+                alias: '波动率(%)',
+                formatter: param => formatNumber(param * 100, 0),
               },
             }}
             onGetG2Instance={g2Chart => {
@@ -255,6 +256,13 @@ const Rollong = props => {
                   delay: 100,
                 },
               }}
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time,
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
             />
             <Geom
               size={4}
@@ -288,6 +296,13 @@ const Rollong = props => {
                   delay: 100,
                 },
               }}
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time,
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
             />
           </Chart>
         ) : (

@@ -173,7 +173,10 @@ const Vol = props => {
             const [x, y, z] = pData;
             return `${
               strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'
-            }: ${x}<br/>期限: ${y}<br/>波动率: ${z}`;
+            }: ${formatNumber(x * 100, 2)}<br/>期限: ${y}<br/>波动率(%): ${formatNumber(
+              z * 100,
+              2,
+            )}`;
           },
         },
         visualMap: {
@@ -191,6 +194,9 @@ const Vol = props => {
           nameTextStyle: {
             fontSize: 13,
           },
+          axisLabel: {
+            formatter: param => formatNumber(param * 100, 0),
+          },
         },
         yAxis3D: {
           type: 'value',
@@ -201,9 +207,12 @@ const Vol = props => {
         },
         zAxis3D: {
           type: 'value',
-          name: '波动率',
+          name: '波动率(%)',
           nameTextStyle: {
             fontSize: 13,
+          },
+          axisLabel: {
+            formatter: param => formatNumber(param * 100, 0),
           },
         },
         grid3D: {

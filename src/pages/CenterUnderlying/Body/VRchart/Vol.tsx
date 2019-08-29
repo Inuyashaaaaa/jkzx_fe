@@ -13,8 +13,9 @@ import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeButton from '@/containers/ThemeButton';
 import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
-import { delay } from '@/tools';
+import { delay, formatNumber } from '@/tools';
 import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const LATEST_PER = 'latest';
@@ -182,7 +183,8 @@ const Vol = props => {
                 type: 'cat',
               },
               value: {
-                alias: '波动率',
+                alias: '波动率(%)',
+                formatter: param => formatNumber(param * 100, 0),
               },
             }}
             onGetG2Instance={g2Chart => {
@@ -263,7 +265,7 @@ const Vol = props => {
                 'pname*value',
                 (name, value) => ({
                   name,
-                  value,
+                  value: formatNumber(value * 100, 2),
                 }),
               ]}
               size={3}

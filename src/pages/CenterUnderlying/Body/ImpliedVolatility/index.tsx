@@ -17,6 +17,7 @@ import ThemeSelect from '@/containers/ThemeSelect';
 import { delay, getMoment } from '@/tools';
 import PosCenter from '@/containers/PosCenter';
 import { getHistoricalAndNeutralVolList } from '@/services/terminal';
+import { formatNumber } from '@/tools';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -174,7 +175,7 @@ const ImpliedVolatility = props => {
           <Chart
             width={1450}
             height={600}
-            padding={[40, 40, 40, 60]}
+            padding={[50, 60, 95, 90]}
             forceFit
             data={dv}
             scale={{
@@ -183,7 +184,13 @@ const ImpliedVolatility = props => {
                 type: 'cat',
                 ...(dataSource.length < 10 ? { range: [0.08, dataSource.length * 0.1] } : {}),
               },
-              vol: { alias: '波动率', min: 0, max: 2, tickCount: 5 },
+              vol: {
+                alias: '波动率(%)',
+                min: 0,
+                max: 2,
+                tickCount: 5,
+                formatter: val => formatNumber(_.toNumber(val) * 100, 0),
+              },
               middle: { min: 0, max: 2 },
             }}
           >
@@ -193,39 +200,57 @@ const ImpliedVolatility = props => {
                 position: 'end',
                 offset: 0,
                 textStyle: {
-                  paddingLeft: 20,
-                },
-              }}
-              grid={null}
-              label={{
-                textStyle: {
-                  fontSize: '14',
-                  fill: 'white',
-                  lineHeight: '32px',
+                  fontSize: '12',
                   fontWeight: '400',
+                  opacity: '0.6',
+                  fill: '#F6FAFF',
                 },
               }}
-              tickLine={null}
-            ></Axis>
-            <Axis
-              name="vol"
-              grid={null}
               label={{
                 textStyle: {
                   fontSize: '12',
-                  fill: 'white',
-                  lineHeight: '32px',
                   fontWeight: '400',
+                  opacity: '0.6',
+                  fill: '#F6FAFF',
                 },
               }}
-              title={{
-                position: 'end',
-                offset: 40,
-                autoRotate: false,
-              }}
+              tickLine={null}
               line={{
-                stroke: '#f2ffff',
+                stroke: '#00BAFF',
                 lineWidth: 1,
+                lineDash: [0],
+                opacity: '0.1',
+              }}
+            ></Axis>
+            <Axis
+              name="vol"
+              label={{
+                textStyle: {
+                  fontSize: '12',
+                  fontWeight: '400',
+                  opacity: '0.6',
+                  fill: '#F6FAFF',
+                },
+                offset: 10,
+              }}
+              title={{
+                offset: -20,
+                textStyle: {
+                  rotate: 0,
+                  fontSize: '12',
+                  fontWeight: '400',
+                  opacity: '0.6',
+                  fill: '#F6FAFF',
+                },
+                position: 'end',
+              }}
+              grid={{
+                type: 'line',
+                lineStyle: {
+                  stroke: '#00baff1a',
+                  lineWidth: 1,
+                  lineDash: [0],
+                },
               }}
             ></Axis>
             <Axis name="middle" grid={null} label={false}></Axis>
@@ -257,11 +282,11 @@ const ImpliedVolatility = props => {
               tooltip={[
                 'min*max*minVol*maxVol*neutralVol',
                 (min, max, minVol, maxVol, neutralVol) => ({
-                  min,
-                  max,
-                  minVol,
-                  maxVol,
-                  neutralVol,
+                  min: formatNumber(min * 100, 2),
+                  max: formatNumber(max * 100, 2),
+                  minVol: formatNumber(minVol * 100, 2),
+                  maxVol: formatNumber(maxVol * 100, 2),
+                  neutralVol: formatNumber(neutralVol * 100, 2),
                 }),
               ]}
               color={['name', val => (val === 'max' ? '#F15345' : '#7070D3')]}
