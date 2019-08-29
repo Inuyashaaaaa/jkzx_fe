@@ -1,7 +1,7 @@
-import { notification } from 'antd';
+import { notification, message } from 'antd';
 import router from 'umi/router';
 import { getPageQuery, delay } from '@/tools';
-import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
+import { login, queryCaptcha, updateOwnPassword, authUserLogout } from '@/services/user';
 import pageRouters from '../../config/router.config';
 import { updatePermission } from '@/services/permission';
 import { PERMISSIONS } from '@/constants/user';
@@ -152,13 +152,21 @@ export default {
 
     *logout(
       {
-        payload: { loginUrl },
+        payload: { loginUrl, userId },
       },
-      { put },
+      { call, put },
     ) {
+      const rsp = yield call(authUserLogout, { userId });
+      if (rsp.error) {
+        message.info('退出登录失败');
+        return;
+      }
+
       yield put({
         type: 'user/cleanCurrentUser',
       });
+
+      message.info('退出登录');
 
       router.push({
         pathname: loginUrl,
