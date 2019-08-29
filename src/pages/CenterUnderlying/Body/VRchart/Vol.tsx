@@ -143,6 +143,7 @@ const Vol = props => {
                 onChange={pDates => setDates(pDates)}
                 value={dates}
                 allowClear={false}
+                disabledDate={current => current && current > moment().endOf('day')}
               ></ThemeDatePickerRanger>
             </FormItem>
           </FormItemWrapper>
