@@ -33,6 +33,7 @@ const User = props => {
       type: 'login/logout',
       payload: {
         loginUrl: '/center/login',
+        userId: _.get(user, 'currentUser.username'),
       },
     });
     message.info('退出登录');
