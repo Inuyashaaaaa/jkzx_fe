@@ -248,7 +248,6 @@ const TopChart = props => {
               position="time*value"
               color="l(0) 0:#dbdcd740 0.3:#bc487640 0.5:#a81e5940 0.8:#63084240 1:26083c40"
               opacity={0.65}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
@@ -282,7 +281,6 @@ const TopChart = props => {
               position="time*value"
               color={meta.gradualColorStr}
               opacity={0.85}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称

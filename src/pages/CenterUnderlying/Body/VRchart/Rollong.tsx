@@ -229,7 +229,6 @@ const Rollong = props => {
               position="time*value"
               color="l(100) 0:#FF0B194F 0.8:#0d2960 1:#0d2960"
               opacity={0.65}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
@@ -263,7 +262,6 @@ const Rollong = props => {
               position="time*value"
               color={meta.gradualColorStr}
               opacity={0.85}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称

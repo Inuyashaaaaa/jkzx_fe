@@ -270,7 +270,6 @@ const Vol = props => {
               position="window*value"
               color={['percentile', percentile => colorMap[percentile]]}
               opacity={0.85}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
