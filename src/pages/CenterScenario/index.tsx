@@ -125,10 +125,16 @@ const CenterScenario = memo(props => {
         if (keys === 'valuationDate') {
           return moment(vals).format('YYYY-MM-DD');
         }
+        // console.log(vals,keys,'vals')
         return vals;
       },
     );
-    setLoading(true);
+    _.mapKeys(Form2.getFieldsValue(reportFormData), (val, key) => {
+      if (key === 'legalName' && val) {
+        reportData.subOrPartyName = val;
+      }
+    }),
+      setLoading(true);
     setTableLoading(true);
 
     const { error, data } = await rptSpotScenariosReportListSearch(reportData);
