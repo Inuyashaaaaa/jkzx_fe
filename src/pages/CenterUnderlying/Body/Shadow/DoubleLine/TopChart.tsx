@@ -117,7 +117,9 @@ const TopChart = props => {
   }, [data]);
 
   useEffect(() => {
-    fetchWindow();
+    if (props.instrumentId) {
+      fetchWindow();
+    }
   }, [options]);
 
   useEffect(() => {

@@ -106,7 +106,7 @@ const Vol = props => {
   const fetch = async () => {
     setLoading(true);
     const rsp = await getInstrumentVolSurface({
-      instrumentId,
+      instrumentId: props.instrumentId,
       valuationDate: valuationDate.format('YYYY-MM-DD'),
       strikeType: strikeTypeData,
     });
@@ -256,10 +256,10 @@ const Vol = props => {
   };
 
   useEffect(() => {
-    fetch();
-    return () => {
+    if (props.instrumentId) {
+      fetch();
       setData({});
-    };
+    }
   }, [props.instrumentId]);
 
   useEffect(() => {

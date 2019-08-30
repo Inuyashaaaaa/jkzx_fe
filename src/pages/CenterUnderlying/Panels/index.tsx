@@ -62,7 +62,7 @@ const Panels = props => {
       <Col>
         <MiniCard
           onClick={() => setActiveKeyCache('3')}
-          title="公允/隐含波动率对比"
+          title="公允/历史波动率对比"
           active={activeKey === '3'}
           imageUrls={[imgPath5]}
         ></MiniCard>
