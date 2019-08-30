@@ -26,7 +26,7 @@ const ClassicSceneTable = memo(props => {
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {
-      title: '股灾（2015/6/22）',
+      title: '股市异常波动（2015/6/26）',
       dataIndex: 'STOCK_CRASH_2015',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -38,7 +38,7 @@ const ClassicSceneTable = memo(props => {
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
-      title: '2008年金融危机（2018/9/15）',
+      title: '2008年金融危机（2008/9/16）',
       dataIndex: 'FINANCIAL_CRISIS_2008',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
