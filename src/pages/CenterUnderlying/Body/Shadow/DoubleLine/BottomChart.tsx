@@ -103,7 +103,7 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchMeta();
-  }, [data, window]);
+  }, [data, window, props.instrumentId]);
 
   const getStrikeLabel = () => {
     if (fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE) {
