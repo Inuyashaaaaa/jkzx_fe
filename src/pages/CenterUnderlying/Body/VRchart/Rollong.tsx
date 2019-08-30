@@ -19,7 +19,6 @@ import { getInstrumentRollingVol } from '@/services/terminal';
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const Rollong = props => {
-  const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +43,7 @@ const Rollong = props => {
   const fetch = async () => {
     setLoading(true);
     const rsp = await getInstrumentRollingVol({
-      instrumentId,
+      instrumentId: props.instrumentId,
       startDate: dates[0].format('YYYY-MM-DD'),
       endDate: dates[1].format('YYYY-MM-DD'),
       window: _.toNumber(window),
@@ -80,7 +79,7 @@ const Rollong = props => {
   };
 
   useEffect(() => {
-    if (instrumentId != null) {
+    if (props.instrumentId) {
       fetch();
     }
   }, [props.instrumentId]);

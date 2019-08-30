@@ -70,7 +70,7 @@ const Vol = props => {
     setLoading(true);
     const [rsp, realRsp] = await Promise.all([
       getInstrumentVolCone({
-        instrumentId,
+        instrumentId: props.instrumentId,
         start_date: dates[0].format('YYYY-MM-DD'),
         end_date: dates[1].format('YYYY-MM-DD'),
         windows,
@@ -78,7 +78,7 @@ const Vol = props => {
         isPrimary: true,
       }),
       getInstrumentRealizedVol({
-        instrumentId,
+        instrumentId: props.instrumentId,
         tradeDate: dates[1].format('YYYY-MM-DD'),
         isPrimary: true,
       }),
@@ -130,7 +130,7 @@ const Vol = props => {
   };
 
   useEffect(() => {
-    if (instrumentId != null) {
+    if (props.instrumentId) {
       fetch();
     }
   }, [props.instrumentId]);

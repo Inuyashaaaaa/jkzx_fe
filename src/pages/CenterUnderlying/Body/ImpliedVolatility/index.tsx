@@ -139,7 +139,9 @@ const ImpliedVolatility = props => {
   });
 
   useEffect(() => {
-    onSearch();
+    if (props.instrumentId) {
+      onSearch();
+    }
   }, [props.instrumentId]);
 
   return (
