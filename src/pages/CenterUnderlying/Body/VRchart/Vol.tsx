@@ -305,6 +305,7 @@ const Vol = props => {
               offsetY={-12}
               offsetX={-3}
               itemFormatter={val => lengedMap[val]}
+              clickable={false}
             />
           </Chart>
         ) : (
