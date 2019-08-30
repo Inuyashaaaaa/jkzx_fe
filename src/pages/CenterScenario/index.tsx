@@ -133,8 +133,8 @@ const CenterScenario = memo(props => {
       if (key === 'legalName' && val) {
         reportData.subOrPartyName = val;
       }
-    }),
-      setLoading(true);
+    });
+    setLoading(true);
     setTableLoading(true);
 
     const { error, data } = await rptSpotScenariosReportListSearch(reportData);
