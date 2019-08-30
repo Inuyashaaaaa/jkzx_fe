@@ -80,7 +80,9 @@ const Rollong = props => {
   };
 
   useEffect(() => {
-    fetch();
+    if (instrumentId != null) {
+      fetch();
+    }
   }, [props.instrumentId]);
 
   return (
