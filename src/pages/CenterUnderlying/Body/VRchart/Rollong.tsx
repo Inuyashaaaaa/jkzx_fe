@@ -86,7 +86,7 @@ const Rollong = props => {
   return (
     <>
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
-        <Col>
+        <Col style={{ borderRight: '1px solid #05507b' }}>
           <FormItemWrapper>
             <FormItem label="日期">
               <ThemeDatePickerRanger
@@ -134,7 +134,7 @@ const Rollong = props => {
             animate
             forceFit
             height={630}
-            padding={[40, 20, 40, 40]}
+            padding={[40, 20, 60, 40]}
             width={800}
             data={meta.dv}
             scale={{
