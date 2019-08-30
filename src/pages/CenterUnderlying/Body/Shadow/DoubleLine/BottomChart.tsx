@@ -237,7 +237,7 @@ const TopChart = props => {
               tooltip={[
                 'value*time',
                 (value, time) => ({
-                  time,
+                  time: formatNumber(value, 2),
                   value: formatNumber(value * 100, 2),
                 }),
               ]}
@@ -277,7 +277,7 @@ const TopChart = props => {
               tooltip={[
                 'value*time',
                 (value, time) => ({
-                  time,
+                  time: formatNumber(value, 2),
                   value: formatNumber(value * 100, 2),
                 }),
               ]}
