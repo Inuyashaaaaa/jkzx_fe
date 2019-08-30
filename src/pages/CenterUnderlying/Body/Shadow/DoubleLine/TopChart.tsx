@@ -122,7 +122,7 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchMeta();
-  }, [data, window]);
+  }, [data, window, props.instrumentId]);
 
   return (
     <>

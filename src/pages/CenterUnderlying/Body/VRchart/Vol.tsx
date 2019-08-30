@@ -132,7 +132,7 @@ const Vol = props => {
 
   useEffect(() => {
     fetch();
-  }, []);
+  }, [props.instrumentId]);
 
   return (
     <>

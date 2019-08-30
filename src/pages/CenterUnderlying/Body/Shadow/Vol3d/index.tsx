@@ -258,7 +258,7 @@ const Vol = props => {
     return () => {
       setData({});
     };
-  }, []);
+  }, [props.instrumentId]);
 
   useEffect(() => {
     convert();
