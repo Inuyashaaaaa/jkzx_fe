@@ -68,7 +68,6 @@ const Vol = props => {
 
   const fetch = async () => {
     setLoading(true);
-
     const [rsp, realRsp] = await Promise.all([
       getInstrumentVolCone({
         instrumentId,
@@ -131,7 +130,9 @@ const Vol = props => {
   };
 
   useEffect(() => {
-    fetch();
+    if (instrumentId != null) {
+      fetch();
+    }
   }, [props.instrumentId]);
 
   return (
