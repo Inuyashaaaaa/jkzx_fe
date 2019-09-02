@@ -114,17 +114,15 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchOption();
-  }, [data]);
+  }, [props.data]);
 
   useEffect(() => {
-    if (props.instrumentId) {
-      fetchWindow();
-    }
+    fetchWindow();
   }, [options]);
 
   useEffect(() => {
     fetchMeta();
-  }, [data, window, props.instrumentId]);
+  }, [props.data, window, props.instrumentId]);
 
   return (
     <>
@@ -132,14 +130,14 @@ const TopChart = props => {
         <Col>
           <FormItemWrapper>
             <FormItem
-              label={fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'}
+              label={fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)' : '行权价(%)'}
             >
               <ThemeSelect
                 value={window}
                 onChange={val => {
                   setWindow(val);
                 }}
-                placeholder="strike"
+                placeholder="行权价"
                 style={{ minWidth: 200 }}
               >
                 {options.map(item => (
