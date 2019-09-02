@@ -95,23 +95,21 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchOption();
-  }, [data]);
+  }, [props.data]);
 
   useEffect(() => {
     fetchWindow();
   }, [options]);
 
   useEffect(() => {
-    if (props.instrumentId) {
-      fetchMeta();
-    }
-  }, [data, window, props.instrumentId]);
+    fetchMeta();
+  }, [props.data, window, props.instrumentId]);
 
   const getStrikeLabel = () => {
     if (fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE) {
-      return 'strike';
+      return '行权价(￥)';
     }
-    return 'strike_percentage';
+    return '行权价(%)';
   };
 
   return (
