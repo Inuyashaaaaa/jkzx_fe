@@ -379,6 +379,11 @@ export default [
               name: 'documentManagement',
               component: './SystemSettingsDocumentManagement/index',
             },
+            {
+              path: '/system-settings/operation-log',
+              name: 'operationLog',
+              component: './SystemSettingOperationLog/index',
+            },
           ],
         },
       ],
