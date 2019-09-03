@@ -197,6 +197,7 @@ const Vol = props => {
           name: `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)' : '行权价(%)'}`,
           nameTextStyle: {
             fontSize: 13,
+            lineHeight: 40,
           },
           axisLabel: {
             formatter: param => {
@@ -222,6 +223,7 @@ const Vol = props => {
           name: '期限',
           nameTextStyle: {
             fontSize: 13,
+            lineHeight: 40,
           },
           axisPointer: {
             label: {
@@ -234,6 +236,7 @@ const Vol = props => {
           name: '波动率(%)',
           nameTextStyle: {
             fontSize: 13,
+            lineHeight: 40,
           },
           axisLabel: {
             formatter: param => formatNumber(param * 100, 0),
