@@ -15,7 +15,7 @@ import ThemeTable from '@/containers/ThemeTable';
 import { delay, formatNumber } from '@/tools';
 import ThemeDatePicker from '@/containers/ThemeDatePicker';
 import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
+import { refSimilarLegalNameListWithoutBook } from '@/services/reference-data-service';
 import { queryNonGroupResource } from '@/services/tradeBooks';
 import { rptSpotScenariosReportListSearch } from '@/services/report-service';
 import moment from 'moment';
@@ -352,7 +352,7 @@ const CenterScenario = memo(props => {
                       style={{ minWidth: 200 }}
                       key="legalName"
                       options={async (value: string) => {
-                        const { data, error } = await refSimilarLegalNameList({
+                        const { data, error } = await refSimilarLegalNameListWithoutBook({
                           similarLegalName: value,
                         });
                         if (error) return [];
