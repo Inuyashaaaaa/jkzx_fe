@@ -88,41 +88,52 @@ const ThemeCenterCommonTable = props => {
       <Title>{title}</Title>
       <Row
         type="flex"
-        justify="start"
+        justify="space-between"
         align="middle"
         gutter={12}
         style={{ marginTop: 18, marginBottom: 13 }}
       >
         <Col>
-          <FormItemWrapper>
-            <Form2
-              hideRequiredMark
-              ref={node => {
-                $form.current = node;
-              }}
-              dataSource={formData}
-              onFieldsChange={onFormChange}
-              columns={formControls}
-              layout="inline"
-              footer={false}
-              onSubmitButtonClick={fetchTable}
-              submitText="查询"
-              resetable={false}
-            ></Form2>
-          </FormItemWrapper>
+          <Row
+            type="flex"
+            justify="start"
+            align="middle"
+            gutter={12}
+            style={{ marginTop: 18, marginBottom: 13 }}
+          >
+            <Col>
+              <FormItemWrapper>
+                <Form2
+                  hideRequiredMark
+                  ref={node => {
+                    $form.current = node;
+                  }}
+                  dataSource={formData}
+                  onFieldsChange={onFormChange}
+                  columns={formControls}
+                  layout="inline"
+                  footer={false}
+                  onSubmitButtonClick={fetchTable}
+                  submitText="查询"
+                  resetable={false}
+                ></Form2>
+              </FormItemWrapper>
+            </Col>
+            <Col>
+              <ThemeButton type="primary">确定</ThemeButton>
+            </Col>
+          </Row>
         </Col>
         <Col>
-          <ThemeButton type="primary">确定</ThemeButton>
+          <Button style={{ margin: '10px 0' }} type="primary">
+            导出
+          </Button>
         </Col>
       </Row>
-      {/* <Divider /> */}
-      <Button style={{ margin: '10px 0' }} type="primary">
-        导出Excel
-      </Button>
       <ThemeTableWrapper>
         <ThemeTable
           loading={loading}
-          wrapStyle={{ maxWidth: 1685 }}
+          wrapStyle={{ minWidth: 1000 }}
           dataSource={dataSource}
           columns={columns}
           scroll={{ x: columns.length && columns.length * 150 }}
