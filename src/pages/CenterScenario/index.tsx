@@ -54,7 +54,6 @@ const CenterScenario = memo(props => {
   const [dataSource, setDataSource] = useState([]);
   const [tableColDefs, setTableColDefs] = useState([]);
   const [subNameOrBook, setSubNameOrBook] = useState([]);
-  setClassicSceneTable;
   const [classicSceneTable, setClassicSceneTable] = useState(true);
 
   const searchForm = useRef<Form2>(null);
