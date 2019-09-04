@@ -19,6 +19,7 @@ const ThemeTabsWrap = styled.div`
   .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active {
     background: rgba(4, 119, 152, 1);
     border: 1px solid rgba(0, 232, 232, 1);
+    text-align: center;
   }
 `;
 

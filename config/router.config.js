@@ -51,6 +51,16 @@ export default [
         path: '/center/scenario',
         component: './CenterScenario',
       },
+      {
+        path: '/center/operation-quality',
+        name: 'centerOperationQuality',
+        component: './CenterOperationQuality',
+      },
+      {
+        path: '/center/risk-monitoring',
+        name: 'centerRiskMonitoring',
+        component: './CenterRiskMonitoring',
+      },
     ],
   },
   // {
