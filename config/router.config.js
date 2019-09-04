@@ -61,17 +61,6 @@ export default [
         name: 'centerRiskMonitoring',
         component: './CenterRiskMonitoring',
       },
-      // {
-      //   path: '/center/market',
-      //   name: 'centerMarket',
-      //   routes: [
-      //     {
-      //       path: '/center/operation-quality',
-      //       name: 'centerOperationQuality',
-      //       component: './CenterOperationQuality'
-      //     }
-      //   ]
-      // }
     ],
   },
   // {
@@ -400,11 +389,6 @@ export default [
               name: 'documentManagement',
               component: './SystemSettingsDocumentManagement/index',
             },
-            // {
-            //   path: '/system-settings/operation-log',
-            //   name: 'operationLog',
-            //   component: './SystemSettingOperationLog/index'
-            // }
           ],
         },
       ],
