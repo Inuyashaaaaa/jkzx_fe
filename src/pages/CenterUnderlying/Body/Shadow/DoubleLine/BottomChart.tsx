@@ -22,6 +22,7 @@ const TopChart = props => {
   const [meta, setMeta] = useState(null);
   const [window, setWindow] = useState();
   const [options, setOptions] = useState([]);
+  const [strikeType, setStrikeType] = useState(fetchStrikeType);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -68,7 +69,7 @@ const TopChart = props => {
 
     const strikeX = _.union(
       allData.map(item => {
-        const field = fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
+        const field = strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
         return item[field];
       }),
     );
@@ -78,6 +79,7 @@ const TopChart = props => {
       dv,
       strikeX,
     });
+    setStrikeType(fetchStrikeType);
   };
 
   const fetchOption = () => {
@@ -178,6 +180,11 @@ const TopChart = props => {
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
+                },
+                formatter(text, item, index) {
+                  return strikeType === STRIKE_TYPE_ENUM.STRIKE
+                    ? formatNumber(_.toNumber(text), 0)
+                    : formatNumber(_.toNumber(text) * 100, 0);
                 },
               }}
               line={{
