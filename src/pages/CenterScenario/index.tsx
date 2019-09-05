@@ -54,7 +54,6 @@ const CenterScenario = memo(props => {
   const [dataSource, setDataSource] = useState([]);
   const [tableColDefs, setTableColDefs] = useState([]);
   const [subNameOrBook, setSubNameOrBook] = useState([]);
-  setClassicSceneTable;
   const [classicSceneTable, setClassicSceneTable] = useState(true);
 
   const searchForm = useRef<Form2>(null);
@@ -407,6 +406,7 @@ const CenterScenario = memo(props => {
         classicSceneTable={classicSceneTable}
         valuationDate={Form2.getFieldsValue(reportFormData.valuationDate)}
         instrumentId={Form2.getFieldsValue(reportFormData.underlyer)}
+        reportFormData={Form2.getFieldsValue(reportFormData)}
       />
     </>
   );
