@@ -1,12 +1,12 @@
 import moment from 'moment';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
-import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
+import { mktInstrumentSearch } from '@/services/market-data-service';
 
 export default {
   namespace: 'centerUnderlying',
   state: {
     data: {},
-    instrumentId: '510050.SH',
+    instrumentId: '',
     activeKey: '0',
     strikeType: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
     fetchStrikeType: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
@@ -30,7 +30,7 @@ export default {
   },
   effects: {
     *queryInstrumentId({ payload }, { call, put }) {
-      const rsp = yield call(mktInstrumentWhitelistSearch, payload);
+      const rsp = yield call(mktInstrumentSearch, payload);
       if (rsp.error) return;
       yield put({
         type: 'setState',

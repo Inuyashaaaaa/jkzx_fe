@@ -1,14 +1,14 @@
 import { notification } from 'antd';
 import router from 'umi/router';
-import { getPageQuery } from '@/tools';
+import { getPageQuery, delay } from '@/tools';
 import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
 import pageRouters from '../../config/router.config';
 import { updatePermission } from '@/services/permission';
 import { PERMISSIONS } from '@/constants/user';
 
-function validateRedirect(routers, redirect, userPermissions) {
+function validateRedirect(routers, redirect, userPermissions, loginUrl, skipPermission) {
   let valid = false;
-  if (!redirect || redirect === '/user/login') {
+  if (!redirect || redirect === loginUrl) {
     return false;
   }
   function inner(_router) {
@@ -16,7 +16,7 @@ function validateRedirect(routers, redirect, userPermissions) {
     if (valid) {
       return;
     }
-    if (name !== 'welcomePage' && path === redirect && userPermissions[name]) {
+    if (path === redirect && (skipPermission ? true : userPermissions[name])) {
       valid = !(routes && routes.length > 0);
       return;
     }
@@ -37,8 +37,20 @@ export default {
   },
 
   effects: {
-    *login({ payload }, { call, put }) {
-      const response = yield call(login, payload);
+    *login(
+      {
+        payload: {
+          loginParams,
+          skipMenu,
+          defaultRedirect,
+          loginUrl,
+          rootRouteTag = 'appRoute',
+          skipPermission = false,
+        },
+      },
+      { call, put },
+    ) {
+      const response = yield call(login, loginParams);
       const { data: userInfo, error } = response;
 
       if (error) {
@@ -73,8 +85,13 @@ export default {
 
       yield put({
         type: 'user/replenishUserInfo',
-        payload: updatedPermissionUserInfo,
+        payload: {
+          userInfo: updatedPermissionUserInfo,
+          skipMenu,
+        },
       });
+
+      yield delay(1000);
 
       const urlParams = new URL(window.location.href);
       const { pathname } = urlParams;
@@ -94,9 +111,17 @@ export default {
         }
       }
 
-      const appRoutes = pageRouters.find(item => !!item.appRoute);
-      if (!validateRedirect(appRoutes, redirect, updatedPermissionUserInfo.permissions)) {
-        redirect = '/center/underlying';
+      const appRoutes = pageRouters.find(item => !!item[rootRouteTag]);
+      if (
+        !validateRedirect(
+          appRoutes,
+          redirect,
+          updatedPermissionUserInfo.permissions,
+          loginUrl,
+          skipPermission,
+        )
+      ) {
+        redirect = defaultRedirect;
       }
 
       router.push({
@@ -125,20 +150,18 @@ export default {
       });
     },
 
-    *logout(_, { put }) {
+    *logout(
+      {
+        payload: { loginUrl },
+      },
+      { put },
+    ) {
       yield put({
         type: 'user/cleanCurrentUser',
       });
 
-      const urlParams = new URL(window.location.href);
-      const { pathname } = urlParams;
-      if (pathname.split('/')[1] === 'center') {
-        router.push('/center/login');
-        return;
-      }
-
       router.push({
-        pathname: '/user/login',
+        pathname: loginUrl,
         query: {
           redirect: window.location.href,
         },

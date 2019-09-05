@@ -143,6 +143,7 @@ const Rollong = props => {
                 tickCount: 5,
                 alias: '日期',
                 mask: 'YYYY/MM/DD',
+                range: [0, 0.95],
               },
               value: {
                 alias: '波动率',

@@ -23,7 +23,7 @@ export default [
   // center login
   {
     path: '/center/login',
-    component: './User/Login/Center',
+    component: '../layouts/Center/Login',
   },
 
   {
@@ -36,6 +36,7 @@ export default [
   },
   {
     path: '/center',
+    centerRoute: true,
     component: '../layouts/Center/index',
     routes: [
       {
@@ -49,6 +50,16 @@ export default [
       {
         path: '/center/scenario',
         component: './CenterScenario',
+      },
+      {
+        path: '/center/operation-quality',
+        name: 'centerOperationQuality',
+        component: './CenterOperationQuality',
+      },
+      {
+        path: '/center/risk-monitoring',
+        name: 'centerRiskMonitoring',
+        component: './CenterRiskMonitoring',
       },
     ],
   },

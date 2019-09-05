@@ -90,7 +90,7 @@ const TableRisk = (props: any) => {
     if (store.first) {
       fetch(false);
     }
-  }, [sorter, searchFormData]);
+  }, [sorter, searchFormData, valuationDate]);
 
   useEffect(() => {
     if (store.first) {

@@ -99,6 +99,9 @@ class BasicLayout extends React.PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'user/replenish',
+      payload: {
+        loginUrl: '/user/login',
+      },
     });
   }
 

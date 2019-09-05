@@ -70,7 +70,14 @@ const UserLayout = props => {
     values.captcha = '';
     props.dispatch({
       type: 'login/login',
-      payload: values,
+      payload: {
+        loginParams: values,
+        skipMenu: true,
+        defaultRedirect: '/center/underlying',
+        loginUrl: '/center/login',
+        rootRouteTag: 'centerRoute',
+        skipPermission: true,
+      },
     });
   };
   return (
