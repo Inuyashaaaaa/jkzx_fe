@@ -52,7 +52,7 @@ const SystemSettingOperationLog = memo(props => {
       return;
     }
     if (getNew) {
-      setPreFormData(searchFormData);
+      setPreFormData(paramsSearchFormData);
     }
     setDataSource(data.page);
     setTotal(data.totalCount);
