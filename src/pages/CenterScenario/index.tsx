@@ -128,9 +128,13 @@ const CenterScenario = memo(props => {
         return vals;
       },
     );
-    _.mapKeys(Form2.getFieldsValue(reportFormData), (val, key) => {
-      if (key === 'legalName' && val) {
-        reportData.subOrPartyName = val;
+    const formData = Form2.getFieldsValue(reportFormData);
+    _.mapKeys(formData, (val, key) => {
+      if (key === 'reportType' && val === 'PARTY') {
+        reportData.subOrPartyName = formData.legalName;
+      }
+      if (key === 'reportType' && val === 'SUBSIDIARY') {
+        reportData.subOrPartyName = formData.subName;
       }
     });
     setLoading(true);
