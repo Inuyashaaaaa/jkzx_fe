@@ -39,12 +39,27 @@ const ThemeMenuWrap = styled.div`
   .ant-menu-item:hover > a:hover,
   .ant-menu-item-selected,
   .ant-menu-item-selected > a,
-  .ant-menu-item-selected > a:hover {
+  .ant-menu-item-selected > a:hover .ant-menu-item:hover,
+  .ant-menu-item-active,
+  .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open,
+  .ant-menu-submenu-active,
+  .ant-menu-submenu-title:hover,
+  .ant-menu-submenu-selected {
     color: rgba(246, 250, 255, 1);
   }
   .ant-menu-inline .ant-menu-item,
   .ant-menu-inline .ant-menu-submenu-title {
     width: 100%;
+  }
+  .ant-menu-submenu-vertical > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::after,
+  .ant-menu-submenu-vertical-left > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::after,
+  .ant-menu-submenu-vertical-right > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::after,
+  .ant-menu-submenu-inline > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::after,
+  .ant-menu-submenu-vertical > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::before,
+  .ant-menu-submenu-vertical-left > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::before,
+  .ant-menu-submenu-vertical-right > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::before,
+  .ant-menu-submenu-inline > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::before {
+    background: rgba(246, 250, 255, 1);
   }
 `;
 

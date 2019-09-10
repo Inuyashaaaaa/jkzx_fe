@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect } from 'react';
-import useLifecycles from 'react-use/lib/useLifecycles';
 import _ from 'lodash';
+import { Popover } from 'antd';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptClassicScenarioMarketRiskReportListByDate } from '@/services/report-service';
 
@@ -18,9 +18,21 @@ const ClassicSceneTable = memo(props => {
     pnlChange: 'Pnl Change',
   };
 
+  const content = (
+    <div>
+      <p>日期： 2015/6/22</p>
+      <p>标的物价格变化幅度： -33$</p>
+    </div>
+  );
+  const titleNode = title => (
+    <Popover content={content} trigger="hover">
+      {title}
+    </Popover>
+  );
+
   const tableColDefs = [
     {
-      title: '经典场景',
+      title: titleNode('经典场景'),
       dataIndex: 'classicScene',
       width: 100,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
@@ -32,7 +44,7 @@ const ClassicSceneTable = memo(props => {
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
-      title: '贸易战（2018/3/22）',
+      title: titleNode('贸易战'),
       dataIndex: 'TRADE_WAR_2018',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -88,41 +100,6 @@ const ClassicSceneTable = memo(props => {
     onSearch();
   }, [classicSceneTable]);
 
-  useLifecycles(async () => {
-    onSearch();
-    setDataSource([
-      {
-        classicScene: 'Delta Cash',
-        stockEchange: '2.312',
-        tradeWar: '2.312',
-        four: '2.569',
-      },
-      {
-        classicScene: 'Gamma Cash   ',
-        stockEchange: '2.312',
-        tradeWar: '2.312',
-        four: '2.569',
-      },
-      {
-        classicScene: 'Vega',
-        stockEchange: '2.312',
-        tradeWar: '2.312',
-        four: '2.569',
-      },
-      {
-        classicScene: 'Theta',
-        stockEchange: '2.312',
-        tradeWar: '2.312',
-        four: '2.569',
-      },
-      {
-        classicScene: 'Rho_R',
-        stockEchange: '2.312',
-        tradeWar: '2.312',
-        four: '2.569',
-      },
-    ]);
-  });
   return (
     <div style={{ marginTop: 24 }}>
       <ThemeTable
