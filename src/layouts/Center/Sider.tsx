@@ -18,15 +18,15 @@ const Sider = props => (
     >
       <Item key="/center/underlying">
         <Icon type="line-chart" />
-        <Link to="/center/underlying">标的物分析</Link>
+        <Link to="/center/underlying">场外期权估值</Link>
       </Item>
       <Item key="/center/risk">
         <Icon type="reconciliation" />
-        <Link to="/center/risk">风险报告</Link>
+        <Link to="/center/risk">主体估值监测</Link>
       </Item>
       <Item key="/center/scenario">
         <Icon type="file-search" />
-        <Link to="/center/scenario">情景分析</Link>
+        <Link to="/center/scenario">情景分析测试</Link>
       </Item>
       <SubMenu
         key="/center/market"
