@@ -95,7 +95,7 @@ class HeaderView extends PureComponent {
   };
 
   handleMenuClick = ({ key }) => {
-    const { dispatch } = this.props;
+    const { dispatch, user } = this.props;
     if (key === 'userinfo') {
       router.push('/user-info');
       return;
@@ -105,6 +105,7 @@ class HeaderView extends PureComponent {
         type: 'login/logout',
         payload: {
           loginUrl: '/user/login',
+          userId: _.get(user, 'currentUser.username'),
         },
       });
     }
@@ -286,4 +287,5 @@ export default connect(({ user, global, setting, loading }) => ({
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
   setting,
+  user,
 }))(HeaderView);

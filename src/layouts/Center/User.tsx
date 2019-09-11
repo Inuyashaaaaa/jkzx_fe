@@ -36,7 +36,6 @@ const User = props => {
         userId: _.get(user, 'currentUser.username'),
       },
     });
-    message.info('退出登录');
   };
   // eslint-disable-next-line
   const imgPath = require('@/assets/touxiang.png');

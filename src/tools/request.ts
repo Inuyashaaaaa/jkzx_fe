@@ -194,6 +194,7 @@ export default function request(url, _options = {}, passError = false) {
                 type: 'login/logout',
                 payload: {
                   loginUrl,
+                  routerPush: true,
                 },
               });
             }, 3000);
