@@ -1,8 +1,8 @@
+import fetch from 'dva/fetch';
+import _ from 'lodash';
 import { HOST_TEST } from '@/constants/global';
 import { delay } from '@/tools';
 import request from '@/tools/request';
-import fetch from 'dva/fetch';
-import _ from 'lodash';
 
 /**
  * 登录
@@ -27,7 +27,7 @@ export async function login(params) {
   };
 
   return request(`${HOST_TEST}auth-service/users/login`, {
-    method: `POST`,
+    method: 'POST',
     body: params,
     passToken: true,
   }).then(result => {
@@ -42,7 +42,8 @@ export async function login(params) {
           captcha: true,
         },
       };
-    } else if (!data.loginStatus) {
+    }
+    if (!data.loginStatus) {
       // 登录状态错误
       return {
         error: true,
@@ -71,24 +72,24 @@ export async function logout() {
 
 export async function queryCaptcha(params) {
   return fetch(`${HOST_TEST}auth-service/users/captcha`, {
-    method: `GET`,
+    method: 'GET',
     credentials: 'include',
   })
     .then(response => response.blob())
     .then(imageBlob => {
       if (window.webkitURL) {
         return window.webkitURL.createObjectURL(imageBlob);
-      } else if (window.URL && window.URL.createObjectURL) {
-        return window.URL.createObjectURL(imageBlob);
-      } else {
-        return null;
       }
+      if (window.URL && window.URL.createObjectURL) {
+        return window.URL.createObjectURL(imageBlob);
+      }
+      return null;
     });
 }
 
 export async function createUser(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authUserCreate',
       params,
@@ -98,7 +99,7 @@ export async function createUser(params) {
 
 export async function updateUser(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authUserUpdate',
       params,
@@ -108,7 +109,7 @@ export async function updateUser(params) {
 
 export async function deleteUser(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authUserRevoke',
       params,
@@ -118,7 +119,7 @@ export async function deleteUser(params) {
 
 export async function updateUserRole(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authUserRoleModify',
       params,
@@ -128,9 +129,9 @@ export async function updateUserRole(params) {
 
 export async function authUserList(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authUserList`,
+      method: 'authUserList',
       params,
     },
   });
@@ -138,9 +139,9 @@ export async function authUserList(params = {}) {
 
 export async function expireUser(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authUserExpire`,
+      method: 'authUserExpire',
       params,
     },
   });
@@ -148,9 +149,9 @@ export async function expireUser(params) {
 
 export async function unexpireUser(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authUserUnexpire`,
+      method: 'authUserUnexpire',
       params,
     },
   });
@@ -158,7 +159,7 @@ export async function unexpireUser(params) {
 
 export async function lockUser(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authUserLock',
       params,
@@ -167,7 +168,7 @@ export async function lockUser(params) {
 }
 export async function unlockUser(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authUserUnlock',
       params,
@@ -178,9 +179,9 @@ export async function unlockUser(params) {
 // 获取某个用户页面权限
 export async function queryUserPagesByName(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authPageTreeGetByUsername`,
+      method: 'authPageTreeGetByUsername',
       params,
     },
   });
@@ -189,9 +190,9 @@ export async function queryUserPagesByName(params) {
 // 获取用户所有页面权限
 export async function queryUserPages() {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authPageTreeGet`,
+      method: 'authPageTreeGet',
       params: {},
     },
   });
@@ -211,9 +212,9 @@ export async function queryDataPermissions() {
 
 export async function saveUserRoles(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authUserRolesModify`,
+      method: 'authUserRolesModify',
       params,
     },
   });
@@ -221,9 +222,9 @@ export async function saveUserRoles(params) {
 
 export async function saveUserPassword(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authUserPasswordModifySelf`,
+      method: 'authUserPasswordModifySelf',
       params,
     },
   });
@@ -231,9 +232,9 @@ export async function saveUserPassword(params) {
 
 export async function saveUserPasswordByAdmin(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
-      method: `authUserPasswordChange`,
+      method: 'authUserPasswordChange',
       params,
     },
   });
@@ -295,7 +296,7 @@ export async function queryNotices() {
 // }
 export async function authUserGetByName(params) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authUserByNameGet',
       params,
@@ -305,7 +306,65 @@ export async function authUserGetByName(params) {
 
 export async function updateOwnPassword(params) {
   return request(`${HOST_TEST}auth-service/users/password-change`, {
-    method: `POST`,
+    method: 'POST',
     body: params,
+  });
+}
+
+export async function authUserLogout(params) {
+  return request(`${HOST_TEST}auth-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'authUserLogout',
+      params,
+    },
+  });
+}
+
+export async function loginByToken(params) {
+  const getLoginErrorMessage = data => {
+    const { expired, locked, message } = data;
+    if (expired) {
+      return '用户已过期';
+    }
+    if (locked) {
+      return '用户已锁定';
+    }
+
+    return message;
+  };
+
+  return request(`${HOST_TEST}auth-service/users/token/login`, {
+    method: 'POST',
+    body: params,
+    passToken: true,
+  }).then(result => {
+    const { data } = result;
+
+    if (data.error) {
+      // 验证码错误
+      return {
+        error: true,
+        data: {
+          message: _.get(data, 'error.message'),
+          captcha: true,
+        },
+      };
+    }
+    if (!data.loginStatus) {
+      // 登录状态错误
+      return {
+        error: true,
+        data: {
+          ...data,
+          message: getLoginErrorMessage(data),
+        },
+      };
+    }
+
+    return {
+      error: false,
+      data,
+    };
   });
 }

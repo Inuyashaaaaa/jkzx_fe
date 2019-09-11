@@ -25,6 +25,10 @@ export default [
     path: '/center/login',
     component: '../layouts/Center/Login',
   },
+  {
+    path: '/jump-in',
+    component: '../layouts/Jumping',
+  },
 
   {
     path: '/component-test',
