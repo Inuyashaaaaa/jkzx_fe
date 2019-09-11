@@ -40,20 +40,16 @@ export default {
   state: {
     loginFormData: {},
     img: null,
-    pathname: null,
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
       if (history.location.query.token) {
-        dispatch({
-          type: 'setPathName',
-          payload: history.location.pathname,
-        });
         router.push({
           pathname: '/jump-in',
           query: {
             token: history.location.query.token,
+            pathname: history.location.pathname,
           },
         });
       }
@@ -127,7 +123,6 @@ export default {
       yield delay(1000);
 
       const urlParams = new URL(window.location.href);
-      const pathname = yield select(state => state.login.pathname);
 
       const params = getPageQuery();
       let { redirect } = params;
@@ -156,25 +151,17 @@ export default {
       ) {
         redirect = defaultRedirect;
       }
-      if (pathname) {
-        router.push({
-          pathname,
-        });
-        return;
-      }
+
       router.push({
         pathname: redirect,
       });
-      yield put({
-        type: 'changeForm',
-        payload: {},
-      });
 
-      // const nextQueryStr = stringify({
-      //   _random: Math.random(),
-      // });
-
-      // window.location.href = `/?${nextQueryStr}/#${redirect || ''}`;
+      if (!token) {
+        yield put({
+          type: 'changeForm',
+          payload: {},
+        });
+      }
     },
 
     *queryCaptcha(_, { call, put }) {
