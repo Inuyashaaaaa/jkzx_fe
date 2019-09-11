@@ -20,7 +20,7 @@ const Jumping = props => {
     }
   }, []);
 
-  return <div style={{ textAlign: 'center', marginTop: '50px' }}>自动登陆中，请稍后</div>;
+  return <div style={{ textAlign: 'center', marginTop: '10px' }}>自动登陆中，请稍后</div>;
 };
 
 export default connect(() => {})(Jumping);
