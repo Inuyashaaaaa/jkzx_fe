@@ -1,7 +1,13 @@
-import { notification } from 'antd';
+import { notification, message } from 'antd';
 import router from 'umi/router';
 import { getPageQuery, delay } from '@/tools';
-import { login, queryCaptcha, updateOwnPassword } from '@/services/user';
+import {
+  login,
+  loginByToken,
+  queryCaptcha,
+  updateOwnPassword,
+  authUserLogout,
+} from '@/services/user';
 import pageRouters from '../../config/router.config';
 import { updatePermission } from '@/services/permission';
 import { PERMISSIONS } from '@/constants/user';
@@ -34,6 +40,24 @@ export default {
   state: {
     loginFormData: {},
     img: null,
+    pathname: null,
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      if (history.location.query.token) {
+        dispatch({
+          type: 'setPathName',
+          payload: history.location.pathname,
+        });
+        router.push({
+          pathname: '/jump-in',
+          query: {
+            token: history.location.query.token,
+          },
+        });
+      }
+    },
   },
 
   effects: {
@@ -46,11 +70,20 @@ export default {
           loginUrl,
           rootRouteTag = 'appRoute',
           skipPermission = false,
+          token,
         },
       },
-      { call, put },
+      { call, put, select },
     ) {
-      const response = yield call(login, loginParams);
+      let response = {};
+      if (token) {
+        response = yield call(loginByToken, {
+          token,
+        });
+      } else {
+        response = yield call(login, loginParams);
+      }
+
       const { data: userInfo, error } = response;
 
       if (error) {
@@ -94,7 +127,8 @@ export default {
       yield delay(1000);
 
       const urlParams = new URL(window.location.href);
-      const { pathname } = urlParams;
+      const pathname = yield select(state => state.login.pathname);
+
       const params = getPageQuery();
       let { redirect } = params;
       if (redirect) {
@@ -110,7 +144,6 @@ export default {
           return;
         }
       }
-
       const appRoutes = pageRouters.find(item => !!item[rootRouteTag]);
       if (
         !validateRedirect(
@@ -123,7 +156,12 @@ export default {
       ) {
         redirect = defaultRedirect;
       }
-
+      if (pathname) {
+        router.push({
+          pathname,
+        });
+        return;
+      }
       router.push({
         pathname: redirect,
       });
@@ -152,14 +190,21 @@ export default {
 
     *logout(
       {
-        payload: { loginUrl },
+        payload: { loginUrl, userId },
       },
-      { put },
+      { call, put },
     ) {
+      const rsp = yield call(authUserLogout, { userId });
+      if (rsp.error) {
+        message.info('退出登录失败');
+        return;
+      }
+
       yield put({
         type: 'user/cleanCurrentUser',
       });
 
+      message.info('退出登录');
       router.push({
         pathname: loginUrl,
         query: {
@@ -237,6 +282,13 @@ export default {
       return {
         ...state,
         showPasswordUpdate: false,
+      };
+    },
+
+    setPathName(state, { payload }) {
+      return {
+        ...state,
+        pathname: payload,
       };
     },
   },
