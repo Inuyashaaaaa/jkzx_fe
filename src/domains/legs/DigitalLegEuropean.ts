@@ -84,6 +84,7 @@ export const DigitalLegEuropean: ILeg = legPipeLine({
         Strike,
         Term,
         ExpirationDate,
+        PaymentType,
         Payment,
         ParticipationRate,
         NotionalAmount,

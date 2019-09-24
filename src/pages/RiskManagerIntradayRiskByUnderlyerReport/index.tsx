@@ -1,3 +1,4 @@
+/*eslint-disable */
 import React, { memo } from 'react';
 import { rptIntradayRiskReportSearchPaged } from '@/services/report-service';
 import RiskCommonTable from '@/containers/RiskCommonTable';
@@ -17,6 +18,39 @@ const RiskManagerIntradayRiskByUnderlyerReport = memo<any>(props => (
     searchMethod={rptIntradayRiskReportSearchPaged}
     downloadName="标的风险"
     scrollWidth={2300}
+    getSheetDataSourceItemMeta={(val, dataIndex, rowIndex) => {
+      if (val === null || val === undefined) {
+        return null;
+      }
+      if (
+        [
+          'underlyerPrice',
+          'underlyerNetPosition',
+          'delta',
+          'netDelta',
+          'deltaCash',
+          'deltaDecay',
+          'deltaWithDecay',
+          'gamma',
+          'gammaCash',
+          'rho',
+          'theta',
+          'vega',
+        ].includes(dataIndex) &&
+        rowIndex > 0
+      ) {
+        return {
+          t: 'n',
+          z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+        };
+      }
+      if (dataIndex === 'underlyerPriceChangePercent' && rowIndex > 0) {
+        return {
+          t: 'n',
+          z: '0.0000%',
+        };
+      }
+    }}
   />
 ));
 

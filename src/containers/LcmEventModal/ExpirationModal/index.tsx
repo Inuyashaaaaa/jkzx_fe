@@ -123,69 +123,63 @@ class ExpirationModal extends PureComponent<
 
     const premiumType = this.data[LEG_FIELD.AUTO_CALL_STRIKE_UNIT];
     const autoCallPaymentType = this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE];
+    const isFixed =
+      this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
+      EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED;
 
-    return this.setState({
-      visible: true,
-      autoCallPaymentType,
-      premiumType,
-      notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
-      ...(this.data[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE] ===
-      EXPIRE_NO_BARRIER_PREMIUM_TYPE_MAP.FIXED
-        ? {
-            fixedDataSource: this.computeFixedDataSource(this.data),
-          }
-        : {
-            callPutDataSource: this.computeCallPutDataSource(this.data),
-          }),
-    });
+    return this.setState(
+      {
+        visible: true,
+        autoCallPaymentType,
+        premiumType,
+        notionalType: this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE],
+        ...(isFixed
+          ? {
+              fixedDataSource: this.computeFixedDataSource(this.data),
+            }
+          : {
+              callPutDataSource: this.computeCallPutDataSource(this.data),
+            }),
+      },
+      async () => {
+        if (isAutocallSnow(this.data) && isFixed) {
+          const dataSource = this.state.fixedDataSource;
+          const { error, data: settleAmount } = await this.preSettleAmount({
+            notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
+          });
+          if (error) return;
+          this.setState(pre => ({
+            ...pre,
+            fixedDataSource: {
+              ...pre.fixedDataSource,
+              [SETTLE_AMOUNT]: settleAmount,
+            },
+          }));
+        }
+      },
+    );
   };
 
   public computeFixedDataSource = value => {
-    const notionalType = value[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
-    const notionalAmount =
-      notionalType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        ? value[LEG_FIELD.NOTIONAL_AMOUNT]
-        : new BigNumber(value[LEG_FIELD.NOTIONAL_AMOUNT])
-            .multipliedBy(value[LEG_FIELD.UNDERLYER_MULTIPLIER])
-            .multipliedBy(value[LEG_FIELD.INITIAL_SPOT])
-            .toNumber();
     const matures = value[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM];
-    const countDay = new BigNumber(
-      moment(value[LEG_FIELD.EXPIRATION_DATE]).valueOf() -
-        moment(value[LEG_FIELD.EFFECTIVE_DATE]).valueOf(),
-    )
-      .div(86400000)
-      .decimalPlaces(0)
-      .toNumber();
-    const dayOfYear = value[LEG_FIELD.DAYS_IN_YEAR];
     return {
       [EXPIRE_NO_BARRIER_PREMIUM_TYPE]:
         EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[value[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]],
       [NOTIONAL_AMOUNT]: value[LEG_FIELD.NOTIONAL_AMOUNT],
       [MATURES]: matures,
-      [SETTLE_AMOUNT]: new BigNumber(notionalAmount)
-        .multipliedBy(new BigNumber(matures).div(100))
-        .multipliedBy(countDay)
-        .div(dayOfYear)
-        .toNumber(),
     };
   };
 
   public computeCallPutDataSource = value => {
-    const notionalType = value[LEG_FIELD.NOTIONAL_AMOUNT_TYPE];
-    const notionalAmount =
-      notionalType === NOTIONAL_AMOUNT_TYPE_MAP.CNY
-        ? value[LEG_FIELD.NOTIONAL_AMOUNT]
-        : new BigNumber(value[LEG_FIELD.NOTIONAL_AMOUNT])
-            .multipliedBy(value[LEG_FIELD.UNDERLYER_MULTIPLIER])
-            .multipliedBy(value[LEG_FIELD.INITIAL_SPOT])
-            .toNumber();
     const autoCallStrike = value[LEG_FIELD.AUTO_CALL_STRIKE];
     return {
       [EXPIRE_NO_BARRIER_PREMIUM_TYPE]:
         EXPIRE_NO_BARRIER_PREMIUM_TYPE_ZHCN_MAP[value[LEG_FIELD.EXPIRE_NOBARRIER_PREMIUM_TYPE]],
       [NOTIONAL_AMOUNT]: value[LEG_FIELD.NOTIONAL_AMOUNT],
       [EXERCISE_PRICE]: autoCallStrike,
+      paymentDate: value[LEG_FIELD.SETTLEMENT_DATE]
+        ? moment(value[LEG_FIELD.SETTLEMENT_DATE])
+        : moment(),
     };
   };
 
@@ -293,6 +287,15 @@ class ExpirationModal extends PureComponent<
     });
   };
 
+  public preSettleAmount = async eventDetail => {
+    const rsp = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventDetail,
+      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
+    });
+    return rsp;
+  };
+
   public handleSettleAmount = async () => {
     const dataSource = this.state.callPutDataSource;
     if (!dataSource[UNDERLYER_PRICE]) {
@@ -301,13 +304,9 @@ class ExpirationModal extends PureComponent<
         return;
       }
     }
-    const { error, data } = await tradeExercisePreSettle({
-      positionId: this.data.id,
-      eventDetail: {
-        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
-        notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
-      },
-      eventType: LCM_EVENT_TYPE_MAP.SETTLE,
+    const { error, data } = await this.preSettleAmount({
+      underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+      notionalAmount: String(dataSource[NOTIONAL_AMOUNT]),
     });
     if (error) return;
     this.setState({
@@ -465,22 +464,20 @@ class ExpirationModal extends PureComponent<
           controls={EXPIRATION_FIXED_FORM_CONTROLS(this.state.notionalType)}
         />
       ) : (
-        <>
-          <Form
-            ref={node => {
-              this.$expirationCallModal = node;
-            }}
-            dataSource={this.state.callPutDataSource}
-            onValueChange={this.onCallValueChange}
-            controlNumberOneRow={1}
-            footer={false}
-            controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
-              this.state.notionalType,
-              this.state.premiumType,
-              this.handleSettleAmount,
-            )}
-          />
-        </>
+        <Form
+          ref={node => {
+            this.$expirationCallModal = node;
+          }}
+          dataSource={this.state.callPutDataSource}
+          onValueChange={this.onCallValueChange}
+          controlNumberOneRow={1}
+          footer={false}
+          controls={EXPIRATION_CALL_PUT_FORM_CONTROLS(
+            this.state.notionalType,
+            this.state.premiumType,
+            this.handleSettleAmount,
+          )}
+        />
       );
     }
     return '确认到期操作？';

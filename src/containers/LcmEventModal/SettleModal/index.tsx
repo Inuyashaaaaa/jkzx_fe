@@ -1,6 +1,7 @@
 import { Alert, message, Modal } from 'antd';
 import BigNumber from 'bignumber.js';
 import React, { PureComponent } from 'react';
+import _ from 'lodash';
 import {
   LCM_EVENT_TYPE_MAP,
   LEG_FIELD,
@@ -23,7 +24,6 @@ import {
 } from './constants';
 import { Form2 } from '@/containers';
 import { getMoment } from '@/tools';
-import _ from 'lodash';
 
 class ExerciseModal extends PureComponent<
   {

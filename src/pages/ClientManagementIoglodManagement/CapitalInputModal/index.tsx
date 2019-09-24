@@ -1,5 +1,6 @@
 import { Button, Card, Col, message, Modal, Row } from 'antd';
-import React, { memo, useRef, useState } from 'react';
+import _ from 'lodash';
+import React, { memo, useRef, useState, useEffect } from 'react';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Form2, SmartTable } from '@/containers';
 import {
@@ -25,18 +26,22 @@ const ClientManagementInsert = memo<any>(props => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [legalFormData, setLegalFormData] = useState({});
   const [tableDataSource, setTableDataSource] = useState([]);
-  const [tradeFormData, setTradeFormData] = useState({});
+  const [tradeFormData, setTradeFormData] = useState(Form2.createFields(getInitialTradeFormData()));
   const [partyFormData, setPartyFormData] = useState({});
   const [counterPartyFormData, setCounterPartyFormData] = useState({});
   const [tradeIds, setTradeIds] = useState([]);
 
+  function getInitialTradeFormData() {
+    return {};
+  }
+
   const handleFundChange = (accountId, fundType, partyData, counterPartyData) => {
     let event;
-    if (fundType.includes('CHANGE_PREMIUM')) {
+    if (_.includes(fundType, 'CHANGE_PREMIUM')) {
       event = 'CHANGE_PREMIUM';
-    } else if (fundType.includes('UNWIND_TRADE')) {
+    } else if (_.includes(fundType, 'UNWIND_TRADE')) {
       event = 'UNWIND_TRADE';
-    } else if (fundType.includes('SETTLE_TRADE')) {
+    } else if (_.includes(fundType, 'SETTLE_TRADE')) {
       event = 'SETTLE_TRADE';
     } else {
       event = 'TRADE_CASH_FLOW';
@@ -127,19 +132,31 @@ const ClientManagementInsert = memo<any>(props => {
   };
 
   const partyFormChange = (record, changedFields, allFields) => {
-    setPartyFormData(allFields);
+    setPartyFormData({
+      ...partyFormData,
+      ...changedFields,
+    });
   };
 
   const counterPartyFormChange = (record, changedFields, allFields) => {
-    setCounterPartyFormData(allFields);
+    setCounterPartyFormData({
+      ...counterPartyFormData,
+      ...changedFields,
+    });
   };
 
   const tableFormChange = (record, changedFields, allFields) => {
-    setTradeFormData(allFields);
+    setTradeFormData({
+      ...tradeFormData,
+      ...changedFields,
+    });
   };
 
   const legalFormChange = async (record, changedFields, allFields) => {
-    setLegalFormData(allFields);
+    setLegalFormData({
+      ...legalFormData,
+      ...changedFields,
+    });
   };
 
   const legalFormValueChange = async (record, changedValues, allValues) => {
@@ -171,6 +188,16 @@ const ClientManagementInsert = memo<any>(props => {
     );
   };
 
+  useEffect(() => {
+    if (visible === false) {
+      setTradeFormData(Form2.createFields(getInitialTradeFormData()));
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    setTradeFormData(Form2.createFields(getInitialTradeFormData()));
+  }, [Form2.getFieldValue(legalFormData.legalName)]);
+
   return (
     <>
       <Modal
@@ -178,7 +205,7 @@ const ClientManagementInsert = memo<any>(props => {
         onOk={handleConfirm}
         onCancel={handleCancel}
         okText="录入"
-        visible={visible}
+        visible={!!visible}
         width={1000}
         confirmLoading={confirmLoading}
         destroyOnClose

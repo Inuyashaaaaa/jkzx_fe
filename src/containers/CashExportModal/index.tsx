@@ -18,10 +18,10 @@ const TABLE_COL_DEFS = fetchTable => [
     title: '交易编号',
     dataIndex: 'tradeId',
   },
-  {
-    title: '账户编号',
-    dataIndex: 'accountId',
-  },
+  // {
+  //   title: '账户编号',
+  //   dataIndex: 'accountId',
+  // },
   {
     title: '现金流',
     dataIndex: 'cashFlow',

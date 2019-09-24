@@ -25,6 +25,8 @@ import { ILegColDef } from '@/types/leg';
 import { LEG_ENV } from '@/constants/legs';
 import { PAGE_SIZE } from '@/constants/component';
 
+const OB_DAY_STRING_FIELD = 'OB_DAY_STRING_FIELD';
+
 class ObserveModalInput extends InputBase<
   {
     direction?: string;
@@ -71,6 +73,11 @@ class ObserveModalInput extends InputBase<
       }));
     }
 
+    nextDataSource = nextDataSource.map(item => ({
+      ...item,
+      [OB_DAY_STRING_FIELD]: getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD'),
+    }));
+
     return nextDataSource;
   };
 
@@ -105,7 +112,7 @@ class ObserveModalInput extends InputBase<
       () => {
         const val = this.state.dealDataSource.map(item =>
           Form2.getFieldsValue({
-            ...item,
+            ..._.omit(item, OB_DAY_STRING_FIELD),
             [OB_DAY_FIELD]: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
           }),
         );
@@ -142,6 +149,7 @@ class ObserveModalInput extends InputBase<
         ...state.dealDataSource,
         {
           [OB_DAY_FIELD]: dataSource.day,
+          [OB_DAY_STRING_FIELD]: getMoment(dataSource.day).format('YYYY-MM-DD'),
         },
       ]),
     }));
@@ -150,7 +158,7 @@ class ObserveModalInput extends InputBase<
   public bindRemove = rowIndex => () => {
     this.setState(state => ({
       dealDataSource: this.computeDataSource(
-        remove(state.dealDataSource, (item, index) => index === rowIndex),
+        remove(state.dealDataSource, (item, index) => item[OB_DAY_STRING_FIELD] === rowIndex),
       ),
     }));
   };
@@ -231,7 +239,6 @@ class ObserveModalInput extends InputBase<
 
   public getColumnDefs = (): ITableColDef[] => {
     const { editing: editable } = this.props;
-
     if (this.isAutoCallSnow() || this.isAutoCallPhoenix()) {
       return [
         {
@@ -253,7 +260,10 @@ class ObserveModalInput extends InputBase<
               title: '已观察到价格',
               dataIndex: 'price',
               defaultEditing: false,
-              editable,
+              editable: record => {
+                const disabled = record.obDay.isBefore(moment().subtract(-1, 'day'), 'day');
+                return editable && disabled;
+              },
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({})(
@@ -268,14 +278,12 @@ class ObserveModalInput extends InputBase<
                 title: '操作',
                 dataIndex: 'operation',
                 render: (text, record, index) => (
-                  <Row
-                    type="flex"
-                    align="middle"
-                    // style={{
-                    //   height: params.context.rowHeight,
-                    // }}
-                  >
-                    <Button size="small" type="danger" onClick={this.bindRemove(index)}>
+                  <Row type="flex" align="middle">
+                    <Button
+                      size="small"
+                      type="danger"
+                      onClick={this.bindRemove(record[OB_DAY_STRING_FIELD])}
+                    >
                       删除
                     </Button>
                   </Row>
@@ -307,7 +315,10 @@ class ObserveModalInput extends InputBase<
               title: '已观察到价格',
               dataIndex: 'price',
               defaultEditing: false,
-              editable,
+              editable: record => {
+                const disabled = record.obDay.isBefore(moment().subtract(-1, 'day'), 'day');
+                return editable && disabled;
+              },
               render: (val, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({})(
@@ -323,14 +334,11 @@ class ObserveModalInput extends InputBase<
               title: '操作',
               dataIndex: 'operation',
               render: (text, record, index) => (
-                <Row
-                  type="flex"
-                  align="middle"
-                  // style={{
-                  //   height: params.context.rowHeight,
-                  // }}
-                >
-                  <a style={{ color: 'red' }} onClick={this.bindRemove(index)}>
+                <Row type="flex" align="middle">
+                  <a
+                    style={{ color: 'red' }}
+                    onClick={this.bindRemove(record[OB_DAY_STRING_FIELD])}
+                  >
                     删除
                   </a>
                 </Row>
@@ -361,7 +369,7 @@ class ObserveModalInput extends InputBase<
     this.setState(state => ({
       dealDataSource: this.computeDataSource(
         state.dealDataSource.map((item, index) => {
-          if (index === params.rowIndex) {
+          if (item[OB_DAY_STRING_FIELD] === params.rowId) {
             return params.record;
           }
           return item;
@@ -371,7 +379,8 @@ class ObserveModalInput extends InputBase<
   };
 
   public renderResult() {
-    const { editing: editable } = this.props;
+    const { editing: editable, record } = this.props;
+    const expirationDate = _.get(record, 'expirationDate.value');
     return (
       <Row
         type="flex"
@@ -426,6 +435,8 @@ class ObserveModalInput extends InputBase<
                           input: {
                             type: 'date',
                             range: 'day',
+                            disabledDate: current =>
+                              current && current > moment(expirationDate).subtract(-1, 'day'),
                           },
                           decorator: {
                             rules: [
@@ -444,8 +455,11 @@ class ObserveModalInput extends InputBase<
                 </Row>
               )}
               <SmartTable
+                pagination={{
+                  showSizeChanger: false,
+                }}
                 dataSource={this.state.dealDataSource}
-                rowKey={record => record[OB_DAY_FIELD].format('YYYY-MM-DD')}
+                rowKey={OB_DAY_STRING_FIELD}
                 onCellFieldsChange={this.handleCellValueChanged}
                 columns={this.getColumnDefs()}
               />

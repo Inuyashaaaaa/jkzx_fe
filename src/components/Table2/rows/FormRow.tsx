@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Dropdown, Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import classNames from 'classnames';
@@ -94,6 +95,7 @@ class EditableRow extends React.Component<ITableRowProps> {
     const { form } = this.props;
     const child = (
       <tr
+        data-test="table-1"
         {...omit(this.props, [
           'form',
           'record',

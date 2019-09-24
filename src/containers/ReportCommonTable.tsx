@@ -1,7 +1,8 @@
+/* eslint-disable no-param-reassign */
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { ConfigProvider, Divider, message, Table } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
-import React, { memo, useEffect, useRef, useState } from 'react';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import CustomNoDataOverlay from '@/containers/CustomNoDataOverlay';
@@ -11,6 +12,7 @@ import Page from '@/containers/Page';
 import { rptReportNameList } from '@/services/report-service';
 import { getMoment } from '@/tools';
 import { PAGE_SIZE } from '@/constants/component';
+import { PRODUCTTYPE_ZHCH_MAP, DIRECTION_ZHCN_MAP, ASSET_TYPE_ZHCN_MAP } from '@/constants/common';
 
 const ReportCommonTable = memo<any>(props => {
   const form = useRef<Form2>(null);
@@ -26,6 +28,7 @@ const ReportCommonTable = memo<any>(props => {
     bordered = false,
     colSwitch = [],
     antd,
+    getSheetDataSourceItemMeta,
   } = props;
   const [markets, setMarkets] = useState([]);
   const [dataSource, setDataSource] = useState([]);
@@ -156,7 +159,7 @@ const ReportCommonTable = memo<any>(props => {
     setSearchFormData(formData);
     setExcelFormData(formData);
     setSearchForm(formData);
-    if (!!_.get(newMarkets, 'length')) {
+    if (_.get(newMarkets, 'length')) {
       fetchTable(formData);
     }
   });
@@ -175,6 +178,23 @@ const ReportCommonTable = memo<any>(props => {
       ),
     );
   }, [dataSource]);
+
+  const handleDataSource = val =>
+    val.map(item => {
+      if (_.has(item, ['productType'])) {
+        item.productType = PRODUCTTYPE_ZHCH_MAP[item.productType];
+      }
+      if (_.has(item, ['side'])) {
+        item.side = DIRECTION_ZHCN_MAP[item.side];
+      }
+      if (_.has(item, ['assetType'])) {
+        item.assetType = ASSET_TYPE_ZHCN_MAP[item.assetType];
+      }
+      return {
+        ...item,
+        createdAt: getMoment(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+      };
+    });
 
   return (
     <Page>
@@ -213,6 +233,8 @@ const ReportCommonTable = memo<any>(props => {
           cols: tableColDefs,
           name: downloadName,
           colSwitch,
+          handleDataSource,
+          getSheetDataSourceItemMeta,
         }}
       >
         导出Excel

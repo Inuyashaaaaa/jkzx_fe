@@ -1,6 +1,7 @@
 import { multiply } from 'mathjs';
-import { PRODUCT_TYPE_OPTIONS, PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
-import { formatNumber } from '@/tools';
+import React from 'react';
+import { PRODUCTTYPE_ZHCH_MAP, PRODUCT_TYPE_OPTIONS } from '@/constants/common';
+import { formatNumber, getMoment } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -19,6 +20,18 @@ export const TABLE_COL_DEFS = [
     title: '交易对手',
     dataIndex: 'partyName',
     width: 150,
+    render: val => (
+      <span
+        style={{
+          overflow: 'hidden',
+          display: 'inline-block',
+          wordBreak: 'break-all',
+          width: '100%',
+        }}
+      >
+        {val}
+      </span>
+    ),
   },
   {
     title: '标的物代码',
@@ -30,6 +43,12 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'productType',
     width: 150,
     render: (value, record, index) => PRODUCTTYPE_ZHCH_MAP[value],
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'createdAt',
+    width: 180,
+    render: (value, record, index) => (value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : ''),
   },
   {
     title: '交易日',

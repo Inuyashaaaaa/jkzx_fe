@@ -1,19 +1,18 @@
+import { Icon, Tooltip } from 'antd';
+import FormItem from 'antd/lib/form/FormItem';
+import { connect } from 'dva';
+import React, { memo, useState } from 'react';
+import moment from 'moment';
 import { DatePicker, Form2 } from '@/containers';
 import { LEG_FIELD, LEG_ID_FIELD } from '@/constants/common';
 import { qlIsHoliday } from '@/services/volatility';
 import { getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import { Icon, Tooltip } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
-import { connect } from 'dva';
-import React, { memo, useState } from 'react';
 
 const ExpirationDateInput = memo<any>(
-  connect(state => {
-    return {
-      expirationDate: state.expirationDate,
-    };
-  })(props => {
+  connect(state => ({
+    expirationDate: state.expirationDate,
+  }))(props => {
     const { form, editing, expirationDate } = props;
     const { volatilityCalendars } = expirationDate;
     const [showTip, setShowTip] = useState(false);
@@ -40,7 +39,7 @@ const ExpirationDateInput = memo<any>(
           title="该到期日并非交易日"
           trigger="hover"
           placement="right"
-          arrowPointAtCenter={true}
+          arrowPointAtCenter
           visible={visible}
         >
           {form.getFieldDecorator({
@@ -48,16 +47,16 @@ const ExpirationDateInput = memo<any>(
           })(
             <DatePicker
               onChange={handleDatePickerChange}
-              defaultOpen={true}
+              defaultOpen
               editing={editing}
-              format={'YYYY-MM-DD'}
+              format="YYYY-MM-DD"
               suffixIcon={loading ? <Icon type="loading" /> : null}
-            />
+            />,
           )}
         </Tooltip>
       </FormItem>
     );
-  })
+  }),
 );
 
 export const ExpirationDate: ILegColDef = {
@@ -66,14 +65,7 @@ export const ExpirationDate: ILegColDef = {
   editable: record => {
     const { isBooking, isPricing, isEditing } = getLegEnvs(record);
     const isAnnual = Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL]);
-    if (isPricing) {
-      if (isAnnual) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-    if (isBooking) {
+    if (isBooking || isPricing) {
       return true;
     }
     if (isEditing) {
@@ -83,11 +75,19 @@ export const ExpirationDate: ILegColDef = {
   },
   defaultEditing: false,
   render: (value, record, index, { form, editing, colDef }) => {
+    const disabledDate = current => current < record.effectiveDate.value.valueOf();
     return (
       <FormItem>
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
-        })(<DatePicker defaultOpen={true} editing={editing} format={'YYYY-MM-DD'} />)}
+        })(
+          <DatePicker
+            defaultOpen
+            disabledDate={disabledDate}
+            editing={editing}
+            format="YYYY-MM-DD"
+          />,
+        )}
       </FormItem>
     );
   },

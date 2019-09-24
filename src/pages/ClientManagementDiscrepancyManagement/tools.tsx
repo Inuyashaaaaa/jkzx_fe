@@ -1,3 +1,4 @@
+/*eslint-disable */
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import { Row, Col } from 'antd';
@@ -9,11 +10,17 @@ import styles from './index.less';
 
 const { Option } = Select;
 
+const formatNum = num => {
+  return num.indexOf('.') === -1
+    ? num.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    : num.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+};
+
 export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAccountList => [
   {
     title: '交易对手',
     dataIndex: 'clientId',
-    render: (val, record, index, { form }) => (
+    render: (value, record, index, { form }) => (
       <FormItem>
         {form.getFieldDecorator({
           rules: [
@@ -27,9 +34,9 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
             showSearch
             allowClear
             fetchOptionsOnSearch
-            options={async (value: string = '') => {
+            options={async (val: string = '') => {
               const { data, error } = await refSimilarLegalNameList({
-                similarLegalName: value,
+                similarLegalName: val,
               });
               if (error) return [];
               return data.map(item => ({
@@ -86,7 +93,7 @@ export const CREATE_FORM_CONTROLS: (bankAccountList) => IFormColDef[] = bankAcco
               message: '出入金金额必填',
             },
           ],
-        })(<InputNumber />)}
+        })(<InputNumber formatter={val => val && formatNum(String(val))} precision={2} />)}
       </FormItem>
     ),
   },

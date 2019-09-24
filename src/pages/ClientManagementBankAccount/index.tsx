@@ -240,9 +240,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption={(val, option) => {
-                        return _.get(option, 'props.children').indexOf(val) >= 0;
-                      }}
+                      filterOption={(val, option) =>
+                        _.get(option, 'props.children').indexOf(val) >= 0
+                      }
                       ref={node => {
                         this.$select.bankAccount = node;
                       }}
@@ -286,9 +286,9 @@ class ClientManagementBankAccount extends PureComponent {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
-                      filterOption={(val, option) => {
-                        return _.get(option, 'props.children').indexOf(val) >= 0;
-                      }}
+                      filterOption={(val, option) =>
+                        _.get(option, 'props.children').indexOf(val) >= 0
+                      }
                       ref={node => {
                         this.$select.bankAccountName = node;
                       }}

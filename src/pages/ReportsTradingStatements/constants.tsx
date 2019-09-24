@@ -1,5 +1,6 @@
+import React from 'react';
 import { ASSET_TYPE_ZHCN_MAP, DIRECTION_ZHCN_MAP } from '@/constants/common';
-import { formatNumber, formatMoney } from '@/tools';
+import { formatNumber, formatMoney, getMoment } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -17,6 +18,18 @@ export const TABLE_COL_DEFS = [
     title: '客户名称',
     dataIndex: 'client',
     width: 130,
+    render: val => (
+      <span
+        style={{
+          overflow: 'hidden',
+          display: 'inline-block',
+          wordBreak: 'break-all',
+          width: '100%',
+        }}
+      >
+        {val}
+      </span>
+    ),
   },
   {
     title: '开始日期',
@@ -31,6 +44,12 @@ export const TABLE_COL_DEFS = [
     width: 130,
     sorter: true,
     sortDirectons: ['ascend', 'descend'],
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'createdAt',
+    width: 180,
+    render: (value, record, index) => (value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : ''),
   },
   {
     title: '买卖方向',
@@ -54,36 +73,28 @@ export const TABLE_COL_DEFS = [
     dataIndex: 'nominalPrice',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '期权费 (¥)',
     dataIndex: 'beginPremium',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '市值 (¥)',
     dataIndex: 'endPremium',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '总盈亏 (¥)',
     dataIndex: 'totalPremium',
     width: 130,
     align: 'right',
-    render: (value, record, index) => {
-      return formatMoney(value);
-    },
+    render: (value, record, index) => formatMoney(value),
   },
   {
     title: '实际平仓日期',

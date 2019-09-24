@@ -99,8 +99,8 @@ class DownloadExcelButton extends PureComponent<ImportButtonProps> {
     );
 
     let newData = [];
-    if (!_data.page && _.isArray(_data)) {
-      newData = handleDataSource ? handleDataSource(_data) : _data;
+    if ((!_data.page && _.isArray(_data)) || handleDataSource) {
+      newData = handleDataSource ? handleDataSource(_.isArray(_data) ? _data : _data.page) : _data;
     } else {
       newData =
         name === '定制化报告'
