@@ -1,6 +1,7 @@
 import { Button } from 'antd';
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
+import { moment } from 'moment';
 import { IFormColDef } from '@/components/type';
 import {
   INPUT_NUMBER_CURRENCY_CNY_CONFIG,
@@ -11,8 +12,12 @@ import {
 } from '@/constants/common';
 import { Input, DatePicker, InputNumber, Select } from '@/containers';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
+import styles from './index.less';
 
-export const KNOCKOUT_FORM_CONTROLS: (type) => IFormColDef[] = type => [
+export const KNOCKOUT_FORM_CONTROLS: (type, handleSettleAmount) => IFormColDef[] = (
+  type,
+  handleSettleAmount,
+) => [
   {
     title: '期权信息',
     dataIndex: 'information',
@@ -57,7 +62,13 @@ export const KNOCKOUT_FORM_CONTROLS: (type) => IFormColDef[] = type => [
               message: '敲出日期为必填项',
             },
           ],
-        })(<DatePicker editing format="YYYY-MM-DD" />)}
+        })(
+          <DatePicker
+            editing
+            format="YYYY-MM-DD"
+            disabledDate={current => current && current > val}
+          />,
+        )}
       </FormItem>
     ),
   },
@@ -81,36 +92,45 @@ export const KNOCKOUT_FORM_CONTROLS: (type) => IFormColDef[] = type => [
     dataIndex: 'settleAmount',
     title: '结算金额 (￥)',
     render: (val, record, index, { form, editing }) => (
+      <div className={styles.settleAmount}>
+        <FormItem>
+          {form.getFieldDecorator({
+            rules: [
+              {
+                required: true,
+                message: '结算金额为必填项',
+              },
+            ],
+          })(<UnitInputNumber unit="¥" editing value={val} />)}
+          <Button key="upload" type="primary" onClick={handleSettleAmount}>
+            试结算
+          </Button>
+        </FormItem>
+      </div>
+    ),
+  },
+  {
+    dataIndex: 'paymentDate',
+    title: '支付日期',
+    render: (val, record, index, { form, editing }) => (
       <FormItem>
         {form.getFieldDecorator({
           rules: [
             {
               required: true,
-              message: '结算金额为必填项',
+              message: '支付日期为必填项',
             },
           ],
-        })(<UnitInputNumber unit="¥" editing disabled={type} />)}
+        })(<DatePicker editing format="YYYY-MM-DD" />)}
       </FormItem>
     ),
   },
-  ...(type
-    ? []
-    : [
-        {
-          dataIndex: 'paymentDate',
-          title: '支付日期',
-          render: (val, record, index, { form, editing }) => (
-            <FormItem>
-              {form.getFieldDecorator({
-                rules: [
-                  {
-                    required: true,
-                    message: '支付日期为必填项',
-                  },
-                ],
-              })(<DatePicker editing format="YYYY-MM-DD" />)}
-            </FormItem>
-          ),
-        },
-      ]),
 ];
+
+export const NOTIONAL_AMOUNT = 'notionalAmount';
+
+export const UNDERLYER_PRICE = 'underlyerPrice';
+
+export const SETTLE_AMOUNT = 'settleAmount';
+
+export const KNOCK_OUT_DATE = 'knockOutDate';

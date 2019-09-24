@@ -12,7 +12,7 @@ import {
   mktInstrumentWhitelistDelete,
   mktInstrumentWhitelistListPaged,
   mktInstrumentWhitelistSave,
-  mktInstrumentWhitelistSearch,
+  mktInstrumentSearch,
 } from '@/services/market-data-service';
 import { tradeReferenceGet } from '@/services/trade-service';
 import { formatMoney } from '@/tools';
@@ -197,8 +197,12 @@ class SystemSettingsRiskSettings extends PureComponent {
   };
 
   public oncreateFormChange = async (props, changedFields, allFields) => {
+    const { createFormData } = this.state;
     this.setState({
-      createFormData: allFields,
+      createFormData: {
+        ...createFormData,
+        ...changedFields,
+      },
     });
   };
 
@@ -289,11 +293,12 @@ class SystemSettingsRiskSettings extends PureComponent {
                           fetchOptionsOnSearch
                           mode="multiple"
                           options={async (value: string = '') => {
-                            const { data, error } = await mktInstrumentWhitelistSearch({
+                            const { data, error } = await mktInstrumentSearch({
                               instrumentIdPart: value,
+                              excludeOption: true,
                             });
                             if (error) return [];
-                            return data.map(item => ({
+                            return data.slice(0, 50).map(item => ({
                               label: item,
                               value: item,
                             }));
@@ -371,6 +376,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                 showSizeChanger: true,
                 showQuickJumper: true,
                 showTotal: (total, range) => `${range[0]}-${range[1]} 共 ${total} 项`,
+                onShowSizeChange: this.paginationChange,
                 onChange: this.paginationChange,
               }}
               loading={this.state.loading}
@@ -380,6 +386,7 @@ class SystemSettingsRiskSettings extends PureComponent {
                   ? { x: '1000px' }
                   : { x: false }
               }
+              s
             />
           </>
         )}

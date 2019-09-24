@@ -101,7 +101,7 @@ const TradeManagementBooking = props => {
         positionId: position.positionId,
       }).then(rsp => {
         if (rsp.error) return;
-        const data = [...rsp.data].filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT);
+        const data = [...rsp.data];
         setEventTypes(pre => ({
           ...pre,
           [position.positionId]: data,
@@ -196,8 +196,7 @@ const TradeManagementBooking = props => {
           key: eventType,
           value: LCM_EVENT_TYPE_ZHCN_MAP[eventType],
         }))
-        .sort((a, b) => b.value.localeCompare(a.value))
-        .filter(item => item !== LCM_EVENT_TYPE_MAP.PAYMENT);
+        .sort((a, b) => b.value.localeCompare(a.value));
     if (!menuItem) return;
     return (
       <Menu onClick={({ key }) => handleEventAction(key, params)}>

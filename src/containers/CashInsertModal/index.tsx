@@ -1,16 +1,17 @@
-import { DIRECTION_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
-import { Form2, Input } from '@/containers';
-import { clientChangePremium, clientSettleTrade } from '@/services/client-service';
-import {
-  clientAccountGetByLegalName,
-  clientSaveAccountOpRecord,
-  cliMmarkTradeTaskProcessed,
-} from '@/services/reference-data-service';
+/* eslint-disable */
 import { Alert, Button, Card, Col, message, Modal, Row, Table } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import React, { memo, useRef, useState } from 'react';
+import {
+  clientAccountGetByLegalName,
+  clientSaveAccountOpRecord,
+  cliMmarkTradeTaskProcessed,
+} from '@/services/reference-data-service';
+import { clientChangePremium, clientSettleTrade } from '@/services/client-service';
+import { Form2, Input } from '@/containers';
+import { DIRECTION_TYPE_ZHCN_MAP, LCM_EVENT_TYPE_ZHCN_MAP } from '@/constants/common';
 import {
   COUNTER_PARTY_FORM_CONTROLS,
   MIDDLE_FORM_CONTROLS,
@@ -67,20 +68,9 @@ const CashInsertModal = memo<{
   };
 
   const handleFundChange = (fundType, partyData, counterPartyData) => {
-    let event;
-    if (fundType.includes('CHANGE_PREMIUM')) {
-      event = 'CHANGE_PREMIUM';
-    } else if (fundType.includes('UNWIND_TRADE')) {
-      event = 'UNWIND_TRADE';
-    } else if (fundType.includes('SETTLE_TRADE')) {
-      event = 'SETTLE_TRADE';
-    } else {
-      event = 'TRADE_CASH_FLOW';
-    }
-
     return {
       accountOpRecord: {
-        event,
+        event: fundType,
         ..._.pick(props.record, ['legalName', 'tradeId', 'accountId']),
         ...Form2.getFieldsValue(partyData),
         ...Form2.getFieldsValue(counterPartyData),
@@ -105,11 +95,11 @@ const CashInsertModal = memo<{
         direction: DIRECTION_TYPE_ZHCN_MAP[props.record.direction],
         lcmEventType: LCM_EVENT_TYPE_ZHCN_MAP[props.record.lcmEventType],
         event: fundType,
-      })
+      }),
     );
     setTableDataSource([data]);
     setLegalFormData(
-      Form2.createFields({ ...data, normalStatus: data.normalStatus ? '正常' : '异常' })
+      Form2.createFields({ ...data, normalStatus: data.normalStatus ? '正常' : '异常' }),
     );
     setVisible(true);
   };
@@ -147,34 +137,34 @@ const CashInsertModal = memo<{
     if (rsp.error) return;
     setPartyFormData(
       Form2.createFields(
-        _.pick(rsp.data, ['cashChange', 'creditBalanceChange', 'debtChange', 'premiumChange'])
-      )
+        _.pick(rsp.data, ['cashChange', 'creditBalanceChange', 'debtChange', 'premiumChange']),
+      ),
     );
     setCounterPartyFormData(
       Form2.createFields(
-        _.pick(rsp.data, ['counterPartyFundChange', 'counterPartyCreditBalanceChange'])
-      )
+        _.pick(rsp.data, ['counterPartyFundChange', 'counterPartyCreditBalanceChange']),
+      ),
     );
   };
 
   const handleFundEventType = (direction, lcmEventType) => {
     if (direction === 'BUYER') {
-      if (lcmEventType === 'OPEN') {
-        return 'BUYER_CHANGE_PREMIUM';
+      if (lcmEventType === 'OPEN' || lcmEventType === 'AMEND') {
+        return 'CHANGE_PREMIUM';
       }
       if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
-        return 'BUYER_UNWIND_TRADE';
+        return 'UNWIND_TRADE';
       }
-      return 'BUYER_SETTLE_TRADE';
-    } else {
-      if (lcmEventType === 'OPEN') {
-        return 'SELLER_CHANGE_PREMIUM';
-      }
-      if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
-        return 'SELLER_UNWIND_TRADE';
-      }
-      return 'SELLER_SETTLE_TRADE';
+      return 'SETTLE_TRADE';
     }
+
+    if (lcmEventType === 'OPEN' || lcmEventType === 'AMEND') {
+      return 'CHANGE_PREMIUM';
+    }
+    if (lcmEventType === 'UNWIND_PARTIAL' || lcmEventType === 'UNWIND') {
+      return 'UNWIND_TRADE';
+    }
+    return 'SETTLE_TRADE';
   };
 
   const partyFormChange = (props, changedFields, allFields) => {
@@ -199,7 +189,7 @@ const CashInsertModal = memo<{
         visible={visible}
         width={1000}
         confirmLoading={confirmLoading}
-        destroyOnClose={true}
+        destroyOnClose
       >
         <Form2
           ref={node => (formEl.current = node)}
@@ -210,20 +200,20 @@ const CashInsertModal = memo<{
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              render: (value, record, index, { form, editing }) => {
-                return (
+              render: (value, record, index, { form, editing }) => (
+                <div data-test="data-legalName">
                   <FormItem>
                     {form.getFieldDecorator({})(<Input type="input" editing={false} />)}
                   </FormItem>
-                );
-              },
+                </div>
+              ),
             },
             {
               title: '状态',
               dataIndex: 'normalStatus',
-              render: (value, record, index, { form }) => {
-                return <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>;
-              },
+              render: (value, record, index, { form }) => (
+                <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>
+              ),
             },
           ]}
         />
@@ -241,6 +231,7 @@ const CashInsertModal = memo<{
           dataSource={tradeFormData}
           columns={MIDDLE_FORM_CONTROLS}
           onFieldsChange={tableFormChange}
+          data-test="data-form-1"
         />
         <Row type="flex" justify="space-around">
           <Col>

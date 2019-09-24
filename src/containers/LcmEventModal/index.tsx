@@ -26,10 +26,11 @@ import KnockOutModal from './KnockOutModal';
 import RollModal from './RollModal';
 import SettleModal from './SettleModal';
 import UnwindModal from './UnwindModal';
+import PaymentModal from './PaymentModal';
 import BarrierKnockOutModal from './BarrierKnockOutModal';
 import { OB_PRICE_FIELD } from './constants';
 import { getObservertionFieldData } from './tools';
-import { isRangeAccruals, getMoment } from '@/tools';
+import { getMoment } from '@/tools';
 import BarrierExerciseModal from './BarrierExerciseModal';
 
 export interface LcmEventModalEventParams {
@@ -44,9 +45,12 @@ export interface LcmEventModalEl {
   show: (event: LcmEventModalEventParams) => void;
 }
 
-const LcmEventModal = memo<{
+interface LcmEventModalType {
   current: (node: LcmEventModalEl) => void;
-}>(props => {
+}
+
+const LcmEventModal = memo<LcmEventModalType>(props => {
+  const $paymentModal = useRef<PaymentModal>(null);
   const $unwindModal = useRef<UnwindModal>(null);
   const $asianExerciseModal = useRef<AsianExerciseModal>(null);
   const $barrierIn = useRef<BarrierIn>(null);
@@ -108,6 +112,9 @@ const LcmEventModal = memo<{
       const legType = record[LEG_TYPE_FIELD];
       const data = Form2.getFieldsValue(record);
       const tableFormData = Form2.getFieldsValue(createFormData);
+      if (eventType === LCM_EVENT_TYPE_MAP.PAYMENT) {
+        return $paymentModal.current.show(data, tableFormData, currentUser, loadData);
+      }
       if (eventType === LCM_EVENT_TYPE_MAP.EXPIRATION) {
         return $expirationModal.current.show(data, tableFormData, currentUser, loadData);
       }
@@ -197,6 +204,11 @@ const LcmEventModal = memo<{
 
   return (
     <>
+      <PaymentModal
+        ref={node => {
+          $paymentModal.current = node;
+        }}
+      />
       <UnwindModal
         ref={node => {
           $unwindModal.current = node;

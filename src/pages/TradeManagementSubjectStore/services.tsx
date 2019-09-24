@@ -342,7 +342,7 @@ const instrumentIds = {
   dataIndex: 'instrumentIds',
   render: (value, record, index, { form, editing }) => {
     const disable = () =>
-      _.get(record, 'record.assetClass.value') ||
+      _.get(record, 'assetClass.value') ||
       _.get(record, 'instrumentType.value') ||
       _.get(record, 'assetSubClass.value');
     return (

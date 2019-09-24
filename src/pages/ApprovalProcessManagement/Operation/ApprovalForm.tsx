@@ -1,37 +1,41 @@
+import moment from 'moment';
+import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
+import React, { PureComponent } from 'react';
+import _ from 'lodash';
+import { format } from 'util';
 import {
   completeTaskProcess,
   queryProcessForm,
   queryProcessHistoryForm,
   terminateProcess,
 } from '@/services/approval';
-import moment from 'moment';
 import { refBankAccountSearch, refSimilarLegalNameList } from '@/services/reference-data-service';
-import { Button, Icon, Input, Popconfirm, Spin, Table } from 'antd';
-import React, { PureComponent } from 'react';
 import CommonForm from '@/pages/SystemSettingDepartment/components/CommonForm';
-import { generateColumns } from '../tools';
-import _ from 'lodash';
+import { generateColumns, CREATE_FORM_CONTROLS } from '../tools';
+import { SmartTable, Form2 } from '@/containers';
+import { formatNum } from '@/tools';
+import styles from '../index.less';
+
 const { TextArea } = Input;
-import { SmartTable } from '@/containers';
+const NORMAL = 'NORMAL';
 
 class ApprovalForm extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       data: {},
-      status: '',
       loading: true,
-      formItems: [],
-      counters: [],
-      accounts: [],
       modifying: false,
       modifyBtn: '',
       rejectReason: '',
       passComment: '',
       modifyComment: '',
       currentNodeDTO: null,
+      financialFormData: {},
+      bankAccountList: [],
     };
   }
+
   public componentDidMount = async () => {
     const { formData, status } = this.props;
     this.fetchData(formData, status);
@@ -44,29 +48,23 @@ class ApprovalForm extends PureComponent {
       this.setState(
         {
           data: {},
-          status: '',
           loading: true,
-          formItems: [],
-          counters: [],
-          accounts: [],
           modifying: false,
           modifyBtn: '',
           rejectReason: '',
           passComment: '',
           modifyComment: '',
+          financialFormData: {},
         },
         () => {
           this.fetchData(formData, status);
-        }
+        },
       );
     }
   }
 
   public fetchData = async (params, status) => {
     const processInstanceId = params.processInstanceId || params.processInstance.processInstanceId;
-    const isCheckBtn =
-      params && params.taskName && status === 'pending' && params.taskName.includes('修改资金流水');
-
     this.setState({
       loading: true,
     });
@@ -95,224 +93,130 @@ class ApprovalForm extends PureComponent {
     this.setState({
       currentNodeDTO: _.get(data, 'currentNodeDTO.taskType'),
     });
-    if (!isCheckBtn) {
-      const formItems = this.formatFormItems(data, true);
-      this.setState({
-        data,
-        status,
-        formItems,
-        loading: false,
-      });
-    } else {
-      this.queryBankAccount(data, status);
-    }
-  };
-
-  public queryBankAccount = async (data, status) => {
-    const payload = (data && data.process && data.process._business_payload) || {};
-    const [counters, banks] = await Promise.all([
-      refSimilarLegalNameList({ similarLegalName: '' }),
-      refBankAccountSearch({ legalName: payload.clientId }),
-    ]);
+    const financialFormData = _.get(data, 'process._business_payload');
     this.setState(
       {
-        counters: (counters && counters.data) || [],
-        accounts: (banks && banks.data && banks.data.map(d => d.bankAccount)) || [],
+        data,
+        loading: false,
+        financialFormData: Form2.createFields({
+          ...financialFormData,
+          paymentDate: moment(financialFormData.paymentDate),
+        }),
       },
       () => {
-        this.setFinalData(data, status);
-      }
+        this.fetchBankAccountList(this.state.financialFormData);
+      },
     );
   };
 
-  public setFinalData = (data, status) => {
-    const formItems = this.formatFormItems(data, false);
-    this.setState({
-      data,
-      status,
-      formItems,
-      loading: false,
-    });
-  };
-
-  public handleCounterChange = () => {
-    const { formData } = this.props;
-    const { data } = this.state;
-    const isCheckBtn =
-      formData && formData.taskName && formData.taskName.includes('复核') && status === 'queued';
-    const formItems = this.formatFormItems(data, isCheckBtn);
-    this.setState({
-      formItems,
-    });
-  };
-
-  public formatFormItems = (data, isDisable) => {
-    const payload = (data && data.process && data.process._business_payload) || {};
-    // isDisable = false;
-    payload.paymentDirection = payload.paymentDirection === 'IN' ? '入金' : '出金';
-    payload.accountDirection = payload.accountDirection === 'PARTY' ? '客户资金' : '我方资金';
-    const { counters, accounts } = this.state;
-    const partner = {
-      type: 'select',
-      label: '交易对手',
-      property: 'clientId',
-      required: true,
-      options: counters,
-      disabled: isDisable,
-      listener: async value => {
-        // this.setState({ accounts: [3435, 88989, 999] }, () => {
-        //   this.handleCounterChange(value);
-        // });
-        const accounts = await refBankAccountSearch({ legalName: value });
-        const data = accounts.data || [];
-        this.setState({ accounts: data.map(d => d.bankAccount) }, () => {
-          this.handleCounterChange();
-        });
-        // this.handleCounterChange(value);
-      },
-    };
-    const bankAccount = {
-      type: 'select',
-      label: '银行帐号',
-      property: 'bankAccount',
-      options: accounts,
-      disabled: isDisable,
-      required: true,
-    };
-    const money = {
-      type: 'number',
-      label: '出入金金额',
-      property: 'paymentAmount',
-      required: true,
-      disabled: isDisable,
-    };
-    const date = {
-      type: 'date',
-      label: '出入金日期',
-      property: 'paymentDate',
-      required: true,
-      disabled: isDisable,
-    };
-    const direction = {
-      type: 'select',
-      label: '出入金方向',
-      property: 'paymentDirection',
-      required: true,
-      options: ['入金', '出金'],
-      disabled: isDisable,
-    };
-    const accountType = {
-      type: 'select',
-      label: '账户类型',
-      property: 'accountDirection',
-      required: true,
-      options: ['我方资金', '客户资金'],
-      disabled: isDisable,
-    };
-    return [partner, bankAccount, money, date, direction, accountType].map(item => {
-      const obj = { value: payload[item.property] || '', ...item };
-      return obj;
-    });
+  public fetchBankAccountList = async form => {
+    if (form.clientId) {
+      const { error, data } = await refBankAccountSearch({
+        legalName: Form2.getFieldValue(form.clientId),
+        bankAccountStatus: NORMAL,
+      });
+      if (error) return;
+      const bankAccountList = _.map(data, (val, key) => ({
+        label: _.pick(val, ['bankAccount']).bankAccount,
+        value: _.pick(val, ['bankAccount']).bankAccount,
+        bankName: _.pick(val, ['bankName']).bankName,
+        bankAccountName: _.pick(val, ['bankAccountName']).bankAccountName,
+      }));
+      this.setState({
+        bankAccountList,
+      });
+    }
   };
 
   public confirmAbandon = async () => {
-    this.$formBuilder.validateForm(values => {
-      const obj = { ...values };
-      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
-      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
-      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
-      const { formData } = this.props;
-      const { modifyComment } = this.state;
-      const params = {
-        taskId: formData.taskId,
-        ctlProcessData: {
-          abandon: true,
-        },
-        businessProcessData: obj,
-      };
-      this.executeModify(params, 'abandon');
-    });
+    const res = await this.$formBuilder.validate();
+    if (res.error) {
+      return;
+    }
+
+    const { formData } = this.props;
+    // const { modifyComment } = this.state;
+    const financialFormData = Form2.getFieldsValue(this.state.financialFormData);
+    const params = {
+      taskId: formData.taskId,
+      ctlProcessData: {
+        abandon: true,
+      },
+      businessProcessData: {
+        ...financialFormData,
+        paymentDate: moment(financialFormData.paymentDate).format('YYYY-MM-DD'),
+      },
+    };
+    this.executeModify(params, 'abandon');
   };
 
   public confirmPass = async () => {
-    // const { formData } = this.props;
-    // const { passComment } = this.state;
-    // const params = {
-    //   taskId: formData.taskId,
-    //   ctlProcessData: {
-    //     confirmed: true,
-    //     comment: passComment,
-    //   },
-    //   businessProcessData: {},
-    // };
-    // this.executeModify(params, 'pass');
-    this.$formBuilder.validateForm(values => {
-      const obj = { ...values };
-      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
-      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
-      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
-      const { formData } = this.props;
-      const { passComment } = this.state;
-      const params = {
-        taskId: formData.taskId,
-        ctlProcessData: {
-          comment: passComment,
-          confirmed: true,
-        },
-        businessProcessData: obj,
-      };
-      this.executeModify(params, 'pass');
-    });
+    const res = await this.$formBuilder.validate();
+    if (res.error) {
+      return;
+    }
+
+    const { formData } = this.props;
+    const { passComment } = this.state;
+    const financialFormData = Form2.getFieldsValue(this.state.financialFormData);
+    const params = {
+      taskId: formData.taskId,
+      ctlProcessData: {
+        comment: passComment,
+        confirmed: true,
+      },
+      businessProcessData: {
+        ...financialFormData,
+        paymentDate: moment(financialFormData.paymentDate).format('YYYY-MM-DD'),
+      },
+    };
+    this.executeModify(params, 'pass');
   };
+
   public confirmModify = async () => {
-    this.$formBuilder.validateForm(values => {
-      const obj = { ...values };
-      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
-      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
-      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
-      const { formData } = this.props;
-      const { modifyComment } = this.state;
-      const params = {
-        taskId: formData.taskId,
-        ctlProcessData: {
-          comment: modifyComment,
-          abandon: false,
-        },
-        businessProcessData: obj,
-      };
-      this.executeModify(params, 'modify');
-    });
+    const res = await this.$formBuilder.validate();
+    if (res.error) {
+      return;
+    }
+
+    const { formData } = this.props;
+    const { modifyComment } = this.state;
+    const financialFormData = Form2.getFieldsValue(this.state.financialFormData);
+    const params = {
+      taskId: formData.taskId,
+      ctlProcessData: {
+        comment: modifyComment,
+        abandon: false,
+      },
+      businessProcessData: {
+        ...financialFormData,
+        paymentDate: moment(financialFormData.paymentDate).format('YYYY-MM-DD'),
+      },
+    };
+    this.executeModify(params, 'modify');
   };
+
   public rejectForm = async () => {
-    // const { formData } = this.props;
-    // const { rejectReason } = this.state;
-    // const params = {
-    //   taskId: formData.taskId,
-    //   ctlProcessData: {
-    //     comment: rejectReason,
-    //     confirmed: false,
-    //   },
-    //   businessProcessData: {},
-    // };
-    // this.executeModify(params, 'reject');
-    this.$formBuilder.validateForm(values => {
-      const obj = { ...values };
-      obj.paymentDirection = obj.paymentDirection === '入金' ? 'IN' : 'OUT';
-      obj.accountDirection = obj.accountDirection === '客户资金' ? 'PARTY' : 'COUNTER_PARTY';
-      obj.paymentDate = moment(obj.paymentDate).format('YYYY-MM-DD');
-      const { formData } = this.props;
-      const { rejectReason } = this.state;
-      const params = {
-        taskId: formData.taskId,
-        ctlProcessData: {
-          comment: rejectReason,
-          comment: rejectReason,
-          confirmed: false,
-        },
-        businessProcessData: obj,
-      };
-      this.executeModify(params, 'reject');
-    });
+    const res = await this.$formBuilder.validate();
+    if (res.error) {
+      return;
+    }
+
+    const { formData } = this.props;
+    const { rejectReason } = this.state;
+    const financialFormData = Form2.getFieldsValue(this.state.financialFormData);
+    const params = {
+      taskId: formData.taskId,
+      ctlProcessData: {
+        comment: rejectReason,
+        confirmed: false,
+      },
+      businessProcessData: {
+        ...financialFormData,
+        paymentDate: moment(financialFormData.paymentDate).format('YYYY-MM-DD'),
+      },
+    };
+    this.executeModify(params, 'reject');
   };
 
   public setRejectReson = e => {
@@ -351,12 +255,48 @@ class ApprovalForm extends PureComponent {
     handleFormChange();
   };
 
+  public financialFormChange = async (props, changedValues, allValues) => {
+    const { financialFormData } = this.state;
+    if (changedValues.clientId) {
+      const { error, data } = await refBankAccountSearch({
+        legalName: Form2.getFieldValue(allValues.clientId),
+        bankAccountStatus: NORMAL,
+      });
+      if (error) return;
+      const bankAccountList = _.map(data, (val, key) => ({
+        label: _.pick(val, ['bankAccount']).bankAccount,
+        value: _.pick(val, ['bankAccount']).bankAccount,
+        bankName: _.pick(val, ['bankName']).bankName,
+        bankAccountName: _.pick(val, ['bankAccountName']).bankAccountName,
+      }));
+      this.setState({
+        bankAccountList,
+        financialFormData: {
+          ...financialFormData,
+          ...changedValues,
+          ...Form2.createFields(
+            Form2.getFieldValue(changedValues.clientId) !==
+              Form2.getFieldValue(financialFormData.clientId)
+              ? { bankAccount: null }
+              : null,
+          ),
+        },
+      });
+      return;
+    }
+    this.setState({
+      financialFormData: {
+        ...financialFormData,
+        ...changedValues,
+      },
+    });
+  };
+
   public render() {
     const { status, formData } = this.props;
     const {
       data,
       loading,
-      formItems,
       modifying,
       modifyBtn,
       rejectReason,
@@ -368,12 +308,28 @@ class ApprovalForm extends PureComponent {
 
     const approvalColumns = generateColumns(
       'approval',
-      data.processInstance && data.processInstance.operator ? 'operator' : 'initiator'
+      data.processInstance && data.processInstance.operator ? 'operator' : 'initiator',
     );
     const processColumns = generateColumns('process');
     const processData = data.processInstance ? [data.processInstance] : [];
-    const histories = data.taskHistory ? data.taskHistory : [];
-    const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin={true} />;
+    const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
+
+    let histories = data.taskHistory ? data.taskHistory : [];
+    histories = histories.sort(
+      (item1, item2) => moment(item1.operateTime).valueOf() - moment(item2.operateTime).valueOf(),
+    );
+    let approvalDataDtatus = null;
+    if (histories.length > 0) {
+      if (histories[histories.length - 1].operation === '退回') {
+        approvalDataDtatus = '待修改';
+      } else if (formData.processInstanceStatusEnum === 'processUnfinished') {
+        approvalDataDtatus = '待审批';
+      } else {
+        approvalDataDtatus = '审批完成';
+      }
+    }
+    const formStatus =
+      approvalDataDtatus === '待审批' || approvalDataDtatus === '审核完成' || status !== 'pending';
     return (
       <div>
         {!loading && (
@@ -398,7 +354,17 @@ class ApprovalForm extends PureComponent {
                 alignItems: 'center',
               }}
             >
-              <CommonForm data={formItems} ref={ele => (this.$formBuilder = ele)} />
+              <Form2
+                ref={node => {
+                  this.$formBuilder = node;
+                }}
+                dataSource={this.state.financialFormData}
+                columns={CREATE_FORM_CONTROLS(this.state.bankAccountList, formStatus)}
+                footer={false}
+                onFieldsChange={this.financialFormChange}
+                style={{ width: '60%' }}
+                className={styles.createForm}
+              />
             </div>
             <div style={{ marginTop: 20 }}>
               <SmartTable
@@ -431,7 +397,7 @@ class ApprovalForm extends PureComponent {
                           <TextArea
                             onChange={this.setPassComment}
                             value={passComment}
-                            placeholder={'请输入审核意见（可选）'}
+                            placeholder="请输入审核意见（可选）"
                           />
                         </div>
                       }

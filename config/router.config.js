@@ -67,6 +67,11 @@ export default [
   //   path: '/center-login',
   //   component: '/user/login',
   // },
+  {
+    path: '/api-docs',
+    name: 'apiDocs',
+    component: './ApiDocs/index',
+  },
   mapTree(
     {
       appRoute: true,

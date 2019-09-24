@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import moment from 'moment';
 import { getMoment, getCurDateMoment } from '@/tools';
 import {
   ASSET_CLASS_MAP,
@@ -28,8 +30,6 @@ import {
 import { Form2 } from '@/containers';
 import { IFormField, ITableData, ITableTriggerCellFieldsChangeParams } from '@/components/type';
 import { ILeg } from '@/types/leg';
-import _ from 'lodash';
-import moment from 'moment';
 import { Direction } from '../../containers/legFields';
 import { DaysInYear } from '../../containers/legFields/DaysInYear';
 import { EffectiveDate } from '../../containers/legFields/EffectiveDate';
@@ -81,9 +81,7 @@ export const Forward: ILeg = legPipeLine({
         ExpirationDate,
         NotionalAmount,
         TradeNumber,
-        ...TOTAL_TRADESCOL_FIELDS.filter(item => {
-          return item.dataIndex !== 'vol';
-        }),
+        ...TOTAL_TRADESCOL_FIELDS.filter(item => item.dataIndex !== 'vol'),
         ...GENERAL_COMPUTED_FIELDS,
       ];
     }

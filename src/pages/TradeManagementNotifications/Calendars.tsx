@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { EVENT_TYPE_MAP, EVENT_TYPE_ZHCN_MAP, LEG_TYPE_ZHCH_MAP } from '@/constants/common';
 import { toggleItem } from '@/tools';
 import { traTradeLCMNotificationSearch } from '@/services/trade-service';
@@ -41,7 +42,7 @@ class Calendars extends PureComponent<any, any> {
       moment()
         .endOf('month')
         .format('YYYY-MM-DD'),
-      this.state.mode
+      this.state.mode,
     );
   };
 
@@ -177,7 +178,6 @@ class Calendars extends PureComponent<any, any> {
           mode={this.state.mode}
           onPanelChange={this.onPanelChange}
         />
-        ;
       </>
     );
   }

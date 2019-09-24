@@ -268,18 +268,30 @@ export const AutoCallPhoenix: ILeg = legPipeLine({
         }),
         {},
       );
+    nextPosition.asset.fixingPaymentDates =
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
+        (result, item) => ({
+          ...result,
+          [item[OB_DAY_FIELD]]: item.payDay !== undefined ? item.payDay : null,
+        }),
+        {},
+      );
 
     nextPosition.asset.annualized = true;
 
     return nextPosition;
   },
   getPageData: (env: string, position: any) => {
-    const data = position.asset.fixingObservations || [];
     const data2 = position.asset.knockInObservationDates;
+    const dataItem = _.toPairs(position.asset.fixingObservations).map((val, index) =>
+      _.concat(val, _.toPairs(position.asset.fixingPaymentDates)[index]),
+    );
     const fields = Form2.createFields({
-      [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: Object.keys(data).map(key => ({
-        [OB_DAY_FIELD]: key,
-        price: data[key],
+      [LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY]: dataItem.map(item => ({
+        [OB_DAY_FIELD]: item[0],
+        price: item[1],
+        payDay: item[3],
       })),
       [LEG_FIELD.IN_EXPIRE_NO_BARRIEROBSERVE_DAY]: data2,
       [LEG_FIELD.UP_BARRIER]: position.asset.barrier,

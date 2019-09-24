@@ -271,7 +271,7 @@ export const CREATE_FORM_CONTROLS: IFormControl[] = [
           instrumentIdPart: value,
         });
         if (error) return [];
-        return data.map(item => ({
+        return data.slice(0, 50).map(item => ({
           label: item,
           value: item,
         }));

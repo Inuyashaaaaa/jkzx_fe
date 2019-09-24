@@ -1,3 +1,6 @@
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React from 'react';
 import {
   LEG_FIELD,
   LEG_TYPE_FIELD,
@@ -13,9 +16,6 @@ import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { Form2, Select } from '@/containers';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React from 'react';
 
 export const RebateUnit: ILegColDef = {
   title: '敲出补偿类型',
@@ -27,15 +27,11 @@ export const RebateUnit: ILegColDef = {
     }
     return true;
   },
-  defaultEditing: record => {
-    return false;
-  },
+  defaultEditing: record => false,
   render: (val, record, index, { form, editing, colDef }) => {
     // const { isBooking, isPricing, isEditing } = getLegEnvs(record);
 
-    const getDefaultOpen = () => {
-      return editing;
-    };
+    const getDefaultOpen = () => editing;
 
     return (
       <FormItem>

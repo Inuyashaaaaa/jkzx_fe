@@ -1,0 +1,41 @@
+{
+  "position": {    
+    "direction": "BUYER",
+    "optionType": "PUT",
+    "underlyerInstrumentId": "000023.SZ",
+    "initialSpot": "13.1",
+    "participationRate": "100",
+    "term": "30",
+    "effectiveDate": "2019-07-23",
+    "premium": "15",
+    "notionalAmountType": "LOT",
+    "notionalAmount": "4000",
+    "comment": "自定义2",
+    "tradingBook": "options1",
+    "tradingId": "自定义产品0723002",
+    "tradingRival": "交易对手000",
+    "tradingDate": "2019-07-23",
+    "tradingNote": "期权",
+    "cashFlow": 7860
+  },
+  "zhPosition": {
+    "LEG_META": "自定义产品",
+    "annualized": "非年化",
+    "direction": "买",
+    "optionType": "看跌",
+    "underlyerInstrumentId": "000023.SZ",
+    "initialSpot": "13.1000",
+    "participationRate": "100.0000%",
+    "term": "30天",
+    "effectiveDate": "2019-07-23",
+    "premium": "15.0000%",
+    "notionalAmountType": "手数",
+    "notionalAmount": "4,000.0000手",
+    "comment": "自定义2",
+    "tradingBook": "options1",
+    "tradingId": "自定义产品0723002",
+    "tradingRival": "交易对手000",
+    "tradingDate": "2019-07-23",
+    "tradingNote": "期权"
+  }
+}

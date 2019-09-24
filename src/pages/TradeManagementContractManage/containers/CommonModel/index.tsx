@@ -44,19 +44,22 @@ class CommonModel extends PureComponent<any> {
       preLocation.pathname === '/trade-management/book-edit' &&
       this.props.entryTabKey === this.props.name
     ) {
-      if (modify) {
-        const { activeTabKey } = this.props;
-        const { pagination } = this.props[activeTabKey];
-        this.onTradeTableSearch(pagination);
-        return this.props.dispatch({
-          type: 'tradeManagementContractManage/modify',
-          payload: false,
-        });
-      }
-      return this.props.dispatch({
+      this.props.dispatch({
+        type: 'tradeManagementContractManage/modify',
+        payload: false,
+      });
+
+      this.props.dispatch({
         type: 'tradeManagementContractManage/setEntryTabKey',
         payload: null,
       });
+
+      const { activeTabKey } = this.props;
+      const { pagination, searchFormData } = this.props[activeTabKey];
+      this.setState({
+        searchFormData,
+      });
+      return this.onTradeTableSearch(pagination, searchFormData, false, false);
     }
     return this.onTradeTableSearch({ current: 1, pageSize: PAGE_SIZE });
   };
@@ -76,6 +79,7 @@ class CommonModel extends PureComponent<any> {
     paramsPagination = undefined,
     formData,
     setSearchForm = false,
+    setLoading = true,
   ) => {
     const { searchFormData, searchForm } = this.state;
     const { activeTabKey } = this.props;
@@ -87,8 +91,9 @@ class CommonModel extends PureComponent<any> {
       }
       return val;
     });
-
-    this.setState({ loading: true });
+    if (setLoading) {
+      this.setState({ loading: true });
+    }
 
     const { error, data } = await trdTradeSearchIndexPaged({
       page: (paramsPagination || pagination).current - 1,
@@ -96,7 +101,9 @@ class CommonModel extends PureComponent<any> {
       ...formatValues,
       status: this.props.status,
     });
-    this.setState({ loading: false });
+    if (setLoading) {
+      this.setState({ loading: false });
+    }
 
     if (error) return;
     if (setSearchForm) {
@@ -125,6 +132,7 @@ class CommonModel extends PureComponent<any> {
       payload: {
         activeTabKey: name,
         tableDataSource,
+        searchFormData: formData || searchForm,
         pagination: {
           ...pagination,
           ...paramsPagination,
@@ -185,6 +193,7 @@ class CommonModel extends PureComponent<any> {
     return (
       <>
         <SmartForm
+          data-test="contract-search"
           spread={3}
           onCollapseChange={next => {
             this.props.dispatch({
@@ -250,6 +259,7 @@ class CommonModel extends PureComponent<any> {
                       allowClear
                       showSearch
                       fetchOptionsOnSearch
+                      data-test="contract-tradeId"
                       options={
                         this.state.bookIdList.length
                           ? this.state.bookIdList.map(item => ({
@@ -261,7 +271,7 @@ class CommonModel extends PureComponent<any> {
                                 similarTradeId: values,
                               });
                               if (error) return [];
-                              return data.map(item => ({
+                              return data.slice(0, 100).map(item => ({
                                 label: item,
                                 value: item,
                               }));
@@ -315,11 +325,15 @@ class CommonModel extends PureComponent<any> {
                         const { data, error } = await refSimilarSalesNameList({
                           similarSalesName: values,
                         });
+                        console.log(data);
                         if (error) return [];
-                        return data.map(item => ({
-                          label: item,
-                          value: item,
-                        }));
+                        return _.uniqBy(
+                          data.map(item => ({
+                            label: item,
+                            value: item,
+                          })),
+                          'value',
+                        );
                       }}
                     />,
                   )}
@@ -427,7 +441,7 @@ class CommonModel extends PureComponent<any> {
                       fetchOptionsOnSearch
                       options={LCM_EVENT_TYPE_OPTIONS.sort((a, b) =>
                         b.value.localeCompare(a.value),
-                      ).filter(item => item.value !== LCM_EVENT_TYPE_MAP.PAYMENT)}
+                      )}
                     />,
                   )}
                 </FormItem>

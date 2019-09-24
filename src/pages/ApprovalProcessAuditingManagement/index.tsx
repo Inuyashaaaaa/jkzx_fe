@@ -95,8 +95,8 @@ class SystemSettingsRoleManagement extends PureComponent {
     this.setState({ userList: userListData });
   };
 
-  public toArray = data => {
-    return data.concat(
+  public toArray = data =>
+    data.concat(
       data.map(item => {
         if (item.children) {
           return this.toArray(item.children);
@@ -104,7 +104,6 @@ class SystemSettingsRoleManagement extends PureComponent {
         return item.children;
       }),
     );
-  };
 
   public fetchList = async () => {
     this.setState({
