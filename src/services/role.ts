@@ -91,3 +91,13 @@ export async function initPagePermissions(token?) {
     authRolesList({}, token),
   ]);
 }
+
+export async function authSysLogList(params = {}) {
+  return request(`${HOST_TEST}auth-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'authSysLogList',
+      params,
+    },
+  });
+}
