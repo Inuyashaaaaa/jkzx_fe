@@ -1,5 +1,9 @@
 {
   "video": false,
   "browser": "chrome",
-  "reporter": "mochawesome"
+  "reporter": "mochawesome",
+  "baseUrl": "http://localhost:8000/#",
+  "blacklistHosts":[],
+  "viewportWidth": 1500,
+  "viewportHeight": 1000
 }

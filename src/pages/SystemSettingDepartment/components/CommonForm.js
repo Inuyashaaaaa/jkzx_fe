@@ -203,6 +203,7 @@ export default class CommonForm extends Component {
       marginTop,
       attachData,
       listener,
+      precision,
     } = item;
     const st = this.state;
     const { uploadDisabled } = this.props;
@@ -255,6 +256,8 @@ export default class CommonForm extends Component {
               placeholder={placeholder || ''}
               onChange={newValue => this.handleChange(newValue, property)}
               style={{ width: 300, marginLeft: 10 }}
+              formatter={formatter}
+              precision={precision}
             />
             <div style={{ width: 300, marginLeft: 10, color: '#f5222d' }}>{st[property] || ''}</div>
           </div>

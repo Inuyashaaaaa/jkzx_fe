@@ -1,0 +1,49 @@
+---
+name: utils/format
+route: /utils/format
+menu: App
+---
+
+# format
+
+## 使用场景
+格式化数字或者金钱，可配置单位或者精度等
+
+
+## 功能展示
+
+import { format, params } from '../index';
+import { Playground, Props } from 'docz';
+import _ from 'lodash';
+
+<Playground>
+  {() => {
+    const random = _.random(10, true);
+    const money = `￥${random}`
+
+    const item = (title, form, to) => {
+      return (
+        <div>
+          <div>{title}</div>
+          <div style={{marginBottom: 20}}>{form} => {to}</div>
+        </div>
+      )
+    }
+
+    return (
+      <>
+         { item('默认格式化数字：', random, format({ value: random }))}
+         { item('格式化数字：', random, format({ value: random, format: '0,0.00' }))}
+         { item('数字转百分比：', random, format({ value: random, format: '0%' }))}
+         { item('数字转金钱：', random, format({ value: random, format: '$0,0.00' }))}
+         { item('金钱转数字：', money, format({value: money, format: '0,0.00' }))}
+         { item('数字加法：', random, format({ value: random, add: 10 }))}
+         { item('差异比较', random, format({ value: random, difference: 100 }))}
+      </>
+      );
+  }}
+</Playground>
+
+## API
+
+<Props of={params} />

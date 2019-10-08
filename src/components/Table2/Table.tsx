@@ -11,6 +11,7 @@ import SwitchCell from './cells/SwitchCell';
 import {
   TABLE_CELL_EDITING_CHANGED,
   TABLE_CELL_FIELDS_CHANGE,
+  TABLE_START_ACTIVE,
   TABLE_CELL_VALUES_CHANGE,
   TABLE_KEY_DOWN,
   TABLE_CELL_CLICK,
@@ -67,26 +68,16 @@ class Table2 extends PureComponent<ITableProps> {
 
     this.$dom = document.getElementById(this.domId);
 
-    window.addEventListener('keydown', this.onKeyDown, false);
-    window.addEventListener('click', this.onWindowClick, false);
+    window.addEventListener('keydown', this.onKeyDown);
+    this.$dom.addEventListener('click', this.onTableClick);
   };
 
   public componentWillUnmount = () => {
-    window.removeEventListener('keydown', this.onKeyDown, false);
-    window.removeEventListener('click', this.onWindowClick, false);
+    window.removeEventListener('keydown', this.onKeyDown);
+    this.$dom.removeEventListener('click', this.onTableClick);
   };
 
-  public onWindowClick = (event: MouseEvent) => {
-    if (Table2.activeTableInstance !== this) return;
-    if (
-      event.target instanceof HTMLElement &&
-      !hasElement(document.getElementById(this.domId), event.target)
-    ) {
-      this.looseActive();
-      this.save();
-      return;
-    }
-
+  public onTableClick = (event: MouseEvent) => {
     if (
       event.target === this.getTbody() ||
       (event.target instanceof HTMLElement && hasElement(this.getThead(), event.target))
@@ -98,11 +89,6 @@ class Table2 extends PureComponent<ITableProps> {
   public onKeyDown = (event: Event) => {
     if (Table2.activeTableInstance !== this) return;
     this.api.eventBus.emit(TABLE_KEY_DOWN, event);
-  };
-
-  public onTableCellClick = params => {
-    // 设置激活状态的 table 为当前，cell click 的后续操作要在此状态更新后处理
-    Table2.setActiveTableInstance(this);
   };
 
   public getFieldNames = () => this.props.columns.map(item => item.dataIndex);
@@ -248,8 +234,8 @@ class Table2 extends PureComponent<ITableProps> {
         })
       );
     }
-    if (eventName === TABLE_CELL_CLICK) {
-      return this.onTableCellClick(params);
+    if (eventName === TABLE_START_ACTIVE) {
+      Table2.setActiveTableInstance(this);
     }
   };
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Divider, Row } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { PureComponent } from 'react';
@@ -69,26 +70,15 @@ class History extends PureComponent {
   };
 
   public handleDataSource = data =>
-    data.map(item => ({
-      ...item,
-      status: HISTORY_CLOUNMS_STATUS_MAP[item.status],
-      event: (
+    data.map(item => {
+      item.status = HISTORY_CLOUNMS_STATUS_MAP[item.status];
+      item.event = (
         IOGLOD_EVENT_TYPE_OPTIONS[
           _.findIndex(IOGLOD_EVENT_TYPE_OPTIONS, param => param.value === item.event)
         ] || {}
-      ).label,
-      marginChange: formatMoney(item.marginChange),
-      cashChange: formatMoney(item.cashChange),
-      premiumChange: formatMoney(item.premiumChange),
-      creditUsedChange: formatMoney(item.creditUsedChange),
-      debtChange: formatMoney(item.debtChange),
-      netDepositChange: formatMoney(item.netDepositChange),
-      realizedPnLChange: formatMoney(item.realizedPnLChange),
-      counterPartyCreditChange: formatMoney(item.counterPartyCreditChange),
-      counterPartyCreditBalanceChange: formatMoney(item.counterPartyCreditBalanceChange),
-      counterPartyFundChange: formatMoney(item.counterPartyFundChange),
-      counterPartyMarginChange: formatMoney(item.counterPartyMarginChange),
-    }));
+      ).label;
+      return item;
+    });
 
   public render() {
     return (
@@ -107,7 +97,7 @@ class History extends PureComponent {
             {
               title: '交易对手',
               dataIndex: 'legalName',
-              render: (val, record, index, { form, editing }) => (
+              render: (value, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({})(
                     <Select
@@ -134,7 +124,7 @@ class History extends PureComponent {
             {
               title: '主协议编号',
               dataIndex: 'masterAgreementId',
-              render: (val, record, index, { form, editing }) => (
+              render: (value, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({})(
                     <Select
@@ -161,7 +151,7 @@ class History extends PureComponent {
             {
               title: '交易ID',
               dataIndex: 'tradeId',
-              render: (val, record, index, { form, editing }) => (
+              render: (value, record, index, { form, editing }) => (
                 <FormItem>
                   {form.getFieldDecorator({})(
                     <Select
@@ -175,7 +165,7 @@ class History extends PureComponent {
                           similarTradeId: value,
                         });
                         if (error) return [];
-                        return data.slice(0, 100).map(item => ({
+                        return data.map(item => ({
                           label: item,
                           value: item,
                         }));
@@ -221,6 +211,34 @@ class History extends PureComponent {
               colSwitch: [],
               sortBy: 'CreateAt',
               handleDataSource: this.handleDataSource,
+              getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+                if (val === null || val === undefined) {
+                  return null;
+                }
+                if (
+                  [
+                    'marginChange',
+                    'cashChange',
+                    'premiumChange',
+                    'creditUsedChange',
+                    'debtChange',
+                    'debtChange',
+                    'netDepositChange',
+                    'realizedPnLChange',
+                    'counterPartyCreditChange',
+                    'counterPartyCreditBalanceChange',
+                    'counterPartyFundChange',
+                    'counterPartyMarginChange',
+                    'creditChange',
+                  ].includes(dataIndex) &&
+                  rowIndex > 0
+                ) {
+                  return {
+                    t: 'n',
+                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                  };
+                }
+              },
             }}
           >
             导出Excel

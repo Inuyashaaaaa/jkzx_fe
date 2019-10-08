@@ -13,8 +13,9 @@ import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeButton from '@/containers/ThemeButton';
 import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
-import { delay } from '@/tools';
+import { delay, formatNumber } from '@/tools';
 import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const LATEST_PER = 'latest';
@@ -67,10 +68,9 @@ const Vol = props => {
 
   const fetch = async () => {
     setLoading(true);
-
     const [rsp, realRsp] = await Promise.all([
       getInstrumentVolCone({
-        instrumentId,
+        instrumentId: props.instrumentId,
         start_date: dates[0].format('YYYY-MM-DD'),
         end_date: dates[1].format('YYYY-MM-DD'),
         windows,
@@ -78,7 +78,7 @@ const Vol = props => {
         isPrimary: true,
       }),
       getInstrumentRealizedVol({
-        instrumentId,
+        instrumentId: props.instrumentId,
         tradeDate: dates[1].format('YYYY-MM-DD'),
         isPrimary: true,
       }),
@@ -130,8 +130,10 @@ const Vol = props => {
   };
 
   useEffect(() => {
-    fetch();
-  }, []);
+    if (props.instrumentId) {
+      fetch();
+    }
+  }, [props.instrumentId]);
 
   return (
     <>
@@ -143,6 +145,7 @@ const Vol = props => {
                 onChange={pDates => setDates(pDates)}
                 value={dates}
                 allowClear={false}
+                disabledDate={current => current && current > moment().endOf('day')}
               ></ThemeDatePickerRanger>
             </FormItem>
           </FormItemWrapper>
@@ -181,7 +184,8 @@ const Vol = props => {
                 type: 'cat',
               },
               value: {
-                alias: '波动率',
+                alias: '波动率(%)',
+                formatter: param => formatNumber(param * 100, 0),
               },
             }}
             onGetG2Instance={g2Chart => {
@@ -262,7 +266,7 @@ const Vol = props => {
                 'pname*value',
                 (name, value) => ({
                   name,
-                  value,
+                  value: formatNumber(value * 100, 2),
                 }),
               ]}
               size={3}
@@ -270,7 +274,6 @@ const Vol = props => {
               position="window*value"
               color={['percentile', percentile => colorMap[percentile]]}
               opacity={0.85}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
@@ -303,6 +306,7 @@ const Vol = props => {
               offsetY={-12}
               offsetX={-3}
               itemFormatter={val => lengedMap[val]}
+              clickable={false}
             />
           </Chart>
         ) : (

@@ -35,6 +35,15 @@ const checkStatus = response => {
 };
 
 function checkData(data) {
+  // 获取资源的接口，网络如果无错误就当是成功返回
+  if (typeof data === 'string') {
+    return {
+      error: false,
+      data,
+      raw: data,
+    };
+  }
+
   // restful api style
   if (!data.jsonrpc) {
     return {
@@ -51,6 +60,7 @@ function checkData(data) {
     error.code = code;
     throw error;
   }
+
   return {
     error: false,
     data: data.result,
@@ -86,6 +96,21 @@ const gotoLogin = _.debounce(() => {
   }
   router.push('/user/login');
 }, 100);
+
+const convertResponse = (options, response) => {
+  const { miniType } = options;
+  // const contentTypeMapStr = response.headers.get('content-type');
+  // const [noop, contentType] = contentTypeMapStr.match(/application\/(.*?);/) || [];
+
+  if (miniType) {
+    return response[miniType]();
+  }
+
+  if (response.status === 204 || options.method === 'DELETE') {
+    return response.text();
+  }
+  return response.json();
+};
 
 /**
  * Requests a URL, returning a promise.
@@ -158,14 +183,7 @@ export default function request(url, _options = {}, passError = false) {
   return fetch(url, newOptions)
     .then(checkStatus)
     .then(response => cachedSave(response, hashcode))
-    .then(response => {
-      // DELETE and 204 do not return data by default
-      // using .json will report an error.
-      if (newOptions.method === 'DELETE' || response.status === 204) {
-        return response.text();
-      }
-      return response.json();
-    })
+    .then(convertResponse.bind(this, newOptions))
     .then(checkData)
     .catch(
       onCatch ||
@@ -194,6 +212,7 @@ export default function request(url, _options = {}, passError = false) {
                 type: 'login/logout',
                 payload: {
                   loginUrl,
+                  routerPush: true,
                 },
               });
             }, 3000);

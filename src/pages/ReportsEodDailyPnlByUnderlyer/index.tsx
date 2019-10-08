@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { memo } from 'react';
 import { rptPnlReportSearchPaged } from '@/services/report-service';
 import { TABLE_COL_DEFS } from './constants';
@@ -9,11 +10,35 @@ const ReportsEodDailyPnlByUnderlyer = memo<any>(props => (
     tableColDefs={TABLE_COL_DEFS}
     searchFormControls={searchFormControls}
     defaultSort="bookName"
+    getSheetDataSourceItemMeta={(val, dataIndex, rowIndex) => {
+      if (val === null || val === undefined) {
+        return null;
+      }
+      if (
+        [
+          'dailyPnl',
+          'dailyOptionPnl',
+          'dailyUnderlyerPnl',
+          'pnlContributionDelta',
+          'pnlContributionGamma',
+          'pnlContributionVega',
+          'pnlContributionTheta',
+          'pnlContributionRho',
+          'pnlContributionUnexplained',
+        ].includes(dataIndex) &&
+        rowIndex > 0
+      ) {
+        return {
+          t: 'n',
+          z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+        };
+      }
+    }}
     defaultDirection="asc"
     reportType="PNL"
     searchMethod={rptPnlReportSearchPaged}
     downloadName="汇总日盈亏"
-    scrollWidth={1550}
+    scrollWidth={2000}
   />
 ));
 

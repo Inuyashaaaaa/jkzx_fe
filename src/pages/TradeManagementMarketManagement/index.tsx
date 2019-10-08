@@ -169,11 +169,23 @@ class TradeManagementMarketManagement extends PureComponent {
   };
 
   public handleIntradayChange = (props, fields, allFields) => {
-    this.setState({ intradayFormData: allFields });
+    const { intradayFormData } = this.state;
+    this.setState({
+      intradayFormData: {
+        ...intradayFormData,
+        ...fields,
+      },
+    });
   };
 
   public handleCloseChange = (props, fields, allFields) => {
-    this.setState({ closeFormData: allFields });
+    const { closeFormData } = this.state;
+    this.setState({
+      closeFormData: {
+        ...closeFormData,
+        ...fields,
+      },
+    });
   };
 
   public render() {
@@ -241,6 +253,7 @@ class TradeManagementMarketManagement extends PureComponent {
             total: this.state.total,
             showSizeChanger: true,
             showQuickJumper: true,
+            onShowSizeChange: this.paginationChange,
             onChange: this.paginationChange,
           }}
           loading={this.state.loading}

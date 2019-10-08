@@ -177,21 +177,24 @@ export default {
 
     *logout(
       {
-        payload: { loginUrl, userId },
+        payload: { loginUrl, userId, routerPush },
       },
       { call, put },
     ) {
-      const rsp = yield call(authUserLogout, { userId });
-      if (rsp.error) {
-        message.info('退出登录失败');
-        return;
+      if (!routerPush) {
+        const rsp = yield call(authUserLogout, { userId });
+        if (rsp.error) {
+          message.info('退出登录失败');
+          return;
+        }
+
+        yield put({
+          type: 'user/cleanCurrentUser',
+        });
+
+        message.info('退出登录');
       }
 
-      yield put({
-        type: 'user/cleanCurrentUser',
-      });
-
-      message.info('退出登录');
       router.push({
         pathname: loginUrl,
         query: {

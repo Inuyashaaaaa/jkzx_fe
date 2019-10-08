@@ -10,6 +10,7 @@ export default {
     contractManagement: {
       tableDataSource: [],
       collapse: true,
+      searchFormData: {},
       pagination: {
         current: 1,
         pageSize: PAGE_SIZE,
@@ -19,6 +20,7 @@ export default {
     open: {
       tableDataSource: [],
       collapse: true,
+      searchFormData: {},
       pagination: {
         current: 1,
         pageSize: PAGE_SIZE,
@@ -28,6 +30,7 @@ export default {
     unwind: {
       tableDataSource: [],
       collapse: true,
+      searchFormData: {},
       pagination: {
         current: 1,
         pageSize: PAGE_SIZE,
@@ -37,6 +40,7 @@ export default {
     expiration: {
       tableDataSource: [],
       collapse: true,
+      searchFormData: {},
       pagination: {
         current: 1,
         pageSize: PAGE_SIZE,
@@ -46,6 +50,7 @@ export default {
     overlate: {
       tableDataSource: [],
       collapse: true,
+      searchFormData: {},
       pagination: {
         current: 1,
         pageSize: PAGE_SIZE,
@@ -73,7 +78,13 @@ export default {
     },
 
     save(state, action) {
-      const { activeTabKey, tableDataSource, pagination, pageSizeCurrent } = action.payload;
+      const {
+        activeTabKey,
+        tableDataSource,
+        pagination,
+        pageSizeCurrent,
+        searchFormData,
+      } = action.payload;
       return {
         ...state,
         [activeTabKey]: {
@@ -81,6 +92,7 @@ export default {
           tableDataSource,
           pagination,
           pageSizeCurrent,
+          searchFormData,
         },
       };
     },

@@ -106,12 +106,19 @@ const Vol = props => {
   const fetch = async () => {
     setLoading(true);
     const rsp = await getInstrumentVolSurface({
-      instrumentId,
+      instrumentId: props.instrumentId,
       valuationDate: valuationDate.format('YYYY-MM-DD'),
       strikeType: strikeTypeData,
     });
     setLoading(false);
-    if (rsp.error) return;
+    if (rsp.error) {
+      setData({
+        modelInfo: {
+          instruments: [],
+        },
+      });
+      return;
+    }
     setData(rsp.data);
     setTypeData(strikeTypeData);
   };
@@ -171,9 +178,9 @@ const Vol = props => {
           formatter: params => {
             const { data: pData } = params;
             const [x, y, z] = pData;
-            return `${
-              strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'
-            }: ${x}<br/>期限: ${y}<br/>波动率: ${z}`;
+            return `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)' : '行权价(%)'}: ${
+              strikeType === STRIKE_TYPE_ENUM.STRIKE ? formatNumber(x, 2) : formatNumber(x * 100, 2)
+            }<br/>期限: ${y}<br/>波动率(%): ${formatNumber(z * 100, 2)}`;
           },
         },
         visualMap: {
@@ -187,9 +194,28 @@ const Vol = props => {
         },
         xAxis3D: {
           type: 'value',
-          name: `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'}`,
+          name: `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)' : '行权价(%)'}`,
           nameTextStyle: {
             fontSize: 13,
+            lineHeight: 40,
+          },
+          axisLabel: {
+            formatter: param => {
+              if (strikeType === STRIKE_TYPE_ENUM.STRIKE) {
+                return param;
+              }
+              return formatNumber(param * 100, 0);
+            },
+          },
+          axisPointer: {
+            label: {
+              formatter: param => {
+                if (strikeType === STRIKE_TYPE_ENUM.STRIKE) {
+                  return formatNumber(_.toNumber(param), 2);
+                }
+                return formatNumber(param * 100, 2);
+              },
+            },
           },
         },
         yAxis3D: {
@@ -197,13 +223,28 @@ const Vol = props => {
           name: '期限',
           nameTextStyle: {
             fontSize: 13,
+            lineHeight: 40,
+          },
+          axisPointer: {
+            label: {
+              formatter: param => formatNumber(_.toNumber(param), 2),
+            },
           },
         },
         zAxis3D: {
           type: 'value',
-          name: '波动率',
+          name: '波动率(%)',
           nameTextStyle: {
             fontSize: 13,
+            lineHeight: 40,
+          },
+          axisLabel: {
+            formatter: param => formatNumber(param * 100, 0),
+          },
+          axisPointer: {
+            label: {
+              formatter: param => formatNumber(param * 100, 2),
+            },
           },
         },
         grid3D: {
@@ -245,11 +286,11 @@ const Vol = props => {
   };
 
   useEffect(() => {
-    fetch();
-    return () => {
+    if (props.instrumentId) {
+      fetch();
       setData({});
-    };
-  }, []);
+    }
+  }, [props.instrumentId]);
 
   useEffect(() => {
     convert();
@@ -280,9 +321,7 @@ const Vol = props => {
 
     const ColumnsHead = [
       {
-        title: `${
-          typeData === STRIKE_TYPE_ENUM.STRIKE ? 'strike(￥)\\期限' : 'strike_percentage(%)\\期限'
-        }`,
+        title: `${typeData === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)\\期限' : '行权价(%)\\期限'}`,
         dataIndex: 'percent',
         render: (value, record, index) => {
           if (typeData === STRIKE_TYPE_ENUM.STRIKE) {
@@ -322,21 +361,21 @@ const Vol = props => {
         </Col>
         <Col>
           <FormItemWrapper>
-            <FormItem label="strike_type">
+            <FormItem label="行权价类型">
               <ThemeSelect
                 onChange={val => {
                   setStrikeTypeData(val);
                 }}
                 value={strikeTypeData}
-                placeholder="strike_percentage"
+                placeholder="行权价类型"
                 style={{ minWidth: 200 }}
                 options={[
                   {
-                    label: 'strike',
+                    label: '行权价(￥)',
                     value: STRIKE_TYPE_ENUM.STRIKE,
                   },
                   {
-                    label: 'strike_percentage',
+                    label: '行权价(%)',
                     value: STRIKE_TYPE_ENUM.STRIKE_PERCENTAGE,
                   },
                 ]}

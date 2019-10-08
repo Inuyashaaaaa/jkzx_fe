@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { ConfigProvider, Divider, message, Row, Table } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useRef, useState, memo } from 'react';
@@ -9,6 +10,8 @@ import ReloadGreekButton from '@/containers/ReloadGreekButton';
 import { Form2, SmartTable } from '@/containers';
 import Page from '@/containers/Page';
 import { PAGE_SIZE } from '@/constants/component';
+import { getMoment } from '@/tools';
+import { PRODUCTTYPE_ZHCH_MAP, DIRECTION_ZHCN_MAP, ASSET_TYPE_ZHCN_MAP } from '@/constants/common';
 
 const RiskCommonTable = memo<any>(props => {
   const form = useRef<Form2>(null);
@@ -24,6 +27,7 @@ const RiskCommonTable = memo<any>(props => {
     getReload,
     hideReload = false,
     colSwitch = [],
+    getSheetDataSourceItemMeta,
   } = props;
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
@@ -161,6 +165,18 @@ const RiskCommonTable = memo<any>(props => {
       ),
     );
   }, [dataSource]);
+
+  const handleDataSource = val =>
+    val.map(item => {
+      if (_.has(item, ['productType'])) {
+        item.productType = PRODUCTTYPE_ZHCH_MAP[item.productType];
+      }
+      return {
+        ...item,
+        createdAt: getMoment(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+      };
+    });
+
   return (
     <Page>
       {searchFormControls && (
@@ -202,6 +218,8 @@ const RiskCommonTable = memo<any>(props => {
               sortField,
             },
             colSwitch,
+            handleDataSource,
+            getSheetDataSourceItemMeta,
           }}
         >
           导出Excel

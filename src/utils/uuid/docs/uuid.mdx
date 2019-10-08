@@ -1,0 +1,27 @@
+---
+name: utils/uuid
+route: /utils/uuid
+menu: App
+---
+
+# uuid
+
+## Feature
+
+## Install
+
+## Usage
+
+import { uuid, params } from '../index';
+import { Playground, Props } from 'docz';
+
+<Playground>
+  {() => {
+    const randomId = uuid();
+    return <div>randomId : {randomId}</div>;
+  }}
+</Playground>
+
+## API
+
+<Props of={params} />

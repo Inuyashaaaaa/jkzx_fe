@@ -1,5 +1,4 @@
-/* eslint-disable consistent-return */
-/* eslint-disable no-param-reassign */
+/* eslint-disable */
 import { message, Button, Modal, Divider, Row } from 'antd';
 import produce from 'immer';
 import _ from 'lodash';
@@ -49,7 +48,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     return {
       ..._.omit(searchFormData, ['paymentDate']),
-      ...(searchFormData.paymentDate
+      ...(_.get(searchFormData, 'paymentDate.length')
         ? {
             startDate: moment(searchFormData.paymentDate[0]).format('YYYY-MM-DD'),
             endDate: moment(searchFormData.paymentDate[1]).format('YYYY-MM-DD'),
@@ -174,16 +173,24 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
     this.setState({ visible: !visible });
   };
 
-  public handleDataSource = data =>
-    data.map(item => ({
-      ...item,
-      paymentAmount: formatMoney(item.paymentAmount),
-      paymentDirection:
-        PAYMENT_DIRECTION_TYPE_ZHCN_MAP[item.paymentDirection] || item.paymentDirection,
-      accountDirection:
-        ACCOUNT_DIRECTION_TYPE_ZHCN_MAP[item.accountDirection] || item.accountDirection,
-      processStatus: PROCESS_STATUS_TYPES_ZHCN_MAPS[item.processStatus] || item.processStatus,
-    }));
+  public handleDataSource = data => {
+    const newData = data.map(item => {
+      item.paymentAmount = item.paymentAmount;
+      item.paymentDirection =
+        PAYMENT_DIRECTION_TYPE_ZHCN_MAP[item.paymentDirection] || item.paymentDirection;
+      item.accountDirection =
+        ACCOUNT_DIRECTION_TYPE_ZHCN_MAP[item.accountDirection] || item.accountDirection;
+      item.processStatus = PROCESS_STATUS_TYPES_ZHCN_MAPS[item.processStatus] || item.processStatus;
+      item.updatedAt = getMoment(item.updatedAt).format('YYYY-MM-DD HH:mm');
+      return item;
+    });
+
+    const sortDataClient = [...newData].sort((a, b) => a.clientId.localeCompare(b.clientId));
+    const sortDataDate = [...sortDataClient].sort(
+      (a, b) => getMoment(b.paymentDate).valueOf() - getMoment(a.paymentDate).valueOf(),
+    );
+    return sortDataDate;
+  };
 
   public render() {
     return (
@@ -219,6 +226,14 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
               name: '财务出入金管理',
               colSwitch: [],
               handleDataSource: this.handleDataSource,
+              getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+                if (dataIndex === 'paymentAmount' && rowIndex > 0) {
+                  return {
+                    t: 'n',
+                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                  };
+                }
+              },
             }}
           >
             导出Excel

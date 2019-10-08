@@ -1,6 +1,6 @@
 import { multiply } from 'mathjs';
 import { INPUT_NUMBER_DIGITAL_CONFIG, INPUT_NUMBER_PERCENTAGE_CONFIG } from '@/constants/common';
-import { formatNumber, formatMoney } from '@/tools';
+import { formatNumber, formatMoney, getMoment } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -17,6 +17,12 @@ export const TABLE_COL_DEFS = [
     sorter: true,
     width: 130,
     sortDirections: ['ascend', 'descend'],
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'createdAt',
+    width: 180,
+    render: (value, record, index) => (value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : ''),
   },
   {
     title: '标的物价格 (¥)',

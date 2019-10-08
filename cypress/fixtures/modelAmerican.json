@@ -1,0 +1,16 @@
+{
+  "position": {
+    "struType": "美式",
+    "is_year": "年化",
+    "is_days": "365",
+    "is_business": "买",
+    "type": "看涨",
+    "marker": "A1909.DCE",
+    "premium": "10000",
+    "minipremium": "10000",
+    "principal": "66666",
+    "tradingCapacity": "1.5615",
+    "tradingNumber": "INIT_phoenix_9"
+  }
+}
+  

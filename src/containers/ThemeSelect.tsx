@@ -24,7 +24,7 @@ const ThemeSelectWrap = styled.div`
   }
   .ant-select-selection__placeholder {
     font-weight: 400;
-    color: #f5faff;
+    color: #7890a8;
   }
   .ant-select-selection-selected-value {
     color: #00e8e8;

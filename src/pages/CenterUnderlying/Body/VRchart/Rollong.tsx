@@ -13,13 +13,12 @@ import ThemeSelect from '@/containers/ThemeSelect';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeButton from '@/containers/ThemeButton';
 import { Loading } from '@/containers';
-import { delay } from '@/tools';
+import { delay, formatNumber } from '@/tools';
 import PosCenter from '@/containers/PosCenter';
 import { getInstrumentRollingVol } from '@/services/terminal';
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const Rollong = props => {
-  const { instrumentId } = props;
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +43,7 @@ const Rollong = props => {
   const fetch = async () => {
     setLoading(true);
     const rsp = await getInstrumentRollingVol({
-      instrumentId,
+      instrumentId: props.instrumentId,
       startDate: dates[0].format('YYYY-MM-DD'),
       endDate: dates[1].format('YYYY-MM-DD'),
       window: _.toNumber(window),
@@ -80,13 +79,15 @@ const Rollong = props => {
   };
 
   useEffect(() => {
-    fetch();
-  }, []);
+    if (props.instrumentId) {
+      fetch();
+    }
+  }, [props.instrumentId]);
 
   return (
     <>
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
-        <Col>
+        <Col style={{ borderRight: '1px solid #05507b' }}>
           <FormItemWrapper>
             <FormItem label="日期">
               <ThemeDatePickerRanger
@@ -127,14 +128,14 @@ const Rollong = props => {
           </ThemeButton>
         </Col>
       </Row>
-      <ChartTitle>Rolling Volatility</ChartTitle>
+      <ChartTitle>历史波动率时间序列</ChartTitle>
       <Row style={{ padding: 17 }} gutter={12}>
         {meta ? (
           <Chart
             animate
             forceFit
             height={630}
-            padding={[40, 20, 40, 40]}
+            padding={[40, 20, 60, 40]}
             width={800}
             data={meta.dv}
             scale={{
@@ -146,7 +147,8 @@ const Rollong = props => {
                 range: [0, 0.95],
               },
               value: {
-                alias: '波动率',
+                alias: '波动率(%)',
+                formatter: param => formatNumber(param * 100, 0),
               },
             }}
             onGetG2Instance={g2Chart => {
@@ -229,7 +231,6 @@ const Rollong = props => {
               position="time*value"
               color="l(100) 0:#FF0B194F 0.8:#0d2960 1:#0d2960"
               opacity={0.65}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
@@ -256,6 +257,13 @@ const Rollong = props => {
                   delay: 100,
                 },
               }}
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time,
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
             />
             <Geom
               size={4}
@@ -263,7 +271,6 @@ const Rollong = props => {
               position="time*value"
               color={meta.gradualColorStr}
               opacity={0.85}
-              shape="smooth"
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
@@ -290,6 +297,13 @@ const Rollong = props => {
                   delay: 100,
                 },
               }}
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time,
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
             />
           </Chart>
         ) : (

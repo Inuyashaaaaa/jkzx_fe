@@ -384,12 +384,12 @@ const AmendModal = props => {
               ),
             },
           ]}
-        /> 
+        />
         <Alert
           message="现金流金额为正时代表我方收入，金额为负时代表我方支出。"
           type="info"
           showIcon
-        />*/}
+        /> */}
       </Modal>
     </>
   );

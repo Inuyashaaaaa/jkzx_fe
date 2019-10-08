@@ -1,5 +1,6 @@
+import React from 'react';
 import { PRODUCTTYPE_ZHCH_MAP } from '@/constants/common';
-import { formatNumber } from '@/tools';
+import { formatNumber, getMoment } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -11,6 +12,18 @@ export const TABLE_COL_DEFS = [
   {
     dataIndex: 'partyName',
     title: '交易对手',
+    render: val => (
+      <span
+        style={{
+          overflow: 'hidden',
+          display: 'inline-block',
+          wordBreak: 'break-all',
+          width: '100%',
+        }}
+      >
+        {val}
+      </span>
+    ),
   },
   {
     dataIndex: 'tradeId',
@@ -24,6 +37,12 @@ export const TABLE_COL_DEFS = [
     title: '期权类型',
     dataIndex: 'productType',
     render: (value, record, index) => PRODUCTTYPE_ZHCH_MAP[value],
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'createdAt',
+    width: 180,
+    render: (value, record, index) => (value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : ''),
   },
   {
     dataIndex: 'tradeDate',
@@ -82,9 +101,7 @@ export const TABLE_COL_DEFS = [
   {
     title: 'Delta Cash (￥)',
     dataIndex: 'deltaCash',
-    render: (value, record, index) => {
-      return formatNumber(value, 4);
-    },
+    render: (value, record, index) => formatNumber(value, 4),
     align: 'right',
   },
   {
