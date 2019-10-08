@@ -1,20 +1,16 @@
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
+import React from 'react';
 import { LEG_FIELD, RULES_REQUIRED } from '@/constants/common';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import { legEnvIsBooking, legEnvIsPricing, getLegEnvs, getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
-import FormItem from 'antd/lib/form/FormItem';
-import _ from 'lodash';
-import React from 'react';
 import { Form2 } from '@/containers';
 
 export const Term: ILegColDef = {
   title: '期限',
   dataIndex: LEG_FIELD.TERM,
   exsitable: record => {
-    const { isBooking, isPricing, isEditing } = getLegEnvs(record);
-    if (isPricing) {
-      return true;
-    }
     if (Form2.getFieldValue(record[LEG_FIELD.IS_ANNUAL])) {
       return true;
     }
@@ -31,9 +27,8 @@ export const Term: ILegColDef = {
     if (isPricing) {
       if (isAnnual) {
         return true;
-      } else {
-        return false;
       }
+      return false;
     }
 
     if (isEditing) {
@@ -60,13 +55,12 @@ export const Term: ILegColDef = {
             autoSelect: true,
             editing,
           };
-        } else {
-          return {
-            ...commonProps,
-            autoSelect: true,
-            editing: false,
-          };
         }
+        return {
+          ...commonProps,
+          autoSelect: true,
+          editing: false,
+        };
       }
 
       if (isBooking) {
@@ -93,13 +87,7 @@ export const Term: ILegColDef = {
         {form.getFieldDecorator({
           rules: [getRequiredRule()],
         })(
-          <UnitInputNumber
-            autoSelect={true}
-            editing={editing}
-            unit="天"
-            precision={0}
-            {...getProps()}
-          />
+          <UnitInputNumber autoSelect editing={editing} unit="天" precision={0} {...getProps()} />,
         )}
       </FormItem>
     );

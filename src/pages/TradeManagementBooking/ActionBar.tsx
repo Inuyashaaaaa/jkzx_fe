@@ -126,6 +126,7 @@ const ActionBar = memo<any>(props => {
 
         <ModalButton
           disabled={_.isEmpty(tableData)}
+          data-test="FinishBookkeeping"
           key="完成簿记"
           type="primary"
           loading={createTradeLoading}

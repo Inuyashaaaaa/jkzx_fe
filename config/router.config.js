@@ -71,6 +71,11 @@ export default [
   //   path: '/center-login',
   //   component: '/user/login',
   // },
+  {
+    path: '/api-docs',
+    name: 'apiDocs',
+    component: './ApiDocs/index',
+  },
   mapTree(
     {
       appRoute: true,
@@ -392,6 +397,11 @@ export default [
               path: '/system-settings/document-management',
               name: 'documentManagement',
               component: './SystemSettingsDocumentManagement/index',
+            },
+            {
+              path: '/system-settings/operation-log',
+              name: 'operationLog',
+              component: './SystemSettingOperationLog/index',
             },
           ],
         },

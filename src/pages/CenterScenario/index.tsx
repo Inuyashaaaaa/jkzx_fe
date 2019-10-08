@@ -15,7 +15,7 @@ import ThemeTable from '@/containers/ThemeTable';
 import { delay, formatNumber } from '@/tools';
 import ThemeDatePicker from '@/containers/ThemeDatePicker';
 import { mktInstrumentWhitelistSearch } from '@/services/market-data-service';
-import { refSimilarLegalNameList } from '@/services/reference-data-service';
+import { refSimilarLegalNameListWithoutBook } from '@/services/reference-data-service';
 import { queryNonGroupResource } from '@/services/tradeBooks';
 import { rptSpotScenariosReportListSearch } from '@/services/report-service';
 import moment from 'moment';
@@ -124,9 +124,19 @@ const CenterScenario = memo(props => {
         if (keys === 'valuationDate') {
           return moment(vals).format('YYYY-MM-DD');
         }
+        // console.log(vals,keys,'vals')
         return vals;
       },
     );
+    const formData = Form2.getFieldsValue(reportFormData);
+    _.mapKeys(formData, (val, key) => {
+      if (key === 'reportType' && val === 'PARTY') {
+        reportData.subOrPartyName = formData.legalName;
+      }
+      if (key === 'reportType' && val === 'SUBSIDIARY') {
+        reportData.subOrPartyName = formData.subName;
+      }
+    });
     setLoading(true);
     setTableLoading(true);
 
@@ -345,7 +355,7 @@ const CenterScenario = memo(props => {
                       style={{ minWidth: 200 }}
                       key="legalName"
                       options={async (value: string) => {
-                        const { data, error } = await refSimilarLegalNameList({
+                        const { data, error } = await refSimilarLegalNameListWithoutBook({
                           similarLegalName: value,
                         });
                         if (error) return [];
@@ -400,6 +410,7 @@ const CenterScenario = memo(props => {
         classicSceneTable={classicSceneTable}
         valuationDate={Form2.getFieldsValue(reportFormData.valuationDate)}
         instrumentId={Form2.getFieldsValue(reportFormData.underlyer)}
+        reportFormData={Form2.getFieldsValue(reportFormData)}
       />
     </>
   );

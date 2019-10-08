@@ -1,6 +1,9 @@
 import _ from 'lodash';
+import settings from '../defaultSettings';
 
-export const USER_LOCAL_FIELD = 'tongyu_USER_LOCAL_FIELD';
+export const USER_LOCAL_FIELD = settings.tokenField;
+
+// export const USER_LOCAL_FIELD = 'tongyu_USER_LOCAL_FIELD';
 
 export const ROLE_LOCAL_FIELD = 'tongyu_ROLE_LOCAL_FIELD';
 

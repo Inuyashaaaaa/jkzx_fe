@@ -14,7 +14,7 @@ import {
   UP_BARRIER_TYPE_MAP,
   LEG_ID_FIELD,
 } from '@/constants/common';
-import { Form2, SmartTable } from '@/containers';
+import { Form2, SmartTable, DatePicker } from '@/containers';
 import Form from '@/containers/Form';
 import ModalButton from '@/containers/ModalButton';
 import PopconfirmButton from '@/containers/PopconfirmButton';
@@ -23,6 +23,8 @@ import { qlDateScheduleCreate } from '@/services/quant-service';
 import { getLegEnvs, getMoment, getRequiredRule, remove } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import { PAGE_SIZE } from '@/constants/component';
+
+const OB_DAY_STRING_FIELD = 'OB_DAY_STRING_FIELD';
 
 class ObserveModalInput extends InputBase<{
   direction?: string;
@@ -43,16 +45,21 @@ class ObserveModalInput extends InputBase<{
   constructor(props) {
     super(props);
     this.legType = props.record[LEG_TYPE_FIELD];
+
     this.state.dealDataSource = this.computeDataSource(
-      (props.value || []).map((item, index) => ({
-        ...item,
-        [OB_DAY_FIELD]: moment(item[OB_DAY_FIELD]),
-        price: Form2.createField(item.price),
-      })),
+      (props.value || []).map((item, index) => {
+        const date = moment(item[OB_DAY_FIELD]);
+        return {
+          ...item,
+          [OB_DAY_FIELD]: date,
+          payDay: Form2.createField(moment(item.payDay ? item.payDay : item[OB_DAY_FIELD])),
+          price: Form2.createField(item.price),
+        };
+      }),
     );
   }
 
-  public computeDataSource = (dataSource = []) => {
+  public computeDataSource = (dataSource = [], reload) => {
     let nextDataSource = dataSource.sort(
       (a, b) => a[OB_DAY_FIELD].valueOf() - b[OB_DAY_FIELD].valueOf(),
     );
@@ -66,22 +73,32 @@ class ObserveModalInput extends InputBase<{
       upBarrierType === UP_BARRIER_TYPE_MAP.PERCENT
         ? new BigNumber(initialSpot).multipliedBy(new BigNumber(upBarrier).div(100)).toNumber()
         : upBarrier;
-    nextDataSource = nextDataSource.map((item, index) => ({
-      ...item,
-      payDay: item[OB_DAY_FIELD],
-      ...(this.isAutoCallSnow()
-        ? {
-            price: Form2.createField(
-              _.isNaN(barrierVal)
-                ? 0
-                : new BigNumber(barrierVal)
-                    .plus(new BigNumber(index).multipliedBy(new BigNumber(step).div(100)))
-                    .decimalPlaces(4)
-                    .toNumber(),
-            ),
-          }
-        : null),
-    }));
+
+    nextDataSource = nextDataSource.map((item, index) => {
+      const price = Form2.getFieldValue(item.price);
+
+      let priceData = price;
+      if (!price || reload) {
+        if (_.isNaN(barrierVal)) {
+          priceData = 0;
+        } else {
+          priceData = new BigNumber(barrierVal)
+            .plus(new BigNumber(index).multipliedBy(new BigNumber(step).div(100)))
+            .decimalPlaces(4)
+            .toNumber();
+        }
+      }
+      return {
+        ...item,
+        // payDay: Form2.createField(item[OB_DAY_FIELD]),
+        ...(this.isAutoCallSnow()
+          ? {
+              price: Form2.createField(priceData),
+            }
+          : null),
+        [OB_DAY_STRING_FIELD]: getMoment(item[OB_DAY_FIELD]).format('YYYY-MM-DD'),
+      };
+    });
 
     return nextDataSource;
   };
@@ -115,12 +132,14 @@ class ObserveModalInput extends InputBase<{
         visible: !state.visible,
       }),
       () => {
-        const val = this.state.dealDataSource.map(item =>
-          Form2.getFieldsValue({
-            ...item,
+        const val = this.state.dealDataSource.map(item => {
+          const DataItem = Form2.getFieldsValue(item);
+          return {
+            ..._.omit(DataItem, OB_DAY_STRING_FIELD),
             [OB_DAY_FIELD]: item[OB_DAY_FIELD].format('YYYY-MM-DD'),
-          }),
-        );
+            payDay: DataItem.payDay ? DataItem.payDay.format('YYYY-MM-DD') : null,
+          };
+        });
         if (this.props.onChange) {
           this.props.onChange(val);
         }
@@ -150,19 +169,25 @@ class ObserveModalInput extends InputBase<{
       return;
     }
     this.setState(state => ({
-      dealDataSource: this.computeDataSource([
-        ...state.dealDataSource,
-        {
-          [OB_DAY_FIELD]: dataSource.day,
-        },
-      ]),
+      dealDataSource: this.computeDataSource(
+        [
+          ...state.dealDataSource,
+          {
+            [OB_DAY_FIELD]: dataSource.day,
+            [OB_DAY_STRING_FIELD]: getMoment(dataSource.day).format('YYYY-MM-DD'),
+            payDay: Form2.createField(moment(dataSource.day)),
+          },
+        ],
+        true,
+      ),
     }));
   };
 
   public bindRemove = rowIndex => () => {
     this.setState(state => ({
       dealDataSource: this.computeDataSource(
-        remove(state.dealDataSource, (item, index) => index === rowIndex),
+        remove(state.dealDataSource, (item, index) => item[OB_DAY_STRING_FIELD] === rowIndex),
+        true,
       ),
     }));
   };
@@ -211,6 +236,7 @@ class ObserveModalInput extends InputBase<{
           .filter(item => moment(item).isAfter(start))
           .map(item => ({
             [OB_DAY_FIELD]: moment(item),
+            payDay: Form2.createField(moment(item)),
           })),
       ),
     });
@@ -253,17 +279,34 @@ class ObserveModalInput extends InputBase<{
       {
         title: '支付日',
         dataIndex: 'payDay',
-        render: (text, record, index) => record.payDay.format('YYYY-MM-DD'),
+        defaultEditing: false,
+        editable,
+        render: (value, record, index, { form, editing, colDef }) => (
+          <FormItem>
+            {form.getFieldDecorator({})(
+              <DatePicker
+                editing={editing}
+                defaultOpen
+                {...{
+                  format: 'YYYY-MM-DD',
+                }}
+              />,
+            )}
+          </FormItem>
+        ),
+        // render: (text, record, index) => record.payDay.format('YYYY-MM-DD'),
       },
       this.isAutoCallSnow()
         ? {
             title: '障碍价格',
             dataIndex: 'price',
             defaultEditing: false,
-            editable: record => false,
+            editable,
             render: (val, record, index, { form, editing }) => (
               <FormItem>
-                {form.getFieldDecorator({})(<UnitInputNumber editing={false} unit="¥" />)}
+                {form.getFieldDecorator({})(
+                  <UnitInputNumber autoSelect editing={editing} unit="¥" min={0} />,
+                )}
               </FormItem>
             ),
           }
@@ -271,11 +314,14 @@ class ObserveModalInput extends InputBase<{
             title: '已观察到价格',
             dataIndex: 'price',
             defaultEditing: false,
-            editable,
+            editable: record => {
+              const disabled = record.obDay.isBefore(moment().subtract(-1, 'day'), 'day');
+              return editable && disabled;
+            },
             render: (val, record, index, { form, editing }) => (
               <FormItem>
                 {form.getFieldDecorator({})(
-                  <UnitInputNumber autoSelect editing={editing} unit="¥" />,
+                  <UnitInputNumber autoSelect editing={editing} unit="¥" min={0} />,
                 )}
               </FormItem>
             ),
@@ -286,14 +332,11 @@ class ObserveModalInput extends InputBase<{
               title: '操作',
               dataIndex: 'operation',
               render: (text, record, index) => (
-                <Row
-                  type="flex"
-                  align="middle"
-                  // style={{
-                  //   height: params.context.rowHeight,
-                  // }}
-                >
-                  <a style={{ color: 'red' }} onClick={this.bindRemove(index)}>
+                <Row type="flex" align="middle">
+                  <a
+                    style={{ color: 'red' }}
+                    onClick={this.bindRemove(record[OB_DAY_STRING_FIELD])}
+                  >
                     删除
                   </a>
                 </Row>
@@ -323,8 +366,8 @@ class ObserveModalInput extends InputBase<{
   public handleCellValueChanged = params => {
     this.setState(state => ({
       dealDataSource: this.computeDataSource(
-        state.dealDataSource.map((item, index) => {
-          if (index === params.rowIndex) {
+        state.dealDataSource.map(item => {
+          if (item[OB_DAY_STRING_FIELD] === params.rowId) {
             return params.record;
           }
           return item;
@@ -334,7 +377,8 @@ class ObserveModalInput extends InputBase<{
   };
 
   public renderResult = () => {
-    const { editing: editable } = this.props;
+    const { editing: editable, record } = this.props;
+    const expirationDate = _.get(record, 'expirationDate.value');
     return (
       <Row
         type="flex"
@@ -368,7 +412,6 @@ class ObserveModalInput extends InputBase<{
             width: 700,
             visible: this.state.visible,
             onCancel: this.onCancel,
-            maskClosable: false,
           }}
           onClick={this.onOpen}
           style={{ width: '100%', display: 'block' }}
@@ -389,6 +432,8 @@ class ObserveModalInput extends InputBase<{
                           input: {
                             type: 'date',
                             range: 'day',
+                            disabledDate: current =>
+                              current && current > moment(expirationDate).subtract(-1, 'day'),
                           },
                           decorator: {
                             rules: [
@@ -407,8 +452,11 @@ class ObserveModalInput extends InputBase<{
                 </Row>
               )}
               <SmartTable
+                pagination={{
+                  showSizeChanger: false,
+                }}
                 dataSource={this.state.dealDataSource}
-                rowKey={record => record[OB_DAY_FIELD].format('YYYY-MM-DD')}
+                rowKey={OB_DAY_STRING_FIELD}
                 onCellFieldsChange={this.handleCellValueChanged}
                 columns={this.getColumnDefs()}
               />

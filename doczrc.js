@@ -1,7 +1,7 @@
 import path from 'path';
 
 export default {
-  title: 'termites-design',
+  title: 'Termites-App',
   src: './src',
   files: '**/*.mdx',
   dest: './cdocs',
@@ -29,31 +29,29 @@ export default {
     config.module
       .rule('ts')
       .use('babel-loader')
-      .tap(options => {
-        return {
-          ...options,
-          plugins: [
-            [
-              // eslint-disable-next-line global-require
-              require('babel-plugin-import'),
-              {
-                libraryName: 'antd',
-                libraryDirectory: 'es',
-                style: true,
-              },
-            ],
-            ...options.plugins,
+      .tap(options => ({
+        ...options,
+        plugins: [
+          [
+            // eslint-disable-next-line global-require
+            require('babel-plugin-import'),
+            {
+              libraryName: 'antd',
+              libraryDirectory: 'es',
+              style: true,
+            },
           ],
-        };
-      });
+          ...options.plugins,
+        ],
+      }));
 
     return config;
   },
   filterComponents: files => files.filter(filepath => /w*.(js|jsx|ts|tsx)$/.test(filepath)),
-  menu: ['Home', 'Components', 'Containers'],
+  menu: ['Home', 'App', 'Layouts', 'Pages', 'Containers', 'Components'],
   themeConfig: {
     colors: {
-      primary: '#000',
+      primary: '#1890ff',
     },
   },
 };

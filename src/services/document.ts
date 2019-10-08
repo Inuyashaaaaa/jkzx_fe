@@ -175,6 +175,7 @@ export async function DOWN_LOAD(url, options) {
             type: 'login/logout',
             payload: {
               loginUrl,
+              routerPush: true,
             },
           });
         }, 3000);

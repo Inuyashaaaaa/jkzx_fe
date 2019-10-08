@@ -1,8 +1,9 @@
-import { wkApproveGroupList } from '@/services/auditing';
+/* eslint-disable */
 import _ from 'lodash';
 import FormItem from 'antd/lib/form/FormItem';
 import React, { memo, useEffect, useState } from 'react';
-import { Divider, Button, notification } from 'antd';
+import { Divider, Button, notification, Row } from 'antd';
+import { wkApproveGroupList } from '@/services/auditing';
 import { Form2, Select, Table2 } from '@/containers';
 import {
   wkProcessConfigModify,
@@ -23,15 +24,12 @@ const GroupSelcet = memo<{
 }>(props => {
   const [options, setOptions] = useState(null);
   const { record, index, form, editing, processName, fetchData } = props;
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState();
   const [value, setValue] = useState(props.value);
 
-  useEffect(
-    () => {
-      fetchOptions();
-    },
-    [props.record]
-  );
+  useEffect(() => {
+    fetchOptions();
+  }, [props.record]);
 
   const fetchOptions = async () => {
     const { data, error } = await wkApproveGroupList();
@@ -71,18 +69,13 @@ const GroupSelcet = memo<{
     if (fetchData) {
       fetchData();
     }
-    setOpen(false);
-  };
-
-  const handleCancle = () => {
-    setOpen(false);
   };
 
   if (!options) {
     return (
       <Select
-        defaultOpen={false}
-        autoSelect={true}
+        defaultOpen
+        autoSelect
         mode="multiple"
         options={options}
         editing={editing}
@@ -94,8 +87,8 @@ const GroupSelcet = memo<{
   if (!_.get(props, 'editing')) {
     return (
       <Select
-        defaultOpen={false}
-        autoSelect={true}
+        defaultOpen
+        autoSelect
         mode="multiple"
         options={options}
         editing={editing}
@@ -105,8 +98,8 @@ const GroupSelcet = memo<{
   }
   return (
     <Select
-      open={open}
-      autoSelect={true}
+      defaultOpen
+      autoSelect
       mode="multiple"
       options={options}
       editing={editing}
@@ -114,23 +107,22 @@ const GroupSelcet = memo<{
       onChange={val => {
         setValue(val);
       }}
-      onFocus={() => {
-        setOpen(true);
-      }}
-      dropdownRender={menu => {
-        return (
-          <>
-            {menu}
-            <Divider style={{ margin: '4px 0' }} />
-            <div style={{ padding: '8px', cursor: 'pointer' }}>
-              <Button type="primary" style={{ marginRight: '15px' }} onClick={handleOk}>
-                确认
-              </Button>
-              <Button onClick={handleCancle}>取消</Button>
-            </div>
-          </>
-        );
-      }}
+      dropdownRender={menu => (
+        <>
+          {menu}
+          <Divider style={{ margin: '4px 0' }} />
+          <Row
+            onMouseDown={e => e.preventDefault()}
+            type="flex"
+            justify="end"
+            style={{ padding: '8px' }}
+          >
+            <Button size="small" type="primary" onClick={handleOk}>
+              确认
+            </Button>
+          </Row>
+        </>
+      )}
     />
   );
 });

@@ -1,7 +1,10 @@
 import React, { memo, useState } from 'react';
+import { Divider, Popconfirm, Button, Modal, Icon, notification, Row, Col, Alert } from 'antd';
+import useLifecycles from 'react-use/lib/useLifecycles';
+import FormItem from 'antd/lib/form/FormItem';
+import _ from 'lodash';
 import { Table2, Form2, Input, Upload } from '@/containers';
 import { PRODUCTTYPE_ZHCH_MAP, DOC_MAP } from '@/constants/common';
-import { Divider, Popconfirm, Button, Modal, Icon, notification, Row, Col, Alert } from 'antd';
 import {
   queryTemplateList,
   deleteTemplate,
@@ -11,11 +14,8 @@ import {
   COMFIRM_POI_URL,
   docPoiTemplateDelete,
 } from '@/services/document';
-import useLifecycles from 'react-use/lib/useLifecycles';
-import FormItem from 'antd/lib/form/FormItem';
 import { getToken } from '@/tools/authority';
 import { getMoment } from '@/tools';
-import _ from 'lodash';
 
 const TradingTemplate = memo(props => {
   const [loading, setLoading] = useState(false);
@@ -122,7 +122,7 @@ const TradingTemplate = memo(props => {
           },
           {
             dataIndex: 'docType',
-            title: '交易类型',
+            title: '文档类型',
             render: (value, record, index) => DOC_MAP[value],
           },
           {
@@ -180,16 +180,16 @@ const TradingTemplate = memo(props => {
             {
               dataIndex: 'tradeType',
               title: '交易类型',
-              render: (val, record, index, { form, editing }) => {
-                return <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>;
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>
+              ),
             },
             {
               dataIndex: 'docType',
               title: '文档类型',
-              render: (val, record, index, { form, editing }) => {
-                return <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>;
-              },
+              render: (val, record, index, { form, editing }) => (
+                <FormItem>{form.getFieldDecorator({})(<Input editing={false} />)}</FormItem>
+              ),
             },
           ]}
         />

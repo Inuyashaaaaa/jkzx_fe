@@ -382,6 +382,12 @@ export const getCurDateMoment = () => {
   return moment(s);
 };
 
+export const formatNum = num => {
+  return num.indexOf('.') === -1
+    ? num.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    : num.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+};
+
 export * from './delay';
 export * from '../utils/eventBus';
 export * from '../utils/isShallowEqual';

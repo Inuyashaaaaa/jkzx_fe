@@ -240,8 +240,9 @@ export const RangeAccruals: ILeg = legPipeLine({
 
     const earnings = position.asset[LEG_FIELD.PAYMENT];
     const earningsType = position.asset[LEG_FIELD.PAYMENT_TYPE];
-    delete position.asset[LEG_FIELD.PAYMENT];
-    delete position.asset[LEG_FIELD.PAYMENT_TYPE];
+    // delete position.asset[LEG_FIELD.PAYMENT];
+    // delete position.asset[LEG_FIELD.PAYMENT_TYPE];
+    console.log(position, earnings, earningsType);
 
     return Form2.createFields({
       [LEG_FIELD.EARNINGS]: earnings,

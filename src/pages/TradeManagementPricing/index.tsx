@@ -118,6 +118,10 @@ const TradeManagementPricing = props => {
         leftKeys = leftKeys.filter(item => item !== LEG_FIELD.EXPIRE_NOBARRIERPREMIUM);
       }
     }
+    // 非年华去除年度计息天数
+    if (_.get(record, 'annualized.value') === false) {
+      leftKeys = leftKeys.filter(item => item !== LEG_FIELD.DAYS_IN_YEAR);
+    }
 
     const fills = leftKeys.reduce(
       (obj, key) => ({

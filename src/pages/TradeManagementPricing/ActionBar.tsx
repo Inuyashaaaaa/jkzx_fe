@@ -135,6 +135,7 @@ const ActionBar = memo<any>(props => {
               type="primary"
               onClick={testPricing}
               disabled={_.isEmpty(tableData)}
+              data-test="试定价"
             >
               试定价
             </Button>
@@ -159,6 +160,7 @@ const ActionBar = memo<any>(props => {
           <Button
             disabled={_.isEmpty(tableData)}
             key="保存试定价"
+            data-test="保存试定价"
             type="primary"
             onClick={() => {
               setSaveModalVisible(true);
@@ -248,6 +250,7 @@ const ActionBar = memo<any>(props => {
         <Alert showIcon message="保存当前的试定价要素以便快速复用" style={{ marginBottom: 20 }} />
         <FormItem label="交易对手" wrapperCol={{ span: 16 }} labelCol={{ span: 8 }}>
           <Select
+            data-test="tradingRival"
             onChange={val => {
               setCounterPartyCode(val);
             }}
@@ -274,6 +277,7 @@ const ActionBar = memo<any>(props => {
             <Input.TextArea
               value={comment}
               onChange={event => setComment(event.target.value)}
+              data-test="note"
               placeholder="请输入备注信息"
             />
           </FormItem>

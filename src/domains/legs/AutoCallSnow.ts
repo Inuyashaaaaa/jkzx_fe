@@ -225,10 +225,27 @@ export const AutoCallSnow: ILeg = legPipeLine({
     } else {
       nextPosition.asset[LEG_FIELD.EXPIRE_NOBARRIERPREMIUM] = undefined;
     }
-
-    nextPosition.asset.observationDates =
-      dataItem[ExpireNoBarrierObserveDay.dataIndex] &&
-      dataItem[ExpireNoBarrierObserveDay.dataIndex].map(item => item[OB_DAY_FIELD]);
+    nextPosition.asset.fixingObservations =
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
+        (result, item) => ({
+          ...result,
+          [item[OB_DAY_FIELD]]: item.price !== undefined ? item.price : null,
+        }),
+        {},
+      );
+    nextPosition.asset.fixingPaymentDates =
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY] &&
+      dataItem[LEG_FIELD.EXPIRE_NO_BARRIEROBSERVE_DAY].reduce(
+        (result, item) => ({
+          ...result,
+          [item[OB_DAY_FIELD]]: item.payDay !== undefined ? item.payDay : null,
+        }),
+        {},
+      );
+    // nextPosition.asset.observationDates =
+    //   dataItem[ExpireNoBarrierObserveDay.dataIndex] &&
+    //   dataItem[ExpireNoBarrierObserveDay.dataIndex].map(item => item[OB_DAY_FIELD]);
 
     nextPosition.asset.barrier = dataItem[LEG_FIELD.UP_BARRIER];
     nextPosition.asset.barrierType = dataItem[LEG_FIELD.UP_BARRIER_TYPE];
@@ -252,14 +269,20 @@ export const AutoCallSnow: ILeg = legPipeLine({
 
     return nextPosition;
   },
-  getPageData: (env: string, position: any) =>
-    Form2.createFields({
-      [ExpireNoBarrierObserveDay.dataIndex]: (position.asset.observationDates || []).map(item => ({
-        [OB_DAY_FIELD]: item,
+  getPageData: (env: string, position: any) => {
+    const dataItem = _.toPairs(position.asset.fixingObservations).map((val, index) =>
+      _.concat(val, _.toPairs(position.asset.fixingPaymentDates)[index]),
+    );
+    return Form2.createFields({
+      [ExpireNoBarrierObserveDay.dataIndex]: dataItem.map(item => ({
+        [OB_DAY_FIELD]: item[0],
+        price: item[1],
+        payDay: item[3],
       })),
       [LEG_FIELD.UP_BARRIER]: position.asset.barrier,
       [LEG_FIELD.UP_BARRIER_TYPE]: position.asset.barrierType,
-    }),
+    });
+  },
   onDataChange: (
     env: string,
     changeFieldsParams: ITableTriggerCellFieldsChangeParams,

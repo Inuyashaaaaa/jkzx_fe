@@ -148,7 +148,6 @@ class Operations extends PureComponent<{
     const lcmEvent = this.props.record;
     return _.get(this.state.eventTypes, lcmEvent.positionId, [])
       .sort((a, b) => LCM_EVENT_TYPE_ZHCN_MAP[b].localeCompare(LCM_EVENT_TYPE_ZHCN_MAP[a]))
-      .filter(item => item !== 'PAYMENT')
       .map(node => <MenuItem key={node}>{LCM_EVENT_TYPE_ZHCN_MAP[node]}</MenuItem>);
   };
 
@@ -159,7 +158,7 @@ class Operations extends PureComponent<{
   public render() {
     return (
       <>
-        <a href="javascript:;" onClick={this.handleBookEdit}>
+        <a href="javascript:;" onClick={this.handleBookEdit} data-test="details">
           详情
         </a>
         <Divider type="vertical" />
