@@ -1,0 +1,25 @@
+@import '~antd/lib/style/themes/default.less';
+
+.notificationWarp {
+  border: 1px solid #00e8e8;
+  background-color: #064d78;
+  .diagnosticsList {
+    padding: 0;
+    p {
+      font-size: 16px;
+    }
+    li {
+      margin-bottom: 15px;
+    }
+  }
+  :global {
+    .ant-notification-notice-description {
+      color: #fff;
+      margin-left: 5px;
+      margin-top: 20px;
+    }
+    .ant-notification-notice-close {
+      color: #00a2ff;
+    }
+  }
+}

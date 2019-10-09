@@ -5,6 +5,8 @@ import hash from 'hash.js';
 import { router } from 'umi';
 import _ from 'lodash';
 import { getToken } from './authority';
+import { messageDom, icon } from './notificationDom';
+import styles from '../styles/notification.less';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -190,10 +192,23 @@ export default function request(url, _options = {}, passError = false) {
         (error => {
           const { code, message } = error;
           if (!passError) {
-            notification.error({
-              message: '请求失败',
-              description: message,
-            });
+            const urlParams = new URL(window.location.href);
+            const { pathname } = urlParams;
+            const isCenter = pathname.split('/')[1] === 'center';
+            if (isCenter) {
+              notification.error({
+                message: messageDom,
+                description: message,
+                className: styles.notificationWarp,
+                // duration: null,
+                icon,
+              });
+            } else {
+              notification.error({
+                message: '请求失败',
+                description: message,
+              });
+            }
           }
 
           const failAction = { error };
