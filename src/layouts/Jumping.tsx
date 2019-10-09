@@ -15,6 +15,7 @@ const Jumping = props => {
           defaultRedirect: pathname,
           loginUrl: '/user/login',
           token,
+          query: props.location.query,
         },
       });
     }

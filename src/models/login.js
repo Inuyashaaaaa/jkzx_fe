@@ -48,7 +48,7 @@ export default {
         router.push({
           pathname: '/jump-in',
           query: {
-            token: history.location.query.token,
+            ...history.location.query,
             pathname: history.location.pathname,
           },
         });
@@ -67,6 +67,7 @@ export default {
           rootRouteTag = 'appRoute',
           skipPermission = false,
           token,
+          query,
         },
       },
       { call, put, select },
@@ -154,6 +155,7 @@ export default {
 
       router.push({
         pathname: redirect,
+        query,
       });
 
       if (!token) {

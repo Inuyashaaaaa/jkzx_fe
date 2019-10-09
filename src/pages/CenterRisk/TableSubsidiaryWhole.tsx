@@ -41,9 +41,20 @@ const TableSubsidiaryWhole = (props: any) => {
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
   const [store, setStore] = useState({});
-  const [formData, setFormData] = useState({
+
+  let initFormData = {
     subsidiaryPart: '',
-  });
+  };
+  const { query } = props;
+
+  if (_.get(query, 'subsidiaryPart')) {
+    initFormData = {
+      ...initFormData,
+      subsidiaryPart: query.subsidiaryPart,
+    };
+  }
+
+  const [formData, setFormData] = useState(initFormData);
   const [searchFormData, setSearchFormData] = useState(formData);
   const [showScroll, setShowScroll] = useState(getShowScroll());
 
