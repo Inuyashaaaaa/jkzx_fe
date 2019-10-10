@@ -102,3 +102,14 @@ export async function authSysLogList(params = {}, token?) {
     },
   });
 }
+
+export async function authErrorLogList(params = {}, token?) {
+  return request(`${HOST_TEST}auth-service/api/rpc`, {
+    token,
+    method: 'POST',
+    body: {
+      method: 'authErrorLogList',
+      params,
+    },
+  });
+}
