@@ -15,6 +15,7 @@ const ThemeTabsWrap = styled.div`
     color: rgba(246, 250, 255, 1);
     background: rgba(4, 83, 126, 1);
     border-color: rgba(4, 83, 126, 1);
+    text-align: center;
   }
   .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active {
     background: rgba(4, 119, 152, 1);

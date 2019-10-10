@@ -50,10 +50,32 @@ const TableRisk = (props: any) => {
   const [sorter, setSorter] = useState({});
   const [total, setTotal] = useState();
   const [store, setStore] = useState({});
-  const [formData, setFormData] = useState({
-    instrumentIdPart: '',
+  let initFormData = {
     bookNamePart: '',
-  });
+    instrumentIdPart: '',
+  };
+  const { query } = props;
+  if (_.get(query, 'instrumentIdPart')) {
+    initFormData = {
+      ...initFormData,
+      instrumentIdPart: query.instrumentIdPart,
+    };
+  }
+
+  if (_.get(query, 'bookNamePart')) {
+    initFormData = {
+      ...initFormData,
+      bookNamePart: query.bookNamePart,
+    };
+  }
+
+  if (_.get(query, 'partyNamePart')) {
+    initFormData = {
+      ...initFormData,
+      partyNamePart: query.partyNamePart,
+    };
+  }
+  const [formData, setFormData] = useState(initFormData);
   const [searchFormData, setSearchFormData] = useState(formData);
   const [showScroll, setShowScroll] = useState(getShowScroll());
 

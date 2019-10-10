@@ -34,11 +34,23 @@ const BigTitle = styled.div`
   line-height: 32px;
 `;
 
-const Risk = () => {
-  const [formData, setFormData] = useState({
+const Risk = props => {
+  let initFormData = {
     valuationDate: moment(),
     instrumentIdPart: '',
-  });
+  };
+  const { query } = props.location || {};
+  const defaultActiveKey = query.activeKey || '1';
+
+  if (query.valuationDate) {
+    initFormData = {
+      ...initFormData,
+      valuationDate: moment(query.valuationDate),
+    };
+  }
+
+  const [formData, setFormData] = useState(initFormData);
+
   return (
     <>
       <Row type="flex" justify="start" gutter={14} style={{ marginBottom: 30 }}>
@@ -55,7 +67,7 @@ const Risk = () => {
         </Col>
       </Row>
 
-      <ThemeTabs defaultActiveKey="1" type="card" animated={false}>
+      <ThemeTabs defaultActiveKey={defaultActiveKey} type="card" animated={false}>
         <TabPane tab="全市场估值监测" key="1">
           <Title>全市场整体风险报告</Title>
           <BoxPanel
@@ -74,10 +86,11 @@ const Risk = () => {
             searchParams={TableWholeBreed.searchParams}
             method={rptSearchPagedMarketRiskDetailReport}
             valuationDate={formData.valuationDate}
+            query={query}
           />
         </TabPane>
         <TabPane tab="各子公司估值监测" key="2">
-          <TableSubsidiaryWhole valuationDate={formData.valuationDate} />
+          <TableSubsidiaryWhole valuationDate={formData.valuationDate} query={query} />
           <TableRisk
             title="各子公司分品种风险报告"
             style={{ marginTop: 18 }}
@@ -93,6 +106,7 @@ const Risk = () => {
             searchParams={riskSubsidiaryVarieties.searchParams}
             method={rptSearchPagedMarketRiskBySubUnderlyerReport}
             valuationDate={formData.valuationDate}
+            query={query}
           />
         </TabPane>
         <TabPane tab="交易对手估值监测 " key="3">
@@ -109,6 +123,7 @@ const Risk = () => {
             searchParams={TableTradeRival.searchParams}
             method={rptSearchPagedCounterPartyMarketRiskReport}
             valuationDate={formData.valuationDate}
+            query={query}
           />
           <TableRisk
             title="交易对手分品种风险报告"
@@ -124,6 +139,7 @@ const Risk = () => {
             searchParams={TableTradeRivalVarieties.searchParams}
             method={rptSearchPagedCounterPartyMarketRiskByUnderlyerReport}
             valuationDate={formData.valuationDate}
+            query={query}
           />
         </TabPane>
       </ThemeTabs>
