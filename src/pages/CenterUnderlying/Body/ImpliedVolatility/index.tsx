@@ -35,7 +35,7 @@ const ImpliedVolatility = props => {
   const formRef = useRef<Form2>(null);
   const [formData, setFormData] = useState(
     Form2.createFields({
-      valuationDate: [moment().subtract(2, 'years'), moment()],
+      valuationDate: [moment().subtract(30 * 6, 'days'), moment().subtract(1, 'd')],
       window: 22,
     }),
   );

@@ -13,7 +13,7 @@ import FormItemWrapper from '@/containers/FormItemWrapper';
 import { getImpliedVolReport } from '@/services/terminal';
 
 const Box = props => {
-  const [dateData, setDateData] = useState(moment());
+  const [dateData, setDateData] = useState(moment().subtract(1, 'd'));
   const { loading, volReport, dispatch, instrumentId } = props;
 
   const setLoading = data => {
