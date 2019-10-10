@@ -61,7 +61,7 @@ const STATUS = {
 const Vol = props => {
   const { instrumentId, data = {}, dispatch, loading, strikeType } = props;
   const [meta, setMeta] = useState();
-  const [valuationDate, setValuationDate] = useState(moment());
+  const [valuationDate, setValuationDate] = useState(moment().subtract(1, 'd'));
   const [status, setStatus] = useState(STATUS.CHART);
   const [echartInstance, setEchartInstance] = useState();
   const [strikeTypeData, setStrikeTypeData] = useState(strikeType);
