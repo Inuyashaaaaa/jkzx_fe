@@ -26,7 +26,7 @@ export default {
   'menu.systemSettings.tradeBooks': '交易簿管理',
   'menu.systemSettings.volatilityCalendar': '波动率日历管理',
   'menu.systemSettings.documentManagement': '文档模板管理',
-  'menu.systemSettings.operationLog': '操作日志',
+  'menu.systemSettings.operationLog': '系统日志',
   'menu.pricingSettings': '定价管理',
   'menu.pricingSettings.volSurface': '波动率曲面',
   'menu.pricingSettings.riskFreeCurve': '无风险利率曲线',
