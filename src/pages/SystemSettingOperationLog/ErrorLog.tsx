@@ -3,14 +3,19 @@ import { Divider } from 'antd';
 import moment from 'moment';
 import _ from 'lodash';
 import { Form2, SmartTable } from '@/containers';
-import { authSysLogList } from '@/services/role';
+import { authErrorLogList } from '@/services/role';
 import { errorSearchFormControls, errorTableColDefs } from './constants';
 
 const PAGE_SIZE = 15;
 
 const ErrorLog = memo(props => {
   const getInitFotrmData = () => ({
-    operationDate: [moment().subtract(30, 'day'), moment()],
+    operationDate: [
+      moment()
+        .subtract(30, 'day')
+        .startOf('day'),
+      moment().endOf('day'),
+    ],
   });
 
   const initPagination = {
@@ -36,13 +41,13 @@ const ErrorLog = memo(props => {
     }
     const formData = Form2.getFieldsValue(paramsSearchFormData);
     setLoading(true);
-    const { data, error } = await authSysLogList({
+    const { data, error } = await authErrorLogList({
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
-      startDate: moment(formData.operationDate[0]).format('YYYY-MM-DD'),
-      endDate: moment(formData.operationDate[1]).format('YYYY-MM-DD'),
+      startDate: moment(formData.operationDate[0]).format('YYYY-MM-DDTHH:mm:ss'),
+      endDate: moment(formData.operationDate[1]).format('YYYY-MM-DDTHH:mm:ss'),
       username: formData.username ? formData.username : '',
-      operation: formData.operation ? formData.operation : '',
+      requestMethod: '',
     });
     setLoading(false);
     if (error) {
@@ -120,7 +125,7 @@ const ErrorLog = memo(props => {
           onChange: onPaginationChange,
         }}
         columns={errorTableColDefs}
-        scroll={{ x: 1500 }}
+        scroll={{ x: 1350 }}
       />
     </>
   );
