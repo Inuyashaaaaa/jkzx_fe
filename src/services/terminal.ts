@@ -106,5 +106,6 @@ export async function getHistoricalAndNeutralVolList(params = {}) {
       jsonrpc: '2.0',
       id: 1,
     },
+    passError: true,
   });
 }

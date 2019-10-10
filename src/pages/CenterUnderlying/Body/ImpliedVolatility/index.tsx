@@ -5,7 +5,9 @@ import React, { memo, useRef, useState, useEffect } from 'react';
 import Mock from 'mockjs';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import moment from 'moment';
+import _ from 'lodash';
 import { connect } from 'dva';
+import { notification, Divider, Icon } from 'antd';
 import { Chart, G2, Geom, Axis, Tooltip, Coord } from 'bizcharts';
 import DataSet from '@antv/data-set';
 import styled from 'styled-components';
@@ -18,6 +20,7 @@ import { delay, getMoment } from '@/tools';
 import PosCenter from '@/containers/PosCenter';
 import { getHistoricalAndNeutralVolList } from '@/services/terminal';
 import { formatNumber } from '@/tools';
+import styles from './index.less';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -75,13 +78,32 @@ const ImpliedVolatility = props => {
       ...formatFormData,
     });
     setLoading(false);
+    const description = (
+      <>
+        <p>数据异常明细</p>
+        <ul className={styles.diagnosticsList}>
+          {(_.get(data, 'diagnostics') || []).slice(0, 5).map(item => (
+            <li>{item.message}</li>
+          ))}
+        </ul>
+      </>
+    );
+    notification.error({
+      message: (
+        <div style={{ fontSize: '14px', color: '#fff' }}>
+          数据加载出现一些异常
+          <Divider type="vertical" style={{ background: '#00E8E8' }} />
+          <a style={{ color: '#00E8E8' }} href="/system-settings/operation-log">
+            查看详情
+          </a>
+        </div>
+      ),
+      description,
+      className: styles.notificationWarp,
+      icon: <Icon type="exclamation-circle" style={{ color: '#00E8E8' }} />,
+    });
     if (error) return;
     setDataSource(data.data);
-    data.diagnostics.forEach(item => {
-      if (item.type === 'ERROR') {
-        message.error(item.message);
-      }
-    });
   };
 
   const onFormChange = (text, changedFields, allFields) => {
