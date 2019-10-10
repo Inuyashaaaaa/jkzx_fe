@@ -2,6 +2,7 @@ import { Col, Row, Statistic, Input } from 'antd';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+import moment from 'moment';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptSearchPagedSubsidiaryMarketRiskReport } from '@/services/report-service';
@@ -170,9 +171,12 @@ const TableSubsidiaryWhole = (props: any) => {
     },
   ];
 
+  const createdAt = _.get(tableData, '[0].createdAt');
+  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+
   return (
     <div>
-      <Title>各子公司风险报告</Title>
+      <Title>各子公司风险报告（报告计算时间：{reportTime}）</Title>
       <Row
         type="flex"
         justify="space-between"

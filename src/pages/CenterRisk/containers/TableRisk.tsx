@@ -2,6 +2,7 @@ import { Col, Row, Statistic, Input } from 'antd';
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+import moment from 'moment';
 import ThemeButton from '@/containers/ThemeButton';
 import ThemeTable from '@/containers/ThemeTable';
 import ThemeInput from '@/containers/ThemeInput';
@@ -126,9 +127,12 @@ const TableRisk = (props: any) => {
   }, []);
 
   const columns = riskColumns(sorter);
+  const createdAt = _.get(tableData, '[0].createdAt');
+  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+
   return (
     <div style={style}>
-      <Title>{title}</Title>
+      <Title>{`${title}（报告计算时间：${reportTime}）`}</Title>
       <Row
         type="flex"
         justify="space-between"
