@@ -4,7 +4,7 @@ import request from '@/tools/request';
 export async function authRolesList(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     token,
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authRoleList',
       params,
@@ -14,7 +14,7 @@ export async function authRolesList(params = {}, token?) {
 
 export async function createRole(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authRoleCreate',
       params,
@@ -24,7 +24,7 @@ export async function createRole(params = {}) {
 
 export async function updateRole(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authRoleUpdate',
       params,
@@ -34,7 +34,7 @@ export async function updateRole(params = {}) {
 
 export async function deleteRole(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authRoleRevoke',
       params,
@@ -45,7 +45,7 @@ export async function deleteRole(params = {}) {
 export async function queryAllPagePermissions(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     token,
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authPageComponentList',
       params,
@@ -56,7 +56,7 @@ export async function queryAllPagePermissions(params = {}, token?) {
 export async function queryRolePagePermissions(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
     token,
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authPagePermissionGet',
       params,
@@ -66,7 +66,7 @@ export async function queryRolePagePermissions(params = {}, token?) {
 
 export async function updateRolePagePermissions(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authPagePermissionSet',
       params,
@@ -76,7 +76,7 @@ export async function updateRolePagePermissions(params = {}) {
 
 export async function authPagePermissionGetByRoleId(params = {}) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    method: 'POST',
     body: {
       method: 'authPagePermissionGetByRoleId',
       params,
@@ -92,9 +92,10 @@ export async function initPagePermissions(token?) {
   ]);
 }
 
-export async function authSysLogList(params = {}) {
+export async function authSysLogList(params = {}, token?) {
   return request(`${HOST_TEST}auth-service/api/rpc`, {
-    method: `POST`,
+    token,
+    method: 'POST',
     body: {
       method: 'authSysLogList',
       params,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // ***********************************************************
 // This example plugins/index.js can be used to load plugins
 //
@@ -7,13 +8,22 @@
 // You can read more here:
 // https://on.cypress.io/plugins-guide
 // ***********************************************************
-
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
-const plugins = (on: any, config: any) => {
+const cypressTypeScriptPreprocessor = require('./cy-ts-preprocessor');
+const settings = require('../../src/defaultSettings.js');
+
+const plugins = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
+  on('file:preprocessor', cypressTypeScriptPreprocessor);
+  config.env = {
+    ...config.env,
+    settings: JSON.stringify(settings),
+  };
+
+  return config;
 };
 
-export default plugins;
+module.exports = plugins;

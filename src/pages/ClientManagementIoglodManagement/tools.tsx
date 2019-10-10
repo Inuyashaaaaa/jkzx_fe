@@ -309,20 +309,12 @@ export const HISTORY_CLOUNMS = fetchTable => [
     title: '创建时间',
     width: 250,
     dataIndex: 'createdAt',
-    // input: {
-    //   type: 'date',
-    //   range: 'day',
-    //   format: 'YYYY-MM-DD h:mm:ss a',
-    // },
+    render: (text, record, index) => _.replace(text, 'T', ' '),
   },
   {
     title: '更新时间',
     width: 250,
     dataIndex: 'updatedAt',
-    // input: {
-    //   type: 'date',
-    //   range: 'day',
-    //   format: 'YYYY-MM-DD h:mm:ss a',
-    // },
+    render: (text, record, index) => _.replace(text, 'T', ' '),
   },
 ];

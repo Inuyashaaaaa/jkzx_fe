@@ -30,7 +30,7 @@ const TradeManagementMarketManagement = props => {
   const [creating, setCreating] = useState(false);
   const [noData, setNoData] = useState(true);
 
-  const fetchTable = useCallback(async (paramsPagination?, formData?, useSearchForm = false) => {
+  const fetchTable = async (paramsPagination?, formData?, useSearchForm = false) => {
     const actualPagination = paramsPagination || pagination;
     setLoading(true);
     const newSearchFormData = _.mapValues(
@@ -56,7 +56,7 @@ const TradeManagementMarketManagement = props => {
     setTableDataSource(data.page);
     setTotal(data.totalCount);
     setNoData(data.page.length === 0);
-  });
+  };
 
   const filterFormData = (allFields, fields) => {
     if (fields.assetClass) {
@@ -182,7 +182,8 @@ const TradeManagementMarketManagement = props => {
   const onReset = () => {
     setPagination(defaultPagination);
     setSearchFormData({});
-    fetchTable(defaultPagination, {}, true);
+    setSearchForm({});
+    fetchTable(defaultPagination, {}, false);
   };
 
   useEffect(() => {
@@ -207,7 +208,7 @@ const TradeManagementMarketManagement = props => {
       </Button>
       <SmartTable
         rowKey="instrumentId"
-        columns={TABLE_COL_DEFS(() => fetchTable(null, searchForm, false))}
+        columns={TABLE_COL_DEFS(() => fetchTable(null, null, false))}
         loading={loading}
         scroll={{ x: noData ? false : 2300 }}
         dataSource={tableDataSource}

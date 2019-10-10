@@ -6,6 +6,7 @@ import {
   INPUT_NUMBER_PERCENTAGE_DECIMAL_CONFIG,
   NOTION_ENUM_MAP,
   UNIT_ENUM_MAP,
+  INPUT_NUMBER_DATE_CONFIG,
 } from '@/constants/common';
 import { IFormControl } from '@/containers/Form/types';
 
@@ -155,6 +156,21 @@ export const EXPIRATION_CALL_PUT_FORM_CONTROLS: (
         {
           required: true,
           message: '期权数量 (手)为必填项',
+        },
+      ],
+    },
+  },
+  {
+    field: 'paymentDate',
+    control: {
+      label: '支付日期',
+    },
+    input: INPUT_NUMBER_DATE_CONFIG,
+    decorator: {
+      rules: [
+        {
+          required: true,
+          message: '支付日期为必填项',
         },
       ],
     },

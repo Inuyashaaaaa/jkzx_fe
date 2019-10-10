@@ -278,9 +278,10 @@ const Settlement = props => {
 
         const settleAmount = parseFloat(get(values, `${LEG_FIELD.SETTLE_AMOUNT}`));
         const underlyerPrice = parseFloat(get(values, `${LEG_FIELD.UNDERLYER_PRICE}`));
+        const positionId = record[POSITION_ID];
 
         return trdTradeLCMEventProcess({
-          positionId: record[POSITION_ID],
+          positionId,
           tradeId: record.tradeId,
           eventType: LCM_EVENT_TYPE_MAP.EXERCISE,
           userLoginId: currentUser.username,
@@ -296,45 +297,41 @@ const Settlement = props => {
             ), // 名义本金(手数)
             notionalAmount: String(get(values, `asset.${LEG_FIELD.NOTIONAL_AMOUNT}`)), // 名义本金
           },
-        });
+        }).then(rsp => ({
+          ...rsp,
+          positionId,
+        }));
       }),
     );
 
     const successRsps = rsps.filter(item => !item.error);
+    const successPositionIds = successRsps.map(item => item.positionId);
 
     if (!_.isEmpty(successRsps)) {
-      message.success(
-        `批量结算成功：${successRsps
-          .reduce((container, rsp) => container.concat((rsp.data || {}).positionIds || []), [])
-          .join(',')}`,
-      );
+      message.success(`批量结算成功：${successPositionIds.join(',')}`);
     }
 
     // 根据接口返回的 positionIds 判断是否结算成功
-    successRsps.forEach(rsp => {
-      setTableData(pre =>
-        pre.map(record => {
-          if (((rsp.data || {}).positionIds || []).indexOf(record[POSITION_ID]) !== -1) {
-            return {
-              ...record,
-              [ALREADY]: true,
-            };
-          }
-          return record;
-        }),
-      );
-    });
+    setTableData(pre =>
+      pre.map(record => {
+        if (successPositionIds.indexOf(record[POSITION_ID]) !== -1) {
+          return {
+            ...record,
+            [ALREADY]: true,
+          };
+        }
+        return record;
+      }),
+    );
 
-    successRsps.forEach(rsp => {
-      const positionId = ((rsp.data || {}).positionIds || [])[0];
+    successPositionIds.forEach(positionId => {
       generateEvent(tableData.find(item => item[POSITION_ID] === positionId));
     });
 
     setSelectedRowKeys(pre =>
-      _.reject(pre, key =>
-        successRsps.some(rsp => ((rsp.data || {}).positionIds || []).indexOf(key) !== -1),
-      ),
+      _.reject(pre, key => successPositionIds.some(positionId => positionId === key)),
     );
+
     setSettLoading(false);
     setSetted(true);
   };
@@ -397,6 +394,7 @@ const Settlement = props => {
               onClick={() => {
                 fetch();
                 setSetted(false);
+                setSelectedRowKeys([]);
               }}
             >
               刷新

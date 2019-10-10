@@ -1,0 +1,42 @@
+{
+  "position": {
+    "struType": "单鲨",
+    "isYear": "年化",
+    "isBusiness": "买",
+    "type": "看涨",
+    "marker": "000028.SZ",
+    "ACM": "1",
+    "initialPrice": "41.8800",
+    "participationRate": "100.0000%",
+    "strikeTpye": "百分比",
+    "strike": "105%",
+    "term": "30",
+    "effectiveDate": "2019-07-18",
+    "expirationDate": "2019-08-17",
+    "principalType": "人民币",
+    "principal": "100000",
+    "tradCapacity": "196.2554",
+    "compensateType": "百分比",
+    "compensate": "10.000%",
+    "direction": "向上",
+    "barrierType": "百分比",
+    "barrier": "110%",
+    "rubType": "离散观察",
+    "observationStep": "每周",
+    "OBSERVATION_DATES": "",
+    "equalBarrier": "112%"
+  },
+  "date": [
+    "1.7392%",
+    "142.9473",
+    "37.9747%",
+    "74.7416手",
+    "¥3",
+    "121.2094",
+    "11.4003",
+    "¥476.0747",
+    "¥9.2896",
+    "¥-6.7152",
+    "1.5025"
+  ]
+}

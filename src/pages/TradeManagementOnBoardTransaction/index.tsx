@@ -57,7 +57,13 @@ const TradeManagementOnBoardTansaction = props => {
   const [searchFormDataFlow, setSearchFormDataFlow] = useState<any>({
     date: [moment().subtract(1, 'days'), moment()],
   });
+  const [searchFormFlow, setSearchFormFlow] = useState<any>({
+    date: [moment().subtract(1, 'days'), moment()],
+  });
   const [searchFormDataPosition, setSearchFormDataPosition] = useState({
+    searchDate: moment(),
+  });
+  const [searchFormPosition, setSearchFormPosition] = useState({
     searchDate: moment(),
   });
   const [activeKey, setActiveKey] = useState('flow');
@@ -136,10 +142,11 @@ const TradeManagementOnBoardTansaction = props => {
     },
   };
 
-  const queryPositionData = async (mode?: string) => {
+  const queryPositionData = async (searchForm, setNew, mode?: string) => {
     const actualMode = mode || positionMode;
+    const fromData = searchForm || searchFormDataPosition;
     const params = {
-      searchDate: searchFormDataPosition.searchDate.format('YYYY-MM-DD'),
+      searchDate: fromData.searchDate.format('YYYY-MM-DD'),
     };
     setLoading(true);
 
@@ -157,6 +164,9 @@ const TradeManagementOnBoardTansaction = props => {
     }
     setPositionData(data);
     setLoading(false);
+    if (setNew) {
+      setSearchFormPosition(searchForm);
+    }
   };
 
   const hideModal = () => {
@@ -171,7 +181,7 @@ const TradeManagementOnBoardTansaction = props => {
   const changePosition = e => {
     const { value } = e.target;
     setPositionMode(value);
-    queryPositionData(value);
+    queryPositionData(searchFormDataPosition, false, value);
   };
 
   const checkFileType = (file, data) => {
@@ -194,6 +204,10 @@ const TradeManagementOnBoardTansaction = props => {
   const onUploadStatusChanged = info => {
     if (info.file.status === 'done') {
       const resp = info.file.response;
+      if (resp.error) {
+        return message.error(`${_.get(resp, '[0].response.error.message') || '批量导入失败失败'}`);
+      }
+
       if (resp) {
         const failure = resp.diagnostics.map(v => {
           const fail = v.split('`');
@@ -207,18 +221,13 @@ const TradeManagementOnBoardTansaction = props => {
       setModalLoading(false);
       hideModal();
       if (_.get(resp, 'diagnostics.length') === 0) {
-        notification.success({
+        return notification.success({
           message: '成功录入所有交易',
         });
-      } else {
-        setResultModalVisible(true);
       }
-    } else if (info.file.status === 'error') {
-      notification.error({
-        message: (info.file && info.file.error && info.file.error.message) || '模板上传失败',
-      });
-      hideModal();
+      return setResultModalVisible(true);
     }
+    return false;
   };
 
   const createFormModal = () => {
@@ -292,8 +301,8 @@ const TradeManagementOnBoardTansaction = props => {
   };
 
   const onResetPosition = () => {
-    setSearchFormDataPosition({ searchDate: moment().subtract(1, 'days') });
-    queryPositionData();
+    setSearchFormDataPosition({ searchDate: moment() });
+    queryPositionData({ searchDate: moment() }, true);
   };
 
   const handlePositionChange = value => {
@@ -325,11 +334,12 @@ const TradeManagementOnBoardTansaction = props => {
   const summaryColumns = generateColumns('summary');
   const portfolioColumns = generateColumns('portfolio');
 
-  const queryFlowData = useCallback(async () => {
+  const queryFlowData = async (searchForm, setNew) => {
+    const formData = searchForm || searchFormFlow;
     const params = {
-      instrumentIds: searchFormDataFlow.instrumentId,
-      startTime: `${searchFormDataFlow.date[0].format('YYYY-MM-DD')}T00:00:00`,
-      endTime: `${searchFormDataFlow.date[1].format('YYYY-MM-DD')}T23:59:59`,
+      instrumentIds: formData.instrumentId,
+      startTime: `${formData.date[0].format('YYYY-MM-DD')}T00:00:00`,
+      endTime: `${formData.date[1].format('YYYY-MM-DD')}T23:59:59`,
     };
 
     setLoading(true);
@@ -368,11 +378,14 @@ const TradeManagementOnBoardTansaction = props => {
     });
     setFlowData(finalData);
     setLoading(false);
-  });
+    if (setNew) {
+      setSearchFormFlow(searchFormDataFlow);
+    }
+  };
 
   const onReset = () => {
     setSearchFormDataFlow({ date: [moment().subtract(1, 'days'), moment()] });
-    queryFlowData();
+    queryFlowData({ date: [moment().subtract(1, 'days'), moment()] }, true);
   };
 
   const handleUpdatePortfolio = async () => {
@@ -388,7 +401,7 @@ const TradeManagementOnBoardTansaction = props => {
     setActiveKey(tab);
     if (tab === 'position') {
       setPositionMode('detail');
-      queryPositionData('detail');
+      queryPositionData(null, false, 'detail');
     } else {
       queryFlowData();
     }
@@ -413,7 +426,10 @@ const TradeManagementOnBoardTansaction = props => {
           <Form
             submitText="查询"
             dataSource={searchFormDataFlow}
-            onSubmitButtonClick={queryFlowData}
+            submitButtonProps={{
+              disabled: !!loading,
+            }}
+            onSubmitButtonClick={() => queryFlowData(searchFormDataFlow, true)}
             onResetButtonClick={onReset}
             controls={[
               {
@@ -478,9 +494,12 @@ const TradeManagementOnBoardTansaction = props => {
       {activeKey === 'position' && (
         <>
           <Form
+            submitButtonProps={{
+              disabled: !!loading,
+            }}
             submitText="查询"
             dataSource={searchFormDataPosition}
-            onSubmitButtonClick={() => queryPositionData()}
+            onSubmitButtonClick={() => queryPositionData(searchFormDataPosition, true)}
             onResetButtonClick={onResetPosition}
             controls={[
               {

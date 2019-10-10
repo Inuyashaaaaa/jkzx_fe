@@ -10,6 +10,8 @@ export const TABLE_KEY_DOWN = 'TABLE_KEY_DOWN';
 
 export const TABLE_STOP_ACTIVE = 'TABLE_STOP_ACTIVE';
 
+export const TABLE_START_ACTIVE = 'TABLE_START_ACTIVE';
+
 export const TABLE_ARROW_KEY_CODE_MAP = {
   LEFT: 37,
   UP: 38,

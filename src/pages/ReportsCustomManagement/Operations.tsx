@@ -23,11 +23,16 @@ const Operations = memo<any>(props => {
 
   const downloadFormModal = () => {
     const cols = ['sheet'];
+    const reportData = _.get(record, 'reportData[0]') || {};
+    const loadData = _.sortBy(
+      Object.keys(reportData).map(item => ({
+        title: item,
+        data: _.get(reportData, item),
+      })),
+      ['title'],
+    );
     const colData = cols.map(() =>
-      _.concat(
-        [Object.keys(record.reportData[0])],
-        (record.reportData || []).map(item => _.values(item)),
-      ),
+      _.concat([loadData.map(item => item.title)], [loadData.map(item => item.data)]),
     );
     const wb = XLSX.utils.book_new();
     cols.forEach((item, index) => {
@@ -36,6 +41,7 @@ const Operations = memo<any>(props => {
     });
     XLSX.writeFile(wb, `${record.reportName}.xlsx`);
   };
+
   return (
     <>
       {/* {
@@ -60,11 +66,14 @@ const Operations = memo<any>(props => {
         <SmartTable
           rowKey="uuid"
           dataSource={record.reportData || []}
-          columns={Object.keys(record.reportData[0]).map(item => ({
-            title: item,
-            dataIndex: item,
-            width: 200,
-          }))}
+          columns={_.sortBy(
+            Object.keys(record.reportData[0]).map(item => ({
+              title: item,
+              dataIndex: item,
+              width: 200,
+            })),
+            ['title'],
+          )}
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,

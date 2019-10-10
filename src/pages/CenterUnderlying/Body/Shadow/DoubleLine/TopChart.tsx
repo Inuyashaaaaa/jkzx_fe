@@ -114,7 +114,7 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchOption();
-  }, [data]);
+  }, [props.data]);
 
   useEffect(() => {
     fetchWindow();
@@ -122,7 +122,7 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchMeta();
-  }, [data, window]);
+  }, [props.data, window, props.instrumentId]);
 
   return (
     <>
@@ -130,14 +130,14 @@ const TopChart = props => {
         <Col>
           <FormItemWrapper>
             <FormItem
-              label={fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'strike_percentage'}
+              label={fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)' : '行权价(%)'}
             >
               <ThemeSelect
                 value={window}
                 onChange={val => {
                   setWindow(val);
                 }}
-                placeholder="strike"
+                placeholder="行权价"
                 style={{ minWidth: 200 }}
               >
                 {options.map(item => (
@@ -165,7 +165,7 @@ const TopChart = props => {
               },
               value: {
                 alias: '波动率(%)',
-                formatter: val => formatNumber(_.toNumber(val) * 100, 2),
+                formatter: val => formatNumber(_.toNumber(val) * 100, 0),
               },
             }}
             onGetG2Instance={g2Chart => {
@@ -248,7 +248,13 @@ const TopChart = props => {
               position="time*value"
               color="l(0) 0:#dbdcd740 0.3:#bc487640 0.5:#a81e5940 0.8:#63084240 1:26083c40"
               opacity={0.65}
-              shape="smooth"
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time,
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
@@ -282,7 +288,13 @@ const TopChart = props => {
               position="time*value"
               color={meta.gradualColorStr}
               opacity={0.85}
-              shape="smooth"
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time,
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称

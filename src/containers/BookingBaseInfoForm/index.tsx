@@ -286,6 +286,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                           }));
                       },
                     }}
+                    data-test="tradingBook"
                   />,
                 )}
               </FormItem>
@@ -304,7 +305,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                       message: '交易编号为必填项',
                     },
                   ],
-                })(<Input editing={editing} autoSelect={!editing} />)}
+                })(<Input editing={editing} autoSelect={!editing} data-test="tradingNumber" />)}
               </FormItem>
             ),
           },
@@ -347,6 +348,7 @@ const BookingBaseInfoForm = memo<any>(props => {
                               }));
                             },
                           }}
+                          data-test="tradingRival"
                         />,
                       )}
                       <Button
@@ -411,7 +413,14 @@ const BookingBaseInfoForm = memo<any>(props => {
                       message: '交易日为必填项',
                     },
                   ],
-                })(<DatePicker editing={editing} format="YYYY-MM-DD" defaultOpen={!editing} />)}
+                })(
+                  <DatePicker
+                    editing={editing}
+                    data-test="tradingDate"
+                    format="YYYY-MM-DD"
+                    defaultOpen={!editing}
+                  />,
+                )}
               </FormItem>
             ),
           },
@@ -423,6 +432,7 @@ const BookingBaseInfoForm = memo<any>(props => {
               <FormItem>
                 {form.getFieldDecorator()(
                   <Select
+                    data-test="tradingNote"
                     editing={editing}
                     mode="tags"
                     style={{ width: '100%' }}

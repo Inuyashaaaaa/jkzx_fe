@@ -503,3 +503,13 @@ export async function wkAttachmentProcessInstanceBind(params) {
     },
   });
 }
+
+export async function refSimilarLegalNameListWithoutBook(params) {
+  return request(`${HOST_TEST}reference-data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'refSimilarLegalNameListWithoutBook',
+      params,
+    },
+  });
+}

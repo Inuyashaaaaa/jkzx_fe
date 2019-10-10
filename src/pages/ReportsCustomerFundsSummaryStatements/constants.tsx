@@ -1,4 +1,5 @@
-import { formatMoney } from '@/tools';
+import React from 'react';
+import { formatMoney, getMoment } from '@/tools';
 
 export const TABLE_COL_DEFS = [
   {
@@ -10,6 +11,24 @@ export const TABLE_COL_DEFS = [
     title: '客户名称',
     dataIndex: 'clientName',
     width: 100,
+    render: val => (
+      <span
+        style={{
+          overflow: 'hidden',
+          display: 'inline-block',
+          wordBreak: 'break-all',
+          width: '100%',
+        }}
+      >
+        {val}
+      </span>
+    ),
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'createdAt',
+    width: 180,
+    render: (value, record, index) => (value ? getMoment(value).format('YYYY-MM-DD HH:mm:ss') : ''),
   },
   {
     title: '财务录入资金',

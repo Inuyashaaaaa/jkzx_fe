@@ -1,7 +1,8 @@
-import { ACCOUNT_EVENT_TYPE_OPTIONS, RULES_REQUIRED } from '@/constants/common';
-import { Input, InputNumber, Select } from '@/containers';
+/* eslint-disable */
 import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
+import { ACCOUNT_EVENT_TYPE_OPTIONS, RULES_REQUIRED } from '@/constants/common';
+import { Input, InputNumber, Select } from '@/containers';
 
 export const TABLE_COL_DEF = [
   {
@@ -39,38 +40,30 @@ export const PARTY_FORM_CONTROLS = [
   {
     title: '可用资金变化',
     dataIndex: 'cashChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
+    ),
   },
   {
     title: '可用授信变化',
     dataIndex: 'creditBalanceChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
+    ),
   },
   {
     title: '负债变化',
     dataIndex: 'debtChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
+    ),
   },
   {
     title: '存续期权利金变化',
     dataIndex: 'premiumChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
+    ),
   },
   // {
   //   title: '冻结保证金变化',
@@ -86,34 +79,30 @@ export const COUNTER_PARTY_FORM_CONTROLS = [
   {
     title: '可用资金变化',
     dataIndex: 'counterPartyFundChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
+    ),
   },
   {
     title: '可用授信变化',
     dataIndex: 'counterPartyCreditBalanceChange',
-    render: (value, record, index, { form, editing }) => {
-      return (
-        <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
-      );
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({ rules: RULES_REQUIRED })(<InputNumber />)}</FormItem>
+    ),
   },
   {
     title: '负债变化',
     dataIndex: 'debt',
-    render: (value, record, index, { form, editing }) => {
-      return <FormItem>{form.getFieldDecorator({})(<InputNumber disabled={true} />)}</FormItem>;
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({})(<InputNumber disabled />)}</FormItem>
+    ),
   },
   {
     title: '存续期权利金变化',
     dataIndex: 'premium',
-    render: (value, record, index, { form, editing }) => {
-      return <FormItem>{form.getFieldDecorator({})(<InputNumber disabled={true} />)}</FormItem>;
-    },
+    render: (value, record, index, { form, editing }) => (
+      <FormItem>{form.getFieldDecorator({})(<InputNumber disabled />)}</FormItem>
+    ),
   },
   // {
   // title: '冻结保证金变化',
@@ -128,59 +117,59 @@ export const MIDDLE_FORM_CONTROLS = [
   {
     title: '交易编号',
     dataIndex: 'tradeId',
-    render: (value, record, index, { form, editing }) => {
-      return (
+    render: (value, record, index, { form, editing }) => (
+      <div data-test="data-tradeId">
         <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
-      );
-    },
+      </div>
+    ),
   },
   {
     title: '方向',
     dataIndex: 'direction',
-    render: (value, record, index, { form }) => {
-      return (
+    render: (value, record, index, { form }) => (
+      <div data-test="data-direction">
         <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
-      );
-    },
+      </div>
+    ),
   },
   {
     title: '生命周期事件',
     dataIndex: 'lcmEventType',
-    render: (value, record, index, { form }) => {
-      return (
+    render: (value, record, index, { form }) => (
+      <div data-test="data-lcmEventType">
         <FormItem wrapperCol={{ span: 16 }}>
           {form.getFieldDecorator({})(<Input type="input" editing={false} />)}
         </FormItem>
-      );
-    },
+      </div>
+    ),
   },
   {
     title: '现金流',
     dataIndex: 'cashFlow',
-    render: (value, record, index, { form }) => {
-      return (
+    render: (value, record, index, { form }) => (
+      <div data-test="data-cashFlow">
         <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
-      );
-    },
+      </div>
+    ),
   },
   {
     title: '期权费',
     dataIndex: 'premium',
-    render: (value, record, index, { form }) => {
-      return (
+    render: (value, record, index, { form }) => (
+      <div data-test="data-premium">
         <FormItem>{form.getFieldDecorator({})(<Input type="input" editing={false} />)}</FormItem>
-      );
-    },
+      </div>
+    ),
   },
   {
     title: '资金事件类型',
     dataIndex: 'event',
-    render: (value, record, index, { form }) => {
-      return (
-        <FormItem wrapperCol={{ span: 16 }}>
-          {form.getFieldDecorator({})(<Select options={ACCOUNT_EVENT_TYPE_OPTIONS} />)}
-        </FormItem>
-      );
-    },
+    render: (value, record, index, { form }) => (
+      <FormItem wrapperCol={{ span: 16 }}>
+        {form.getFieldDecorator({})(
+          <Select data-test="data-event" options={ACCOUNT_EVENT_TYPE_OPTIONS} />,
+        )}
+      </FormItem>
+    ),
   },
 ];

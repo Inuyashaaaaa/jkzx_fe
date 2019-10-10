@@ -1,4 +1,4 @@
-import { Alert, message, Modal } from 'antd';
+import { Alert, message, Modal, Popconfirm, Button } from 'antd';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
 import _ from 'lodash';
@@ -20,9 +20,15 @@ import {
 } from '@/constants/common';
 import CashExportModal from '@/containers/CashExportModal';
 import { Form2 } from '@/containers';
-import { trdTradeLCMEventProcess } from '@/services/trade-service';
+import { trdTradeLCMEventProcess, tradeExercisePreSettle } from '@/services/trade-service';
 import { getMoment } from '@/tools';
-import { KNOCKOUT_FORM_CONTROLS } from './constants';
+import {
+  KNOCKOUT_FORM_CONTROLS,
+  KNOCK_OUT_DATE,
+  NOTIONAL_AMOUNT,
+  SETTLE_AMOUNT,
+  UNDERLYER_PRICE,
+} from './constants';
 
 class BarrierKnockOutModal extends PureComponent<
   {
@@ -111,28 +117,30 @@ class BarrierKnockOutModal extends PureComponent<
         },
       ),
     ).join(' | ');
-    const notional =
-      this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTION_ENUM_MAP.CNY
-        ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
-        : new BigNumber(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
-            .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
-            .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
-            .toNumber();
-    const settleAmountUnit =
-      this.data[LEG_FIELD.REBATE_TYPE] === REBATETYPE_TYPE_MAP.PAY_NONE
-        ? 0
-        : this.data[LEG_FIELD.REBATE];
-    const settleAmount =
-      this.data[LEG_FIELD.REBATE_UNIT] === UNIT_ENUM_MAP.CNY
-        ? settleAmountUnit
-        : new BigNumber(settleAmountUnit)
-            .multipliedBy(0.01)
-            .multipliedBy(notional)
-            .toNumber();
-    const paymentDate =
-      this.data[LEG_FIELD.REBATE_TYPE] === REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY
-        ? getMoment(expirationDate)
-        : this.getInitialKnockOutDate(this.data);
+    // const notional =
+    //   this.data[LEG_FIELD.NOTIONAL_AMOUNT_TYPE] === NOTION_ENUM_MAP.CNY
+    //     ? this.data[LEG_FIELD.NOTIONAL_AMOUNT]
+    //     : new BigNumber(this.data[LEG_FIELD.NOTIONAL_AMOUNT])
+    //         .multipliedBy(this.data[LEG_FIELD.UNDERLYER_MULTIPLIER])
+    //         .multipliedBy(this.data[LEG_FIELD.INITIAL_SPOT])
+    //         .toNumber();
+    // const settleAmountUnit =
+    //   this.data[LEG_FIELD.REBATE_TYPE] === REBATETYPE_TYPE_MAP.PAY_NONE
+    //     ? 0
+    //     : this.data[LEG_FIELD.REBATE];
+    const settleAmount = '';
+    // this.data[LEG_FIELD.REBATE_UNIT] === UNIT_ENUM_MAP.CNY
+    //   ? settleAmountUnit
+    //   : new BigNumber(settleAmountUnit)
+    //       .multipliedBy(0.01)
+    //       .multipliedBy(notional)
+    //       .toNumber();
+    // 支付日期
+    // const paymentDate =
+    //   this.data[LEG_FIELD.REBATE_TYPE] === REBATETYPE_TYPE_MAP.PAY_AT_EXPIRY
+    //     ? getMoment(expirationDate)
+    //     : this.getInitialKnockOutDate(this.data);
+    const date = this.getInitialKnockOutDate(this.data);
     this.setState({
       visible: true,
       dataSource: Form2.createFields({
@@ -141,8 +149,8 @@ class BarrierKnockOutModal extends PureComponent<
         rebateType,
         expirationDate,
         settleAmount,
-        paymentDate,
-        knockOutDate: this.getInitialKnockOutDate(this.data),
+        paymentDate: date,
+        knockOutDate: date,
       }),
       rebateType: this.data[LEG_FIELD.REBATE_TYPE] === REBATETYPE_TYPE_MAP.PAY_NONE,
     });
@@ -174,7 +182,7 @@ class BarrierKnockOutModal extends PureComponent<
         notionalAmount: String(this.data[LEG_FIELD.NOTIONAL_AMOUNT]),
         knockOutDate: getMoment(dataSource.knockOutDate).format('YYYY-MM-DD'),
         expirationDate: dataSource.expirationDate,
-        paymentDate: getMoment(dataSource.paymentDate).format('YYYY-MM-DD'),
+        paymentDate: getMoment(dataSource.knockOutDate).format('YYYY-MM-DD'),
         rebateType: dataSource.rebateType,
       },
     });
@@ -203,6 +211,32 @@ class BarrierKnockOutModal extends PureComponent<
     });
   };
 
+  public handleSettleAmount = async () => {
+    const dataSource = Form2.getFieldsValue(this.state.dataSource);
+    if (!dataSource[UNDERLYER_PRICE]) {
+      if (!(dataSource[UNDERLYER_PRICE] === 0)) {
+        message.error('请填标的物价格');
+        return;
+      }
+    }
+    const { error, data } = await tradeExercisePreSettle({
+      positionId: this.data.id,
+      eventDetail: {
+        underlyerPrice: String(dataSource[UNDERLYER_PRICE]),
+        notionalAmount: String(this.data[LEG_FIELD.NOTIONAL_AMOUNT]),
+        knockOutDate: dataSource[KNOCK_OUT_DATE].format('YYYY-MM-DD'),
+      },
+      eventType: LCM_EVENT_TYPE_MAP.KNOCK_OUT,
+    });
+    if (error) return;
+    this.setState({
+      dataSource: Form2.createFields({
+        ...dataSource,
+        [SETTLE_AMOUNT]: data,
+      }),
+    });
+  };
+
   public $barrierKnockOutModal: Form2;
 
   public tableFormData: any;
@@ -223,8 +257,21 @@ class BarrierKnockOutModal extends PureComponent<
         />
         <Modal
           closable={false}
-          onCancel={this.switchModal}
-          onOk={this.onConfirm}
+          // onCancel={this.switchModal}
+          // onOk={this.onConfirm}
+          footer={
+            <>
+              <Button onClick={this.switchModal}>取消</Button>
+              <Popconfirm
+                title="确认敲出？"
+                okText="确定"
+                cancelText="取消"
+                onConfirm={this.onConfirm}
+              >
+                <Button type="primary">确定</Button>
+              </Popconfirm>
+            </>
+          }
           maskClosable={false}
           visible={visible}
           confirmLoading={this.state.modalConfirmLoading}
@@ -237,7 +284,7 @@ class BarrierKnockOutModal extends PureComponent<
             dataSource={this.state.dataSource}
             onFieldsChange={this.onValueChange}
             footer={false}
-            columns={KNOCKOUT_FORM_CONTROLS(this.state.rebateType)}
+            columns={KNOCKOUT_FORM_CONTROLS(this.state.rebateType, this.handleSettleAmount)}
           />
           <Alert message="结算金额为正时代表我方收入，金额为负时代表我方支出。" type="info" />
         </Modal>

@@ -222,7 +222,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
                 </Button>
               </Upload>
             </p>
-            <Alert message="请在“审批管理”模块中查看审批进展。" />
+            <Alert message="请在“流程管理”模块中查看审批进展。" />
           </div>
         </Modal>
       </>

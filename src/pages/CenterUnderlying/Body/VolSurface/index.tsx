@@ -48,7 +48,7 @@ const Box = props => {
 
   useEffect(() => {
     fetch();
-  }, []);
+  }, [props.instrumentId]);
 
   return (
     <div style={{ border: '1px solid #05507b', padding: '15px 15px' }}>

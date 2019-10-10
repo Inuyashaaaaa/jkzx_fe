@@ -22,6 +22,7 @@ const TopChart = props => {
   const [meta, setMeta] = useState(null);
   const [window, setWindow] = useState();
   const [options, setOptions] = useState([]);
+  const [strikeType, setStrikeType] = useState(fetchStrikeType);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -68,7 +69,7 @@ const TopChart = props => {
 
     const strikeX = _.union(
       allData.map(item => {
-        const field = fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
+        const field = strikeType === STRIKE_TYPE_ENUM.STRIKE ? 'strike' : 'percent';
         return item[field];
       }),
     );
@@ -78,6 +79,7 @@ const TopChart = props => {
       dv,
       strikeX,
     });
+    setStrikeType(fetchStrikeType);
   };
 
   const fetchOption = () => {
@@ -95,7 +97,7 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchOption();
-  }, [data]);
+  }, [props.data]);
 
   useEffect(() => {
     fetchWindow();
@@ -103,13 +105,13 @@ const TopChart = props => {
 
   useEffect(() => {
     fetchMeta();
-  }, [data, window]);
+  }, [props.data, window, props.instrumentId]);
 
   const getStrikeLabel = () => {
     if (fetchStrikeType === STRIKE_TYPE_ENUM.STRIKE) {
-      return 'strike';
+      return '行权价(￥)';
     }
-    return 'strike_percentage';
+    return '行权价(%)';
   };
 
   return (
@@ -151,7 +153,7 @@ const TopChart = props => {
               },
               value: {
                 alias: '波动率(%)',
-                formatter: val => formatNumber(_.toNumber(val) * 100, 2),
+                formatter: val => formatNumber(_.toNumber(val) * 100, 0),
               },
             }}
             onGetG2Instance={g2Chart => {
@@ -178,6 +180,11 @@ const TopChart = props => {
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
+                },
+                formatter(text, item, index) {
+                  return strikeType === STRIKE_TYPE_ENUM.STRIKE
+                    ? formatNumber(_.toNumber(text), 0)
+                    : formatNumber(_.toNumber(text) * 100, 0);
                 },
               }}
               line={{
@@ -234,7 +241,13 @@ const TopChart = props => {
               position="time*value"
               color="l(0) 0:#dbdcd740 0.3:#bc487640 0.5:#a81e5940 0.8:#63084240 1:26083c40"
               opacity={0.65}
-              shape="smooth"
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time: formatNumber(value, 2),
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称
@@ -268,7 +281,13 @@ const TopChart = props => {
               position="time*value"
               color={meta.gradualColorStr}
               opacity={0.85}
-              shape="smooth"
+              tooltip={[
+                'value*time',
+                (value, time) => ({
+                  time: formatNumber(value, 2),
+                  value: formatNumber(value * 100, 2),
+                }),
+              ]}
               animate={{
                 enter: {
                   animation: 'clipIn', // 动画名称

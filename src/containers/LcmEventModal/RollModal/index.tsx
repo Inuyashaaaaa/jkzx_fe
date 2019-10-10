@@ -1,25 +1,19 @@
 import React, { PureComponent } from 'react';
-import Form from '@/containers/Form';
 import { Modal, message } from 'antd';
+import moment from 'moment';
+import Form from '@/containers/Form';
 import { LCM_EVENT_TYPE_MAP } from '@/constants/common';
 import { trdTradeLCMEventProcess } from '@/services/trade-service';
-import moment from 'moment';
+
+const DATE_FIELD = 'expirationDate';
 
 class RollModal extends PureComponent<{ visible?: boolean; data?: any }> {
-  public $rollForm: Form;
-
-  public data: any;
-
-  public tableFormData: any;
-
-  public currentUser: any;
-
-  public reload: any;
-
   public state = {
     visible: false,
     confirmLoading: false,
-    formData: {},
+    formData: {
+      [DATE_FIELD]: moment(),
+    },
   };
 
   public show = (data = {}, tableFormData, currentUser, reload) => {
@@ -40,10 +34,13 @@ class RollModal extends PureComponent<{ visible?: boolean; data?: any }> {
   };
 
   public switchConfirmLoading = () => {
-    this.setState({ confirmLoading: !this.state.confirmLoading });
+    this.setState(state => ({ confirmLoading: !state.confirmLoading }));
   };
 
   public onConfirm = async () => {
+    if (this.state.formData[DATE_FIELD] == null) {
+      return;
+    }
     this.switchConfirmLoading();
     const { error, data } = await trdTradeLCMEventProcess({
       positionId: this.data.id,
@@ -72,15 +69,25 @@ class RollModal extends PureComponent<{ visible?: boolean; data?: any }> {
     });
   };
 
+  public $rollForm: Form;
+
+  public data: any;
+
+  public tableFormData: any;
+
+  public currentUser: any;
+
+  public reload: any;
+
   public render() {
     return (
       <>
         <Modal
           onCancel={this.switchModal}
           closeable={false}
-          destroyOnClose={true}
+          destroyOnClose
           visible={this.state.visible}
-          title={'展期'}
+          title="展期"
           onOk={this.onConfirm}
           confirmLoading={this.state.confirmLoading}
         >
@@ -91,7 +98,7 @@ class RollModal extends PureComponent<{ visible?: boolean; data?: any }> {
             footer={false}
             controls={[
               {
-                field: 'expirationDate',
+                field: DATE_FIELD,
                 control: {
                   label: '到期日',
                 },

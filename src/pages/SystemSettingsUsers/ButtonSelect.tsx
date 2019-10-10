@@ -6,6 +6,7 @@ import { Select, Table2 } from '@/containers';
 const GroupSelcet = memo<any>(props => {
   const { cellApi, value: _value } = props;
   const [value, setValue] = useState(_value);
+  const [open, setOpen] = useState(true);
   const { options, mode, editing, onChange } = props;
 
   const handleOk = () => {
@@ -14,9 +15,9 @@ const GroupSelcet = memo<any>(props => {
 
   return (
     <Select
-      open={editing}
+      open={open}
       editing={editing}
-      autoSelect={true}
+      autoSelect
       options={options}
       mode={mode}
       value={value}
@@ -24,19 +25,25 @@ const GroupSelcet = memo<any>(props => {
         onChange(val);
         setValue(val);
       }}
-      dropdownRender={menu => {
-        return (
-          <>
-            {menu}
-            <Divider style={{ margin: '6px 0' }} />
-            <Row type="flex" justify="end" style={{ padding: '8px' }}>
-              <Button size="small" type="primary" onClick={handleOk}>
-                确认
-              </Button>
-            </Row>
-          </>
-        );
+      onBlur={() => {
+        setTimeout(() => {
+          setOpen(false);
+        }, 0);
       }}
+      onFocus={() => {
+        setOpen(true);
+      }}
+      dropdownRender={menu => (
+        <>
+          {menu}
+          <Divider style={{ margin: '6px 0' }} />
+          <Row type="flex" justify="end" style={{ padding: '8px' }}>
+            <Button size="small" type="primary" onClick={handleOk}>
+              确认
+            </Button>
+          </Row>
+        </>
+      )}
     />
   );
 });

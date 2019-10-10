@@ -27,7 +27,7 @@ import { OB_LIFE_PAYMENT, OB_PRICE_FIELD } from '../constants';
 import ExpirationModal from '../ExpirationModal';
 import KnockOutModal from '../KnockOutModal';
 import { getObservertionFieldData } from '../tools';
-import { countAvg, filterObDays } from '../utils';
+import { countAvg } from '../utils';
 import { NOTIONAL_AMOUNT, NUM_OF_OPTIONS, SETTLE_AMOUNT, UNDERLYER_PRICE } from './constants';
 
 class FixingModal extends PureComponent<
@@ -63,7 +63,7 @@ class FixingModal extends PureComponent<
     this.currentUser = currentUser;
     this.reload = reload;
     this.changedPrice = false;
-    const tableData = filterObDays(getObservertionFieldData(data)).map(item => ({
+    const tableData = getObservertionFieldData(data).map(item => ({
       ...item,
       [OB_PRICE_FIELD]: Form2.createField(item[OB_PRICE_FIELD]),
     }));
@@ -221,7 +221,7 @@ class FixingModal extends PureComponent<
         }),
       };
     }
-    const tableData = filterObDays(getObservertionFieldData(this.data)).map(item => ({
+    const tableData = getObservertionFieldData(this.data).map(item => ({
       ...item,
       [OB_PRICE_FIELD]: Form2.createField(item[OB_PRICE_FIELD]),
     }));
@@ -276,15 +276,17 @@ class FixingModal extends PureComponent<
         {
           title: '敲出障碍价',
           dataIndex: LEG_FIELD.UP_BARRIER,
-          render: (val, record, index) =>
-            this.state.upBarrierType === UP_BARRIER_TYPE_MAP.CNY
-              ? formatMoney(val, { unit: '¥' })
-              : `${formatMoney(val)} %`,
+          render: val => {
+            if (this.state.upBarrierType === UP_BARRIER_TYPE_MAP.CNY) {
+              return formatMoney(val, { unit: '¥' });
+            }
+            return `${formatMoney(val)} %`;
+          },
         },
         {
           title: 'Coupon障碍',
           dataIndex: LEG_FIELD.COUPON_BARRIER,
-          render: (val, record, index) => `${formatMoney(val)} %`,
+          render: val => `${formatMoney(val)} %`,
         },
         {
           title: '已观察到价格',
@@ -312,7 +314,12 @@ class FixingModal extends PureComponent<
         {
           title: '观察周期收益',
           dataIndex: OB_LIFE_PAYMENT,
-          render: (val, record, index) => formatMoney(val, { unit: '¥' }),
+          render: (val, record) => {
+            if (Form2.getFieldValue(record[OB_PRICE_FIELD]) != null) {
+              return formatMoney(val, { unit: '¥' });
+            }
+            return undefined;
+          },
         },
       ];
     }

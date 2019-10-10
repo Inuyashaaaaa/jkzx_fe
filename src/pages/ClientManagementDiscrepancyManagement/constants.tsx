@@ -82,6 +82,7 @@ export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
             showSearch
             allowClear
             fetchOptionsOnSearch
+            placeholder="请输入内容搜索"
             options={async (value: string = '') => {
               const { data, error } = await refSimilarLegalNameList({
                 similarLegalName: value,
@@ -107,6 +108,7 @@ export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
             style={{ minWidth: 180 }}
             showSearch
             allowClear
+            placeholder="请输入内容搜索"
             fetchOptionsOnSearch
             options={async (value: string = '') => {
               const { data, error } = await refMasterAgreementSearch({
@@ -127,7 +129,7 @@ export const SEARCH_FORM_CONTROLS: IFormColDef[] = [
     title: '银行账号',
     dataIndex: 'bankAccount',
     render: (value, record, index, { form }) => (
-      <FormItem>{form.getFieldDecorator({})(<Input />)}</FormItem>
+      <FormItem>{form.getFieldDecorator({})(<Input placeholder="请输入内容搜索" />)}</FormItem>
     ),
   },
   {

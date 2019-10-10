@@ -5,7 +5,7 @@ import ThemeTable from '@/containers/ThemeTable';
 import { rptClassicScenarioMarketRiskReportListByDate } from '@/services/report-service';
 
 const ClassicSceneTable = memo(props => {
-  const { valuationDate, instrumentId, classicSceneTable } = props;
+  const { classicSceneTable, reportFormData } = props;
   const [tableLoading, setTableLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
 
@@ -38,7 +38,7 @@ const ClassicSceneTable = memo(props => {
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {
-      title: titleNode('股市异常波动'),
+      title: '股市异常波动（2015/6/26）',
       dataIndex: 'STOCK_CRASH_2015',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -50,7 +50,7 @@ const ClassicSceneTable = memo(props => {
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
-      title: titleNode('2008年金融危机'),
+      title: '2008年金融危机（2008/9/16）',
       dataIndex: 'FINANCIAL_CRISIS_2008',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -59,10 +59,25 @@ const ClassicSceneTable = memo(props => {
 
   const onSearch = async () => {
     setTableLoading(true);
-    const { error, data } = await rptClassicScenarioMarketRiskReportListByDate({
-      valuationDate: valuationDate.value.format('YYYY-MM-DD'),
-      instrumentId: instrumentId.value,
-    });
+    let formData = {
+      valuationDate: reportFormData.valuationDate.format('YYYY-MM-DD'),
+      instrumentId: reportFormData.underlyer,
+      reportType: reportFormData.reportType,
+    };
+    if (reportFormData.reportType === 'PARTY') {
+      formData = {
+        ...formData,
+        partyName: reportFormData.legalName,
+      };
+    }
+    if (reportFormData.reportType === 'SUBSIDIARY') {
+      formData = {
+        ...formData,
+        subsidiary: reportFormData.subName,
+      };
+    }
+
+    const { error, data } = await rptClassicScenarioMarketRiskReportListByDate(formData);
     setTableLoading(false);
     if (error) return;
     if (!data.length) {

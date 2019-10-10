@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { FormItemProps } from 'antd/lib/form';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import FormItem from 'antd/lib/form/FormItem';
@@ -13,14 +14,16 @@ import {
   TABLE_CELL_EDITING_CHANGED,
   TABLE_KEY_DOWN,
   TABLE_STOP_ACTIVE,
+  TABLE_START_ACTIVE,
   TABLE_CELL_CLICK,
 } from '../constants/EVENT';
 import { EditableContext } from '../rows/FormRow';
 import EditingCell from './EditingCell';
 import RenderingCell from './RenderingCell';
+import { hasElement } from '@/utils';
 
 const getEditable = (editable, colDef, record, rowIndex) =>
-  (typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable);
+  typeof editable === 'function' ? editable(record, rowIndex, { colDef }) : editable;
 
 class SwitchCell extends PureComponent<
   ITableCellProps,
@@ -157,8 +160,6 @@ class SwitchCell extends PureComponent<
     if (this.isSelectionCell()) {
       return;
     }
-
-    event.stopPropagation();
     this.props.api.eventBus.emit(TABLE_CELL_CLICK, event);
     this.props.tableApi.saveBy((rowId, colId) => {
       if (rowId === this.props.rowId && colId === this.props.colDef.dataIndex) {
@@ -359,6 +360,7 @@ class SwitchCell extends PureComponent<
 
   public setAcitve = () => {
     this.props.api.eventBus.emit(TABLE_STOP_ACTIVE, this);
+    this.props.api.eventBus.emit(TABLE_START_ACTIVE, this);
     this.setState({
       active: true,
     });
