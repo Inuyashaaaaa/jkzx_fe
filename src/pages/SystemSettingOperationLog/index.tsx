@@ -4,8 +4,9 @@ import OperationLog from './OperationLog';
 import ErrorLog from './ErrorLog';
 import TabHeader from '@/containers/TabHeader';
 
-const SystemSettingOperationLog = () => {
-  const [activeTabKey, setActiveTabKey] = useState('operation');
+const SystemSettingOperationLog = props => {
+  const { query } = props.location;
+  const [activeTabKey, setActiveTabKey] = useState(query.activeKey || 'operation');
 
   const onHeaderTabChange = key => {
     setActiveTabKey(key);
