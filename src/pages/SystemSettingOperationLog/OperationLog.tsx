@@ -11,8 +11,6 @@ const PAGE_SIZE = 15;
 const OperationLog = memo(props => {
   const getInitFotrmData = () => ({
     operationDate: [moment().subtract(30, 'day'), moment()],
-    // username: '',
-    // operation: '',
   });
 
   const initPagination = {
