@@ -1,13 +1,24 @@
 import React, { memo, useState, useEffect } from 'react';
 import _ from 'lodash';
+import styled from 'styled-components';
+import moment from 'moment';
 import { Popover } from 'antd';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptClassicScenarioMarketRiskReportListByDate } from '@/services/report-service';
+
+const Title = styled.div`
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(246, 250, 255, 1);
+  line-height: 32px;
+  margin-bottom: 10px;
+`;
 
 const ClassicSceneTable = memo(props => {
   const { classicSceneTable, reportFormData } = props;
   const [tableLoading, setTableLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
+  const [reportTime, setReportTime] = useState('');
 
   const colDefsMirrior = {
     deltaCash: 'Delta Cash',
@@ -79,6 +90,11 @@ const ClassicSceneTable = memo(props => {
 
     const { error, data } = await rptClassicScenarioMarketRiskReportListByDate(formData);
     setTableLoading(false);
+
+    const createdAt = _.get(data, '[0].createdAt');
+    const reportDate = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+    setReportTime(reportDate);
+
     if (error) return;
     if (!data.length) {
       setDataSource([]);
@@ -102,6 +118,7 @@ const ClassicSceneTable = memo(props => {
 
   return (
     <div style={{ marginTop: 24 }}>
+      <Title>报告计算时间：{reportTime}</Title>
       <ThemeTable
         loading={tableLoading}
         wrapStyle={{ width: 900 }}

@@ -69,7 +69,6 @@ const Risk = props => {
 
       <ThemeTabs defaultActiveKey={defaultActiveKey} type="card" animated={false}>
         <TabPane tab="全市场估值监测" key="1">
-          <Title>全市场整体风险报告</Title>
           <BoxPanel
             date={formData.valuationDate}
             style={{ marginBottom: 18, marginTop: 18 }}

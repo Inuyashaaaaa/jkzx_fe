@@ -1,3 +1,4 @@
+import moment from 'moment';
 import formatNumber from '@/utils/format';
 
 export const columns = sorter => [

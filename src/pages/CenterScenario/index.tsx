@@ -38,6 +38,14 @@ const Title = styled.div`
   line-height: 32px;
 `;
 
+const SamllTitle = styled.div`
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(246, 250, 255, 1);
+  line-height: 32px;
+  margin-bottom: 10px;
+`;
+
 const ThemeTableWrapper = styled.div`
   margin-top: 24px;
 `;
@@ -55,6 +63,7 @@ const CenterScenario = memo(props => {
   const [tableColDefs, setTableColDefs] = useState([]);
   const [subNameOrBook, setSubNameOrBook] = useState([]);
   const [classicSceneTable, setClassicSceneTable] = useState(true);
+  const [reportTime, setReportTime] = useState('');
 
   const searchForm = useRef<Form2>(null);
   const reportForm = useRef<Form2>(null);
@@ -143,6 +152,11 @@ const CenterScenario = memo(props => {
     const { error, data } = await rptSpotScenariosReportListSearch(reportData);
     setLoading(false);
     setTableLoading(false);
+
+    const createdAt = _.get(data, '[0].createdAt');
+    const reportDate = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+    setReportTime(reportDate);
+
     if (error) return;
     if (!data.length) {
       setTableColDefs([
@@ -372,6 +386,7 @@ const CenterScenario = memo(props => {
           ];
     setSubNameOrBook(subFields);
   }, [reportFormData]);
+
   return (
     <>
       <Title>情景分析</Title>
@@ -396,6 +411,7 @@ const CenterScenario = memo(props => {
         </Col>
       </Row>
       <ThemeTableWrapper>
+        <SamllTitle>报告计算时间：{reportTime}</SamllTitle>
         <ThemeTable
           loading={tableLoading}
           wrapStyle={{ maxWidth: 1685 }}
