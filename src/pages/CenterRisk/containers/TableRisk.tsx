@@ -56,26 +56,21 @@ const TableRisk = (props: any) => {
     instrumentIdPart: '',
   };
   const { query } = props;
-  if (_.get(query, 'instrumentIdPart')) {
+  if (_.get(query, 'activeKey') === props.activeKey) {
     initFormData = {
       ...initFormData,
-      instrumentIdPart: query.instrumentIdPart,
+      bookNamePart: query.bookName,
+      instrumentIdPart: query.instrumentId,
+    };
+  }
+  if (_.get(query, 'activeKey') === props.activeKey) {
+    initFormData = {
+      ...initFormData,
+      partyNamePart: query.partyName,
+      instrumentIdPart: query.instrumentId,
     };
   }
 
-  if (_.get(query, 'bookNamePart')) {
-    initFormData = {
-      ...initFormData,
-      bookNamePart: query.bookNamePart,
-    };
-  }
-
-  if (_.get(query, 'partyNamePart')) {
-    initFormData = {
-      ...initFormData,
-      partyNamePart: query.partyNamePart,
-    };
-  }
   const [formData, setFormData] = useState(initFormData);
   const [searchFormData, setSearchFormData] = useState(formData);
   const [showScroll, setShowScroll] = useState(getShowScroll());
