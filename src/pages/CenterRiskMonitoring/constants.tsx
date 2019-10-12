@@ -1,11 +1,12 @@
 import React from 'react';
 import moment from 'moment';
+import { formatNumber } from '@/tools';
 
 export const InfectionRiskDefs = [
   {
     title: '日期',
     width: 150,
-    dataIndex: 'date',
+    dataIndex: 'statDate',
     render: value => {
       if (value) {
         return moment(value).format('YYYY-MM-DD hh-mm-ss');
@@ -16,37 +17,43 @@ export const InfectionRiskDefs = [
   {
     title: '子公司间交易家数',
     width: 150,
-    dataIndex: 'date33',
+    dataIndex: 'interCompNum',
   },
   {
     title: '子公司间成交金额',
     width: 150,
-    dataIndex: 'date1',
+    dataIndex: 'interCompTrdAmount',
+    render: val => val && formatNumber(val, 4),
   },
   {
     title: '总成交金额',
     width: 150,
-    dataIndex: 'date2',
+    dataIndex: 'compTrdAmountTotal',
+    render: val => val && formatNumber(val, 4),
   },
   {
     title: '成交占比',
     width: 150,
-    dataIndex: 'date3',
+    dataIndex: 'trdRatio',
+    render: val => val && formatNumber(val, 4),
   },
   {
     title: '子公司间持仓金额',
     width: 150,
-    dataIndex: 'date4',
+    dataIndex: 'interCompPosAmount',
+    render: val => val && formatNumber(val, 4),
   },
   {
     title: '总持仓金额',
     width: 150,
-    dataIndex: 'date5',
+    dataIndex: 'compPosAmountTotal',
+    render: val => val && formatNumber(val, 4),
   },
   {
     title: '持仓占比',
     width: 150,
-    dataIndex: 'date6',
+    dataIndex: 'posRatio',
+    render: val => val && formatNumber(val, 4),
   },
 ];
 
@@ -54,7 +61,7 @@ export const ControlRiskDefs = [
   {
     title: '日期',
     width: 150,
-    dataIndex: 'date',
+    dataIndex: 'statDate',
     render: value => {
       if (value) {
         return moment(value).format('YYYY-MM-DD hh-mm-ss');
@@ -65,16 +72,16 @@ export const ControlRiskDefs = [
   {
     title: '跨公司交易客户数',
     width: 150,
-    dataIndex: 'date33',
+    dataIndex: 'interCompCusNum',
   },
   {
     title: '跨公司成交规模',
     width: 150,
-    dataIndex: 'date1',
+    dataIndex: 'interCompTrd',
   },
   {
     title: '跨公司持仓规模',
     width: 150,
-    dataIndex: 'date2',
+    dataIndex: 'interCompPos',
   },
 ];

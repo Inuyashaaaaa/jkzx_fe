@@ -108,3 +108,171 @@ export async function getHistoricalAndNeutralVolList(params = {}) {
     },
   });
 }
+
+export async function getOtcSummaryReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_summary_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcTradeSummaryReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_trade_summary_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcPositionSummaryReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_position_summary_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcAssetToolReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_asset_tool_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcCusDistReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_cus_dist_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcSubCompanyDistReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_sub_company_dist_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcVarietyDistReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_variety_dist_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcCusTypeReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_cus_type_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcMarketDistReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_market_dist_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcEtCommodityReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_et_commodity_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcEtCusReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_et_cus_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcEtSubCompanyReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_et_sub_company_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcMarketManipulateReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_market_manipulate_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
+
+export async function getOtcCompPropagateReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_comp_propagate_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
