@@ -2,7 +2,7 @@ import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { MarketDefs } from './constants';
-import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import { getOtcEtSubCompanyReport } from '@/services/terminal';
 
 import ThemeCenterCommonTable from '@/containers/ThemeCenterCommonTable';
 
@@ -25,7 +25,8 @@ const ToolStructure = () => (
     <ThemeCenterCommonTable
       title="子公司联动统计"
       formControls={formControls}
-      fetchMethod={rptSearchPagedMarketRiskDetailReport}
+      fetchMethod={getOtcEtSubCompanyReport}
+      scrollWidth={{ x: 1000 }}
       columns={MarketDefs}
     />
   </>

@@ -2,7 +2,7 @@ import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { ControlRiskDefs } from './constants';
-import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import { getOtcMarketManipulateReport } from '@/services/terminal';
 
 import ThemeCenterCommonTable from '@/containers/ThemeCenterCommonTable';
 
@@ -25,7 +25,7 @@ const ToolStructure = () => (
     <ThemeCenterCommonTable
       title="场外衍生品市场操纵风险监测"
       formControls={formControls}
-      fetchMethod={rptSearchPagedMarketRiskDetailReport}
+      fetchMethod={getOtcMarketManipulateReport}
       columns={ControlRiskDefs}
     />
   </>

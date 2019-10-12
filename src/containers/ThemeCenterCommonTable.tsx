@@ -1,5 +1,6 @@
 import React, { memo, useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
 import { Row, Col, Divider, Button } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import moment from 'moment';
@@ -37,7 +38,7 @@ const ThemeCenterCommonTable = props => {
       date: [moment().subtract(1, 'd'), moment()],
     }),
   );
-  const [form, setForm] = useState(
+  const [searchForm, setSearchForm] = useState(
     Form2.createFields({
       date: [moment().subtract(1, 'd'), moment()],
     }),
@@ -58,13 +59,19 @@ const ThemeCenterCommonTable = props => {
     });
   };
 
-  const fetchTable = async () => {
+  const fetchTable = async (formParam, update) => {
     const res = await $form.current.validate();
     if (res.error) {
       return;
     }
     setLoading(true);
-    const { error, data } = await fetchMethod(formData);
+    const searchData = Form2.getFieldsValue(formParam);
+    const { error, data } = await fetchMethod({
+      start_date: moment(_.get(searchData, 'date[0]')).format('YYYY-MM-DD'),
+      end_date: moment(_.get(searchData, 'date[1]')).format('YYYY-MM-DD'),
+      page: pagination.current - 1,
+      page_size: pagination.pageSize,
+    });
     setLoading(false);
     if (error) {
       return;
@@ -72,15 +79,18 @@ const ThemeCenterCommonTable = props => {
     const { page, totalCount } = data;
     setDataSource(page);
     setTotal(totalCount);
+    if (update) {
+      setSearchForm(formParam);
+    }
   };
 
   const onChange = (current, pagesize) => {
     setPagination({ current, pagesize });
-    fetchTable();
+    fetchTable(searchForm);
   };
 
   useEffect(() => {
-    fetchTable();
+    fetchTable(searchForm);
   }, []);
 
   return (
@@ -113,14 +123,15 @@ const ThemeCenterCommonTable = props => {
                   columns={formControls}
                   layout="inline"
                   footer={false}
-                  onSubmitButtonClick={fetchTable}
                   submitText="查询"
                   resetable={false}
                 ></Form2>
               </FormItemWrapper>
             </Col>
             <Col>
-              <ThemeButton type="primary">确定</ThemeButton>
+              <ThemeButton type="primary" onClick={() => fetchTable(formData, true)}>
+                确定
+              </ThemeButton>
             </Col>
           </Row>
         </Col>
@@ -133,10 +144,9 @@ const ThemeCenterCommonTable = props => {
       <ThemeTableWrapper>
         <ThemeTable
           loading={loading}
-          wrapStyle={{ minWidth: 1000 }}
           dataSource={dataSource}
           columns={columns}
-          scroll={{ x: columns.length && columns.length * 150 }}
+          scroll={props.scrollWidth}
           rowkey="id"
           pagination={{
             ...pagination,

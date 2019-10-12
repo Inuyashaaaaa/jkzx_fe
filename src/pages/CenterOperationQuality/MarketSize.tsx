@@ -2,7 +2,7 @@ import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { MarketSizeDefs } from './constants';
-import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import { getOtcSummaryReport } from '@/services/terminal';
 
 import ThemeCenterCommonTable from '@/containers/ThemeCenterCommonTable';
 
@@ -25,7 +25,8 @@ const MarketSize = () => (
     <ThemeCenterCommonTable
       title="场外衍生品市场规模概况"
       formControls={formControls}
-      fetchMethod={rptSearchPagedMarketRiskDetailReport}
+      fetchMethod={getOtcSummaryReport}
+      scrollWidth={{ x: 1700 }}
       columns={MarketSizeDefs}
     />
   </>

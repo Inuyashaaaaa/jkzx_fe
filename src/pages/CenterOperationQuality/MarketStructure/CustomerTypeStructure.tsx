@@ -2,7 +2,7 @@ import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { CustomerTypeStructureDefs } from './constants';
-import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import { getOtcCusTypeReport } from '@/services/terminal';
 
 import ThemeCenterCommonTable from '@/containers/ThemeCenterCommonTable';
 
@@ -25,8 +25,9 @@ const ToolStructure = () => (
     <ThemeCenterCommonTable
       title="场外衍生品市场客户类型结构"
       formControls={formControls}
-      fetchMethod={rptSearchPagedMarketRiskDetailReport}
+      fetchMethod={getOtcCusTypeReport}
       columns={CustomerTypeStructureDefs}
+      scrollWidth={{ x: 1250 }}
     />
   </>
 );

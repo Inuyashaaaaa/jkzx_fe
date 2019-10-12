@@ -2,7 +2,7 @@ import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { VarietiesDefs } from './constants';
-import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import { getOtcEtCommodityReport } from '@/services/terminal';
 
 import ThemeCenterCommonTable from '@/containers/ThemeCenterCommonTable';
 
@@ -25,8 +25,9 @@ const ToolStructure = () => (
     <ThemeCenterCommonTable
       title="场内外品种联动统计"
       formControls={formControls}
-      fetchMethod={rptSearchPagedMarketRiskDetailReport}
+      fetchMethod={getOtcEtCommodityReport}
       columns={VarietiesDefs}
+      scrollWidth={{ x: 1200 }}
     />
   </>
 );
