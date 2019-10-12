@@ -48,10 +48,10 @@ const TableSubsidiaryWhole = (props: any) => {
   };
   const { query } = props;
 
-  if (_.get(query, 'subsidiaryPart')) {
+  if (_.get(query, 'activeKey') === props.activeKey && _.get(query, 'bookName')) {
     initFormData = {
       ...initFormData,
-      subsidiaryPart: query.subsidiaryPart,
+      subsidiaryPart: query.bookName,
     };
   }
 

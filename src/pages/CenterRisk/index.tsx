@@ -89,7 +89,11 @@ const Risk = props => {
           />
         </TabPane>
         <TabPane tab="各子公司估值监测" key="2">
-          <TableSubsidiaryWhole valuationDate={formData.valuationDate} query={query} />
+          <TableSubsidiaryWhole
+            valuationDate={formData.valuationDate}
+            activeKey="2"
+            query={query}
+          />
           <TableRisk
             title="各子公司分品种风险报告"
             style={{ marginTop: 18 }}
@@ -106,6 +110,7 @@ const Risk = props => {
             method={rptSearchPagedMarketRiskBySubUnderlyerReport}
             valuationDate={formData.valuationDate}
             query={query}
+            activeKey="2"
           />
         </TabPane>
         <TabPane tab="交易对手估值监测 " key="3">
@@ -123,6 +128,7 @@ const Risk = props => {
             method={rptSearchPagedCounterPartyMarketRiskReport}
             valuationDate={formData.valuationDate}
             query={query}
+            activeKey="3"
           />
           <TableRisk
             title="交易对手分品种风险报告"
@@ -139,6 +145,7 @@ const Risk = props => {
             method={rptSearchPagedCounterPartyMarketRiskByUnderlyerReport}
             valuationDate={formData.valuationDate}
             query={query}
+            activeKey="3"
           />
         </TabPane>
       </ThemeTabs>
