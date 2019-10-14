@@ -7,12 +7,12 @@ import Exception from '@/containers/Exception';
 const Jumping = props => {
   useEffect(() => {
     const { dispatch } = props;
-    const { token, pathname } = props.location.query || {};
+    const { token, routerName } = props.location.query || {};
     if (token) {
       dispatch({
         type: 'login/login',
         payload: {
-          defaultRedirect: pathname,
+          defaultRedirect: routerName,
           loginUrl: '/user/login',
           token,
           query: props.location.query,
