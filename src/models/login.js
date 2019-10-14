@@ -49,7 +49,7 @@ export default {
           pathname: '/jump-in',
           query: {
             ...history.location.query,
-            pathname: history.location.pathname,
+            routerName: history.location.pathname,
           },
         });
       }
@@ -152,10 +152,10 @@ export default {
       ) {
         redirect = defaultRedirect;
       }
-
+      const { routerName, ...restParams } = query;
       router.push({
         pathname: redirect,
-        query,
+        query: restParams,
       });
 
       if (!token) {
