@@ -1,5 +1,6 @@
 import React, { memo, useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import { connect } from 'dva';
 import _ from 'lodash';
 import { Row, Col, Divider, Button } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
@@ -71,6 +72,7 @@ const ThemeCenterCommonTable = props => {
       end_date: moment(_.get(searchData, 'date[1]')).format('YYYY-MM-DD'),
       page: pagination.current - 1,
       page_size: pagination.pageSize,
+      current_user: _.get(props, 'currentUser.username'),
     });
     setLoading(false);
     if (error) {
@@ -160,4 +162,6 @@ const ThemeCenterCommonTable = props => {
   );
 };
 
-export default ThemeCenterCommonTable;
+export default connect(({ user, global, setting, loading }) => ({
+  currentUser: user.currentUser,
+}))(ThemeCenterCommonTable);
