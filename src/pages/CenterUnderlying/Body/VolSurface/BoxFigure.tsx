@@ -113,7 +113,7 @@ const BoxFigure = props => {
               name="x"
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -132,7 +132,7 @@ const BoxFigure = props => {
               name="range"
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',

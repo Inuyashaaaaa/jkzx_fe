@@ -7,7 +7,7 @@ import ThemeTable from '@/containers/ThemeTable';
 import { rptClassicScenarioMarketRiskReportListByDate } from '@/services/report-service';
 
 const Title = styled.div`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   color: rgba(246, 250, 255, 1);
   line-height: 32px;
@@ -51,18 +51,21 @@ const ClassicSceneTable = memo(props => {
     {
       title: '股市异常波动（2015/6/26）',
       dataIndex: 'STOCK_CRASH_2015',
+      align: 'right',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: titleNode('贸易战'),
       dataIndex: 'TRADE_WAR_2018',
+      align: 'right',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: '2008年金融危机（2008/9/16）',
       dataIndex: 'FINANCIAL_CRISIS_2008',
+      align: 'right',
       width: 150,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
@@ -121,7 +124,6 @@ const ClassicSceneTable = memo(props => {
       <Title>报告计算时间：{reportTime}</Title>
       <ThemeTable
         loading={tableLoading}
-        wrapStyle={{ width: 900 }}
         dataSource={dataSource}
         columns={tableColDefs}
         pagination={false}

@@ -119,7 +119,7 @@ const TopChart = props => {
       <Row type="flex" justify="end" style={{ padding: 17, paddingBottom: 0 }} gutter={12}>
         <Col>
           <FormItemWrapper>
-            <FormItem label="期限">
+            <FormItem label="期限" style={{ fontSize: 16 }}>
               <ThemeSelect
                 value={window}
                 onChange={val => {
@@ -167,7 +167,7 @@ const TopChart = props => {
                 offset: 0,
                 position: 'end',
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -176,7 +176,7 @@ const TopChart = props => {
               }}
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -200,17 +200,17 @@ const TopChart = props => {
               line={null}
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
                 },
               }}
               title={{
-                offset: -20,
+                offset: -30,
                 position: 'end',
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -227,8 +227,6 @@ const TopChart = props => {
               }}
             />
             <Tooltip
-              shared={false}
-              position="value"
               crosshairs={{
                 type: 'y',
                 style: {

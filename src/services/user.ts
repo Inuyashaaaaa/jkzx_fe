@@ -33,12 +33,12 @@ export async function login(params) {
   }).then(result => {
     const { data } = result;
 
-    if (data.error) {
+    if (result.error) {
       // 验证码错误
       return {
         error: true,
         data: {
-          message: _.get(data, 'error.message'),
+          message: _.get(result, 'error.message'),
           captcha: true,
         },
       };

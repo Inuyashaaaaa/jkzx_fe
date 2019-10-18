@@ -25,9 +25,11 @@ const ThemeSelectWrap = styled.div`
   .ant-select-selection__placeholder {
     font-weight: 400;
     color: #7890a8;
+    font-size: 16px;
   }
   .ant-select-selection-selected-value {
     color: #00e8e8;
+    font-size: 16px;
   }
   .ant-select-search__field {
     color: #ffffff;

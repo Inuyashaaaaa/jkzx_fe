@@ -12,6 +12,7 @@ const ThemeInputWrap = styled.div`
     background: rgba(27, 38, 80, 1);
     border-radius: 3px;
     color: #00e8e8;
+    font-size: 16px;
     &:hover {
       border-color: #01c7d1;
     }

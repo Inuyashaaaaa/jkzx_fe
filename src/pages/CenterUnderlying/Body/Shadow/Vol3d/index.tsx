@@ -196,7 +196,7 @@ const Vol = props => {
           type: 'value',
           name: `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)' : '行权价(%)'}`,
           nameTextStyle: {
-            fontSize: 13,
+            fontSize: 14,
             lineHeight: 40,
           },
           axisLabel: {
@@ -206,6 +206,7 @@ const Vol = props => {
               }
               return formatNumber(param * 100, 0);
             },
+            fontSize: 14,
           },
           axisPointer: {
             label: {
@@ -222,7 +223,7 @@ const Vol = props => {
           type: 'value',
           name: '期限',
           nameTextStyle: {
-            fontSize: 13,
+            fontSize: 14,
             lineHeight: 40,
           },
           axisPointer: {
@@ -230,16 +231,20 @@ const Vol = props => {
               formatter: param => formatNumber(_.toNumber(param), 2),
             },
           },
+          axisLabel: {
+            fontSize: 14,
+          },
         },
         zAxis3D: {
           type: 'value',
           name: '波动率(%)',
           nameTextStyle: {
-            fontSize: 13,
+            fontSize: 14,
             lineHeight: 40,
           },
           axisLabel: {
             formatter: param => formatNumber(param * 100, 0),
+            fontSize: 14,
           },
           axisPointer: {
             label: {
@@ -350,7 +355,7 @@ const Vol = props => {
       <Row type="flex" justify="start" align="middle" gutter={12} style={{ padding: 17 }}>
         <Col>
           <FormItemWrapper>
-            <FormItem label="日期">
+            <FormItem label="日期" style={{ fontSize: 16 }}>
               <ThemeDatePicker
                 onChange={pDate => setValuationDate(pDate)}
                 value={valuationDate}
@@ -361,7 +366,7 @@ const Vol = props => {
         </Col>
         <Col>
           <FormItemWrapper>
-            <FormItem label="行权价类型">
+            <FormItem label="行权价类型" style={{ fontSize: 16 }}>
               <ThemeSelect
                 onChange={val => {
                   setStrikeTypeData(val);

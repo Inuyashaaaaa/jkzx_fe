@@ -50,6 +50,7 @@ const ThemeMenuWrap = styled.div`
   .ant-menu-inline .ant-menu-item,
   .ant-menu-inline .ant-menu-submenu-title {
     width: 100%;
+    font-size: 18px;
   }
   .ant-menu-submenu-vertical > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::after,
   .ant-menu-submenu-vertical-left > .ant-menu-submenu-title:hover .ant-menu-submenu-arrow::after,

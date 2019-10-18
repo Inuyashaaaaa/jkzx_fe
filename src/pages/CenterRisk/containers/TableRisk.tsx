@@ -10,10 +10,11 @@ import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './Unit';
 
 const Title = styled.div`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   color: rgba(246, 250, 255, 1);
   line-height: 32px;
+  margin-top: 20px;
 `;
 
 const ORDER_BY = {
@@ -200,7 +201,7 @@ const TableRisk = (props: any) => {
                 searchFormData: searchParams(valuationDate, searchFormData),
               },
               cols: columns,
-              name: '风险报告',
+              name: title,
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
                 if (dataIndex !== dataValue && rowIndex > 0) {
@@ -237,6 +238,7 @@ const TableRisk = (props: any) => {
             }
           }}
           columns={columns}
+          bordered
         />
         <UnitWrap>
           <Unit hookTopRight></Unit>
