@@ -37,7 +37,7 @@ const Header = props => {
     <Row>
       <Col>
         <FormItemWrapper>
-          <FormItem label="标的物">
+          <FormItem label="标的物" style={{ fontSize: 16 }}>
             {activeKey === '3' ? (
               <ThemeSelect
                 onChange={val =>

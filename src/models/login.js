@@ -67,7 +67,7 @@ export default {
           rootRouteTag = 'appRoute',
           skipPermission = false,
           token,
-          query,
+          query = {},
         },
       },
       { call, put, select },

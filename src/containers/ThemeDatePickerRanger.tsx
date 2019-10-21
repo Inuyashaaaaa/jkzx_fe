@@ -12,6 +12,7 @@ const ThemeDatePickerRangerWrap = styled.div`
     border: 1px solid #05507b;
     background: transparent;
     border-radius: 3px;
+    font-size: 16px;
   }
   .ant-calendar-range-picker-separator {
     color: #00e8e8;

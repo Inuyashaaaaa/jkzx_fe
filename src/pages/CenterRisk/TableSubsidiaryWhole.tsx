@@ -12,7 +12,7 @@ import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './containers/Unit';
 
 const Title = styled.div`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   color: rgba(246, 250, 255, 1);
   line-height: 32px;

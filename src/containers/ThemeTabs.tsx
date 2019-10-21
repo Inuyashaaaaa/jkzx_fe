@@ -9,13 +9,14 @@ const ThemeTabsWrap = styled.div`
     border: none;
   }
   .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab {
-    width: 150px;
+    width: 190px;
     height: 32px;
     line-height: 32px;
     color: rgba(246, 250, 255, 1);
     background: rgba(4, 83, 126, 1);
     border-color: rgba(4, 83, 126, 1);
     text-align: center;
+    font-size: 19px;
   }
   .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active {
     background: rgba(4, 119, 152, 1);

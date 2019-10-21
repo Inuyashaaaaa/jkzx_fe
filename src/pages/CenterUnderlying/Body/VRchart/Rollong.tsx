@@ -89,7 +89,7 @@ const Rollong = props => {
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
         <Col style={{ borderRight: '1px solid #05507b' }}>
           <FormItemWrapper>
-            <FormItem label="日期">
+            <FormItem label="日期" style={{ fontSize: 16 }}>
               <ThemeDatePickerRanger
                 onChange={pDates => setDates(pDates)}
                 value={dates}
@@ -100,7 +100,7 @@ const Rollong = props => {
         </Col>
         <Col>
           <FormItemWrapper>
-            <FormItem label="窗口">
+            <FormItem label="窗口" style={{ fontSize: 16 }}>
               <ThemeSelect
                 value={window}
                 onChange={val => setWindow(val)}
@@ -145,6 +145,7 @@ const Rollong = props => {
                 alias: '日期',
                 mask: 'YYYY/MM/DD',
                 range: [0, 0.95],
+                fontSize: 16,
               },
               value: {
                 alias: '波动率(%)',
@@ -162,7 +163,7 @@ const Rollong = props => {
                 offset: 0,
                 position: 'end',
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -171,7 +172,7 @@ const Rollong = props => {
               }}
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -190,17 +191,17 @@ const Rollong = props => {
               line={null}
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
                 },
               }}
               title={{
-                offset: -20,
+                offset: -30,
                 position: 'end',
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -217,8 +218,6 @@ const Rollong = props => {
               }}
             />
             <Tooltip
-              shared={false}
-              position="value"
               crosshairs={{
                 type: 'y',
                 style: {

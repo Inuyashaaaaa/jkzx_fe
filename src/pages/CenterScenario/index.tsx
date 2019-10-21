@@ -25,6 +25,7 @@ import ClassicSceneTable from './ ClassicSceneTable';
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
     color: #f5faff;
+    font-size: 16px;
   }
   .ant-row.ant-form-item {
     margin-bottom: 0;
@@ -39,7 +40,7 @@ const Title = styled.div`
 `;
 
 const SamllTitle = styled.div`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   color: rgba(246, 250, 255, 1);
   line-height: 32px;
@@ -64,6 +65,7 @@ const CenterScenario = memo(props => {
   const [subNameOrBook, setSubNameOrBook] = useState([]);
   const [classicSceneTable, setClassicSceneTable] = useState(true);
   const [reportTime, setReportTime] = useState('');
+  const width = 170;
 
   const searchForm = useRef<Form2>(null);
   const reportForm = useRef<Form2>(null);
@@ -163,12 +165,14 @@ const CenterScenario = memo(props => {
         {
           title: '标的物情景分析',
           dataIndex: 'greekLatter',
+          width,
           onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
         },
         ...col.map(item => {
           return {
             title: `scenario_${item}%`,
             dataIndex: `scenario_${item}%`,
+            width,
             onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
           };
         }),
@@ -205,6 +209,7 @@ const CenterScenario = memo(props => {
       {
         title: '标的物情景分析',
         dataIndex: 'greekLatter',
+        width,
         onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
       },
       ...colDef,
@@ -311,10 +316,11 @@ const CenterScenario = memo(props => {
     setTableColDefs([
       {
         title: '标的物情景分析',
+        width,
         dataIndex: 'greekLatter',
       },
       ...col.map(item => {
-        return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%` };
+        return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%`, width };
       }),
     ]);
     onSearch();
@@ -387,6 +393,8 @@ const CenterScenario = memo(props => {
     setSubNameOrBook(subFields);
   }, [reportFormData]);
 
+  console.log(tableColDefs);
+
   return (
     <>
       <Title>情景分析</Title>
@@ -414,10 +422,9 @@ const CenterScenario = memo(props => {
         <SamllTitle>报告计算时间：{reportTime}</SamllTitle>
         <ThemeTable
           loading={tableLoading}
-          wrapStyle={{ maxWidth: 1685 }}
           dataSource={dataSource}
           columns={tableColDefs}
-          scroll={{ x: tableColDefs.length && tableColDefs.length * 150 }}
+          scroll={{ x: tableColDefs.length && tableColDefs.length * width }}
           pagination={false}
           rowkey="greekLatter"
         ></ThemeTable>

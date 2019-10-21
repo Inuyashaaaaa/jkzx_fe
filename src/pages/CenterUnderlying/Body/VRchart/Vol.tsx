@@ -140,7 +140,7 @@ const Vol = props => {
       <Row type="flex" justify="start" style={{ padding: 17 }} gutter={12}>
         <Col>
           <FormItemWrapper>
-            <FormItem label="日期" style={{ display: 'flex' }}>
+            <FormItem label="日期" style={{ display: 'flex', fontSize: 16 }}>
               <ThemeDatePickerRanger
                 onChange={pDates => setDates(pDates)}
                 value={dates}
@@ -168,7 +168,8 @@ const Vol = props => {
           <Chart
             animate
             forceFit
-            height={630}
+            height={610}
+            // padding={[40, 20, 60, 40]}
             padding={[80, 20, 40, 40]}
             width={800}
             data={meta.dv}
@@ -199,7 +200,7 @@ const Vol = props => {
                 offset: 0,
                 position: 'end',
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -208,7 +209,7 @@ const Vol = props => {
               }}
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -227,17 +228,17 @@ const Vol = props => {
               line={null}
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
                 },
               }}
               title={{
-                offset: -20,
+                offset: -30,
                 position: 'end',
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -307,6 +308,9 @@ const Vol = props => {
               offsetX={-3}
               itemFormatter={val => lengedMap[val]}
               clickable={false}
+              textStyle={{
+                fontSize: '14',
+              }}
             />
           </Chart>
         ) : (
