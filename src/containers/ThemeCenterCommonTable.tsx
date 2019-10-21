@@ -73,7 +73,7 @@ const ThemeCenterCommonTable = props => {
       end_date: moment(_.get(searchData, 'date[1]')).format('YYYY-MM-DD'),
       page: pagination.current - 1,
       page_size: pagination.pageSize,
-      current_user: _.get(props, 'user.currentUser.username'),
+      current_user: _.get(props, 'currentUser.username'),
     });
     setLoading(false);
     if (error) {
@@ -178,8 +178,6 @@ const ThemeCenterCommonTable = props => {
   );
 };
 
-export default memo(
-  connect(({ user }) => ({
-    user,
-  }))(ThemeCenterCommonTable),
-);
+export default connect(({ user, global, setting, loading }) => ({
+  currentUser: user.currentUser,
+}))(ThemeCenterCommonTable);
