@@ -44,26 +44,45 @@ export default [
     component: '../layouts/Center/index',
     routes: [
       {
+        path: '/center/welcome-page',
+        name: 'welcomeCenterPage',
+        component: './WelcomeCenterPage',
+        hideInMenu: true,
+      },
+      {
         path: '/center/underlying',
         component: './CenterUnderlying',
+        name: 'centerUnderlying',
+        icon: 'line-chart',
       },
       {
         path: '/center/risk',
         component: './CenterRisk',
+        name: 'centerRisk',
+        icon: 'reconciliation',
       },
       {
         path: '/center/scenario',
         component: './CenterScenario',
+        name: 'centerScenario',
+        icon: 'file-search',
       },
       {
-        path: '/center/operation-quality',
-        name: 'centerOperationQuality',
-        component: './CenterOperationQuality',
-      },
-      {
-        path: '/center/risk-monitoring',
-        name: 'centerRiskMonitoring',
-        component: './CenterRiskMonitoring',
+        path: '/center/market',
+        name: 'market',
+        icon: 'pie-chart',
+        routes: [
+          {
+            path: '/center/market/operation-quality',
+            name: 'centerOperationQuality',
+            component: './CenterOperationQuality/index',
+          },
+          {
+            path: '/center/market/risk-monitoring',
+            name: 'centerRiskMonitoring',
+            component: './CenterRiskMonitoring/index',
+          },
+        ],
       },
     ],
   },

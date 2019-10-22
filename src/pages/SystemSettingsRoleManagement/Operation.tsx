@@ -1,13 +1,13 @@
-import PopconfirmButton from '@/containers/PopconfirmButton';
+import { Button, Col, Drawer, message, Row, Tree, Divider, Modal } from 'antd';
+import _ from 'lodash';
+import React, { PureComponent } from 'react';
 import {
   authPagePermissionGetByRoleId,
   deleteRole,
   updateRolePagePermissions,
   updateRole,
 } from '@/services/role';
-import { Button, Col, Drawer, message, Row, Tree, Divider, Modal } from 'antd';
-import _ from 'lodash';
-import React, { PureComponent } from 'react';
+import PopconfirmButton from '@/containers/PopconfirmButton';
 import { treeData, FORM_CONTROL } from './constants';
 import { Form2 } from '@/containers';
 
@@ -22,6 +22,8 @@ const fatherTreeNode = [
   'riskManager',
   'approvalProcess',
   'systemSettings',
+  'center',
+  'market',
 ];
 
 class Operation extends PureComponent<{ data: any; fetchTable: any; showResource: any }> {
@@ -29,17 +31,11 @@ class Operation extends PureComponent<{ data: any; fetchTable: any; showResource
 
   public state = {
     visible: false,
-    selectedKeys: [],
     checkedKeys: [],
-    displayResources: false,
     formVisible: false,
     formData: {},
     confirmLoading: false,
   };
-
-  constructor(props) {
-    super(props);
-  }
 
   public componentDidMount = () => {
     this.setState({
@@ -61,12 +57,13 @@ class Operation extends PureComponent<{ data: any; fetchTable: any; showResource
       message.error('页面权限获取失败');
       return;
     }
-    const checkedKey = data.map(item => {
-      return _.toPairs(this.props.data.newPageMap).filter(items => items[1] === item)[0][0];
-    });
-    const checkedKeys = checkedKey.filter(item => {
-      return !fatherTreeNode.find(items => item === items);
-    });
+    console.log(this.props.data.newPageMap);
+    const checkedKey = data.map(
+      item => _.toPairs(this.props.data.newPageMap).filter(items => items[1] === item)[0][0],
+    );
+    console.log(fatherTreeNode);
+    const checkedKeys = checkedKey.filter(item => !fatherTreeNode.find(items => item === items));
+    console.log(checkedKeys);
     this.setState({
       visible: true,
       checkedKeys,
@@ -127,12 +124,12 @@ class Operation extends PureComponent<{ data: any; fetchTable: any; showResource
     }
     message.success('删除成功');
     this.props.fetchTable();
-    return;
   };
 
   public showModal = () => {
+    const { formVisible } = this.state;
     this.setState({
-      formVisible: !this.state.formVisible,
+      formVisible: !formVisible,
     });
   };
 
@@ -200,7 +197,7 @@ class Operation extends PureComponent<{ data: any; fetchTable: any; showResource
           }
         >
           <Tree
-            checkable={true}
+            checkable
             onCheck={this.onCheck}
             defaultCheckedKeys={this.state.checkedKeys}
             checkedKeys={this.state.checkedKeys}
@@ -234,7 +231,9 @@ class Operation extends PureComponent<{ data: any; fetchTable: any; showResource
           confirmLoading={this.state.confirmLoading}
         >
           <Form2
-            ref={node => (this.$form = node)}
+            ref={node => {
+              this.$form = node;
+            }}
             dataSource={this.state.formData}
             columns={FORM_CONTROL}
             footer={false}

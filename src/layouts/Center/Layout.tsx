@@ -13,7 +13,7 @@ const Layout = props => {
       type: 'user/replenish',
       payload: {
         loginUrl: '/center/login',
-        skipMenu: true,
+        skipMenu: false,
       },
     });
   }, []);

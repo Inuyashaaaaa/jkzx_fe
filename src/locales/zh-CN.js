@@ -89,6 +89,13 @@ export default {
   'menu.reports.fundsDetailedStatements': '资金明细报表',
   'menu.reports.customerFundsSummaryStatements': '客户资金汇总报表',
   'menu.reports.reportsCustomManagement': '自定义报告管理',
+  'menu.welcomeCenterPage': '欢迎页面',
+  'menu.centerUnderlying': '场外期权估值',
+  'menu.centerRisk': '主体估值监测',
+  'menu.centerScenario': '情景分析测试',
+  'menu.market': '市场统计监测',
+  'menu.market.centerOperationQuality': '市场运行质量',
+  'menu.market.centerRiskMonitoring': '风险监测',
   'menu.userInfo': '个人中心',
   // pro lang
   'navBar.lang': '语言',
