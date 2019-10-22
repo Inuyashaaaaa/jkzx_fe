@@ -393,6 +393,8 @@ const CenterScenario = memo(props => {
     setSubNameOrBook(subFields);
   }, [reportFormData]);
 
+  console.log(tableColDefs);
+
   return (
     <>
       <Title>情景分析</Title>
