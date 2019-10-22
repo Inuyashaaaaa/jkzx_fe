@@ -125,7 +125,7 @@ class GlobalHeaderRight extends PureComponent {
         <Button
           type="primary"
           onClick={() => {
-            router.push('/center/underlying');
+            router.push('/center/welcome-page');
           }}
         >
           进入监控中心系统

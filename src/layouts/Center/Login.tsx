@@ -72,7 +72,7 @@ const UserLayout = props => {
       type: 'login/login',
       payload: {
         loginParams: values,
-        skipMenu: true,
+        skipMenu: false,
         defaultRedirect: '/center/underlying',
         loginUrl: '/center/login',
         rootRouteTag: 'centerRoute',

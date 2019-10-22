@@ -15,8 +15,7 @@ const AdminWrap = styled.div`
     cursor: pointer;
   }
   p {
-    font-size: 14px;
-    font-family: PingFang-SC-Bold;
+    font-size: 18px;
     font-weight: bold;
     color: rgba(197, 212, 231, 1);
     line-height: 32px;

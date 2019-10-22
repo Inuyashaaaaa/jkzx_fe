@@ -5,13 +5,13 @@ export const columns = sorter => [
   {
     title: '标的物合约',
     dataIndex: 'underlyerInstrumentId',
-    width: 100,
+    width: 135,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: 'Delta',
     dataIndex: 'delta',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'delta' && sorter.order,
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
@@ -21,7 +21,7 @@ export const columns = sorter => [
   {
     title: 'Delta_Cash',
     dataIndex: 'deltaCash',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'deltaCash' && sorter.order,
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
@@ -31,7 +31,7 @@ export const columns = sorter => [
   {
     title: 'Gamma',
     dataIndex: 'gamma',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'gamma' && sorter.order,
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
@@ -41,7 +41,7 @@ export const columns = sorter => [
   {
     title: 'Gamma_Cash',
     dataIndex: 'gammaCash',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'gammaCash' && sorter.order,
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
@@ -51,7 +51,7 @@ export const columns = sorter => [
   {
     title: 'Vega',
     dataIndex: 'vega',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'vega' && sorter.order,
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
@@ -61,7 +61,7 @@ export const columns = sorter => [
   {
     title: 'Theta',
     dataIndex: 'theta',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'theta' && sorter.order,
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),
@@ -71,7 +71,7 @@ export const columns = sorter => [
   {
     title: 'Rho',
     dataIndex: 'rho',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'rho' && sorter.order,
     sorter: true,
     render: value => formatNumber({ value, formatter: '0,0.00' }),

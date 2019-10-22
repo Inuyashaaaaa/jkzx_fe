@@ -10,9 +10,10 @@ import ThemeButton from '@/containers/ThemeButton';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
+import DownloadExcelButton from '@/containers/DownloadExcelButton';
 
 const Title = styled.div`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   color: rgba(246, 250, 255, 1);
   line-height: 32px;
@@ -28,7 +29,7 @@ const FormItemWrapper = styled.div`
 `;
 
 const ThemeTableWrapper = styled.div`
-  margin-top: 24px;
+  margin-bottom: 25px;
 `;
 
 const ThemeCenterCommonTable = props => {
@@ -103,16 +104,10 @@ const ThemeCenterCommonTable = props => {
         justify="space-between"
         align="middle"
         gutter={12}
-        style={{ marginTop: 18, marginBottom: 13 }}
+        style={{ marginRight: -4, marginLeft: -6 }}
       >
-        <Col>
-          <Row
-            type="flex"
-            justify="start"
-            align="middle"
-            gutter={12}
-            style={{ marginTop: 18, marginBottom: 13 }}
-          >
+        <Col style={{ marginTop: 18, marginBottom: 13 }}>
+          <Row type="flex" justify="start" align="middle" ß gutter={12}>
             <Col>
               <FormItemWrapper>
                 <Form2
@@ -138,9 +133,30 @@ const ThemeCenterCommonTable = props => {
           </Row>
         </Col>
         <Col>
-          <Button style={{ margin: '10px 0' }} type="primary">
+          <DownloadExcelButton
+            component={ThemeButton}
+            type="primary"
+            data={{
+              searchMethod: fetchMethod,
+              argument: {
+                searchFormData: {},
+              },
+              cols: columns,
+              name: title,
+              colSwitch: [],
+              getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+                if (dataIndex !== 'statDate' && rowIndex > 0) {
+                  return {
+                    t: 'n',
+                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                  };
+                }
+                return null;
+              },
+            }}
+          >
             导出
-          </Button>
+          </DownloadExcelButton>
         </Col>
       </Row>
       <ThemeTableWrapper>

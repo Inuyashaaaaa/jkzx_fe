@@ -6,6 +6,7 @@ const ThemeButtonWrap = styled.div`
   .ant-btn {
     border-radius: 3px;
     background: #1594d0;
+    font-size: 16px;
   }
 `;
 

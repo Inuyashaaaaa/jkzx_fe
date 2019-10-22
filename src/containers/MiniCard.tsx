@@ -8,8 +8,8 @@ const MiniCardWrap = styled.div<{ active?: boolean }>`
   flex-direction: column;
   align-content: center;
   justify-content: space-around;
-  width: 150px;
-  height: 80px;
+  width: 215px;
+  height: 140px;
   padding: 0 10px 5px 10px;
   color: #fff;
   border: 1px solid #01c7d1;
@@ -39,7 +39,7 @@ const MiniCard = memo(props => {
   return (
     <MiniCardWrap active={active} onClick={onClick}>
       <Row type="flex" justify="center">
-        <Col>{title}</Col>
+        <Col style={{ fontSize: 20 }}>{title}</Col>
       </Row>
       <Row type="flex" justify="center" gutter={20} style={{ position: 'relative' }}>
         {imageUrls.length && imageUrls.length === 2 && (

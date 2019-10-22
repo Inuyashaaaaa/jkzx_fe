@@ -52,10 +52,13 @@ export default {
         type: 'saveUserData',
         payload: userInfo,
       });
-
       if (skipMenu) return;
       yield put({
         type: 'menu/initMenu',
+        payload: userInfo,
+      });
+      yield put({
+        type: 'menu/initCenterMenu',
         payload: userInfo,
       });
     },

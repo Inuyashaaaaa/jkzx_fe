@@ -11,13 +11,13 @@ const ThemeStatisticWrap = styled.div`
   }
   .ant-statistic-content {
     line-height: 1;
-    font-size: 18px;
+    font-size: 16px;
   }
   .ant-statistic-title {
     margin-bottom: 2px;
   }
   .ant-statistic-content-value-int {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: rgba(255, 120, 42, 1);
   }

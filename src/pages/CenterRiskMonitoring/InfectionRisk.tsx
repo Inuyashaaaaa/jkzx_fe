@@ -1,21 +1,30 @@
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
+import styled from 'styled-components';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { InfectionRiskDefs } from './constants';
 import { getOtcCompPropagateReport } from '@/services/terminal';
 
 import ThemeCenterCommonTable from '@/containers/ThemeCenterCommonTable';
 
+const ThemeFormItemWrap = styled.div`
+  label {
+    font-size: 16px;
+  }
+`;
+
 const formControls = [
   {
     title: '日期范围',
     dataIndex: 'date',
     render: (val, record, index, { form }) => (
-      <FormItem>
-        {form.getFieldDecorator({ rules: [{ required: true, message: '日期范围必填' }] })(
-          <ThemeDatePickerRanger allowClear={false}></ThemeDatePickerRanger>,
-        )}
-      </FormItem>
+      <ThemeFormItemWrap>
+        <FormItem>
+          {form.getFieldDecorator({ rules: [{ required: true, message: '日期范围必填' }] })(
+            <ThemeDatePickerRanger allowClear={false}></ThemeDatePickerRanger>,
+          )}
+        </FormItem>
+      </ThemeFormItemWrap>
     ),
   },
 ];
@@ -27,7 +36,7 @@ const ToolStructure = () => (
       formControls={formControls}
       fetchMethod={getOtcCompPropagateReport}
       columns={InfectionRiskDefs}
-      scrollWidth={{ x: 1250 }}
+      scrollWidth={{ x: 1600 }}
     />
   </>
 );

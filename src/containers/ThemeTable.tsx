@@ -9,7 +9,7 @@ const ThemeTableWrap = styled.div`
   .ant-table-thead > tr > th {
     background: #00e8e833;
     color: rgba(246, 250, 255, 1);
-    border: none;
+    border: 1px solid rgba(0, 232, 232, 0.5);
     &.ant-table-column-sort {
       background: rgba(0, 232, 232, 0.1);
     }
@@ -21,7 +21,7 @@ const ThemeTableWrap = styled.div`
     background: rgba(0, 232, 232, 0.06);
   }
   .ant-table-tbody > tr > td {
-    border: none;
+    border: 1px solid rgba(0, 232, 232, 0.5);
   }
   .anticon {
     color: rgba(0, 232, 232, 0.6);
@@ -36,9 +36,6 @@ const ThemeTableWrap = styled.div`
   .ant-pagination-simple-pager {
     color: rgba(246, 250, 255, 1);
   }
-  .ant-table {
-    border: 1px solid rgba(0, 232, 232, 0.5);
-  }
   .ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row) > td,
   .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row) > td,
   .ant-table-thead > tr:hover:not(.ant-table-expanded-row) > td,
@@ -49,15 +46,25 @@ const ThemeTableWrap = styled.div`
   .ant-table-tbody > tr > td {
     padding: 12px;
   }
+  .ant-table-tbody > tr > td {
+    font-size: 20px;
+  }
+  .ant-table-thead > tr > th {
+    font-size: 20px;
+  }
 
   .ant-pagination-prev .ant-pagination-item-link,
   .ant-pagination-next .ant-pagination-item-link {
     background: transparent;
   }
+  .ant-table-bordered.ant-table-empty .ant-table-placeholder {
+    border-color: rgba(0, 232, 232, 0.5);
+  }
   .ant-table-placeholder {
     background: transparent;
-    border: none;
     color: rgba(246, 250, 255, 1);
+    border: 1px solid rgba(0, 232, 232, 0.5);
+    font-size: 16px;
   }
 
   .ant-table-thead > tr > th.ant-table-column-has-actions.ant-table-column-has-sorters:hover {

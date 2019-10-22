@@ -25,6 +25,7 @@ import styles from './index.less';
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
     color: #f5faff;
+    font-size: 16px;
   }
   .ant-row.ant-form-item {
     margin-bottom: 0;
@@ -122,7 +123,7 @@ const ImpliedVolatility = props => {
       title: '观察日期',
       dataIndex: 'valuationDate',
       render: (val, record, index, { form }) => (
-        <FormItem>
+        <FormItem style={{ fontSize: 16 }} className={styles.FormItem}>
           {form.getFieldDecorator({
             rules: [
               {
@@ -138,7 +139,7 @@ const ImpliedVolatility = props => {
       title: '窗口',
       dataIndex: 'window',
       render: (val, record, index, { form }) => (
-        <FormItem>
+        <FormItem style={{ fontSize: 16 }}>
           {form.getFieldDecorator({
             rules: [
               {
@@ -232,7 +233,7 @@ const ImpliedVolatility = props => {
                 position: 'end',
                 offset: 0,
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -240,7 +241,7 @@ const ImpliedVolatility = props => {
               }}
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -258,7 +259,7 @@ const ImpliedVolatility = props => {
               name="vol"
               label={{
                 textStyle: {
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
@@ -269,7 +270,7 @@ const ImpliedVolatility = props => {
                 offset: -20,
                 textStyle: {
                   rotate: 0,
-                  fontSize: '12',
+                  fontSize: '14',
                   fontWeight: '400',
                   opacity: '0.6',
                   fill: '#F6FAFF',
