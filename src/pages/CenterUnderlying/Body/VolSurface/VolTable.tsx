@@ -48,37 +48,37 @@ const VolTable = props => {
     {
       title: '最小值',
       dataIndex: 'min',
-      width: 100,
+      width: 190,
       render: value => <GradientBox value={value} max={max} />,
     },
     {
       title: '最大值',
       dataIndex: 'max',
-      width: 100,
+      width: 190,
       render: value => <GradientBox value={value} max={max} />,
     },
     {
       title: '平均值',
       dataIndex: 'average',
-      width: 100,
+      width: 190,
       render: value => <GradientBox value={value} max={max} />,
     },
     {
       title: '中位数',
       dataIndex: 'median',
-      width: 100,
+      width: 190,
       render: value => <GradientBox value={value} max={max} />,
     },
     {
-      title: '上四分位数：',
+      title: '上四分位数',
       dataIndex: 'q3',
-      width: 100,
+      width: 190,
       render: value => <GradientBox value={value} max={max} />,
     },
     {
-      title: '下四分位数：',
+      title: '下四分位数',
       dataIndex: 'q1',
-      width: 100,
+      width: 190,
       render: value => <GradientBox value={value} max={max} />,
     },
   ];
@@ -95,6 +95,7 @@ const VolTable = props => {
         setPagination(ppagination);
       }}
       columns={columns}
+      scroll={{ x: 1240 }}
     />
   );
 };
