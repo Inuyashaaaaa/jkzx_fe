@@ -18,20 +18,18 @@ const Header = props => {
     });
     if (error) return;
     setInstrumentIdArr(data.sort());
+
+    dispatch({
+      type: 'centerUnderlying/setState',
+      payload: {
+        instrumentId: _.get(data.sort(), '[0]'),
+      },
+    });
   };
 
   useEffect(() => {
     fetchArray();
   }, []);
-
-  useEffect(() => {
-    dispatch({
-      type: 'centerUnderlying/setState',
-      payload: {
-        instrumentId: _.get(instrumentIdArr, '[0]'),
-      },
-    });
-  }, [instrumentIdArr]);
 
   return (
     <Row>

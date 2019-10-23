@@ -64,7 +64,9 @@ const Box = props => {
   };
 
   useEffect(() => {
-    fetch();
+    if (props.instrumentId) {
+      fetch();
+    }
   }, [props.instrumentId]);
 
   return (
