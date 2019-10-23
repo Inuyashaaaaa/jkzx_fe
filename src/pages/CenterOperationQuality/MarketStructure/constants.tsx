@@ -5,11 +5,11 @@ import { formatNumber } from '@/tools';
 export const KnockdownStructureDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },
@@ -98,11 +98,11 @@ export const KnockdownStructureDefs = [
 export const PositionStructureDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },
@@ -210,11 +210,11 @@ export const PositionStructureDefs = [
 export const ToolStructureDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },
@@ -265,11 +265,11 @@ export const ToolStructureDefs = [
 export const CustomerTypeStructureDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },

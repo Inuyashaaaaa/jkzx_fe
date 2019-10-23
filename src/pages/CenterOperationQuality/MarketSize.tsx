@@ -35,7 +35,7 @@ const MarketSize = () => (
       title="场外衍生品市场规模概况"
       formControls={formControls}
       fetchMethod={getOtcSummaryReport}
-      scrollWidth={{ x: 1730 }}
+      scrollWidth={{ x: 1780 }}
       columns={MarketSizeDefs}
     />
   </>

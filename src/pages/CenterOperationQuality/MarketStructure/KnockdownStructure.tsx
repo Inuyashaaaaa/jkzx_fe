@@ -36,7 +36,7 @@ const ToolStructure = () => (
       formControls={formControls}
       fetchMethod={getOtcTradeSummaryReport}
       columns={KnockdownStructureDefs}
-      scrollWidth={{ x: 2650 }}
+      scrollWidth={{ x: 2700 }}
     />
   </>
 );

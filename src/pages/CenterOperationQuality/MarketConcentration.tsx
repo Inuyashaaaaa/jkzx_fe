@@ -36,7 +36,7 @@ const MarketConcentration = () => (
       formControls={formControls}
       fetchMethod={getOtcMarketDistReport}
       columns={MarketConcentrationDefs}
-      scrollWidth={{ x: 1700 }}
+      scrollWidth={{ x: 1750 }}
     />
   </>
 );

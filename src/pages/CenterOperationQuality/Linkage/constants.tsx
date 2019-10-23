@@ -5,11 +5,11 @@ import { formatNumber } from '@/tools';
 export const MarketDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },
@@ -42,11 +42,11 @@ export const MarketDefs = [
 export const VarietiesDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },
@@ -95,12 +95,11 @@ export const VarietiesDefs = [
 export const CounterpartyDefs = [
   {
     title: '日期',
-    align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },

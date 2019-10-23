@@ -36,7 +36,7 @@ const ToolStructure = () => (
       formControls={formControls}
       fetchMethod={getOtcCusTypeReport}
       columns={CustomerTypeStructureDefs}
-      scrollWidth={{ x: 1300 }}
+      scrollWidth={{ x: 1350 }}
     />
   </>
 );

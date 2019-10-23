@@ -36,7 +36,7 @@ const ToolStructure = () => (
       formControls={formControls}
       fetchMethod={getOtcPositionSummaryReport}
       columns={PositionStructureDefs}
-      scrollWidth={{ x: 3250 }}
+      scrollWidth={{ x: 3300 }}
     />
   </>
 );

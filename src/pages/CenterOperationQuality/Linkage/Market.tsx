@@ -35,7 +35,7 @@ const ToolStructure = () => (
       title="子公司联动统计"
       formControls={formControls}
       fetchMethod={getOtcEtSubCompanyReport}
-      scrollWidth={{ x: 1000 }}
+      scrollWidth={{ x: 1050 }}
       columns={MarketDefs}
     />
   </>
