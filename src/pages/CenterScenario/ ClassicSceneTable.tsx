@@ -119,9 +119,11 @@ const ClassicSceneTable = memo(props => {
     onSearch();
   }, [classicSceneTable]);
 
+  const titleTxt = reportTime ? `报告计算时间：${reportTime} ` : '';
+
   return (
     <div style={{ marginTop: 24 }}>
-      <Title>报告计算时间：{reportTime}</Title>
+      <Title>{titleTxt}</Title>
       <ThemeTable
         loading={tableLoading}
         dataSource={dataSource}

@@ -393,7 +393,7 @@ const CenterScenario = memo(props => {
     setSubNameOrBook(subFields);
   }, [reportFormData]);
 
-  console.log(tableColDefs);
+  const titleTxt = reportTime ? `报告计算时间：${reportTime} ` : '';
 
   return (
     <>
@@ -419,7 +419,7 @@ const CenterScenario = memo(props => {
         </Col>
       </Row>
       <ThemeTableWrapper>
-        <SamllTitle>报告计算时间：{reportTime}</SamllTitle>
+        <SamllTitle>{titleTxt}</SamllTitle>
         <ThemeTable
           loading={tableLoading}
           dataSource={dataSource}
