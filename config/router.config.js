@@ -38,58 +38,63 @@ export default [
     path: '/',
     redirect: '/center/underlying',
   },
-  {
-    path: '/center',
-    centerRoute: true,
-    component: '../layouts/Center/index',
-    routes: [
-      {
-        path: '/center/welcome-page',
-        name: 'welcomeCenterPage',
-        component: './WelcomeCenterPage',
-        hideInMenu: true,
-      },
-      {
-        path: '/center/underlying',
-        component: './CenterUnderlying',
-        name: 'centerUnderlying',
-        icon: 'line-chart',
-      },
-      {
-        path: '/center/risk',
-        component: './CenterRisk',
-        name: 'centerRisk',
-        icon: 'reconciliation',
-      },
-      {
-        path: '/center/scenario',
-        component: './CenterScenario',
-        name: 'centerScenario',
-        icon: 'file-search',
-      },
-      {
-        path: '/center/market',
-        name: 'market',
-        icon: 'pie-chart',
-        routes: [
-          {
-            path: '/center/market/operation-quality',
-            name: 'centerOperationQuality',
-            component: './CenterOperationQuality/index',
-          },
-          {
-            path: '/center/market/risk-monitoring',
-            name: 'centerRiskMonitoring',
-            component: './CenterRiskMonitoring/index',
-          },
-        ],
-      },
-    ],
-  },
-  // {
-  //   path: '/center-login',
-  //   component: '/user/login',
-  // },
+  mapTree(
+    {
+      path: '/center',
+      centerRoute: true,
+      component: '../layouts/Center/index',
+      routes: [
+        {
+          path: '/center/welcome-page',
+          name: 'welcomeCenterPage',
+          component: './WelcomeCenterPage',
+          hideInMenu: true,
+        },
+        {
+          path: '/center/underlying',
+          component: './CenterUnderlying',
+          name: 'centerUnderlying',
+          icon: 'line-chart',
+        },
+        {
+          path: '/center/risk',
+          component: './CenterRisk',
+          name: 'centerRisk',
+          icon: 'reconciliation',
+        },
+        {
+          path: '/center/scenario',
+          component: './CenterScenario',
+          name: 'centerScenario',
+          icon: 'file-search',
+        },
+        {
+          path: '/center/market',
+          name: 'market',
+          icon: 'pie-chart',
+          routes: [
+            {
+              path: '/center/market/operation-quality',
+              name: 'centerOperationQuality',
+              component: './CenterOperationQuality/index',
+            },
+            {
+              path: '/center/market/risk-monitoring',
+              name: 'centerRiskMonitoring',
+              component: './CenterRiskMonitoring/index',
+            },
+          ],
+        },
+      ],
+    },
+    node => {
+      if (!node.routes) {
+        return { ...node, Routes: ['./src/pages/CenterAuthorized'] };
+      }
+      return node;
+    },
+    'routes',
+  ),
   {
     path: '/api-docs',
     name: 'apiDocs',
