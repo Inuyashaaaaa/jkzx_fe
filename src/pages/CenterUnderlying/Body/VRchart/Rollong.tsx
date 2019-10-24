@@ -24,6 +24,7 @@ const Rollong = props => {
   const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState([moment().subtract(30 * 6, 'd'), moment()]);
   const [window, setWindow] = useState('22');
+  const [startDate, setStartDate] = useState();
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -91,9 +92,18 @@ const Rollong = props => {
           <FormItemWrapper>
             <FormItem label="日期" style={{ fontSize: 16 }}>
               <ThemeDatePickerRanger
-                onChange={pDates => setDates(pDates)}
+                onChange={pDates => {
+                  setDates(pDates);
+                  setStartDate();
+                }}
+                onCalendarChange={pDates => {
+                  setStartDate(pDates[0]);
+                }}
                 value={dates}
                 allowClear={false}
+                disabledDate={current =>
+                  startDate && current && current.valueOf() === startDate.valueOf()
+                }
               ></ThemeDatePickerRanger>
             </FormItem>
           </FormItemWrapper>
