@@ -5,11 +5,11 @@ import { formatNumber } from '@/tools';
 export const InfectionRiskDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },
@@ -67,11 +67,11 @@ export const InfectionRiskDefs = [
 export const ControlRiskDefs = [
   {
     title: '日期',
-    width: 150,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },

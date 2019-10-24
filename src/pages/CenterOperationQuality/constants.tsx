@@ -5,11 +5,11 @@ import { formatNumber } from '@/tools';
 export const MarketSizeDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },
@@ -89,11 +89,11 @@ const DISTTYPE_OPTION = {
 export const MarketConcentrationDefs = [
   {
     title: '日期',
-    width: 200,
+    width: 250,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh-mm-ss');
+        return moment(value).format('YYYY-MM-DD hh:mm:ss');
       }
       return value;
     },

@@ -36,6 +36,7 @@ const ToolStructure = () => (
       formControls={formControls}
       fetchMethod={getOtcMarketManipulateReport}
       columns={ControlRiskDefs}
+      scrollWidth={{ x: 700 }}
     />
   </>
 );

@@ -36,7 +36,7 @@ const ToolStructure = () => (
       formControls={formControls}
       fetchMethod={getOtcCompPropagateReport}
       columns={InfectionRiskDefs}
-      scrollWidth={{ x: 1600 }}
+      scrollWidth={{ x: 1650 }}
     />
   </>
 );

@@ -36,7 +36,7 @@ const ToolStructure = () => (
       formControls={formControls}
       fetchMethod={getOtcEtCusReport}
       columns={CounterpartyDefs}
-      scrollWidth={{ x: 1350 }}
+      scrollWidth={{ x: 1400 }}
     />
   </>
 );
