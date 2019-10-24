@@ -111,33 +111,12 @@ const BoxPanel = memo(props => {
 
   const createdAt = _.get(result, 'createdAt');
   const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+  const titleTxt = reportTime
+    ? `全市场整体风险报告（报告计算时间：${reportTime} ）`
+    : '全市场整体风险报告';
+
   return (
     <>
-      {/* <Title>全市场整体风险报告（报告计算时间：{reportTime}）</Title> */}
-      {/* <BoxWrapper {...rest}>
-        <BoxInner>
-          <Box>
-            <ThemeStatistic title="Delta_Cash" value={result.deltaCash} />
-          </Box>
-          <BoxSplit></BoxSplit>
-          <Box>
-            <ThemeStatistic title="Gamma_Cash" value={result.gammaCash} />
-          </Box>
-          <BoxSplit></BoxSplit>
-          <Box>
-            <ThemeStatistic title="Vega" value={result.vega} />
-          </Box>
-          <BoxSplit></BoxSplit>
-          <Box>
-            <ThemeStatistic title="Theta" value={result.theta} />
-          </Box>
-          <BoxSplit></BoxSplit>
-          <Box>
-            <ThemeStatistic title="Rho" value={result.rho} />
-          </Box>
-        </BoxInner>
-        <Unit borderLeft></Unit>
-      </BoxWrapper> */}
       <Row
         type="flex"
         justify="space-between"
@@ -146,7 +125,7 @@ const BoxPanel = memo(props => {
         style={{ marginTop: 18, marginBottom: 13 }}
       >
         <Col>
-          <Title>全市场整体风险报告（报告计算时间：{reportTime}）</Title>
+          <Title>{titleTxt}</Title>
         </Col>
         <Col>
           <DownloadExcelButton

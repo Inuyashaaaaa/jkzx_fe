@@ -126,9 +126,11 @@ const TableRisk = (props: any) => {
   const createdAt = _.get(tableData, '[0].createdAt');
   const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
 
+  const titleTxt = title + (reportTime ? `（报告计算时间：${reportTime} ）` : '');
+
   return (
     <div style={style}>
-      <Title>{`${title}（报告计算时间：${reportTime}）`}</Title>
+      <Title>{`${titleTxt}`}</Title>
       <Row
         type="flex"
         justify="space-between"
