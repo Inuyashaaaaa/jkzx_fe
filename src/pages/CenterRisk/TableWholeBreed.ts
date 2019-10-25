@@ -88,7 +88,7 @@ export const params = (
   sorter: any,
 ) => {
   const obj = {
-    valuationDate: valuationDate.format('YYYY-MM-DD'),
+    valuationDate: valuationDate ? valuationDate.format('YYYY-MM-DD') : '',
     page: 0,
     pageSize: pagination.pageSize,
     instrumentIdPart: searchFormData.instrumentIdPart,

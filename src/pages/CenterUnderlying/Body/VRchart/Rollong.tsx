@@ -16,15 +16,17 @@ import { Loading } from '@/containers';
 import { delay, formatNumber } from '@/tools';
 import PosCenter from '@/containers/PosCenter';
 import { getInstrumentRollingVol } from '@/services/terminal';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const Rollong = props => {
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(30 * 6, 'd'), moment()]);
+  const [dates, setDates] = useState([moment().subtract(6, 'months'), null]);
   const [window, setWindow] = useState('22');
   const [startDate, setStartDate] = useState();
+  const [tradeDate, setTradeDate] = useState(false);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -41,12 +43,13 @@ const Rollong = props => {
     return `l(270) ${colorStrs}`;
   };
 
-  const fetch = async () => {
+  const fetch = async param => {
+    const searchDates = param || dates;
     setLoading(true);
     const rsp = await getInstrumentRollingVol({
       instrumentId: props.instrumentId,
-      startDate: dates[0].format('YYYY-MM-DD'),
-      endDate: dates[1].format('YYYY-MM-DD'),
+      startDate: searchDates[0].format('YYYY-MM-DD'),
+      endDate: searchDates[1].format('YYYY-MM-DD'),
       window: _.toNumber(window),
       isPrimary: true,
     });
@@ -59,17 +62,11 @@ const Rollong = props => {
       time: item.tradeDate,
       value: item.vol,
     }));
-
+    // const s = _.concat(fdata, {
+    //   time: dates[1].format('YYYY-MM-DD'),
+    //   value: null,
+    // })
     const dv = new DataSet.View().source(fdata);
-
-    // dv.transform({
-    //   type: 'sort',
-    //   callback(a, b) {
-    //     const time1 = new Date(a.time).getTime();
-    //     const time2 = new Date(b.time).getTime();
-    //     return time2 - time1;
-    //   },
-    // });
 
     const gradualColorStr = generateGradualColorStr(dv);
     setLoading(false);
@@ -79,8 +76,22 @@ const Rollong = props => {
     });
   };
 
+  const getDate = async () => {
+    const { data, error } = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    setTradeDate(true);
+    if (error) return;
+    setDates([moment().subtract(6, 'months'), moment(data)]);
+    fetch([moment().subtract(6, 'months'), moment(data)]);
+  };
+
   useEffect(() => {
-    if (props.instrumentId) {
+    getDate();
+  }, []);
+
+  useEffect(() => {
+    if (props.instrumentId && tradeDate) {
       fetch();
     }
   }, [props.instrumentId]);
@@ -102,7 +113,11 @@ const Rollong = props => {
                 value={dates}
                 allowClear={false}
                 disabledDate={current =>
-                  startDate && current && current.valueOf() === startDate.valueOf()
+                  // startDate && current && current.valueOf() === startDate.valueOf()
+                  (current && current > moment().endOf('day')) ||
+                  (startDate &&
+                    current &&
+                    (current.valueOf() === startDate.valueOf() || current > moment().endOf('day')))
                 }
               ></ThemeDatePickerRanger>
             </FormItem>

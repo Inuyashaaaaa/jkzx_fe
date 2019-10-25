@@ -1,7 +1,7 @@
-import { Table2, SmartTable } from '@/containers';
-import { queryProcessToDoList } from '@/services/approval';
 import moment from 'moment';
 import React, { PureComponent } from 'react';
+import { Table2, SmartTable } from '@/containers';
+import { queryProcessToDoList } from '@/services/approval';
 import { PENDING_COL_DEFS } from './tools';
 
 class Pending extends PureComponent {
@@ -29,13 +29,13 @@ class Pending extends PureComponent {
       }
       obj.initiatorName = (obj.initiator && obj.initiator.userName) || '';
       obj.operatorName = (obj.operator && obj.operator.userName) || '';
-      // obj.startTime = moment(obj.startTime).format('YYYY-MM-DD hh:mm:ss');
+      // obj.startTime = moment(obj.startTime).format('YYYY-MM-DD HH:mm:ss');
       return obj;
     });
     this.setState({
-      dataSource: result.sort((item1, item2) => {
-        return moment(item1.startTime).valueOf() - moment(item2.startTime).valueOf();
-      }),
+      dataSource: result.sort(
+        (item1, item2) => moment(item1.startTime).valueOf() - moment(item2.startTime).valueOf(),
+      ),
     });
   };
 

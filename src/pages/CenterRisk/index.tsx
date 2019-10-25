@@ -17,6 +17,7 @@ import { TableTradeRival } from './TableTradeRival';
 import { TableTradeRivalVarieties } from './TableTradeRivalVarieties';
 import { TableWholeBreed } from './TableWholeBreed';
 import TableRisk from './containers/TableRisk';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 const { TabPane } = ThemeTabs;
 
@@ -36,20 +37,39 @@ const BigTitle = styled.div`
 
 const Risk = props => {
   let initFormData = {
-    valuationDate: moment(),
+    // valuationDate: moment(),
     instrumentIdPart: '',
   };
   const { query } = props.location || {};
   const defaultActiveKey = query.activeKey || '1';
 
-  if (query.valuationDate) {
+  const [formData, setFormData] = useState(initFormData);
+  const [tradeDate, setTradeDate] = useState(false);
+
+  const getDate = async () => {
+    setTradeDate(true);
+    if (query.valuationDate) {
+      initFormData = {
+        ...initFormData,
+        valuationDate: moment(query.valuationDate),
+      };
+      setFormData(initFormData);
+      return;
+    }
+    const { data, error } = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    if (error) return;
     initFormData = {
       ...initFormData,
-      valuationDate: moment(query.valuationDate),
+      valuationDate: moment(data),
     };
-  }
+    setFormData(initFormData);
+  };
 
-  const [formData, setFormData] = useState(initFormData);
+  useEffect(() => {
+    getDate();
+  }, []);
 
   return (
     <>
@@ -72,6 +92,7 @@ const Risk = props => {
           <BoxPanel
             date={formData.valuationDate}
             style={{ marginBottom: 18, marginTop: 18 }}
+            tradeDate={tradeDate}
           ></BoxPanel>
           <TableRisk
             title="全市场分品种风险报告"
@@ -86,6 +107,7 @@ const Risk = props => {
             method={rptSearchPagedMarketRiskDetailReport}
             valuationDate={formData.valuationDate}
             query={query}
+            tradeDate={tradeDate}
           />
         </TabPane>
         <TabPane tab="各子公司估值监测" key="2">
@@ -93,6 +115,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             activeKey="2"
             query={query}
+            tradeDate={tradeDate}
           />
           <TableRisk
             title="各子公司分品种风险报告"
@@ -111,6 +134,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="2"
+            tradeDate={tradeDate}
           />
         </TabPane>
         <TabPane tab="交易对手估值监测 " key="3">
@@ -129,6 +153,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="3"
+            tradeDate={tradeDate}
           />
           <TableRisk
             title="交易对手分品种风险报告"
@@ -146,6 +171,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="3"
+            tradeDate={tradeDate}
           />
         </TabPane>
       </ThemeTabs>

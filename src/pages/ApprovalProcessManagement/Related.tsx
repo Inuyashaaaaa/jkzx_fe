@@ -1,13 +1,13 @@
+import { Switch } from 'antd';
+import _ from 'lodash';
+import moment from 'moment';
+import React, { PureComponent } from 'react';
 import { PROCESS_STATUS_TYPE_MAP, PROCESS_STATUS_TYPE_OPTIONS } from '@/constants/common';
 import { VERTICAL_GUTTER } from '@/constants/global';
 import { Table2, SmartTable } from '@/containers';
 import Form from '@/containers/Form';
 import { IFormControl } from '@/containers/Form/types';
 import { wkProcessInstanceComplexList } from '@/services/approval';
-import { Switch } from 'antd';
-import _ from 'lodash';
-import moment from 'moment';
-import React, { PureComponent } from 'react';
 import { RELATED_COL_DEFS } from './tools';
 
 class Related extends PureComponent {
@@ -44,14 +44,14 @@ class Related extends PureComponent {
       }
       obj.initiatorName = (obj.initiator && obj.initiator.userName) || '';
       obj.operatorName = (obj.operator && obj.operator.userName) || '';
-      // obj.startTime = moment(obj.startTime).format('YYYY-MM-DD hh:mm:ss');
+      // obj.startTime = moment(obj.startTime).format('YYYY-MM-DD HH:mm:ss');
       return obj;
     });
 
     this.setState({
-      dataSource: result.sort((item1, item2) => {
-        return moment(item1.startTime).valueOf() - moment(item2.startTime).valueOf();
-      }),
+      dataSource: result.sort(
+        (item1, item2) => moment(item1.startTime).valueOf() - moment(item2.startTime).valueOf(),
+      ),
     });
   };
 
@@ -63,7 +63,7 @@ class Related extends PureComponent {
       },
       () => {
         this.fetchTable();
-      }
+      },
     );
   };
 
@@ -74,7 +74,7 @@ class Related extends PureComponent {
       },
       () => {
         this.fetchTable();
-      }
+      },
     );
   };
 
@@ -87,7 +87,7 @@ class Related extends PureComponent {
               checkedChildren="开"
               unCheckedChildren="关"
               onChange={this.onChange}
-              defaultChecked={true}
+              defaultChecked
               style={{ marginRight: '10px' }}
             />
             <span>仅包含我发起的流程</span>

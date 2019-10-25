@@ -95,7 +95,7 @@ const ClassicSceneTable = memo(props => {
     setTableLoading(false);
 
     const createdAt = _.get(data, '[0].createdAt');
-    const reportDate = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+    const reportDate = createdAt ? moment(createdAt).format('YYYY-MM-DD HH:mm:ss') : '';
     setReportTime(reportDate);
 
     if (error) return;
@@ -116,7 +116,9 @@ const ClassicSceneTable = memo(props => {
   };
 
   useEffect(() => {
-    onSearch();
+    if (props.tradeDate) {
+      onSearch();
+    }
   }, [classicSceneTable]);
 
   const titleTxt = reportTime ? `报告计算时间：${reportTime} ` : '';

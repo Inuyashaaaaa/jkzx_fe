@@ -21,6 +21,7 @@ import { rptSpotScenariosReportListSearch } from '@/services/report-service';
 import moment from 'moment';
 import useLifecycles from 'react-use/lib/useLifecycles';
 import ClassicSceneTable from './ ClassicSceneTable';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -53,11 +54,12 @@ const ThemeTableWrapper = styled.div`
 const CenterScenario = memo(props => {
   const [reportFormData, setReportFormData] = useState(
     Form2.createFields({
-      valuationDate: moment(),
+      // valuationDate: moment(),
       reportType: 'MARKET',
       underlyer: '600030.SH',
     }),
   );
+  const [tradeDate, setTradeDate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
@@ -120,12 +122,12 @@ const CenterScenario = memo(props => {
     });
   };
 
-  const onSearch = async () => {
+  const onSearch = async param => {
     setClassicSceneTable(!classicSceneTable);
     const [reportRsp] = await Promise.all([reportForm.current.validate()]);
     if (reportRsp.error) return;
     const reportData = _.mapValues(
-      _.mapKeys(Form2.getFieldsValue(reportFormData), (val, key) => {
+      _.mapKeys(Form2.getFieldsValue(param || reportFormData), (val, key) => {
         if (key === 'legalName' || key === 'subName') {
           return 'subOrPartyName';
         }
@@ -156,7 +158,7 @@ const CenterScenario = memo(props => {
     setTableLoading(false);
 
     const createdAt = _.get(data, '[0].createdAt');
-    const reportDate = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+    const reportDate = createdAt ? moment(createdAt).format('YYYY-MM-DD HH:mm:ss') : '';
     setReportTime(reportDate);
 
     if (error) return;
@@ -312,6 +314,33 @@ const CenterScenario = memo(props => {
     },
   ];
 
+  const getDate = async () => {
+    const { data, error } = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    setTradeDate(true);
+    if (error) return;
+    setReportFormData(
+      Form2.createFields({
+        valuationDate: moment(data),
+        reportType: 'MARKET',
+        underlyer: '600030.SH',
+      }),
+    );
+
+    onSearch(
+      Form2.createFields({
+        valuationDate: moment(data),
+        reportType: 'MARKET',
+        underlyer: '600030.SH',
+      }),
+    );
+  };
+
+  useEffect(() => {
+    getDate();
+  }, []);
+
   useLifecycles(() => {
     setTableColDefs([
       {
@@ -323,7 +352,6 @@ const CenterScenario = memo(props => {
         return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%`, width };
       }),
     ]);
-    onSearch();
   });
 
   useEffect(() => {
@@ -434,6 +462,7 @@ const CenterScenario = memo(props => {
         valuationDate={Form2.getFieldsValue(reportFormData.valuationDate)}
         instrumentId={Form2.getFieldsValue(reportFormData.underlyer)}
         reportFormData={Form2.getFieldsValue(reportFormData)}
+        tradeDate={tradeDate}
       />
     </>
   );

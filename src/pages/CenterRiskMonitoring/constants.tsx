@@ -9,7 +9,7 @@ export const InfectionRiskDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },
@@ -71,7 +71,7 @@ export const ControlRiskDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },

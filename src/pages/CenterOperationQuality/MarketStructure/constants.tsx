@@ -9,7 +9,7 @@ export const KnockdownStructureDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },
@@ -102,7 +102,7 @@ export const PositionStructureDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },
@@ -214,7 +214,7 @@ export const ToolStructureDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },
@@ -269,7 +269,7 @@ export const CustomerTypeStructureDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },

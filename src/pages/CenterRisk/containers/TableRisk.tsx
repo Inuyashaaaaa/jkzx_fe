@@ -77,6 +77,9 @@ const TableRisk = (props: any) => {
   const [showScroll, setShowScroll] = useState(getShowScroll());
 
   const fetch = async (bool: boolean) => {
+    if (!valuationDate) {
+      return;
+    }
     setLoading(true);
     const params = tableParams(valuationDate, pagination, searchFormData, ORDER_BY, sorter);
     if (bool) {
@@ -124,7 +127,7 @@ const TableRisk = (props: any) => {
 
   const columns = riskColumns(sorter);
   const createdAt = _.get(tableData, '[0].createdAt');
-  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD HH:mm:ss') : '';
 
   const titleTxt = title + (reportTime ? `（报告计算时间：${reportTime} ）` : '');
 

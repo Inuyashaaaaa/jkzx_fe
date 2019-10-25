@@ -21,6 +21,7 @@ import PosCenter from '@/containers/PosCenter';
 import { getHistoricalAndNeutralVolList } from '@/services/terminal';
 import { formatNumber } from '@/tools';
 import styles from './index.less';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 const FormItemWrapper = styled.div`
   .ant-form-item-label label {
@@ -36,10 +37,12 @@ const ImpliedVolatility = props => {
   const formRef = useRef<Form2>(null);
   const [formData, setFormData] = useState(
     Form2.createFields({
-      valuationDate: [moment().subtract(30 * 6, 'days'), moment().subtract(1, 'd')],
+      valuationDate: [moment().subtract(6, 'months'), null],
       window: 22,
     }),
   );
+  const [tradeDate, setTradeDate] = useState(false);
+
   const [dataSource, setDataSource] = useState([]);
   const [loading, setLoading] = useState(false);
   const [meta, setMeta] = useState(false);
@@ -67,10 +70,11 @@ const ImpliedVolatility = props => {
     window: data.window,
   });
 
-  const onSearch = async () => {
+  const onSearch = async param => {
+    const searchDates = param || formData;
     const rsp = await formRef.current.validate();
     if (rsp.error) return;
-    const formatFormData = formatDate(Form2.getFieldsValue(formData));
+    const formatFormData = formatDate(Form2.getFieldsValue(searchDates));
     setLoading(true);
 
     const { data, error } = await getHistoricalAndNeutralVolList({
@@ -161,12 +165,32 @@ const ImpliedVolatility = props => {
     },
   ];
 
-  useLifecycles(() => {
-    onSearch();
-  });
+  const getDate = async () => {
+    const { data, error } = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    setTradeDate(true);
+    if (error) return;
+    setFormData(
+      Form2.createFields({
+        valuationDate: [moment().subtract(6, 'months'), moment(data)],
+        window: 22,
+      }),
+    );
+    onSearch(
+      Form2.createFields({
+        valuationDate: [moment().subtract(6, 'months'), moment(data)],
+        window: 22,
+      }),
+    );
+  };
 
   useEffect(() => {
-    if (props.instrumentId) {
+    getDate();
+  }, []);
+
+  useEffect(() => {
+    if (props.instrumentId && tradeDate) {
       onSearch();
     }
   }, [props.instrumentId]);
