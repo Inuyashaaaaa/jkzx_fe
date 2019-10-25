@@ -17,7 +17,8 @@ before_script:
   - tail ~/.bashrc
   - whoami
   - export PATH=/home/gitlab-runner/.nvm/versions/node/v10.15.3/bin:$PATH
-  - node -v
+  - node -v 
+  - node --max_old_space_size=4096
   - yarn -v
   - export
 
