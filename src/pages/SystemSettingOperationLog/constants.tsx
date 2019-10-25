@@ -2,9 +2,11 @@ import FormItem from 'antd/lib/form/FormItem';
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import { DatePicker } from 'antd';
+import { DatePicker, Icon, Button, message } from 'antd';
 import { Select, Input } from '@/containers';
 import { authUserList } from '@/services/user';
+import styles from './index.less';
+import uuidv4 from 'uuid/v4';
 
 const { RangePicker } = DatePicker;
 
@@ -151,6 +153,32 @@ export const errorSearchFormControls = [
   },
 ];
 
+const EllipsisWrap = props => {
+  const copy = () => {
+    const input = document.createElement('input');
+    input.value = props.value;
+    const Id = uuidv4();
+    input.id = Id;
+    input.setAttribute('style', 'opacity: 0;zInde: -10;');
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.getElementById(Id).remove();
+    message.success('复制成功');
+  };
+
+  return (
+    <div className={styles.wrap}>
+      <a className={styles.ellipsisWrap} title={props.value} id={props.id}>
+        {props.value}
+      </a>
+      {props.value ? (
+        <Button shape="circle" icon="copy" onClick={copy} className={styles.copy} />
+      ) : null}
+    </div>
+  );
+};
+
 export const errorTableColDefs = [
   {
     title: '操作用户',
@@ -189,51 +217,18 @@ export const errorTableColDefs = [
     title: '请求参数',
     dataIndex: 'requestParams',
     width: 250,
-    render: val => (
-      <span
-        style={{
-          overflow: 'hidden',
-          display: 'inline-block',
-          wordBreak: 'break-all',
-          width: '100%',
-        }}
-      >
-        {val}
-      </span>
-    ),
+    render: (value, record) => <EllipsisWrap value={value} id={record.id} />,
   },
   {
     title: '错误信息',
     dataIndex: 'errorMessage',
     width: 250,
-    render: val => (
-      <span
-        style={{
-          overflow: 'hidden',
-          display: 'inline-block',
-          wordBreak: 'break-all',
-          width: '100%',
-        }}
-      >
-        {val}
-      </span>
-    ),
+    render: (value, record) => <EllipsisWrap value={value} id={record.id} />,
   },
   {
     title: '报错位置',
     dataIndex: 'errorStackTrace',
     width: 250,
-    render: val => (
-      <span
-        style={{
-          overflow: 'hidden',
-          display: 'inline-block',
-          wordBreak: 'break-all',
-          width: '100%',
-        }}
-      >
-        {val}
-      </span>
-    ),
+    render: (value, record) => <EllipsisWrap value={value} id={record.id} />,
   },
 ];

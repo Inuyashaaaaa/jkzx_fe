@@ -1,0 +1,30 @@
+@import '~antd/lib/style/themes/default.less';
+
+.wrap {
+  position: relative;
+  width: 250px;
+  height: 40px;
+  :global {
+    .ant-btn,
+    .ant-btn:active,
+    .ant-btn:focus {
+      border: none;
+      background: none;
+    }
+  }
+}
+.ellipsisWrap {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 24px;
+  width: 80%;
+  line-height: 40px;
+}
+.copy {
+  position: absolute;
+  right: 0;
+  top: 6px;
+}
