@@ -9,7 +9,7 @@ export const MarketDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },
@@ -46,7 +46,7 @@ export const VarietiesDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },
@@ -99,7 +99,7 @@ export const CounterpartyDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD hh:mm:ss');
+        return moment(value).format('YYYY-MM-DD HH:mm:ss');
       }
       return value;
     },

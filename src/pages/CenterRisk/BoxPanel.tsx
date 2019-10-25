@@ -106,11 +106,13 @@ const BoxPanel = memo(props => {
   };
 
   useEffect(() => {
-    fechData();
+    if (props.tradeDate) {
+      fechData();
+    }
   }, [date]);
 
   const createdAt = _.get(result, 'createdAt');
-  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD HH:mm:ss') : '';
   const titleTxt = reportTime
     ? `全市场整体风险报告（报告计算时间：${reportTime} ）`
     : '全市场整体风险报告';
@@ -135,7 +137,7 @@ const BoxPanel = memo(props => {
               searchMethod: rptMarketRiskReportListByDate,
               argument: {
                 searchFormData: {
-                  valuationDate: date.format('YYYY-MM-DD'),
+                  valuationDate: date ? date.format('YYYY-MM-DD') : '',
                 },
               },
               cols: columns,

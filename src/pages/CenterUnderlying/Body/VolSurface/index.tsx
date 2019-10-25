@@ -12,9 +12,11 @@ import ThemeSelect from '@/containers/ThemeSelect';
 import FormItemWrapper from '@/containers/FormItemWrapper';
 import { getImpliedVolReport } from '@/services/terminal';
 import styles from '../ImpliedVolatility/index.less';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 const Box = props => {
-  const [dateData, setDateData] = useState(moment().subtract(1, 'd'));
+  const [dateData, setDateData] = useState(null);
+  const [tradeDate, setTradeDate] = useState(false);
   const { loading, volReport, dispatch, instrumentId } = props;
 
   const setLoading = data => {
@@ -35,11 +37,12 @@ const Box = props => {
     });
   };
 
-  const fetch = async () => {
+  const fetch = async param => {
+    const searchDates = param || dateData;
     setLoading(true);
     const rsp = await getImpliedVolReport({
       instrumentId,
-      reportDate: dateData.format('YYYY-MM-DD'),
+      reportDate: searchDates.format('YYYY-MM-DD'),
     });
     setLoading(false);
     const { error, data = [] } = rsp;
@@ -63,8 +66,22 @@ const Box = props => {
     setVolReport(data);
   };
 
+  const getDate = async () => {
+    const { data, error } = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    setTradeDate(true);
+    if (error) return;
+    setDateData(moment(data));
+    fetch(moment(data));
+  };
+
   useEffect(() => {
-    if (props.instrumentId) {
+    getDate();
+  }, []);
+
+  useEffect(() => {
+    if (props.instrumentId && tradeDate) {
       fetch();
     }
   }, [props.instrumentId]);

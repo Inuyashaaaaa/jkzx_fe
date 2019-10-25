@@ -172,7 +172,7 @@ const TableSubsidiaryWhole = (props: any) => {
   ];
 
   const createdAt = _.get(tableData, '[0].createdAt');
-  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD hh:mm:ss') : '';
+  const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD HH:mm:ss') : '';
   const titleTxt = reportTime
     ? `各子公司风险报告（报告计算时间：${reportTime} ）`
     : '各子公司风险报告';

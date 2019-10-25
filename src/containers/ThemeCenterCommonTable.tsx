@@ -11,6 +11,7 @@ import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 const Title = styled.div`
   font-size: 18px;
@@ -92,8 +93,31 @@ const ThemeCenterCommonTable = props => {
     fetchTable(searchForm);
   };
 
+  const getDate = async () => {
+    const { data, error } = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    if (error) return;
+    setFormData(
+      Form2.createFields({
+        date: [moment(data).subtract(1, 'd'), moment(data)],
+      }),
+    );
+    setSearchForm(
+      Form2.createFields({
+        date: [moment(data).subtract(1, 'd'), moment(data)],
+      }),
+    );
+
+    fetchTable(
+      Form2.createFields({
+        date: [moment(data).subtract(1, 'd'), moment(data)],
+      }),
+    );
+  };
+
   useEffect(() => {
-    fetchTable(searchForm);
+    getDate();
   }, []);
 
   return (

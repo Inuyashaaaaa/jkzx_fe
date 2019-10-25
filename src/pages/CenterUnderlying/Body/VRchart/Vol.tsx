@@ -15,6 +15,7 @@ import { Loading } from '@/containers';
 import PosCenter from '@/containers/PosCenter';
 import { delay, formatNumber } from '@/tools';
 import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
@@ -49,7 +50,8 @@ const Vol = props => {
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(30 * 6, 'd'), moment()]);
+  const [dates, setDates] = useState([moment().subtract(6, 'months'), null]);
+  const [tradeDate, setTradeDate] = useState(false);
 
   const generateGradualColorStr = fdv => {
     const { rows } = fdv;
@@ -66,20 +68,21 @@ const Vol = props => {
     return `l(270) ${colorStrs}`;
   };
 
-  const fetch = async () => {
+  const fetch = async param => {
+    const searchDates = param || dates;
     setLoading(true);
     const [rsp, realRsp] = await Promise.all([
       getInstrumentVolCone({
         instrumentId: props.instrumentId,
-        start_date: dates[0].format('YYYY-MM-DD'),
-        end_date: dates[1].format('YYYY-MM-DD'),
+        start_date: searchDates[0].format('YYYY-MM-DD'),
+        end_date: searchDates[1].format('YYYY-MM-DD'),
         windows,
         percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
         isPrimary: true,
       }),
       getInstrumentRealizedVol({
         instrumentId: props.instrumentId,
-        tradeDate: dates[1].format('YYYY-MM-DD'),
+        tradeDate: searchDates[1].format('YYYY-MM-DD'),
         isPrimary: true,
       }),
     ]);
@@ -129,8 +132,22 @@ const Vol = props => {
     });
   };
 
+  const getDate = async () => {
+    const { data, error } = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    setTradeDate(true);
+    if (error) return;
+    setDates([moment().subtract(6, 'months'), moment(data)]);
+    fetch([moment().subtract(6, 'months'), moment(data)]);
+  };
+
   useEffect(() => {
-    if (props.instrumentId) {
+    getDate();
+  }, []);
+
+  useEffect(() => {
+    if (props.instrumentId && tradeDate) {
       fetch();
     }
   }, [props.instrumentId]);

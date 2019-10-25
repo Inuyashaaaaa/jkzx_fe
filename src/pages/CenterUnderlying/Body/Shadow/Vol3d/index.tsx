@@ -24,6 +24,7 @@ import { delay } from '@/utils';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
 import FormItemWrapper from '@/containers/FormItemWrapper';
 import { formatNumber } from '@/tools';
+import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 const debug = true;
 
@@ -61,7 +62,8 @@ const STATUS = {
 const Vol = props => {
   const { instrumentId, data = {}, dispatch, loading, strikeType } = props;
   const [meta, setMeta] = useState();
-  const [valuationDate, setValuationDate] = useState(moment().subtract(1, 'd'));
+  const [valuationDate, setValuationDate] = useState(null);
+  const [tradeDate, setTradeDate] = useState(false);
   const [status, setStatus] = useState(STATUS.CHART);
   const [echartInstance, setEchartInstance] = useState();
   const [strikeTypeData, setStrikeTypeData] = useState(strikeType);
@@ -103,11 +105,12 @@ const Vol = props => {
     });
   };
 
-  const fetch = async () => {
+  const fetch = async param => {
+    const searchDates = param || valuationDate;
     setLoading(true);
     const rsp = await getInstrumentVolSurface({
       instrumentId: props.instrumentId,
-      valuationDate: valuationDate.format('YYYY-MM-DD'),
+      valuationDate: searchDates.format('YYYY-MM-DD'),
       strikeType: strikeTypeData,
     });
     setLoading(false);
@@ -290,8 +293,22 @@ const Vol = props => {
     });
   };
 
+  const getDate = async () => {
+    const res = await refTradeDateByOffsetGet({
+      offset: -2,
+    });
+    setTradeDate(true);
+    if (res.error) return;
+    setValuationDate(moment(res.data));
+    fetch(moment(res.data));
+  };
+
   useEffect(() => {
-    if (props.instrumentId) {
+    getDate();
+  }, []);
+
+  useEffect(() => {
+    if (props.instrumentId && tradeDate) {
       fetch();
       setData({});
     }
