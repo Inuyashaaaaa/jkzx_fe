@@ -54,7 +54,7 @@ const Header = props => {
                 mode="multiple"
                 options={async (value: string) => {
                   const { data, error } = await mktInstrumentSearch({
-                    instrumentIdPart: value,
+                    instrumentIdPart: _.toUpper(value),
                     excludeOption: true,
                   });
                   if (error) return [];
@@ -87,7 +87,7 @@ const Header = props => {
                   //   instrumentIdPart: value,
                   // });
                   const { data, error } = await mktInstrumentSearch({
-                    instrumentIdPart: value,
+                    instrumentIdPart: _.toUpper(value),
                     excludeOption: true,
                   });
                   if (error) return [];
