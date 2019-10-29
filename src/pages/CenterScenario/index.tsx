@@ -243,7 +243,7 @@ const CenterScenario = memo(props => {
               style={{ minWidth: 200 }}
               options={async (value: string) => {
                 const { data, error } = await mktInstrumentWhitelistSearch({
-                  instrumentIdPart: value,
+                  instrumentIdPart: _.toUpper(value),
                 });
                 if (error) return [];
                 return data.slice(0, 50).map(item => ({
