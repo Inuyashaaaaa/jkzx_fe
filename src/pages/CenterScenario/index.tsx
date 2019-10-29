@@ -441,7 +441,7 @@ const CenterScenario = memo(props => {
           </FormItemWrapper>
         </Col>
         <Col>
-          <ThemeButton onClick={onSearch} type="primary">
+          <ThemeButton onClick={() => onSearch(null)} type="primary">
             确定
           </ThemeButton>
         </Col>
