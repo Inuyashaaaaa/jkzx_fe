@@ -50,7 +50,8 @@ const Vol = props => {
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(6, 'months'), null]);
+  const [dates, setDates] = useState([moment().subtract(6, 'months'), moment()]);
+  const [searchDates, setSearchDates] = useState([moment().subtract(6, 'months'), moment()]);
   const [tradeDate, setTradeDate] = useState(false);
 
   const generateGradualColorStr = fdv => {
@@ -69,20 +70,19 @@ const Vol = props => {
   };
 
   const fetch = async param => {
-    const searchDates = param || dates;
-    setLoading(true);
+    const paramDates = param || dates;
     const [rsp, realRsp] = await Promise.all([
       getInstrumentVolCone({
         instrumentId: props.instrumentId,
-        start_date: searchDates[0].format('YYYY-MM-DD'),
-        end_date: searchDates[1].format('YYYY-MM-DD'),
+        start_date: paramDates[0].format('YYYY-MM-DD'),
+        end_date: paramDates[1].format('YYYY-MM-DD'),
         windows,
         percentiles: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1],
         isPrimary: true,
       }),
       getInstrumentRealizedVol({
         instrumentId: props.instrumentId,
-        tradeDate: searchDates[1].format('YYYY-MM-DD'),
+        tradeDate: paramDates[1].format('YYYY-MM-DD'),
         isPrimary: true,
       }),
     ]);
@@ -139,7 +139,7 @@ const Vol = props => {
     setTradeDate(true);
     if (error) return;
     setDates([moment().subtract(6, 'months'), moment(data)]);
-    fetch([moment().subtract(6, 'months'), moment(data)]);
+    setSearchDates([moment().subtract(6, 'months'), moment(data)]);
   };
 
   useEffect(() => {
@@ -148,9 +148,9 @@ const Vol = props => {
 
   useEffect(() => {
     if (props.instrumentId && tradeDate) {
-      fetch();
+      fetch(dates);
     }
-  }, [props.instrumentId]);
+  }, [props.instrumentId, searchDates]);
 
   return (
     <>
@@ -171,7 +171,7 @@ const Vol = props => {
           <ThemeButton
             loading={meta && loading}
             onClick={() => {
-              fetch();
+              fetch(dates);
             }}
             type="primary"
           >

@@ -13,21 +13,6 @@ export default {
     volReport: [],
     instrumentIds: [],
   },
-  subscriptions: {
-    setup({ dispatch, history }) {
-      history.listen(location => {
-        if (location.pathname === '/center/underlying') {
-          dispatch({
-            type: 'queryInstrumentId',
-            payload: {
-              instrumentIdPart: '',
-              excludeOption: true,
-            },
-          });
-        }
-      });
-    },
-  },
   effects: {
     *queryInstrumentId({ payload }, { call, put }) {
       const rsp = yield call(mktInstrumentSearch, payload);
