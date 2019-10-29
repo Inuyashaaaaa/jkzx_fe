@@ -23,7 +23,8 @@ const Rollong = props => {
   const chartRef = useRef(null);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dates, setDates] = useState([moment().subtract(6, 'months'), null]);
+  const [dates, setDates] = useState([moment().subtract(6, 'months'), moment()]);
+  const [searchDates, setSearchDates] = useState([moment().subtract(6, 'months'), moment()]);
   const [window, setWindow] = useState('22');
   const [startDate, setStartDate] = useState();
   const [tradeDate, setTradeDate] = useState(false);
@@ -44,12 +45,12 @@ const Rollong = props => {
   };
 
   const fetch = async param => {
-    const searchDates = param || dates;
+    const paramDates = param || dates;
     setLoading(true);
     const rsp = await getInstrumentRollingVol({
       instrumentId: props.instrumentId,
-      startDate: searchDates[0].format('YYYY-MM-DD'),
-      endDate: searchDates[1].format('YYYY-MM-DD'),
+      startDate: paramDates[0].format('YYYY-MM-DD'),
+      endDate: paramDates[1].format('YYYY-MM-DD'),
       window: _.toNumber(window),
       isPrimary: true,
     });
@@ -83,7 +84,7 @@ const Rollong = props => {
     setTradeDate(true);
     if (error) return;
     setDates([moment().subtract(6, 'months'), moment(data)]);
-    fetch([moment().subtract(6, 'months'), moment(data)]);
+    setSearchDates([moment().subtract(6, 'months'), moment(data)]);
   };
 
   useEffect(() => {
@@ -92,9 +93,9 @@ const Rollong = props => {
 
   useEffect(() => {
     if (props.instrumentId && tradeDate) {
-      fetch();
+      fetch(dates);
     }
-  }, [props.instrumentId]);
+  }, [props.instrumentId, searchDates]);
 
   return (
     <>
@@ -145,7 +146,7 @@ const Rollong = props => {
           <ThemeButton
             loading={meta && loading}
             onClick={() => {
-              fetch();
+              fetch(dates);
             }}
             type="primary"
           >
