@@ -10,12 +10,7 @@ const PAGE_SIZE = 15;
 
 const ErrorLog = memo(props => {
   const getInitFotrmData = () => ({
-    operationDate: [
-      moment()
-        .subtract(30, 'day')
-        .startOf('day'),
-      moment().endOf('day'),
-    ],
+    operationDate: [moment().subtract(30, 'day'), moment()],
   });
 
   const initPagination = {
@@ -44,8 +39,8 @@ const ErrorLog = memo(props => {
     const { data, error } = await authErrorLogList({
       page: (paramsPagination || pagination).current - 1,
       pageSize: (paramsPagination || pagination).pageSize,
-      startDate: moment(formData.operationDate[0]).format('YYYY-MM-DDTHH:mm:ss'),
-      endDate: moment(formData.operationDate[1]).format('YYYY-MM-DDTHH:mm:ss'),
+      startDate: moment(formData.operationDate[0]).format('YYYY-MM-DD'),
+      endDate: moment(formData.operationDate[1]).format('YYYY-MM-DD'),
       username: formData.username ? formData.username : '',
       requestMethod: '',
     });
