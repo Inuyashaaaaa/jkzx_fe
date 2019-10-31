@@ -139,16 +139,7 @@ export const errorSearchFormControls = [
     title: '操作时间',
     dataIndex: 'operationDate',
     render: (val, record, index, { form, editing }) => (
-      <FormItem>
-        {form.getFieldDecorator({})(
-          <RangePicker
-            allowClear={false}
-            showTime={{
-              defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')],
-            }}
-          />,
-        )}
-      </FormItem>
+      <FormItem>{form.getFieldDecorator({})(<RangePicker allowClear={false} />)}</FormItem>
     ),
   },
 ];
