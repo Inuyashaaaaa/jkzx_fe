@@ -135,7 +135,12 @@ const ImpliedVolatility = props => {
                 message: '观察日期是必填项',
               },
             ],
-          })(<ThemeDatePickerRanger allowClear={false}></ThemeDatePickerRanger>)}
+          })(
+            <ThemeDatePickerRanger
+              allowClear={false}
+              disabledDate={current => current && current > moment()}
+            ></ThemeDatePickerRanger>,
+          )}
         </FormItem>
       ),
     },

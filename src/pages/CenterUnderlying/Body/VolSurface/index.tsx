@@ -96,6 +96,7 @@ const Box = props => {
                 onChange={pDate => setDateData(pDate)}
                 value={dateData}
                 allowClear={false}
+                disabledDate={current => current && current > moment()}
               ></ThemeDatePicker>
             </FormItem>
           </FormItemWrapper>

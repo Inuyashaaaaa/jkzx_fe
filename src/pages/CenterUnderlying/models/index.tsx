@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { STRIKE_TYPE_ENUM } from '@/constants/global';
 import { mktInstrumentSearch } from '@/services/market-data-service';
+import _ from 'lodash';
 
 export default {
   namespace: 'centerUnderlying',
@@ -13,6 +14,22 @@ export default {
     volReport: [],
     instrumentIds: [],
   },
+  subscriptions: {
+    setup({ dispatch, history }) {
+      history.listen(location => {
+        if (location.pathname === '/center/underlying') {
+          dispatch({
+            type: 'queryInstrumentId',
+            payload: {
+              instrumentIdPart: '',
+              excludeOption: true,
+            },
+          });
+        }
+      });
+    },
+  },
+
   effects: {
     *queryInstrumentId({ payload }, { call, put }) {
       const rsp = yield call(mktInstrumentSearch, payload);
@@ -21,6 +38,7 @@ export default {
         type: 'setState',
         payload: {
           instrumentIds: rsp.data.slice(0, 10),
+          instrumentId: _.get(rsp.data.sort(), '[0]'),
         },
       });
     },

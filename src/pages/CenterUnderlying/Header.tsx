@@ -9,27 +9,6 @@ import FormItemWrapper from '@/containers/FormItemWrapper';
 
 const Header = props => {
   const { instrumentId, dispatch, activeKey, instrumentIds } = props;
-  const [instrumentIdArr, setInstrumentIdArr] = useState([]);
-
-  const fetchArray = async () => {
-    const { data, error } = await mktInstrumentSearch({
-      instrumentIdPart: '',
-      excludeOption: true,
-    });
-    if (error) return;
-    setInstrumentIdArr(data.sort());
-
-    dispatch({
-      type: 'centerUnderlying/setState',
-      payload: {
-        instrumentId: _.get(data.sort(), '[0]'),
-      },
-    });
-  };
-
-  useEffect(() => {
-    fetchArray();
-  }, []);
 
   return (
     <Row>
@@ -83,9 +62,6 @@ const Header = props => {
                 fetchOptionsOnSearch
                 showSearch
                 options={async (value: string) => {
-                  // const { data, error } = await mktInstrumentSearch({
-                  //   instrumentIdPart: value,
-                  // });
                   const { data, error } = await mktInstrumentSearch({
                     instrumentIdPart: _.toUpper(value),
                     excludeOption: true,
