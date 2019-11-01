@@ -1,6 +1,7 @@
 import React from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import styled from 'styled-components';
+import moment from 'moment';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { MarketSizeDefs } from './constants';
 import { getOtcSummaryReport } from '@/services/terminal';
@@ -21,7 +22,10 @@ const formControls = [
       <ThemeFormItemWrap>
         <FormItem>
           {form.getFieldDecorator({ rules: [{ required: true, message: '日期范围必填' }] })(
-            <ThemeDatePickerRanger allowClear={false}></ThemeDatePickerRanger>,
+            <ThemeDatePickerRanger
+              allowClear={false}
+              disabledDate={current => current && current > moment()}
+            ></ThemeDatePickerRanger>,
           )}
         </FormItem>
       </ThemeFormItemWrap>

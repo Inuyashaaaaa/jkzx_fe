@@ -226,7 +226,11 @@ const CenterScenario = memo(props => {
       render: (val, record, index, { form }) => (
         <FormItem>
           {form.getFieldDecorator({ rules: [{ required: true, message: '观察日必填' }] })(
-            <ThemeDatePicker placeholder="" allowClear={false}></ThemeDatePicker>,
+            <ThemeDatePicker
+              placeholder=""
+              allowClear={false}
+              disabledDate={current => current && current > moment()}
+            ></ThemeDatePicker>,
           )}
         </FormItem>
       ),

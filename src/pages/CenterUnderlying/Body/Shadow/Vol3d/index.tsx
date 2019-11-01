@@ -377,6 +377,7 @@ const Vol = props => {
                 onChange={pDate => setValuationDate(pDate)}
                 value={valuationDate}
                 allowClear={false}
+                disabledDate={current => current && current > moment()}
               ></ThemeDatePicker>
             </FormItem>
           </FormItemWrapper>

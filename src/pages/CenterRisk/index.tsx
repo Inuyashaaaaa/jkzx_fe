@@ -83,6 +83,7 @@ const Risk = props => {
             value={formData.valuationDate}
             allowClear={false}
             placeholder="请选择观察日"
+            disabledDate={current => current && current > moment()}
           ></ThemeDatePicker>
         </Col>
       </Row>
