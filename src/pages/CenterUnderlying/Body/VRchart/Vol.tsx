@@ -16,6 +16,7 @@ import PosCenter from '@/containers/PosCenter';
 import { delay, formatNumber } from '@/tools';
 import { getInstrumentVolCone, getInstrumentRealizedVol } from '@/services/terminal';
 import { refTradeDateByOffsetGet } from '@/services/volatility';
+import { themeNotification } from './themeNotification';
 
 import FormItemWrapper from '@/containers/FormItemWrapper';
 
@@ -89,6 +90,10 @@ const Vol = props => {
     if (rsp.error) {
       setLoading(false);
       return;
+    }
+    const diagnostics = _.get(rsp, 'raw.result.diagnostics');
+    if (_.get(diagnostics, 'length')) {
+      themeNotification(diagnostics);
     }
 
     let fdata = _.flatten(

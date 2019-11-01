@@ -1,5 +1,5 @@
 import DataSet from '@antv/data-set';
-import { Button, Col, DatePicker, Row, Select } from 'antd';
+import { Button, Col, DatePicker, Row, Select, notification, Divider, Icon } from 'antd';
 import { Axis, Chart, Geom, Tooltip } from 'bizcharts';
 import { scaleLinear } from 'd3-scale';
 import _ from 'lodash';
@@ -18,6 +18,7 @@ import PosCenter from '@/containers/PosCenter';
 import { getInstrumentRollingVol } from '@/services/terminal';
 import { refTradeDateByOffsetGet } from '@/services/volatility';
 import FormItemWrapper from '@/containers/FormItemWrapper';
+import { themeNotification } from './themeNotification';
 
 const Rollong = props => {
   const chartRef = useRef(null);
@@ -57,6 +58,11 @@ const Rollong = props => {
     if (rsp.error) {
       setLoading(false);
       return;
+    }
+
+    const diagnostics = _.get(rsp, 'raw.result.diagnostics');
+    if (_.get(diagnostics, 'length')) {
+      themeNotification(diagnostics);
     }
 
     const fdata = rsp.data.map(item => ({
