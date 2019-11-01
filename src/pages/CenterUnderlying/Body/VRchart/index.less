@@ -9,3 +9,27 @@
   left: 50%;
   height: 100%;
 }
+
+.notificationWarp {
+  background-color: #064d78;
+  border: 1px solid #00e8e8;
+  .diagnosticsList {
+    padding: 0;
+    p {
+      font-size: 16px;
+    }
+    li {
+      margin-bottom: 15px;
+    }
+  }
+  :global {
+    .ant-notification-notice-description {
+      margin-top: 20px;
+      margin-left: 5px;
+      color: #fff;
+    }
+    .ant-notification-notice-close {
+      color: #00a2ff;
+    }
+  }
+}
