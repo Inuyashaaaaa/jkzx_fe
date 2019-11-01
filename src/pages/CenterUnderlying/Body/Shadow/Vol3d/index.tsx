@@ -215,7 +215,7 @@ const Vol = props => {
             label: {
               formatter: param => {
                 if (strikeType === STRIKE_TYPE_ENUM.STRIKE) {
-                  return formatNumber(_.toNumber(param), 2);
+                  return formatNumber(_.toNumber(_.replace(param, ',', '')), 2);
                 }
                 return formatNumber(param * 100, 2);
               },
