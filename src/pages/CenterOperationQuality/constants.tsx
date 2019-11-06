@@ -9,7 +9,7 @@ export const MarketSizeDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD HH:mm:ss');
+        return moment(value).format('YYYY-MM-DD');
       }
       return value;
     },
@@ -93,7 +93,7 @@ export const MarketConcentrationDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD HH:mm:ss');
+        return moment(value).format('YYYY-MM-DD');
       }
       return value;
     },
