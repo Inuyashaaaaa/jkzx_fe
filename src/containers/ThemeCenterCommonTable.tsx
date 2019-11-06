@@ -11,7 +11,6 @@ import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptSearchPagedMarketRiskDetailReport } from '@/services/report-service';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
-import { refTradeDateByOffsetGet } from '@/services/volatility';
 
 const Title = styled.div`
   font-size: 18px;
@@ -34,19 +33,12 @@ const ThemeTableWrapper = styled.div`
 `;
 
 const ThemeCenterCommonTable = props => {
-  const { title, formControls, fetchMethod, columns } = props;
-
-  const [formData, setFormData] = useState(
-    Form2.createFields({
-      date: [moment().subtract(1, 'd'), moment()],
-    }),
-  );
+  const { title, fetchMethod, columns } = props;
   const [searchForm, setSearchForm] = useState(
     Form2.createFields({
       date: [moment().subtract(1, 'd'), moment()],
     }),
   );
-  const $form = useRef<Form2>(null);
   const [dataSource, setDataSource] = useState([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState();
@@ -55,21 +47,10 @@ const ThemeCenterCommonTable = props => {
     pageSize: 10,
   };
   const [pagination, setPagination] = useState(initPagination);
-
-  const onFormChange = (propsData, changedFields, allFields) => {
-    setFormData({
-      ...formData,
-      ...changedFields,
-    });
-  };
-
   const fetchTable = async (formParam, paramPagination, update) => {
-    const res = await $form.current.validate();
-    if (res.error) {
-      return;
-    }
+    const searchData = Form2.getFieldsValue(formParam || props.formData);
+    if (!_.get(searchData, 'date[0]') || !_.get(searchData, 'date[1]')) return;
     setLoading(true);
-    const searchData = Form2.getFieldsValue(formParam);
     const { error, data } = await fetchMethod({
       start_date: moment(_.get(searchData, 'date[0]')).format('YYYY-MM-DD'),
       end_date: moment(_.get(searchData, 'date[1]')).format('YYYY-MM-DD'),
@@ -94,99 +75,45 @@ const ThemeCenterCommonTable = props => {
     fetchTable(searchForm, { current, pageSize: 10 });
   };
 
-  const getDate = async () => {
-    const { data, error } = await refTradeDateByOffsetGet({
-      offset: -2,
-    });
-    if (error) return;
-    setFormData(
-      Form2.createFields({
-        date: [moment(data).subtract(1, 'd'), moment(data)],
-      }),
-    );
-    setSearchForm(
-      Form2.createFields({
-        date: [moment(data).subtract(1, 'd'), moment(data)],
-      }),
-    );
-
-    fetchTable(
-      Form2.createFields({
-        date: [moment(data).subtract(1, 'd'), moment(data)],
-      }),
-      initPagination,
-    );
-  };
-
   useEffect(() => {
-    getDate();
-  }, []);
+    fetchTable(props.formData, initPagination, true);
+    setPagination(initPagination);
+  }, [props.formData]);
 
   return (
     <>
       <Title>{title}</Title>
       <Row
         type="flex"
-        justify="space-between"
+        justify="end"
         align="middle"
         gutter={12}
-        style={{ marginRight: -4, marginLeft: -6 }}
+        style={{ marginRight: -4, marginLeft: -6, marginBottom: 10 }}
       >
-        <Col style={{ marginTop: 18, marginBottom: 13 }}>
-          <Row type="flex" justify="start" align="middle" ß gutter={12}>
-            <Col>
-              <FormItemWrapper>
-                <Form2
-                  hideRequiredMark
-                  ref={node => {
-                    $form.current = node;
-                  }}
-                  dataSource={formData}
-                  onFieldsChange={onFormChange}
-                  columns={formControls}
-                  layout="inline"
-                  footer={false}
-                  submitText="查询"
-                  resetable={false}
-                ></Form2>
-              </FormItemWrapper>
-            </Col>
-            <Col>
-              <ThemeButton
-                type="primary"
-                onClick={() => fetchTable(formData, initPagination, true)}
-              >
-                确定
-              </ThemeButton>
-            </Col>
-          </Row>
-        </Col>
-        <Col>
-          <DownloadExcelButton
-            component={ThemeButton}
-            type="primary"
-            data={{
-              searchMethod: fetchMethod,
-              argument: {
-                searchFormData: {},
-              },
-              cols: columns,
-              name: title,
-              colSwitch: [],
-              getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (dataIndex !== 'statDate' && rowIndex > 0) {
-                  return {
-                    t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
-                  };
-                }
-                return null;
-              },
-            }}
-          >
-            导出
-          </DownloadExcelButton>
-        </Col>
+        <DownloadExcelButton
+          component={ThemeButton}
+          type="primary"
+          data={{
+            searchMethod: fetchMethod,
+            argument: {
+              searchFormData: {},
+            },
+            cols: columns,
+            name: title,
+            colSwitch: [],
+            getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+              if (dataIndex !== 'statDate' && rowIndex > 0) {
+                return {
+                  t: 'n',
+                  z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                };
+              }
+              return null;
+            },
+          }}
+        >
+          导出
+        </DownloadExcelButton>
       </Row>
       <ThemeTableWrapper>
         <ThemeTable
