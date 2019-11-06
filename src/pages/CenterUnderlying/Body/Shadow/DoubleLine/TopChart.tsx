@@ -156,7 +156,7 @@ const TopChart = props => {
           <Chart
             animate
             forceFit
-            height={315}
+            height={210}
             padding={[40, 50, 40, 40]}
             width={800}
             data={meta.dv}
@@ -323,7 +323,7 @@ const TopChart = props => {
             />
           </Chart>
         ) : (
-          <PosCenter height={315}>
+          <PosCenter height={210}>
             <Loading loading={loading}></Loading>
           </PosCenter>
         )}
