@@ -5,6 +5,7 @@ import moment from 'moment';
 import { Popover } from 'antd';
 import ThemeTable from '@/containers/ThemeTable';
 import { rptClassicScenarioMarketRiskReportListByDate } from '@/services/report-service';
+import { formatNumber } from '@/tools';
 
 const Title = styled.div`
   font-size: 18px;
@@ -53,6 +54,7 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'STOCK_CRASH_2015',
       align: 'right',
       width: 150,
+      render: val => val && formatNumber(val, 2),
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
@@ -60,6 +62,7 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'TRADE_WAR_2018',
       align: 'right',
       width: 150,
+      render: val => val && formatNumber(val, 2),
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
@@ -67,6 +70,7 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'FINANCIAL_CRISIS_2008',
       align: 'right',
       width: 150,
+      render: val => val && formatNumber(val, 2),
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
   ];
