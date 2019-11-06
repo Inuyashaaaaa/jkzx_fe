@@ -43,7 +43,7 @@ const ClassicSceneTable = memo(props => {
 
   const tableColDefs = [
     {
-      title: titleNode('经典场景'),
+      title: '经典场景（2015/6/22）',
       dataIndex: 'classicScene',
       width: 100,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
@@ -56,7 +56,7 @@ const ClassicSceneTable = memo(props => {
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
-      title: titleNode('贸易战'),
+      title: '贸易战（2019/3/22）',
       dataIndex: 'TRADE_WAR_2018',
       align: 'right',
       width: 150,
