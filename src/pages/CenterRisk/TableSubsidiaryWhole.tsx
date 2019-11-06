@@ -225,7 +225,7 @@ const TableSubsidiaryWhole = (props: any) => {
                 },
               },
               cols: columns,
-              name: '风险报告',
+              name: '各子公司风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
                 if (dataIndex !== 'subsidiaryPart' && rowIndex > 0) {
