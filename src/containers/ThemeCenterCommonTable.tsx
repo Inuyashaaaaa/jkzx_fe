@@ -50,10 +50,11 @@ const ThemeCenterCommonTable = props => {
   const [dataSource, setDataSource] = useState([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState();
-  const [pagination, setPagination] = useState({
+  const initPagination = {
     current: 1,
     pageSize: 10,
-  });
+  };
+  const [pagination, setPagination] = useState(initPagination);
 
   const onFormChange = (propsData, changedFields, allFields) => {
     setFormData({
@@ -62,7 +63,7 @@ const ThemeCenterCommonTable = props => {
     });
   };
 
-  const fetchTable = async (formParam, update) => {
+  const fetchTable = async (formParam, paramPagination, update) => {
     const res = await $form.current.validate();
     if (res.error) {
       return;
@@ -72,8 +73,8 @@ const ThemeCenterCommonTable = props => {
     const { error, data } = await fetchMethod({
       start_date: moment(_.get(searchData, 'date[0]')).format('YYYY-MM-DD'),
       end_date: moment(_.get(searchData, 'date[1]')).format('YYYY-MM-DD'),
-      page: pagination.current - 1,
-      page_size: pagination.pageSize,
+      page: (paramPagination || pagination).current - 1,
+      page_size: (paramPagination || pagination).pageSize,
       current_user: _.get(props, 'currentUser.username'),
     });
     setLoading(false);
@@ -88,9 +89,9 @@ const ThemeCenterCommonTable = props => {
     }
   };
 
-  const onChange = (current, pagesize) => {
-    setPagination({ current, pagesize });
-    fetchTable(searchForm);
+  const onChange = current => {
+    setPagination({ current, pageSize: 10 });
+    fetchTable(searchForm, { current, pageSize: 10 });
   };
 
   const getDate = async () => {
@@ -113,6 +114,7 @@ const ThemeCenterCommonTable = props => {
       Form2.createFields({
         date: [moment(data).subtract(1, 'd'), moment(data)],
       }),
+      initPagination,
     );
   };
 
@@ -150,7 +152,10 @@ const ThemeCenterCommonTable = props => {
               </FormItemWrapper>
             </Col>
             <Col>
-              <ThemeButton type="primary" onClick={() => fetchTable(formData, true)}>
+              <ThemeButton
+                type="primary"
+                onClick={() => fetchTable(formData, initPagination, true)}
+              >
                 确定
               </ThemeButton>
             </Col>
