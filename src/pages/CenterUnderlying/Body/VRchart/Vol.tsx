@@ -190,7 +190,7 @@ const Vol = props => {
           <Chart
             animate
             forceFit
-            height={610}
+            height={410}
             // padding={[40, 20, 60, 40]}
             padding={[80, 20, 40, 40]}
             width={800}
@@ -336,7 +336,7 @@ const Vol = props => {
             />
           </Chart>
         ) : (
-          <PosCenter height={500}>
+          <PosCenter height={400}>
             <Loading loading={loading}></Loading>
           </PosCenter>
         )}

@@ -7,7 +7,7 @@ import { Table } from 'antd';
 const ThemeTableWrap = styled.div`
   width: 100%;
   .ant-table-thead > tr > th {
-    background: #00e8e833;
+    background: #043269;
     color: rgba(246, 250, 255, 1);
     border: 1px solid rgba(0, 232, 232, 0.5);
     &.ant-table-column-sort {

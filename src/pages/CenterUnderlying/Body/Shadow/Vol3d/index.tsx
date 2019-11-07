@@ -329,7 +329,7 @@ const Vol = props => {
     if (status === STATUS.CHART) {
       return (
         <ReactEcharts
-          style={{ height: '600px', width: '100%' }}
+          style={{ height: '400px', width: '100%' }}
           // option={meta.option}
           option={{}}
           notMerge
@@ -469,7 +469,7 @@ const Vol = props => {
         {meta ? (
           getCom()
         ) : (
-          <PosCenter height={500}>
+          <PosCenter height={420}>
             <Loading loading={loading}></Loading>
           </PosCenter>
         )}

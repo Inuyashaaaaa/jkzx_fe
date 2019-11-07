@@ -9,7 +9,7 @@ export const MarketSizeDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD HH:mm:ss');
+        return moment(value).format('YYYY-MM-DD');
       }
       return value;
     },
@@ -19,7 +19,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'trdNotionAmount',
-    render: val => val && formatNumber(val, 4),
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '成交笔数',
@@ -32,7 +32,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'optFeeAmount',
-    render: val => val && formatNumber(val, 4),
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '成交客户数',
@@ -45,7 +45,7 @@ export const MarketSizeDefs = [
     width: 150,
     align: 'right',
     dataIndex: 'posNotionAmount',
-    render: val => val && formatNumber(val, 4),
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '持仓笔数',
@@ -58,7 +58,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'posValue',
-    render: val => val && formatNumber(val, 4),
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '持仓客户数',
@@ -93,7 +93,7 @@ export const MarketConcentrationDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD HH:mm:ss');
+        return moment(value).format('YYYY-MM-DD');
       }
       return value;
     },
@@ -109,38 +109,41 @@ export const MarketConcentrationDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'top3Pos',
-    render: val => val && formatNumber(val, 4),
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '前三名集中度',
     align: 'right',
     width: 200,
     dataIndex: 'top3PosDist',
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '前五名持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'top5Pos',
-    render: val => val && formatNumber(val, 4),
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '前五名集中度',
     align: 'right',
     width: 200,
     dataIndex: 'top5PosDist',
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '前十名持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'top10Pos',
-    render: val => val && formatNumber(val, 4),
+    render: val => val && formatNumber(val, 2),
   },
   {
     title: '前十名集中度',
     align: 'right',
     width: 200,
     dataIndex: 'top10PosDist',
+    render: val => val && formatNumber(val, 2),
   },
 ];
