@@ -96,7 +96,15 @@ const ThemeCenterCommonTable = props => {
           data={{
             searchMethod: fetchMethod,
             argument: {
-              searchFormData: {},
+              searchFormData: {
+                start_date: moment(_.get(Form2.getFieldsValue(props.formData), 'date[0]')).format(
+                  'YYYY-MM-DD',
+                ),
+                end_date: moment(_.get(Form2.getFieldsValue(props.formData), 'date[1]')).format(
+                  'YYYY-MM-DD',
+                ),
+                current_user: _.get(props, 'currentUser.username'),
+              },
             },
             cols: columns,
             name: title,
