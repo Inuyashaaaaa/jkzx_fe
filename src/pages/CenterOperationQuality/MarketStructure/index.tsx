@@ -5,12 +5,12 @@ import PositionStructure from './PositionStructure';
 import ToolStructure from './ToolStructure';
 import CustomerTypeStructure from './CustomerTypeStructure';
 
-const MarketStructure = () => (
+const MarketStructure = props => (
   <>
-    <KnockdownStructure />
-    <PositionStructure />
-    <ToolStructure />
-    <CustomerTypeStructure />
+    <KnockdownStructure {...props} />
+    <PositionStructure {...props} />
+    <ToolStructure {...props} />
+    <CustomerTypeStructure {...props} />
   </>
 );
 

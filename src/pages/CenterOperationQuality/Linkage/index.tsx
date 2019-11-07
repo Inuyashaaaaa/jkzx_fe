@@ -4,11 +4,11 @@ import Market from './Market';
 import Varieties from './Varieties';
 import Counterparty from './Counterparty';
 
-const Linkage = () => (
+const Linkage = props => (
   <>
-    <Varieties />
-    <Counterparty />
-    <Market />
+    <Varieties {...props} />
+    <Counterparty {...props} />
+    <Market {...props} />
   </>
 );
 
