@@ -166,7 +166,7 @@ const Rollong = props => {
           <Chart
             animate
             forceFit
-            height={630}
+            height={400}
             padding={[40, 20, 60, 40]}
             width={800}
             data={meta.dv}
@@ -338,7 +338,7 @@ const Rollong = props => {
             />
           </Chart>
         ) : (
-          <PosCenter height={500}>
+          <PosCenter height={400}>
             <Loading loading={loading}></Loading>
           </PosCenter>
         )}
