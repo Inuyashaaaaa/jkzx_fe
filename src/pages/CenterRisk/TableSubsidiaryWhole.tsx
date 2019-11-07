@@ -16,6 +16,7 @@ const Title = styled.div`
   font-weight: 400;
   color: rgba(246, 250, 255, 1);
   line-height: 32px;
+  margin: 20px 0;
 `;
 
 const ORDER_BY = {
