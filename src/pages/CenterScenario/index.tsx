@@ -194,7 +194,7 @@ const CenterScenario = memo(props => {
       title: item,
       dataIndex: item,
       align: 'right',
-      render: val => val && formatNumber(val, 4),
+      render: val => val && formatNumber(val, 2),
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     }));
 
