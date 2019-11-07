@@ -5,7 +5,7 @@ import { formatNumber } from '@/tools';
 export const MarketDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
@@ -42,7 +42,7 @@ export const MarketDefs = [
 export const VarietiesDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
@@ -95,7 +95,7 @@ export const VarietiesDefs = [
 export const CounterpartyDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {

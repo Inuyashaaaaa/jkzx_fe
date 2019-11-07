@@ -9,7 +9,7 @@ const ToolStructure = props => (
       title="场外衍生品市场操纵风险监测"
       fetchMethod={getOtcMarketManipulateReport}
       columns={ControlRiskDefs}
-      scrollWidth={{ x: 700 }}
+      scrollWidth={{ x: 510 }}
       formData={props.formData}
     />
   </>

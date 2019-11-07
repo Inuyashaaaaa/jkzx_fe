@@ -5,7 +5,7 @@ import { formatNumber } from '@/tools';
 export const MarketSizeDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
@@ -89,7 +89,7 @@ const DISTTYPE_OPTION = {
 export const MarketConcentrationDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
