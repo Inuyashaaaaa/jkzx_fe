@@ -224,7 +224,7 @@ const Vol = props => {
         },
         yAxis3D: {
           type: 'value',
-          name: '期限',
+          name: '期限(天)',
           nameTextStyle: {
             fontSize: 14,
             lineHeight: 40,
