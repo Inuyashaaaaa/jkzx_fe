@@ -75,7 +75,7 @@ const Risk = props => {
     <>
       <Row type="flex" justify="start" gutter={14} style={{ marginBottom: 30 }}>
         <Col>
-          <BigTitle>全市场风险报告</BigTitle>
+          <BigTitle>主体估值监测</BigTitle>
         </Col>
         <Col>
           <ThemeDatePicker
