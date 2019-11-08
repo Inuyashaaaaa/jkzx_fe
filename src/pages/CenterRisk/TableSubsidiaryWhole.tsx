@@ -126,7 +126,7 @@ const TableSubsidiaryWhole = (props: any) => {
       width: 100,
       sortOrder: sorter.field === 'deltaCash' && sorter.order,
       sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
       align: 'right',
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
@@ -136,7 +136,7 @@ const TableSubsidiaryWhole = (props: any) => {
       width: 100,
       sortOrder: sorter.field === 'gammaCash' && sorter.order,
       sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
       align: 'right',
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
@@ -146,7 +146,7 @@ const TableSubsidiaryWhole = (props: any) => {
       width: 100,
       sortOrder: sorter.field === 'vega' && sorter.order,
       sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
       align: 'right',
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
@@ -156,7 +156,7 @@ const TableSubsidiaryWhole = (props: any) => {
       width: 100,
       sortOrder: sorter.field === 'theta' && sorter.order,
       sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
       align: 'right',
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
@@ -166,7 +166,7 @@ const TableSubsidiaryWhole = (props: any) => {
       width: 100,
       sortOrder: sorter.field === 'rho' && sorter.order,
       sorter: true,
-      render: value => formatNumber({ value, formatter: '0,0.00' }),
+      render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
       align: 'right',
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
@@ -229,6 +229,12 @@ const TableSubsidiaryWhole = (props: any) => {
               name: '各子公司风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+                if (_.indexOf(['gamma', 'delta'], dataIndex) > -1) {
+                  return {
+                    t: 'n',
+                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                  };
+                }
                 if (dataIndex !== 'subsidiaryPart' && rowIndex > 0) {
                   return {
                     t: 'n',

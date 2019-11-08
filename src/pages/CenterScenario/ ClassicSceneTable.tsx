@@ -48,13 +48,14 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'classicScene',
       width: 100,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
+      render: val => <span>{val}</span>,
     },
     {
       title: '股市异常波动（2015/6/26）',
       dataIndex: 'STOCK_CRASH_2015',
       align: 'right',
       width: 150,
-      render: val => val && formatNumber(val, 2),
+      render: val => <span>{val && formatNumber(val, 2)}</span>,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
@@ -62,7 +63,7 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'TRADE_WAR_2018',
       align: 'right',
       width: 150,
-      render: val => val && formatNumber(val, 2),
+      render: val => <span>{val && formatNumber(val, 2)}</span>,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
@@ -70,7 +71,7 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'FINANCIAL_CRISIS_2008',
       align: 'right',
       width: 150,
-      render: val => val && formatNumber(val, 2),
+      render: val => <span>{val && formatNumber(val, 2)}</span>,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
   ];

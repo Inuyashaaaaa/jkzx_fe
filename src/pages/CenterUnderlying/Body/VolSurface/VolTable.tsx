@@ -44,42 +44,67 @@ const VolTable = props => {
     {
       dataIndex: 'name',
       width: 100,
+      render: val => <span>{val}</span>,
     },
     {
       title: '最小值',
       dataIndex: 'min',
       width: 190,
-      render: value => <GradientBox value={value} max={max} />,
+      render: value => (
+        <span>
+          <GradientBox value={value} max={max} />
+        </span>
+      ),
     },
     {
       title: '最大值',
       dataIndex: 'max',
       width: 190,
-      render: value => <GradientBox value={value} max={max} />,
+      render: value => (
+        <span>
+          <GradientBox value={value} max={max} />
+        </span>
+      ),
     },
     {
       title: '平均值',
       dataIndex: 'average',
       width: 190,
-      render: value => <GradientBox value={value} max={max} />,
+      render: value => (
+        <span>
+          <GradientBox value={value} max={max} />
+        </span>
+      ),
     },
     {
       title: '中位数',
       dataIndex: 'median',
       width: 190,
-      render: value => <GradientBox value={value} max={max} />,
+      render: value => (
+        <span>
+          <GradientBox value={value} max={max} />
+        </span>
+      ),
     },
     {
       title: '上四分位数',
       dataIndex: 'q3',
       width: 190,
-      render: value => <GradientBox value={value} max={max} />,
+      render: value => (
+        <span>
+          <GradientBox value={value} max={max} />
+        </span>
+      ),
     },
     {
       title: '下四分位数',
       dataIndex: 'q1',
       width: 190,
-      render: value => <GradientBox value={value} max={max} />,
+      render: value => (
+        <span>
+          <GradientBox value={value} max={max} />
+        </span>
+      ),
     },
   ];
 

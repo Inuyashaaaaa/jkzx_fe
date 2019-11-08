@@ -9,34 +9,36 @@ export const MarketDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD');
+        return <span>{moment(value).format('YYYY-MM-DD')}</span>;
       }
-      return value;
+      return <span>{value}</span>;
     },
   },
   {
     title: '品种',
     width: 200,
     dataIndex: 'commodityId',
+    render: val => <span>{val}</span>,
   },
   {
     title: '子公司名称',
     width: 200,
     dataIndex: 'mainBodyName',
+    render: val => <span>{val}</span>,
   },
   {
     title: '子公司场外持仓金额',
     align: 'right',
     width: 200,
     dataIndex: 'otcSubPosAmount',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '子公司场内持仓金额',
     align: 'right',
     width: 200,
     dataIndex: 'etSubPosAmount',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
 export const VarietiesDefs = [
@@ -46,50 +48,51 @@ export const VarietiesDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD');
+        return <span>{moment(value).format('YYYY-MM-DD')}</span>;
       }
-      return value;
+      return <span>{value}</span>;
     },
   },
   {
     title: '品种',
     width: 150,
     dataIndex: 'commodityId',
+    render: val => <span>{val}</span>,
   },
   {
     title: '场外持仓名义金额',
     align: 'right',
     width: 200,
     dataIndex: 'otcPosAmount',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '场外持仓比例',
     align: 'right',
     width: 150,
     dataIndex: 'otcPosRatio',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '场内持仓金额',
     align: 'right',
     width: 150,
     dataIndex: 'etPosAmount',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '场内持仓比例',
     align: 'right',
     width: 150,
     dataIndex: 'etPosRatio',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '当月倍数（场外持仓比例/场内持仓比例）',
     align: 'right',
     width: 400,
     dataIndex: 'otcEtRatio',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
 export const CounterpartyDefs = [
@@ -99,9 +102,9 @@ export const CounterpartyDefs = [
     dataIndex: 'statDate',
     render: value => {
       if (value) {
-        return moment(value).format('YYYY-MM-DD');
+        return <span>{moment(value).format('YYYY-MM-DD')}</span>;
       }
-      return value;
+      return <span>{value}</span>;
     },
   },
   {
@@ -109,26 +112,27 @@ export const CounterpartyDefs = [
     align: 'right',
     width: 300,
     dataIndex: 'etAccountCusNum',
+    render: val => <span>{val}</span>,
   },
   {
     title: '场内开户对手方场外持仓名义金额',
     align: 'right',
     width: 350,
     dataIndex: 'otcCusPosAmount',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '交易对手方场内持仓金额',
     align: 'right',
     width: 250,
     dataIndex: 'etCusPosAmount',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '对应账户的场内总权益',
     align: 'right',
     width: 250,
     dataIndex: 'etCusRight',
-    render: val => val && formatNumber(val, 2),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];

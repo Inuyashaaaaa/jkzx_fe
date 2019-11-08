@@ -136,7 +136,7 @@ const Vol = props => {
       return {
         title: tenor.replace('D', '天'),
         dataIndex: tenor,
-        render: (value, record, index) => formatNumber(_.toNumber(value) * 100, 2),
+        render: (value, record, index) => <span>{formatNumber(_.toNumber(value) * 100, 2)}</span>,
       };
     });
 
@@ -347,9 +347,9 @@ const Vol = props => {
         dataIndex: 'percent',
         render: (value, record, index) => {
           if (typeData === STRIKE_TYPE_ENUM.STRIKE) {
-            return formatNumber(_.toNumber(value), 2);
+            return <span>{formatNumber(_.toNumber(value), 2)}</span>;
           }
-          return formatNumber(_.toNumber(value) * 100, 2);
+          return <span>{formatNumber(_.toNumber(value) * 100, 2)}</span>;
         },
       },
     ];
