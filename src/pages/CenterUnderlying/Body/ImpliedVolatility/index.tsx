@@ -249,11 +249,11 @@ const ImpliedVolatility = props => {
               vol: {
                 alias: '波动率(%)',
                 min: 0,
-                max: 2,
+                // max: 2,
                 tickCount: 5,
                 formatter: val => formatNumber(_.toNumber(val) * 100, 0),
               },
-              middle: { min: 0, max: 2 },
+              // middle: { min: 0, max: 2 },
             }}
           >
             <Axis
@@ -315,7 +315,7 @@ const ImpliedVolatility = props => {
                 },
               }}
             ></Axis>
-            <Axis name="middle" grid={null} label={false}></Axis>
+            {/* <Axis name="middle" grid={null} label={false}></Axis> */}
             <Tooltip
               useHtml
               crosshairs={{
@@ -353,7 +353,7 @@ const ImpliedVolatility = props => {
               ]}
               color={['name', val => (val === 'max' ? '#F15345' : '#7070D3')]}
             ></Geom>
-            <Geom
+            {/* <Geom
               type="interval"
               size={[
                 'instrumentId',
@@ -370,7 +370,7 @@ const ImpliedVolatility = props => {
                 lineWidth: 2,
                 stroke: '#E7B677',
               }}
-            ></Geom>
+            ></Geom> */}
           </Chart>
         ) : (
           <PosCenter height={500}>
