@@ -356,7 +356,7 @@ const Vol = props => {
 
     return (
       <ThemeTable
-        scroll={{ x: meta.tableColumns.length && meta.tableColumns.length * 100 }}
+        scroll={{ x: 720 }}
         pagination={{
           simple: true,
         }}
