@@ -212,6 +212,7 @@ const CenterScenario = memo(props => {
       {
         title: '标的物情景分析',
         dataIndex: 'greekLatter',
+        fixed: 'left',
         width,
         onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
       },
@@ -350,6 +351,7 @@ const CenterScenario = memo(props => {
     setTableColDefs([
       {
         title: '标的物情景分析',
+        fixed: 'left',
         width,
         dataIndex: 'greekLatter',
       },
