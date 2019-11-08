@@ -170,6 +170,7 @@ const CenterScenario = memo(props => {
           width,
           fixed: 'left',
           onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
+          render: val => <span>{val}</span>,
         },
         ...col.map(item => {
           return {
@@ -177,6 +178,7 @@ const CenterScenario = memo(props => {
             dataIndex: `scenario_${item}%`,
             width,
             onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+            render: val => <span>{val}</span>,
           };
         }),
       ]);
@@ -195,7 +197,7 @@ const CenterScenario = memo(props => {
       title: item,
       dataIndex: item,
       align: 'right',
-      render: val => val && formatNumber(val, 2),
+      render: val => <span>{val && formatNumber(val, 2)}</span>,
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     }));
 
@@ -215,6 +217,7 @@ const CenterScenario = memo(props => {
         fixed: 'left',
         width,
         onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
+        render: val => <span>{val}</span>,
       },
       ...colDef,
     ]);
@@ -354,9 +357,15 @@ const CenterScenario = memo(props => {
         fixed: 'left',
         width,
         dataIndex: 'greekLatter',
+        render: val => <span>{val}</span>,
       },
       ...col.map(item => {
-        return { title: `scenario_${item}%`, dataIndex: `scenario_${item}%`, width };
+        return {
+          title: `scenario_${item}%`,
+          dataIndex: `scenario_${item}%`,
+          width,
+          render: val => <span>{val}</span>,
+        };
       }),
     ]);
   });

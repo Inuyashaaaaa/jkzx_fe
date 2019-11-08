@@ -53,7 +53,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => formatNumber({ value, formatter: '0,0.00' }),
+    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
   },
   {
     title: 'Gamma_Cash',
@@ -61,7 +61,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => formatNumber({ value, formatter: '0,0.00' }),
+    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
   },
   {
     title: 'Vega',
@@ -69,7 +69,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => formatNumber({ value, formatter: '0,0.00' }),
+    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
   },
   {
     title: 'Theta',
@@ -77,7 +77,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => formatNumber({ value, formatter: '0,0.00' }),
+    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
   },
   {
     title: 'Rho',
@@ -85,7 +85,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => formatNumber({ value, formatter: '0,0.00' }),
+    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
   },
 ];
 
@@ -144,13 +144,16 @@ const BoxPanel = memo(props => {
               name: '全市场整体风险报告',
               colSwitch: [],
               getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
-                if (rowIndex > 0) {
+                if (_.indexOf(['gamma', 'delta'], dataIndex) > -1) {
                   return {
                     t: 'n',
                     z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
                   };
                 }
-                return null;
+                return {
+                  t: 'n',
+                  z: Math.abs(val) >= 1000 ? '0,0' : '0',
+                };
               },
             }}
           >

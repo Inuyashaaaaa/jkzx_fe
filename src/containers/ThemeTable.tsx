@@ -53,6 +53,11 @@ const ThemeTableWrap = styled.div`
     font-size: 20px;
   }
 
+  .ant-table-tbody > tr:hover > td > span {
+    display: inline-block;
+    transform: scale(1.1);
+  }
+
   .ant-pagination-prev .ant-pagination-item-link,
   .ant-pagination-next .ant-pagination-item-link {
     background: transparent;
@@ -78,6 +83,10 @@ const ThemeTableWrap = styled.div`
     &.off {
       color: #cad9e2;
     }
+  }
+  .ant-table-fixed .ant-table-thead > tr > th,
+  .ant-table-fixed .ant-table-tbody > tr > td {
+    background: rgb(4, 50, 105);
   }
 `;
 
