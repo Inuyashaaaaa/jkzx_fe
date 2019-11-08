@@ -44,7 +44,7 @@ const ClassicSceneTable = memo(props => {
 
   const tableColDefs = [
     {
-      title: '经典场景（2015/6/22）',
+      title: '经典场景',
       dataIndex: 'classicScene',
       width: 100,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
