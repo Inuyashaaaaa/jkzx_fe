@@ -9,7 +9,7 @@ const ToolStructure = props => (
       title="场外衍生品市场资产和工具结构"
       fetchMethod={getOtcAssetToolReport}
       columns={ToolStructureDefs}
-      scrollWidth={{ x: 1450 }}
+      scrollWidth={{ x: 1190 }}
       formData={props.formData}
     />
   </>

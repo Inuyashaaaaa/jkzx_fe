@@ -9,7 +9,7 @@ const ToolStructure = props => (
       title="场内外品种联动统计"
       fetchMethod={getOtcEtCommodityReport}
       columns={VarietiesDefs}
-      scrollWidth={{ x: 1450 }}
+      scrollWidth={{ x: 1340 }}
       formData={props.formData}
     />
   </>

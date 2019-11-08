@@ -5,7 +5,7 @@ import { formatNumber } from '@/tools';
 export const KnockdownStructureDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
@@ -98,7 +98,7 @@ export const KnockdownStructureDefs = [
 export const PositionStructureDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
@@ -210,7 +210,7 @@ export const PositionStructureDefs = [
 export const ToolStructureDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
@@ -265,7 +265,7 @@ export const ToolStructureDefs = [
 export const CustomerTypeStructureDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {

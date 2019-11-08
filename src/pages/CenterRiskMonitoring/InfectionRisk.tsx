@@ -9,7 +9,7 @@ const ToolStructure = props => (
       title="场外衍生品市场子公司传染风险监测"
       fetchMethod={getOtcCompPropagateReport}
       columns={InfectionRiskDefs}
-      scrollWidth={{ x: 1650 }}
+      scrollWidth={{ x: 1540 }}
       formData={props.formData}
     />
   </>

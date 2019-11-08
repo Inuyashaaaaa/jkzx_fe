@@ -9,7 +9,7 @@ const ToolStructure = props => (
       title="场外衍生品市场成交结构"
       fetchMethod={getOtcTradeSummaryReport}
       columns={KnockdownStructureDefs}
-      scrollWidth={{ x: 2700 }}
+      scrollWidth={{ x: 2590 }}
       formData={props.formData}
     />
   </>

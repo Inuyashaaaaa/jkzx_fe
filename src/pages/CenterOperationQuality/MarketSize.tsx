@@ -8,7 +8,7 @@ const MarketSize = props => (
     <ThemeCenterCommonTable
       title="场外衍生品市场规模概况"
       fetchMethod={getOtcSummaryReport}
-      scrollWidth={{ x: 1780 }}
+      scrollWidth={{ x: 1670 }}
       columns={MarketSizeDefs}
       formData={props.formData}
     />

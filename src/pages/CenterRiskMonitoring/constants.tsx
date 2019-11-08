@@ -5,7 +5,7 @@ import { formatNumber } from '@/tools';
 export const InfectionRiskDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
@@ -67,7 +67,7 @@ export const InfectionRiskDefs = [
 export const ControlRiskDefs = [
   {
     title: '日期',
-    width: 250,
+    width: 140,
     dataIndex: 'statDate',
     render: value => {
       if (value) {
