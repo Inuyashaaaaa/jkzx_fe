@@ -197,19 +197,24 @@ const CenterScenario = memo(props => {
       title: item,
       dataIndex: item,
       align: 'right',
-      render: val => <span>{val && formatNumber(val, 2)}</span>,
+      render: (val, record) => {
+        if (_.indexOf(['Gamma', 'Delta'], record.greekLatter) > -1) {
+          return <span>{val && formatNumber(val, 2)}</span>;
+        }
+        return <span>{val && formatNumber(val, 0)}</span>;
+      },
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     }));
 
-    const tableData = Object.keys(colDefsMirrior).map(item =>
-      data[0].scenarios.reduce(
+    const tableData = Object.keys(colDefsMirrior).map(item => {
+      return data[0].scenarios.reduce(
         (prev, next) => ({
           ...prev,
           [next.scenarioId]: next[item],
         }),
         { greekLatter: _.get(colDefsMirrior, item) },
-      ),
-    );
+      );
+    });
     setTableColDefs([
       {
         title: '标的物情景分析',

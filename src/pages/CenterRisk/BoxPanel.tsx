@@ -53,7 +53,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
+    render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
   },
   {
     title: 'Gamma_Cash',
@@ -61,7 +61,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
+    render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
   },
   {
     title: 'Vega',
@@ -69,7 +69,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
+    render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
   },
   {
     title: 'Theta',
@@ -77,7 +77,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
+    render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
   },
   {
     title: 'Rho',
@@ -85,7 +85,7 @@ const columns = [
     align: 'right',
     width: 100,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: value => <span>{formatNumber({ value, formatter: '0,0.00' })}</span>,
+    render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
   },
 ];
 
