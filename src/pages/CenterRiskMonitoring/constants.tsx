@@ -109,3 +109,85 @@ export const ControlRiskDefs = [
     render: val => <span>{val}</span>,
   },
 ];
+
+export const PositionProportionDefs = [
+  {
+    title: '日期',
+    width: 140,
+    dataIndex: 'statDate',
+    render: value => {
+      if (value) {
+        return <span>{moment(value).format('YYYY-MM-DD')}</span>;
+      }
+      return <span>{value}</span>;
+    },
+  },
+  {
+    title: '对手方名称',
+    width: 200,
+    dataIndex: 'analogueName',
+    render: val => <span>{val}</span>,
+  },
+  {
+    title: '标的资产品种',
+    width: 200,
+    dataIndex: 'underAssVarit',
+    render: val => <span>{val}</span>,
+  },
+  {
+    title: '在所有子公司的正Delta累加值',
+    align: 'right',
+    width: 200,
+    dataIndex: 'cusPositiveDelta',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
+  },
+  {
+    title: '场内空头持仓量',
+    align: 'right',
+    width: 200,
+    dataIndex: 'cusShortPosition',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
+  },
+  {
+    title: '在所有子公司的负Delta累加值',
+    align: 'right',
+    width: 200,
+    dataIndex: 'cusNegativeDelta',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
+  },
+  {
+    title: '场内多头持仓量',
+    align: 'right',
+    width: 200,
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    dataIndex: 'cusLongPostion',
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
+  },
+  {
+    title: '场内合并单边最大持仓',
+    align: 'right',
+    width: 200,
+    dataIndex: 'exchangeMaxPos',
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+  },
+  {
+    title: '场内单边持仓量',
+    align: 'right',
+    width: 200,
+    dataIndex: 'exchangePos',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
+  },
+  {
+    title: '对手方场内外合并持仓占比',
+    align: 'right',
+    width: 200,
+    dataIndex: 'cusExgOtcRatio',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
+  },
+];

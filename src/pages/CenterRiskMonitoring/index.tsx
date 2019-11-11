@@ -7,6 +7,7 @@ import ThemeTabs from '@/containers/ThemeTabs';
 import { Form2 } from '@/containers';
 import InfectionRisk from './InfectionRisk';
 import ControlRisk from './ControlRisk';
+import PositionProportion from './PositionProportion';
 import ThemeDatePickerRanger from '@/containers/ThemeDatePickerRanger';
 import { refTradeDateByOffsetGet } from '@/services/volatility';
 
@@ -101,6 +102,9 @@ const CenterRiskMonitoring = () => {
         </TabPane>
         <TabPane tab="子公司传染风险" key="2">
           <InfectionRisk formData={formData} />
+        </TabPane>
+        <TabPane tab="对手方场内外合并持仓占比" key="3">
+          <PositionProportion formData={formData} />
         </TabPane>
       </ThemeTabs>
     </>
