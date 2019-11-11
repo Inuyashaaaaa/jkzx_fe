@@ -9,10 +9,6 @@ const FormItemWrapper = styled.div`
     display: flex;
     align-items: center;
   }
-  .ant-form-item-label,
-  .ant-form-item-control {
-    line-height: 1;
-  }
 `;
 
 export default FormItemWrapper;
