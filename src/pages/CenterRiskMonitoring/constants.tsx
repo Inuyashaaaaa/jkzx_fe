@@ -129,6 +129,7 @@ export const PositionProportionDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'cusPositiveDelta',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -136,6 +137,7 @@ export const PositionProportionDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'cusShortPosition',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -143,12 +145,14 @@ export const PositionProportionDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'cusNegativeDelta',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '场内多头持仓量',
     align: 'right',
     width: 200,
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     dataIndex: 'cusLongPostion',
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
@@ -158,12 +162,14 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'exchangeMaxPos',
     render: val => <span>{val && formatNumber(val, 2)}</span>,
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: '场内单边持仓量',
     align: 'right',
     width: 200,
     dataIndex: 'exchangePos',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -171,6 +177,7 @@ export const PositionProportionDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'cusExgOtcRatio',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
