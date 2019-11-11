@@ -19,6 +19,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'openTrdNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -26,6 +27,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'closeTrdNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -33,6 +35,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'endTrdNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -40,6 +43,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -47,6 +51,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdOpenPremium',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -54,6 +59,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdClosePremium',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -61,6 +67,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdEndPremium',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -68,6 +75,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'premiumAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -75,6 +83,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdOpenCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -82,6 +91,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdCloseCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -89,6 +99,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdEndCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -96,6 +107,7 @@ export const KnockdownStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
 ];
@@ -116,6 +128,7 @@ export const PositionStructureDefs = [
     width: 250,
     align: 'right',
     dataIndex: 'posCallBuyAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -123,6 +136,7 @@ export const PositionStructureDefs = [
     width: 250,
     align: 'right',
     dataIndex: 'posPutBuyAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -130,6 +144,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'posOtherBuyAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -137,6 +152,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posBuyAmountTotal',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -144,6 +160,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'posCallSellAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -151,6 +168,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'posPutSellAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -158,6 +176,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posSellAmountTotal',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -165,6 +184,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posCallBuyCValue',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -172,6 +192,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posPutBuyCValue',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -179,6 +200,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posOtherBuyCValue',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -186,6 +208,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posBuyValueTotal',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -193,6 +216,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posCallSellCValue',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -200,6 +224,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posPutSellCValue',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -207,6 +232,7 @@ export const PositionStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posSellValueTotal',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
@@ -240,6 +266,7 @@ export const ToolStructureDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'trdTransNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -247,6 +274,7 @@ export const ToolStructureDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'trdNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -255,12 +283,14 @@ export const ToolStructureDefs = [
     align: 'right',
     dataIndex: 'posTransNum',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: '持仓名义金额',
     width: 150,
     align: 'right',
     dataIndex: 'posNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -268,6 +298,7 @@ export const ToolStructureDefs = [
     width: 150,
     align: 'right',
     dataIndex: 'inMarketCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
 ];
@@ -300,6 +331,7 @@ export const CustomerTypeStructureDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'trdTransNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -307,6 +339,7 @@ export const CustomerTypeStructureDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'trdNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -314,6 +347,7 @@ export const CustomerTypeStructureDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'posTransNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -321,6 +355,7 @@ export const CustomerTypeStructureDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'posNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -328,6 +363,7 @@ export const CustomerTypeStructureDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'inMarketCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
 ];

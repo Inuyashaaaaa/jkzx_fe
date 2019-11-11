@@ -19,6 +19,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'trdNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -26,6 +27,7 @@ export const MarketSizeDefs = [
     width: 150,
     align: 'right',
     dataIndex: 'trdTransNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -33,6 +35,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'optFeeAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -40,6 +43,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'trdCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -47,6 +51,7 @@ export const MarketSizeDefs = [
     width: 150,
     align: 'right',
     dataIndex: 'posNotionAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -54,6 +59,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'posTransNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -61,6 +67,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'posValue',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -68,6 +75,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'posCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -75,6 +83,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 180,
     dataIndex: 'inMarketCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -82,6 +91,7 @@ export const MarketSizeDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'fullMarketCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
 ];
@@ -115,6 +125,7 @@ export const MarketConcentrationDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'top3Pos',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -122,6 +133,7 @@ export const MarketConcentrationDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'top3PosDist',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -129,6 +141,7 @@ export const MarketConcentrationDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'top5Pos',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -136,6 +149,7 @@ export const MarketConcentrationDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'top5PosDist',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -143,6 +157,7 @@ export const MarketConcentrationDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'top10Pos',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -150,6 +165,7 @@ export const MarketConcentrationDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'top10PosDist',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];

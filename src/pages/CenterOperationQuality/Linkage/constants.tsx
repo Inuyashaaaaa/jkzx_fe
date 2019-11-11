@@ -31,6 +31,7 @@ export const MarketDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'otcSubPosAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -38,6 +39,7 @@ export const MarketDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'etSubPosAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
@@ -64,6 +66,7 @@ export const VarietiesDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'otcPosAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -71,6 +74,7 @@ export const VarietiesDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'otcPosRatio',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -78,6 +82,7 @@ export const VarietiesDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'etPosAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -85,6 +90,7 @@ export const VarietiesDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'etPosRatio',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -92,6 +98,7 @@ export const VarietiesDefs = [
     align: 'right',
     width: 400,
     dataIndex: 'otcEtRatio',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
@@ -112,6 +119,7 @@ export const CounterpartyDefs = [
     align: 'right',
     width: 300,
     dataIndex: 'etAccountCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -119,6 +127,7 @@ export const CounterpartyDefs = [
     align: 'right',
     width: 350,
     dataIndex: 'otcCusPosAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -126,6 +135,7 @@ export const CounterpartyDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'etCusPosAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -133,6 +143,7 @@ export const CounterpartyDefs = [
     align: 'right',
     width: 250,
     dataIndex: 'etCusRight',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
