@@ -9,7 +9,7 @@ const ThemeTabsWrap = styled.div`
     border: none;
   }
   .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab {
-    width: 190px;
+    min-width: 190px;
     height: 32px;
     line-height: 32px;
     color: rgba(246, 250, 255, 1);

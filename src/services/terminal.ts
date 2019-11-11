@@ -276,3 +276,15 @@ export async function getOtcCompPropagateReport(params = {}) {
     },
   });
 }
+
+export async function getOtcCusPosPercentageReport(params = {}) {
+  return request(`${HOST_TEST}data-service/api/rpc`, {
+    method: 'POST',
+    body: {
+      method: 'get_otc_cus_pos_percentage_report',
+      params,
+      jsonrpc: '2.0',
+      id: 1,
+    },
+  });
+}
