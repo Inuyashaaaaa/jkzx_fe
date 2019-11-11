@@ -30,6 +30,9 @@ const ThemeDatePickerRangerWrap = styled.div`
     border-color: #01c7d1;
     box-shadow: none;
   }
+  .ant-calendar-picker {
+    max-width: 383px;
+  }
 `;
 
 const ThemeDatePickerRanger = memo(props => {
