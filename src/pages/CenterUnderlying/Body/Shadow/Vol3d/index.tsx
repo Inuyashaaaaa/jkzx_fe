@@ -184,7 +184,7 @@ const Vol = props => {
             const [x, y, z] = pData;
             return `${strikeType === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)' : '行权价(%)'}: ${
               strikeType === STRIKE_TYPE_ENUM.STRIKE ? formatNumber(x, 2) : formatNumber(x * 100, 2)
-            }<br/>期限: ${y}<br/>波动率(%): ${formatNumber(z * 100, 2)}`;
+            }<br/>期限(天): ${y}<br/>波动率(%): ${formatNumber(z * 100, 2)}`;
           },
         },
         visualMap: {
