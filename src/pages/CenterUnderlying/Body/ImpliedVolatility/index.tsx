@@ -51,15 +51,25 @@ const ImpliedVolatility = props => {
 
   const newData = dataSource.map(item => ({
     ...item,
-    min: [item.minVol, item.neutralVol],
-    max: [item.neutralVol, item.maxVol],
+    min:
+      item.neutralVol < item.minVol
+        ? [item.minVol, item.minVol]
+        : item.neutralVol > item.maxVol
+        ? [item.minVol, item.maxVol]
+        : [item.minVol, item.neutralVol],
+    max:
+      item.neutralVol < item.minVol
+        ? [item.minVol, item.maxVol]
+        : item.neutralVol > item.maxVol
+        ? [item.maxVol, item.maxVol]
+        : [item.neutralVol, item.maxVol],
     middle: [item.neutralVol, item.neutralVol],
   }));
 
   const dv = new DataSet.View().source(newData);
   dv.transform({
     type: 'fold',
-    fields: ['max', 'min'],
+    fields: ['max', 'min', 'middle'],
     key: 'name',
     value: 'vol',
   });
@@ -351,7 +361,22 @@ const ImpliedVolatility = props => {
                   neutralVol: formatNumber(neutralVol * 100, 2),
                 }),
               ]}
-              color={['name', val => (val === 'max' ? '#F15345' : '#7070D3')]}
+              active={false}
+              color={[
+                'name',
+                val => (val === 'max' ? '#F15345' : val === 'min' ? '#7070D3' : '#E7B677'),
+              ]}
+              style={[
+                'name',
+                {
+                  lineWidth: name => {
+                    return name === 'middle' ? 2 : 0;
+                  },
+                  stroke: name => {
+                    return name === 'middle' ? '#E7B677' : null;
+                  },
+                },
+              ]}
             ></Geom>
             {/* <Geom
               type="interval"
