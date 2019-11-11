@@ -55,7 +55,12 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'STOCK_CRASH_2015',
       align: 'right',
       width: 150,
-      render: val => <span>{val && formatNumber(val, 2)}</span>,
+      render: (val, record) => {
+        if (_.indexOf(['Gamma', 'Delta'], record.greekLatter) > -1) {
+          return <span>{val && formatNumber(val, 2)}</span>;
+        }
+        return <span>{val && formatNumber(val, 0)}</span>;
+      },
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
@@ -63,7 +68,12 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'TRADE_WAR_2018',
       align: 'right',
       width: 150,
-      render: val => <span>{val && formatNumber(val, 2)}</span>,
+      render: (val, record) => {
+        if (_.indexOf(['Gamma', 'Delta'], record.greekLatter) > -1) {
+          return <span>{val && formatNumber(val, 2)}</span>;
+        }
+        return <span>{val && formatNumber(val, 0)}</span>;
+      },
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
@@ -71,7 +81,12 @@ const ClassicSceneTable = memo(props => {
       dataIndex: 'FINANCIAL_CRISIS_2008',
       align: 'right',
       width: 150,
-      render: val => <span>{val && formatNumber(val, 2)}</span>,
+      render: (val, record) => {
+        if (_.indexOf(['Gamma', 'Delta'], record.greekLatter) > -1) {
+          return <span>{val && formatNumber(val, 2)}</span>;
+        }
+        return <span>{val && formatNumber(val, 0)}</span>;
+      },
       onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
   ];
