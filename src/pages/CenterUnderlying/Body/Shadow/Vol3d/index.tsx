@@ -136,6 +136,7 @@ const Vol = props => {
       return {
         title: tenor.replace('D', '天'),
         dataIndex: tenor,
+        onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
         render: (value, record, index) => <span>{formatNumber(_.toNumber(value) * 100, 2)}</span>,
       };
     });
@@ -345,6 +346,7 @@ const Vol = props => {
       {
         title: `${typeData === STRIKE_TYPE_ENUM.STRIKE ? '行权价(￥)\\期限' : '行权价(%)\\期限'}`,
         dataIndex: 'percent',
+        onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
         render: (value, record, index) => {
           if (typeData === STRIKE_TYPE_ENUM.STRIKE) {
             return <span>{formatNumber(_.toNumber(value), 2)}</span>;

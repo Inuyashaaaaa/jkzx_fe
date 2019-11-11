@@ -50,6 +50,7 @@ const VolTable = props => {
       title: '最小值',
       dataIndex: 'min',
       width: 190,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
       render: value => (
         <span>
           <GradientBox value={value} max={max} />
@@ -60,6 +61,7 @@ const VolTable = props => {
       title: '最大值',
       dataIndex: 'max',
       width: 190,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
       render: value => (
         <span>
           <GradientBox value={value} max={max} />
@@ -70,6 +72,7 @@ const VolTable = props => {
       title: '平均值',
       dataIndex: 'average',
       width: 190,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
       render: value => (
         <span>
           <GradientBox value={value} max={max} />
@@ -80,6 +83,7 @@ const VolTable = props => {
       title: '中位数',
       dataIndex: 'median',
       width: 190,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
       render: value => (
         <span>
           <GradientBox value={value} max={max} />
@@ -90,6 +94,7 @@ const VolTable = props => {
       title: '上四分位数',
       dataIndex: 'q3',
       width: 190,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
       render: value => (
         <span>
           <GradientBox value={value} max={max} />
@@ -100,6 +105,7 @@ const VolTable = props => {
       title: '下四分位数',
       dataIndex: 'q1',
       width: 190,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
       render: value => (
         <span>
           <GradientBox value={value} max={max} />

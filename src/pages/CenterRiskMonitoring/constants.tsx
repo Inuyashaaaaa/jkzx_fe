@@ -19,6 +19,7 @@ export const InfectionRiskDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'interCompNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -26,6 +27,7 @@ export const InfectionRiskDefs = [
     width: 200,
     align: 'right',
     dataIndex: 'interCompTrdAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -33,6 +35,7 @@ export const InfectionRiskDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'compTrdAmountTotal',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -40,6 +43,7 @@ export const InfectionRiskDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'trdRatio',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -47,6 +51,7 @@ export const InfectionRiskDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'interCompPosAmount',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -54,6 +59,7 @@ export const InfectionRiskDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'compPosAmountTotal',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -61,6 +67,7 @@ export const InfectionRiskDefs = [
     align: 'right',
     width: 200,
     dataIndex: 'posRatio',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
@@ -82,6 +89,7 @@ export const ControlRiskDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'interCompCusNum',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -89,6 +97,7 @@ export const ControlRiskDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'interCompTrd',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {
@@ -96,6 +105,7 @@ export const ControlRiskDefs = [
     align: 'right',
     width: 150,
     dataIndex: 'interCompPos',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
 ];
