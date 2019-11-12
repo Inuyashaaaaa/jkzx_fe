@@ -1,8 +1,10 @@
 import styled from 'styled-components';
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import classnames from 'classnames';
 import { Table } from 'antd';
+import _ from 'lodash';
 // import styles from './ThemeTable.less';
+import uuidv4 from 'uuid/v4';
 
 const ThemeTableWrap = styled.div`
   width: 100%;
@@ -90,10 +92,27 @@ const ThemeTableWrap = styled.div`
   }
 `;
 
-const ThemeTable = memo(props => (
-  <ThemeTableWrap style={props.wrapStyle}>
-    <Table {...props}></Table>
-  </ThemeTableWrap>
-));
+const ThemeTable = memo(props => {
+  const [uuid, setUuid] = useState(uuidv4());
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const dom = document.getElementById(uuid);
+    setWidth(dom.offsetWidth);
+  }, []);
+
+  const propsObj = {
+    ...props,
+    scroll: {
+      ...props.scroll,
+      x: width < _.get(props, 'scroll.x') ? _.get(props, 'scroll.x') : undefined,
+    },
+  };
+
+  return (
+    <ThemeTableWrap style={props.wrapStyle}>
+      <Table {...propsObj} id={uuid}></Table>
+    </ThemeTableWrap>
+  );
+});
 
 export default ThemeTable;
