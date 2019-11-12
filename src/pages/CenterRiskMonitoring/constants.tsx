@@ -163,7 +163,7 @@ export const PositionProportionDefs = [
     align: 'right',
     width: 200,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    dataIndex: 'cusLongPostion',
+    dataIndex: 'cusLongPosition',
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
