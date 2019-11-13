@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import BigNumber from 'bignumber.js';
 import { formatNumber } from '@/tools';
 
 export const MarketDefs = [
@@ -75,7 +76,9 @@ export const VarietiesDefs = [
     width: 150,
     dataIndex: 'otcPosRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
   {
     title: '场内持仓金额',
@@ -91,7 +94,9 @@ export const VarietiesDefs = [
     width: 150,
     dataIndex: 'etPosRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
   {
     title: '当月倍数（场外持仓比例/场内持仓比例）',
