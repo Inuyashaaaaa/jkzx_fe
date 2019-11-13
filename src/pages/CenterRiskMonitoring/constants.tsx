@@ -30,7 +30,7 @@ export const InfectionRiskDefs = [
     align: 'right',
     dataIndex: 'interCompTrdAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '总成交金额',
@@ -38,7 +38,7 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'compTrdAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '成交占比',
@@ -46,7 +46,7 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'trdRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '子公司间持仓金额',
@@ -54,7 +54,7 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'interCompPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '总持仓金额',
@@ -62,7 +62,7 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'compPosAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓占比',
@@ -70,7 +70,7 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'posRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 
@@ -101,7 +101,7 @@ export const ControlRiskDefs = [
     width: 150,
     dataIndex: 'interCompTrd',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '跨公司持仓规模',
@@ -109,7 +109,7 @@ export const ControlRiskDefs = [
     width: 150,
     dataIndex: 'interCompPos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 
@@ -146,7 +146,7 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'cusPositiveDelta',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '场内空头持仓量',
@@ -154,7 +154,7 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'cusShortPosition',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '在所有子公司的负Delta累加值',
@@ -162,7 +162,7 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'cusNegativeDelta',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '场内多头持仓量',
@@ -170,14 +170,14 @@ export const PositionProportionDefs = [
     width: 200,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     dataIndex: 'cusLongPosition',
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '场内合并单边最大持仓',
     align: 'right',
     width: 200,
     dataIndex: 'exchangeMaxPos',
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
@@ -186,7 +186,7 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'exchangePos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '对手方场内外合并持仓占比',
