@@ -8,6 +8,7 @@ export const MarketSizeDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -29,7 +30,7 @@ export const MarketSizeDefs = [
     align: 'right',
     dataIndex: 'trdTransNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '期权费金额',
@@ -45,7 +46,7 @@ export const MarketSizeDefs = [
     width: 150,
     dataIndex: 'trdCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓名义金额',
@@ -61,7 +62,7 @@ export const MarketSizeDefs = [
     width: 150,
     dataIndex: 'posTransNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓市值',
@@ -77,7 +78,7 @@ export const MarketSizeDefs = [
     width: 150,
     dataIndex: 'posCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '参与交易客户数',
@@ -85,7 +86,7 @@ export const MarketSizeDefs = [
     width: 180,
     dataIndex: 'inMarketCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '全市场客户数',
@@ -93,7 +94,7 @@ export const MarketSizeDefs = [
     width: 150,
     dataIndex: 'fullMarketCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 
@@ -108,6 +109,7 @@ export const MarketConcentrationDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -120,6 +122,7 @@ export const MarketConcentrationDefs = [
     width: 150,
     dataIndex: 'distType',
     render: value => <span>{value && DISTTYPE_OPTION[value]}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '前三名持仓名义金额',

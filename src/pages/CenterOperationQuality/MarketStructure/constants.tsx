@@ -7,6 +7,7 @@ export const KnockdownStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -84,7 +85,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdOpenCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '平仓成交客户数',
@@ -92,7 +93,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdCloseCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '终止成交客户数',
@@ -100,7 +101,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdEndCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '成交客户数',
@@ -108,7 +109,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 export const PositionStructureDefs = [
@@ -116,6 +117,7 @@ export const PositionStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -242,6 +244,7 @@ export const ToolStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -254,12 +257,14 @@ export const ToolStructureDefs = [
     width: 150,
     dataIndex: 'assetType',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '工具类型',
     width: 150,
     dataIndex: 'toolType',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '成交笔数',
@@ -267,7 +272,7 @@ export const ToolStructureDefs = [
     width: 150,
     dataIndex: 'trdTransNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '成交名义金额',
@@ -282,7 +287,7 @@ export const ToolStructureDefs = [
     width: 150,
     align: 'right',
     dataIndex: 'posTransNum',
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
@@ -299,7 +304,7 @@ export const ToolStructureDefs = [
     align: 'right',
     dataIndex: 'inMarketCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 export const CustomerTypeStructureDefs = [
@@ -307,6 +312,7 @@ export const CustomerTypeStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -319,12 +325,14 @@ export const CustomerTypeStructureDefs = [
     width: 150,
     dataIndex: 'cusType',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '资产类型',
     width: 150,
     dataIndex: 'assetType',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '成交笔数',
@@ -332,7 +340,7 @@ export const CustomerTypeStructureDefs = [
     width: 150,
     dataIndex: 'trdTransNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '成交名义金额',
@@ -348,7 +356,7 @@ export const CustomerTypeStructureDefs = [
     width: 150,
     dataIndex: 'posTransNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓名义金额',
@@ -364,6 +372,6 @@ export const CustomerTypeStructureDefs = [
     width: 200,
     dataIndex: 'inMarketCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];

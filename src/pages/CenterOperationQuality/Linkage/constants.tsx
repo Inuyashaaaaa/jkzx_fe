@@ -8,6 +8,7 @@ export const MarketDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -20,12 +21,14 @@ export const MarketDefs = [
     width: 200,
     dataIndex: 'commodityId',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '子公司名称',
     width: 200,
     dataIndex: 'mainBodyName',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '子公司场外持仓金额',
@@ -49,6 +52,7 @@ export const VarietiesDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -61,6 +65,7 @@ export const VarietiesDefs = [
     width: 150,
     dataIndex: 'commodityId',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '场外持仓名义金额',
@@ -112,6 +117,7 @@ export const CounterpartyDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -125,7 +131,7 @@ export const CounterpartyDefs = [
     width: 300,
     dataIndex: 'etAccountCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '场内开户对手方场外持仓名义金额',
