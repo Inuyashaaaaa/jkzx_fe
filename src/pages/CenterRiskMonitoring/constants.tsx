@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import BigNumber from 'bignumber.js';
 import { formatNumber } from '@/tools';
 
 export const InfectionRiskDefs = [
@@ -163,7 +164,7 @@ export const PositionProportionDefs = [
     align: 'right',
     width: 200,
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    dataIndex: 'cusLongPostion',
+    dataIndex: 'cusLongPosition',
     render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
@@ -188,6 +189,8 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'cusExgOtcRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
 ];
