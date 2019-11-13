@@ -21,7 +21,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'openTrdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '平仓成交名义金额',
@@ -29,7 +29,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'closeTrdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '终止成交名义金额',
@@ -37,7 +37,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'endTrdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '成交名义金额',
@@ -45,7 +45,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '开仓期权费金额',
@@ -53,7 +53,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdOpenPremium',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '平仓期权费金额',
@@ -61,7 +61,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdClosePremium',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '终止期权费金额',
@@ -69,7 +69,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'trdEndPremium',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '期权费金额',
@@ -77,7 +77,7 @@ export const KnockdownStructureDefs = [
     width: 200,
     dataIndex: 'premiumAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '开仓成交客户数',
@@ -131,7 +131,7 @@ export const PositionStructureDefs = [
     align: 'right',
     dataIndex: 'posCallBuyAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '买看跌持仓名义金额',
@@ -139,7 +139,7 @@ export const PositionStructureDefs = [
     align: 'right',
     dataIndex: 'posPutBuyAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '买其他持仓名义金额',
@@ -147,7 +147,7 @@ export const PositionStructureDefs = [
     width: 250,
     dataIndex: 'posOtherBuyAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '买名义金额合计',
@@ -155,7 +155,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posBuyAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '卖看涨持仓名义金额',
@@ -163,7 +163,7 @@ export const PositionStructureDefs = [
     width: 250,
     dataIndex: 'posCallSellAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '卖看跌持仓名义金额',
@@ -171,7 +171,7 @@ export const PositionStructureDefs = [
     width: 250,
     dataIndex: 'posPutSellAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '卖名义金额合计',
@@ -179,7 +179,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posSellAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '买看涨持仓市值',
@@ -187,7 +187,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posCallBuyCValue',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '买看跌持仓市值',
@@ -195,7 +195,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posPutBuyCValue',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '买其他持仓市值',
@@ -203,7 +203,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posOtherBuyCValue',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '买市值合计',
@@ -211,7 +211,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posBuyValueTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '卖看涨持仓市值',
@@ -219,7 +219,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posCallSellCValue',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '卖看跌持仓市值',
@@ -227,7 +227,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posPutSellCValue',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '卖市值合计',
@@ -235,7 +235,7 @@ export const PositionStructureDefs = [
     width: 200,
     dataIndex: 'posSellValueTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 
@@ -280,7 +280,7 @@ export const ToolStructureDefs = [
     width: 150,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓笔数',
@@ -296,7 +296,7 @@ export const ToolStructureDefs = [
     align: 'right',
     dataIndex: 'posNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '参与交易客户数',
@@ -348,7 +348,7 @@ export const CustomerTypeStructureDefs = [
     width: 150,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓笔数',
@@ -364,7 +364,7 @@ export const CustomerTypeStructureDefs = [
     width: 150,
     dataIndex: 'posNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '参与交易客户数',

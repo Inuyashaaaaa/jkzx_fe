@@ -22,7 +22,7 @@ export const MarketSizeDefs = [
     width: 150,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '成交笔数',
@@ -38,7 +38,7 @@ export const MarketSizeDefs = [
     width: 150,
     dataIndex: 'optFeeAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '成交客户数',
@@ -54,7 +54,7 @@ export const MarketSizeDefs = [
     align: 'right',
     dataIndex: 'posNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓笔数',
@@ -70,7 +70,7 @@ export const MarketSizeDefs = [
     width: 150,
     dataIndex: 'posValue',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '持仓客户数',
@@ -130,7 +130,7 @@ export const MarketConcentrationDefs = [
     width: 250,
     dataIndex: 'top3Pos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '前三名集中度',
@@ -148,7 +148,7 @@ export const MarketConcentrationDefs = [
     width: 250,
     dataIndex: 'top5Pos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '前五名集中度',
@@ -166,7 +166,7 @@ export const MarketConcentrationDefs = [
     width: 250,
     dataIndex: 'top10Pos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '前十名集中度',

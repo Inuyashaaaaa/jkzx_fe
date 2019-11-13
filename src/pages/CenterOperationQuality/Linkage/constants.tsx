@@ -36,7 +36,7 @@ export const MarketDefs = [
     width: 200,
     dataIndex: 'otcSubPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '子公司场内持仓金额',
@@ -44,7 +44,7 @@ export const MarketDefs = [
     width: 200,
     dataIndex: 'etSubPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 export const VarietiesDefs = [
@@ -73,7 +73,7 @@ export const VarietiesDefs = [
     width: 200,
     dataIndex: 'otcPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '场外持仓比例',
@@ -91,7 +91,7 @@ export const VarietiesDefs = [
     width: 150,
     dataIndex: 'etPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '场内持仓比例',
@@ -109,7 +109,7 @@ export const VarietiesDefs = [
     width: 400,
     dataIndex: 'otcEtRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
 export const CounterpartyDefs = [
@@ -139,7 +139,7 @@ export const CounterpartyDefs = [
     width: 350,
     dataIndex: 'otcCusPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '交易对手方场内持仓金额',
@@ -147,7 +147,7 @@ export const CounterpartyDefs = [
     width: 250,
     dataIndex: 'etCusPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '对应账户的场内总权益',
@@ -155,6 +155,6 @@ export const CounterpartyDefs = [
     width: 250,
     dataIndex: 'etCusRight',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
 ];
