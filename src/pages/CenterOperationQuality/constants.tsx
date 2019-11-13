@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import BigNumber from 'bignumber.js';
 import { formatNumber } from '@/tools';
 
 export const MarketSizeDefs = [
@@ -134,7 +135,9 @@ export const MarketConcentrationDefs = [
     width: 200,
     dataIndex: 'top3PosDist',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
   {
     title: '前五名持仓名义金额',
@@ -150,7 +153,9 @@ export const MarketConcentrationDefs = [
     width: 200,
     dataIndex: 'top5PosDist',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
   {
     title: '前十名持仓名义金额',
@@ -166,6 +171,8 @@ export const MarketConcentrationDefs = [
     width: 200,
     dataIndex: 'top10PosDist',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 2)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
 ];
