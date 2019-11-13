@@ -7,7 +7,7 @@ export const InfectionRiskDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -78,7 +78,7 @@ export const ControlRiskDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -117,7 +117,7 @@ export const PositionProportionDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -130,14 +130,14 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'analogueName',
     render: val => <span>{val}</span>,
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '标的资产品种',
     width: 200,
     dataIndex: 'underAssVarit',
     render: val => <span>{val}</span>,
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '在所有子公司的正Delta累加值',

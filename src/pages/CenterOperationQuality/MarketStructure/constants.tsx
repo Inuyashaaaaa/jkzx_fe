@@ -7,7 +7,7 @@ export const KnockdownStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -117,7 +117,7 @@ export const PositionStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -244,7 +244,7 @@ export const ToolStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -257,14 +257,14 @@ export const ToolStructureDefs = [
     width: 150,
     dataIndex: 'assetType',
     render: val => <span>{val}</span>,
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '工具类型',
     width: 150,
     dataIndex: 'toolType',
     render: val => <span>{val}</span>,
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '成交笔数',
@@ -312,7 +312,7 @@ export const CustomerTypeStructureDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -325,14 +325,14 @@ export const CustomerTypeStructureDefs = [
     width: 150,
     dataIndex: 'cusType',
     render: val => <span>{val}</span>,
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '资产类型',
     width: 150,
     dataIndex: 'assetType',
     render: val => <span>{val}</span>,
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '成交笔数',

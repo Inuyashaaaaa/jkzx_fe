@@ -7,7 +7,7 @@ export const MarketSizeDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -108,7 +108,7 @@ export const MarketConcentrationDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -121,7 +121,7 @@ export const MarketConcentrationDefs = [
     width: 150,
     dataIndex: 'distType',
     render: value => <span>{value && DISTTYPE_OPTION[value]}</span>,
-    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
     title: '前三名持仓名义金额',
