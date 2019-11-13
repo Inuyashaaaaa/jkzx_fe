@@ -45,6 +45,7 @@ const VolTable = props => {
       dataIndex: 'name',
       width: 100,
       render: val => <span>{val}</span>,
+      onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     },
     {
       title: '最小值',

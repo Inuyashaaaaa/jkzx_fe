@@ -6,7 +6,7 @@ export const columns = sorter => [
     title: '交易对手',
     dataIndex: 'partyName',
     width: 100,
-    onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val}</span>,
   },
   {

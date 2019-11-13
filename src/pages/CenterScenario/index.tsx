@@ -169,7 +169,7 @@ const CenterScenario = memo(props => {
           dataIndex: 'greekLatter',
           width,
           fixed: 'left',
-          onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
+          onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
           render: val => <span>{val}</span>,
         },
         ...col.map(item => {
@@ -221,7 +221,7 @@ const CenterScenario = memo(props => {
         dataIndex: 'greekLatter',
         fixed: 'left',
         width,
-        onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
+        onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
         render: val => <span>{val}</span>,
       },
       ...colDef,

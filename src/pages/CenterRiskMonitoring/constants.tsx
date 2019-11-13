@@ -7,6 +7,7 @@ export const InfectionRiskDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -20,7 +21,7 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'interCompNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '子公司间成交金额',
@@ -77,6 +78,7 @@ export const ControlRiskDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -90,7 +92,7 @@ export const ControlRiskDefs = [
     width: 150,
     dataIndex: 'interCompCusNum',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
     title: '跨公司成交规模',
@@ -98,7 +100,7 @@ export const ControlRiskDefs = [
     width: 150,
     dataIndex: 'interCompTrd',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
   {
     title: '跨公司持仓规模',
@@ -106,7 +108,7 @@ export const ControlRiskDefs = [
     width: 150,
     dataIndex: 'interCompPos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val}</span>,
+    render: val => <span>{val && formatNumber(val, 2)}</span>,
   },
 ];
 
@@ -115,6 +117,7 @@ export const PositionProportionDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: value => {
       if (value) {
         return <span>{moment(value).format('YYYY-MM-DD')}</span>;
@@ -127,12 +130,14 @@ export const PositionProportionDefs = [
     width: 200,
     dataIndex: 'analogueName',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: '标的资产品种',
     width: 200,
     dataIndex: 'underAssVarit',
     render: val => <span>{val}</span>,
+    onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
     title: '在所有子公司的正Delta累加值',
