@@ -478,13 +478,13 @@ const CenterScenario = memo(props => {
           rowkey="greekLatter"
         ></ThemeTable>
       </ThemeTableWrapper>
-      <ClassicSceneTable
+      {/* <ClassicSceneTable
         classicSceneTable={classicSceneTable}
         valuationDate={Form2.getFieldsValue(reportFormData.valuationDate)}
         instrumentId={Form2.getFieldsValue(reportFormData.underlyer)}
         reportFormData={Form2.getFieldsValue(reportFormData)}
         tradeDate={tradeDate}
-      />
+      /> */}
     </>
   );
 });
