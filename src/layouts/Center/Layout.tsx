@@ -16,6 +16,10 @@ const Layout = props => {
         skipMenu: false,
       },
     });
+    dispatch({
+      type: 'centerDate/getDate',
+      payload: {},
+    });
   }, []);
 
   const handleJumpBCT = useCallback(() => {
@@ -46,4 +50,4 @@ const Layout = props => {
   );
 };
 
-export default memo(connect()(Layout));
+export default memo(connect(state => state)(Layout));
