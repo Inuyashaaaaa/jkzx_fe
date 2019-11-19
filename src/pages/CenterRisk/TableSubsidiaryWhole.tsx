@@ -117,13 +117,13 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: '子公司名称',
       dataIndex: 'subsidiary',
-      width: 100,
+      width: 350,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {
       title: 'Delta_Cash',
       dataIndex: 'deltaCash',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'deltaCash' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -133,7 +133,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Gamma_Cash',
       dataIndex: 'gammaCash',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'gammaCash' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -143,7 +143,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Vega',
       dataIndex: 'vega',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'vega' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -153,7 +153,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Theta',
       dataIndex: 'theta',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'theta' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -163,7 +163,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Rho',
       dataIndex: 'rho',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'rho' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -251,7 +251,7 @@ const TableSubsidiaryWhole = (props: any) => {
       </Row>
       <div style={{ position: 'relative' }}>
         <ThemeTable
-          scroll={showScroll ? { x: 1080 } : undefined}
+          scroll={{ x: 750 }}
           loading={loading}
           pagination={{
             ...pagination,

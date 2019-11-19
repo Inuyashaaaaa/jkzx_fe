@@ -119,7 +119,7 @@ export const MarketConcentrationDefs = [
   },
   {
     title: '指标',
-    width: 150,
+    width: 200,
     dataIndex: 'distType',
     render: value => <span>{value && DISTTYPE_OPTION[value]}</span>,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
