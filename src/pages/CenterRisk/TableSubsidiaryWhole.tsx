@@ -118,6 +118,8 @@ const TableSubsidiaryWhole = (props: any) => {
       title: '子公司名称',
       dataIndex: 'subsidiary',
       width: 350,
+      sortOrder: sorter.field === 'subsidiary' && sorter.order,
+      sorter: true,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {

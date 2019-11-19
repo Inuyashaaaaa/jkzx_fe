@@ -6,6 +6,8 @@ export const columns = sorter => [
     title: '交易对手',
     dataIndex: 'partyName',
     width: 100,
+    sortOrder: sorter.field === 'partyName' && sorter.order,
+    sorter: true,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: val => <span>{val}</span>,
   },
