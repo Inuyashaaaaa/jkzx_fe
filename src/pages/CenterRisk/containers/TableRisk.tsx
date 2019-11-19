@@ -8,6 +8,10 @@ import ThemeTable from '@/containers/ThemeTable';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './Unit';
+import ThemeSelect from '@/containers/ThemeSelect';
+import { mktInstrumentSearch } from '@/services/market-data-service';
+import { queryNonGroupResource } from '@/services/tradeBooks';
+import { refSimilarLegalNameListWithoutBook } from '@/services/reference-data-service';
 
 const Title = styled.div`
   font-size: 18px;
@@ -130,6 +134,7 @@ const TableRisk = (props: any) => {
   const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD HH:mm:ss') : '';
 
   const titleTxt = title + (reportTime ? `（报告计算时间：${reportTime} ）` : '');
+  console.log(formData.bookNamePart);
 
   return (
     <div style={style}>
@@ -145,39 +150,83 @@ const TableRisk = (props: any) => {
           <Row type="flex" justify="start" align="middle" gutter={12}>
             {riskButton.bookNamePart ? (
               <Col>
-                <ThemeInput
-                  value={formData.bookNamePart}
+                <ThemeSelect
+                  filterOption
+                  showSearch
+                  style={{ minWidth: 200 }}
+                  value={formData.bookNamePart !== '' ? formData.bookNamePart : undefined}
                   onChange={event => {
-                    setFormData({ ...formData, bookNamePart: _.get(event.target, 'value') });
+                    setFormData({ ...formData, bookNamePart: event });
                   }}
+                  allowClear
                   placeholder="请输入搜索子公司"
-                ></ThemeInput>
+                  options={async (value: string) => {
+                    const { data, error } = await queryNonGroupResource();
+                    if (error) return [];
+                    return data.map(item => ({
+                      label: item.resourceName,
+                      value: item.resourceName,
+                    }));
+                  }}
+                ></ThemeSelect>
               </Col>
             ) : (
               ''
             )}
             {riskButton.partyNamePart ? (
               <Col>
-                <ThemeInput
-                  value={formData.partyNamePart}
-                  onChange={event => {
-                    setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
-                  }}
+                <ThemeSelect
+                  fetchOptionsOnSearch
+                  allowClear
                   placeholder="请输入搜索交易对手"
-                ></ThemeInput>
+                  showSearch
+                  style={{ minWidth: 200 }}
+                  value={formData.partyNamePart !== '' ? formData.partyNamePart : undefined}
+                  onChange={event => {
+                    setFormData({ ...formData, partyNamePart: event });
+                  }}
+                  options={async (value: string) => {
+                    const { data, error } = await refSimilarLegalNameListWithoutBook({
+                      similarLegalName: value,
+                    });
+                    if (error) return [];
+                    return data.slice(0, 50).map(item => ({
+                      label: item,
+                      value: item,
+                    }));
+                  }}
+                ></ThemeSelect>
               </Col>
             ) : (
               ''
             )}
             {riskButton.instrumentIdPart ? (
               <Col>
-                <ThemeInput
-                  value={formData.instrumentIdPart}
+                <ThemeSelect
                   onChange={event => {
-                    setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
+                    setFormData({ ...formData, instrumentIdPart: event });
                   }}
+                  value={formData.instrumentIdPart !== '' ? formData.instrumentIdPart : undefined}
+                  allowClear
                   placeholder="请输入搜索标的物"
-                ></ThemeInput>
+                  style={{ minWidth: 200 }}
+                  fetchOptionsOnSearch
+                  showSearch
+                  options={async (value: string) => {
+                    const { data, error } = await mktInstrumentSearch({
+                      instrumentIdPart: _.toUpper(value),
+                      excludeOption: true,
+                    });
+                    if (error) return [];
+                    return data
+                      .sort()
+                      .slice(0, 50)
+                      .map(item => ({
+                        label: item,
+                        value: item,
+                      }));
+                  }}
+                ></ThemeSelect>
               </Col>
             ) : (
               ''
