@@ -275,7 +275,7 @@ const Vol = props => {
           },
           viewControl: {
             // projection: 'orthographic',
-            distance: 200,
+            distance: 250,
           },
           boxHeight: 100,
           boxWidth: 100,
