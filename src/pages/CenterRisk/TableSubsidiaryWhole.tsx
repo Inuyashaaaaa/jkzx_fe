@@ -10,6 +10,8 @@ import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './containers/Unit';
+import { queryNonGroupResource } from '@/services/tradeBooks';
+import ThemeSelect from '@/containers/ThemeSelect';
 
 const Title = styled.div`
   font-size: 18px;
@@ -193,13 +195,25 @@ const TableSubsidiaryWhole = (props: any) => {
         <Col>
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
-              <ThemeInput
-                value={formData.subsidiaryPart}
+              <ThemeSelect
+                filterOption
+                showSearch
+                style={{ minWidth: 200 }}
+                value={formData.subsidiaryPart !== '' ? formData.subsidiaryPart : undefined}
                 onChange={event => {
-                  setFormData({ ...formData, subsidiaryPart: _.get(event.target, 'value') });
+                  setFormData({ ...formData, subsidiaryPart: event });
                 }}
-                placeholder="请输入搜索子公司"
-              ></ThemeInput>
+                allowClear
+                placeholder="请输入搜索标的物"
+                options={async (value: string) => {
+                  const { data, error } = await queryNonGroupResource();
+                  if (error) return [];
+                  return data.map(item => ({
+                    label: item.resourceName,
+                    value: item.resourceName,
+                  }));
+                }}
+              ></ThemeSelect>
             </Col>
             <Col>
               <ThemeButton

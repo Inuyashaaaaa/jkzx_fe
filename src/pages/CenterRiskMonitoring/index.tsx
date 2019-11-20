@@ -1,6 +1,8 @@
 import React, { memo, useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Col, Row } from 'antd';
+import { connect } from 'dva';
+import _ from 'lodash';
 import FormItem from 'antd/lib/form/FormItem';
 import moment from 'moment';
 import ThemeTabs from '@/containers/ThemeTabs';
@@ -25,36 +27,37 @@ const BigTitle = styled.div`
   color: rgba(246, 250, 255, 1);
   line-height: 32px;
 `;
-const CenterRiskMonitoring = () => {
+const CenterRiskMonitoring = props => {
+  const { dates, dispatch } = props;
   const [formData, setFormData] = useState(
     Form2.createFields({
-      date: [null, null],
+      date: dates,
     }),
   );
   const $form = useRef<Form2>(null);
 
   const onFormChange = (propsData, changedFields, allFields) => {
+    if (changedFields.date) {
+      dispatch({
+        type: 'centerDate/save',
+        payload: {
+          dates: _.get(changedFields, 'date.value'),
+        },
+      });
+    }
     setFormData({
       ...formData,
       ...changedFields,
     });
   };
 
-  const getDate = async () => {
-    const { data, error } = await refTradeDateByOffsetGet({
-      offset: -2,
-    });
-    if (error) return;
+  useEffect(() => {
     setFormData(
       Form2.createFields({
-        date: [moment(data).subtract(1, 'd'), moment(data)],
+        date: props.dates,
       }),
     );
-  };
-
-  useEffect(() => {
-    getDate();
-  }, []);
+  }, [props.dates]);
 
   return (
     <>
@@ -111,4 +114,8 @@ const CenterRiskMonitoring = () => {
   );
 };
 
-export default CenterRiskMonitoring;
+export default memo(
+  connect(state => ({
+    dates: state.centerDate.dates,
+  }))(CenterRiskMonitoring),
+);

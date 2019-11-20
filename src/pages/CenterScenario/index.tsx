@@ -3,6 +3,7 @@ import React, { memo, useState, useRef, useEffect } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import styled from 'styled-components';
 import { Row, Col } from 'antd';
+import { connect } from 'dva';
 import Mock from 'mockjs';
 import _ from 'lodash';
 import { Form2 } from '@/containers';
@@ -51,10 +52,11 @@ const SamllTitle = styled.div`
 const ThemeTableWrapper = styled.div`
   margin-top: 24px;
 `;
-const CenterScenario = memo(props => {
+const CenterScenario = props => {
+  const { scenarioData, dispatch } = props;
   const [reportFormData, setReportFormData] = useState(
     Form2.createFields({
-      // valuationDate: moment(),
+      valuationDate: scenarioData,
       reportType: 'MARKET',
       underlyer: '600030.SH',
     }),
@@ -108,6 +110,14 @@ const CenterScenario = memo(props => {
   ];
 
   const onReportFormChange = (props, changedFields, allFields) => {
+    if (changedFields.valuationDate) {
+      dispatch({
+        type: 'centerDate/save',
+        payload: {
+          scenarioData: _.get(changedFields, 'valuationDate.value'),
+        },
+      });
+    }
     if (changedFields.reportType && Form2.getFieldsValue(changedFields).reportType === 'MARKET') {
       return setReportFormData({
         ...reportFormData,
@@ -328,32 +338,26 @@ const CenterScenario = memo(props => {
     },
   ];
 
-  const getDate = async () => {
-    const { data, error } = await refTradeDateByOffsetGet({
-      offset: -2,
-    });
-    setTradeDate(true);
-    if (error) return;
-    setReportFormData(
-      Form2.createFields({
-        valuationDate: moment(data),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
-
-    onSearch(
-      Form2.createFields({
-        valuationDate: moment(data),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
+  const getDate = async form => {
+    onSearch(form);
   };
 
   useEffect(() => {
-    getDate();
-  }, []);
+    setReportFormData(
+      Form2.createFields({
+        valuationDate: moment(props.scenarioData),
+        reportType: 'MARKET',
+        underlyer: '600030.SH',
+      }),
+    );
+    getDate(
+      Form2.createFields({
+        valuationDate: moment(props.scenarioData),
+        reportType: 'MARKET',
+        underlyer: '600030.SH',
+      }),
+    );
+  }, [props.scenarioData]);
 
   useLifecycles(() => {
     setTableColDefs([
@@ -487,6 +491,10 @@ const CenterScenario = memo(props => {
       /> */}
     </>
   );
-});
+};
 
-export default CenterScenario;
+export default memo(
+  connect(state => ({
+    scenarioData: state.centerDate.scenarioData,
+  }))(CenterScenario),
+);

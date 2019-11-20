@@ -1,6 +1,7 @@
 import { Col, Row } from 'antd';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import { connect } from 'dva';
 import moment from 'moment';
 import ThemeDatePicker from '@/containers/ThemeDatePicker';
 import BoxPanel from './BoxPanel';
@@ -36,8 +37,9 @@ const BigTitle = styled.div`
 `;
 
 const Risk = props => {
+  const { riskDate, dispatch } = props;
   let initFormData = {
-    // valuationDate: moment(),
+    valuationDate: riskDate,
     instrumentIdPart: '',
   };
   const { query } = props.location || {};
@@ -54,22 +56,25 @@ const Risk = props => {
         valuationDate: moment(query.valuationDate),
       };
       setFormData(initFormData);
-      return;
+      dispatch({
+        type: 'centerDate/save',
+        payload: {
+          riskDate: moment(query.valuationDate),
+        },
+      });
     }
-    const { data, error } = await refTradeDateByOffsetGet({
-      offset: -2,
-    });
-    if (error) return;
-    initFormData = {
-      ...initFormData,
-      valuationDate: moment(data),
-    };
-    setFormData(initFormData);
   };
 
   useEffect(() => {
     getDate();
   }, []);
+
+  useEffect(() => {
+    setFormData({
+      ...formData,
+      valuationDate: props.riskDate,
+    });
+  }, [props.riskDate]);
 
   return (
     <>
@@ -79,7 +84,15 @@ const Risk = props => {
         </Col>
         <Col>
           <ThemeDatePicker
-            onChange={pDate => setFormData({ ...formData, valuationDate: pDate })}
+            onChange={pDate => {
+              setFormData({ ...formData, valuationDate: pDate });
+              dispatch({
+                type: 'centerDate/save',
+                payload: {
+                  riskDate: pDate,
+                },
+              });
+            }}
             value={formData.valuationDate}
             allowClear={false}
             placeholder="请选择观察日"
@@ -180,4 +193,8 @@ const Risk = props => {
   );
 };
 
-export default Risk;
+export default memo(
+  connect(state => ({
+    riskDate: state.centerDate.riskDate,
+  }))(Risk),
+);

@@ -90,6 +90,9 @@ const ThemeTableWrap = styled.div`
   .ant-table-fixed .ant-table-tbody > tr > td {
     background: rgb(4, 50, 105);
   }
+  .ant-table-thead > tr > th.ant-table-column-has-actions {
+    position: static;
+  }
 `;
 
 const ThemeTable = memo(props => {
