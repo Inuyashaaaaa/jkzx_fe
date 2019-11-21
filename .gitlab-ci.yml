@@ -59,7 +59,7 @@ Install:
 Build:
   stage: build
   script:
-    - node --max_old_space_size=16384 && yarn run build
+    - node --max_old_space_size=32768 && yarn run build
   only:
     - /master.*/
     - /develop.*/
