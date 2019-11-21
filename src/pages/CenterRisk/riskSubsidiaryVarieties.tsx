@@ -6,6 +6,8 @@ export const columns = sorter => [
     title: '子公司名称',
     dataIndex: 'bookName',
     width: 100,
+    sortOrder: sorter.field === 'bookName' && sorter.order,
+    sorter: true,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: val => <span>{val}</span>,
   },
@@ -13,6 +15,8 @@ export const columns = sorter => [
     title: '标的物合约',
     dataIndex: 'underlyerInstrumentId',
     width: 100,
+    sortOrder: sorter.field === 'underlyerInstrumentId' && sorter.order,
+    sorter: true,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
