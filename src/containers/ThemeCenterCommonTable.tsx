@@ -113,7 +113,7 @@ const ThemeCenterCommonTable = props => {
               if (dataIndex !== 'statDate' && rowIndex > 0) {
                 return {
                   t: 'n',
-                  z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                  z: Math.abs(val) >= 1000 ? '0,0' : '0',
                 };
               }
               return null;
