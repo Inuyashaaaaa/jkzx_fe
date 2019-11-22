@@ -61,6 +61,7 @@ const CenterScenario = props => {
       underlyer: '600030.SH',
     }),
   );
+  const [oldFormData, serOldFormData] = useState(null);
   const [tradeDate, setTradeDate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
@@ -147,7 +148,6 @@ const CenterScenario = props => {
         if (keys === 'valuationDate') {
           return moment(vals).format('YYYY-MM-DD');
         }
-        // console.log(vals,keys,'vals')
         return vals;
       },
     );
@@ -198,7 +198,6 @@ const CenterScenario = props => {
     const scenarioId = data[0].scenarios
       .map(item => item.scenarioId)
       .sort((item1, item2) => {
-        // console.log(item1.match(/scenario_(\d+)%/));
         const num1 = Number(item1.match(/scenario_(\d+)%/)[1]);
         const num2 = Number(item2.match(/scenario_(\d+)%/)[1]);
         return num1 - num2;
@@ -338,26 +337,23 @@ const CenterScenario = props => {
     },
   ];
 
-  const getDate = async form => {
-    onSearch(form);
-  };
+  useEffect(() => {
+    if (props.date && !oldFormData) {
+      const form = Form2.createFields({
+        valuationDate: props.date,
+        reportType: 'MARKET',
+        underlyer: '600030.SH',
+      });
+      setReportFormData(form);
+      serOldFormData(form);
+    }
+  }, [props.date]);
 
   useEffect(() => {
-    setReportFormData(
-      Form2.createFields({
-        valuationDate: moment(props.date),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
-    getDate(
-      Form2.createFields({
-        valuationDate: moment(props.date),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
-  }, [props.date]);
+    if (_.get(oldFormData, 'valuationDate.value')) {
+      onSearch(oldFormData);
+    }
+  }, [oldFormData]);
 
   useLifecycles(() => {
     setTableColDefs([
@@ -466,7 +462,7 @@ const CenterScenario = props => {
           </FormItemWrapper>
         </Col>
         <Col>
-          <ThemeButton onClick={() => onSearch(null)} type="primary">
+          <ThemeButton onClick={() => onSearch(reportFormData)} type="primary">
             确定
           </ThemeButton>
         </Col>

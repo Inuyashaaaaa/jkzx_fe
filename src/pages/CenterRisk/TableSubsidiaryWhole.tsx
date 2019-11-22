@@ -12,7 +12,7 @@ import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './containers/Unit';
 import { queryNonGroupResource } from '@/services/tradeBooks';
 import ThemeSelect from '@/containers/ThemeSelect';
-
+import { rptReportSubsidiaryListByValuationDate } from '@/services/tradeBooks';
 const Title = styled.div`
   font-size: 18px;
   font-weight: 400;
@@ -102,7 +102,7 @@ const TableSubsidiaryWhole = (props: any) => {
     if (store.first) {
       fetch(false);
     }
-  }, [sorter, searchFormData, valuationDate]);
+  }, [sorter, searchFormData]);
 
   useEffect(() => {
     if (store.first) {
@@ -182,6 +182,33 @@ const TableSubsidiaryWhole = (props: any) => {
     ? `各子公司风险报告（报告计算时间：${reportTime} ）`
     : '各子公司风险报告';
 
+  const [subsidiaryList, setSubsidiaryList] = useState([]);
+
+  const getSelectList = async () => {
+    setFormData(initFormData);
+    setSearchFormData(initFormData);
+    const subsidiaryListRes = await rptReportSubsidiaryListByValuationDate({
+      reportType: props.reportType,
+      valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+    });
+    if (subsidiaryListRes.error) {
+      setSubsidiaryList([]);
+    } else {
+      setSubsidiaryList(
+        subsidiaryListRes.data.sort().map(item => ({
+          label: item,
+          value: item,
+        })),
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (props.valuationDate) {
+      getSelectList();
+    }
+  }, [props.valuationDate]);
+
   return (
     <div>
       <Title>{titleTxt}</Title>
@@ -204,15 +231,8 @@ const TableSubsidiaryWhole = (props: any) => {
                   setFormData({ ...formData, subsidiaryPart: event });
                 }}
                 allowClear
-                placeholder="请输入搜索标的物"
-                options={async (value: string) => {
-                  const { data, error } = await queryNonGroupResource();
-                  if (error) return [];
-                  return data.map(item => ({
-                    label: item.resourceName,
-                    value: item.resourceName,
-                  }));
-                }}
+                placeholder="请输入搜索子公司"
+                options={subsidiaryList}
               ></ThemeSelect>
             </Col>
             <Col>
