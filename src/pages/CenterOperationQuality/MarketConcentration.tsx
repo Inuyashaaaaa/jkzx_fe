@@ -9,7 +9,7 @@ const MarketConcentration = props => (
       title="场外衍生品市场集中度"
       fetchMethod={getOtcMarketDistReport}
       columns={MarketConcentrationDefs}
-      scrollWidth={{ x: 1640 }}
+      scrollWidth={{ x: 1690 }}
       formData={props.formData}
     />
   </>

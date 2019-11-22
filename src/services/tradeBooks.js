@@ -42,3 +42,33 @@ export async function deleteNonGroupResource(params = {}) {
     },
   });
 }
+
+export async function rptReportInstrumentListByValuationDate(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptReportInstrumentListByValuationDate',
+      params,
+    },
+  });
+}
+
+export async function rptReportSubsidiaryListByValuationDate(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptReportSubsidiaryListByValuationDate',
+      params,
+    },
+  });
+}
+
+export async function rptReportCounterPartyListByValuationDate(params = {}) {
+  return request(`${HOST_TEST}report-service/api/rpc`, {
+    method: `POST`,
+    body: {
+      method: 'rptReportCounterPartyListByValuationDate',
+      params,
+    },
+  });
+}

@@ -10,6 +10,11 @@ import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './containers/Unit';
+import {
+  queryNonGroupResource,
+  rptReportSubsidiaryListByValuationDate,
+} from '@/services/tradeBooks';
+import ThemeSelect from '@/containers/ThemeSelect';
 
 const Title = styled.div`
   font-size: 18px;
@@ -100,7 +105,7 @@ const TableSubsidiaryWhole = (props: any) => {
     if (store.first) {
       fetch(false);
     }
-  }, [sorter, searchFormData, valuationDate]);
+  }, [sorter, searchFormData]);
 
   useEffect(() => {
     if (store.first) {
@@ -117,13 +122,15 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: '子公司名称',
       dataIndex: 'subsidiary',
-      width: 100,
+      width: 350,
+      sortOrder: sorter.field === 'subsidiary' && sorter.order,
+      sorter: true,
       onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     },
     {
       title: 'Delta_Cash',
       dataIndex: 'deltaCash',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'deltaCash' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -133,7 +140,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Gamma_Cash',
       dataIndex: 'gammaCash',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'gammaCash' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -143,7 +150,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Vega',
       dataIndex: 'vega',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'vega' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -153,7 +160,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Theta',
       dataIndex: 'theta',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'theta' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -163,7 +170,7 @@ const TableSubsidiaryWhole = (props: any) => {
     {
       title: 'Rho',
       dataIndex: 'rho',
-      width: 100,
+      width: 80,
       sortOrder: sorter.field === 'rho' && sorter.order,
       sorter: true,
       render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -178,6 +185,33 @@ const TableSubsidiaryWhole = (props: any) => {
     ? `各子公司风险报告（报告计算时间：${reportTime} ）`
     : '各子公司风险报告';
 
+  const [subsidiaryList, setSubsidiaryList] = useState([]);
+
+  const getSelectList = async () => {
+    setFormData(initFormData);
+    setSearchFormData(initFormData);
+    const subsidiaryListRes = await rptReportSubsidiaryListByValuationDate({
+      reportType: props.reportType,
+      valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+    });
+    if (subsidiaryListRes.error) {
+      setSubsidiaryList([]);
+    } else {
+      setSubsidiaryList(
+        subsidiaryListRes.data.map(item => ({
+          label: item,
+          value: item,
+        })),
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (props.valuationDate) {
+      getSelectList();
+    }
+  }, [props.valuationDate]);
+
   return (
     <div>
       <Title>{titleTxt}</Title>
@@ -191,13 +225,18 @@ const TableSubsidiaryWhole = (props: any) => {
         <Col>
           <Row type="flex" justify="start" align="middle" gutter={12}>
             <Col>
-              <ThemeInput
-                value={formData.subsidiaryPart}
+              <ThemeSelect
+                filterOption
+                showSearch
+                style={{ minWidth: 200 }}
+                value={formData.subsidiaryPart !== '' ? formData.subsidiaryPart : undefined}
                 onChange={event => {
-                  setFormData({ ...formData, subsidiaryPart: _.get(event.target, 'value') });
+                  setFormData({ ...formData, subsidiaryPart: event });
                 }}
+                allowClear
                 placeholder="请输入搜索子公司"
-              ></ThemeInput>
+                options={subsidiaryList}
+              ></ThemeSelect>
             </Col>
             <Col>
               <ThemeButton
@@ -232,13 +271,13 @@ const TableSubsidiaryWhole = (props: any) => {
                 if (_.indexOf(['gamma', 'delta'], dataIndex) > -1) {
                   return {
                     t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                    z: Math.abs(val) >= 1000 ? '0,0.00' : '0.00',
                   };
                 }
                 if (dataIndex !== 'subsidiaryPart' && rowIndex > 0) {
                   return {
                     t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                    z: Math.abs(val) >= 1000 ? '0,0' : '0',
                   };
                 }
                 return null;
@@ -251,7 +290,7 @@ const TableSubsidiaryWhole = (props: any) => {
       </Row>
       <div style={{ position: 'relative' }}>
         <ThemeTable
-          scroll={showScroll ? { x: 1080 } : undefined}
+          scroll={{ x: 750 }}
           loading={loading}
           pagination={{
             ...pagination,

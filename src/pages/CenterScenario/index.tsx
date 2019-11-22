@@ -3,6 +3,7 @@ import React, { memo, useState, useRef, useEffect } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 import styled from 'styled-components';
 import { Row, Col } from 'antd';
+import { connect } from 'dva';
 import Mock from 'mockjs';
 import _ from 'lodash';
 import { Form2 } from '@/containers';
@@ -51,14 +52,10 @@ const SamllTitle = styled.div`
 const ThemeTableWrapper = styled.div`
   margin-top: 24px;
 `;
-const CenterScenario = memo(props => {
-  const [reportFormData, setReportFormData] = useState(
-    Form2.createFields({
-      // valuationDate: moment(),
-      reportType: 'MARKET',
-      underlyer: '600030.SH',
-    }),
-  );
+const CenterScenario = props => {
+  const { date, dispatch, form } = props;
+  const [reportFormData, setReportFormData] = useState(Form2.createFields(form));
+  const [oldFormData, serOldFormData] = useState(null);
   const [tradeDate, setTradeDate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
@@ -108,6 +105,23 @@ const CenterScenario = memo(props => {
   ];
 
   const onReportFormChange = (props, changedFields, allFields) => {
+    dispatch({
+      type: 'centerDate/save',
+      payload: {
+        form: Form2.getFieldsValue({
+          ...reportFormData,
+          ...changedFields,
+        }),
+      },
+    });
+    if (changedFields.valuationDate) {
+      dispatch({
+        type: 'centerDate/save',
+        payload: {
+          date: _.get(changedFields, 'valuationDate.value'),
+        },
+      });
+    }
     if (changedFields.reportType && Form2.getFieldsValue(changedFields).reportType === 'MARKET') {
       return setReportFormData({
         ...reportFormData,
@@ -126,7 +140,7 @@ const CenterScenario = memo(props => {
     setClassicSceneTable(!classicSceneTable);
     const [reportRsp] = await Promise.all([reportForm.current.validate()]);
     if (reportRsp.error) return;
-    const reportData = _.mapValues(
+    let reportData = _.mapValues(
       _.mapKeys(Form2.getFieldsValue(param || reportFormData), (val, key) => {
         if (key === 'legalName' || key === 'subName') {
           return 'subOrPartyName';
@@ -137,7 +151,6 @@ const CenterScenario = memo(props => {
         if (keys === 'valuationDate') {
           return moment(vals).format('YYYY-MM-DD');
         }
-        // console.log(vals,keys,'vals')
         return vals;
       },
     );
@@ -150,9 +163,13 @@ const CenterScenario = memo(props => {
         reportData.subOrPartyName = formData.subName;
       }
     });
+
+    if (reportData.reportType === 'MARKET') {
+      reportData = _.omit(reportData, ['subOrPartyName']);
+    }
+
     setLoading(true);
     setTableLoading(true);
-
     const { error, data } = await rptSpotScenariosReportListSearch(reportData);
     setLoading(false);
     setTableLoading(false);
@@ -188,7 +205,6 @@ const CenterScenario = memo(props => {
     const scenarioId = data[0].scenarios
       .map(item => item.scenarioId)
       .sort((item1, item2) => {
-        // console.log(item1.match(/scenario_(\d+)%/));
         const num1 = Number(item1.match(/scenario_(\d+)%/)[1]);
         const num2 = Number(item2.match(/scenario_(\d+)%/)[1]);
         return num1 - num2;
@@ -328,32 +344,19 @@ const CenterScenario = memo(props => {
     },
   ];
 
-  const getDate = async () => {
-    const { data, error } = await refTradeDateByOffsetGet({
-      offset: -2,
-    });
-    setTradeDate(true);
-    if (error) return;
-    setReportFormData(
-      Form2.createFields({
-        valuationDate: moment(data),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
-
-    onSearch(
-      Form2.createFields({
-        valuationDate: moment(data),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
-  };
+  useEffect(() => {
+    if (props.form.valuationDate && !oldFormData) {
+      const form = Form2.createFields(props.form);
+      setReportFormData(form);
+      serOldFormData(form);
+    }
+  }, [props.form]);
 
   useEffect(() => {
-    getDate();
-  }, []);
+    if (_.get(oldFormData, 'valuationDate.value')) {
+      onSearch(oldFormData);
+    }
+  }, [oldFormData]);
 
   useLifecycles(() => {
     setTableColDefs([
@@ -462,7 +465,7 @@ const CenterScenario = memo(props => {
           </FormItemWrapper>
         </Col>
         <Col>
-          <ThemeButton onClick={() => onSearch(null)} type="primary">
+          <ThemeButton onClick={() => onSearch(reportFormData)} type="primary">
             确定
           </ThemeButton>
         </Col>
@@ -487,6 +490,11 @@ const CenterScenario = memo(props => {
       /> */}
     </>
   );
-});
+};
 
-export default CenterScenario;
+export default memo(
+  connect(state => ({
+    date: state.centerDate.date,
+    form: state.centerDate.form,
+  }))(CenterScenario),
+);

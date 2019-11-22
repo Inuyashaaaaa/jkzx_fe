@@ -26,7 +26,7 @@ const Wrap = styled.div`
 `;
 
 const UserLayout = props => {
-  const { login, submitting } = props;
+  const { login, submitting, dispatch } = props;
   const [formData, setFormData] = useState({});
 
   const columns: IFormColDef[] = [
@@ -68,7 +68,7 @@ const UserLayout = props => {
     const { error, values } = await formData.validate();
     if (error) return;
     values.captcha = '';
-    props.dispatch({
+    dispatch({
       type: 'login/login',
       payload: {
         loginParams: values,
@@ -80,6 +80,7 @@ const UserLayout = props => {
       },
     });
   };
+
   return (
     <Wrap>
       <div className="wrap">

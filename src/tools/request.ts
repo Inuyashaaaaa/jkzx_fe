@@ -191,13 +191,45 @@ export default function request(url, _options = {}, passError = false) {
       onCatch ||
         (error => {
           const { code, message } = error;
+          const urlParams = new URL(window.location.href);
+          const { pathname } = urlParams;
+          const isCenter = pathname.split('/')[1] === 'center';
+          const failAction = { error };
+
           if (!passError) {
-            const urlParams = new URL(window.location.href);
-            const { pathname } = urlParams;
-            const isCenter = pathname.split('/')[1] === 'center';
+            if (code === 107) {
+              if (isCenter) {
+                notification.error({
+                  message: messageDom({ reLogin: true }),
+                  className: styles.notificationWarp,
+                  // duration: null,
+                  icon,
+                });
+              } else {
+                notification.error({
+                  message: '登陆信息已过期，请重新登陆,3秒后自动跳转登录页',
+                });
+              }
+              setTimeout(() => {
+                const urlParams = new URL(window.location.href);
+                const { pathname } = urlParams;
+                const loginUrl =
+                  pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
+                // @HACK
+                window.g_app._store.dispatch({
+                  type: 'login/logout',
+                  payload: {
+                    loginUrl,
+                    routerPush: true,
+                  },
+                });
+              }, 3000);
+
+              return failAction;
+            }
             if (isCenter) {
               notification.error({
-                message: messageDom,
+                message: messageDom({}),
                 description: message,
                 className: styles.notificationWarp,
                 // duration: null,
@@ -210,8 +242,6 @@ export default function request(url, _options = {}, passError = false) {
               });
             }
           }
-
-          const failAction = { error };
 
           if (code === 401) {
             notification.error({

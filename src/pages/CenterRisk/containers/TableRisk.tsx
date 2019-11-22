@@ -8,6 +8,14 @@ import ThemeTable from '@/containers/ThemeTable';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './Unit';
+import ThemeSelect from '@/containers/ThemeSelect';
+import { mktInstrumentSearch } from '@/services/market-data-service';
+import {
+  rptReportInstrumentListByValuationDate,
+  rptReportCounterPartyListByValuationDate,
+  rptReportSubsidiaryListByValuationDate,
+} from '@/services/tradeBooks';
+import { refSimilarLegalNameListWithoutBook } from '@/services/reference-data-service';
 
 const Title = styled.div`
   font-size: 18px;
@@ -112,7 +120,7 @@ const TableRisk = (props: any) => {
     if (store.first) {
       fetch(false);
     }
-  }, [sorter, searchFormData, valuationDate]);
+  }, [sorter, searchFormData]);
 
   useEffect(() => {
     if (store.first) {
@@ -131,6 +139,71 @@ const TableRisk = (props: any) => {
 
   const titleTxt = title + (reportTime ? `（报告计算时间：${reportTime} ）` : '');
 
+  const [instrumentList, setInstrumentList] = useState([]);
+  const [subsidiaryList, setSubsidiaryList] = useState([]);
+  const [counterPartyList, setCounterPartyList] = useState([]);
+
+  const getSelectList = async () => {
+    setFormData(initFormData);
+    setSearchFormData(initFormData);
+    if (riskButton.instrumentIdPart) {
+      const instrumentListRes = await rptReportInstrumentListByValuationDate({
+        reportType: props.reportType,
+        valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+      });
+      if (instrumentListRes.error) {
+        setInstrumentList([]);
+      } else {
+        setInstrumentList(
+          instrumentListRes.data.map(item => ({
+            label: item,
+            value: item,
+          })),
+        );
+      }
+    }
+
+    if (riskButton.bookNamePart) {
+      const subsidiaryListRes = await rptReportSubsidiaryListByValuationDate({
+        reportType: props.reportType,
+        valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+      });
+      if (subsidiaryListRes.error) {
+        setSubsidiaryList([]);
+      } else {
+        setSubsidiaryList(
+          subsidiaryListRes.data.map(item => ({
+            label: item,
+            value: item,
+          })),
+        );
+      }
+    }
+
+    if (riskButton.partyNamePart) {
+      const counterPartyListRes = await rptReportCounterPartyListByValuationDate({
+        reportType: props.reportType,
+        valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+      });
+      if (counterPartyListRes.error) {
+        setCounterPartyList([]);
+      } else {
+        setCounterPartyList(
+          counterPartyListRes.data.map(item => ({
+            label: item,
+            value: item,
+          })),
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (props.valuationDate) {
+      getSelectList();
+    }
+  }, [props.valuationDate]);
+
   return (
     <div style={style}>
       <Title>{`${titleTxt}`}</Title>
@@ -145,39 +218,54 @@ const TableRisk = (props: any) => {
           <Row type="flex" justify="start" align="middle" gutter={12}>
             {riskButton.bookNamePart ? (
               <Col>
-                <ThemeInput
-                  value={formData.bookNamePart}
+                <ThemeSelect
+                  filterOption={(val, option) => _.get(option, 'props.children').indexOf(val) >= 0}
+                  showSearch
+                  style={{ minWidth: 200 }}
+                  value={formData.bookNamePart !== '' ? formData.bookNamePart : undefined}
                   onChange={event => {
-                    setFormData({ ...formData, bookNamePart: _.get(event.target, 'value') });
+                    setFormData({ ...formData, bookNamePart: event });
                   }}
+                  allowClear
                   placeholder="请输入搜索子公司"
-                ></ThemeInput>
+                  options={subsidiaryList}
+                ></ThemeSelect>
               </Col>
             ) : (
               ''
             )}
             {riskButton.partyNamePart ? (
               <Col>
-                <ThemeInput
-                  value={formData.partyNamePart}
-                  onChange={event => {
-                    setFormData({ ...formData, partyNamePart: _.get(event.target, 'value') });
-                  }}
+                <ThemeSelect
+                  filterOption={(val, option) => _.get(option, 'props.children').indexOf(val) >= 0}
+                  allowClear
                   placeholder="请输入搜索交易对手"
-                ></ThemeInput>
+                  showSearch
+                  style={{ minWidth: 200 }}
+                  value={formData.partyNamePart !== '' ? formData.partyNamePart : undefined}
+                  onChange={event => {
+                    setFormData({ ...formData, partyNamePart: event });
+                  }}
+                  options={counterPartyList}
+                ></ThemeSelect>
               </Col>
             ) : (
               ''
             )}
             {riskButton.instrumentIdPart ? (
               <Col>
-                <ThemeInput
-                  value={formData.instrumentIdPart}
+                <ThemeSelect
                   onChange={event => {
-                    setFormData({ ...formData, instrumentIdPart: _.get(event.target, 'value') });
+                    setFormData({ ...formData, instrumentIdPart: event });
                   }}
+                  value={formData.instrumentIdPart !== '' ? formData.instrumentIdPart : undefined}
+                  allowClear
                   placeholder="请输入搜索标的物"
-                ></ThemeInput>
+                  style={{ minWidth: 200 }}
+                  filterOption={(val, option) => _.get(option, 'props.children').indexOf(val) >= 0}
+                  showSearch
+                  options={instrumentList}
+                ></ThemeSelect>
               </Col>
             ) : (
               ''
@@ -212,7 +300,7 @@ const TableRisk = (props: any) => {
                 if (_.indexOf(['gamma', 'delta'], dataIndex) > -1) {
                   return {
                     t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                    z: Math.abs(val) >= 1000 ? '0,0.00' : '0.00',
                   };
                 }
                 if (dataIndex !== dataValue && rowIndex > 0) {
@@ -232,7 +320,7 @@ const TableRisk = (props: any) => {
       </Row>
       <div style={{ position: 'relative' }}>
         <ThemeTable
-          scroll={showScroll ? scroll : undefined}
+          scroll={props.scroll}
           loading={loading}
           pagination={{
             ...pagination,

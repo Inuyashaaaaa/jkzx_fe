@@ -7,6 +7,8 @@ export const columns = sorter => [
     title: '标的物合约',
     dataIndex: 'underlyerInstrumentId',
     width: 135,
+    sortOrder: sorter.field === 'underlyerInstrumentId' && sorter.order,
+    sorter: true,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: val => <span>{val}</span>,
   },

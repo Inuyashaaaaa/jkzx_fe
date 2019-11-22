@@ -9,7 +9,7 @@ import uuidv4 from 'uuid/v4';
 const ThemeTableWrap = styled.div`
   width: 100%;
   .ant-table-thead > tr > th {
-    background: #043269;
+    background: transparent;
     color: rgba(246, 250, 255, 1);
     border: 1px solid rgba(0, 232, 232, 0.5);
     &.ant-table-column-sort {
