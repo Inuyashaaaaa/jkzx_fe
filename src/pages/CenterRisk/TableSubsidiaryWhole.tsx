@@ -10,9 +10,12 @@ import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './containers/Unit';
-import { queryNonGroupResource } from '@/services/tradeBooks';
+import {
+  queryNonGroupResource,
+  rptReportSubsidiaryListByValuationDate,
+} from '@/services/tradeBooks';
 import ThemeSelect from '@/containers/ThemeSelect';
-import { rptReportSubsidiaryListByValuationDate } from '@/services/tradeBooks';
+
 const Title = styled.div`
   font-size: 18px;
   font-weight: 400;
@@ -195,7 +198,7 @@ const TableSubsidiaryWhole = (props: any) => {
       setSubsidiaryList([]);
     } else {
       setSubsidiaryList(
-        subsidiaryListRes.data.sort().map(item => ({
+        subsidiaryListRes.data.map(item => ({
           label: item,
           value: item,
         })),
