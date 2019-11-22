@@ -10,7 +10,12 @@ import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './Unit';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { mktInstrumentSearch } from '@/services/market-data-service';
-import { queryNonGroupResource } from '@/services/tradeBooks';
+import {
+  queryNonGroupResource,
+  rptReportInstrumentListByValuationDate,
+  rptReportCounterPartyListByValuationDate,
+  rptReportSubsidiaryListByValuationDate,
+} from '@/services/tradeBooks';
 import { refSimilarLegalNameListWithoutBook } from '@/services/reference-data-service';
 
 const Title = styled.div`
@@ -160,11 +165,14 @@ const TableRisk = (props: any) => {
                   allowClear
                   placeholder="请输入搜索子公司"
                   options={async (value: string) => {
-                    const { data, error } = await queryNonGroupResource();
+                    const { data, error } = await rptReportSubsidiaryListByValuationDate({
+                      reportType: props.reportType,
+                      valuationDate: moment(valuationDate).format('YYYY-MM-DD'),
+                    });
                     if (error) return [];
-                    return data.map(item => ({
-                      label: item.resourceName,
-                      value: item.resourceName,
+                    return data.sort().map(item => ({
+                      label: item,
+                      value: item,
                     }));
                   }}
                 ></ThemeSelect>
@@ -175,7 +183,7 @@ const TableRisk = (props: any) => {
             {riskButton.partyNamePart ? (
               <Col>
                 <ThemeSelect
-                  fetchOptionsOnSearch
+                  filterOption
                   allowClear
                   placeholder="请输入搜索交易对手"
                   showSearch
@@ -185,11 +193,12 @@ const TableRisk = (props: any) => {
                     setFormData({ ...formData, partyNamePart: event });
                   }}
                   options={async (value: string) => {
-                    const { data, error } = await refSimilarLegalNameListWithoutBook({
-                      similarLegalName: value,
+                    const { data, error } = await rptReportCounterPartyListByValuationDate({
+                      reportType: props.reportType,
+                      valuationDate: moment(valuationDate).format('YYYY-MM-DD'),
                     });
                     if (error) return [];
-                    return data.slice(0, 50).map(item => ({
+                    return data.sort().map(item => ({
                       label: item,
                       value: item,
                     }));
@@ -209,21 +218,18 @@ const TableRisk = (props: any) => {
                   allowClear
                   placeholder="请输入搜索标的物"
                   style={{ minWidth: 200 }}
-                  fetchOptionsOnSearch
+                  filterOption
                   showSearch
                   options={async (value: string) => {
-                    const { data, error } = await mktInstrumentSearch({
-                      instrumentIdPart: _.toUpper(value),
-                      excludeOption: true,
+                    const { data, error } = await rptReportInstrumentListByValuationDate({
+                      reportType: props.reportType,
+                      valuationDate: moment(valuationDate).format('YYYY-MM-DD'),
                     });
                     if (error) return [];
-                    return data
-                      .sort()
-                      .slice(0, 50)
-                      .map(item => ({
-                        label: item,
-                        value: item,
-                      }));
+                    return data.sort().map(item => ({
+                      label: item,
+                      value: item,
+                    }));
                   }}
                 ></ThemeSelect>
               </Col>

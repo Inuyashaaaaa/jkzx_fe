@@ -118,6 +118,7 @@ const Risk = props => {
             method={rptSearchPagedMarketRiskDetailReport}
             valuationDate={formData.valuationDate}
             query={query}
+            reportType="MARKET_RISK_DETAIL"
           />
         </TabPane>
         <TabPane tab="各子公司估值监测" key="2">
@@ -125,6 +126,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             activeKey="2"
             query={query}
+            reportType="SUBSIDIARY_RISK"
           />
           <TableRisk
             title="各子公司分品种风险报告"
@@ -143,6 +145,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="2"
+            reportType="SUBSIDIARY_RISK_DETAIL"
           />
         </TabPane>
         <TabPane tab="交易对手估值监测 " key="3">
@@ -161,6 +164,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="3"
+            reportType="PARTY_RISK"
           />
           <TableRisk
             title="交易对手分品种风险报告"
@@ -178,6 +182,7 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="3"
+            reportType="PARTY_RISK_DETAIL"
           />
         </TabPane>
       </ThemeTabs>
