@@ -5,9 +5,14 @@ export default {
   namespace: 'centerDate',
 
   state: {
-    riskDate: null,
+    date: null,
     scenarioData: null,
     dates: [null, null],
+    form: {
+      reportType: 'MARKET',
+      underlyer: '600030.SH',
+      valuationDate: null,
+    },
   },
   effects: {
     *getDate(action, { put }) {
@@ -18,9 +23,13 @@ export default {
       yield put({
         type: 'save',
         payload: {
-          riskDate: moment(data),
-          scenarioData: moment(data),
+          date: moment(data),
           dates: [moment(data).subtract(1, 'd'), moment(data)],
+          form: {
+            reportType: 'MARKET',
+            underlyer: '600030.SH',
+            valuationDate: moment(data),
+          },
         },
       });
     },

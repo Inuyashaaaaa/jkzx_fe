@@ -10,7 +10,10 @@ import formatNumber from '@/utils/format';
 import ThemeInput from '@/containers/ThemeInput';
 import DownloadExcelButton from '@/containers/DownloadExcelButton';
 import Unit from './containers/Unit';
-import { queryNonGroupResource } from '@/services/tradeBooks';
+import {
+  queryNonGroupResource,
+  rptReportSubsidiaryListByValuationDate,
+} from '@/services/tradeBooks';
 import ThemeSelect from '@/containers/ThemeSelect';
 
 const Title = styled.div`
@@ -102,7 +105,7 @@ const TableSubsidiaryWhole = (props: any) => {
     if (store.first) {
       fetch(false);
     }
-  }, [sorter, searchFormData, valuationDate]);
+  }, [sorter, searchFormData]);
 
   useEffect(() => {
     if (store.first) {
@@ -182,6 +185,33 @@ const TableSubsidiaryWhole = (props: any) => {
     ? `各子公司风险报告（报告计算时间：${reportTime} ）`
     : '各子公司风险报告';
 
+  const [subsidiaryList, setSubsidiaryList] = useState([]);
+
+  const getSelectList = async () => {
+    setFormData(initFormData);
+    setSearchFormData(initFormData);
+    const subsidiaryListRes = await rptReportSubsidiaryListByValuationDate({
+      reportType: props.reportType,
+      valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+    });
+    if (subsidiaryListRes.error) {
+      setSubsidiaryList([]);
+    } else {
+      setSubsidiaryList(
+        subsidiaryListRes.data.map(item => ({
+          label: item,
+          value: item,
+        })),
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (props.valuationDate) {
+      getSelectList();
+    }
+  }, [props.valuationDate]);
+
   return (
     <div>
       <Title>{titleTxt}</Title>
@@ -204,15 +234,8 @@ const TableSubsidiaryWhole = (props: any) => {
                   setFormData({ ...formData, subsidiaryPart: event });
                 }}
                 allowClear
-                placeholder="请输入搜索标的物"
-                options={async (value: string) => {
-                  const { data, error } = await queryNonGroupResource();
-                  if (error) return [];
-                  return data.map(item => ({
-                    label: item.resourceName,
-                    value: item.resourceName,
-                  }));
-                }}
+                placeholder="请输入搜索子公司"
+                options={subsidiaryList}
               ></ThemeSelect>
             </Col>
             <Col>
@@ -248,13 +271,13 @@ const TableSubsidiaryWhole = (props: any) => {
                 if (_.indexOf(['gamma', 'delta'], dataIndex) > -1) {
                   return {
                     t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                    z: Math.abs(val) >= 1000 ? '0,0.00' : '0.00',
                   };
                 }
                 if (dataIndex !== 'subsidiaryPart' && rowIndex > 0) {
                   return {
                     t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                    z: Math.abs(val) >= 1000 ? '0,0' : '0',
                   };
                 }
                 return null;

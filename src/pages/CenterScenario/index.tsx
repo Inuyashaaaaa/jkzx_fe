@@ -53,14 +53,9 @@ const ThemeTableWrapper = styled.div`
   margin-top: 24px;
 `;
 const CenterScenario = props => {
-  const { scenarioData, dispatch } = props;
-  const [reportFormData, setReportFormData] = useState(
-    Form2.createFields({
-      valuationDate: scenarioData,
-      reportType: 'MARKET',
-      underlyer: '600030.SH',
-    }),
-  );
+  const { date, dispatch, form } = props;
+  const [reportFormData, setReportFormData] = useState(Form2.createFields(form));
+  const [oldFormData, serOldFormData] = useState(null);
   const [tradeDate, setTradeDate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
@@ -110,11 +105,20 @@ const CenterScenario = props => {
   ];
 
   const onReportFormChange = (props, changedFields, allFields) => {
+    dispatch({
+      type: 'centerDate/save',
+      payload: {
+        form: Form2.getFieldsValue({
+          ...reportFormData,
+          ...changedFields,
+        }),
+      },
+    });
     if (changedFields.valuationDate) {
       dispatch({
         type: 'centerDate/save',
         payload: {
-          scenarioData: _.get(changedFields, 'valuationDate.value'),
+          date: _.get(changedFields, 'valuationDate.value'),
         },
       });
     }
@@ -136,7 +140,7 @@ const CenterScenario = props => {
     setClassicSceneTable(!classicSceneTable);
     const [reportRsp] = await Promise.all([reportForm.current.validate()]);
     if (reportRsp.error) return;
-    const reportData = _.mapValues(
+    let reportData = _.mapValues(
       _.mapKeys(Form2.getFieldsValue(param || reportFormData), (val, key) => {
         if (key === 'legalName' || key === 'subName') {
           return 'subOrPartyName';
@@ -147,7 +151,6 @@ const CenterScenario = props => {
         if (keys === 'valuationDate') {
           return moment(vals).format('YYYY-MM-DD');
         }
-        // console.log(vals,keys,'vals')
         return vals;
       },
     );
@@ -160,9 +163,13 @@ const CenterScenario = props => {
         reportData.subOrPartyName = formData.subName;
       }
     });
+
+    if (reportData.reportType === 'MARKET') {
+      reportData = _.omit(reportData, ['subOrPartyName']);
+    }
+
     setLoading(true);
     setTableLoading(true);
-
     const { error, data } = await rptSpotScenariosReportListSearch(reportData);
     setLoading(false);
     setTableLoading(false);
@@ -198,7 +205,6 @@ const CenterScenario = props => {
     const scenarioId = data[0].scenarios
       .map(item => item.scenarioId)
       .sort((item1, item2) => {
-        // console.log(item1.match(/scenario_(\d+)%/));
         const num1 = Number(item1.match(/scenario_(\d+)%/)[1]);
         const num2 = Number(item2.match(/scenario_(\d+)%/)[1]);
         return num1 - num2;
@@ -338,26 +344,19 @@ const CenterScenario = props => {
     },
   ];
 
-  const getDate = async form => {
-    onSearch(form);
-  };
+  useEffect(() => {
+    if (props.form.valuationDate && !oldFormData) {
+      const form = Form2.createFields(props.form);
+      setReportFormData(form);
+      serOldFormData(form);
+    }
+  }, [props.form]);
 
   useEffect(() => {
-    setReportFormData(
-      Form2.createFields({
-        valuationDate: moment(props.scenarioData),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
-    getDate(
-      Form2.createFields({
-        valuationDate: moment(props.scenarioData),
-        reportType: 'MARKET',
-        underlyer: '600030.SH',
-      }),
-    );
-  }, [props.scenarioData]);
+    if (_.get(oldFormData, 'valuationDate.value')) {
+      onSearch(oldFormData);
+    }
+  }, [oldFormData]);
 
   useLifecycles(() => {
     setTableColDefs([
@@ -466,7 +465,7 @@ const CenterScenario = props => {
           </FormItemWrapper>
         </Col>
         <Col>
-          <ThemeButton onClick={() => onSearch(null)} type="primary">
+          <ThemeButton onClick={() => onSearch(reportFormData)} type="primary">
             确定
           </ThemeButton>
         </Col>
@@ -495,6 +494,7 @@ const CenterScenario = props => {
 
 export default memo(
   connect(state => ({
-    scenarioData: state.centerDate.scenarioData,
+    date: state.centerDate.date,
+    form: state.centerDate.form,
   }))(CenterScenario),
 );
