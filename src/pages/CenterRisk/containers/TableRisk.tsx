@@ -134,7 +134,6 @@ const TableRisk = (props: any) => {
   const reportTime = createdAt ? moment(createdAt).format('YYYY-MM-DD HH:mm:ss') : '';
 
   const titleTxt = title + (reportTime ? `（报告计算时间：${reportTime} ）` : '');
-  console.log(formData.bookNamePart);
 
   return (
     <div style={style}>
@@ -281,7 +280,7 @@ const TableRisk = (props: any) => {
       </Row>
       <div style={{ position: 'relative' }}>
         <ThemeTable
-          scroll={showScroll ? scroll : undefined}
+          scroll={props.scroll}
           loading={loading}
           pagination={{
             ...pagination,

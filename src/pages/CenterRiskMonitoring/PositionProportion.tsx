@@ -9,7 +9,7 @@ const PositionProportion = props => (
       title="对手方场内外合并持仓占比"
       fetchMethod={getOtcCusPosPercentageReport}
       columns={PositionProportionDefs}
-      scrollWidth={{ x: 1940 }}
+      scrollWidth={{ x: 2160 }}
       formData={props.formData}
     />
   </>

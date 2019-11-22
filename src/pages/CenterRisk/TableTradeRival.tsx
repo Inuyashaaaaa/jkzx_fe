@@ -5,7 +5,7 @@ export const columns = sorter => [
   {
     title: '交易对手',
     dataIndex: 'partyName',
-    width: 100,
+    width: 400,
     sortOrder: sorter.field === 'partyName' && sorter.order,
     sorter: true,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
@@ -14,7 +14,7 @@ export const columns = sorter => [
   {
     title: 'Delta_Cash',
     dataIndex: 'deltaCash',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'deltaCash' && sorter.order,
     sorter: true,
     render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -24,7 +24,7 @@ export const columns = sorter => [
   {
     title: 'Gamma_Cash',
     dataIndex: 'gammaCash',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'gammaCash' && sorter.order,
     sorter: true,
     render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -34,7 +34,7 @@ export const columns = sorter => [
   {
     title: 'Vega',
     dataIndex: 'vega',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'vega' && sorter.order,
     sorter: true,
     render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -44,7 +44,7 @@ export const columns = sorter => [
   {
     title: 'Theta',
     dataIndex: 'theta',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'theta' && sorter.order,
     sorter: true,
     render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
@@ -54,7 +54,7 @@ export const columns = sorter => [
   {
     title: 'Rho',
     dataIndex: 'rho',
-    width: 100,
+    width: 150,
     sortOrder: sorter.field === 'rho' && sorter.order,
     sorter: true,
     render: value => <span>{formatNumber({ value, formatter: '0,0' })}</span>,
