@@ -37,19 +37,17 @@ const BigTitle = styled.div`
 `;
 
 const Risk = props => {
-  const { riskDate, dispatch } = props;
+  const { date, dispatch } = props;
   let initFormData = {
-    valuationDate: riskDate,
+    valuationDate: date,
     instrumentIdPart: '',
   };
   const { query } = props.location || {};
   const defaultActiveKey = query.activeKey || '1';
 
   const [formData, setFormData] = useState(initFormData);
-  const [tradeDate, setTradeDate] = useState(false);
 
   const getDate = async () => {
-    setTradeDate(true);
     if (query.valuationDate) {
       initFormData = {
         ...initFormData,
@@ -59,7 +57,7 @@ const Risk = props => {
       dispatch({
         type: 'centerDate/save',
         payload: {
-          riskDate: moment(query.valuationDate),
+          date: moment(query.valuationDate),
         },
       });
     }
@@ -72,9 +70,9 @@ const Risk = props => {
   useEffect(() => {
     setFormData({
       ...formData,
-      valuationDate: props.riskDate,
+      valuationDate: props.date,
     });
-  }, [props.riskDate]);
+  }, [props.date]);
 
   return (
     <>
@@ -89,7 +87,7 @@ const Risk = props => {
               dispatch({
                 type: 'centerDate/save',
                 payload: {
-                  riskDate: pDate,
+                  date: pDate,
                 },
               });
             }}
@@ -106,7 +104,6 @@ const Risk = props => {
           <BoxPanel
             date={formData.valuationDate}
             style={{ marginBottom: 18, marginTop: 18 }}
-            tradeDate={tradeDate}
           ></BoxPanel>
           <TableRisk
             title="全市场分品种风险报告"
@@ -121,7 +118,6 @@ const Risk = props => {
             method={rptSearchPagedMarketRiskDetailReport}
             valuationDate={formData.valuationDate}
             query={query}
-            tradeDate={tradeDate}
           />
         </TabPane>
         <TabPane tab="各子公司估值监测" key="2">
@@ -129,7 +125,6 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             activeKey="2"
             query={query}
-            tradeDate={tradeDate}
           />
           <TableRisk
             title="各子公司分品种风险报告"
@@ -148,7 +143,6 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="2"
-            tradeDate={tradeDate}
           />
         </TabPane>
         <TabPane tab="交易对手估值监测 " key="3">
@@ -167,7 +161,6 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="3"
-            tradeDate={tradeDate}
           />
           <TableRisk
             title="交易对手分品种风险报告"
@@ -185,7 +178,6 @@ const Risk = props => {
             valuationDate={formData.valuationDate}
             query={query}
             activeKey="3"
-            tradeDate={tradeDate}
           />
         </TabPane>
       </ThemeTabs>
@@ -195,6 +187,6 @@ const Risk = props => {
 
 export default memo(
   connect(state => ({
-    riskDate: state.centerDate.riskDate,
+    date: state.centerDate.date,
   }))(Risk),
 );

@@ -106,9 +106,7 @@ const BoxPanel = memo(props => {
   };
 
   useEffect(() => {
-    if (props.tradeDate) {
-      fechData();
-    }
+    fechData();
   }, [date]);
 
   const createdAt = _.get(result, 'createdAt');
@@ -116,7 +114,6 @@ const BoxPanel = memo(props => {
   const titleTxt = reportTime
     ? `全市场整体风险报告（报告计算时间：${reportTime} ）`
     : '全市场整体风险报告';
-
   return (
     <>
       <Row
