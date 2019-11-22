@@ -261,7 +261,7 @@ const TableRisk = (props: any) => {
                 if (_.indexOf(['gamma', 'delta'], dataIndex) > -1) {
                   return {
                     t: 'n',
-                    z: Math.abs(val) >= 1000 ? '0,0.0000' : '0.0000',
+                    z: Math.abs(val) >= 1000 ? '0,0.00' : '0.00',
                   };
                 }
                 if (dataIndex !== dataValue && rowIndex > 0) {
