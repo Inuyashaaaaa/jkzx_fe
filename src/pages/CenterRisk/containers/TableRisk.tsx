@@ -155,7 +155,7 @@ const TableRisk = (props: any) => {
         setInstrumentList([]);
       } else {
         setInstrumentList(
-          instrumentListRes.data.sort().map(item => ({
+          instrumentListRes.data.map(item => ({
             label: item,
             value: item,
           })),
@@ -172,7 +172,7 @@ const TableRisk = (props: any) => {
         setSubsidiaryList([]);
       } else {
         setSubsidiaryList(
-          subsidiaryListRes.data.sort().map(item => ({
+          subsidiaryListRes.data.map(item => ({
             label: item,
             value: item,
           })),
@@ -189,7 +189,7 @@ const TableRisk = (props: any) => {
         setCounterPartyList([]);
       } else {
         setCounterPartyList(
-          counterPartyListRes.data.sort().map(item => ({
+          counterPartyListRes.data.map(item => ({
             label: item,
             value: item,
           })),
