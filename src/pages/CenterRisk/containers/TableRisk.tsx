@@ -11,7 +11,6 @@ import Unit from './Unit';
 import ThemeSelect from '@/containers/ThemeSelect';
 import { mktInstrumentSearch } from '@/services/market-data-service';
 import {
-  queryNonGroupResource,
   rptReportInstrumentListByValuationDate,
   rptReportCounterPartyListByValuationDate,
   rptReportSubsidiaryListByValuationDate,
@@ -121,7 +120,7 @@ const TableRisk = (props: any) => {
     if (store.first) {
       fetch(false);
     }
-  }, [sorter, searchFormData, valuationDate]);
+  }, [sorter, searchFormData]);
 
   useEffect(() => {
     if (store.first) {
@@ -140,6 +139,71 @@ const TableRisk = (props: any) => {
 
   const titleTxt = title + (reportTime ? `（报告计算时间：${reportTime} ）` : '');
 
+  const [instrumentList, setInstrumentList] = useState([]);
+  const [subsidiaryList, setSubsidiaryList] = useState([]);
+  const [counterPartyList, setCounterPartyList] = useState([]);
+
+  const getSelectList = async () => {
+    setFormData(initFormData);
+    setSearchFormData(initFormData);
+    if (riskButton.instrumentIdPart) {
+      const instrumentListRes = await rptReportInstrumentListByValuationDate({
+        reportType: props.reportType,
+        valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+      });
+      if (instrumentListRes.error) {
+        setInstrumentList([]);
+      } else {
+        setInstrumentList(
+          instrumentListRes.data.sort().map(item => ({
+            label: item,
+            value: item,
+          })),
+        );
+      }
+    }
+
+    if (riskButton.bookNamePart) {
+      const subsidiaryListRes = await rptReportSubsidiaryListByValuationDate({
+        reportType: props.reportType,
+        valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+      });
+      if (subsidiaryListRes.error) {
+        setSubsidiaryList([]);
+      } else {
+        setSubsidiaryList(
+          subsidiaryListRes.data.sort().map(item => ({
+            label: item,
+            value: item,
+          })),
+        );
+      }
+    }
+
+    if (riskButton.partyNamePart) {
+      const counterPartyListRes = await rptReportCounterPartyListByValuationDate({
+        reportType: props.reportType,
+        valuationDate: moment(props.valuationDate).format('YYYY-MM-DD'),
+      });
+      if (counterPartyListRes.error) {
+        setCounterPartyList([]);
+      } else {
+        setCounterPartyList(
+          counterPartyListRes.data.sort().map(item => ({
+            label: item,
+            value: item,
+          })),
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (props.valuationDate) {
+      getSelectList();
+    }
+  }, [props.valuationDate]);
+
   return (
     <div style={style}>
       <Title>{`${titleTxt}`}</Title>
@@ -155,7 +219,7 @@ const TableRisk = (props: any) => {
             {riskButton.bookNamePart ? (
               <Col>
                 <ThemeSelect
-                  filterOption
+                  filterOption={(val, option) => _.get(option, 'props.children').indexOf(val) >= 0}
                   showSearch
                   style={{ minWidth: 200 }}
                   value={formData.bookNamePart !== '' ? formData.bookNamePart : undefined}
@@ -164,17 +228,7 @@ const TableRisk = (props: any) => {
                   }}
                   allowClear
                   placeholder="请输入搜索子公司"
-                  options={async (value: string) => {
-                    const { data, error } = await rptReportSubsidiaryListByValuationDate({
-                      reportType: props.reportType,
-                      valuationDate: moment(valuationDate).format('YYYY-MM-DD'),
-                    });
-                    if (error) return [];
-                    return data.sort().map(item => ({
-                      label: item,
-                      value: item,
-                    }));
-                  }}
+                  options={subsidiaryList}
                 ></ThemeSelect>
               </Col>
             ) : (
@@ -183,7 +237,7 @@ const TableRisk = (props: any) => {
             {riskButton.partyNamePart ? (
               <Col>
                 <ThemeSelect
-                  filterOption
+                  filterOption={(val, option) => _.get(option, 'props.children').indexOf(val) >= 0}
                   allowClear
                   placeholder="请输入搜索交易对手"
                   showSearch
@@ -192,17 +246,7 @@ const TableRisk = (props: any) => {
                   onChange={event => {
                     setFormData({ ...formData, partyNamePart: event });
                   }}
-                  options={async (value: string) => {
-                    const { data, error } = await rptReportCounterPartyListByValuationDate({
-                      reportType: props.reportType,
-                      valuationDate: moment(valuationDate).format('YYYY-MM-DD'),
-                    });
-                    if (error) return [];
-                    return data.sort().map(item => ({
-                      label: item,
-                      value: item,
-                    }));
-                  }}
+                  options={counterPartyList}
                 ></ThemeSelect>
               </Col>
             ) : (
@@ -218,19 +262,9 @@ const TableRisk = (props: any) => {
                   allowClear
                   placeholder="请输入搜索标的物"
                   style={{ minWidth: 200 }}
-                  filterOption
+                  filterOption={(val, option) => _.get(option, 'props.children').indexOf(val) >= 0}
                   showSearch
-                  options={async (value: string) => {
-                    const { data, error } = await rptReportInstrumentListByValuationDate({
-                      reportType: props.reportType,
-                      valuationDate: moment(valuationDate).format('YYYY-MM-DD'),
-                    });
-                    if (error) return [];
-                    return data.sort().map(item => ({
-                      label: item,
-                      value: item,
-                    }));
-                  }}
+                  options={instrumentList}
                 ></ThemeSelect>
               </Col>
             ) : (

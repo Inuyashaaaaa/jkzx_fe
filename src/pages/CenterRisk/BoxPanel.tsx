@@ -106,7 +106,9 @@ const BoxPanel = memo(props => {
   };
 
   useEffect(() => {
-    fechData();
+    if (date) {
+      fechData();
+    }
   }, [date]);
 
   const createdAt = _.get(result, 'createdAt');
