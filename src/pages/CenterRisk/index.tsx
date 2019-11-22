@@ -58,6 +58,10 @@ const Risk = props => {
         type: 'centerDate/save',
         payload: {
           date: moment(query.valuationDate),
+          form: {
+            ...props.form,
+            valuationDate: moment(query.valuationDate),
+          },
         },
       });
     }
@@ -88,6 +92,10 @@ const Risk = props => {
                 type: 'centerDate/save',
                 payload: {
                   date: pDate,
+                  form: {
+                    ...props.form,
+                    valuationDate: pDate,
+                  },
                 },
               });
             }}
@@ -193,5 +201,6 @@ const Risk = props => {
 export default memo(
   connect(state => ({
     date: state.centerDate.date,
+    form: state.centerDate.form,
   }))(Risk),
 );
