@@ -5,7 +5,7 @@ export default {
   namespace: 'centerDate',
 
   state: {
-    riskDate: null,
+    date: null,
     scenarioData: null,
     dates: [null, null],
   },
@@ -18,8 +18,7 @@ export default {
       yield put({
         type: 'save',
         payload: {
-          riskDate: moment(data),
-          scenarioData: moment(data),
+          date: moment(data),
           dates: [moment(data).subtract(1, 'd'), moment(data)],
         },
       });

@@ -53,10 +53,10 @@ const ThemeTableWrapper = styled.div`
   margin-top: 24px;
 `;
 const CenterScenario = props => {
-  const { scenarioData, dispatch } = props;
+  const { date, dispatch } = props;
   const [reportFormData, setReportFormData] = useState(
     Form2.createFields({
-      valuationDate: scenarioData,
+      valuationDate: date,
       reportType: 'MARKET',
       underlyer: '600030.SH',
     }),
@@ -114,7 +114,7 @@ const CenterScenario = props => {
       dispatch({
         type: 'centerDate/save',
         payload: {
-          scenarioData: _.get(changedFields, 'valuationDate.value'),
+          date: _.get(changedFields, 'valuationDate.value'),
         },
       });
     }
@@ -345,19 +345,19 @@ const CenterScenario = props => {
   useEffect(() => {
     setReportFormData(
       Form2.createFields({
-        valuationDate: moment(props.scenarioData),
+        valuationDate: moment(props.date),
         reportType: 'MARKET',
         underlyer: '600030.SH',
       }),
     );
     getDate(
       Form2.createFields({
-        valuationDate: moment(props.scenarioData),
+        valuationDate: moment(props.date),
         reportType: 'MARKET',
         underlyer: '600030.SH',
       }),
     );
-  }, [props.scenarioData]);
+  }, [props.date]);
 
   useLifecycles(() => {
     setTableColDefs([
@@ -495,6 +495,6 @@ const CenterScenario = props => {
 
 export default memo(
   connect(state => ({
-    scenarioData: state.centerDate.scenarioData,
+    date: state.centerDate.date,
   }))(CenterScenario),
 );
