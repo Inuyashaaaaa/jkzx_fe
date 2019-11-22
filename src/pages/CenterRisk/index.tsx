@@ -129,7 +129,7 @@ const Risk = props => {
           <TableRisk
             title="各子公司分品种风险报告"
             style={{ marginTop: 18 }}
-            scroll={{ x: 1600 }}
+            scroll={{ x: 1630 }}
             riskButton={{
               bookNamePart: true,
               instrumentIdPart: true,
@@ -149,7 +149,7 @@ const Risk = props => {
           <TableRisk
             title="交易对手风险报告"
             // style={{ maxWidth: 1080 }}
-            scroll={{ x: 1130 }}
+            scroll={{ x: 1150 }}
             riskButton={{
               partyNamePart: true,
             }}
@@ -165,7 +165,7 @@ const Risk = props => {
           <TableRisk
             title="交易对手分品种风险报告"
             style={{ marginTop: 18 }}
-            scroll={{ x: 1740 }}
+            scroll={{ x: 1630 }}
             riskButton={{
               partyNamePart: true,
               instrumentIdPart: true,

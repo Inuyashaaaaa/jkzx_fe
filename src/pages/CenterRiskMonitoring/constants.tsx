@@ -118,6 +118,7 @@ export const PositionProportionDefs = [
     title: '日期',
     width: 140,
     dataIndex: 'statDate',
+    fixed: 'left',
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
     render: value => {
       if (value) {
@@ -128,7 +129,8 @@ export const PositionProportionDefs = [
   },
   {
     title: '对手方名称',
-    width: 200,
+    width: 420,
+    fixed: 'left',
     dataIndex: 'analogueName',
     render: val => <span>{val}</span>,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
@@ -137,6 +139,7 @@ export const PositionProportionDefs = [
     title: '标的资产品种',
     width: 200,
     dataIndex: 'underAssVarit',
+    fixed: 'left',
     render: val => <span>{val}</span>,
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
