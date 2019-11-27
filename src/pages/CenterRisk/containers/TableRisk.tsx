@@ -262,7 +262,9 @@ const TableRisk = (props: any) => {
                   allowClear
                   placeholder="请输入搜索标的物"
                   style={{ minWidth: 200 }}
-                  filterOption={(val, option) => _.get(option, 'props.children').indexOf(val) >= 0}
+                  filterOption={(val, option) =>
+                    _.get(option, 'props.children').indexOf(_.toUpper(val)) >= 0
+                  }
                   showSearch
                   options={instrumentList}
                 ></ThemeSelect>
