@@ -109,7 +109,7 @@ export const VarietiesDefs = [
     width: 400,
     dataIndex: 'otcEtRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 0)}</span>,
+    render: val => <span>{val && `${formatNumber(new BigNumber(val).toNumber(), 2)}`}</span>,
   },
 ];
 export const CounterpartyDefs = [
