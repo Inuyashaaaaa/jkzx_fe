@@ -46,7 +46,9 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'trdRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 0)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
   {
     title: '子公司间持仓金额',
@@ -70,7 +72,9 @@ export const InfectionRiskDefs = [
     width: 200,
     dataIndex: 'posRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
-    render: val => <span>{val && formatNumber(val, 0)}</span>,
+    render: val => (
+      <span>{val && `${formatNumber(new BigNumber(val).multipliedBy(100).toNumber(), 2)}%`}</span>
+    ),
   },
 ];
 
