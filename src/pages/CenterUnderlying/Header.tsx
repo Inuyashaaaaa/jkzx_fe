@@ -42,6 +42,7 @@ const Header = props => {
                 fetchOptionsOnSearch
                 showSearch
                 mode="multiple"
+                allowClear
                 options={async (value: string) => {
                   const { data, error } = await mktInstrumentSearch({
                     instrumentIdPart: _.toUpper(value),
