@@ -86,7 +86,7 @@ export default {
       if (error) {
         notification.error({
           message: '登录失败',
-          description: _.get(userInfo, 'error.message'),
+          description: _.get(userInfo, 'error.message') || _.get(userInfo, 'message'),
         });
 
         if (userInfo.expired) {
