@@ -163,10 +163,12 @@ const TopChart = props => {
             scale={{
               time: {
                 alias: '期限',
+                range: [0, 0.95],
               },
               value: {
                 alias: '波动率(%)',
-                formatter: val => formatNumber(_.toNumber(val) * 100, 0),
+                range: [0, 0.85],
+                formatter: val => formatNumber(_.toNumber(val) * 100, 1),
               },
             }}
             onGetG2Instance={g2Chart => {
@@ -207,6 +209,7 @@ const TopChart = props => {
               name="value"
               line={null}
               label={{
+                autoRotate: false,
                 textStyle: {
                   fontSize: '14',
                   fontWeight: '400',
@@ -215,7 +218,8 @@ const TopChart = props => {
                 },
               }}
               title={{
-                offset: -30,
+                offset: 10,
+                autoRotate: false,
                 position: 'end',
                 textStyle: {
                   fontSize: '14',

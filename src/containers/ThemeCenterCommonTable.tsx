@@ -110,6 +110,28 @@ const ThemeCenterCommonTable = props => {
             name: title,
             colSwitch: [],
             getSheetDataSourceItemMeta: (val, dataIndex, rowIndex) => {
+              const arr = [
+                'posRatio',
+                'trdRatio',
+                'cusExgOtcRatio',
+                'top3PosDist',
+                'top5PosDist',
+                'top10PosDist',
+                'etPosRatio',
+                'otcPosRatio',
+              ];
+              if (dataIndex === 'otcEtRatio') {
+                return {
+                  t: 'n',
+                  z: Math.abs(val) >= 1000 ? '0,0.00' : '0.00',
+                };
+              }
+              if (_.indexOf(arr, dataIndex) > -1) {
+                return {
+                  t: 'n',
+                  z: Math.abs(val * 100) >= 1000 ? '0,0.00%' : '0.00%',
+                };
+              }
               if (dataIndex !== 'statDate' && rowIndex > 0) {
                 return {
                   t: 'n',

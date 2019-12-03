@@ -15,8 +15,8 @@ const Wrap = styled.div`
   height: 100vh;
   padding-top: 20vh;
   .wrap {
-    height: 290px;
-    width: 390px;
+    height: 354px;
+    width: 494px;
     margin: 0 auto;
     padding-top: 61px;
     border: 1px solid rgba(0, 232, 232, 1);
@@ -28,6 +28,13 @@ const Wrap = styled.div`
 const UserLayout = props => {
   const { login, submitting, dispatch } = props;
   const [formData, setFormData] = useState({});
+
+  const queryCaptcha = async () => {
+    dispatch({
+      type: 'login/queryCaptcha',
+      payload: {},
+    });
+  };
 
   const columns: IFormColDef[] = [
     {
@@ -62,12 +69,38 @@ const UserLayout = props => {
         </FormItem>
       ),
     },
+    {
+      dataIndex: 'captcha',
+      render: (val, record, index, { form }) => (
+        <FormItem>
+          <Row type="flex" justify="space-between">
+            {form.getFieldDecorator({
+              rules: [{ required: true, message: '请输入验证码' }],
+            })(
+              <ThemeInput
+                size="large"
+                placeholder="请输入验证码"
+                style={{ width: 'auto', flexGrow: 1 }}
+                prefix={<Icon type="security-scan" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              />,
+            )}
+
+            <img
+              style={{ cursor: 'pointer' }}
+              src={login.img}
+              alt="验证码"
+              onClick={() => queryCaptcha()}
+            />
+          </Row>
+        </FormItem>
+      ),
+    },
   ];
 
   const handleSubmit = async () => {
     const { error, values } = await formData.validate();
     if (error) return;
-    values.captcha = '';
+    // values.captcha = '';
     dispatch({
       type: 'login/login',
       payload: {
@@ -80,6 +113,10 @@ const UserLayout = props => {
       },
     });
   };
+
+  useEffect(() => {
+    queryCaptcha();
+  }, []);
 
   return (
     <Wrap>
