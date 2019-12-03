@@ -1,4 +1,5 @@
 import { notification, message } from 'antd';
+import _ from 'lodash';
 import router from 'umi/router';
 import { getPageQuery, delay } from '@/tools';
 import {
@@ -80,13 +81,12 @@ export default {
       } else {
         response = yield call(login, loginParams);
       }
-
       const { data: userInfo, error } = response;
 
       if (error) {
         notification.error({
-          message: '请求失败',
-          description: userInfo.message,
+          message: '登录失败',
+          description: _.get(userInfo, 'error.message'),
         });
 
         if (userInfo.expired) {
@@ -166,7 +166,7 @@ export default {
       }
     },
 
-    *queryCaptcha(_, { call, put }) {
+    *queryCaptcha(payload, { call, put }) {
       const response = yield call(queryCaptcha);
 
       yield put({
