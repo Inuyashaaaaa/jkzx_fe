@@ -17,7 +17,7 @@ export const MarketSizeDefs = [
     },
   },
   {
-    title: '成交名义金额',
+    title: '实际成交名义金额',
     align: 'right',
     width: 150,
     dataIndex: 'trdNotionAmount',
@@ -49,7 +49,7 @@ export const MarketSizeDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '持仓名义金额',
+    title: '实际持仓名义金额',
     width: 150,
     align: 'right',
     dataIndex: 'posNotionAmount',
@@ -125,7 +125,7 @@ export const MarketConcentrationDefs = [
     onCell: () => ({ style: { color: 'rgba(222,230,240,1)' } }),
   },
   {
-    title: '前三名持仓名义金额',
+    title: '前三名实际持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'top3Pos',
@@ -143,7 +143,7 @@ export const MarketConcentrationDefs = [
     ),
   },
   {
-    title: '前五名持仓名义金额',
+    title: '前五名实际持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'top5Pos',
@@ -161,7 +161,7 @@ export const MarketConcentrationDefs = [
     ),
   },
   {
-    title: '前十名持仓名义金额',
+    title: '前十名实际持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'top10Pos',

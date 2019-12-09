@@ -25,7 +25,7 @@ export const InfectionRiskDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '子公司间成交金额',
+    title: '子公司间实际成交金额',
     width: 200,
     align: 'right',
     dataIndex: 'interCompTrdAmount',
@@ -33,7 +33,7 @@ export const InfectionRiskDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '总成交金额',
+    title: '实际总成交金额',
     align: 'right',
     width: 200,
     dataIndex: 'compTrdAmountTotal',
@@ -51,7 +51,7 @@ export const InfectionRiskDefs = [
     ),
   },
   {
-    title: '子公司间持仓金额',
+    title: '子公司间实际持仓金额',
     align: 'right',
     width: 200,
     dataIndex: 'interCompPosAmount',
@@ -59,7 +59,7 @@ export const InfectionRiskDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '总持仓金额',
+    title: '实际总持仓金额',
     align: 'right',
     width: 200,
     dataIndex: 'compPosAmountTotal',
