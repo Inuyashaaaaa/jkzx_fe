@@ -16,7 +16,7 @@ export const KnockdownStructureDefs = [
     },
   },
   {
-    title: '开仓成交名义金额',
+    title: '实际开仓成交名义金额',
     align: 'right',
     width: 200,
     dataIndex: 'openTrdNotionAmount',
@@ -24,7 +24,7 @@ export const KnockdownStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '平仓成交名义金额',
+    title: '实际平仓成交名义金额',
     align: 'right',
     width: 200,
     dataIndex: 'closeTrdNotionAmount',
@@ -32,7 +32,7 @@ export const KnockdownStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '终止成交名义金额',
+    title: '实际终止成交名义金额',
     align: 'right',
     width: 200,
     dataIndex: 'endTrdNotionAmount',
@@ -40,7 +40,7 @@ export const KnockdownStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '成交名义金额',
+    title: '实际成交名义金额',
     align: 'right',
     width: 200,
     dataIndex: 'trdNotionAmount',
@@ -126,7 +126,7 @@ export const PositionStructureDefs = [
     },
   },
   {
-    title: '买看涨持仓名义金额',
+    title: '实际买看涨持仓名义金额',
     width: 250,
     align: 'right',
     dataIndex: 'posCallBuyAmount',
@@ -134,7 +134,7 @@ export const PositionStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '买看跌持仓名义金额',
+    title: '实际买看跌持仓名义金额',
     width: 250,
     align: 'right',
     dataIndex: 'posPutBuyAmount',
@@ -142,7 +142,7 @@ export const PositionStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '买其他持仓名义金额',
+    title: '实际买其他持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'posOtherBuyAmount',
@@ -150,7 +150,7 @@ export const PositionStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '买名义金额合计',
+    title: '实际买名义金额合计',
     align: 'right',
     width: 200,
     dataIndex: 'posBuyAmountTotal',
@@ -158,7 +158,7 @@ export const PositionStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '卖看涨持仓名义金额',
+    title: '实际卖看涨持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'posCallSellAmount',
@@ -166,7 +166,7 @@ export const PositionStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '卖看跌持仓名义金额',
+    title: '实际卖看跌持仓名义金额',
     align: 'right',
     width: 250,
     dataIndex: 'posPutSellAmount',
@@ -174,7 +174,7 @@ export const PositionStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '卖名义金额合计',
+    title: '实际卖名义金额合计',
     align: 'right',
     width: 200,
     dataIndex: 'posSellAmountTotal',
@@ -275,7 +275,7 @@ export const ToolStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '成交名义金额',
+    title: '实际成交名义金额',
     align: 'right',
     width: 150,
     dataIndex: 'trdNotionAmount',
@@ -291,7 +291,7 @@ export const ToolStructureDefs = [
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
   },
   {
-    title: '持仓名义金额',
+    title: '实际持仓名义金额',
     width: 150,
     align: 'right',
     dataIndex: 'posNotionAmount',
@@ -343,7 +343,7 @@ export const CustomerTypeStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '成交名义金额',
+    title: '实际成交名义金额',
     align: 'right',
     width: 150,
     dataIndex: 'trdNotionAmount',
@@ -359,7 +359,7 @@ export const CustomerTypeStructureDefs = [
     render: val => <span>{val && formatNumber(val, 0)}</span>,
   },
   {
-    title: '持仓名义金额',
+    title: '实际持仓名义金额',
     align: 'right',
     width: 150,
     dataIndex: 'posNotionAmount',
