@@ -9,7 +9,7 @@ const ToolStructure = props => (
       title="场外衍生品市场客户类型结构"
       fetchMethod={getOtcCusTypeReport}
       columns={CustomerTypeStructureDefs}
-      scrollWidth={{ x: 1240 }}
+      scrollWidth={{ x: 1340 }}
       formData={props.formData}
     />
   </>

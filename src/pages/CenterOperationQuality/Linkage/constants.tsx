@@ -33,7 +33,7 @@ export const MarketDefs = [
   {
     title: '子公司场外实际持仓金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'otcSubPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -70,7 +70,7 @@ export const VarietiesDefs = [
   {
     title: '场外实际持仓名义金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'otcPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -106,7 +106,7 @@ export const VarietiesDefs = [
   {
     title: '当月倍数（场外持仓比例/场内持仓比例）',
     align: 'right',
-    width: 400,
+    width: 430,
     dataIndex: 'otcEtRatio',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && `${formatNumber(new BigNumber(val).toNumber(), 2)}`}</span>,
@@ -136,7 +136,7 @@ export const CounterpartyDefs = [
   {
     title: '场内开户对手方场外实际持仓名义金额',
     align: 'right',
-    width: 350,
+    width: 400,
     dataIndex: 'otcCusPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
