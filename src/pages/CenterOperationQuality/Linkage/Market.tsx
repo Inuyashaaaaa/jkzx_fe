@@ -8,7 +8,7 @@ const ToolStructure = props => (
     <ThemeCenterCommonTable
       title="子公司联动统计"
       fetchMethod={getOtcEtSubCompanyReport}
-      scrollWidth={{ x: 940 }}
+      scrollWidth={{ x: 990 }}
       columns={MarketDefs}
       formData={props.formData}
     />

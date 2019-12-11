@@ -9,7 +9,7 @@ const ToolStructure = props => (
       title="场外衍生品市场持仓结构"
       fetchMethod={getOtcPositionSummaryReport}
       columns={PositionStructureDefs}
-      scrollWidth={{ x: 3190 }}
+      scrollWidth={{ x: 3540 }}
       formData={props.formData}
     />
   </>
