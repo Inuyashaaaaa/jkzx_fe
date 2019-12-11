@@ -26,7 +26,7 @@ export const InfectionRiskDefs = [
   },
   {
     title: '子公司间实际成交金额',
-    width: 200,
+    width: 250,
     align: 'right',
     dataIndex: 'interCompTrdAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -35,7 +35,7 @@ export const InfectionRiskDefs = [
   {
     title: '实际总成交金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'compTrdAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -53,7 +53,7 @@ export const InfectionRiskDefs = [
   {
     title: '子公司间实际持仓金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'interCompPosAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -61,7 +61,7 @@ export const InfectionRiskDefs = [
   {
     title: '实际总持仓金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'compPosAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,

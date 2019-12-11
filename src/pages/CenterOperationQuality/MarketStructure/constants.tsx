@@ -18,7 +18,7 @@ export const KnockdownStructureDefs = [
   {
     title: '实际开仓成交名义金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'openTrdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -26,7 +26,7 @@ export const KnockdownStructureDefs = [
   {
     title: '实际平仓成交名义金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'closeTrdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -34,7 +34,7 @@ export const KnockdownStructureDefs = [
   {
     title: '实际终止成交名义金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'endTrdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -42,7 +42,7 @@ export const KnockdownStructureDefs = [
   {
     title: '实际成交名义金额',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -127,7 +127,7 @@ export const PositionStructureDefs = [
   },
   {
     title: '实际买看涨持仓名义金额',
-    width: 250,
+    width: 300,
     align: 'right',
     dataIndex: 'posCallBuyAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -135,7 +135,7 @@ export const PositionStructureDefs = [
   },
   {
     title: '实际买看跌持仓名义金额',
-    width: 250,
+    width: 300,
     align: 'right',
     dataIndex: 'posPutBuyAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -144,7 +144,7 @@ export const PositionStructureDefs = [
   {
     title: '实际买其他持仓名义金额',
     align: 'right',
-    width: 250,
+    width: 300,
     dataIndex: 'posOtherBuyAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -152,7 +152,7 @@ export const PositionStructureDefs = [
   {
     title: '实际买名义金额合计',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'posBuyAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -160,7 +160,7 @@ export const PositionStructureDefs = [
   {
     title: '实际卖看涨持仓名义金额',
     align: 'right',
-    width: 250,
+    width: 300,
     dataIndex: 'posCallSellAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -176,7 +176,7 @@ export const PositionStructureDefs = [
   {
     title: '实际卖名义金额合计',
     align: 'right',
-    width: 200,
+    width: 250,
     dataIndex: 'posSellAmountTotal',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -277,7 +277,7 @@ export const ToolStructureDefs = [
   {
     title: '实际成交名义金额',
     align: 'right',
-    width: 150,
+    width: 200,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -292,7 +292,7 @@ export const ToolStructureDefs = [
   },
   {
     title: '实际持仓名义金额',
-    width: 150,
+    width: 200,
     align: 'right',
     dataIndex: 'posNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -345,7 +345,7 @@ export const CustomerTypeStructureDefs = [
   {
     title: '实际成交名义金额',
     align: 'right',
-    width: 150,
+    width: 200,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -361,7 +361,7 @@ export const CustomerTypeStructureDefs = [
   {
     title: '实际持仓名义金额',
     align: 'right',
-    width: 150,
+    width: 200,
     dataIndex: 'posNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,

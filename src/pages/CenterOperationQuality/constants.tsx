@@ -19,7 +19,7 @@ export const MarketSizeDefs = [
   {
     title: '实际成交名义金额',
     align: 'right',
-    width: 150,
+    width: 200,
     dataIndex: 'trdNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -50,7 +50,7 @@ export const MarketSizeDefs = [
   },
   {
     title: '实际持仓名义金额',
-    width: 150,
+    width: 200,
     align: 'right',
     dataIndex: 'posNotionAmount',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
@@ -127,7 +127,7 @@ export const MarketConcentrationDefs = [
   {
     title: '前三名实际持仓名义金额',
     align: 'right',
-    width: 250,
+    width: 300,
     dataIndex: 'top3Pos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -145,7 +145,7 @@ export const MarketConcentrationDefs = [
   {
     title: '前五名实际持仓名义金额',
     align: 'right',
-    width: 250,
+    width: 300,
     dataIndex: 'top5Pos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
@@ -163,7 +163,7 @@ export const MarketConcentrationDefs = [
   {
     title: '前十名实际持仓名义金额',
     align: 'right',
-    width: 250,
+    width: 300,
     dataIndex: 'top10Pos',
     onCell: () => ({ style: { color: 'rgba(255,120,42,1)' } }),
     render: val => <span>{val && formatNumber(val, 0)}</span>,
