@@ -10,7 +10,7 @@ import Sider from './Sider';
 const ChartTalk = props => {
   sessionStorage.setItem('lastTime', new Date().getTime());
   let currentTime = new Date().getTime();
-  const timeOut = 2 * 60 * 60 * 1000;
+  const timeOut = 4 * 60 * 60 * 1000;
   const { user } = props;
   let timer;
 
