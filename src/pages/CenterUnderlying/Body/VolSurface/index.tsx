@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, { memo, useRef, useState, useEffect } from 'react';
 import { connect } from 'dva';
 import { Col, Row, notification, Icon } from 'antd';
@@ -47,22 +48,22 @@ const Box = props => {
     setLoading(false);
     const { error, data = [] } = rsp;
     if (rsp.error) return;
-    if (!data.length) {
-      notification.info({
-        message: (
-          <div style={{ fontSize: '14px', color: '#fff' }}>
-            没有可用数据
-            {/* <Divider type="vertical" style={{ background: '#00E8E8' }} />
-            <a style={{ color: '#00E8E8' }} href="/system-settings/operation-log?activeKey=error">
-              查看详情
-            </a> */}
-          </div>
-        ),
-        // description,
-        className: styles.notificationWarp,
-        icon: <Icon type="exclamation-circle" style={{ color: '#00E8E8' }} />,
-      });
-    }
+    // if (!data.length) {
+    //   notification.info({
+    //     message: (
+    //       <div style={{ fontSize: '14px', color: '#fff' }}>
+    //         没有可用数据
+    //         {/* <Divider type="vertical" style={{ background: '#00E8E8' }} />
+    //         <a style={{ color: '#00E8E8' }} href="/system-settings/operation-log?activeKey=error">
+    //           查看详情
+    //         </a> */}
+    //       </div>
+    //     ),
+    //     // description,
+    //     className: styles.notificationWarp,
+    //     icon: <Icon type="exclamation-circle" style={{ color: '#00E8E8' }} />,
+    //   });
+    // }
     setVolReport(data);
   };
 

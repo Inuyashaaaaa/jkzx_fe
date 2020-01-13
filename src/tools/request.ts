@@ -124,6 +124,8 @@ const convertResponse = (options, response) => {
 export default function request(url, _options = {}, passError = false) {
   const { token, passToken, ...options } = _options;
 
+  passError = true;
+
   if (!passToken && !(token || getToken())) {
     passError = true;
     gotoLogin();
