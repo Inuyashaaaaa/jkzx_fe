@@ -184,11 +184,11 @@ export default {
       { call, put },
     ) {
       if (!routerPush) {
-        // const rsp = yield call(authUserLogout, { userId });
-        // if (rsp.error) {
-        //   message.info('退出登录失败');
-        //   return;
-        // }
+        const rsp = yield call(authUserLogout, { userId });
+        if (rsp.error) {
+          message.info('退出登录失败');
+          return;
+        }
 
         yield put({
           type: 'user/cleanCurrentUser',
