@@ -55,6 +55,15 @@ function checkData(data) {
     };
   }
 
+  if (data.error && data.error.code === 107) {
+    return {
+      error: false,
+      code: 107,
+      data: data.result,
+      raw: data,
+    };
+  }
+
   if (data.error) {
     const { code, message } = data.error;
     // 常规错误处理
