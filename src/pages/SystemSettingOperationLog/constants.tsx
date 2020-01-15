@@ -10,6 +10,113 @@ import uuidv4 from 'uuid/v4';
 
 const { RangePicker } = DatePicker;
 
+const operation = [
+  {
+    label: '用户登录',
+    value: '用户登录',
+  },
+  {
+    label: '用户登出',
+    value: '用户注销',
+  },
+  {
+    label: '查看历史波动率',
+    value: '查看历史波动率',
+  },
+  {
+    label: '查看历史波动率锥',
+    value: '查看历史波动率锥',
+  },
+  {
+    label: '查看公允波动率',
+    value: '查看公允波动率',
+  },
+  {
+    label: '查看子公司波动率对比',
+    value: '查看子公司波动率对比',
+  },
+  {
+    label: '查看公允/历史波动率对比',
+    value: '查看公允/历史波动率对比',
+  },
+  {
+    label: '查看全市场整体风险报告',
+    value: '查看全市场整体风险报告',
+  },
+  {
+    label: '查看全市场分品种风险报告',
+    value: '查看全市场分品种风险报告',
+  },
+  {
+    label: '查看各子公司风险报告',
+    value: '查看各子公司风险报告',
+  },
+  {
+    label: '查看各子公司分品种风险报告',
+    value: '查看各子公司分品种风险报告',
+  },
+  {
+    label: '查看交易对手风险报告',
+    value: '查看交易对手风险报告',
+  },
+  {
+    label: '查看交易对手分品种风险报告',
+    value: '查看交易对手分品种风险报告',
+  },
+  {
+    label: '查看情景分析报告',
+    value: '查看情景分析报告',
+  },
+  {
+    label: '查看场外衍生品市场规模概况',
+    value: '查看场外衍生品市场规模概况',
+  },
+  {
+    label: '查看场外衍生品市场成交结构',
+    value: '查看场外衍生品市场成交结构',
+  },
+  {
+    label: '查看场外衍生品市场持仓结构',
+    value: '查看场外衍生品市场持仓结构',
+  },
+  {
+    label: '查看场外衍生品市场资产和工具结构',
+    value: '查看场外衍生品市场资产和工具结构',
+  },
+  {
+    label: '查看场外衍生品市场客户类型结构',
+    value: '查看场外衍生品市场客户类型结构',
+  },
+  {
+    label: '查看场外衍生品市场集中度',
+    value: '查看场外衍生品市场集中度',
+  },
+  {
+    label: '查看场内外品种联动统计',
+    value: '查看场内外品种联动统计',
+  },
+  {
+    label: '查看交易对手方联动统计',
+    value: '查看交易对手方联动统计',
+  },
+  {
+    label: '查看子公司联动统计',
+    value: '查看子公司联动统计',
+  },
+  {
+    label: '查看场外衍生品市场操纵风险监测',
+    value: '查看场外衍生品市场操纵风险监测',
+  },
+  {
+    label: '查看场外衍生品市场子公司传染风险监测',
+    value: '查看场外衍生品市场子公司传染风险监测',
+  },
+  {
+    label: '查看对手方场内外合并持仓占比',
+    value: '查看对手方场内外合并持仓占比',
+  },
+];
+
 export const searchFormControls = [
   {
     title: '用户',
@@ -47,16 +154,7 @@ export const searchFormControls = [
             allowClear
             showSearch
             fetchOptionsOnSearch
-            options={[
-              {
-                label: '用户登录',
-                value: '用户登录',
-              },
-              {
-                label: '用户登出',
-                value: '用户注销',
-              },
-            ]}
+            options={operation}
           />,
         )}
       </FormItem>
