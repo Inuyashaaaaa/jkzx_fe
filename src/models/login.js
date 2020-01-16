@@ -185,7 +185,7 @@ export default {
     ) {
       if (!routerPush) {
         const rsp = yield call(authUserLogout, { userId });
-        if (rsp.error) {
+        if (_.get(rsp, 'error') && !_.get(rsp.code === 107)) {
           message.info('退出登录失败');
           return;
         }
