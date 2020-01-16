@@ -52,6 +52,7 @@ const CenterRiskMonitoring = props => {
   };
 
   useEffect(() => {
+    if (Form2.getFieldValue(formData.date) === props.dates) return;
     setFormData(
       Form2.createFields({
         date: props.dates,
