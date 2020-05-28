@@ -54,11 +54,14 @@ function checkData(data) {
       raw: data,
     };
   }
+
   if (data.error && data.error.code === 107) {
-    const { code, message } = data.error;
-    const error = new Error(message);
-    error.code = code;
-    throw error;
+    return {
+      error: false,
+      code: 107,
+      data: data.result,
+      raw: data,
+    };
   }
 
   if (data.error) {
@@ -198,13 +201,12 @@ export default function request(url, _options = {}, passError = false) {
     .catch(
       onCatch ||
         (error => {
-          console.log(error);
           const { code, message } = error;
-          console.log(code, message);
           const urlParams = new URL(window.location.href);
           const { pathname } = urlParams;
           const isCenter = pathname.split('/')[1] === 'center';
           const failAction = { error };
+
           if (!passError) {
             if (code === 107) {
               if (isCenter) {
@@ -250,28 +252,6 @@ export default function request(url, _options = {}, passError = false) {
                 description: message,
               });
             }
-          }
-
-          if (code === 107) {
-            notification.error({
-              message: `${message},3秒后自动跳转登录页`,
-            });
-            setTimeout(() => {
-              const urlParams = new URL(window.location.href);
-              const { pathname } = urlParams;
-              const loginUrl =
-                pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
-              // @HACK
-              window.g_app._store.dispatch({
-                type: 'login/logout',
-                payload: {
-                  loginUrl,
-                  routerPush: true,
-                },
-              });
-            }, 3000);
-
-            return failAction;
           }
 
           if (code === 401) {
