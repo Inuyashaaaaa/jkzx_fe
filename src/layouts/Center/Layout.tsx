@@ -38,13 +38,13 @@ const Layout = props => {
         </div>
       )}
     >
-      {/* <ThemeButton
-        style={{ position: 'fixed', top: 10, right: 15, zIndex: 999 }}
+      <ThemeButton
+        style={{ position: 'fixed', top: 10, right: 15, zIndex: 999, visibility: 'hidden' }}
         type="primary"
         onClick={handleJumpBCT}
       >
         进入BCT系统
-      </ThemeButton> */}
+      </ThemeButton>
       <div className={styles.wrap} {...props}></div>
     </ConfigProvider>
   );
