@@ -46,20 +46,18 @@ function checkData(data) {
     };
   }
 
+  if (data.error && data.error.code == 107) {
+    const { code, message } = data.error;
+    const error = new Error(message);
+    error.code = 107;
+    throw error;
+  }
+
   // restful api style
   if (!data.jsonrpc) {
     return {
       error: false,
       data,
-      raw: data,
-    };
-  }
-
-  if (data.error && data.error.code === 107) {
-    return {
-      error: false,
-      code: 107,
-      data: data.result,
       raw: data,
     };
   }
@@ -206,9 +204,8 @@ export default function request(url, _options = {}, passError = false) {
           const { pathname } = urlParams;
           const isCenter = pathname.split('/')[1] === 'center';
           const failAction = { error };
-
           if (!passError) {
-            if (code === 107) {
+            if (code == 107) {
               if (isCenter) {
                 notification.error({
                   message: messageDom({ reLogin: true }),
@@ -252,6 +249,27 @@ export default function request(url, _options = {}, passError = false) {
                 description: message,
               });
             }
+          }
+          if (code == 107) {
+            notification.error({
+              message: `无效的登陆信息,3秒后自动跳转登录页`,
+            });
+            setTimeout(() => {
+              const urlParams = new URL(window.location.href);
+              const { pathname } = urlParams;
+              const loginUrl =
+                pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
+              // @HACK
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+                payload: {
+                  loginUrl,
+                  routerPush: true,
+                },
+              });
+            }, 3000);
+
+            return failAction;
           }
 
           if (code === 401) {
