@@ -81,13 +81,15 @@ export default {
       } else {
         response = yield call(login, loginParams);
       }
-      const { data: userInfo, error } = response;
+      const { data: userInfo, error, code } = response;
 
       if (error) {
-        notification.error({
-          message: '登录失败',
-          description: _.get(userInfo, 'error.message') || _.get(userInfo, 'message'),
-        });
+        if (code !== 107) {
+          notification.error({
+            message: '登录失败',
+            description: _.get(userInfo, 'error.message') || _.get(userInfo, 'message'),
+          });
+        }
 
         if (userInfo.expired) {
           // 首先设置一次用户信息，保存 token 内容到本地，因为修改密码接口需要 token

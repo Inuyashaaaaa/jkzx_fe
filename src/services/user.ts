@@ -339,13 +339,15 @@ export async function loginByToken(params) {
     body: params,
     passToken: true,
   }).then(result => {
-    const { data } = result;
+    const { data, error } = result;
+    const { code, message } = error || {};
     if (result.error) {
       // 验证码错误
       return {
         error: true,
+        code,
         data: {
-          message: _.get(result, 'error'),
+          message,
           captcha: true,
         },
       };
