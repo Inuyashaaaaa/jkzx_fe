@@ -23,7 +23,6 @@ export function queryModelRiskFreeCurve(params) {
     body: {
       method: 'mdlModelDataGet',
       params: {
-        instance: 'intraday',
         modelType: 'risk_free_curve',
         ...params,
       },
@@ -101,7 +100,7 @@ export function queryModelDividendCurve(params, passError) {
 }
 
 export function saveModelRiskFreeCurve(params) {
-  const { dataSource, modelName } = params;
+  const { dataSource, modelName, instance } = params;
 
   return request(`${HOST_TEST}model-service/api/rpc`, {
     method: 'POST',
@@ -109,7 +108,7 @@ export function saveModelRiskFreeCurve(params) {
       method: 'mdlCurveRiskFreeCreate',
       params: {
         save: true,
-        instance: 'intraday',
+        instance,
         instruments: dataSource.map(item => ({
           ...item,
           quote: new BigNumber(item.quote)

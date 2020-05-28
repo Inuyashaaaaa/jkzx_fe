@@ -27,7 +27,9 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     editings: {},
     saveLoading: false,
     options: [],
-    searchFormData: {},
+    searchFormData: Form2.createFields({
+      instance: 'CLOSE',
+    }),
     insertFormData: {},
     visible: [],
   };
@@ -92,6 +94,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     const searchFormData = Form2.getFieldsValue(this.state.searchFormData);
     const { error, data } = await queryModelRiskFreeCurve({
       modelName: searchFormData[GROUP_KEY],
+      instance: searchFormData.instance,
     });
     if (error) return;
     const { dataSource } = data;
@@ -125,6 +128,7 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
     const { error } = await saveModelRiskFreeCurve({
       dataSource: tableDataSource.map(item => _.omit(Form2.getFieldsValue(item), 'visible')),
       modelName: searchFormData[GROUP_KEY],
+      instance: searchFormData.instance,
     });
 
     if (error) return;
@@ -256,6 +260,36 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
                         filterOption: true,
                         options: this.state.options,
                       }}
+                    />,
+                  )}
+                </FormItem>
+              ),
+            },
+            {
+              title: '定价环境',
+              dataIndex: 'instance',
+              render: (value, record, index, { form, editing }) => (
+                <FormItem>
+                  {form.getFieldDecorator({
+                    rules: [
+                      {
+                        required: true,
+                      },
+                    ],
+                  })(
+                    <Select
+                      style={{ minWidth: 180 }}
+                      placeholder="选择定价环境"
+                      options={[
+                        {
+                          label: '日内',
+                          value: 'INTRADAY',
+                        },
+                        {
+                          label: '收盘',
+                          value: 'CLOSE',
+                        },
+                      ]}
                     />,
                   )}
                 </FormItem>
