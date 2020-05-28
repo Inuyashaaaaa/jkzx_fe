@@ -11,7 +11,11 @@ import Page from '@/containers/Page';
 import { UnitInputNumber } from '@/containers/UnitInputNumber';
 import ModalButton from '@/containers/_ModalButton2';
 import { getCanUsedTranorsOtions } from '@/services/common';
-import { queryModelName, queryModelRiskFreeCurve, saveModelRiskFreeCurve } from '@/services/model';
+import {
+  queryAllModelNameVol,
+  queryModelRiskFreeCurve,
+  saveModelRiskFreeCurve,
+} from '@/services/model';
 import { GROUP_KEY } from './constants';
 import Action from './Action';
 
@@ -47,23 +51,17 @@ class PricingSettingsRiskFreeCurve extends PureStateComponent {
   };
 
   public loadGroups = async () => {
-    const { error, data } = await queryModelName({
-      modelType: 'risk_free_curve',
+    const { error, data } = await queryAllModelNameVol({
+      modelType: 'RISK_FREE_CURVE',
     });
 
     if (error) return this.setState({ options: [] });
 
     return this.setState({
-      options: _.unionBy<any>(
-        data.map(item => {
-          const { modelName } = item;
-          return {
-            label: modelName,
-            value: modelName,
-          };
-        }),
-        item => item.value,
-      ),
+      options: data.map(item => ({
+        label: item,
+        value: item,
+      })),
     });
   };
 
