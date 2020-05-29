@@ -1,6 +1,7 @@
 import React, { PureComponent, memo, useEffect, useCallback } from 'react';
 import { ConfigProvider, Empty, Row } from 'antd';
 import { connect } from 'dva';
+import _ from 'lodash';
 import router from 'umi/router';
 import Header from '../../pages/CenterUnderlying/Header';
 import styles from './Layout.less';
@@ -16,10 +17,12 @@ const Layout = props => {
         skipMenu: false,
       },
     });
-    dispatch({
-      type: 'centerDate/getDate',
-      payload: {},
-    });
+    if (_.get(props, 'currentUser.username')) {
+      dispatch({
+        type: 'centerDate/getDate',
+        payload: {},
+      });
+    }
   }, []);
 
   const handleJumpBCT = useCallback(() => {
