@@ -2,13 +2,13 @@ import { USER_LOCAL_FIELD } from '@/constants/global';
 
 export function setUser(userInfo) {
   if (typeof userInfo === 'undefined') return;
-  sessionStorage.setItem(USER_LOCAL_FIELD, JSON.stringify(userInfo));
+  return localStorage.setItem(USER_LOCAL_FIELD, JSON.stringify(userInfo));
 }
 
 export function getUser(): object | null {
   try {
     // @todo 内容加密，防止篡改
-    const user = JSON.parse(sessionStorage.getItem(USER_LOCAL_FIELD));
+    const user = JSON.parse(localStorage.getItem(USER_LOCAL_FIELD));
     return user;
   } catch {
     return null;
