@@ -12,6 +12,7 @@ import SiderMenu from '@/containers/SiderMenu';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
+import { setUser } from '@/tools/authority';
 
 const logoPath = '/logo.svg';
 
@@ -103,6 +104,17 @@ class BasicLayout extends React.PureComponent {
         loginUrl: '/user/login',
       },
     });
+    var timer = null;
+
+    window.addEventListener('unload', function() {
+      timer = null;
+    });
+
+    window.onbeforeunload = function() {
+      timer = setTimeout(() => {
+        setUser({});
+      }, 5000);
+    };
   }
 
   public componentDidUpdate(preProps) {
