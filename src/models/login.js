@@ -12,6 +12,7 @@ import {
 import pageRouters from '../../config/router.config';
 import { updatePermission } from '@/services/permission';
 import { PERMISSIONS } from '@/constants/user';
+import { Base64 } from 'js-base64';
 
 function validateRedirect(routers, redirect, userPermissions, loginUrl, skipPermission) {
   let valid = false;
@@ -79,7 +80,11 @@ export default {
           token,
         });
       } else {
-        response = yield call(login, loginParams);
+        response = yield call(login, {
+          ...loginParams,
+          username: Base64.encode(loginParams.username),
+          password: Base64.encode(loginParams.password),
+        });
       }
       const { data: userInfo, error, code } = response;
 
@@ -212,7 +217,11 @@ export default {
     },
     // eslint-disable-next-line
     *updatePassword({ payload }, { call, put }) {
-      const { data } = yield call(updateOwnPassword, payload);
+      const { data } = yield call(updateOwnPassword, {
+        username: Base64.encode(payload.username),
+        newPassword: Base64.encode(payload.newPassword),
+        oldPassword: Base64.encode(payload.oldPassword),
+      });
       if (!data || data.error) {
         return notification.error({
           message: `${data.error.message}`,
