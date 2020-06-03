@@ -6,9 +6,25 @@ import router from 'umi/router';
 import Header from '../../pages/CenterUnderlying/Header';
 import styles from './Layout.less';
 import ThemeButton from '@/containers/ThemeButton';
+import { getUser, setUser } from '@/tools/authority';
 
 const Layout = props => {
   const { dispatch } = props;
+
+  useEffect(() => {
+    let beforeUnloadTime = 0;
+    let gapTime = 0;
+    window.onunload = () => {
+      gapTime = new Date().getTime() - beforeUnloadTime;
+      if (gapTime <= 5) {
+        setUser({});
+      }
+    };
+    window.onbeforeunload = () => {
+      beforeUnloadTime = new Date().getTime();
+    };
+  }, []);
+
   useEffect(() => {
     dispatch({
       type: 'user/replenish',
