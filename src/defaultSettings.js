@@ -1,5 +1,5 @@
 module.exports = {
-  version: '1.6.6.0',
+  version: '1.2.0',
   navTheme: 'dark', // theme for nav menu
   layout: 'sidemenu', // nav menu position: sidemenu or topmenu
   contentWidth: 'Fluid', // layout of content: Fluid or Fixed, only works when layout is topmenu
