@@ -33,13 +33,16 @@ const Layout = props => {
         skipMenu: false,
       },
     });
-    if (_.get(props, 'currentUser.username')) {
+  }, []);
+
+  useEffect(() => {
+    if (_.get(props, 'user.currentUser.username')) {
       dispatch({
         type: 'centerDate/getDate',
         payload: {},
       });
     }
-  }, []);
+  }, [_.get(props, 'user.currentUser.username')]);
 
   const handleJumpBCT = useCallback(() => {
     router.push({
