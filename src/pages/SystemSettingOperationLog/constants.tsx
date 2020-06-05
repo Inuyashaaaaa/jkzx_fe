@@ -20,6 +20,10 @@ const operation = [
     value: '用户注销',
   },
   {
+    label: '用户修改密码',
+    value: '用户修改密码',
+  },
+  {
     label: '查看历史波动率',
     value: '查看历史波动率',
   },
