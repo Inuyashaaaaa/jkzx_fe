@@ -99,11 +99,8 @@ const cachedSave = (response, hashcode) => {
 const gotoLogin = _.debounce(() => {
   const urlParams = new URL(window.location.href);
   const { pathname } = urlParams;
-  if (pathname.split('/')[1] === 'center') {
-    router.push('/center/login');
-    return;
-  }
-  router.push('/user/login');
+
+  router.push('/center/login');
 }, 100);
 
 const convertResponse = (options, response) => {
@@ -221,9 +218,7 @@ export default function request(url, _options = {}, passError = false) {
               setTimeout(() => {
                 const urlParams = new URL(window.location.href);
                 const { pathname } = urlParams;
-                const loginUrl =
-                  pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
-                // @HACK
+                const loginUrl = '/center/login';
                 window.g_app._store.dispatch({
                   type: 'login/logout',
                   payload: {
@@ -257,8 +252,7 @@ export default function request(url, _options = {}, passError = false) {
             setTimeout(() => {
               const urlParams = new URL(window.location.href);
               const { pathname } = urlParams;
-              const loginUrl =
-                pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
+              const loginUrl = '/center/login';
               // @HACK
               window.g_app._store.dispatch({
                 type: 'login/logout',
@@ -279,8 +273,7 @@ export default function request(url, _options = {}, passError = false) {
             setTimeout(() => {
               const urlParams = new URL(window.location.href);
               const { pathname } = urlParams;
-              const loginUrl =
-                pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
+              const loginUrl = '/center/login';
               // @HACK
               window.g_app._store.dispatch({
                 type: 'login/logout',

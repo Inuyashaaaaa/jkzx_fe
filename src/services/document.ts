@@ -168,7 +168,7 @@ export async function DOWN_LOAD(url, options) {
         setTimeout(() => {
           const urlParams = new URL(window.location.href);
           const { pathname } = urlParams;
-          const loginUrl = pathname.split('/')[1] === 'center' ? '/center/login' : '/user/login';
+          const loginUrl = '/center/login';
 
           // eslint-disable-next-line  no-underscore-dangle
           window.g_app._store.dispatch({
