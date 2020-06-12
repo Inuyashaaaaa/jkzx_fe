@@ -29,7 +29,7 @@ const ActionBar = memo<{
       type="primary"
       onClick={() => {
         router.push({
-          pathname: '/trade-management/pricing',
+          pathname: '/bct/trade-management/pricing',
           query: {
             from: PRICING_FROM_EDITING,
           },

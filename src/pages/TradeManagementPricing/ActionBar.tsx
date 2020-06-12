@@ -148,7 +148,7 @@ const ActionBar = memo<any>(props => {
             type="primary"
             onClick={() => {
               router.push({
-                pathname: '/trade-management/booking',
+                pathname: '/bct/trade-management/booking',
                 query: {
                   from: BOOKING_FROM_PRICING,
                 },

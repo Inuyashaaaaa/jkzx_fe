@@ -136,7 +136,7 @@ class ClientManagementDiscrepancyManagement extends PureComponent {
       () => {
         message.success(data.processInstanceId ? '已进入流程' : '资金录入成功');
         if (data.processInstanceId) {
-          return router.push('/approval-process/process-manangement');
+          return router.push('/bct/approval-process/process-manangement');
         }
         this.fetchTable();
       },

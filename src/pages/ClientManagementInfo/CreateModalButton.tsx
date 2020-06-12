@@ -87,7 +87,7 @@ const CreateModalButton = memo<any>(props => {
     if (_error) return;
     if (_data.processInstanceId) {
       message.success('已进入流程');
-      router.push('/approval-process/process-manangement');
+      router.push('/bct/approval-process/process-manangement');
     }
     // notification.success({
     //   message: '发起审批成功，已进入流程',
