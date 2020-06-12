@@ -83,7 +83,15 @@ export default [
               name: 'centerRiskMonitoring',
               component: './CenterRiskMonitoring/index',
             },
+            {
+              path: '/center/market/*',
+              redirect: '/center/welcome-page',
+            },
           ],
+        },
+        {
+          path: '/center/*',
+          redirect: '/center/welcome-page',
         },
       ],
     },
@@ -175,6 +183,10 @@ export default [
               name: 'tradeDocuments',
               component: './TradeManagementTradeDocuments/index',
             },
+            {
+              path: '/trade-management/*',
+              redirect: '/center/welcome-page',
+            },
           ],
         },
         {
@@ -211,6 +223,10 @@ export default [
               path: '/pricingSettings/customModel',
               name: 'customModel',
               component: './PricingSettingCustomModal/index',
+            },
+            {
+              path: '/pricingSettings/*',
+              redirect: '/center/welcome-page',
             },
           ],
         },
@@ -258,6 +274,10 @@ export default [
               path: '/client-management/valuation-management',
               name: 'valuationManagement',
               component: './ClientManagementValuationManagement/index',
+            },
+            {
+              path: '/client-management/*',
+              redirect: '/center/welcome-page',
             },
           ],
         },
@@ -311,6 +331,10 @@ export default [
               name: 'reportsCustomManagement',
               component: './ReportsCustomManagement/index',
             },
+            {
+              path: '/reports/*',
+              redirect: '/center/welcome-page',
+            },
           ],
         },
         {
@@ -343,6 +367,10 @@ export default [
               name: 'portfolioRisk',
               component: './RiskManagerPortfolioRisk/index',
             },
+            {
+              path: '/risk-manager/*',
+              redirect: '/center/welcome-page',
+            },
           ],
         },
         {
@@ -364,6 +392,10 @@ export default [
               path: '/approval-process/process-configuration',
               name: 'processConfiguration',
               component: './ApprovalProcessConfiguration/index',
+            },
+            {
+              path: '/approval-process/*',
+              redirect: '/center/welcome-page',
             },
           ],
         },
@@ -427,7 +459,15 @@ export default [
               name: 'operationLog',
               component: './SystemSettingOperationLog/index',
             },
+            {
+              path: '/system-settings/*',
+              redirect: '/center/welcome-page',
+            },
           ],
+        },
+        {
+          path: '/*',
+          redirect: '/center/welcome-page',
         },
       ],
     },
@@ -439,6 +479,10 @@ export default [
     },
     'routes',
   ),
+  {
+    path: '*',
+    redirect: '/center/welcome-page',
+  },
   {
     component: '404',
   },
