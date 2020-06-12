@@ -111,7 +111,7 @@ class Operation extends PureComponent<{ record: any; fetchTable: any }> {
     });
     const error = await this.handleCreate();
     if (error) return;
-    router.push('/approval-process/process-manangement');
+    router.push('/bct/approval-process/process-manangement');
   };
 
   public handleCancel = () => {

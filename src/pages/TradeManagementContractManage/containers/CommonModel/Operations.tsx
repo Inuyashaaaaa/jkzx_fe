@@ -56,7 +56,7 @@ class Operations extends PureComponent<{
       payload: this.props.name,
     });
     router.push({
-      pathname: '/trade-management/book-edit',
+      pathname: '/bct/trade-management/book-edit',
       query: {
         id: this.props.record.tradeId,
       },

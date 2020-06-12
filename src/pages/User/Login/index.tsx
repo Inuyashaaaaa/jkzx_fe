@@ -37,7 +37,7 @@ class LoginPage extends Component<any> {
       type: 'login/login',
       payload: {
         loginParams: values,
-        defaultRedirect: '/welcome-page',
+        defaultRedirect: '/bct/welcome-page',
         loginUrl: '/user/login',
       },
     });

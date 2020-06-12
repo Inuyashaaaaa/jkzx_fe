@@ -88,7 +88,7 @@ const ActionBar = memo<any>(props => {
     setTransactionModalVisible(false);
     const error = await handelTrdTradeCreate();
     if (!error) {
-      router.push('/approval-process/process-manangement');
+      router.push('/bct/approval-process/process-manangement');
     }
   };
 
