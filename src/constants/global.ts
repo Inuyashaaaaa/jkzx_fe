@@ -92,3 +92,5 @@ export const STRIKE_TYPE_ENUM = {
   STRIKE: 'STRIKE',
   STRIKE_PERCENTAGE: 'PERCENT',
 };
+
+export const sm4Key = 'KaYup#asD1%79iYu';
