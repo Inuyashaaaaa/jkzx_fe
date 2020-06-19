@@ -12,7 +12,9 @@ import {
 import pageRouters from '../../config/router.config';
 import { updatePermission } from '@/services/permission';
 import { PERMISSIONS } from '@/constants/user';
-import { Base64 } from 'js-base64';
+import JSSM4 from 'jssm4';
+import { sm4Key } from '@/constants/global';
+const sm4 = new JSSM4(sm4Key);
 
 function validateRedirect(routers, redirect, userPermissions, loginUrl, skipPermission) {
   let valid = false;
@@ -82,8 +84,8 @@ export default {
       } else {
         response = yield call(login, {
           ...loginParams,
-          username: Base64.encode(loginParams.username),
-          password: Base64.encode(loginParams.password),
+          username: sm4.encryptData_ECB(loginParams.username),
+          password: sm4.encryptData_ECB(loginParams.password),
         });
       }
       const { data: userInfo, error, code } = response;
@@ -218,9 +220,9 @@ export default {
     // eslint-disable-next-line
     *updatePassword({ payload }, { call, put }) {
       const { data } = yield call(updateOwnPassword, {
-        username: Base64.encode(payload.username),
-        newPassword: Base64.encode(payload.newPassword),
-        oldPassword: Base64.encode(payload.oldPassword),
+        username: sm4.encryptData_ECB(payload.username),
+        newPassword: sm4.encryptData_ECB(payload.newPassword),
+        oldPassword: sm4.encryptData_ECB(payload.oldPassword),
       });
       if (!data || data.error) {
         return notification.error({

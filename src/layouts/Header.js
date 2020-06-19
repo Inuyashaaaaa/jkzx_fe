@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { Base64 } from 'js-base64';
 import { formatMessage } from 'umi/locale';
 import { Layout, message, Modal, Input } from 'antd';
 import Animate from 'rc-animate';
@@ -12,6 +11,10 @@ import { updateOwnPassword } from '@/services/user';
 import GlobalHeader from '@/containers/GlobalHeader';
 import TopNavHeader from '@/containers/TopNavHeader';
 import styles from './Header.less';
+
+import JSSM4 from 'jssm4';
+import { sm4Key } from '@/constants/global';
+const sm4 = new JSSM4(sm4Key);
 
 const { Header } = Layout;
 
@@ -76,9 +79,9 @@ class HeaderView extends PureComponent {
     const user = currentUser.username;
     const params = _.omit(Form2.getFieldsValue(updateFormData), 'confirmpassword');
     const rsp = await updateOwnPassword({
-      username: Base64.encode(user),
-      newPassword: Base64.encode(params.newPassword),
-      oldPassword: Base64.encode(params.oldPassword),
+      username: sm4.encryptData_ECB(user),
+      newPassword: sm4.encryptData_ECB(params.newPassword),
+      oldPassword: sm4.encryptData_ECB(params.oldPassword),
     });
     const { data = {} } = rsp;
     this.setState({ confirmLoading: false });
