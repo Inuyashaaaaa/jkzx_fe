@@ -13,8 +13,9 @@ export default {
       let token = getToken();
 
       if (!token) {
-        const { payload: currentUser = {} } = yield take('user/saveUserData');
-        token = currentUser.token;
+        // const { payload: currentUser = {} } = yield take('user/fetchData');
+        // token = currentUser.token;
+        return;
       }
 
       const rsp = yield call(queryVolatilityCalendars, token);

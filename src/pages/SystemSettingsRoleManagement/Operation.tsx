@@ -85,6 +85,9 @@ class Operation extends PureComponent<{ data: any; fetchTable: any; showResource
           </TreeNode>
         );
       }
+      if (!item.key) {
+        return null;
+      }
       return <TreeNode key={item.key} title={item.title} dataRef={item} />;
     });
 
