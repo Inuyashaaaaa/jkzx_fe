@@ -1,9 +1,9 @@
-import { IFormControl } from '@/containers/_Form2';
 import React from 'react';
-import { ITableColDef } from '@/components/type';
 import FormItem from 'antd/lib/form/FormItem';
-import { Select } from '@/containers';
 import { Divider, Button } from 'antd';
+import { IFormControl } from '@/containers/_Form2';
+import { ITableColDef } from '@/components/type';
+import { Select } from '@/containers';
 import Operation from './Operation';
 import ButtonSelect from './ButtonSelect';
 
@@ -21,22 +21,18 @@ export const createPageTableColDefs = (roleOptions, showResources, departments, 
   {
     title: '拥有角色',
     dataIndex: 'roles',
-    editable: record => {
-      return true;
-    },
-    render: (value, record, index, { form, editing, cellApi }) => {
-      return (
-        <FormItem>
-          {form.getFieldDecorator({})(
-            <ButtonSelect
-              options={roleOptions}
-              mode={'multiple'}
-              {...{ record, index, form, editing, cellApi }}
-            />
-          )}
-        </FormItem>
-      );
-    },
+    editable: record => true,
+    render: (value, record, index, { form, editing, cellApi }) => (
+      <FormItem>
+        {form.getFieldDecorator({})(
+          <ButtonSelect
+            options={roleOptions}
+            mode="multiple"
+            {...{ record, index, form, editing, cellApi }}
+          />,
+        )}
+      </FormItem>
+    ),
   },
   {
     title: '部门',
@@ -58,16 +54,14 @@ export const createPageTableColDefs = (roleOptions, showResources, departments, 
     dataIndex: 'operation',
     fixed: 'right',
     width: 230,
-    render: (value, record, index) => {
-      return (
-        <Operation
-          record={record}
-          showResources={showResources}
-          departments={departments}
-          fetchData={fetchData}
-        />
-      );
-    },
+    render: (value, record, index) => (
+      <Operation
+        record={record}
+        showResources={showResources}
+        departments={departments}
+        fetchData={fetchData}
+      />
+    ),
   },
 ];
 
@@ -96,8 +90,8 @@ export const createFormControls = roles => ({ createFormData }): IFormControl[] 
           required: true,
         },
         {
-          pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
-          message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
+          pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{12,30}/,
+          message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于12位',
         },
       ],
     },
@@ -130,12 +124,10 @@ export const createFormControls = roles => ({ createFormData }): IFormControl[] 
     input: {
       type: 'select',
       mode: 'multiple',
-      options: roles.map(item => {
-        return {
-          label: item.roleName,
-          value: item.uuid,
-        };
-      }),
+      options: roles.map(item => ({
+        label: item.roleName,
+        value: item.uuid,
+      })),
     },
   },
 ];
