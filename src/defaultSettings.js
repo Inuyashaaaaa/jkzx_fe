@@ -1,5 +1,5 @@
 module.exports = {
-  version: 'BCT_JKZX_1.2.4',
+  version: 'BCT_JKZX_1.2.5',
   navTheme: 'dark', // theme for nav menu
   layout: 'sidemenu', // nav menu position: sidemenu or topmenu
   contentWidth: 'Fluid', // layout of content: Fluid or Fixed, only works when layout is topmenu
