@@ -1,4 +1,4 @@
-import { Alert, Button, Form, Icon, Input, Modal, Row } from 'antd';
+import { Alert, Button, Form, Icon, Input, Modal, Row, message } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import { connect } from 'dva';
 import _ from 'lodash';
@@ -53,12 +53,19 @@ class LoginPage extends Component<any> {
 
   public handleModalOK = async () => {
     const { error, values } = await this.$updatePassword.validate();
-    const { username, oldPassword, password } = values;
+    if (error) {
+      return;
+    }
+    const { username, oldPassword, password, confirmPassword } = values;
     const params = {
       username,
       newPassword: password,
       oldPassword,
     };
+    if (confirmPassword !== password) {
+      message.error('新密码与确认密码须保持一致');
+      return;
+    }
     const { dispatch } = this.props;
     dispatch({
       type: 'login/updatePassword',

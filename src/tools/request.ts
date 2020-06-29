@@ -126,13 +126,13 @@ const convertResponse = (options, response) => {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, _options = {}, passError = false) {
-  const { token, passToken, ...options } = _options;
+  const { token, passToken, notGotoLogin, ...options } = _options;
 
   passError = true;
 
   if (!passToken && !(token || getToken())) {
     passError = true;
-    gotoLogin();
+    !notGotoLogin && gotoLogin();
   }
 
   /**
