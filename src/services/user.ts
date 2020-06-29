@@ -308,6 +308,7 @@ export async function updateOwnPassword(params) {
   return request(`${HOST_TEST}auth-service/users/password-change`, {
     method: 'POST',
     body: params,
+    notGotoLogin: true,
   });
 }
 
