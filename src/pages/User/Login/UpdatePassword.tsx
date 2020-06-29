@@ -1,22 +1,21 @@
-import { Form2 } from '@/containers';
+/* eslint-disable react/no-access-state-in-setstate */
 import { Input } from 'antd';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
+import { Form2 } from '@/containers';
 
 class UpdatePassword extends PureComponent<any> {
   public state = {
     formData: {},
   };
 
-  public validate = () => {
-    return this.form.validate();
-  };
+  public validate = () => this.form.validate();
 
   public testPassword = (rule, value, callback) => {
-    const reg = /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/;
+    const reg = /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{12,30}/;
     if (value && !reg.test(value)) {
-      callback('密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位');
+      callback('密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于12位');
     } else {
       callback();
     }
@@ -53,80 +52,72 @@ class UpdatePassword extends PureComponent<any> {
           {
             title: '用户名',
             dataIndex: 'username',
-            render: (val, record, index, { form }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入用户名',
-                      },
-                    ],
-                  })(<Input disabled={true} />)}
-                </FormItem>
-              );
-            },
+            render: (val, record, index, { form }) => (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入用户名',
+                    },
+                  ],
+                })(<Input disabled />)}
+              </FormItem>
+            ),
           },
           {
             title: '原密码',
             dataIndex: 'oldPassword',
-            render: (val, record, index, { form }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入原密码',
-                      },
-                    ],
-                  })(<Input.Password />)}
-                </FormItem>
-              );
-            },
+            render: (val, record, index, { form }) => (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入原密码',
+                    },
+                  ],
+                })(<Input.Password />)}
+              </FormItem>
+            ),
           },
           {
             title: '新密码',
             dataIndex: 'password',
-            render: (val, record, index, { form }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入新密码',
-                      },
-                      {
-                        validator: this.testPassword,
-                      },
-                    ],
-                  })(<Input.Password />)}
-                </FormItem>
-              );
-            },
+            render: (val, record, index, { form }) => (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入新密码',
+                    },
+                    {
+                      validator: this.testPassword,
+                    },
+                  ],
+                })(<Input.Password />)}
+              </FormItem>
+            ),
           },
           {
             title: '确认密码',
             dataIndex: 'confirmPassword',
-            render: (val, record, index, { form }) => {
-              return (
-                <FormItem>
-                  {form.getFieldDecorator({
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入与新密码一致的确认密码',
-                      },
-                      {
-                        validator: this.validateConfirm,
-                      },
-                    ],
-                  })(<Input.Password />)}
-                </FormItem>
-              );
-            },
+            render: (val, record, index, { form }) => (
+              <FormItem>
+                {form.getFieldDecorator({
+                  rules: [
+                    {
+                      required: true,
+                      message: '请输入与新密码一致的确认密码',
+                    },
+                    {
+                      validator: this.validateConfirm,
+                    },
+                  ],
+                })(<Input.Password />)}
+              </FormItem>
+            ),
           },
         ]}
       />

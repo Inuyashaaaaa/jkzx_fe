@@ -6,14 +6,15 @@ import { connect } from 'dva';
 import router from 'umi/router';
 import FormItem from 'antd/lib/form/FormItem';
 import _ from 'lodash';
+import JSSM4 from 'jssm4';
 import { Form2 } from '@/containers';
 import { updateOwnPassword } from '@/services/user';
 import GlobalHeader from '@/containers/GlobalHeader';
 import TopNavHeader from '@/containers/TopNavHeader';
 import styles from './Header.less';
 
-import JSSM4 from 'jssm4';
 import { sm4Key } from '@/constants/global';
+
 const sm4 = new JSSM4(sm4Key);
 
 const { Header } = Layout;
@@ -221,8 +222,8 @@ class HeaderView extends PureComponent {
                           message: '必填',
                         },
                         // {
-                        //   pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
-                        //   message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
+                        //   pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{12,30}/,
+                        //   message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于12位',
                         // },
                       ],
                     })(<Input.Password placeholder="请输入旧密码" />)}
@@ -241,12 +242,12 @@ class HeaderView extends PureComponent {
                           message: '必填',
                         },
                         {
-                          pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{8,30}/,
-                          message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于8位',
+                          pattern: /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z]).{12,30}/,
+                          message: '密码必须包含至少一位数字、字母、以及其他特殊字符，且不小于12位',
                         },
                       ],
                     })(
-                      <Input.Password placeholder="至少一位数字、字母以及其他特殊字符，且不少于8位" />,
+                      <Input.Password placeholder="至少一位数字、字母以及其他特殊字符，且不少于12位" />,
                     )}
                   </FormItem>
                 ),
