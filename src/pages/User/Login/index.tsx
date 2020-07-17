@@ -135,7 +135,10 @@ class LoginPage extends Component<any> {
                 <FormItem>
                   <Row type="flex" justify="space-between">
                     {form.getFieldDecorator({
-                      rules: [{ required: true, message: '请输入验证码' }],
+                      rules: [
+                        { required: true, message: '请输入验证码' },
+                        { max: 4, message: '长度不能超过 4 位' },
+                      ],
                     })(
                       <Input
                         size="large"
