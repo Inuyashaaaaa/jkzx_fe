@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "check-env": "node ./scripts/node-env.js",
-    "dev": "umi dev",
+    "dev": "cross-env PORT=8012 umi dev",
     "start": "yarn run check-env && yarn run dev",
     "start:no-mock": "cross-env MOCK=none yarn run start",
     "build": "yarn run check-env && cross-env UMI_ENV=prod umi build",
@@ -105,6 +105,8 @@
     "xlsx": "~0.14.1"
   },
   "devDependencies": {
+    "@ty-devops-tools/api-generator": "^1.2.1",
+    "@ty-fee-tools/create-dva-model": "^0.1.1",
     "@babel/polyfill": "~7.0.0",
     "@babel/preset-typescript": "~7.3.3",
     "@commitlint/cli": "~8.0.0",

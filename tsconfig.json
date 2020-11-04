@@ -17,10 +17,11 @@
     "allowJs": true,
     "experimentalDecorators": true,
     "paths": {
-      "@/*": ["./src/*"]
-    },
+      "@/*": ["./src/*"],
+      "@@/*": ["./src/.umi/*"]
+    }
   },
-  "include": ["./src"],
+  "include": ["./src", "./typings"],
   "exclude": [
     "node_modules",
     "build",

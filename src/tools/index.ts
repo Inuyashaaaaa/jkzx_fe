@@ -353,10 +353,16 @@ export const catchCallbackError = (target: any) => {
   };
 };
 
-export const getLocaleId = (parent, item) => {
-  const parentName = parent && parent.name;
-  if (parentName) {
-    return `menu.${parentName}.${item.name}`;
+export const getLocaleId = (parents, item) => {
+  console.log('parents', parents);
+  const parentNames = parents
+    .map(parent => {
+      const parentName = parent && parent.name;
+      return parentName;
+    })
+    .join('.');
+  if (parentNames) {
+    return `menu.${parentNames}.${item.name}`;
   }
   return `menu.${item.name}`;
 };

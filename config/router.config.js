@@ -9,7 +9,6 @@ export default [
     path: '/component-test',
     component: './ComponentTest/index',
   },
-  // user
   {
     path: '/user',
     component: '../layouts/UserLayout',
@@ -20,17 +19,15 @@ export default [
       { path: '/user/register-result', component: './User/RegisterResult' },
     ],
   },
-  // center login
   { path: '/welcome-page', redirect: '/bct/welcome-page' },
   {
-    path: '/center/login',
-    component: '../layouts/Center/Login',
+    path: '/login/center',
+    component: './login/center',
   },
   {
     path: '/jump-in',
     component: '../layouts/Jumping',
   },
-
   {
     path: '/component-test',
     component: './ComponentTest/index',
@@ -43,53 +40,106 @@ export default [
     {
       path: '/center',
       centerRoute: true,
-      component: '../layouts/Center/index',
+      name: 'center',
+      component: './center/index',
       routes: [
         {
           path: '/center/welcome-page',
-          name: 'welcomeCenterPage',
-          component: './WelcomeCenterPage',
+          name: 'welcome-page',
+          component: './center/welcome-page',
           hideInMenu: true,
         },
         {
-          path: '/center/underlying',
-          component: './CenterUnderlying',
-          name: 'centerUnderlying',
+          path: '/center/overall-monitoring',
+          component: './center/overall-monitoring',
+          name: 'overall-monitoring',
           icon: 'line-chart',
         },
         {
-          path: '/center/risk',
-          component: './CenterRisk',
-          name: 'centerRisk',
-          icon: 'reconciliation',
-        },
-        {
-          path: '/center/scenario',
-          component: './CenterScenario',
-          name: 'centerScenario',
-          icon: 'file-search',
-        },
-        {
-          path: '/center/market',
-          name: 'market',
-          icon: 'pie-chart',
+          path: '/center/var-monitoring-and-analysis',
+          component: './center/var-monitoring-and-analysis',
+          name: 'var-monitoring-and-analysis',
+          icon: 'line-chart',
           routes: [
             {
-              path: '/center/market/operation-quality',
-              name: 'centerOperationQuality',
-              component: './CenterOperationQuality/index',
+              path: '/center/var-monitoring-and-analysis/var-parameter-setting',
+              component: './center/var-monitoring-and-analysis/var-parameter-setting',
+              name: 'var-parameter-setting',
+              icon: 'line-chart',
             },
             {
-              path: '/center/market/risk-monitoring',
-              name: 'centerRiskMonitoring',
-              component: './CenterRiskMonitoring/index',
+              path: '/center/var-monitoring-and-analysis/var-monitoring-report',
+              component: './center/var-monitoring-and-analysis/var-monitoring-report',
+              name: 'var-monitoring-report',
+              icon: 'line-chart',
             },
             {
-              path: '/center/market/*',
-              redirect: '/center/welcome-page',
+              path: '/center/var-monitoring-and-analysis/var-on-the-fly-testing',
+              component: './center/var-monitoring-and-analysis/var-on-the-fly-testing',
+              name: 'var-on-the-fly-testing',
+              icon: 'line-chart',
             },
           ],
         },
+        {
+          path: '/center/market-monitoring',
+          component: './center/market-monitoring',
+          name: 'market-monitoring',
+          icon: 'line-chart',
+          routes: [
+            {
+              path: '/center/capital-monitoring',
+              component: './center/market-monitoring/capital-monitoring',
+              name: 'capital-monitoring',
+              icon: 'line-chart',
+            },
+            {
+              path: '/center/credit-monitoring',
+              component: './center/market-monitoring/credit-monitoring',
+              name: 'credit-monitoring',
+              icon: 'line-chart',
+            },
+          ],
+        },
+        // {
+        //   path: '/center/underlying',
+        //   component: './CenterUnderlying',
+        //   name: 'underlying',
+        //   icon: 'line-chart',
+        // },
+        // {
+        //   path: '/center/risk',
+        //   component: './CenterRisk',
+        //   name: 'risk',
+        //   icon: 'reconciliation',
+        // },
+        // {
+        //   path: '/center/scenario',
+        //   component: './CenterScenario',
+        //   name: 'scenario',
+        //   icon: 'file-search',
+        // },
+        // {
+        //   path: '/center/market',
+        //   name: 'market',
+        //   icon: 'pie-chart',
+        //   routes: [
+        //     {
+        //       path: '/center/market/operation-quality',
+        //       name: 'operation-quality',
+        //       component: './CenterOperationQuality/index',
+        //     },
+        //     {
+        //       path: '/center/market/risk-monitoring',
+        //       name: 'risk-monitoring',
+        //       component: './CenterRiskMonitoring/index',
+        //     },
+        //     {
+        //       path: '/center/market/*',
+        //       redirect: '/center/welcome-page',
+        //     },
+        //   ],
+        // },
         {
           path: '/center/*',
           redirect: '/center/welcome-page',
@@ -97,7 +147,7 @@ export default [
       ],
     },
     node => {
-      if (!node.routes) {
+      if (!node.jumpAuthorized && !node.routes) {
         return { ...node, Routes: ['./src/pages/CenterAuthorized'] };
       }
       return node;
