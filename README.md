@@ -1,5 +1,16 @@
 # 项目介绍
 
+## 快速开始
+
+启动本地 server
+
+```sh
+yarn run dev
+```
+
+修改本地代理，打开 `config/config.local.js` 修改 target 值
+
+
 ## 文件结构
 
 ### 路由结构和文件结构映射关系

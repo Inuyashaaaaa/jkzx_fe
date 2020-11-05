@@ -4,4 +4,4 @@ export * from './isShallowEqual';
 export * from './uuid';
 export * from './typings';
 export * from './fetch';
-export * from './request';
+export { default as request } from './request';
