@@ -79,6 +79,7 @@ const mockUserInfo = {
     auditingManagement: true,
 
     center: true,
+    'test-page': true,
     'welcome-page': true,
     'overall-monitoring': true,
     'var-monitoring-and-analysis': true,

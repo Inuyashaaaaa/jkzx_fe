@@ -1,9 +1,6 @@
-const { stylelint } = require('@umijs/fabric');
-
 module.exports = {
-  ...stylelint,
+  extends: [require.resolve('@umijs/fabric/dist/stylelint')],
   rules: {
-    ...stylelint.rules,
     'declaration-empty-line-before': null,
   },
 };

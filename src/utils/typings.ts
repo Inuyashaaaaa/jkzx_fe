@@ -1,7 +1,7 @@
 export type PickParamsType<T> = T extends any[] ? T[0] : any;
 
 export type PickRPCParamsType<T> = T extends any[]
-  ? T[0] extends { method: any; params: any }
+  ? T[0] extends { method?: any; params?: any }
     ? T[0]['params']
     : any
   : any;

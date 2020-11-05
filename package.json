@@ -3,7 +3,7 @@
   "scripts": {
     "check-env": "node ./scripts/node-env.js",
     "dev": "cross-env PORT=8012 umi dev",
-    "start": "yarn run check-env && yarn run dev",
+    "start": "yarn dev",
     "start:no-mock": "cross-env MOCK=none yarn run start",
     "build": "yarn run check-env && cross-env UMI_ENV=prod umi build",
     "build:zero": "npm run check-env && yarn install && cross-env UMI_ENV=prod umi build",
@@ -18,7 +18,7 @@
     "test": "umi test",
     "test:component": "umi test ./src/components",
     "lint-staged": "lint-staged",
-    "lint:js": "eslint --fix './src/**/*.{ts,tsx,js,jsx}'",
+    "lint:js": "eslint --ext .js,.jsx,.ts,.tsx ",
     "lint:style": "stylelint --syntax less './src/**/*.less'",
     "prettier": "prettier --write './src/**/*.{js,jsx,ts,tsx,less,css}'",
     "e2e:dev": "cypress open",
@@ -26,7 +26,8 @@
     "doc:dev": "docz dev",
     "doc:build": "docz build",
     "lint": "yarn run lint:js && yarn run lint:style",
-    "precommit": "yarn run lint-staged"
+    "precommit": "yarn run lint-staged",
+    "gen:api": "api-gen"
   },
   "dependencies": {
     "@antv/data-set": "^0.10.2",
@@ -37,7 +38,7 @@
     "@cypress/webpack-preprocessor": "^4.1.0",
     "@types/mathjs": "^6.0.0",
     "@types/styled-components": "^4.1.18",
-    "@umijs/fabric": "~1.0.9",
+    "@umijs/fabric": "^2.3.1",
     "animate.css": "~3.7.0",
     "antd": "~3.19.2",
     "babel-plugin-import": "~1.11.2",
@@ -100,61 +101,43 @@
     "styled-components": "^4.3.2",
     "ts-loader": "6.0.4",
     "umi-library": "~1.6.0",
+    "umi-request": "^1.3.5",
     "uuid": "~3.3.2",
     "ws": "~6.2.1",
     "xlsx": "~0.14.1"
   },
   "devDependencies": {
-    "@ty-devops-tools/api-generator": "^1.2.1",
-    "@ty-fee-tools/create-dva-model": "^0.1.1",
-    "@babel/polyfill": "~7.0.0",
-    "@babel/preset-typescript": "~7.3.3",
     "@commitlint/cli": "~8.0.0",
     "@commitlint/config-angular": "~8.0.0",
+    "@ty-devops-tools/api-generator": "^1.2.1",
+    "@ty-fee-tools/create-dva-model": "^0.1.1",
     "@types/d3-scale": "~2.1.0",
     "@types/lodash": "~4.14.118",
-    "@types/react": "~16.4.16",
+    "@types/react": "^16.9.55",
     "@types/react-dom": "~16.0.9",
     "babel-eslint": "~10.0.1",
     "babel-plugin-lodash": "~3.3.4",
     "cross-env": "~5.1.1",
     "css-loader": "~2.1.1",
     "cypress": "~3.3.2",
-    "docz-theme-default": "~1.2.0",
-    "eslint": "~5.16.0",
-    "husky": "~1.2.0",
+    "eslint": "^7.1.0",
+    "husky": "^4.3.0",
     "less-loader": "~5.0.0",
-    "lint-staged": "~8.1.0",
-    "mocha": "~5.2.0",
-    "mochawesome": "~4.0.1",
     "precommit": "^1.2.2",
-    "prettier": "~1.18.2",
+    "prettier": "^2.0.1",
     "style-loader": "~0.23.1",
-    "stylelint": "~10.1.0",
+    "stylelint": "^13.0.0",
+    "typescript": "^4.0.3",
+    "lint-staged": "^10.0.0",
     "umi": "~2.4.4",
     "umi-plugin-react": "~1.4.2",
     "webpack-bundle-analyzer": "~2.13.1"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn run precommit",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
   "lint-staged": {
-    "linters": {
-      "**/*.{js,jsx,ts,tsx,less,css}": [
-        "prettier --write",
-        "git add"
-      ],
-      "**/*.{js,jsx,ts,tsx}": "eslint --quiet --fix",
-      "**/*.less": "stylelint --syntax less --fix"
-    },
-    "ignore": [
-      "**/*.min.*"
-    ]
+    "**/*.less": "stylelint --syntax less",
+    "**/*.{js,jsx,ts,tsx}": "npm run lint:js",
+    "**/*.{js,jsx,tsx,ts,less,md,json}": ["prettier --write"]
   },
-  "optionalDependencies": {},
   "browserslist": [
     "> 1%",
     "last 2 versions",
@@ -162,9 +145,5 @@
   ],
   "engines": {
     "node": ">=10.0.0"
-  },
-  "hope-env": {
-    "node": "v10.15.3",
-    "yarn": "1.16.0"
   }
 }

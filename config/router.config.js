@@ -1,40 +1,40 @@
 import mapTree from '../src/tools/mapTree';
 
 export default [
-  {
-    path: '/socket-test-page',
-    component: './SocketTestPage/index',
-  },
-  {
-    path: '/component-test',
-    component: './ComponentTest/index',
-  },
-  {
-    path: '/user',
-    component: '../layouts/UserLayout',
-    routes: [
-      { path: '/user', redirect: '/userc/login' },
-      { path: '/user/login', component: './User/Login' },
-      { path: '/user/register', component: './User/Register' },
-      { path: '/user/register-result', component: './User/RegisterResult' },
-    ],
-  },
-  { path: '/welcome-page', redirect: '/bct/welcome-page' },
-  {
-    path: '/login/center',
-    component: './login/center',
-  },
-  {
-    path: '/jump-in',
-    component: '../layouts/Jumping',
-  },
-  {
-    path: '/component-test',
-    component: './ComponentTest/index',
-  },
+  // {
+  //   path: '/socket-test-page',
+  //   component: './SocketTestPage/index',
+  // },
+  // {
+  //   path: '/component-test',
+  //   component: './ComponentTest/index',
+  // },
+  // {
+  //   path: '/user',
+  //   component: '../layouts/UserLayout',
+  //   routes: [
+  //     { path: '/user', redirect: '/userc/login' },
+  //     { path: '/user/login', component: './User/Login' },
+  //     { path: '/user/register', component: './User/Register' },
+  //     { path: '/user/register-result', component: './User/RegisterResult' },
+  //   ],
+  // },
+  // { path: '/welcome-page', redirect: '/bct/welcome-page' },
+  // {
+  //   path: '/login/center',
+  //   component: './login/center',
+  // },
+  // {
+  //   path: '/jump-in',
+  //   component: '../layouts/Jumping',
+  // },
+  // {
+  //   path: '/component-test',
+  //   component: './ComponentTest/index',
+  // },
   {
     path: '/',
-    redirect: '/center/underlying',
+    redirect: '/center/welcome-page',
   },
   mapTree(
     {
@@ -48,6 +48,11 @@ export default [
           name: 'welcome-page',
           component: './center/welcome-page',
           hideInMenu: true,
+        },
+        {
+          path: '/center/test-page',
+          name: 'test-page',
+          component: './center/test-page',
         },
         {
           path: '/center/overall-monitoring',
@@ -154,11 +159,6 @@ export default [
     },
     'routes',
   ),
-  {
-    path: '/api-docs',
-    name: 'apiDocs',
-    component: './ApiDocs/index',
-  },
   mapTree(
     {
       appRoute: true,

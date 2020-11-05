@@ -1,12 +1,11 @@
+import { InputBase } from '@/components/type';
 import { LEG_FIELD, LEG_TYPE_FIELD, LEG_TYPE_MAP } from '@/constants/common';
 import { InputNumber } from '@/containers';
+import { Import2 } from '@/containers/InstrumentModalInput';
 import { getRequiredRule } from '@/tools';
 import { ILegColDef } from '@/types/leg';
 import FormItem from 'antd/lib/form/FormItem';
-import { InputBase } from '@/components/type';
-import { Tag, Icon } from 'antd';
 import React from 'react';
-import { Import2 } from '@/containers/InstrumentModalInput';
 
 class MultiplierModalInput extends InputBase {
   public renderEditing() {
@@ -55,7 +54,7 @@ export const UnderlyerMultiplier: ILegColDef = {
             <MultiplierModalInput editing={editing} />
           ) : (
             <InputNumber editing={false} />
-          )
+          ),
         )}
       </FormItem>
     );

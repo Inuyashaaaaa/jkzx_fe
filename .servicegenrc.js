@@ -1,9 +1,8 @@
 module.exports = {
   type: 'normal',
-  rapUrl: 'http://api.tongyu.tech:3000',
-  apiUrl:
-    'http://api.tongyu.tech:38080/repository/get?id=32&token=6C-p2st4L4HaAa0Q4kz1ZHRColEk3Xa0',
+  rapUrl: 'http://10.1.5.117:3000',
+  apiUrl: 'http://10.1.5.117:38080/repository/get?id=33&token=MZzwEq0bYstOHX1CIdQajiyeJFmoT6xh',
   rapperPath: 'src/__apis__',
-  typeRef: 'import { ResponseData, ResultData, BCTAPIData } from "@/utils/request-new";',
+  typeRef: 'import { ResponseData, ResultData, BCTAPIData } from "@/utils/request";',
   resSelector: 'type ResSelector<T extends BCTAPIData> = ResponseData<ResultData<T>>',
 };

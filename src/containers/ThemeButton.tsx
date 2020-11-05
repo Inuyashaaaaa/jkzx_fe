@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import React, { memo } from 'react';
 import { Button } from 'antd';
+import { ButtonProps } from 'antd/lib/button';
 
 const ThemeButtonWrap = styled.div`
   .ant-btn {
@@ -10,7 +11,7 @@ const ThemeButtonWrap = styled.div`
   }
 `;
 
-const ThemeButton = memo(props => (
+const ThemeButton = memo<ButtonProps>(props => (
   <ThemeButtonWrap>
     <Button {...props}></Button>
   </ThemeButtonWrap>

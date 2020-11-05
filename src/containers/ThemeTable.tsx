@@ -1,9 +1,8 @@
-import styled from 'styled-components';
-import React, { memo, useEffect, useState } from 'react';
-import classnames from 'classnames';
 import { Table } from 'antd';
+import { TableProps } from 'antd/lib/table';
 import _ from 'lodash';
-// import styles from './ThemeTable.less';
+import React, { memo, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import uuidv4 from 'uuid/v4';
 
 const ThemeTableWrap = styled.div`
@@ -92,7 +91,7 @@ const ThemeTableWrap = styled.div`
   }
 `;
 
-const ThemeTable = memo(props => {
+const ThemeTable = memo<TableProps>(props => {
   const [uuid, setUuid] = useState(uuidv4());
   const [width, setWidth] = useState(0);
   useEffect(() => {

@@ -1,10 +1,7 @@
-import styled from 'styled-components';
-import React, { memo } from 'react';
-import classnames from 'classnames';
 import { Input } from 'antd';
-
-// eslint-disable-next-line
-const imgPath = require('@/assets/4.png');
+import { InputProps } from 'antd/lib/input';
+import React, { memo } from 'react';
+import styled from 'styled-components';
 
 const ThemeInputWrap = styled.div`
   .ant-input {
@@ -19,8 +16,7 @@ const ThemeInputWrap = styled.div`
   }
 `;
 
-const ThemeInput = memo(props => {
-  const { dropdownClassName } = props;
+const ThemeInput = memo<InputProps>(props => {
   return (
     <ThemeInputWrap>
       <Input {...props}></Input>

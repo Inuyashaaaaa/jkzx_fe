@@ -1,24 +1,17 @@
 /* eslint-disable no-param-reassign */
+import { ReportServices } from '@/pages/center/test-page/services/report-service';
+import { ModelNameSpaces } from '@/typings';
+import { PickServiceReturnType } from '@/utils';
 import createModel, { PayloadAction } from '@ty-fee-tools/create-dva-model';
 import { PaginationConfig } from 'antd/lib/table';
 import { SorterResult } from 'antd/lib/table/interface';
 import moment from 'moment';
-import { Form2 } from '@/components';
-import { IFormData } from '@/components/type';
-import { SearchFormFieldsEnums } from '@/pages/center/test-page/constants';
-import { ReportServices } from '@/pages/center/test-page/services/report-service';
-import { PickServiceReturnType } from '@/utils';
-import { ModelNameSpaces } from '@/typings';
-
-const initialSearchFormData = {
-  [SearchFormFieldsEnums.BaseDate]: '',
-};
 
 const initialState = {
   // 交易对手表格数据
   traderTableData: [],
   // 搜索表格数据
-  searchFormData: initialSearchFormData as IFormData,
+  searchData: '',
   // 分页数据
   pagination: {
     current: 1,
@@ -35,19 +28,10 @@ const model = {
   state: initialState,
   effects: {
     *fetchTableData(action: PayloadAction<null>, { put, call, select }) {
-      const { searchFormData, pagination } = (yield select(
+      const { searchData, pagination } = (yield select(
         ({ [ModelNameSpaces.RiskControlIndexReportModel]: RiskControlIndexReport }) =>
           RiskControlIndexReport,
       )) as RiskControlIndexReportModel;
-
-      const getSearchDate = () => {
-        const searchFormValues = Form2.getFieldsValue(searchFormData);
-        const searchValue = searchFormValues[SearchFormFieldsEnums.BaseDate];
-        if (searchValue) {
-          return searchValue.format('YYYY-MM-DD');
-        }
-        return undefined;
-      };
 
       const {
         data: {
@@ -55,7 +39,7 @@ const model = {
           data: { result },
         },
       } = (yield call(ReportServices.searchRiskLimitListByBaseDatePaged, {
-        baseDate: getSearchDate(),
+        baseDate: searchData,
         page: pagination.current - 1,
         pageSize: pagination.pageSize,
       })) as PickServiceReturnType<typeof ReportServices.searchRiskLimitListByBaseDatePaged>;
@@ -63,6 +47,7 @@ const model = {
       if (error) return;
 
       const { page, totalCount } = result;
+
       yield put({
         type: 'setDataWhenTableFetchSuccess',
         payload: {
@@ -86,8 +71,8 @@ const model = {
       );
       state.total = total;
     },
-    setSearchFormData(state, action: PayloadAction<IFormData>) {
-      state.searchFormData = action.payload;
+    setSearchData(state, action: PayloadAction<string>) {
+      state.searchData = action.payload;
     },
     setTableMeta(
       state,
@@ -105,8 +90,6 @@ const model = {
 
 const RiskControlIndexReportWithEnhanced = createModel(model);
 
-// @todo remove esssf
-// eslint-disable-next-line no-undef
-export { initialSearchFormData, RiskControlIndexReportWithEnhanced, RiskControlIndexReportModel };
+export { RiskControlIndexReportWithEnhanced, RiskControlIndexReportModel };
 
 export default model;

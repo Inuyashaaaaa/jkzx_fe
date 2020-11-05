@@ -1,25 +1,5 @@
 import { fetch, PickRPCParamsType } from '@/utils';
 
-async function importRiskLimit(
-  params: PickRPCParamsType<
-    Parameters<typeof fetch['POST/report-service/api/rpc/method=importRiskLimit']>
-  >,
-) {
-  return fetch['POST/report-service/api/rpc/method=importRiskLimit'](params, {
-    mock: false,
-  });
-}
-
-async function searchRiskLimitListPaged(
-  params: PickRPCParamsType<
-    Parameters<typeof fetch['POST/report-service/api/rpc/method=searchRiskLimitListPaged']>
-  >,
-) {
-  return fetch['POST/report-service/api/rpc/method=searchRiskLimitListPaged'](params, {
-    mock: false,
-  });
-}
-
 async function searchRiskLimitListByBaseDatePaged(
   params: PickRPCParamsType<
     Parameters<
@@ -28,13 +8,11 @@ async function searchRiskLimitListByBaseDatePaged(
   >,
 ) {
   return fetch['POST/report-service/api/rpc/method=searchRiskLimitListByBaseDatePaged'](params, {
-    mock: false,
+    mock: true,
   });
 }
 
 const ReportServices = {
-  importRiskLimit,
-  searchRiskLimitListPaged,
   searchRiskLimitListByBaseDatePaged,
 };
 

@@ -1,5 +1,5 @@
-import request from '@/tools/request';
-import { createFetch } from '../__apis__/request';
+import request from '@/utils/request';
+import { createFetch } from '@/__apis__/request';
 
 const fetch = createFetch(async options => {
   const { url, method, params, extra } = options;
