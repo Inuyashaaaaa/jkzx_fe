@@ -1,6 +1,4 @@
-import { HOST_TEST } from '@/constants/global';
 import { fetch, PickRPCParamsType } from '@/utils';
-import request from '@/utils/request';
 
 async function importRiskLimit(
   params: PickRPCParamsType<

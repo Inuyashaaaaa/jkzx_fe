@@ -54,7 +54,7 @@
 
 	- locales
 
-		- 本地化
+		- 语言本地化
 
 	- configs
 
@@ -165,6 +165,8 @@
 	- Maps
 	- Enums
 	- List
+	- Services
+	- Model
 
 ### 3. 方法名称
 
@@ -173,5 +175,19 @@
 	- handleXXXX
 
 - 动词开头
+
+### 4. 文件命名
+
+- 小写中划线分割
+
+## Todos
+
+### 1. 替换 dva/fetch 为 umi-request
+
+### 2. 合并 containers，components 和 tools，utils
+
+### 3. 重构老页面结构
+
+### 4. 编写代码设计文档，搭建可访问页面
 
 *XMind - Trial Version*
