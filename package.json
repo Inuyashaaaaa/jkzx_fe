@@ -5,7 +5,7 @@
     "dev": "cross-env PORT=8012 umi dev",
     "start": "yarn dev",
     "start:no-mock": "cross-env MOCK=none yarn run start",
-    "build": "yarn run check-env && cross-env UMI_ENV=prod umi build",
+    "build": "cross-env UMI_ENV=prod umi build",
     "build:zero": "npm run check-env && yarn install && cross-env UMI_ENV=prod umi build",
     "deploy:test": "cross-env DEPLOY_DIST=test node ./scripts/deploy.js",
     "deploy:release": "cross-env DEPLOY_DIST=release node ./scripts/deploy.js",
