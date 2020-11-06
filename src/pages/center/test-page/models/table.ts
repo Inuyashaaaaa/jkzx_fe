@@ -2,7 +2,7 @@
 import { ReportServices } from '@/pages/center/test-page/services/report-service';
 import { ModelNameSpaces } from '@/typings';
 import { PickServiceReturnType } from '@/utils';
-import createModel, { PayloadAction } from '@ty-fee-tools/create-dva-model';
+import createModel, { PayloadAction } from '@/../libs/create-dva-model';
 import { PaginationConfig } from 'antd/lib/table';
 import { SorterResult } from 'antd/lib/table/interface';
 import moment from 'moment';
