@@ -9,7 +9,7 @@
  * Rap仓库 地址: http://10.1.5.117:3000/repository/editor?id=33
  */
 
-import * as commonLib from '@ty-devops-tools/api-generator/runtime/commonLib';
+import * as commonLib from '@/../libs/api-generator/runtime/commonLib';
 import { ResponseData, ResultData, BCTAPIData } from '@/utils/request';
 
 export interface IModels {

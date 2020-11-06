@@ -21,7 +21,7 @@
       "@@/*": ["./src/.umi/*"]
     }
   },
-  "include": ["./src", "./typings"],
+  "include": ["./src", "./typings", "libs"],
   "exclude": [
     "node_modules",
     "build",
