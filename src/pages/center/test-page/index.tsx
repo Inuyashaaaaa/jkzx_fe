@@ -1,10 +1,9 @@
-import { VERTICAL_GUTTER } from '@/constants/global';
-import { ThemeButton, ThemeInput, ThemeTable } from '@/containers';
-import {
+import { GutterEnums } from '@/constants';
+import { DownloadExcelButton, ThemeButton, ThemeInput, ThemeTable } from '@/components';
+import RiskControlIndexReportModelInstance, {
   RiskControlIndexReportModel,
-  RiskControlIndexReportWithEnhanced,
 } from '@/pages/center/test-page/models/table';
-import { ModelNameSpaces, RootStore } from '@/typings';
+import { ModelNameSpaces, RootStore } from '@/types';
 import { Col, Row } from 'antd';
 import { TableProps } from 'antd/lib/table/interface';
 import { connect } from 'dva';
@@ -12,6 +11,7 @@ import utl from 'lodash';
 import React, { memo, useEffect } from 'react';
 import { Dispatch } from 'redux';
 import { MainTableColumnsList } from '@/pages/center/test-page/constants';
+import { PaginationConfig } from 'antd/lib/pagination';
 
 type RiskControlIndexReportProps = {} & {
   dispatch: Dispatch<any>;
@@ -20,7 +20,7 @@ type RiskControlIndexReportProps = {} & {
   };
 
 const RiskControlIndexReport = memo<RiskControlIndexReportProps>(
-  connect(store => {
+  connect((store) => {
     const { [ModelNameSpaces.RiskControlIndexReportModel]: model, loading } = store as RootStore;
     return {
       ...utl.pick(model, ['traderTableData', 'pagination', 'total', 'searchData']),
@@ -30,11 +30,10 @@ const RiskControlIndexReport = memo<RiskControlIndexReportProps>(
   })((props: RiskControlIndexReportProps) => {
     const { dispatch, pagination, searchLoading, total, traderTableData, searchData } = props;
 
-    const handleTableChange: TableProps<any>['onChange'] = (_pagination, filters, _sorter) => {
+    const handleTableChange: TableProps<any>['onChange'] = (_pagination: PaginationConfig) => {
       dispatch(
-        RiskControlIndexReportWithEnhanced.actions.setTableMeta({
+        RiskControlIndexReportModelInstance.actions.setTableMeta({
           pagination: _pagination,
-          sorter: _sorter,
         }),
       );
     };
@@ -43,12 +42,12 @@ const RiskControlIndexReport = memo<RiskControlIndexReportProps>(
       triggerFetchTableData();
     };
 
-    const handleInputChange = event => {
-      dispatch(RiskControlIndexReportWithEnhanced.actions.setSearchData(event.target.value));
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch(RiskControlIndexReportModelInstance.actions.setSearchData(event.target.value));
     };
 
     const triggerFetchTableData = () => {
-      dispatch(RiskControlIndexReportWithEnhanced.asyncActions.fetchTableData());
+      dispatch(RiskControlIndexReportModelInstance.asyncActions.fetchTableData());
     };
 
     useEffect(() => {
@@ -57,16 +56,30 @@ const RiskControlIndexReport = memo<RiskControlIndexReportProps>(
 
     return (
       <div>
-        <Row type="flex" justify="start">
+        <Row justify="start" gutter={12}>
           <Col>
             <ThemeInput value={searchData} onChange={handleInputChange}></ThemeInput>
           </Col>
           <Col>
             <ThemeButton onClick={handleSearch}>搜索</ThemeButton>
           </Col>
+          <Col>
+            <DownloadExcelButton
+              fileName="下载文件名称"
+              configs={[
+                {
+                  sheetName: 'sheetName1',
+                  dataSource: traderTableData,
+                  columns: MainTableColumnsList,
+                },
+              ]}
+            >
+              下载
+            </DownloadExcelButton>
+          </Col>
         </Row>
         <ThemeTable
-          style={{ marginTop: VERTICAL_GUTTER }}
+          style={{ marginTop: GutterEnums.Vertical }}
           pagination={{
             ...pagination,
             total,

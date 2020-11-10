@@ -1,5 +1,4 @@
 import React from 'react';
-import Demo from './components/text';
 
 const WelcomePage = () => (
   <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
@@ -18,7 +17,7 @@ const WelcomePage = () => (
         width: '100%',
       }}
     >
-      <Demo />
+      var-on-the-fly-testing
     </div>
   </div>
 );

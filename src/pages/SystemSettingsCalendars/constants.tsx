@@ -1,3 +1,0 @@
-export const DEFAULT_CALENDAR = 'DEFAULT_CALENDAR';
-
-export const HOLIDAY_FORMAT = 'YYYY-MM-DD';

@@ -1,10 +1,8 @@
 module.exports = {
   extends: [require.resolve('@umijs/fabric/dist/eslint')],
   globals: {
-    cy: true,
-  },
-  rules: {
-    'eslint-comments/disable-enable-pair': 0,
-    'eslint-comments/no-unlimited-disable': 0,
+    ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION: true,
+    page: true,
+    REACT_APP_ENV: true,
   },
 };

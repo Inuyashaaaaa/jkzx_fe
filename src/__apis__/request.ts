@@ -29,8 +29,8 @@ export interface IModels {
     Res: {
       jsonrpc?: string;
       id?: string;
-      result?: {
-        page?: {
+      result: {
+        page: {
           uuid?:
             | string
             | number
@@ -68,7 +68,7 @@ export interface IModels {
            */
           criticalLimit?: number;
         }[];
-        totalCount?: number;
+        totalCount: number;
       };
     };
   };

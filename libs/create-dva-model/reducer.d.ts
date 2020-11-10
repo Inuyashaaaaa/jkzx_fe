@@ -1,6 +1,6 @@
 import { Draft } from 'immer';
 import { AnyAction } from 'redux';
-import { CaseEffectsActions, SliceCaseEffects, SubscriptionsMapObject } from './effect';
+import { CaseEffectsActions, SliceCaseEffects } from './effect';
 export interface Action<T = any> {
     type: T;
 }
@@ -77,12 +77,10 @@ export declare type CaseReducerActions<CaseReducers extends SliceCaseReducers<an
         prepare: any;
     } ? ActionCreatorForCaseReducerWithPrepare<CaseReducers[Type]> : ActionCreatorForCaseReducer<CaseReducers[Type]>;
 };
-export declare interface Slice<State = any, CaseReducers extends SliceCaseReducers<State> = SliceCaseReducers<State>, Name extends string = string, CaseEffects extends SliceCaseEffects<State> = SliceCaseEffects<State>> {
-    namespace: Name;
+export declare interface Slice<State = any, CaseReducers extends SliceCaseReducers<State> = SliceCaseReducers<State>, CaseEffects extends SliceCaseEffects<State, CaseReducers> = SliceCaseEffects<State, CaseReducers>> {
     actions: CaseReducerActions<CaseReducers>;
-    asyncActions: CaseEffectsActions<CaseEffects>;
+    asyncActions: CaseEffectsActions<State, CaseReducers, CaseEffects>;
 }
-export declare function createSlice<State, CaseReducers extends SliceCaseReducers<State>, Name extends string = string>(options: CreateSliceOptions<State, CaseReducers, Name>): Slice<State, CaseReducers, Name>;
 export declare type ValidateSliceCaseReducers<S, ACR extends SliceCaseReducers<S>> = ACR & {
     [T in keyof ACR]: ACR[T] extends {
         reducer(s: S, action?: infer A): any;
@@ -90,11 +88,9 @@ export declare type ValidateSliceCaseReducers<S, ACR extends SliceCaseReducers<S
         prepare(...a: never[]): Omit<A, 'type'>;
     } : {};
 };
-export declare interface CreateSliceOptions<State = any, CR extends SliceCaseReducers<State> = SliceCaseReducers<State>, Name extends string = string, CE extends SliceCaseEffects<State> = SliceCaseEffects<State>> {
+export declare interface CreateSliceOptions<State = any, CR extends SliceCaseReducers<State> = SliceCaseReducers<State>, Name extends string = string> {
     namespace: Name;
     state: State;
     reducers: ValidateSliceCaseReducers<State, CR>;
-    effects?: CE;
-    subscriptions?: SubscriptionsMapObject;
 }
 export {};

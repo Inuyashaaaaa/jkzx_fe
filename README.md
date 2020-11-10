@@ -10,82 +10,81 @@ yarn run dev
 
 修改本地代理，打开 `config/config.local.js` 修改 target 值
 
-
 ## 文件结构
 
 ### 路由结构和文件结构映射关系
 
 - pages 下的文件夹结构，除模块定义外和页面路由一一对应
 
-	- src/center/*
+  - src/center/\*
 
 ### 模块划分
 
 - modules
 
-	- components
+  - components
 
-		- 公共组件
+    - 公共组件
 
-	- hooks
+  - hooks
 
-		- 通用状态处理逻辑
+    - 通用状态处理逻辑
 
-	- utils
+  - utils
 
-		- 工具方法
+    - 工具方法
 
-	- typings
+  - typings
 
-		- 类型定义
+    - 类型定义
 
-	- services
+  - services
 
-		- 异步服务
+    - 异步服务
 
-	- constants
+  - constants
 
-		- 常量定义
+    - 常量定义
 
-	- docs
+  - docs
 
-		- 界面功能文档，代码设计文档
+    - 界面功能文档，代码设计文档
 
-	- tests
+  - tests
 
-		- 单元测试
+    - 单元测试
 
-	- e2es
+  - e2es
 
-		- 端到端测试
+    - 端到端测试
 
-	- assets
+  - assets
 
-		- 资源文件
+    - 资源文件
 
-	- locales
+  - locales
 
-		- 语言本地化
+    - 语言本地化
 
-	- configs
+  - configs
 
-		- 静态配置
+    - 静态配置
 
-	- models
+  - models
 
-		- 数据中心
+    - 数据中心
 
-	- selectors
+  - selectors
 
-		- model 选择器
+    - model 选择器
 
-	- styles
+  - styles
 
-		- 样式
+    - 样式
 
-	- fixtures
+  - fixtures
 
-		- 指纹代码，比如以 json 结尾的数据文件
+    - 指纹代码，比如以 json 结尾的数据文件
 
 ## 视图控制层
 
@@ -93,31 +92,31 @@ yarn run dev
 
 - subscriptions
 
-	- {[key in string]: (options: { dispatch, history } => void)}
+  - {[key in string]: (options: { dispatch, history } => void)}
 
 - effects
 
-	- call
+  - call
 
-		- 异步数据返回继续执行迭代器
+    - 异步数据返回继续执行迭代器
 
-	- put
+  - put
 
-		- 触发其他迭代器对象生成并执行，或者触发 reducer 函数执行
+    - 触发其他迭代器对象生成并执行，或者触发 reducer 函数执行
 
-	- select
+  - select
 
-		- 从 store 中获取数据
+    - 从 store 中获取数据
 
-	- generators
+  - generators
 
-		- 迭代器生成器对象
+    - 迭代器生成器对象
 
-			- 迭代器的启停可以和外部数据交换
+      - 迭代器的启停可以和外部数据交换
 
 - reducers
 
-	- (state, action) => state
+  - (state, action) => state
 
 ## 演示 Demo
 
@@ -129,32 +128,32 @@ yarn run dev
 
 - 1. 定义 model
 
-	- create-dva-model
+  - create-dva-model
 
-		- model 类型推导工具
+    - model 类型推导工具
 
-	- 调用服务
+  - 调用服务
 
-		- api-generator
+    - api-generator
 
-			- 自动化静态类型请求代码生成工具
-			- 公共接口文档平台
+      - 自动化静态类型请求代码生成工具
+      - 公共接口文档平台
 
-	- 定义 reducers 处理状态更新逻辑
+  - 定义 reducers 处理状态更新逻辑
 
 - 2. 构建视图
 
-	- themes components
+  - themes components
 
-		- 主题组件
+    - 主题组件
 
-	- 绑定 model
+  - 绑定 model
 
-		- 编写交互
+    - 编写交互
 
-			- 函数式派发 action
+      - 函数式派发 action
 
-		- connect 关联状态
+    - connect 关联状态
 
 ## 开发约定
 
@@ -162,9 +161,9 @@ yarn run dev
 
 - 优先使用命名导出
 
-	- 模块使用 index 入口导出
+  - 模块使用 index 入口导出
 
-		- 框架约定除外，比如 models
+    - 框架约定除外，比如 models
 
 ### 2. 常量编写
 
@@ -172,18 +171,18 @@ yarn run dev
 - 大驼峰
 - 后缀定义
 
-	- Cont
-	- Maps
-	- Enums
-	- List
-	- Services
-	- Model
+  - Cont
+  - Maps
+  - Enums
+  - List
+  - Services
+  - Model
 
 ### 3. 方法名称
 
 - 事件处理
 
-	- handleXXXX
+  - handleXXXX
 
 - 动词开头
 
@@ -197,12 +196,18 @@ yarn run dev
 
 ## Todos
 
-### 1. 替换 dva/fetch 为 umi-request
+- [x] 替换 dva/fetch 为 umi-request
 
-### 2. 合并 containers，components 和 tools，utils
+- [x] 合并 containers，components 和 tools，utils
 
-### 3. 重构老页面结构
+- [x] 重构老页面结构
 
-### 4. 编写代码设计文档，搭建可访问页面
+- [ ] 编写代码设计文档，搭建可访问页面
 
-*XMind - Trial Version*
+## 新版本注意事项
+
+1. `create-dva-model` 调用参数变化，从对象变为了 3 个对象，可以在 `effects` 和 `subscription` 中获取 `actions` 和 `asyncActions` 进行调用来获得当前 model actions
+
+2. 新导航过滤和生成参考 `src/layouts/sider.tsx`
+
+3. 导出组件调用方式参考测试页面

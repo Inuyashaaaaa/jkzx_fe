@@ -1,1 +1,0 @@
-export const SOCKET_EVENT_TYPE = 'SOCKET_EVENT_TYPE';

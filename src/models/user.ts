@@ -1,93 +1,92 @@
-import _ from 'lodash';
-import router from 'umi/router';
-import { PERMISSIONS } from '@/constants/user';
-import { updatePermission } from '@/services/permission';
-import { getUser, setUser } from '@/tools/authority';
-import { mockUserInfo } from '@/fixtures/mock-user';
+/* eslint-disable no-param-reassign */
+import createModel, { PayloadAction } from '@/../libs/create-dva-model';
+import { ReportServices } from '@/pages/center/test-page/services/report-service';
+import { ModelNameSpaces, RootStore } from '@/types/index';
+import { PickServiceReturnType } from '@/utils';
+import { PaginationConfig } from 'antd/lib/pagination';
+import moment from 'moment';
+import { getRoutes } from '@@/core/routes';
 
-export default {
-  namespace: 'user',
+interface MenuItem {
+  path: string;
+  exact: boolean;
+  component: React.ComponentClass;
+  routes?: MenuItem[];
+}
 
-  state: {
-    currentUser: {},
+const initialState = {
+  // 登录用户
+  userinfo: {
+    username: '',
+    token: '',
   },
-
-  effects: {
-    // 从本地项目获取 userInfo 数据
-    *replenish({ payload: { loginUrl, skipMenu } }, { put, call }) {
-      // const userInfo = getUser();
-      // if (_.isEmpty(userInfo)) {
-      //   // router.push('/user/login');
-      //   router.push(loginUrl);
-      //   return;
-      // }
-
-      const userInfo = mockUserInfo;
-
-      // 调用接口更新权限
-      // const updatedPermissionUserInfo = yield call(updatePermission, {
-      //   ...userInfo,
-      //   permissions: PERMISSIONS,
-      // });
-
-      yield put({
-        type: 'replenishUserInfo',
-        payload: { skipMenu, userInfo },
-      });
-
-      // eslint-disable-next-line no-underscore-dangle
-      if (window._hmt && userInfo.username) {
-        // eslint-disable-next-line no-underscore-dangle
-        window._hmt.push(['_setUserTag', '7350', userInfo.username]);
-      }
-    },
-
-    *replenishUserInfo({ payload: { userInfo = {}, skipMenu = false } }, { put }) {
-      yield put({
-        type: 'saveUserData',
-        payload: userInfo,
-      });
-      if (skipMenu) return;
-      yield put({
-        type: 'menu/initMenu',
-        payload: userInfo,
-      });
-      yield put({
-        type: 'menu/initCenterMenu',
-        payload: userInfo,
-      });
-    },
-
-    *cleanCurrentUser($, { put }) {
-      yield put({
-        type: 'saveUserData',
-        payload: {},
-      });
-    },
-  },
-
-  reducers: {
-    saveUserData(state, action) {
-      setUser(action.payload);
-
-      return {
-        ...state,
-        currentUser: action.payload,
-      };
-    },
-
-    setRoles(state, action) {
-      const currentUser = {
-        ...state.userInfo,
-        roles: action.payload || [],
-      };
-
-      setUser(currentUser);
-
-      return {
-        ...state,
-        currentUser,
-      };
-    },
-  },
+  menus: getRoutes() as MenuItem[],
 };
+
+const model = createModel(
+  {
+    namespace: ModelNameSpaces.User,
+    state: initialState,
+    reducers: {
+      setDataWhenTableFetchSuccess(
+        state,
+        action: PayloadAction<{
+          total: number;
+          list: any[];
+        }>,
+      ) {
+        const { list, total } = action.payload;
+        state.traderTableData = list.sort(
+          (a, b) => moment(b.updatedAt).valueOf() - moment(a.updatedAt).valueOf(),
+        );
+        state.total = total;
+      },
+      setSearchData(state, action: PayloadAction<string>) {
+        state.searchData = action.payload;
+      },
+      setTableMeta(
+        state,
+        action: PayloadAction<{
+          pagination: PaginationConfig;
+        }>,
+      ) {
+        const { pagination } = action.payload;
+        state.pagination = pagination;
+      },
+    },
+  },
+  {
+    *fetchTableData(action: PayloadAction<undefined>, { put, call, select, actions }) {
+      const { searchData, pagination } = (yield select(
+        ({ [ModelNameSpaces.RiskControlIndexReportModel]: RiskControlIndexReport }) =>
+          RiskControlIndexReport,
+      )) as RootStore[ModelNameSpaces.RiskControlIndexReportModel];
+
+      const {
+        data: {
+          error,
+          data: { result },
+        },
+      } = (yield call(ReportServices.searchRiskLimitListByBaseDatePaged, {
+        baseDate: searchData,
+        page: (pagination.current || 1) - 1,
+        pageSize: pagination.pageSize,
+      })) as PickServiceReturnType<typeof ReportServices.searchRiskLimitListByBaseDatePaged>;
+
+      if (error) return;
+
+      const { page, totalCount } = result;
+
+      yield put(
+        actions.setDataWhenTableFetchSuccess({
+          list: page,
+          total: totalCount,
+        }),
+      );
+    },
+  },
+);
+
+export { initialState };
+
+export default model;

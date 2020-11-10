@@ -8,9 +8,7 @@ _roadhog-api-doc
 
 # production
 /dist
-/docs
-/cdocs
-/mochawesome-report
+/.vscode
 
 # misc
 .DS_Store
@@ -19,16 +17,16 @@ yarn-error.log
 
 /coverage
 .idea
+yarn.lock
 package-lock.json
 *bak
-.pnp*
+.vscode
 
 # visual studio code
 .history
 *.log
-
+functions/*
 .temp/**
-.docz
 
 # umi
 .umi
@@ -37,3 +35,8 @@ package-lock.json
 # screenshot
 screenshot
 .firebase
+.eslintcache
+
+build
+
+*.local.*
