@@ -32,12 +32,12 @@ export interface IModels {
       result: {
         page: {
           uuid?:
-            | string
-            | number
-            | boolean
-            | {
-                [k: string]: any;
-              };
+          | string
+          | number
+          | boolean
+          | {
+            [k: string]: any;
+          };
           baseDate?: string;
           /**
            * 指标名称
@@ -318,6 +318,39 @@ export interface IModels {
       result?: number;
     };
   };
+  /**
+  * 接口名: 子公司整体var查询
+  */
+  'POST/var-service/api/rpc/method=varSearchPartyRecords':{
+    Req: {
+      method?: string
+      params?: {
+        date: string
+        confidenceLevel: number
+        varDay: number
+        sortBy: string
+        sortDirection: string
+        pageSize: number
+        pageNumber: number
+      }
+    },
+    Res: {
+      jsonrpc?: string
+      id?: string
+      result?: {
+        page?: {
+          reportingDate: string
+          partyName: string
+          netCapital: number
+          netAsset: number
+          var: number
+          varByNetCapital: number
+          varByNetAsset: number
+        }[]
+        totalCount: number
+      }
+    }
+  }
 }
 
 type ResSelector<T extends BCTAPIData> = ResponseData<ResultData<T>>;
@@ -352,6 +385,9 @@ export interface IResponseTypes {
   'GET/trade-service/api/rpc/method=tradeExercisePreSettle': ResSelector<
     IModels['GET/trade-service/api/rpc/method=tradeExercisePreSettle']['Res']
   >;
+  'POST/var-service/api/rpc/method=varSearchPartyRecords': ResSelector<
+    IModels['POST/var-service/api/rpc/method=varSearchPartyRecords']['Res']
+  >
 }
 
 export function createFetch(fetchConfig: commonLib.RequesterOption) {
@@ -1099,6 +1135,21 @@ export function createFetch(fetchConfig: commonLib.RequesterOption) {
         schemas,
         extra,
       }) as Promise<IResponseTypes['POST/trade-service/api/rpc?method=mktStockSearch']>;
+    },
+
+    'POST/var-service/api/rpc/method=varSearchPartyRecords': (
+      req?: IModels['POST/var-service/api/rpc/method=varSearchPartyRecords']['Req'],
+      extra?: commonLib.IExtra
+    ) => {
+      return rapperFetch({
+        url:
+          extra && extra.mock
+            ? ''
+            : '/var-service/api/rpc/method=varSearchPartyRecords',
+        method: 'POST',
+        params: req,
+        extra
+      })
     },
 
     /**

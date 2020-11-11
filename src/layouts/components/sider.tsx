@@ -3,9 +3,9 @@ import { ModelNameSpaces, RootStore } from '@/types';
 import React, { memo } from 'react';
 import { Link, useIntl } from 'umi';
 import { useDispatch, useSelector } from 'dva';
+import utl from 'lodash';
 import styles from './sider.less';
 import User from './user';
-import utl from 'lodash';
 
 const { SubMenu, Item } = ThemeMenu;
 
@@ -14,7 +14,6 @@ const Sider = memo((props) => {
 
   const dispatch = useDispatch();
   const { menus } = useSelector((state: RootStore) => {
-    console.log('123123123', state);
     return state[ModelNameSpaces.User];
   });
 

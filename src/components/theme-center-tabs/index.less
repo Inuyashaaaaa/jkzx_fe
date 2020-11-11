@@ -1,0 +1,40 @@
+.scope {
+  :global {
+    .ant-tabs-nav::before {
+      border-bottom: none;
+    }
+
+    .ant-tabs-tab {
+      width: 300px;
+      margin: 0 1px;
+      padding-top: 7px;
+      padding-bottom: 7px;
+      background: #04537E;
+      border: none;
+
+      &.ant-tabs-tab-active {
+        background: rgba(0, 232, 232, 0.3);
+        border: 1px solid rgba(0, 232, 232, 0.8);
+      }
+    }
+
+    .ant-tabs-tab-btn {
+      width: 300px;
+      text-align: center;
+      font-family: PingFang SC;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 18px;
+      line-height: 25px;
+      color: #F6FAFF;
+    }
+
+    .ant-tabs-nav-wrap {
+      margin-bottom: 0;
+    }
+
+    .ant-tabs-ink-bar {
+      display: none !important;
+    }
+  }
+}

@@ -1,0 +1,337 @@
+@panel-bg-color: #092157;
+@panel-title-color: #ffc40f;
+@panel-title-hover-color: #daa60d;
+@normal-date-color: #01c7d1;
+@normal-date-border-color: #01c7d1;
+@normal-date-hover-color: #ffffff;
+@week-title-color: #ffc40f;
+@today-date-color: #ffffff;
+@today-date-hover-color: #01c7d1;
+
+@disabled-date-color: #006aa1;
+@week-title-color: #ffc40f;
+
+@today-date-bg-color: #092157;
+@today-date-border-color: #01c7d1;
+@in-range-cell-bg-color: #0b336a;
+@selected-date-bg-color: #1594cf;
+@selected-day-color: #f6faff;
+@show-date-color: #f6faff;
+@date-icon-color: #f6faff;
+@split-color: #045480;
+@normal-date-hover-bg-color: #0b336a;
+
+.scope {
+  :global {
+
+    // 日期整个背景
+    .ant-picker-panel-container {
+      background-color: @panel-bg-color;
+    }
+
+    .ant-picker-panel {
+      border: none;
+    }
+
+    // 日期顶部样式
+    .ant-picker-header-view {
+      color: @panel-title-color;
+    }
+
+    .ant-picker-year-btn,
+    .ant-picker-month-btn,
+    .ant-picker-decade-btn {
+      &:hover {
+        color: @panel-title-hover-color;
+      }
+    }
+
+    .ant-picker-header {
+      border-bottom: 1px solid @normal-date-border-color;
+    }
+
+    // 换页的
+    .ant-picker-header-super-prev-btn,
+    .ant-picker-header-prev-btn,
+    .ant-picker-header-next-btn,
+    .ant-picker-header-super-next-btn {
+      color: @normal-date-color;
+      &:hover {
+        color: @normal-date-hover-color
+      }
+    }
+
+    // 日期内部
+    .ant-picker-content tr>th {
+      color: @week-title-color;
+    }
+
+    .ant-picker-content tr>td {
+      color: @today-date-color;
+
+      &:hover {
+        .ant-picker-cell-inner {
+          background-color: @today-date-hover-color !important;
+        }
+      }
+    }
+
+    .ant-picker-cell-selected div {
+      background: @today-date-hover-color !important;;
+    }
+
+    .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+      border: 1px solid @today-date-hover-color;
+    }
+
+    // 日期底部
+    .ant-picker-footer {
+      border-top: 1px solid @normal-date-border-color;
+    }
+
+
+
+
+
+
+
+
+
+
+    .ant-selected-day .ant-date {
+      background-color: transparent;
+    }
+
+    .ant-range-middle {
+      color: #00e8e8;
+    }
+
+    .ant-header a:hover,
+    .ant-year-panel-header a:hover {
+      color: @normal-date-color;
+    }
+
+    .ant-decade-panel-header {
+      height: 41px;
+      border-bottom-color: @split-color;
+    }
+
+    .ant-footer {
+      border-top-color: @split-color;
+    }
+
+    .ant-header {
+      border-bottom-color: @split-color;
+    }
+
+    .ant-decade-panel,
+    .ant-year-panel,
+    .ant-month-panel {
+      background-color: @panel-bg-color;
+    }
+
+    .ant-year-panel-decade-select,
+    .ant-year-panel-prev-decade-btn,
+    .ant-year-panel-next-decade-btn,
+    .ant-month-panel-year-select,
+    .ant-month-panel-prev-year-btn,
+    .ant-month-panel-next-year-btn,
+    .ant-decade-panel-century,
+    .ant-decade-panel-prev-century-btn,
+    .ant-decade-panel-next-century-btn {
+      color: #fff;
+    }
+
+    .ant-decade-panel-cell {
+
+      &.ant-decade-panel-last-century-cell,
+      &.ant-decade-panel-next-century-cell {
+        .ant-decade-panel-decade {
+          color: @disabled-date-color;
+        }
+      }
+
+      &.ant-decade-panel-cell-disabled {
+        .ant-decade-panel-decade {
+          color: #006aa1;
+          background: #0b336a;
+          cursor: not-allowed;
+        }
+      }
+
+      &.ant-decade-panel-selected-cell {
+        .ant-decade-panel-decade {
+          color: @today-date-color;
+          background: @today-date-bg-color;
+          border: 1px solid @today-date-border-color;
+        }
+      }
+
+      .ant-decade-panel-decade {
+        color: @normal-date-color;
+
+        &:hover {
+          color: @normal-date-hover-color  !important;
+          background: @normal-date-hover-bg-color;
+        }
+      }
+    }
+
+    .ant-month-panel-cell {
+      &.ant-month-panel-cell-disabled {
+        .ant-month-panel-month {
+          color: #006aa1;
+          background: #0b336a;
+          cursor: not-allowed;
+        }
+      }
+
+      &.ant-month-panel-selected-cell {
+        .ant-month-panel-month {
+          color: @today-date-color;
+          background: @today-date-bg-color;
+          border: 1px solid @today-date-border-color;
+        }
+      }
+
+      .ant-month-panel-month {
+        color: @normal-date-color;
+
+        &:hover {
+          color: @normal-date-hover-color  !important;
+          background: @normal-date-hover-bg-color;
+        }
+      }
+    }
+
+    .ant-year-panel-cell {
+
+      &.ant-year-panel-last-decade-cell,
+      &.ant-year-panel-next-decade-cell {
+        .ant-year-panel-year {
+          color: @disabled-date-color;
+        }
+      }
+
+      &.ant-year-panel-selected-cell {
+        .ant-year-panel-year {
+          color: @today-date-color;
+          background: @today-date-bg-color;
+          border: 1px solid @today-date-border-color;
+        }
+      }
+
+      .ant-year-panel-year {
+        color: @normal-date-color;
+
+        &:hover {
+          color: @normal-date-hover-color  !important;
+          background: @normal-date-hover-bg-color;
+        }
+      }
+    }
+
+    .ant-input-wrap {
+      border-bottom-color: @split-color;
+    }
+
+    .ant-range .ant-body,
+    .ant-range .ant-month-panel-body,
+    .ant-range .ant-year-panel-body {
+      border-top-color: @split-color;
+    }
+
+    .ant-prev-year-btn,
+    .ant-prev-month-btn,
+    .ant-next-year-btn,
+    .ant-next-month-btn {
+      color: @date-icon-color;
+    }
+
+    .ant {
+      background: @panel-bg-color;
+      border: none;
+    }
+
+    .ant-input {
+      color: #00e8e8;
+      background-color: @panel-bg-color;
+    }
+
+    .ant-range .ant-input {
+      color: #00e8e8;
+    }
+
+    .ant-date {
+      color: @normal-date-color;
+
+      &:hover {
+        color: #fff;
+        background: @normal-date-hover-bg-color;
+      }
+    }
+
+    .ant-column-header-inner {
+      color: @week-title-color;
+    }
+
+    .ant-year-select,
+    .ant-month-select {
+      color: @show-date-color;
+    }
+
+    .ant-cell {
+
+      &.ant-next-month-btn-day,
+      &.ant-last-month-cell {
+        .ant-date {
+          color: @disabled-date-color;
+        }
+      }
+
+      &.ant-today {
+        .ant-date {
+          color: @today-date-color;
+          border-color: @today-date-border-color;
+        }
+
+        &.ant-selected-date {
+          .ant-date {
+            background: transparent;
+
+            &:hover {
+              background: @normal-date-hover-bg-color;
+            }
+          }
+        }
+      }
+
+      &.ant-in-range-cell {
+        &::before {
+          background: @in-range-cell-bg-color;
+        }
+      }
+
+      &.ant-selected-day {
+        .ant-date {
+          color: @selected-day-color;
+        }
+      }
+
+      &.ant-selected-date,
+      &.ant-selected-start-date,
+      &.ant-selected-end-date {
+        .ant-date {
+          background: @selected-date-bg-color;
+        }
+      }
+    }
+
+    .ant-disabled-cell {
+      .ant-date {
+        color: @disabled-date-color;
+        background: @split-color;
+      }
+    }
+  }
+}

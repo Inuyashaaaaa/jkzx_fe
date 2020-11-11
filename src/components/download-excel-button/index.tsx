@@ -71,29 +71,32 @@ const DownloadExcelButton = memo<DownloadExcelButtonProps>((props) => {
 
     const wb = XLSX.utils.book_new();
 
-    configs.forEach((meta, index) => {
+    configs.forEach((meta) => {
       const { sheetName, dataSource, getSheetDataSourceItemMeta, columns } = meta;
 
       const rowDatas = [
         columns.map((col: ColType) => col.title),
-        ...dataSource.map((record) => {
+        ...dataSource.map((record, _index) => {
           return columns.map((col: ColType) => {
             const { dataIndex } = col;
             if (dataIndex == null) {
               throw new Error(`${dataIndex} must be exist`);
             }
-            const val = record[Array.isArray(dataIndex) ? dataIndex.join('.') : dataIndex];
+
+            let val = record[Array.isArray(dataIndex) ? dataIndex.join('.') : dataIndex];
+            if (col.render) {
+              val = col.render(val, null, _index)
+            }
             return val;
           });
         }),
       ];
-
       const sheetDataSourceMeta = utl.flatten(
         rowDatas.map((rowData, rowIndex) => {
-          return rowData.map((cellVal: any, index: number) => ({
-            pos: `${getLetter(index)}${rowIndex + 1}`,
+          return rowData.map((cellVal: any, _index: number) => ({
+            pos: `${getLetter(_index)}${rowIndex + 1}`,
             value: cellVal,
-            meta: getSheetDataSourceItemMeta?.(cellVal, columns[index], rowIndex),
+            meta: getSheetDataSourceItemMeta?.(cellVal, columns[_index], rowIndex),
           }));
         }),
       );
@@ -115,7 +118,7 @@ const DownloadExcelButton = memo<DownloadExcelButtonProps>((props) => {
     XLSX.writeFile(wb, `${fileName}.xlsx`);
   };
 
-  return <ThemeButton {...restProps} onClick={handleBtnClick}></ThemeButton>;
+  return <ThemeButton {...restProps} onClick={handleBtnClick} />;
 });
 
 export default DownloadExcelButton;

@@ -12,3 +12,9 @@ export { default as ThemeStatistic } from './ThemeStatistic';
 export { default as ThemeTable } from './ThemeTable';
 export { default as ThemeTabs } from './ThemeTabs';
 export { default as DownloadExcelButton } from './download-excel-button';
+
+export { default as ThemeCenterTable } from './theme-center-table'
+export { default as ThemeCenterTabs } from './theme-center-tabs'
+export { default as ThemeCenterDatePicker } from './theme-date-picker'
+export { default as ThemeCenterInput } from './theme-center-input'
+export { default as ThemeCenterButtonGroup } from './theme-button-group'

@@ -5,7 +5,7 @@ import RiskControlIndexReportModelInstance, {
 } from '@/pages/center/test-page/models/table';
 import { ModelNameSpaces, RootStore } from '@/types';
 import { Col, Row } from 'antd';
-import { TableProps } from 'antd/lib/table/interface';
+import { TableProps } from 'antd/lib/table';
 import { connect } from 'dva';
 import utl from 'lodash';
 import React, { memo, useEffect } from 'react';
